@@ -1,6 +1,6 @@
 # JS/TS core CEL 지원 범위
 
-2026-11-02 생산 모듈 첫 이관. 이 문서는 `packages/core/src/cel/index.mjs`의 실제 지원 범위를 설명한다. 전체 CEL 명세, Dart 실행기, 전체 core/renderer의 적합성 완료를 뜻하지 않는다. 기존 `experiments/`와 archive는 수정하지 않았다.
+이 문서는 [JS/TS CEL 모듈](../../packages/core/src/cel/index.mjs)의 **현재 지원 의미와 제한**을 소유한다. `handoff` 경로에 있지만 과거 실험 지원표가 아니다. 정확한 함수 목록은 [supported-functions.json](../../packages/core/src/cel/supported-functions.json), 패치 출처·재현 절차는 [vendor 안내](../../packages/core/vendor/README.md), 제품 전체 실행 결과는 [검증 기록](core-verification-results.json)을 따른다. 전체 CEL 표준·Dart·다른 렌더러의 적합성으로 확대하지 않는다.
 
 ## 공개 진입점
 
@@ -66,6 +66,8 @@ timestamp/duration은 내부 CEL 중간값을 계산하는 기능이며 Viewstem
 
 ## 실행 검증
 
+아래는 2026-11-02 첫 생산 이관 시점의 검증 기록이다. 현재 실행 환경·결과·해시는 [제품 검증 결과](core-verification-results.json)를 따른다. 기록된 검사 수를 최신 결과처럼 수동 갱신하지 않는다.
+
 ```sh
 node --test packages/core/test/cel.test.mjs
 node packages/core/test/cel-browser.mjs
@@ -75,4 +77,4 @@ node packages/core/test/cel-browser.mjs
 
 별도 browser script는 production src/vendor를 esbuild로 browser IIFE bundle한 후 기존 고정 Playwright **1.62.1**을 테스트 드라이버로만 재사용한다. 위 Node 두 버전에서 각각 Node **25/25**, 실제 Chromium **151.0.7922.34 25/25**, pageerror **0**. 런타임 bundle에는 실험 모듈이 포함되지 않는다. 이 25건은 CEL 제품 경계의 브라우저 검사이며 모든 engine overload의 브라우저 전수 적합성 검사나 성능 benchmark가 아니다.
 
-등록 catalog는 목록 일치를 입증하며 모든 overload의 모든 경계값을 입증하지 않는다. 전체 CEL 표준 적합성·다른 브라우저·Dart·시간대 DB 버전 간 교차 결과·임의 호스트 코드 격리는 남은 제한이다. core 전체 패키지 build/typecheck/HTTP/registry 통합 결과는 해당 담당 검증 기록을 따른다.
+등록 catalog는 목록 일치를 입증하며 모든 overload의 모든 경계값을 입증하지 않는다. 전체 CEL 표준 적합성·다른 브라우저·Dart·시간대 DB 버전 간 교차 결과·임의 호스트 코드 격리는 남은 제한이다. core 전체 build/typecheck/HTTP/registry 통합 결과는 [제품 검증 기록](core-verification-results.json)을 따른다.

@@ -97,12 +97,12 @@
       "dist/THIRD-PARTY-NOTICES.txt",
       "package.json"
     ],
-    "integrity": "sha512-EQhoWLrpoqSNUTCi9430jCtTCP7jjuhNpkMkQNZBYIm5TvwFIP3GFKxEtokbah+cCsT3E3L/l9kHL/Jgt34H7Q==",
-    "bytes": 273539,
-    "unpackedBytes": 1193493,
+    "integrity": "sha512-v/A+nt32PQELFJfOaUMW4oaiUG9OvGu6dfi+H/9NkcaQSX6lMik8vauGPLEkY3/zMkEUX+MC3TAlHlwLpJMRRw==",
+    "bytes": 274191,
+    "unpackedBytes": 1195059,
     "runtime": "passed",
     "types": "passed",
-    "readmeSha256": "d1c3bb131528b8439af1d1511f1776738647efccbdb0481d618cb0036cdde949"
+    "readmeSha256": "f91f9e608228d4082c7e5bfe5bd1484f1390f69801e4eec652450559b5108b60"
   },
   "repeatedBuildByteIdentical": true,
   "artifactSha256": {
@@ -662,5 +662,132 @@
     ],
     "beforeEvidence": "packages/core/test/results/preflight-before-adbad43/ (ignored local original reports/repros); committed source and documents at adbad431",
     "remoteActions": "No commit, push, PR, remote CI, version change or publication"
+  },
+  "documentationRefactor": {
+    "date": "2026-11-02",
+    "scope": "Approved documentation refactor; existing paths and canonical contracts retained. No product code or test changes.",
+    "reviewedHeadSha": "adbad431b9e92f58cacf1dae72e88bbf6efbe254",
+    "worktreeBasis": "Existing uncommitted branch-preflight fixes were preserved.",
+    "profile": "Existing thin task router + canonical owners + historical and pending work records",
+    "changedMarkdownFiles": [
+      "README.md",
+      "docs/README.md",
+      "docs/VIEWSTEM-SPEC.md",
+      "docs/handoff/acceptance-matrix.md",
+      "docs/handoff/core-cel-support.md",
+      "docs/handoff/core-implementation-2026-11-02.md",
+      "docs/handoff/implementation-start.md",
+      "docs/handoff/open-contracts.md",
+      "docs/handoff/verification-ledger.md",
+      "docs/spec/08-readiness-conformance.md",
+      "docs/spec/09-preserved-contracts.md",
+      "packages/core/README.md"
+    ],
+    "structuralScope": {
+      "markdownFiles": 40,
+      "jsonArtifacts": [
+        "docs/handoff/core-acceptance-coverage.json",
+        "docs/handoff/core-verification-results.json"
+      ]
+    },
+    "structuralVerification": {
+      "markdownFiles": 40,
+      "localFileLinks": 782,
+      "markdownFragmentLinks": 234,
+      "inboundFragmentLinks": 8,
+      "missingFiles": [],
+      "missingAnchors": [],
+      "inboundMissing": [],
+      "removedHeadingAnchors": [],
+      "unreachable": [],
+      "optionalLocalLinks": [
+        [
+          "docs/README.md",
+          "../context-archive/README.md"
+        ]
+      ],
+      "generatedPackageLinks": [
+        [
+          "packages/core/README.md",
+          "dist/index.d.ts"
+        ],
+        [
+          "packages/core/README.md",
+          "dist/http.d.ts"
+        ],
+        [
+          "packages/core/README.md",
+          "dist/cel-support.json"
+        ]
+      ],
+      "preservedContracts": {
+        "acceptanceTablesUnchanged": true,
+        "representativeScenariosUnchanged": true,
+        "mainNormativeSectionsUnchanged": true,
+        "storeUrlNormativeSectionsUnchanged": true
+      }
+    },
+    "verificationMethod": "One-off local Markdown link and heading-slug inspection, inbound fragment check, root/AGENTS reachability, preserved acceptance tables and normative sections comparison, publication manifest inspection, and manual semantic review. No native documentation checker exists.",
+    "verificationLimits": "Not a full Markdown renderer or a new semantic audit of every contract. Optional ignored context-archive link is excluded from required checkout reachability; dist links require a build. Repository-relative package documentation links apply to the source checkout, not the installed tarball. No unpublished release URL was invented.",
+    "gitDiffCheck": "passed",
+    "reusedEvidence": {
+      "sourceFilesSha256Matched": 129,
+      "buildArtifactsSha256Matched": 8,
+      "reason": "Product source, tests, dependency inputs and built runtime bytes unchanged; existing Node 22/24, strict types, coverage and Chromium evidence remains applicable.",
+      "originalExperimentCoverageUnchanged": true,
+      "productAcceptanceCoverageUnchanged": true
+    },
+    "rerunCommands": [
+      "npm run test:package",
+      "git diff --check"
+    ],
+    "packageEvidence": "Top-level package now records the new tarball after README changes; the previous package result below is historical.",
+    "previousPackage": {
+      "nodeVersion": "v22.21.1",
+      "package": "@viewstem/core",
+      "version": "0.1.0",
+      "files": [
+        "README.md",
+        "dist/cel-support.json",
+        "dist/http.d.ts",
+        "dist/http.js",
+        "dist/http.js.map",
+        "dist/index.d.ts",
+        "dist/index.js",
+        "dist/index.js.map",
+        "dist/THIRD-PARTY-NOTICES.txt",
+        "package.json"
+      ],
+      "integrity": "sha512-EQhoWLrpoqSNUTCi9430jCtTCP7jjuhNpkMkQNZBYIm5TvwFIP3GFKxEtokbah+cCsT3E3L/l9kHL/Jgt34H7Q==",
+      "bytes": 273539,
+      "unpackedBytes": 1193493,
+      "runtime": "passed",
+      "types": "passed",
+      "readmeSha256": "d1c3bb131528b8439af1d1511f1776738647efccbdb0481d618cb0036cdde949"
+    },
+    "documentationSha256": {
+      "README.md": "77e6bff4e4f87789ea5c3ff9b5f3fce40868886f8e13fdfe5a47da1aa533108e",
+      "docs/README.md": "57b800d5318d643161010f1abbe0e1ba71dc1005314827ca5267608080b0bb78",
+      "docs/VIEWSTEM-SPEC.md": "19e7f03135c8647cf50b27412871f2cef5f69c1336dd0a397a7cc7503d96ef41",
+      "docs/handoff/acceptance-matrix.md": "a76ff15c5778d1f7bd702068424e6601860a7f496fe0851c7eca497c66e19b6b",
+      "docs/handoff/core-cel-support.md": "d9d14823468034a259b6aa0265a586b2f58de24f0f09ed66803d1f6391ca19b8",
+      "docs/handoff/core-implementation-2026-11-02.md": "4eaf2d7ef6113f38445e5d05f34eba39c87a11c6e9064d04a9357f27277be33f",
+      "docs/handoff/implementation-start.md": "c512bef4ea9f89a5cd44c034a1a473655506dcb64cf47b90421b35d6bb5ccbaa",
+      "docs/handoff/open-contracts.md": "eae29dbf0f8641d1e88bfe680ff830bf734f8eb028a7444dcf20fdf8b6c1f8c9",
+      "docs/handoff/verification-ledger.md": "f4f946b2cb57bf2f01e21f45cece34f98283291d62e92eb32d0248e36d1e8b4b",
+      "docs/spec/08-readiness-conformance.md": "1d00fd87ed74bd69251e327467463ad8901ef80bac9e99097db90327beaa3671",
+      "docs/spec/09-preserved-contracts.md": "c69780b30ee5d0c46a0f2b7630f6bf24b01d12158ada8242fa7cb635a52d957c",
+      "packages/core/README.md": "f91f9e608228d4082c7e5bfe5bd1484f1390f69801e4eec652450559b5108b60"
+    },
+    "remaining": "Publish source docs at the chosen release tag/commit and replace checkout-only package documentation links with version-bound public URLs when publication is authorized.",
+    "publication": "Historical documentation verification snapshot before the subsequent split-commit request; no push, remote CI run, or npm publication performed.",
+    "splitCommitPreparation": {
+      "date": "2026-11-02",
+      "runtimeCommit": "19976d134ce2845857749d8ab0ceebbaab66a6d0",
+      "verificationCommit": "7c62a8a886df31e9f2568832f796ebdfaa30fedc",
+      "documentationCommit": "This record is included in the separate documentation refactor commit.",
+      "verification": "All recorded product source and build hashes still match. Existing Node 22/24, strict type, coverage, Chromium and isolated tarball results reused; staged whitespace and documentation structure rechecked.",
+      "publication": "Local commits only; no push or npm publication."
+    }
   }
 }

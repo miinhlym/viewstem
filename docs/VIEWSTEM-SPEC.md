@@ -2,11 +2,7 @@
 
 최초 통합: **2026-10-28** · 현재 인계: **2026-11-02, U37** · 구현 담당자를 위한 현재 계약
 
-2026-10-29 적대적 리뷰 후, 원문에서 이미 승인된 9개 계약의 누락·축소를 복원했다. 새로운 SDK나 기능 승인이 아니며 [복원·검증 기록](handoff/semantic-review-2026-10-29.md)과 보충 근거 E43–E51을 함께 관리한다.
-
-같은 날 추가 재평가 후 Query 실패 의미를 E52로 복원하고, 사용자 개선 요청 U01에 따라 등록 식별을 `(kind, id)`로 명확히 했다. 후자는 과거 최종 승인의 복원으로 취급하지 않는다. [추가 보완 기록](handoff/semantic-review-2026-10-29.md#추가-재평가-후-두-항목-보완)을 따른다.
-
-이어 보관된 1,530개 메시지를 주제별로 전문 대조하고 방 기록의 회수 근거를 추가 검증했다. 현재 계약의 위치·이유·대체 관계는 [전체 원문→계약 대응표](handoff/source-contract-matrix.md), 실제 미결은 [열린 구현 과제](handoff/open-contracts.md)를 따른다. 새로 복원한 E53–E69은 확정 의미의 누락을 보완하며 구체 SDK를 새로 승인하는 기록이 아니다.
+설계 복원·명확화의 배경은 [결정 등록부](history/decision-register.md)와 [원문→계약 대응표](handoff/source-contract-matrix.md)에 있다. 현재 구현·검증 결과는 [제품 인수인계](handoff/core-implementation-2026-11-02.md), 실제 잔여는 [후속 작업](handoff/open-contracts.md#실제-남은-작업)을 따른다. 이 명세는 언어 독립 계약을 소유하며 진행 수치를 복제하지 않는다.
 
 Viewstem은 **재사용 리소스로 UI·상태·데이터·동작을 선언하고, 사용자와 에이전트가 같은 실행 규칙으로 화면을 조작하는 도메인 독립 라이브러리**다. 에이전트 없이도 실행 가능하며, 에이전트는 별도 엔진이 아니라 같은 코어의 요청 주체다.
 
@@ -24,16 +20,14 @@ Viewstem은 **재사용 리소스로 UI·상태·데이터·동작을 선언하�
 | [05 Component·View](spec/05-component-view.md) | JSON 골격, slots/events/on, when/repeat, Grid |
 | [06 연결 예시](spec/06-composition-examples.md) | State→입력→이벤트→Action→결과, 슬롯 작성자 문맥, 반복 Grid |
 | [07 호스트 연결](spec/07-host-integration.md) | 구현 제안인 등록·마운트 의사 코드와 확정 계약의 경계 |
-| [08 구현 준비·적합성](spec/08-readiness-conformance.md) | 재논의하지 않을 결정, 열린 구현 상세, 인수 테스트 기대값 |
-| [09 이전 승인 이관](spec/09-preserved-contracts.md) | URL·reaction·날짜·컬렉션·폴링·차트·기존 API 의미 보존 |
+| [08 적합성 검증](spec/08-readiness-conformance.md) | 확정 계약의 검증 관점, 대표 시나리오, 인수 증거 연결 |
+| [09 StateStore·reaction·URL](spec/09-preserved-contracts.md) | Store 주입·관찰·URL·컬렉션 전송의 현행 계약과 이관 근거 |
 | [10 값 상세](spec/10-value-contracts.md) | State의 missing 읽기·undefined·숫자 범위·표현·정규화·미지원 값/순환 거절, literal/escape, 시간 의존 계산, 타입별 비교, 격리·읽기 snapshot, 날짜 경계 |
 | [11 선택 차트](spec/11-optional-charts.md) | core 기본 제공과 구별하는 차트 계약·엔진 범위·독립 실험과 제품 구현의 구분 |
 
 `[E01]` 등의 근거 표기는 결정 근거 식별자다. E01–E42는 원 통합 명세의 색인이고 E43–E69은 보관 원문 직접 대조와 방 기록 회수로 보완한 근거다. 회수 요약과 원문 전문은 [색인](history/evidence-index.md)에서 구별한다. U01–U37은 이관 후 프로젝트 대화에서 확정한 명확화·값 계약·실행 실험·CEL 패치 진행 전제·검증 진행·중단 조건의 근거다. 해당 대화를 읽어야만 이 명세를 해석할 수 있도록 작성하지 않는다.
 
-**현재 구현 상태:** U37에서 JS/TS core 패키지와 공개 타입·빌드를 구현했고 core 인수 216개의 제품 실행 대조를 마쳤다. [구현 인수인계](handoff/core-implementation-2026-11-02.md)와 [제품 검증 결과](handoff/core-verification-results.json)가 현재 근거다. U34–U35의 224개 독립 실험 기준선은 그대로 보존한다. Svelte·Dart/Flutter·선택 차트 제품·npm 발행은 이번 완료 범위가 아니다. 아래 U28–U36의 시점별 검증 설명은 당시 범위를 기록한다.
-
-U28에서 Datasource.baseUrl 평가 누락을 수정하고 [현재 HTTP/Login의 @path 적용 위치 17개 전체](handoff/t2-path-audit-2026-10-30.md)를 점검·보완했다. Node 22/24와 실제 Chromium에서 검사 범위는 모두 통과했다. U20–U27의 책임 구분·검증 증거를 유지하며, 미구현 core·State/Action/renderer의 경로 평가·실제 서비스 연결은 후속이다. U29의 [Query–HTTP 연결 검증](handoff/t2-query-http-2026-10-30.md)은 기존 두 실험을 실제 HTTP로 연결해 39개 사례·4개 고의 결함을 각 Node 버전에서 확인했다. U30의 [복합 Query·완료 기준 polling 검증](handoff/t2-composite-polling-2026-10-30.md)은 하위 inputs·sources/Concat/Join·캐시·완료 주기와 실제 HTTP 결합을 다뤘다. 발견한 재사용·오류 위치·owner 정리 문제는 수정했으며 전체 스키마·등록/교체·core 통합은 포함하지 않는다. 기존 계약에 정답이 있는 버그는 추가 질문 없이 해결하고, 계약의 선택이 필요한 경우만 논의한다.
+JS/TS의 실제 API는 [패키지 사용법](../packages/core/README.md)과 [공개 타입](../packages/core/src/index.d.ts), 실행 가능한 CEL 프로필은 [지원 문서](handoff/core-cel-support.md)를 따른다. U28–U36의 독립 실험·누락 보완·실패 전후 증거는 [검증 진행표](handoff/verification-ledger.md)에 보존한다. 그 시점의 미구현 표기는 현재 진행 상태가 아니다.
 
 ## 1 이 문서의 상태 표시와 사용법
 
@@ -55,9 +49,9 @@ JSON 예시는 확정된 구조의 의미를 설명한다. 외부 코드형 Comp
 
 추진 순서는 **공통 계약 → 프레임워크 독립 core → Svelte 렌더러 → 서비스 확장**이다.
 
-| 영역 | 확정된 범위 | 구체화 또는 후속 범위 |
+| 영역 | 확정된 범위 | 구현·검증 경계 |
 |---|---|---|
-| 리소스 | Datasource Query Variable Action Component View Type | 실제 검증 스키마와 오류 코드 |
+| 리소스 | Datasource Query Variable Action Component View Type | 스키마 프로필·등록 검증·공통 오류 |
 | 상태와 데이터 | Value/State/Query 포트, State/Derived, Query 사용 인스턴스 | 직렬화와 CEL 구현체 적합성 |
 | UI 구성 | 단일 render 루트, componentRef, inputs, slots, on, when, repeat | 코드형 어댑터 API와 테스트 |
 | 동작 | 순차 단계, If/Assert, 명시 Query, SetState, RefreshQuery, 코드 Action | SDK 시그니처와 취소 신호 전달 API |
@@ -65,7 +59,7 @@ JSON 예시는 확정된 구조의 의미를 설명한다. 외부 코드형 Comp
 | 변경과 에이전트 | 공통 탐색·설명·변경·호출, 코어 상태/구성 원자 적용 | 부분 변경 프로토콜과 충돌 처리 |
 | 후속 | Dart core와 Flutter, 선택 UI 패키지 | Theme, scoped slot 데이터, 드래그 편집기 |
 
-공통 리소스・상태・실행 책임은 이미 결정했다. 구현 전에는 새 기능을 다시 선택하기보다 대표 시나리오를 검증 가능한 타입과 테스트로 옮긴다. 과거 승인 중 이관할 의미는 [이전 승인 의미의 이관](spec/09-preserved-contracts.md)에서 보존한다. [E02]
+공통 리소스・상태・실행 책임은 이미 결정했다. 위 마지막 열은 언어별 구현과 테스트로 확인할 경계이며 JS/TS의 미구현 목록이 아니다. 과거 승인에서 이어지는 [Store·URL 등의 현재 의미](spec/09-preserved-contracts.md)를 유지한다. [E02]
 
 ## 3 최상위 확정 결정
 
@@ -433,4 +427,6 @@ agent-kit과 SDK 어댑터는 이를 모델/SDK에 연결하는 구성 제안이
 
 ## 10 구현으로 넘어가는 기준
 
-상위 설계는 core 구현을 시작할 정도로 결정됐다. 공통 타입/검증, State·표현 평가, Query, Action·코드 확장, 렌더러를 작은 실행 흐름으로 구현한다. U13에서 스키마 프로필·오류 구조·요청 DTO·최소 SDK를 구체화했다. U14에서 날짜 표현·명시 업무 시간대, 실패 후 마지막 성공 결과 보존, v1 선언형 Catch/Finally 제외를 확정했다. 실행기·어댑터의 실제 적합성은 T1–T4에서 검증한다. 이는 이미 확정한 리소스·포트·slots·output·서버 경계를 다시 고르는 의제가 아니다. [구현 준비와 인수 기준](spec/08-readiness-conformance.md), [이전 승인 이관 항목](spec/09-preserved-contracts.md)을 함께 적용한다.
+확정 계약을 변경·확장할 때 [적합성 안내](spec/08-readiness-conformance.md)와 [현재 작업 절차](handoff/implementation-start.md#새-채팅에서-시작할-때)를 적용한다. 공통 타입/검증 → State·값 → Query → Action → 화면 실행의 의존 관계를 유지하며 이미 구현한 core를 다시 착수 대상으로 취급하지 않는다.
+
+U13의 스키마·오류·요청 DTO·최소 SDK, U14의 날짜·명시 업무 시간대·실패 후 성공 결과 보존·v1 선언형 Catch/Finally 제외, U35의 하위 호출 수명은 종료된 결정이다. 실제 지원과 통과 여부는 해당 구현의 타입·지원 문서·실행 증거로 확인한다.

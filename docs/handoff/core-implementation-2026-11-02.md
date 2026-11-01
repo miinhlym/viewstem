@@ -4,7 +4,7 @@
 
 ## 완료한 범위
 
-`@viewstem/core` 0.1.0의 ESM 공개 진입점, `@viewstem/core/http`, TypeScript 선언, CEL 지원 JSON, 고정 패치 빌드, npm tarball을 구성했다. 공통 Registry·스키마·값 표현식, 하나의 StateStore, Query 사용 수명, Action, headless Component/View 실행을 연결했다. 초기 구현 코드·테스트·검증 결과·인수 문서는 로컬 커밋 `adbad43`에 보존했다. 이후 branch-preflight의 미커밋 수정은 아래에 별도로 기록한다. npm 발행·원격 push는 수행하지 않았다.
+`@viewstem/core` 0.1.0의 ESM 공개 진입점, `@viewstem/core/http`, TypeScript 선언, CEL 지원 JSON, 고정 패치 빌드, npm tarball을 구성했다. 공통 Registry·스키마·값 표현식, 하나의 StateStore, Query 사용 수명, Action, headless Component/View 실행을 연결했다. 초기 구현 코드·테스트·검증 결과·인수 문서는 로컬 커밋 `adbad43`에 보존했다. 이후 branch-preflight 수정은 runtime 계약 `19976d1`, 검증·패키지 `7c62a8a`로 분리해 커밋했다. 아래 검토 기록은 당시 작업 트리 상태를 설명한다. npm 발행·원격 push는 수행하지 않았다.
 
 - 7종 리소스의 원자 등록, `(kind,id)` 조회, ref/inline, 정적 순환·타입·capability 검증.
 - 안정적인 native 값 snapshot, State scope/Derived/reaction/Clock, 초기값·명시 쓰기 경합, 공통 변경 묶음.
@@ -16,6 +16,8 @@
 실제 사용법은 [패키지 README](../../packages/core/README.md), 정확한 타입은 [index.d.ts](../../packages/core/src/index.d.ts)와 [http.d.ts](../../packages/core/src/http.d.ts)를 따른다. 초기 SDK 의사 코드의 이름을 그대로 공개 API로 복사하지 않았다.
 
 ## 관찰 가능한 완료 기준과 결과
+
+아래 수치와 검토 결과는 **2026-11-02 U37·branch-preflight 시점의 기록**이다. 이후 현재 실행 결과는 [검증 결과 JSON](core-verification-results.json)에서 관리하며 이 날짜별 기록의 수치를 덮어쓰지 않는다. 후속 작업의 현재 목록은 [열린 과제](open-contracts.md#실제-남은-작업)를 따른다.
 
 [core 인수 대응표](core-acceptance-coverage.json)는 원래 224개 목록을 모두 보존하고 **core 216개를 실제 제품 테스트에 연결**, 선택 차트 X01–X08은 `deferred-optional-chart`로 구별한다. `check-coverage.mjs`가 각 인수 항목의 정확한 테스트 이름·파일을 실제 실행 보고서와 대조한다. 테스트 이름에 ID가 들어 있다는 이유만으로 통과 처리하지 않는다.
 
@@ -30,7 +32,7 @@
 | 의존성 재설치 후 빌드 | `npm ci --ignore-scripts` 및 고정 패치/해시 검증 통과 |
 | 독립 디렉터리 tarball 설치 | runtime·타입 소비자 통과, 두 진입점/지원 JSON/선언/README 포함 |
 
-1,060은 Node test-runner가 실행한 이름 있는 검사 수이며 인수 항목 수와 다르다. HTTP 261개·동적 경로 152개도 이제 개별 이름으로 보고한다. 스키마 내부 2,484개 Ajv 비교와 CEL 내부 216개 회귀는 해당 검사 안에서 실행되며 총수에 중복 합산하지 않았다. 최종 환경·산출물·소스 해시는 [검증 결과](core-verification-results.json)에 남긴다. 상세 실행 보고서는 `npm run test:report`로 `packages/core/test/results/current.json`에 재생성한다.
+1,060은 Node test-runner가 실행한 이름 있는 검사 수이며 인수 항목 수와 다르다. HTTP 261개·동적 경로 152개도 이제 개별 이름으로 보고한다. 스키마 내부 2,484개 Ajv 비교와 CEL 내부 216개 회귀는 해당 검사 안에서 실행되며 총수에 중복 합산하지 않았다. 실행 시점의 환경·산출물·소스 해시는 [검증 결과](core-verification-results.json)에 남긴다. 배포 README처럼 검증 입력이 바뀌면 영향받는 증거를 갱신하고 이전 결과의 적용 범위를 구분한다. 상세 실행 보고서는 `npm run test:report`로 `packages/core/test/results/current.json`에 재생성한다.
 
 브라우저 검사는 실제 패키지를 bundle한 작은 **테스트 전용** DOM/History 어댑터다. URL 복원→최초 HTTP→Derived CEL, native 입력→Action→State→표시, URL 소유 키/원래 인코딩 보존, 실제 뒤로 가기, false 반환 성공, 교체 후 새 초기값/서비스 State 보존을 검사했다. Svelte 제품 렌더러 완료를 뜻하지 않는다.
 
@@ -80,7 +82,7 @@
 
 검증 도구 변경은 top-level `*.test.mjs` 포함, helper·중첩 fixture 제외, skip/todo 실패, 보고서 없는 인수 대조 실패, 누락 선언 빌드 실패 시 이전 dist 보존, 성공 시 잔여 파일 제거를 별도 임시 소비자로 검사했다. 생성 순서는 CEL provenance 검증 → 필수 선언·bundle·지원 목록·라이선스 준비 → dist 교체 → 실제 검사 보고서 → 타입·인수 대조다. 기존 CI의 명령/행렬과 의존성 lockfile은 바꾸지 않았다. 변경 없는 `npm ci --ignore-scripts`의 앞선 설치 증거는 재사용했다.
 
-수정 전 소스·문서는 `adbad43`에 보존되어 있고, 로컬 원본 보고서·재현 파일은 무시 경로 `packages/core/test/results/preflight-before-adbad43/`에 보관했다. 이번 변경은 **커밋하지 않은 로컬 수정**이며 push/PR/원격 CI는 수행하지 않았다. 원격 main tip은 `af86b953a31ac08cf476ad6c812bf3397b396efb`로 확인했지만 사용자 지정 기준보다 앞선 변경을 이번 구현 감사 범위에 합치지 않았다. 이번 ready 판정은 해당 범위의 사람용 결과이며, 다른 Git lifecycle에서 재사용할 clean·immutable readiness 근거를 뜻하지 않는다.
+수정 전 소스·문서는 `adbad43`에 보존되어 있고, 로컬 원본 보고서·재현 파일은 무시 경로 `packages/core/test/results/preflight-before-adbad43/`에 보관했다. 검토 시점에는 **커밋 전 로컬 수정**이었으며 push/PR/원격 CI는 수행하지 않았다. 이후 로컬 분리 커밋은 문서 앞의 구현 이력과 구별해 읽는다. 원격 main tip은 `af86b953a31ac08cf476ad6c812bf3397b396efb`로 확인했지만 사용자 지정 기준보다 앞선 변경을 이번 구현 감사 범위에 합치지 않았다. 이번 ready 판정은 해당 범위의 사람용 결과이며, 다른 Git lifecycle에서 재사용할 clean·immutable readiness 근거를 뜻하지 않는다.
 
 ## CEL·지원 범위·후속 작업
 
@@ -99,3 +101,11 @@ npm run test:package
 ```
 
 Node 22.21.1과 24.1.0에서 동일한 명령을 사용한다. 루트 lockfile과 vendored hash manifest가 재현 입력이다. 실험 디렉터리의 node_modules나 비공개 context-archive가 없어도 패키지와 제품 검증을 실행할 수 있다.
+
+## 2026-11-02 · 문서 구조 리팩토링
+
+검토한 문서 설계에 따라 기존 경로를 유지하고 [문서 지도](../README.md)를 독자의 작업별 진입점으로 정리했다. 현재 실행 수치는 제품 검증 결과에 연결하고, 인수 행렬은 기대값, 제품 대응표는 테스트 연결만 담당한다. 이 문서와 CEL 문서의 날짜별 검사 수는 해당 시점의 기록이다. 기존 착수 절차·O01–O16·Q1–Q3·T1–T4는 과거 기록으로 표시하고, 실제 후속 범위는 [열린 과제](open-contracts.md#실제-남은-작업)에서 관리한다.
+
+기준은 로컬 `adbad43`와 앞선 branch-preflight의 작업 트리다. Markdown 문서와 검증 기록만 변경했으며 기존 제품 소스·테스트·인수 기대값·실험·실패 증거는 보존했다. 파일 이동·삭제는 없고 변경한 제목의 이전 앵커도 유지했다. 저장소 문서와 배포물의 경계를 패키지 README에 명시했으며, tag/commit에 고정된 공개 문서 URL은 발행 작업으로 남겼다. 로컬 미반영 문서를 이미 공개한 것으로 표시하지 않는다.
+
+문서 경로·앵커·진입점 도달성과 기대값 보존을 확인하고 `git diff --check`를 실행했다. 기존 소스·산출물 해시가 같아 Node 전체 검사·브라우저 결과는 재사용했다. 패키지 README는 tarball 입력이므로 `npm run test:package`를 다시 실행해 파일 구성·독립 runtime·타입 소비자를 검증했다. 새 tarball 결과와 이전 패키지 증거, 문서 검사 범위·한계는 [검증 결과의 documentationRefactor](core-verification-results.json)에 남긴다. 리팩토링 검증 시점에는 커밋 전이었다. 이후 사용자 요청에 따라 core·검증 수정과 별도 문서 커밋으로 보존한다. push·공개 발행은 수행하지 않았다.

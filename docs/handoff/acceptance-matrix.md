@@ -1,11 +1,16 @@
-# 계약 인수 테스트 백로그
+<a id="계약-인수-테스트-백로그"></a>
 
-U37 제품 검증: [core 216개·선택 차트 후속 8개 대응표](core-acceptance-coverage.json)와 [실행 결과](core-verification-results.json)를 확인한다. 아래 표는 기대값 원문이며 실험 기준선 `experiments/verification/coverage.json`은 변경하지 않는다.
+# 계약 인수 기대값
 
+이 문서는 [현재 명세](../VIEWSTEM-SPEC.md)의 **인수 ID별 기대 동작**을 소유한다. 전체 목록에는 JS/TS core와 별도 선택 차트 항목이 함께 있으므로 실행 상태를 단일 ‘전체 core 완료/미완료’로 표시하지 않는다.
 
-**상태: 아래 인수 항목 전체를 통과한 core 구현은 아직 없다.** 이 표는 [최종 명세](../VIEWSTEM-SPEC.md)의 설계 기대값이며, U34까지의 실제 독립 실행 상태는 [전체 진행표](verification-ledger.md)와 [항목별 증거](../../experiments/verification/coverage.json)를 따른다. 문서 끝의 시점별 대응표와 현재 실행 결과를 구별한다. 독립 실험 통과를 코드·Schema·렌더러 전체 구현 완료로 확대하지 않으며, 정확한 오류 코드와 SDK는 연결된 현재 명세를 따른다.
+- 실제 제품 테스트 파일·이름과 후속 범위: [제품 인수 대응표](core-acceptance-coverage.json).
+- 실행 환경·통과/실패·해시: [제품 검증 결과](core-verification-results.json).
+- 구현 전 독립 실험: [진행표](verification-ledger.md)와 [원래 항목별 증거](../../experiments/verification/coverage.json). 원래 기준선과 실패 기록은 보존한다.
 
-출처: [통합 명세](https://chatgpt.com/space/page_7842bb8bff0c8191be6cd5831e7e375f) §12 및 [근거 색인](../history/evidence-index.md). 테스트 작성 시 각 ID에 구현 파일·fixture·실행 결과를 연결한다. 성공뿐 아니라 부정 경로를 반드시 포함한다.
+기대값 표는 실행 결과가 아니다. 아래 U15 이후 날짜별 실험은 해당 시점의 증거이며 그때의 ‘미구현’을 현재 제품 상태로 적용하지 않는다. 정확한 오류와 SDK는 연결된 현행 명세·공개 타입을 따른다.
+
+출처: [통합 명세](https://chatgpt.com/space/page_7842bb8bff0c8191be6cd5831e7e375f) §12 및 [근거 색인](../history/evidence-index.md). 외부 원문 없이 이 문서와 현재 명세로 기대값을 이해할 수 있어야 한다. 테스트 작성 시 ID와 부정 경로를 유지하고 실제 실행 증거에 연결한다.
 
 ## A. 계약·값·소유권
 
@@ -241,7 +246,7 @@ U37 제품 검증: [core 216개·선택 차트 후속 8개 대응표](core-accep
 
 ## H. U13 일괄 구체화 인수 사례
 
-**설계 기대값이며 실행 상태는 항목별 증거를 따른다.** Q1–Q3은 U14에서 승인한 현재 규칙을 적용한다. K05 동적 코드 Action은 U35에서 부모에 연결된 문맥 호출과 독립 외부 호출로 구분했다. 현재 검증은 [진행표](verification-ledger.md)를 따른다.
+**설계 기대값이며 실행 상태는 항목별 증거를 따른다.** Q1–Q3은 U14에서 승인한 현재 규칙을 적용한다. K05 동적 코드 Action은 U35에서 부모에 연결된 문맥 호출과 독립 외부 호출로 구분했다. 제품 검증은 [대응표](core-acceptance-coverage.json)와 [실행 결과](core-verification-results.json)를 따른다.
 
 | ID | 입력/행동 | 기대 결과 | 근거 |
 |---|---|---|---|
@@ -289,6 +294,10 @@ U37 제품 검증: [core 216개·선택 차트 후속 8개 대응표](core-accep
 | K35 | 날짜 x-viewstem-type / 표준 format 사용 / null 허용 anyOf | 날짜 형식 검사·정규화, format 등록 오류, 명시 null 분기는 null 보존. 분기별 정규 값이 다른 모호한 조합은 등록 오류 | U14, D69 |
 | K36 | 선언형 Try/Catch/Finally 또는 catch/finally 필드 / 등록 코드 Action의 정상 복구·미처리 오류 | 선언형 미지원은 INVALID_DEFINITION. 코드 복구는 유효 output까지 성공하면 성공, 미처리 오류·정리 실패는 실패 | U14, D70 |
 | K37 | State 쓰기 후 단계 실패 / 취소를 catch한 코드의 늦은 반환·핸들 쓰기 | 완료한 쓰기·외부 효과 유지, 후속 단계 중단. 취소는 정상 반환으로 회복되지 않고 호출 핸들 쓰기는 거절 | U14, D70 |
+
+## 독립 실험의 날짜별 기록
+
+이하 U15–U33은 구현 전 증거다. 당시의 검사 수·실패·미구현 범위를 보존하며 최신 제품 결과로 해석하지 않는다.
 
 ## U15. T1 부분 실험의 실행 증거
 

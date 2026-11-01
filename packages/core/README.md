@@ -56,9 +56,23 @@ URL adapter는 `read`, `subscribe`, `writeOwned(patch,{mode,isCurrent})`를 구�
 
 ## CEL 지원 및 제한
 
-`dist/cel-support.json`에 공개 지원 목록이 포함됩니다. upstream cel-js 8.0.0, 검증된 기존 패치와 production 수정 패치의 SHA-256을 확인해 빌드합니다. 지원 범위는 71개 upstream 함수/연산자와 19개 native/calendar 시그니처입니다. 전체 CEL 적합성을 주장하지 않습니다. bytes, uint, type, optional, cel.bind 등은 미지원입니다. 날짜는 선언된 문자열/명시적 시간대 계약을 사용합니다. 일반 `number`는 CEL double, `integer`는 안전 정수입니다.
+`dist/cel-support.json`에 공개 지원 목록이 포함됩니다. upstream cel-js 8.0.0, 검증된 기존 패치와 production 수정 패치의 SHA-256을 확인해 빌드합니다. 정확한 시그니처는 배포물의 지원 목록을 따릅니다. 전체 CEL 적합성을 주장하지 않습니다. bytes, uint, type, optional, cel.bind 등은 미지원입니다. 날짜는 선언된 문자열/명시적 시간대 계약을 사용합니다. 일반 `number`는 CEL double, `integer`는 안전 정수입니다.
 
 CEL AST·비용·결과 크기 제한은 `celLimits`로 확인할 수 있습니다. 등록 함수는 신뢰하는 호스트의 동기·순수 콜백이며 스키마 검증과 읽기 전용 입력을 적용합니다. 실행 시간 격리나 악성 호스트 콜백 sandbox는 제공하지 않습니다.
+
+## 상세 계약과 문서 버전
+
+패키지 안에서 확인할 정확한 API는 [기본 타입](dist/index.d.ts)과 [HTTP 타입](dist/http.d.ts), 지원 함수 목록은 [CEL 지원 JSON](dist/cel-support.json)이다. 이 파일들은 빌드·tarball에 포함된다. 위 사용 예제는 이 공개 API를 설명한다.
+
+다음 링크는 **같은 revision의 소스 저장소에서 읽는 문서**다. 상세 `docs/`는 tarball에 포함되지 않으며 설치 디렉터리를 기준으로 이 상대 링크를 해석하지 않는다.
+
+- [전체 계약과 문서 지도](../../docs/README.md): 리소스별 기준 명세와 검증 경로.
+- [스키마 프로필](../../docs/spec/03-variable-type.md), [값·날짜·snapshot](../../docs/spec/10-value-contracts.md).
+- [호스트·권한·초기 완료](../../docs/spec/07-host-integration.md), [Store·reaction·URL](../../docs/spec/09-preserved-contracts.md).
+- [CEL 지원 의미·제한](../../docs/handoff/core-cel-support.md), [패치와 재현 빌드](vendor/README.md).
+- [제품 검증 결과](../../docs/handoff/core-verification-results.json), [후속 범위](../../docs/handoff/open-contracts.md#실제-남은-작업).
+
+[공개 저장소](https://github.com/miinhlym/viewstem)와 로컬 미반영 변경은 구분한다. 현재 공개 발행 전이며, 발행할 때는 해당 소스 tag/commit에 문서를 함께 제공하고 위 소스 문서 링크를 그 revision의 공개 URL로 연결해야 한다. 존재하지 않는 릴리스 URL이나 원격에 없는 문서를 이미 제공하는 것으로 표시하지 않는다.
 
 ## 재현
 
