@@ -168,6 +168,33 @@ test('named slots retain their order and duplicate repeat keys are rejected befo
   assert.deepEqual(await page.locator('#preview .preview-text').allTextContents(), ['머리', '본문', '꼬리']);
 });
 
+test('unresolved when and repeat nodes remain distinct across slots and resolve independently', async t => {
+  const page = await open(t);
+  const data = { resources: [setAction('boolean'), { kind: 'Action', id: 'set-items', spec: {
+    ports: { target: { kind: 'State', schema: { type: 'array' }, required: true } },
+    steps: [{ kind: 'SetState', target: path('/ports/target'), value: ['준비된 항목'] }],
+  } }], view: { states: { gate: cell('boolean'), items: cell('array') }, render: {
+    id: 'card', componentRef: 'Card', slots: {
+      header: [{ ...text('conditional', '조건 준비됨'), when: path('/states/gate') }],
+      default: [
+        button('prepare-gate', '조건 준비', 'set-boolean', { target: path('/states/gate'), value: true }),
+        button('prepare-items', '항목 준비', 'set-items', { target: path('/states/items') }),
+        { ...text('rows', path('/repeat/item')), repeat: { items: path('/states/items'), as: 'item', key: path('/repeat/item') } },
+      ],
+    },
+  } } };
+  await run(page, data);
+  const notices = page.locator('#preview .node-notice:not([hidden])');
+  assert.deepEqual(await notices.allTextContents(), ['conditional: 입력 대기', 'rows: 입력 대기']);
+  await page.getByRole('button', { name: '조건 준비', exact: true }).click();
+  await page.getByText('조건 준비됨', { exact: true }).waitFor();
+  assert.deepEqual(await notices.allTextContents(), ['rows: 입력 대기']);
+  await page.getByRole('button', { name: '항목 준비', exact: true }).click();
+  await page.getByText('준비된 항목', { exact: true }).waitFor();
+  assert.equal(await notices.count(), 0);
+  assert.deepEqual(await page.locator('#preview .preview-text').allTextContents(), ['조건 준비됨', '준비된 항목']);
+});
+
 test('invalid JSON envelopes, duplicate built-ins and oversized UTF-8 drafts preserve the active view', async t => {
   const page = await open(t); await run(page, simple('유지'));
   for (const data of [[], null, { view: {}, viewRef: 'both' }, { view: {}, inputs: [] }, { view: {}, extra: true }, { view: {}, resources: {} }, { resources: [{ kind: 'Component', id: 'Text', spec: {} }], view: {} }]) {
