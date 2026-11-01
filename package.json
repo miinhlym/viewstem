@@ -14,7 +14,8 @@
     "test:package": "node packages/core/scripts/test-package.mjs",
     "check:coverage": "node packages/core/scripts/check-coverage.mjs packages/core/test/results/current.json",
     "test:report": "node packages/core/scripts/run-tests.mjs",
-    "playground": "npm run build && node playground/server.mjs"
+    "playground": "npm run build && node playground/server.mjs",
+    "test:playground": "npm run build && node --test playground/test/*.test.mjs"
   },
   "devDependencies": {
     "@marcbachmann/cel-js": "8.0.0",

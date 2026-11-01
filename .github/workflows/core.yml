@@ -17,3 +17,4 @@ jobs:
       - run: npm run test:package
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
+      - run: npm run test:playground
