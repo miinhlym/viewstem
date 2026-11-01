@@ -1,0 +1,1685 @@
+{
+  "scope": "Actual JS/TS core acceptance evidence; tests execute package src modules, never experiment probe runtimes. Exact test names identify grouped fixtures, not independent count per acceptance row.",
+  "primaryTargetCount": 113,
+  "additionalTargets": [
+    "M05"
+  ],
+  "testFiles": [
+    {
+      "file": "packages/core/test/state-lifecycle.test.mjs",
+      "tests": 27
+    },
+    {
+      "file": "packages/core/test/state-ports.test.mjs",
+      "tests": 28
+    },
+    {
+      "file": "packages/core/test/values-schema-registration.test.mjs",
+      "tests": 78
+    },
+    {
+      "file": "packages/core/test/values-schema-runtime.test.mjs",
+      "tests": 83
+    },
+    {
+      "file": "packages/core/test/state-integration.test.mjs",
+      "tests": 10
+    },
+    {
+      "file": "packages/core/test/values-expression-date.test.mjs",
+      "tests": 10
+    },
+    {
+      "file": "packages/core/test/url-state.test.mjs",
+      "tests": 22
+    },
+    {
+      "file": "packages/core/test/url-runtime.test.mjs",
+      "tests": 12
+    }
+  ],
+  "executedTestCount": 270,
+  "generatedJsonComparisons": 2484,
+  "records": [
+    {
+      "id": "C01",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "C01/schema-typeRef-exactly-one-and-query-untyped"
+        },
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "C01/schema-registration-profile-and-json-admission"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "C02",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "C02/port-required-and-object-required-are-separate"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "C03",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "C03 expected-kind registry lookup never falls back to Component"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "C04",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "C04/all-resource-kind-port-matrix"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "C05",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "C05/value-object-native-input-cannot-mutate-source-state"
+        },
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "C05/external-value-source-is-not-frozen-or-retained"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "C06",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "C06-C07-C15/scope-ownership-and-shared-handles"
+        },
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "C06/C13 same cell connects twice; equal local names have independent reactions"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "C07",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "C06-C07-C15/scope-ownership-and-shared-handles"
+        },
+        {
+          "file": "packages/core/test/runtime.test.mjs",
+          "test": "C07/C15 scopes, shared State port, derived CEL and service lifetime"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "C08",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "C08-C09/initial-write-race-reset-baseline"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "C08/L02 explicit write during pending baseline survives settlement and releases URL readiness"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "C09",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "C08-C09/initial-write-race-reset-baseline"
+        },
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "V01/C09/K24 explicit Clock drives dependent CEL only, reset keeps initial baseline and owner disposal unsubscribes"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "C10",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "C10/derived-failure-and-cycle"
+        },
+        {
+          "file": "packages/core/test/values-expression-date.test.mjs",
+          "test": "C10 initial dependency order rejects undeclared targets and cycles before execution"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "C11",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "C11-C13/reaction-explicit-priority-and-atomic-derived"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L02/C11/K18 actual View restores URL before first Query and suppresses initial/restore reactions"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "C12",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "C11-C13/reaction-explicit-priority-and-atomic-derived"
+        },
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V31-V35/missing-null-falsy-reference"
+        },
+        {
+          "file": "packages/core/test/values-expression-date.test.mjs",
+          "test": "V10/V12/K30 date/time/datetime normalize explicit values and validate complete boundaries"
+        }
+      ],
+      "limits": [
+        "JS core only; Dart/CEL cross-language execution is a separate evidence scope."
+      ]
+    },
+    {
+      "id": "C13",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "C06/C13 same cell connects twice; equal local names have independent reactions"
+        },
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "C11-C13/reaction-explicit-priority-and-atomic-derived"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "C14",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "C14 library Store injection accepts real capability and rejects method-shaped fake"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "C15",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "C06-C07-C15/scope-ownership-and-shared-handles"
+        },
+        {
+          "file": "packages/core/test/runtime.test.mjs",
+          "test": "C07/C15 scopes, shared State port, derived CEL and service lifetime"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K02",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "K02/default-only-on-omission-and-falsy-values"
+        },
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "K02/invalid-default-declarations-and-unknown-inputs"
+        },
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "K02/defaults-are-literals-and-isolated-between-calls"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K03",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "K03/required-structural-failure-precedes-expression-evaluation"
+        },
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "K03/missing-pending-auto-wait-and-explicit-zero-execution"
+        },
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "K03/schema-validation-waits-until-value-ready"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K04",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "K04/number-cell-current-integer-does-not-pass-integer-contract"
+        },
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "K04/common-Type-missing-cell-connects-before-readiness"
+        },
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "K04/contracts-ignore-key-required-enum-type-order-and-annotations"
+        },
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "K04/local-refs-expand-with-escaped-pointers-and-siblings"
+        },
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "K04/const-enum-data-annotation-names-remain-constraints"
+        },
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "K04/no-general-logical-equivalence-or-subsumption-inference"
+        },
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "K04/readonly-derived-values-and-query-results-are-not-state-targets"
+        },
+        {
+          "file": "packages/core/test/state-ports.test.mjs",
+          "test": "K04/followup-write-revalidates-value-permissions-and-generation"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K06",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/values-schema-registration.test.mjs",
+          "test": "registration/complete-keyword-inventory"
+        },
+        {
+          "file": "packages/core/test/values-schema-registration.test.mjs",
+          "test": "reject/unknown"
+        },
+        {
+          "file": "packages/core/test/values-schema-registration.test.mjs",
+          "test": "reject/format"
+        },
+        {
+          "file": "packages/core/test/values-schema-registration.test.mjs",
+          "test": "reject/external-ref"
+        },
+        {
+          "file": "packages/core/test/values-schema-registration.test.mjs",
+          "test": "reject/self-cycle"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K07",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/values-expression-date.test.mjs",
+          "test": "K07 returned data and unescaped result are never reexecuted; mixed operator syntax fails"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K08",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L02/K08 failed initial remains error baseline when URL key is absent"
+        },
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "K08/initial-error-and-snapshot-status"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K17",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "S01-S05/atomic-scoped-observation-and-generations"
+        },
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "lifecycle/removed-dependency-cannot-retain-stale-success"
+        },
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "lifecycle/replaced-and-disposed-dependency-invalidates-atomically"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K18",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L02/C11/K18 actual View restores URL before first Query and suppresses initial/restore reactions"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L08/K18 atomic push+replace batch writes once; same values and restore do not repush"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K19",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L01/K19 fixed pre-URL baseline, invalid diagnostics and missing stay distinct"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L05/K19 duplicate owned keys/targets and derived binding reject configuration"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L06/K19 oversized encoded output keeps State and writes no partial patch"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L06/K19 input limits use baseline; external URL bytes are excluded from owned budget"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L06 output list and registration limits reject without truncation"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K20",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L09/K20 delayed newest write carries unapplied keys and invalidates old commit"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L09/K20 delayed writes are checked again after restore/dispose/ABA"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L09/K20 superseded cleanup checks currentness immediately before actual commit"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L09/K20 disposing View invalidates in-flight cleanup and preserves old URL"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K24",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "V01/C09/K24 explicit Clock drives dependent CEL only, reset keeps initial baseline and owner disposal unsubscribes"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K30",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/values-expression-date.test.mjs",
+          "test": "V10/V12/K30 date/time/datetime normalize explicit values and validate complete boundaries"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K31",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/values-expression-date.test.mjs",
+          "test": "K31/K35 declared-date constraints run after normalization and ordinary strings stay raw"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K32",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/values-expression-date.test.mjs",
+          "test": "K32 same instant has stable snapshot; service collection codec preserves strings and numeric keys"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "K30-K32 declared datetime URL normalization and same-instant notifications"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K33",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/values-expression-date.test.mjs",
+          "test": "K33/K34 explicit zone conversion rejects DST ambiguity; calendar next-day spans 23/25 hours"
+        },
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "K33 explicit timezone required definition, waiting input and invalid value remain distinct"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K34",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/values-expression-date.test.mjs",
+          "test": "K33/K34 explicit zone conversion rejects DST ambiguity; calendar next-day spans 23/25 hours"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "K35",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/values-expression-date.test.mjs",
+          "test": "K31/K35 declared-date constraints run after normalization and ordinary strings stay raw"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "L01",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L01/K19 fixed pre-URL baseline, invalid diagnostics and missing stay distinct"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "L02",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L02/C11/K18 actual View restores URL before first Query and suppresses initial/restore reactions"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L02 pending initial settles before URL restoration, missing URL uses settled baseline"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "C08/L02 explicit write during pending baseline survives settlement and releases URL readiness"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L02/K08 failed initial remains error baseline when URL key is absent"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "L03",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L03/L04 scalar/array/Set and nullable round trips preserve exact values"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L03 unsupported collection profiles reject before installing observers"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "L04",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L03/L04 scalar/array/Set and nullable round trips preserve exact values"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L04 duplicate owned key and malformed JSON restore baseline with diagnostics"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "L05",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L05 exact owned merge preserves raw external query bytes, path/hash and other stores"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L05 cross-store collisions on same adapter owned keys reject before restoration"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L05/K19 duplicate owned keys/targets and derived binding reject configuration"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "L06",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L06/K19 oversized encoded output keeps State and writes no partial patch"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L06/K19 input limits use baseline; external URL bytes are excluded from owned budget"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L06 output list and registration limits reject without truncation"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L06/L07 write and cleanup failure are synchronization errors; subsequent State writes still work"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "L07",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L06/L07 write and cleanup failure are synchronization errors; subsequent State writes still work"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L07/L10 disposing connection preserves URL and shared service binding survives consumer scope disposal"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L07 replacement cleanup removes selected exact keys and retains external/prefix keys"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L07 cleanup failure still completes new View, preserves new baseline and reports error"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L07/M05 actual View replacement removes old owned keys and uses new initial without reimporting old URL"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L07/M05 invalid replacement schema preserves existing tree/state/URL before cleanup"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L07/M05 URL replacement preflight/adapter"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L07/M05 URL replacement preflight/history"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L07/M05 URL replacement preflight/duplicate-state"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L07/M05 URL replacement preflight/limits"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L07/M05 URL replacement preflight/missing-state"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "L08",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L08/K18 atomic push+replace batch writes once; same values and restore do not repush"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "L09",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L09/K20 delayed newest write carries unapplied keys and invalidates old commit"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L09/K20 delayed writes are checked again after restore/dispose/ABA"
+        },
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L09 delayed old cleanup cannot remove newer values"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L09/K20 superseded cleanup checks currentness immediately before actual commit"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L09/K20 disposing View invalidates in-flight cleanup and preserves old URL"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "L10",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L07/L10 disposing connection preserves URL and shared service binding survives consumer scope disposal"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L10/M05 service Store connection rejects View convenience URL before old screen changes"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "L11",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L11-L13 dates use fixed normalized baseline; explicit baseline value remains in share link"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "L12",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L11-L13 dates use fixed normalized baseline; explicit baseline value remains in share link"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "L13",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-state.test.mjs",
+          "test": "L11-L13 dates use fixed normalized baseline; explicit baseline value remains in share link"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "M05",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L07/M05 actual View replacement removes old owned keys and uses new initial without reimporting old URL"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L07/M05 invalid replacement schema preserves existing tree/state/URL before cleanup"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L07/M05 URL replacement preflight/adapter"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L07/M05 URL replacement preflight/history"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L07/M05 URL replacement preflight/duplicate-state"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L07/M05 URL replacement preflight/limits"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L07/M05 URL replacement preflight/missing-state"
+        },
+        {
+          "file": "packages/core/test/url-runtime.test.mjs",
+          "test": "L10/M05 service Store connection rejects View convenience URL before old screen changes"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "S01",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "S01-S05/atomic-scoped-observation-and-generations"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "S02",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "S01-S05/atomic-scoped-observation-and-generations"
+        },
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "S02/S03 transaction batches final notifications and rolls back structural/value failures"
+        },
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "S02 transaction with no net value change emits no extra snapshot"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "S03",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "S01-S05/atomic-scoped-observation-and-generations"
+        },
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "S02/S03 transaction batches final notifications and rolls back structural/value failures"
+        },
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "S03/reentrant-writes-next-batch"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "S04",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "S01-S05/atomic-scoped-observation-and-generations"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "S05",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "S01-S05/atomic-scoped-observation-and-generations"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "S06",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V08-V09/S06/protected-stable-snapshots"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V01",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "V01/C09/K24 explicit Clock drives dependent CEL only, reset keeps initial baseline and owner disposal unsubscribes"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V02",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/values-expression-date.test.mjs",
+          "test": "V02 ordinary path/call data, escaped operator keys and native data retain literal meaning"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V03",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/values-expression-date.test.mjs",
+          "test": "V03 direct path preserves scalar/object types; interpolation produces only permitted strings"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V04",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/values-expression-date.test.mjs",
+          "test": "V04 common evaluator enforces root-specific context, JSON Pointer and exact array positions"
+        }
+      ],
+      "limits": [
+        "Common evaluator root/Pointer contract is exercised here; all concrete HTTP/UI/Query consumers are covered by their separate package suites, not this test alone."
+      ]
+    },
+    {
+      "id": "V05",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V05-V07/content-and-native-membership"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V06",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V05-V07/content-and-native-membership"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V07",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V05-V07/content-and-native-membership"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V08",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V08-V09/S06/protected-stable-snapshots"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V09",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V08-V09/S06/protected-stable-snapshots"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V10",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/values-expression-date.test.mjs",
+          "test": "V10/V12/K30 date/time/datetime normalize explicit values and validate complete boundaries"
+        },
+        {
+          "file": "packages/core/test/values-expression-date.test.mjs",
+          "test": "V10/V11 integer date addition rejects rounding and preserves YY 00/68/69/99 pivot"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V11",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/values-expression-date.test.mjs",
+          "test": "V10/V11 integer date addition rejects rounding and preserves YY 00/68/69/99 pivot"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V12",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/values-expression-date.test.mjs",
+          "test": "V10/V12/K30 date/time/datetime normalize explicit values and validate complete boundaries"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V13",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V13-V18/object-normalization-and-atomic-failure"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V14",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V13-V18/object-normalization-and-atomic-failure"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V15",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V13-V18/object-normalization-and-atomic-failure"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V16",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V13-V18/object-normalization-and-atomic-failure"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V17",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V13-V18/object-normalization-and-atomic-failure"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V18",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V13-V18/object-normalization-and-atomic-failure"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V19",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V19-V22/arrays-and-positions"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V20",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V19-V22/arrays-and-positions"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V21",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V19-V22/arrays-and-positions"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V22",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V19-V22/arrays-and-positions"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V23",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V23-V26/sets-undefined-null-identity"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V24",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V23-V26/sets-undefined-null-identity"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V25",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V23-V26/sets-undefined-null-identity"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V26",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V23-V26/sets-undefined-null-identity"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V27",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V27-V30/maps-undefined-null-objects"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V28",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V27-V30/maps-undefined-null-objects"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V29",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V27-V30/maps-undefined-null-objects"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V30",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V27-V30/maps-undefined-null-objects"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V31",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V31-V35/missing-null-falsy-reference"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V32",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V31-V35/missing-null-falsy-reference"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V33",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V31-V35/missing-null-falsy-reference"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V34",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V31-V35/missing-null-falsy-reference"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V35",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V31-V35/missing-null-falsy-reference"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V36",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V36-V40/nonfinite-recursive-and-map-keys"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V37",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V36-V40/nonfinite-recursive-and-map-keys"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V38",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V36-V40/nonfinite-recursive-and-map-keys"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V39",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V36-V40/nonfinite-recursive-and-map-keys"
+        },
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "V39-V45 calculated nonfinite and unsafe integer results reject atomically through actual CEL and State"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V40",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V36-V40/nonfinite-recursive-and-map-keys"
+        },
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "V39-V45 calculated nonfinite and unsafe integer results reject atomically through actual CEL and State"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V41",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V41-V45/safe-integer-recursive"
+        },
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "V39-V45 calculated nonfinite and unsafe integer results reject atomically through actual CEL and State"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V42",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V41-V45/safe-integer-recursive"
+        },
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "V39-V45 calculated nonfinite and unsafe integer results reject atomically through actual CEL and State"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V43",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V41-V45/safe-integer-recursive"
+        },
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "V39-V45 calculated nonfinite and unsafe integer results reject atomically through actual CEL and State"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V44",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V41-V45/safe-integer-recursive"
+        },
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "V39-V45 calculated nonfinite and unsafe integer results reject atomically through actual CEL and State"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V45",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V41-V45/safe-integer-recursive"
+        },
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "V39-V45 calculated nonfinite and unsafe integer results reject atomically through actual CEL and State"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V46",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V46-V49/binary64-preserved"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V47",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V46-V49/binary64-preserved"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V48",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V46-V49/binary64-preserved"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V49",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V46-V49/binary64-preserved"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V50",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V50-V55/negative-zero-and-notifications"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V51",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V50-V55/negative-zero-and-notifications"
+        },
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "V51 negative zero avoids downstream CEL/reaction/Query requests"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V52",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V50-V55/negative-zero-and-notifications"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V53",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V50-V55/negative-zero-and-notifications"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V54",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V50-V55/negative-zero-and-notifications"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V55",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V50-V55/negative-zero-and-notifications"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V56",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V56/unsupported-values-not-executed"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V57",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-integration.test.mjs",
+          "test": "V57 registered async Action is executable while function/Promise data remain rejected"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V58",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V58-V59/cycles-and-shared-graph"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V59",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V58-V59/cycles-and-shared-graph"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V60",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V60-V62/equality-coercion-default-extra"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V61",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V60-V62/equality-coercion-default-extra"
+        }
+      ],
+      "limits": []
+    },
+    {
+      "id": "V62",
+      "scope": "core-js",
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "test": "V60-V62/equality-coercion-default-extra"
+        }
+      ],
+      "limits": []
+    }
+  ],
+  "limitations": [
+    "Node22.21.1 and24.1.0 final targeted outcomes recorded in verification; parent owns whole-package build/typecheck and subsequent changed-source revalidation.",
+    "Real browser History/router verification is parent-owned; URL endpoint fixtures here test commit-time isCurrent with controlled asynchronous delivery.",
+    "No Dart runtime or full CEL conformance claim."
+  ],
+  "verification": {
+    "date": "2026-11-02",
+    "command": "node --test packages/core/test/state-*.test.mjs packages/core/test/values-*.test.mjs packages/core/test/url-*.test.mjs",
+    "runtimes": [
+      {
+        "version": "22.21.1",
+        "tests": 270,
+        "passed": 270,
+        "failed": 0
+      },
+      {
+        "version": "24.1.0",
+        "tests": 270,
+        "passed": 270,
+        "failed": 0
+      }
+    ],
+    "fixedDefectsCovered": [
+      "Pending URL initialization preserves settled baseline and error status",
+      "Pending initial outraced by explicit write releases URL readiness without replacing explicit value",
+      "Cross-store same-adapter owned-key collision rejects before restore",
+      "Net-zero transaction preserves stable snapshot and emits no update",
+      "View URL full configuration/service connection preflight precedes old cleanup/tree replacement"
+    ]
+  },
+  "testSha256": {
+    "packages/core/test/state-lifecycle.test.mjs": "632069b51abde2372308cdde50b28faf0682c276e05cb82496080822b045ecac",
+    "packages/core/test/state-ports.test.mjs": "9149b96b85e5824c4bdda66fa03bee1d2788cc0ebf28c28a50a0a8f7a22cd9b8",
+    "packages/core/test/values-schema-registration.test.mjs": "5a8a1c1f7f8746dc9274f77e697101ef313d68a936371ffca4df7e0e33492aa4",
+    "packages/core/test/values-schema-runtime.test.mjs": "13ddc011789d50ff6b76ce2bcba76000459a0b611f6fb48e12048a7f14358af1",
+    "packages/core/test/state-integration.test.mjs": "38b96f42ca1493ccc8828fefa1f22ea7edd8c24705a87901c40b845b54e7925a",
+    "packages/core/test/values-expression-date.test.mjs": "697fe8ae0a37e77280e517af53ea6d7703eebacf4be785097b3c6b644f67a008",
+    "packages/core/test/url-state.test.mjs": "b471e4dda2eb209c61d2ce76c69491397d5456fc519c9298b9a4298095dce2cd",
+    "packages/core/test/url-runtime.test.mjs": "65835d9772713ed92bc6471661f90dbcab01c414431582da7754debdc6983919",
+    "packages/core/test/fixtures/state/schema-cases.mjs": "962e068ac0ac264be066ff4a86b5ebe50bd0ce4964ac55e7333317e0f02d7a74",
+    "packages/core/test/fixtures/state/url-adapter.mjs": "4aeea7f00c91926c9dcd663c8093623e660b129afe566f22096ae2f959646f7f"
+  }
+}

@@ -1,0 +1,807 @@
+{
+  "package": "@marcbachmann/cel-js@8.0.0",
+  "source": "default Environment.getDefinitions() from patched build-7b2e5605b35a1dc6d32d",
+  "defaultEnvironment": {
+    "optionalTypes": false,
+    "actualOptionName": "enableOptionalTypes",
+    "enableOptionalTypes": false
+  },
+  "counts": {
+    "definitionEntriesIncludingMacros": 108,
+    "macroEntriesWithinDefinitions": 10,
+    "nonMacroOverloads": 98
+  },
+  "variables": [
+    {
+      "name": "string",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "bool",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "int",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "uint",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "double",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "map",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "list",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "bytes",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "null_type",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "type",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "google",
+      "description": null,
+      "type": "map<string, map<string, type>>"
+    },
+    {
+      "name": "optional",
+      "description": null,
+      "type": "OptionalNamespace"
+    },
+    {
+      "name": "cel",
+      "description": null,
+      "type": "CelNamespace"
+    }
+  ],
+  "functionSignatures": [
+    "dyn(dyn): dyn",
+    "type(string): type",
+    "type(bool): type",
+    "type(int): type",
+    "type(uint): type",
+    "type(double): type",
+    "type(map<dyn, dyn>): type",
+    "type(list<dyn>): type",
+    "type(bytes): type",
+    "type(null): type",
+    "type(type): type",
+    "bool(bool): bool",
+    "bool(string): bool",
+    "size(string): int",
+    "size(bytes): int",
+    "size(list<dyn>): int",
+    "size(map<dyn, dyn>): int",
+    "string.size(): int",
+    "bytes.size(): int",
+    "list<dyn>.size(): int",
+    "map<dyn, dyn>.size(): int",
+    "bytes(string): bytes",
+    "bytes(bytes): bytes",
+    "double(double): double",
+    "double(int): double",
+    "double(uint): double",
+    "double(string): double",
+    "int(int): int",
+    "int(double): int",
+    "int(string): int",
+    "uint(uint): uint",
+    "uint(int): uint",
+    "uint(double): uint",
+    "uint(string): uint",
+    "string(string): string",
+    "string(bool): string",
+    "string(int): string",
+    "string(uint): string",
+    "string(bytes): string",
+    "string(double): string",
+    "string.startsWith(string): bool",
+    "string.endsWith(string): bool",
+    "string.contains(string): bool",
+    "string.lowerAscii(): string",
+    "string.upperAscii(): string",
+    "string.trim(): string",
+    "string.indexOf(string): int",
+    "string.indexOf(string, int): int",
+    "string.lastIndexOf(string): int",
+    "string.lastIndexOf(string, int): int",
+    "string.substring(int): string",
+    "string.substring(int, int): string",
+    "string.matches(string): bool",
+    "matches(string, string): bool",
+    "string.split(string): list<string>",
+    "string.split(string, int): list<string>",
+    "list<string>.join(): string",
+    "list<string>.join(string): string",
+    "bytes.json(): map<dyn, dyn>",
+    "bytes.hex(): string",
+    "bytes.string(): string",
+    "bytes.base64(): string",
+    "bytes.at(int): int",
+    "type(google.protobuf.Timestamp): type",
+    "type(google.protobuf.Duration): type",
+    "timestamp(string): google.protobuf.Timestamp",
+    "timestamp(int): google.protobuf.Timestamp",
+    "google.protobuf.Timestamp.getDate(): int",
+    "google.protobuf.Timestamp.getDate(string): int",
+    "google.protobuf.Timestamp.getDayOfMonth(): int",
+    "google.protobuf.Timestamp.getDayOfMonth(string): int",
+    "google.protobuf.Timestamp.getDayOfWeek(): int",
+    "google.protobuf.Timestamp.getDayOfWeek(string): int",
+    "google.protobuf.Timestamp.getDayOfYear(): int",
+    "google.protobuf.Timestamp.getDayOfYear(string): int",
+    "google.protobuf.Timestamp.getFullYear(): int",
+    "google.protobuf.Timestamp.getFullYear(string): int",
+    "google.protobuf.Timestamp.getHours(): int",
+    "google.protobuf.Timestamp.getHours(string): int",
+    "google.protobuf.Timestamp.getMilliseconds(): int",
+    "google.protobuf.Timestamp.getMilliseconds(string): int",
+    "google.protobuf.Timestamp.getMinutes(): int",
+    "google.protobuf.Timestamp.getMinutes(string): int",
+    "google.protobuf.Timestamp.getMonth(): int",
+    "google.protobuf.Timestamp.getMonth(string): int",
+    "google.protobuf.Timestamp.getSeconds(): int",
+    "google.protobuf.Timestamp.getSeconds(string): int",
+    "duration(string): google.protobuf.Duration",
+    "google.protobuf.Duration.getHours(): int",
+    "google.protobuf.Duration.getMinutes(): int",
+    "google.protobuf.Duration.getSeconds(): int",
+    "google.protobuf.Duration.getMilliseconds(): int",
+    "type(OptionalNamespace): type",
+    "optional<dyn>.hasValue(): bool",
+    "optional<A>.value(): A",
+    "OptionalNamespace.none(): optional<T>",
+    "OptionalNamespace.of(A): optional<A>",
+    "optional<dyn>.or(ast): optional<dyn>",
+    "optional<dyn>.orValue(ast): dyn",
+    "has(ast): bool",
+    "list<dyn>.all(ast, ast): bool",
+    "list<dyn>.exists(ast, ast): bool",
+    "list<dyn>.exists_one(ast, ast): bool",
+    "list<dyn>.map(ast, ast): list<dyn>",
+    "list<dyn>.map(ast, ast, ast): list<dyn>",
+    "list<dyn>.filter(ast, ast): list<dyn>",
+    "type(CelNamespace): type",
+    "CelNamespace.bind(ast, dyn, ast): dyn"
+  ],
+  "macros": [
+    {
+      "signature": "has(ast): bool",
+      "kind": "CEL core macro",
+      "note": "Included among 108 definition entries, not 10 additional overloads."
+    },
+    {
+      "signature": "list.all(ast, ast): bool",
+      "kind": "CEL core macro",
+      "note": "Included among 108 definition entries, not 10 additional overloads."
+    },
+    {
+      "signature": "list.exists(ast, ast): bool",
+      "kind": "CEL core macro",
+      "note": "Included among 108 definition entries, not 10 additional overloads."
+    },
+    {
+      "signature": "list.exists_one(ast, ast): bool",
+      "kind": "CEL core macro",
+      "note": "Included among 108 definition entries, not 10 additional overloads."
+    },
+    {
+      "signature": "list.map(ast, ast): list<dyn>",
+      "kind": "CEL macro",
+      "note": "Included among 108 definition entries, not 10 additional overloads."
+    },
+    {
+      "signature": "list.map(ast, ast, ast): list<dyn>",
+      "kind": "CEL macro",
+      "note": "Included among 108 definition entries, not 10 additional overloads."
+    },
+    {
+      "signature": "list.filter(ast, ast): list<dyn>",
+      "kind": "CEL macro",
+      "note": "Included among 108 definition entries, not 10 additional overloads."
+    },
+    {
+      "signature": "optional.or(ast): optional<dyn>",
+      "kind": "optional extension macro; disabled in default Environment",
+      "note": "Included among 108 definition entries, not 10 additional overloads."
+    },
+    {
+      "signature": "optional.orValue(ast): dyn",
+      "kind": "optional extension macro; disabled in default Environment",
+      "note": "Included among 108 definition entries, not 10 additional overloads."
+    },
+    {
+      "signature": "CelNamespace.bind(ast, dyn, ast): dyn",
+      "kind": "cel-js package namespace macro",
+      "note": "Included among 108 definition entries, not 10 additional overloads."
+    }
+  ],
+  "currentPatchSha256": "62dd517376de54a08018f6166b250d9013b907e87b11ab75d0f07e264de0da63",
+  "scope": "Observed default cel-js candidate inventory. No complete CEL standard, extensions, or Viewstem v1 public function profile approval. Presence is not exhaustive conformance.",
+  "inventoryProvenance": "Original /tmp inventory copied unchanged under archive/u34-default-extensions/original-function-catalog.json; exact signature equality rechecked by catalog.mjs after patch.",
+  "macroSignatures": [
+    "optional<dyn>.or(ast): optional<dyn>",
+    "optional<dyn>.orValue(ast): dyn",
+    "has(ast): bool",
+    "list<dyn>.all(ast, ast): bool",
+    "list<dyn>.exists(ast, ast): bool",
+    "list<dyn>.exists_one(ast, ast): bool",
+    "list<dyn>.map(ast, ast): list<dyn>",
+    "list<dyn>.map(ast, ast, ast): list<dyn>",
+    "list<dyn>.filter(ast, ast): list<dyn>",
+    "CelNamespace.bind(ast, dyn, ast): dyn"
+  ],
+  "sources": {
+    "standard": "https://github.com/cel-expr/cel-spec/blob/master/doc/langdef.md#standard-environment",
+    "stringsExtension": "https://github.com/cel-expr/cel-go/blob/master/ext/strings.go",
+    "package": "archive/u34-default-extensions/upstream/lib/functions.js",
+    "optional": "archive/u34-default-extensions/upstream/lib/optional.js",
+    "bind": "archive/u34-default-extensions/upstream/lib/macros.js"
+  },
+  "classifications": [
+    {
+      "signature": "dyn(dyn): dyn",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "type(string): type",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "type(bool): type",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "type(int): type",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "type(uint): type",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "type(double): type",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "type(map<dyn, dyn>): type",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "type(list<dyn>): type",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "type(bytes): type",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "type(null): type",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "type(type): type",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "bool(bool): bool",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "bool(string): bool",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "size(string): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "size(bytes): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "size(list<dyn>): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "size(map<dyn, dyn>): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "string.size(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "bytes.size(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "list<dyn>.size(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "map<dyn, dyn>.size(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "bytes(string): bytes",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "bytes(bytes): bytes",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "double(double): double",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "double(int): double",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "double(uint): double",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "double(string): double",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "int(int): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "int(double): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "int(string): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "uint(uint): uint",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "uint(int): uint",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "uint(double): uint",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "uint(string): uint",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "string(string): string",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "string(bool): string",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "string(int): string",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "string(uint): string",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "string(bytes): string",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "string(double): string",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "string.startsWith(string): bool",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "string.endsWith(string): bool",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "string.contains(string): bool",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "string.lowerAscii(): string",
+      "kind": "CEL strings extension (cel-go ext), outside standard environment",
+      "verification": "Focused extension regression only; not exhaustive string extension conformance."
+    },
+    {
+      "signature": "string.upperAscii(): string",
+      "kind": "CEL strings extension (cel-go ext), outside standard environment",
+      "verification": "Focused extension regression only; not exhaustive string extension conformance."
+    },
+    {
+      "signature": "string.trim(): string",
+      "kind": "CEL strings extension (cel-go ext), outside standard environment",
+      "verification": "Focused extension regression only; not exhaustive string extension conformance."
+    },
+    {
+      "signature": "string.indexOf(string): int",
+      "kind": "CEL strings extension (cel-go ext), outside standard environment",
+      "verification": "Focused extension regression only; not exhaustive string extension conformance."
+    },
+    {
+      "signature": "string.indexOf(string, int): int",
+      "kind": "CEL strings extension (cel-go ext), outside standard environment",
+      "verification": "Focused extension regression only; not exhaustive string extension conformance."
+    },
+    {
+      "signature": "string.lastIndexOf(string): int",
+      "kind": "CEL strings extension (cel-go ext), outside standard environment",
+      "verification": "Focused extension regression only; not exhaustive string extension conformance."
+    },
+    {
+      "signature": "string.lastIndexOf(string, int): int",
+      "kind": "CEL strings extension (cel-go ext), outside standard environment",
+      "verification": "Focused extension regression only; not exhaustive string extension conformance."
+    },
+    {
+      "signature": "string.substring(int): string",
+      "kind": "CEL strings extension (cel-go ext), outside standard environment",
+      "verification": "Focused extension regression only; not exhaustive string extension conformance."
+    },
+    {
+      "signature": "string.substring(int, int): string",
+      "kind": "CEL strings extension (cel-go ext), outside standard environment",
+      "verification": "Focused extension regression only; not exhaustive string extension conformance."
+    },
+    {
+      "signature": "string.matches(string): bool",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "matches(string, string): bool",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "string.split(string): list<string>",
+      "kind": "CEL strings extension (cel-go ext), outside standard environment",
+      "verification": "Focused extension regression only; not exhaustive string extension conformance."
+    },
+    {
+      "signature": "string.split(string, int): list<string>",
+      "kind": "CEL strings extension (cel-go ext), outside standard environment",
+      "verification": "Focused extension regression only; not exhaustive string extension conformance."
+    },
+    {
+      "signature": "list<string>.join(): string",
+      "kind": "CEL strings extension (cel-go ext), outside standard environment",
+      "verification": "Unverified by new extension regression; registry presence only."
+    },
+    {
+      "signature": "list<string>.join(string): string",
+      "kind": "CEL strings extension (cel-go ext), outside standard environment",
+      "verification": "Unverified by new extension regression; registry presence only."
+    },
+    {
+      "signature": "bytes.json(): map<dyn, dyn>",
+      "kind": "cel-js package extension, outside standard environment",
+      "verification": "Object/nested Unicode JSON success, malformed JSON SyntaxError, admission cost in Node/Chromium. Scalar/list returns and numeric/prototype/invalid-UTF8 boundaries unverified."
+    },
+    {
+      "signature": "bytes.hex(): string",
+      "kind": "cel-js package extension, outside standard environment",
+      "verification": "Unverified by new extension regression; registry presence only."
+    },
+    {
+      "signature": "bytes.string(): string",
+      "kind": "cel-js package extension, outside standard environment",
+      "verification": "Unverified by new extension regression; registry presence only."
+    },
+    {
+      "signature": "bytes.base64(): string",
+      "kind": "cel-js package extension, outside standard environment",
+      "verification": "Unverified by new extension regression; registry presence only."
+    },
+    {
+      "signature": "bytes.at(int): int",
+      "kind": "cel-js package extension, outside standard environment",
+      "verification": "Unverified by new extension regression; registry presence only."
+    },
+    {
+      "signature": "type(google.protobuf.Timestamp): type",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "type(google.protobuf.Duration): type",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "timestamp(string): google.protobuf.Timestamp",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "timestamp(int): google.protobuf.Timestamp",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getDate(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getDate(string): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getDayOfMonth(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getDayOfMonth(string): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getDayOfWeek(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getDayOfWeek(string): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getDayOfYear(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getDayOfYear(string): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getFullYear(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getFullYear(string): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getHours(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getHours(string): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getMilliseconds(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getMilliseconds(string): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getMinutes(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getMinutes(string): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getMonth(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getMonth(string): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getSeconds(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Timestamp.getSeconds(string): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "duration(string): google.protobuf.Duration",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Duration.getHours(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Duration.getMinutes(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Duration.getSeconds(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "google.protobuf.Duration.getMilliseconds(): int",
+      "kind": "CEL standard environment",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "type(OptionalNamespace): type",
+      "kind": "Optional extension, disabled namespace/syntax by default",
+      "verification": "Registry metadata present; default enableOptionalTypes=false. Opt-in behavior unverified."
+    },
+    {
+      "signature": "optional<dyn>.hasValue(): bool",
+      "kind": "Optional extension, disabled namespace/syntax by default",
+      "verification": "Registry metadata present; default enableOptionalTypes=false. Opt-in behavior unverified."
+    },
+    {
+      "signature": "optional<A>.value(): A",
+      "kind": "Optional extension, disabled namespace/syntax by default",
+      "verification": "Registry metadata present; default enableOptionalTypes=false. Opt-in behavior unverified."
+    },
+    {
+      "signature": "OptionalNamespace.none(): optional<T>",
+      "kind": "Optional extension, disabled namespace/syntax by default",
+      "verification": "Registry metadata present; default enableOptionalTypes=false. Opt-in behavior unverified."
+    },
+    {
+      "signature": "OptionalNamespace.of(A): optional<A>",
+      "kind": "Optional extension, disabled namespace/syntax by default",
+      "verification": "Registry metadata present; default enableOptionalTypes=false. Opt-in behavior unverified."
+    },
+    {
+      "signature": "optional<dyn>.or(ast): optional<dyn>",
+      "kind": "Optional extension, disabled namespace/syntax by default",
+      "verification": "Registry metadata present; default enableOptionalTypes=false. Opt-in behavior unverified."
+    },
+    {
+      "signature": "optional<dyn>.orValue(ast): dyn",
+      "kind": "Optional extension, disabled namespace/syntax by default",
+      "verification": "Registry metadata present; default enableOptionalTypes=false. Opt-in behavior unverified."
+    },
+    {
+      "signature": "has(ast): bool",
+      "kind": "CEL standard macro",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "list<dyn>.all(ast, ast): bool",
+      "kind": "CEL standard macro",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "list<dyn>.exists(ast, ast): bool",
+      "kind": "CEL standard macro",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "list<dyn>.exists_one(ast, ast): bool",
+      "kind": "CEL standard macro",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "list<dyn>.map(ast, ast): list<dyn>",
+      "kind": "CEL standard macro",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "list<dyn>.map(ast, ast, ast): list<dyn>",
+      "kind": "CEL standard macro",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "list<dyn>.filter(ast, ast): list<dyn>",
+      "kind": "CEL standard macro",
+      "verification": "Only existing golden/cost/value/date/regex scenarios; remaining overload boundaries unverified."
+    },
+    {
+      "signature": "type(CelNamespace): type",
+      "kind": "cel-js cel namespace extension",
+      "verification": "Unverified by new extension regression; registry presence only."
+    },
+    {
+      "signature": "CelNamespace.bind(ast, dyn, ast): dyn",
+      "kind": "cel-js cel namespace extension",
+      "verification": "Unverified by new extension regression; registry presence only."
+    }
+  ]
+}

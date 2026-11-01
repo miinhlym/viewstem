@@ -1,0 +1,12 @@
+import {mkdir,readdir,writeFile} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import {spawnSync} from 'node:child_process';
+const root=new URL('../../../',import.meta.url),directory=new URL('../test/',import.meta.url);
+const files=(await readdir(directory)).filter(name=>name.endsWith('.test.mjs')).sort().map(name=>fileURLToPath(new URL(name,directory)));
+await mkdir(new URL('results/',directory),{recursive:true});
+const result=spawnSync(process.execPath,['--test','--test-reporter=./packages/core/scripts/test-reporter.mjs',...files],{cwd:fileURLToPath(root),encoding:'utf8',maxBuffer:8*1024*1024});
+if(result.error)throw result.error;
+if(result.stderr)process.stderr.write(result.stderr);
+await writeFile(new URL('results/current.json',directory),result.stdout);
+const report=JSON.parse(result.stdout);console.log(JSON.stringify({node:report.nodeVersion,passed:report.passed,failed:report.failed,failures:report.failures}));
+process.exitCode=result.status??1;

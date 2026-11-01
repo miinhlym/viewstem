@@ -1,5 +1,8 @@
 # 계약 인수 테스트 백로그
 
+U37 제품 검증: [core 216개·선택 차트 후속 8개 대응표](core-acceptance-coverage.json)와 [실행 결과](core-verification-results.json)를 확인한다. 아래 표는 기대값 원문이며 실험 기준선 `experiments/verification/coverage.json`은 변경하지 않는다.
+
+
 **상태: 아래 인수 항목 전체를 통과한 core 구현은 아직 없다.** 이 표는 [최종 명세](../VIEWSTEM-SPEC.md)의 설계 기대값이며, U34까지의 실제 독립 실행 상태는 [전체 진행표](verification-ledger.md)와 [항목별 증거](../../experiments/verification/coverage.json)를 따른다. 문서 끝의 시점별 대응표와 현재 실행 결과를 구별한다. 독립 실험 통과를 코드·Schema·렌더러 전체 구현 완료로 확대하지 않으며, 정확한 오류 코드와 SDK는 연결된 현재 명세를 따른다.
 
 출처: [통합 명세](https://chatgpt.com/space/page_7842bb8bff0c8191be6cd5831e7e375f) §12 및 [근거 색인](../history/evidence-index.md). 테스트 작성 시 각 ID에 구현 파일·fixture·실행 결과를 연결한다. 성공뿐 아니라 부정 경로를 반드시 포함한다.

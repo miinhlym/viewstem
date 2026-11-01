@@ -1,5 +1,8 @@
 # 호스트 등록 · 렌더러 연결
 
+U37 구현: 실제 JS/TS API는 [core README](../../packages/core/README.md)와 [공개 타입](../../packages/core/src/index.d.ts)에 구체화했다. `NodeSnapshot`은 이름별 `slots`와 평탄한 `children`을 함께 제공한다. 기존 화면은 주입한 정의를 유지하고 `replace`/새 mount에서 새 Registry 정의를 주입한다. 아래 의사 코드와 실제 패키지 시그니처를 구별하며 최소 계약·권한·초기 완료 의미는 그대로 따른다.
+
+
 기준일: 2026-10-28 · Viewstem v1 설계 계약
 
 [명세 시작점](../VIEWSTEM-SPEC.md) · 이 문서는 최종 명세의 주제별 상세다. **확정**과 **구체화 필요/구현 제안/이전 승인 이관**을 구분해 읽는다. JSON은 계약 설명이며 실행 검증 완료를 뜻하지 않는다.

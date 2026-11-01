@@ -1,0 +1,36 @@
+{
+  "name": "@viewstem/core",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Framework-independent declarative UI runtime",
+  "engines": {
+    "node": ">=22"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./http": {
+      "types": "./dist/http.d.ts",
+      "import": "./dist/http.js"
+    },
+    "./cel-support.json": "./dist/cel-support.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test test/*.test.mjs",
+    "typecheck": "tsc -p test/types/tsconfig.json"
+  },
+  "dependencies": {
+    "@js-temporal/polyfill": "0.5.1",
+    "ajv": "8.20.0",
+    "re2js": "2.9.1"
+  }
+}

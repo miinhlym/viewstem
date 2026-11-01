@@ -1,0 +1,188 @@
+{
+  "scope": "Root integration/packaged core evidence; browser evidence is separately retained in final verification results",
+  "records": [
+    {
+      "id": "C16",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "tests": [
+            "C16/C17 same ids in different resource kinds coexist, same-kind duplicates are atomic"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C17",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "tests": [
+            "C16/C17 same ids in different resource kinds coexist, same-kind duplicates are atomic"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "U08",
+      "evidence": [
+        {
+          "file": "packages/core/test/grid.test.mjs",
+          "tests": [
+            "U08 Grid rejects fixed overlap, partial coordinates, invalid integers and range instead of moving"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "U09",
+      "evidence": [
+        {
+          "file": "packages/core/test/grid.test.mjs",
+          "tests": [
+            "U09 Grid reserves fixed nodes first and searches whole rectangles forward in expanded order"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "U10",
+      "evidence": [
+        {
+          "file": "packages/core/test/grid.test.mjs",
+          "tests": [
+            "U10 Grid hidden declarations validate layout but consume no space; unknown layout ids reject"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "K01",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-composition.test.mjs",
+          "tests": [
+            "K01 ref and inline Component Query Derived use the same declared inputs and never capture surrounding values"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "K21",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-composition.test.mjs",
+          "tests": [
+            "K21 repeat computes every key before item when and does not evaluate hidden inputs or start hidden Query"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "U03",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-composition.test.mjs",
+          "tests": [
+            "U03 renderer snapshot preserves named slot boundaries and multiple authored nodes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "K23",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "tests": [
+            "N04/K23 first Query errors report through initial; blocked and missing-input Queries do not prevent completion",
+            "N05/K23 failed update preserves existing State, screen, in-flight Query and initial completion",
+            "K23/Q07 replace cancels prior initial and old owner, discarding late Query results",
+            "K23 update before initial completion cancels the old completion while preserving the active valid usage"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C13",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-review-regression.test.mjs",
+          "tests": [
+            "C13/M05 replacing View reactions on shared targets succeeds with and without URL preflight"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M05",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-review-regression.test.mjs",
+          "tests": [
+            "C13/M05 replacing View reactions on shared targets succeeds with and without URL preflight"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "A11",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-review-regression.test.mjs",
+          "tests": [
+            "A11 running notification reentry ignores same connection without starting a second native call"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-review-regression.test.mjs",
+          "tests": [
+            "M01/C13 simultaneous State and reaction configuration uses new definitions and final projection",
+            "C13/M01 simultaneous reaction target exchange across live owners is atomic",
+            "M01 final reaction-driven invalid tree rolls back State config and active connection"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C13",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-review-regression.test.mjs",
+          "tests": [
+            "M01/C13 simultaneous State and reaction configuration uses new definitions and final projection",
+            "C13/M01 simultaneous reaction target exchange across live owners is atomic",
+            "M01 final reaction-driven invalid tree rolls back State config and active connection"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-review-regression.test.mjs",
+          "tests": [
+            "M01/U05 intermediate staged when=false does not destroy a finally retained instance"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "U05",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-review-regression.test.mjs",
+          "tests": [
+            "M01/U05 intermediate staged when=false does not destroy a finally retained instance"
+          ]
+        }
+      ]
+    }
+  ]
+}

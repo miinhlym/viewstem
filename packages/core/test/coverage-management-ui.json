@@ -1,0 +1,515 @@
+{
+  "schemaVersion": 1,
+  "scope": "Actual core tests owned by registry/management/UI reviewer; Grid U08-U10 and browser rendering are owned by root and intentionally excluded.",
+  "evidence": {
+    "management": {
+      "command": "npm run build && node --test packages/core/test/runtime-management.test.mjs",
+      "latestResult": {
+        "tests": 24,
+        "passed": 24,
+        "failed": 0
+      },
+      "note": "Parent rebuilt the current package and reran all 24 management cases after fixing nested retainedChildren lifetime; passing evidence reused without repeating unchanged checks."
+    },
+    "uiReview": {
+      "command": "node --test packages/core/test/runtime-ui-review.test.mjs",
+      "latestResult": {
+        "tests": 14,
+        "passed": 14,
+        "failed": 0
+      }
+    },
+    "types": {
+      "command": "npm run typecheck -w @viewstem/core",
+      "latestResult": "passed after CEL synchrony/read-only declarations"
+    },
+    "defaultHttp": {
+      "command": "node --test --test-name-pattern='N02 unknown reference without resolver fails clearly; default public native HTTP works without a supplied executor' packages/core/test/runtime-query.test.mjs",
+      "latestResult": {
+        "tests": 1,
+        "passed": 1,
+        "failed": 0
+      }
+    }
+  },
+  "entries": [
+    {
+      "id": "M01",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "M01 invalid State plus valid configuration and reverse have no partial effects"
+        },
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "M01 valid State and configuration publish one coherent new generation"
+        },
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "M01 failed build after a retained Component input becomes pending preserves its live State"
+        },
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "M01 failed dynamic update preserves State, old tree and an in-flight Action connection"
+        }
+      ],
+      "covered": [
+        "Invalid State and invalid structure each leave prior State/definition/projection unchanged.",
+        "Valid State/configuration changes publish coherent values.",
+        "Late dynamic build failure preserves existing pending-input owner and active Action connection."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "M02",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "M02 synchronous and asynchronous Query errors retain committed configuration and State"
+        }
+      ],
+      "covered": [
+        "Both synchronous throws and rejected request promises become Query errors after commit.",
+        "Committed configuration/State persist and initial report identifies the Query error without private exception text."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "M03",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "M03 only instance A changes while B handle and shared definition remain intact"
+        },
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "M03 replacing only instance A preserves B state and the common definition"
+        }
+      ],
+      "covered": [
+        "Replacing only A leaves B instance/State handle and registered common definition unchanged."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "M04",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "M04 definition updates affect future injection while existing mounted definitions stay pinned"
+        },
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "M04 Query, Variable, Type and Action references stay pinned across updates until explicit replacement"
+        }
+      ],
+      "covered": [
+        "Mutating original database-like input does not affect registered/mounted definitions.",
+        "Registry updates do not auto-follow in existing Component, Type, Variable, Query or Action references, including refresh/handlers after View.update.",
+        "Future mount and explicit replace inject new definitions."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "M05",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "M05 replacement cleans prior owned URL and State while service State and foreign URL survive"
+        }
+      ],
+      "covered": [
+        "Replace creates a new owner lifetime and invalidates old internal State handles.",
+        "Only old owned URL keys are cleaned with replace history; service State, foreign keys and fragment survive.",
+        "Disposing the View leaves service-owned State usable."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "M06",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "M06 State, current configuration and reusable definitions export independently without autosave"
+        }
+      ],
+      "covered": [
+        "All three change targets are supported.",
+        "Definition exports retain declaration initial values independently of live State values.",
+        "View/resource exports are detached, JSON serializable, and unaffected by editing the returned copies.",
+        "Saving is an explicit service function in the fixture."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "M07",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "M07 listing does not grant invoke or update rights; denied update starts no State/Query/URL effects"
+        },
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "M07 UI events and explicit invocation use the same deny and allow Action policy"
+        },
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "M07 denied existing-view replacement preserves State, URL, connections and data execution"
+        }
+      ],
+      "covered": [
+        "List/describe do not grant invocation rights; invalid/disposed owners are rejected.",
+        "UI and explicit Action calls share deny/allow policy.",
+        "Denied update/replace preserve State/configuration/lifetime/URL and start no data requests."
+      ],
+      "remaining": [],
+      "notes": [
+        "Service-specific actor/public-target filtering and external agent adapters remain host integrations; this fixture exercises the common core authorization hook."
+      ]
+    },
+    {
+      "id": "N01",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "N01 inline static business definitions mount without resolver or Query executor callbacks"
+        }
+      ],
+      "covered": [
+        "Static inline business definitions mount with registered code Component contracts and no resolver/requestExecutor callbacks."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "N02",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "N02 referenced definitions resolve recursively in their expected kind and invalid resolution keeps current View"
+        },
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "N02 malformed resolved graph never executes data or replaces the current screen"
+        },
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "name": "N02 unknown reference without resolver fails clearly; default public native HTTP works without a supplied executor"
+        }
+      ],
+      "covered": [
+        "Missing resolver, wrong returned kind and missing graph child fail clearly and preserve current screen.",
+        "Recursive valid resolution uses expected resource kinds.",
+        "Invalid preparation starts no data request.",
+        "The shipped direct HTTP executor is a supported default; a missing custom requestExecutor is not an error. Actual native HTTP default behavior is covered by runtime-query.test.mjs."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "U01",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/registry.test.mjs",
+          "name": "slots, event handlers and inline actions use their actual contracts"
+        },
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "U01 runtime accepts empty required slots and omitted optional slots as empty content"
+        }
+      ],
+      "covered": [
+        "Required slot absence is rejected; explicit empty array is accepted by actual registry.",
+        "Runtime projects explicit empty required slots and omitted declared optional slots as empty content."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "U02",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "U02 forwarded slots retain author state and original child ordering"
+        }
+      ],
+      "covered": [
+        "Directly forwarded slot nodes read and react to author State rather than receiver State."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "U03",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "U02 forwarded slots retain author state and original child ordering"
+        }
+      ],
+      "covered": [
+        "Multiple slot nodes retain author order and are represented as separate children."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "U04",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "U04 invalid event payload calls no Action and preserves idle observation"
+        }
+      ],
+      "covered": [
+        "Invalid typed event payload reports TYPE_MISMATCH, invokes no Action and preserves idle observation."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "U05",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "A15/A16 self-removing Action cancels remaining steps and recreates an idle connection"
+        }
+      ],
+      "covered": [
+        "when false removes the connection; returning true creates a new generation and idle observation while owner State remains."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "U06",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "U06 repeat reorder preserves key-owned state; remove and re-add creates a fresh lifetime"
+        },
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "A20 realized repeated action connection ids are rejected atomically"
+        },
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "M01 failed dynamic update preserves State, old tree and an in-flight Action connection"
+        }
+      ],
+      "covered": [
+        "Key reorder preserves State/instance, removed then re-added key creates fresh State lifetime.",
+        "Duplicate repeat keys fail atomically without replacing the prior screen."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "U07",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "U07 moving a stateful node between Row slots preserves its handle and instance"
+        },
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "U07 moving the same local node id into another author Component creates a new lifetime"
+        },
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "U07/C07 temporarily missing required input preserves the existing Component State lifetime"
+        },
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "U07/C07 temporarily error required input preserves the existing Component State lifetime"
+        },
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "U07/C07 reactions reconnect to actual State ports and pause while required input is unavailable"
+        },
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "U07 suspended nested owner preserves active Action, local State and Query handle until resume"
+        }
+      ],
+      "covered": [
+        "Moving a node between layout Row slots in the same author owner preserves instance/State identity.",
+        "Moving the same local node ID into another author Component creates a fresh State/instance lifetime.",
+        "Temporary missing/error required inputs preserve direct Component local State through recovery.",
+        "Reactions reconnect to actual changed source/target State ports, detach while suspended and resume on input recovery.",
+        "Nested suspended owner scopes, active Action connections, local State and Query handles survive repeated pending refreshes; owned Query work is gated and resumes with new inputs."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "U11",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/registry.test.mjs",
+          "name": "Component cycles include inline definitions and do not reject shared DAG children"
+        },
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "U11 unused direct self and separate registered Component cycles fail before any execution"
+        }
+      ],
+      "covered": [
+        "Unused inline Component back-reference cycles are rejected at registration; valid shared-child DAGs are accepted.",
+        "Unused direct self-reference and separate independently registered A→B→A Component cycles are each rejected atomically."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "U12",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/registry.test.mjs",
+          "name": "UI statically validates when:false, node scopes, root and nested repeat aliases"
+        },
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "U06 repeat reorder preserves key-owned state; remove and re-add creates a fresh lifetime"
+        },
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "U12 node ids remain unique across two Row containers in one author owner"
+        }
+      ],
+      "covered": [
+        "Same-owner duplicate node IDs are rejected.",
+        "Separate Counter instances each accept the same internal render node ID.",
+        "Duplicate author node IDs remain invalid across two different layout Rows."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "U13",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "U13 nested repeat reads outer and inner aliases and scopes equal keys under each parent"
+        }
+      ],
+      "covered": [
+        "Nested different repeat aliases are simultaneously readable, and equal child keys under separate parents do not conflict."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "A14",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "A14 action observations exist before earlier sibling inputs and remain current while running"
+        }
+      ],
+      "covered": [
+        "Earlier sibling inputs read later Action connection idle/running/success state correctly, independent of traversal order."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "A15",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "A15/A16 self-removing Action cancels remaining steps and recreates an idle connection"
+        }
+      ],
+      "covered": [
+        "Removed connection cancels its call; recreated same observed ID is idle/new generation and old event target is rejected."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "A16",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "A15/A16 self-removing Action cancels remaining steps and recreates an idle connection"
+        }
+      ],
+      "covered": [
+        "SetState removing its own connection preserves the completed State write and prevents subsequent Action step."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "A20",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "A20 realized repeated action connection ids are rejected atomically"
+        },
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "A20 projecting one author slot twice rejects duplicate realized connections"
+        }
+      ],
+      "covered": [
+        "Repeated and multiply projected connections cannot share one observed ID in the same author owner."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "A21",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "A21 same internal action id in separate instances is independent and anonymous running duplicates are ignored"
+        }
+      ],
+      "covered": [
+        "Separate Component owners can use the same internal observed ID and run independently.",
+        "Anonymous connection ignores additional invocation while active without sharing other connection state."
+      ],
+      "remaining": []
+    },
+    {
+      "id": "A22",
+      "coverage": "covered",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "name": "A22 failed dynamic action input reports preparation error and executes no implementation"
+        }
+      ],
+      "covered": [
+        "Dynamic input type failure executes zero native effects, sets error/running:false/data:null, and identifies /inputs plus port name."
+      ],
+      "remaining": []
+    }
+  ],
+  "additionalFindings": [
+    {
+      "status": "resolved",
+      "contract": "VIEWSTEM-SPEC §4.2 same instance on inputs changes; §5.1 readiness; §5.2 one-time initial",
+      "tests": [
+        {
+          "file": "packages/core/test/runtime-management.test.mjs",
+          "name": "U07 suspended nested owner preserves active Action, local State and Query handle until resume"
+        }
+      ],
+      "observed": "After an ancestor becomes pending, repeated reconciliation loses the retained nested subtree and cancels nested State/Action lifetime.",
+      "expected": "Preserve nested owners, active connection, State and Query handles through suspension; gate new Query work, then resume with the same lifetime.",
+      "resolution": "Parent retains an internal nested subtree across repeated suspended refreshes; actual-package management 24/24 now passes."
+    }
+  ],
+  "unresolvedFindings": []
+}

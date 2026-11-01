@@ -1,0 +1,2 @@
+# Unified patch context lines require a leading space, including blank lines.
+packages/core/vendor/*.patch -whitespace

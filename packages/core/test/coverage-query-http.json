@@ -1,0 +1,1023 @@
+{
+  "schemaVersion": 1,
+  "scope": "Production core Query/HTTP acceptance evidence; original experimental coverage is preserved unchanged.",
+  "source": "docs/handoff/acceptance-matrix.md",
+  "originalCoverage": "experiments/verification/coverage.json",
+  "scopeExclusions": [
+    "Renderer DOM acknowledgement/browser visual presentation are not claimed by core initial completion tests.",
+    "External secret storage, network availability and service authorization policy implementations remain host responsibilities.",
+    "Passing fixtures establish only their listed branches; scheduler-only assertions do not prove Action interpreter continuation behavior."
+  ],
+  "verification": [
+    {
+      "command": "node --test packages/core/test/query*.test.mjs packages/core/test/http*.test.mjs",
+      "result": "181/181 Node tests passed; HTTP file suites additionally execute 261 contract cases and 152 path cases."
+    },
+    {
+      "command": "node --test packages/core/test/runtime-query.test.mjs packages/core/test/runtime.test.mjs",
+      "result": "20/20 Node tests passed."
+    },
+    {
+      "command": "node --test packages/core/test/query-acceptance-gaps.test.mjs",
+      "result": "16/16 tests passed through @viewstem/core public package exports after the zero-argument custom-function schema fix."
+    },
+    {
+      "command": "node --test packages/core/test/query*.test.mjs packages/core/test/http*.test.mjs packages/core/test/runtime-query.test.mjs",
+      "result": "213/213 Node tests passed; nested HTTP suites passed 261 loopback contract cases and 152 dynamic-path cases."
+    }
+  ],
+  "summary": {
+    "total": 47,
+    "verifiedCore": 47,
+    "partial": 0
+  },
+  "records": [
+    {
+      "id": "Q01",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "S01-cycle-unused-definition"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "Q01 valid unused Query and Component registrations make no requests before or after a separate static View mount"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q02",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "C21-inline-query-equals-reference",
+            "S04-inline-ref-xor"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q03",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "C27-dynamic-missing-child-input-identifies-child-port",
+            "C18-missing-required-child-binding-is-registration-error"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q04",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "C01-siblings-start-independently-and-publish-once",
+            "C25-source-map-order-is-not-an-execution-dependency"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q05",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "S08-join-key/strict-types",
+            "S08-join-key/null-unmatched",
+            "S08-join-key/own-dot-key",
+            "S09-join-invalid-key/missing",
+            "S09-join-invalid-key/object",
+            "S09-join-invalid-key/nan",
+            "S10-join-compound-key-and-cartesian-matches"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q06",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "C15-concat-order-duplicates-and-heterogeneous-data",
+            "S14-concat-many-arrays-does-not-use-call-argument-limit"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q07",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R01-obsolete-success",
+            "R02-obsolete-error",
+            "R03-input-ABA",
+            "R04-completion-queued-before-input-change"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "C06-obsolete-run-cannot-seed-current-cache"
+          ]
+        },
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "testNames": [
+            "K23/Q07 replace cancels prior initial and old owner, discarding late Query results"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q08",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R05-latest-pending-burst"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "C11-refresh-follows-latest-input-and-forces-fresh-children"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q09",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R08-gate-closes-pending",
+            "R31-initial-gate-blocked"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "Q09 Q13 K12 actual Action closed gate preserves earlier effects and skips later stages/output"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q10",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R24-auto-refresh-gate-does-not-block-manual"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-polling.test.mjs",
+          "testNames": [
+            "P08-auto-condition-affects-only-periodic-execution"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q11",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R06-refresh-waves",
+            "R07-refresh-follows-new-input-after-start"
+          ]
+        },
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "testNames": [
+            "Q11/K16 cancelled parent Action propagates to its child refresh waiter while the shared Query keeps running"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "Q11 actual RefreshQuery Action waits beyond the old active response before executing its next stage/output"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q12",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "S11-explicit-execution-does-not-use-owner-cache"
+          ]
+        },
+        {
+          "file": "packages/core/test/query.test.mjs",
+          "testNames": [
+            "direct independent execution never uses a usage cache"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R25-no-implicit-retry"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "Q12 K28 actual explicit Action Queries stay independent, never subscribe/retry/share, and never substitute cached data after failure"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q13",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R23-refresh-disabled-first-input-retry-allowed"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-polling.test.mjs",
+          "testNames": [
+            "P09-refresh-disabled-keeps-initial-input-and-retry"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "Q09 Q13 K12 actual Action refresh disabled preserves earlier effects and skips later stages/output"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q14",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "C16-transform-error-location-and-no-partial-cache"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q15",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query.test.mjs",
+          "testNames": [
+            "prepared default values and recursively encoded native collections reach actual executor"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "Q15 actual native-collection State stays protected and native after recursive callback encoding and callback mutation"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q16",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "C04-source-failure-preserves-location-and-old-pair",
+            "C07-failed-partial-run-does-not-commit-cache",
+            "C09-first-source-failure-is-not-empty-success",
+            "C10-independent-owner-not-blocked",
+            "C31-first-failure-aborts-siblings-and-ignores-late-rejection"
+          ]
+        },
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "testNames": [
+            "N04/K23 first Query errors report through initial; blocked and missing-input Queries do not prevent completion"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q17",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "C16-transform-error-location-and-no-partial-cache",
+            "C24-static-query-needs-no-http-source"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q18",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "testNames": [
+            "Q18 atomic State batch opens gate and starts exactly one execution with the complete new input snapshot"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R10-atomic-gate-and-input"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q19",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R08-gate-closes-pending",
+            "R09-gate-close-reopen-ABA"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-polling.test.mjs",
+          "testNames": [
+            "P12-gate-closing-clears-pending-and-completion-cannot-poll"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q20",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "C17-join-order-collision-and-unmatched/left",
+            "C17-join-order-collision-and-unmatched/inner",
+            "C17-join-order-collision-and-unmatched/right"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q21",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "testNames": [
+            "Q22 separate usages of the same Query keep independent data, executions and child caches"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "Q21 explicit multiple Queries accept array Values and do not become list-driven fanout"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "Q22",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "C02-reuse-only-unchanged-child-query",
+            "C03-all-changed-inputs-wait-for-all-new-results",
+            "C34-deep-child-reuse-and-fresh-propagation"
+          ]
+        },
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "testNames": [
+            "Q22 unchanged child inputs reuse across State changes and View removal creates a fresh cache lifetime",
+            "Q22 separate usages of the same Query keep independent data, executions and child caches",
+            "Q22/K23 replacing a fully successful View resets owner caches even with identical query inputs",
+            "Q22/K16 conditional Component removal disposes its Query cache and recreated owner fetches both children"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "H01",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/http-contracts.test.mjs",
+          "suite": "production HTTP",
+          "caseIds": [
+            "P01-public-methods-and-current-definition"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-http.test.mjs",
+          "testNames": [
+            "H01 real HTTP composite query, input reuse, failure retention and polling resume"
+          ]
+        },
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "testNames": [
+            "N02 unknown reference without resolver fails clearly; default public native HTTP works without a supplied executor"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "H02",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "S17-definition-and-input-mutation-do-not-change-execution"
+          ]
+        },
+        {
+          "file": "packages/core/test/http-contracts.test.mjs",
+          "suite": "production HTTP",
+          "caseIds": [
+            "P01-public-methods-and-current-definition"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "H02 mounted current definition ignores later backing-store changes and does not re-read the resolver on refresh"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "H03",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/http-contracts.test.mjs",
+          "suite": "production HTTP",
+          "caseIds": [
+            "P07-authority-not-from-plan",
+            "P25-denied-secret-reference-no-transport",
+            "P26-denied-destination-login",
+            "P26-denied-destination-data",
+            "P27-denied-path-on-allowed-origin",
+            "P28-final-query-policy-denial",
+            "P65-dynamic-path-authorized-destination-before-secret",
+            "P66-dynamic-path-final-query-reauthorized"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "H04",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/http-contracts.test.mjs",
+          "suite": "production HTTP",
+          "caseIds": [
+            "P02-secret-without-login",
+            "P21-upstream-reflected-secret",
+            "P23-internal-login-data-not-added-or-logged",
+            "P25-denied-secret-reference-no-transport"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-http.test.mjs",
+          "testNames": [
+            "direct executor allows public plans and requires explicit trusted authorization for Login/secrets"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "H04 H09 all seven named authentication layouts use the actual public executor and isolate Login/secret results"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "H05",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/http-contracts.test.mjs",
+          "suite": "production HTTP",
+          "caseIds": [
+            "P05-invalid-token-missing",
+            "P05-invalid-token-number",
+            "P05-invalid-token-empty",
+            "P05-invalid-token-control",
+            "P06-login-failure"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "H06",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/http-contracts.test.mjs",
+          "suite": "production HTTP",
+          "caseIds": [
+            "P03-login-isolation-and-request-overrides"
+          ]
+        },
+        {
+          "file": "packages/core/test/http-contracts.test.mjs",
+          "suite": "production HTTP",
+          "caseIds": [
+            "P71-datasource-base-url-reference-is-a-dynamic-value"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "H07",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/http-contracts.test.mjs",
+          "suite": "production HTTP",
+          "caseIds": [
+            "P03-login-isolation-and-request-overrides",
+            "P49-valid-params-merge-removal-order",
+            "P57-dynamic-headers-merge-removal-and-data-string",
+            "P71-datasource-base-url-reference-is-a-dynamic-value"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "H08",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/http-contracts.test.mjs",
+          "suite": "production HTTP",
+          "caseIds": [
+            "P06-login-redirect"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "H09",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/http-contracts.test.mjs",
+          "suite": "production HTTP",
+          "caseIds": [
+            "P01-public-methods-and-current-definition",
+            "P02-secret-without-login",
+            "P03-login-isolation-and-request-overrides",
+            "P04-concurrent-login-no-sharing"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "H04 H09 all seven named authentication layouts use the actual public executor and isolate Login/secret results"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K09",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/http-contracts.test.mjs",
+          "suite": "production HTTP",
+          "caseIds": [
+            "P47-params-container-datasource-array",
+            "P47-params-container-datasource-null",
+            "P47-params-container-datasource-string",
+            "P47-params-container-datasource-number",
+            "P47-params-container-datasource-boolean",
+            "P47-params-container-datasource-map",
+            "P47-params-container-datasource-set",
+            "P47-params-container-datasource-date",
+            "P47-params-container-request-array",
+            "P47-params-container-request-null",
+            "P47-params-container-request-string",
+            "P47-params-container-request-number",
+            "P47-params-container-request-boolean",
+            "P47-params-container-request-map",
+            "P47-params-container-request-set",
+            "P47-params-container-request-date",
+            "P47-params-container-login-array",
+            "P47-params-container-login-null",
+            "P47-params-container-login-string",
+            "P47-params-container-login-number",
+            "P47-params-container-login-boolean",
+            "P47-params-container-login-map",
+            "P47-params-container-login-set",
+            "P47-params-container-login-date",
+            "P49-valid-params-merge-removal-order",
+            "P55-invalid-resolved-headers-duplicate-case",
+            "P57-dynamic-headers-merge-removal-and-data-string"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "K09 params nested object values are rejected before transport in common and request declarations"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K10",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/http-contracts.test.mjs",
+          "suite": "production HTTP",
+          "caseIds": [
+            "P17-body-encodings",
+            "P18-response-redirect",
+            "P18-response-invalid-json"
+          ]
+        },
+        {
+          "file": "packages/core/test/http-paths.test.mjs",
+          "suite": "production HTTP path audit",
+          "caseIds": [
+            "method-body/GET",
+            "method-body/HEAD"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K11",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/http-contracts.test.mjs",
+          "suite": "production HTTP",
+          "caseIds": [
+            "P04-concurrent-login-no-sharing",
+            "P06-login-failure",
+            "P09-timeout-during-login",
+            "P10-one-budget-login-plus-api",
+            "P13-ignore-abort-late-login-no-api",
+            "P15-timeout-in-response-body"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R16-timeout-late-success-after-retry",
+            "R17-timeout-late-error-during-fresh-run"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K12",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R08-gate-closes-pending",
+            "R23-refresh-disabled-first-input-retry-allowed",
+            "R31-initial-gate-blocked"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "Q09 Q13 K12 actual Action closed gate preserves earlier effects and skips later stages/output",
+            "Q09 Q13 K12 actual Action refresh disabled preserves earlier effects and skips later stages/output"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K13",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R06-refresh-waves",
+            "R07-refresh-follows-new-input-after-start",
+            "R30-active-fresh-waiter-rejected-when-gate-closes"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "C11-refresh-follows-latest-input-and-forces-fresh-children"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K14",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R14-dispose-all-waiters-no-new-request",
+            "R23-refresh-disabled-first-input-retry-allowed"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "K14 retry never bypasses a closed gate or trusted server authorization even with refresh disabled"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K22",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "C17-join-order-collision-and-unmatched/left",
+            "C17-join-order-collision-and-unmatched/inner",
+            "C17-join-order-collision-and-unmatched/right",
+            "C24-static-query-needs-no-http-source",
+            "S08-join-key/strict-types",
+            "S08-join-key/null-unmatched",
+            "S08-join-key/own-dot-key",
+            "S09-join-invalid-key/missing",
+            "S09-join-invalid-key/object",
+            "S09-join-invalid-key/nan",
+            "S10-join-compound-key-and-cartesian-matches",
+            "S15-sequential-transforms-preserve-original-sources"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K25",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R20-last-success-failure-retry",
+            "R22-first-failure-no-data"
+          ]
+        },
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "testNames": [
+            "K25/K27 current Query status keeps prior data/dataInputs stale on failure and replaces the pair after retry"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K26",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R21-preserve-null",
+            "R21-preserve-false",
+            "R21-preserve-zero",
+            "R21-preserve-empty-string",
+            "R21-preserve-empty-array"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K27",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R20-last-success-failure-retry"
+          ]
+        },
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "testNames": [
+            "K25/K27 current Query status keeps prior data/dataInputs stale on failure and replaces the pair after retry"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "K27 a retry that fails again preserves the last successful pair with the new error and stale flag"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K28",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-composite.test.mjs",
+          "testNames": [
+            "C04-source-failure-preserves-location-and-old-pair",
+            "C07-failed-partial-run-does-not-commit-cache"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R28-fresh-failure-stops-awaiting-step"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "K28 real fresh RefreshQuery failure rejects the Action while retaining data and suppressing its remaining stages/output",
+            "Q12 K28 actual explicit Action Queries stay independent, never subscribe/retry/share, and never substitute cached data after failure"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K29",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/query-races.test.mjs",
+          "testNames": [
+            "R01-obsolete-success",
+            "R02-obsolete-error",
+            "R12-replace-same-address-late-success",
+            "R13-replace-same-address-late-error",
+            "R14-dispose-all-waiters-no-new-request",
+            "R29-dispose-after-transport-completion-before-microtask"
+          ]
+        },
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "testNames": [
+            "K23/Q07 replace cancels prior initial and old owner, discarding late Query results",
+            "Q22/K23 replacing a fully successful View resets owner caches even with identical query inputs",
+            "Q22/K16 conditional Component removal disposes its Query cache and recreated owner fetches both children"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "N02",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "testNames": [
+            "N02 unknown reference without resolver fails clearly; default public native HTTP works without a supplied executor",
+            "N02 server-only secret plan without resolver is a Query error reported by initial without a data request"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "N03",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "testNames": [
+            "N03 initial waits for every executable first Query while ready UI appears independently"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "N04",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "testNames": [
+            "N04/K23 first Query errors report through initial; blocked and missing-input Queries do not prevent completion"
+          ]
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "N05",
+      "status": "verified-core",
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "testNames": [
+            "N05/K23 failed update preserves existing State, screen, in-flight Query and initial completion",
+            "N05/K23 dynamic duplicate-key update rolls back staged State writes before retaining the old screen and pending initial"
+          ]
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "N05 incompatible State-type update rejects before new Query execution and preserves the active prior screen",
+            "N05 competing Component reaction owners reject an update atomically without disturbing the old owner or its Query"
+          ]
+        }
+      ],
+      "remaining": ""
+    }
+  ],
+  "verificationNotes": [
+    "The prior 16 partial records now have dedicated public-package regression evidence appended; their original evidence is retained.",
+    "Zero-argument registered custom calls exposed an empty prefixItems validation defect; root fixed it before the passing public Action output/counter tests.",
+    "Query custom @call dispatch is also exercised in nested inputs and transforms; forbidden secret roots are rejected during registration without invoking the host function."
+  ]
+}

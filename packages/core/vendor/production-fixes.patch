@@ -1,0 +1,20 @@
+--- a/lib/operators.js
++++ b/lib/operators.js
+@@ -560,7 +560,7 @@
+ 
+       const handle = argTypes.some((t) => t.hasDynType)
+         ? callFn
+-        : (decl.handler.__handle ??= (l, _ast, e) => callFunctionHandler(decl.handler, e, l, _ast))
++        : ((l, _ast, e) => callFunctionHandler(decl.handler, e, l, _ast))
+ 
+       ast.handle = maybeAsync(args, false, handle)
+       return decl.returnType
+@@ -598,7 +598,7 @@
+ 
+       if (!receiverType.hasPlaceholderType && !argTypes.some((t) => t.hasDynType)) {
+         const fn = decl.handler
+-        const handle = (fn.__handle ??= (a, ev, _ast) => callFunctionHandler(fn, ev, a, _ast))
++        const handle = ((a, ev, _ast) => callFunctionHandler(fn, ev, a, _ast))
+         ast.handle = maybeAsync(ast.receiverWithArgs, false, handle)
+       }
+ 

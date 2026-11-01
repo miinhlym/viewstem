@@ -2,7 +2,7 @@
 
 A framework-independent runtime for declarative UIs.
 
-현재는 설계 계약과 구현 전 독립 실험 검증을 마치고 JS/TS core 구현으로 넘어가는 단계입니다. 인수 224개 항목의 증거와 범위는 [검증 진행표](docs/handoff/verification-ledger.md)에 있습니다. 실제 라이브러리·렌더러 구현 및 배포 완료를 뜻하지는 않습니다.
+JS/TS core 패키지 구현과 실제 패키지 검증을 완료했습니다. Node 22·24 각각 1,017개 검사가 통과했고, core 인수 216개를 실행 증거와 연결했습니다. [구현 인수인계](docs/handoff/core-implementation-2026-11-02.md)와 [패키지 사용법](packages/core/README.md)을 확인하세요. Svelte·Dart/Flutter·선택 차트 및 공개 발행은 후속 범위입니다.
 
 - [문서 지도와 읽는 순서](docs/README.md)
 - [현재 설계 명세](docs/VIEWSTEM-SPEC.md)

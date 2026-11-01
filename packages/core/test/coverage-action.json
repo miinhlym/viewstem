@@ -1,0 +1,821 @@
+{
+  "schemaVersion": 1,
+  "scope": "Action acceptance closure against the built @viewstem/core consumer export, with exact still-valid existing product evidence reused. Grouped names are not treated as proof for unasserted subcases.",
+  "source": "docs/handoff/acceptance-matrix.md",
+  "ownedIds": [
+    "A01",
+    "A02",
+    "A03",
+    "A04",
+    "A05",
+    "A06",
+    "A07",
+    "A08",
+    "A09",
+    "A10",
+    "A11",
+    "A12",
+    "A13",
+    "A14",
+    "A15",
+    "A16",
+    "A17",
+    "A18",
+    "A19",
+    "A20",
+    "A21",
+    "A22",
+    "A23",
+    "A24",
+    "A25",
+    "K05",
+    "K15",
+    "K16",
+    "K17",
+    "K21",
+    "K35",
+    "K36",
+    "K37"
+  ],
+  "summary": {
+    "targets": 33,
+    "verified": 33,
+    "partial": 0,
+    "unresolved": 0,
+    "newPackageTests": 24
+  },
+  "verification": [
+    {
+      "command": "npm run build",
+      "result": "passed; built package export used by the new tests"
+    },
+    {
+      "command": "node --test packages/core/test/action-acceptance.test.mjs",
+      "runtime": "22.21.1",
+      "result": "24/24 passed"
+    },
+    {
+      "command": "node --test packages/core/test/action-acceptance.test.mjs",
+      "runtime": "24.1.0",
+      "result": "24/24 passed"
+    }
+  ],
+  "records": [
+    {
+      "id": "A01",
+      "status": "verified-product",
+      "contract": "| A01 | 첫 단계 실패 | 후속 0회, 이미 성공한 외부 효과 자동 롤백 없음 | E16 |",
+      "subcases": [
+        "The first top-level If fails inside its then branch; no else or following step executes; the already completed external trace remains.",
+        "Completed SetState/native effect survives Assert failure; later steps do not execute. This grouped legacy title alone does not establish object replacement."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A17 branch failure stops after and never treats else as catch"
+          ],
+          "consumer": "@viewstem/core package"
+        },
+        {
+          "file": "packages/core/test/action.test.mjs",
+          "testNames": [
+            "A01 A08 A23 A24: completed State and external effects survive subsequent failure"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A02",
+      "status": "verified-product",
+      "contract": "| A02 | 호출 뒤 폼 Value 변경/포트 연결 교체 | 기존 호출 스냅샷/대상 정체성 유지 | E16 |",
+      "subcases": [
+        "Changing source form and reconnecting View ports during a pending call preserves the original protected Value snapshot and State target address."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A02 Value snapshot and State target identity survive form mutation and port reconnection"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A03",
+      "status": "verified-product",
+      "contract": "| A03 | queryRef와 inline spec 모두 / 둘 다 없음 | XOR 검증 오류 | E30 |",
+      "subcases": [
+        "Query step rejects both queryRef+spec and neither form before registering an Action."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A03 Query step reference and inline spec are exclusive including omitted forms"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A04",
+      "status": "verified-product",
+      "contract": "| A04 | 코드·선언 Action이 false 반환 | 같은 `/steps/id` 원시 boolean; 성공 판단은 status | E42 |",
+      "subcases": [
+        "Code/declarative false are raw boolean step results and successful observed data; no implicit return from the last step; nullable null remains null; void step path cannot register."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A04/A05/A07 code and declared false stay raw success; implicit return is void and null is real"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A05",
+      "status": "verified-product",
+      "contract": "| A05 | output 생략 선언형 마지막 단계에 값 있음 | 암묵 반환 없음, void | E42 |",
+      "subcases": [
+        "Code/declarative false are raw boolean step results and successful observed data; no implicit return from the last step; nullable null remains null; void step path cannot register."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A04/A05/A07 code and declared false stay raw success; implicit return is void and null is real"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A06",
+      "status": "verified-product",
+      "contract": "| A06 | output 없는 native가 값 반환 / 선언 output에 undefined | 계약 오류·후속 중단 | E42 |",
+      "subcases": [
+        "Declared native output returning undefined rejects and prevents parent continuation.",
+        "Native void contract returning a value rejects."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A06 undefined declared native output fails and prevents parent continuation"
+          ],
+          "consumer": "@viewstem/core package"
+        },
+        {
+          "file": "packages/core/test/action.test.mjs",
+          "testNames": [
+            "A04 A05 A06 A07 A18: false/null/void raw results and lexical branch scope"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A07",
+      "status": "verified-product",
+      "contract": "| A07 | nullable output에 null / void 단계 경로 읽기 | 전자 타입 허용 시 성공, 후자 참조 오류 | E42 |",
+      "subcases": [
+        "Code/declarative false are raw boolean step results and successful observed data; no implicit return from the last step; nullable null remains null; void step path cannot register."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A04/A05/A07 code and declared false stay raw success; implicit return is void and null is real"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A08",
+      "status": "verified-product",
+      "contract": "| A08 | output 평가 또는 타입 검증 실패 | Action 실패; 앞 외부 효과 유지 | E42 |",
+      "subcases": [
+        "Output evaluation and output type failures preserve prior object SetState/native effects, fail the Action, and skip the caller continuation."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A08/A23/A24 output evaluation failure retains object replacement and effects",
+            "A08/A23/A24 output type failure retains object replacement and effects"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A09",
+      "status": "verified-product",
+      "contract": "| A09 | If 비boolean / Assert false | truthiness 허용 없음 / 즉시 오류, 정상 output 안 탐 | E41 |",
+      "subcases": [
+        "Nonboolean If input is TYPE_MISMATCH instead of truthiness coercion.",
+        "True Assert never executes a failing message callback; false explicit/default messages and message-evaluation errors skip all later steps and normal output."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action.test.mjs",
+          "testNames": [
+            "A02 A09 A17 A19 K15: input snapshots, strict If, lazy Assert message"
+          ],
+          "consumer": "@viewstem/core package"
+        },
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A09/A19/K15 Assert message is lazy; false error/default/message-failure never evaluate output"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A10",
+      "status": "verified-product",
+      "contract": "| A10 | 미래 단계/다른 분기 로컬 단계 읽기 | 성공 결과로 읽지 못함 | §7 |",
+      "subcases": [
+        "Both branches can read earlier successful outer results; future results, then-local from else/outside, and If id result reject at registration without native execution."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A10/A18 branch locals stay lexical; both branches can read earlier outer success"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A11",
+      "status": "verified-product",
+      "contract": "| A11 | 실행 중 동일 on 다시 호출 | 추가 무시; 큐·자동 취소 없음 | §7.2 |",
+      "subcases": [
+        "Active event connection ignores duplicate invocation while an independent external call using the same State continues; removal cancels only the old connection; same observation id can be recreated idle; old completion does not publish to it.",
+        "Anonymous active connection also ignores repeated invocation; equal action ids in separate Component instances execute independently."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A11/A13/A15 active event connection ignores duplicate while independent shared-State call survives its removal"
+          ],
+          "consumer": "@viewstem/core package"
+        },
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "testNames": [
+            "A21 same internal action id in separate instances is independent and anonymous running duplicates are ignored"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A12",
+      "status": "verified-product",
+      "contract": "| A12 | 실제 호출 연결 제거 또는 실행 소유자 폐기 뒤 native 반환/쓰기 | 늦은 결과·하위/후속 폐기, 호출 핸들 새 쓰기/refresh 거절 | E43, E42 |",
+      "subcases": [
+        "Active event connection ignores duplicate invocation while an independent external call using the same State continues; removal cancels only the old connection; same observation id can be recreated idle; old completion does not publish to it.",
+        "Parent owner cancellation bounds child invoker/State handles and prevents late child State effects while the shared State remains writable externally.",
+        "Cancelled parent passes cancellation into a child Query refresh waiter; retained Query handle cannot issue a new refresh; the shared Query request/data survive."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A11/A13/A15 active event connection ignores duplicate while independent shared-State call survives its removal"
+          ],
+          "consumer": "@viewstem/core package"
+        },
+        {
+          "file": "packages/core/test/action.test.mjs",
+          "testNames": [
+            "A12 A13 K16 K37: parent cancellation bounds descendants and handles, shared state survives"
+          ],
+          "consumer": "@viewstem/core package"
+        },
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "testNames": [
+            "Q11/K16 cancelled parent Action propagates to its child refresh waiter while the shared Query keeps running"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A13",
+      "status": "verified-product",
+      "contract": "| A13 | 다른 호출이 같은 shared State 사용 중 | 폐기 호출만 무효; 공유 대상/다른 호출은 파괴하지 않음 | E42 |",
+      "subcases": [
+        "Active event connection ignores duplicate invocation while an independent external call using the same State continues; removal cancels only the old connection; same observation id can be recreated idle; old completion does not publish to it."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A11/A13/A15 active event connection ignores duplicate while independent shared-State call survives its removal"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A14",
+      "status": "verified-product",
+      "contract": "| A14 | UI 입력이 /actions/id 참조 | 연결 등록과 초기 상태 후 평가; JSON 속성 순서 무관 | §7.2 |",
+      "subcases": [
+        "Observation id is initialized before earlier sibling inputs and updates running/success irrespective of JSON sibling order."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "testNames": [
+            "A14 action observations exist before earlier sibling inputs and remain current while running"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A15",
+      "status": "verified-product",
+      "contract": "| A15 | View 유지 중 on 연결 제거·같은 id 재생성 | 이전 실행·늦은 결과를 새 연결에 반영하지 않음; 다른 호출/공유 대상 유지 | E43 |",
+      "subcases": [
+        "Active event connection ignores duplicate invocation while an independent external call using the same State continues; removal cancels only the old connection; same observation id can be recreated idle; old completion does not publish to it."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A11/A13/A15 active event connection ignores duplicate while independent shared-State call survives its removal"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A16",
+      "status": "verified-product",
+      "contract": "| A16 | 실행 중 SetState가 자기 호출 연결을 실제 제거 | 남은 단계·하위 Action·output 계속 실행 안 함, 앞 외부 효과 롤백 안 함 | E43 |",
+      "subcases": [
+        "SetState that removes its own live connection preserves the write but cancels child steps and normal output callback."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A16 self-removing SetState cancels child steps and normal output evaluation"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A17",
+      "status": "verified-product",
+      "contract": "| A17 | If.condition false, else 없음 / then 누락 / 분기 단계 실패 | 무작업 후 다음 단계 / 필수 필드 오류 / Action 중단, else를 catch로 실행 안 함 | E48 |",
+      "subcases": [
+        "The first top-level If fails inside its then branch; no else or following step executes; the already completed external trace remains.",
+        "False If with no else is a no-op before continuation; missing then is a definition error."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A17 branch failure stops after and never treats else as catch"
+          ],
+          "consumer": "@viewstem/core package"
+        },
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A17 false If without else continues; missing then is rejected without execution"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A18",
+      "status": "verified-product",
+      "contract": "| A18 | 분기 안에서 바깥 앞선 성공 결과 읽기 / 분기 결과의 외부·반대 분기 읽기 | 전자 허용, 후자 불가; If 자체 반환 결과 없음 | E48 |",
+      "subcases": [
+        "Both branches can read earlier successful outer results; future results, then-local from else/outside, and If id result reject at registration without native execution."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A10/A18 branch locals stay lexical; both branches can read earlier outer success"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A19",
+      "status": "verified-product",
+      "contract": "| A19 | Assert.condition false, 문자열 message 제공 | message 포함 오류, 뒤 단계·output 평가 0회; 생략 기본값·실패 때만 평가하는 정책과 오류 DTO는 U13/K15 적용 | E48 |",
+      "subcases": [
+        "True Assert never executes a failing message callback; false explicit/default messages and message-evaluation errors skip all later steps and normal output."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A09/A19/K15 Assert message is lazy; false error/default/message-failure never evaluate output"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A20",
+      "status": "verified-product",
+      "contract": "| A20 | 같은 owner 범위의 두 on 연결에 같은 관찰 id; 같은 슬롯 내용을 여러 번 투영한 경우 포함 | 실제 중복 연결이면 오류; 하나의 실행 상태로 자동 공유하지 않음 | E56 |",
+      "subcases": [
+        "Duplicate realized ids in repeated nodes and twice-projected author slots reject atomically; no automatic shared observation."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "testNames": [
+            "A20 realized repeated action connection ids are rejected atomically",
+            "A20 projecting one author slot twice rejects duplicate realized connections"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A21",
+      "status": "verified-product",
+      "contract": "| A21 | 서로 다른 Component 인스턴스가 같은 on id 사용 / id 없는 연결 실행 중 다시 호출 | 전자는 독립 관찰 상태; 후자는 id가 없어도 해당 연결의 추가 호출 무시; 같은 Action 정의를 호출하는 다른 연결과 상태를 합치지 않음 | E56 |",
+      "subcases": [
+        "Two Component instances with the same internal id display independent idle/running/success states while calls finish separately.",
+        "Anonymous active connection also ignores repeated invocation; equal action ids in separate Component instances execute independently."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A21 same observation id in two Component instances has independently visible running/success states"
+          ],
+          "consumer": "@viewstem/core package"
+        },
+        {
+          "file": "packages/core/test/runtime-ui-review.test.mjs",
+          "testNames": [
+            "A21 same internal action id in separate instances is independent and anonymous running duplicates are ignored"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A22",
+      "status": "verified-product",
+      "contract": "| A22 | Action 호출 inputs 평가 실패 또는 required 입력 누락·타입 오류 | steps 0개, 정상 output 평가 0회; status:error/running:false/data:null; error에 입력 평가·검증 실패 원인과 문제 입력 식별 정보 유지 | E57 |",
+      "subcases": [
+        "Connected missing data, wrong type, omitted required key via dynamic whole inputs, and thrown input evaluation all cause observed error/running:false/data:null, owned input+cause metadata, and zero step/output callbacks."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A22 input missing failure observes error and evaluates no steps/output",
+            "A22 input type failure observes error and evaluates no steps/output",
+            "A22 input omitted failure observes error and evaluates no steps/output",
+            "A22 input evaluation failure observes error and evaluates no steps/output"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A23",
+      "status": "verified-product",
+      "contract": "| A23 | SetState 성공 뒤 Assert·Query 단계 또는 output 평가/검증 실패 | Action은 실패하고 후속 실행을 중단하지만 완료된 State 변경은 유지; Action 전체를 자동 롤백하지 않음 | E67 |",
+      "subcases": [
+        "Completed SetState/native effect survives Assert failure; later steps do not execute. This grouped legacy title alone does not establish object replacement.",
+        "Output evaluation and output type failures preserve prior object SetState/native effects, fail the Action, and skip the caller continuation.",
+        "Real Query refresh failure after SetState retains that write/earlier effects and skips remaining stages/output; cached data is not returned as Action success."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action.test.mjs",
+          "testNames": [
+            "A01 A08 A23 A24: completed State and external effects survive subsequent failure"
+          ],
+          "consumer": "@viewstem/core package"
+        },
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A08/A23/A24 output evaluation failure retains object replacement and effects",
+            "A08/A23/A24 output type failure retains object replacement and effects"
+          ],
+          "consumer": "@viewstem/core package"
+        },
+        {
+          "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+          "testNames": [
+            "K28 real fresh RefreshQuery failure rejects the Action while retaining data and suppressing its remaining stages/output"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A24",
+      "status": "verified-product",
+      "contract": "| A24 | 기존 객체 State {a:1,b:2}에 SetState로 {a:3} 기록 | 결과는 {a:3}; 객체 자동 병합·전체 Store 교체 없음 | E31, E67 |",
+      "subcases": [
+        "Actual {a:1,b:2} -> {a:3} replacement removes b and preserves another Store cell."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A24 SetState replaces the addressed object only and returns its complete new value"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "A25",
+      "status": "verified-product",
+      "contract": "| A25 | SetState 대상이 없음·미연결·쓰기 금지·Derived·Query data·일반 입력값·계산 결과이거나 새 값 타입 불일치 | 쓰기 오류; 없는 State 자동 생성·Derived 쓰기·Value 변이로 우회하지 않음 | E31, E67 |",
+      "subcases": [
+        "Static targets missing/unknown/Value/Query/data/partial path/step-computed/call/plain value cannot register; actual unconnected, Derived, Query handle/data, Value/calculation, nonwritable-shaped and forged/stale handles reject; type mismatch preserves the old State and skips continuation."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A25 SetState syntax rejects absent/Value/Query/data/computed/partial targets before execution",
+            "A25 actual target preparation rejects unconnected/Derived/Query/data/forged/stale and new value mismatches"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K05",
+      "status": "verified-product",
+      "contract": "| K05 | 미사용·조건 분기·인라인 안의 Query 순환/Action 재귀 / 코드 하위 호출 / 비순환 공통 하위 참조·외부 독립 호출 | 선언형 순환은 등록 오류; 문맥 하위 호출은 await 이후에도 부모 스택의 재귀 거절. 비순환 재사용·외부 독립 호출 허용. 정의 검사 중 실행 없음 | U13, U35, O04 |",
+      "subcases": [
+        "Named/inline unused Query cycles reject; a shared noncyclic child DAG is admitted.",
+        "Unused conditional inline Action recursion rejects during registration, including references in a false branch.",
+        "Awaited dynamic child recursion retains parent stack; sequential/parallel shared children and independent external calls remain valid.",
+        "Parent completion cancels unawaited children and retained child invoker."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/registry.test.mjs",
+          "testNames": [
+            "Query traverses named sources, including unused and inline cycles"
+          ],
+          "consumer": "production core source"
+        },
+        {
+          "file": "packages/core/test/registry.test.mjs",
+          "testNames": [
+            "Action validates unused branch recursion, schema XOR and step targets"
+          ],
+          "consumer": "production core source"
+        },
+        {
+          "file": "packages/core/test/action.test.mjs",
+          "testNames": [
+            "K05 U35: child recursion, awaited sequential and parallel reuse, independent external calls"
+          ],
+          "consumer": "@viewstem/core package"
+        },
+        {
+          "file": "packages/core/test/action.test.mjs",
+          "testNames": [
+            "K05/K36: parent completion cancels unawaited children and retained invoker"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K15",
+      "status": "verified-product",
+      "contract": "| K15 | Assert true의 실패 가능한 message 표현식 / false의 생략 message | true면 message 미평가. false면 ASSERTION_FAILED와 기본 문자열, 후속 단계 없음 | U13, O10 |",
+      "subcases": [
+        "True Assert never executes a failing message callback; false explicit/default messages and message-evaluation errors skip all later steps and normal output."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "A09/A19/K15 Assert message is lazy; false error/default/message-failure never evaluate output"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K16",
+      "status": "verified-product",
+      "contract": "| K16 | 취소된 코드 Action이 보유한 State/Query 핸들로 새 요청; 늦은 반환 | 새 쓰기·갱신 거절·늦은 결과 폐기. 다른 호출·공유 대상은 살아 있음 | U13, O10 |",
+      "subcases": [
+        "Parent owner cancellation bounds child invoker/State handles and prevents late child State effects while the shared State remains writable externally.",
+        "Cancelled parent passes cancellation into a child Query refresh waiter; retained Query handle cannot issue a new refresh; the shared Query request/data survive."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action.test.mjs",
+          "testNames": [
+            "A12 A13 K16 K37: parent cancellation bounds descendants and handles, shared state survives"
+          ],
+          "consumer": "@viewstem/core package"
+        },
+        {
+          "file": "packages/core/test/runtime-query.test.mjs",
+          "testNames": [
+            "Q11/K16 cancelled parent Action propagates to its child refresh waiter while the shared Query keeps running"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K17",
+      "status": "verified-product",
+      "contract": "| K17 | 같은 name의 다른 scope 관찰, 셀 replace/remove 뒤 옛 핸들 사용 | 주소별 격리·replaced/removed 구별·옛 핸들 거절·새 논리 주소 구독 유지 | U13, O11 |",
+      "subcases": [
+        "Scoped addresses isolate subscriptions; remove/add/replaced notifications differ; old generation handles reject while logical-address subscriptions follow the new cell.",
+        "Same local State name in separate scopes has separate ownership/lifetime."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "testNames": [
+            "S01-S05/atomic-scoped-observation-and-generations"
+          ],
+          "consumer": "production core source"
+        },
+        {
+          "file": "packages/core/test/state-lifecycle.test.mjs",
+          "testNames": [
+            "C06-C07-C15/scope-ownership-and-shared-handles"
+          ],
+          "consumer": "production core source"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K21",
+      "status": "verified-product",
+      "contract": "| K21 | 같은 노드 repeat+when, 숨겨질 항목의 중복 key, 중첩/형제 as 중복 | 항목 문맥에서 when 평가·false의 inputs/Query 없음. 전체 key 중복·중첩 shadowing 오류, 형제 별칭 허용 | U13, O12 |",
+      "subcases": [
+        "Repeat item context precedes when; hidden item missing inputs/Queries are not evaluated; hidden duplicate key still rejects; nested alias shadowing rejects and sibling alias reuse is valid."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "K21 item-local when skips hidden inputs/Queries; hidden duplicate keys still reject and aliases are scoped"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K35",
+      "status": "verified-product",
+      "contract": "| K35 | 날짜 x-viewstem-type / 표준 format 사용 / null 허용 anyOf | 날짜 형식 검사·정규화, format 등록 오류, 명시 null 분기는 null 보존. 분기별 정규 값이 다른 모호한 조합은 등록 오류 | U14, D69 |",
+      "subcases": [
+        "Date State/output normalization applies through Action; nullable date output keeps null; unsupported format and ambiguous date/string schemas reject."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "K35 Action date admission normalizes outputs and rejects unsupported or ambiguous schemas"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K36",
+      "status": "verified-product",
+      "contract": "| K36 | 선언형 Try/Catch/Finally 또는 catch/finally 필드 / 등록 코드 Action의 정상 복구·미처리 오류 | 선언형 미지원은 INVALID_DEFINITION. 코드 복구는 유효 output까지 성공하면 성공, 미처리 오류·정리 실패는 실패 | U14, D70 |",
+      "subcases": [
+        "Try/Catch/Finally inside an unused branch and catch/finally resource fields reject without running native implementation.",
+        "Valid code recovery may return false; unhandled or finally errors fail safely without hostile getter execution."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "K36 declarative recovery syntax is rejected in branches and resource fields without code execution"
+          ],
+          "consumer": "@viewstem/core package"
+        },
+        {
+          "file": "packages/core/test/action.test.mjs",
+          "testNames": [
+            "K36: code recovery and finally failure; hostile errors never leak or execute getters"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    },
+    {
+      "id": "K37",
+      "status": "verified-product",
+      "contract": "| K37 | State 쓰기 후 단계 실패 / 취소를 catch한 코드의 늦은 반환·핸들 쓰기 | 완료한 쓰기·외부 효과 유지, 후속 단계 중단. 취소는 정상 반환으로 회복되지 않고 호출 핸들 쓰기는 거절 | U14, D70 |",
+      "subcases": [
+        "Catching callback cancellation and returning a valid late value does not recover invocation; retained State writes remain CANCELLED; completed effects and shared State survive.",
+        "Ordinary later failure does not roll back already completed State/external effects."
+      ],
+      "evidence": [
+        {
+          "file": "packages/core/test/action-acceptance.test.mjs",
+          "testNames": [
+            "K37 caught cancellation and a normal late return cannot recover an invalidated invocation"
+          ],
+          "consumer": "@viewstem/core package"
+        },
+        {
+          "file": "packages/core/test/action.test.mjs",
+          "testNames": [
+            "A01 A08 A23 A24: completed State and external effects survive subsequent failure"
+          ],
+          "consumer": "@viewstem/core package"
+        }
+      ],
+      "remaining": ""
+    }
+  ],
+  "sourceSha256": {
+    "packages/core/src/action.mjs": "0e667df9efad3c1858b3b4fb9ef1b69f6eb96f67323b57e4196f73f29264004f",
+    "packages/core/src/runtime.mjs": "beb80e810b1cd3f53a804d63834f47cdceec3276a5649eb0a0d7591b9845f9d5",
+    "packages/core/src/expressions.mjs": "54b737fa2e6b80b5a9c851d0f300633a1f5837924dbbfa58c80fc8766ad6e055",
+    "packages/core/src/registry.mjs": "ffa9e5f398e1a471cedf61c7a85b9d2c4b303dc749642c6bde54f064ae937063",
+    "packages/core/src/ports.mjs": "7b478d0e787f8fe81b1217daba76aec57deabd7bbeba28831cc5adc788a17e32",
+    "packages/core/src/state.mjs": "c536a46c2a6ab3f056982e57e69b63004084b6b45d07458340e067d139fc25f3",
+    "packages/core/dist/index.js": "85a700190e02fec26a177d3348fce1f6f6b489f350862a10198c317a85c07fc8",
+    "packages/core/test/action-acceptance.test.mjs": "cd9eeb74020fdef497546a6fe17c3f8d2546ef5c54e2af930cb7869436fc578b"
+  },
+  "verificationNotes": [
+    "An actual package test exposed absent event data property incorrectly reported as REFERENCE_NOT_FOUND. Root corrected it to INPUT_NOT_READY while preserving undeclared port/state name errors; the final package was rebuilt and the regression passed.",
+    "Prior child cancellation/Query waiter tests are cited without duplicating their fixture setup.",
+    "CEL native int/double/string Map overloads, setSame and date equality now have retained public-adapter tests; browser native Map case also exercises integer/fractional/string key distinctions."
+  ],
+  "scopeLimits": [
+    "Core interpreter/UI-model semantics only; renderer-specific DOM or visual behavior is outside these acceptance checks.",
+    "No new Action source change was made by the acceptance-test owner; concrete defects were repaired by root."
+  ]
+}

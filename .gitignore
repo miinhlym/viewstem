@@ -1,1 +1,6 @@
 /context-archive/
+
+/node_modules/
+/packages/*/dist/
+/packages/*/node_modules/
+/packages/core/test/results/

@@ -1,0 +1,85 @@
+import {attachErrorAst, evaluationError, typeError} from './errors.js'
+import {Base} from './operators.js'
+const toDynTypeBinding = new Map().set('A', 'dyn').set('T', 'dyn').set('K', 'dyn').set('V', 'dyn')
+
+/**
+ * TypeChecker performs static type analysis on CEL expressions
+ * without executing them. It validates:
+ * - Variable existence and types
+ * - Function signatures and overloads
+ * - Operator compatibility using the actual overload registry
+ * - Property and index access validity
+ */
+export class TypeChecker extends Base {
+  constructor(opts, isEvaluating) {
+    super(opts)
+    this.createError = isEvaluating ? evaluationError : typeError
+  }
+
+  /**
+   * Check an expression and return its inferred type
+   * @param {Array|any} ast - The AST node to check
+   * @returns {Object} The inferred type declaration
+   * @throws {TypeError} If type checking fails
+   */
+  check(ast, ctx) {
+    try {
+      return (ast.checkedType ??= ast.check(this, ast, ctx))
+    } catch (error) {
+      throw attachErrorAst(error, ast)
+    }
+  }
+
+  checkAccessOnType(ast, ctx, leftType, allowMissingField = false) {
+    if (leftType === this.dynType) return leftType
+
+    const indexTypeName = (
+      ast.op === '[]' || ast.op === '[?]' ? this.check(ast.args[1], ctx) : this.stringType
+    ).type
+
+    if (leftType.kind === 'list') {
+      if (indexTypeName === 'int' || indexTypeName === 'dyn') return leftType.valueType
+      throw this.createError('invalid_index_type', `List index must be int, got '${indexTypeName}'`, ast)
+    }
+
+    if (leftType.kind === 'map') return leftType.valueType
+
+    const customType = this.objectTypes.get(leftType.name)
+    if (customType) {
+      if (!(indexTypeName === 'string' || indexTypeName === 'dyn')) {
+        throw this.createError(
+          'invalid_index_type',
+          `Cannot index type '${leftType.name}' with type '${indexTypeName}'`,
+          ast
+        )
+      }
+
+      if (customType.fields) {
+        let keyName
+        if (ast.op === '.' || ast.op === '.?') keyName = ast.args[1]
+        else if (ast.args[1].op === 'value') keyName = ast.args[1].args
+
+        if (typeof keyName === 'string') {
+          const fieldType = customType.fields[keyName]
+          if (fieldType) return fieldType
+          // For optional access, missing field returns dyn; for regular access, throw
+          if (allowMissingField) return this.dynType
+          throw this.createError('no_such_key', `No such key: ${keyName}`, ast)
+        }
+      }
+      return this.dynType
+    }
+
+    // No other types support indexing/property access
+    throw this.createError('cannot_index_type', `Cannot index type '${this.formatType(leftType)}'`, ast)
+  }
+
+  formatType(type) {
+    if (!type.hasPlaceholderType) return type.name
+    return type.templated(this.registry, toDynTypeBinding).name
+  }
+
+  formatTypeList(types) {
+    return types.map((t) => this.formatType(t)).join(', ')
+  }
+}

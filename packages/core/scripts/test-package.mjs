@@ -1,0 +1,38 @@
+import { mkdtemp,writeFile,readFile,rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
+import assert from 'node:assert/strict';
+const root=fileURLToPath(new URL('../../../',import.meta.url)),pkg=fileURLToPath(new URL('../',import.meta.url));
+const directory=await mkdtemp(join(tmpdir(),'viewstem-package-consumer-'));
+const execute=(command,args,cwd=directory)=>execFileSync(command,args,{cwd,encoding:'utf8',stdio:['ignore','pipe','pipe']});
+try {
+ const [packed]=JSON.parse(execute('npm',['pack',pkg,'--pack-destination',directory,'--ignore-scripts','--json'],root));
+ assert.ok(packed.files.some(file=>file.path==='dist/index.d.ts'));assert.ok(packed.files.some(file=>file.path==='dist/http.js'));assert.ok(packed.files.some(file=>file.path==='dist/cel-support.json'));assert.ok(packed.files.some(file=>file.path==='README.md'));assert.ok(packed.files.every(file=>!file.path.startsWith('test/')&&!file.path.startsWith('experiments/')));
+ await writeFile(join(directory,'package.json'),JSON.stringify({private:true,type:'module'}));
+ execute('npm',['install',join(directory,packed.filename),'--ignore-scripts','--no-audit','--no-fund']);
+ await writeFile(join(directory,'consumer.mjs'),`import assert from 'node:assert/strict';
+import {createRegistry,createRuntime,createStateStore,compileCel} from '@viewstem/core';
+import {createHttpExecutor} from '@viewstem/core/http';
+import support from '@viewstem/core/cel-support.json' with {type:'json'};
+const registry=createRegistry();registry.registerComponent({kind:'Component',id:'Leaf',spec:{}});
+registry.registerAction({kind:'Action',id:'answer',spec:{output:{schema:{type:'boolean'}}}},()=>false);
+const runtime=createRuntime({registry}),{view,initial}=await runtime.mount({view:{render:{id:'leaf',componentRef:'Leaf'}}});await initial;
+assert.equal(await runtime.invokeAction({owner:view,actionRef:'answer'}),false);
+assert.equal(compileCel('x+1',{inputs:{x:{type:'integer'}}})({x:2}),3);
+const store=createStateStore(),scope=store.createScope(),cell=scope.registerState('n',{schema:{type:'integer'},initial:1});cell.write(2);assert.equal(cell.read(),2);
+assert.equal(typeof createHttpExecutor(),'function');assert.ok(support);store.dispose();runtime.dispose();console.log('isolated package runtime passed');
+`);
+ execute(process.execPath,['consumer.mjs']);
+ await writeFile(join(directory,'consumer.ts'),`import {createRegistry,createRuntime,createStateStore} from '@viewstem/core';
+import {createHttpExecutor} from '@viewstem/core/http';
+const registry=createRegistry();const store=createStateStore();
+const cell=store.createScope().registerState('n',{schema:{type:'integer'} as const,initial:1});cell.write(2);
+// @ts-expect-error schema-inferred integer rejects strings
+cell.write('wrong');
+const runtime=createRuntime({registry,stateStore:store,requestExecutor:createHttpExecutor()});runtime.dispose();
+`);
+ execute(process.execPath,[join(root,'node_modules/typescript/bin/tsc'),'--strict','--noEmit','--target','ES2022','--module','NodeNext','--moduleResolution','NodeNext','--lib','ES2022,DOM','consumer.ts']);
+ console.log(JSON.stringify({nodeVersion:process.version,package:packed.name,version:packed.version,files:packed.files.map(file=>file.path),integrity:packed.integrity,bytes:packed.size,unpackedBytes:packed.unpackedSize,runtime:'passed',types:'passed'},null,2));
+}finally{await rm(directory,{recursive:true,force:true});}

@@ -10,7 +10,7 @@
 
 ## 현재 인계 상태 · 2026-11-02
 
-U35의 코드 Action 하위 호출까지 확정했고, 구현 전 독립 실험의 224개 인수 항목 대조를 마쳤다. 추가 사용자 선택 대기는 없다. U36은 이 최신 상태로 문서를 정리하고 문서·실험 코드를 커밋해 새 채팅으로 넘기는 요청이다. [새 채팅 시작 절차](handoff/implementation-start.md#새-채팅에서-시작할-때)와 [최종 검증 범위](handoff/verification-ledger.md)를 먼저 확인한다. 날짜가 붙은 과거 기록의 미실행·보류·실패 설명을 현재 상태로 적용하지 않는다.
+U37 요청으로 구현 보류를 해제하고 `packages/core`의 실제 JS/TS 패키지를 구현했다. Node 22·24에서 각각 1,017개 검사와 core 인수 216개의 실제 실행 대조, Chromium·독립 tarball 소비자 검증을 마쳤다. [구현 인수인계](handoff/core-implementation-2026-11-02.md), [제품 인수 대응표](handoff/core-acceptance-coverage.json), [검증 결과](handoff/core-verification-results.json)를 현재 상태로 사용한다. Svelte·Dart/Flutter·선택 차트 제품 및 공개 발행은 후속이다. 아래 날짜별 실험 기록은 보존하며 현재 core 미구현으로 해석하지 않는다.
 
 ## 처음 참여했다면
 
@@ -53,7 +53,7 @@ U32/U33에서 [복합 Query·URL 교체·날짜 경계](handoff/boundary-followu
 
 - [결정 등록부](history/decision-register.md): 채택·대체·기각·보류·구체화 필요의 구분.
 - [Patchboard에서 Viewstem으로 이관](history/patchboard-migration.md): 옛 요구를 어디에 보존했는지, 무엇이 명시적으로 대체됐는지.
-- [근거 색인](history/evidence-index.md): 원본 E01–E42와 복원 보충 E43–E69, 현재 프로젝트 결정 U01–U36을 구별한다. 보관 원문 직접 대조와 방 기록 회수 요약도 구별하며, 로컬 원문은 명세 해석의 필수 외부 의존성이 아니다.
+- [근거 색인](history/evidence-index.md): 원본 E01–E42와 복원 보충 E43–E69, 현재 프로젝트 결정 U01–U37을 구별한다. 보관 원문 직접 대조와 방 기록 회수 요약도 구별하며, 로컬 원문은 명세 해석의 필수 외부 의존성이 아니다.
 
 ## 상세 대화 기록
 

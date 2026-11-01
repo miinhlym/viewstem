@@ -1,0 +1,27 @@
+{
+  "name": "viewstem-workspace",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @viewstem/core",
+    "test": "npm run test -w @viewstem/core",
+    "typecheck": "npm run typecheck -w @viewstem/core",
+    "check": "npm run build && npm run test:report && npm run typecheck && npm run check:coverage",
+    "test:browser": "node packages/core/test/cel-browser.mjs && node packages/core/test/browser.mjs",
+    "test:package": "node packages/core/scripts/test-package.mjs",
+    "check:coverage": "node packages/core/scripts/check-coverage.mjs packages/core/test/results/current.json",
+    "test:report": "node packages/core/scripts/run-tests.mjs"
+  },
+  "devDependencies": {
+    "@marcbachmann/cel-js": "8.0.0",
+    "esbuild": "0.25.12",
+    "playwright": "1.62.1",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

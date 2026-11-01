@@ -1,0 +1,599 @@
+--- a/lib/evaluator.js
++++ b/lib/evaluator.js
+@@ -1,3 +1,4 @@
++import {EvaluationBudget, CostLimitError, sizeCost} from './viewstem-budget.js'
+ import {createRegistry, RootContext} from './registry.js'
+ import {evaluationError} from './errors.js'
+ import {registerFunctions, Duration, UnsignedInt} from './functions.js'
+@@ -15,7 +16,6 @@
+ 
+ class Environment {
+   #registry
+-  #evaluator
+   #typeChecker
+   #evalTypeChecker
+   #parser
+@@ -29,7 +29,6 @@
+     const childOpts = {registry: this.#registry, opts: this.opts}
+     this.#typeChecker = new TypeChecker(childOpts)
+     this.#evalTypeChecker = new TypeChecker(childOpts, true)
+-    this.#evaluator = new Evaluator(childOpts)
+     this.#parser = new Parser(this.opts.limits, this.#registry)
+     Object.freeze(this)
+   }
+@@ -106,20 +105,22 @@
+     return this.#evaluateAST(this.#parser.parse(expression), context)
+   }
+ 
+-  #evaluateAST(ast, ctx) {
+-    if (ast.checkedType) {
+-      return ast.evaluate(this.#evaluator, ast, new RootContext(this.#registry, ctx))
+-    } else {
+-      this.#evalTypeChecker.check(ast, (ctx = new RootContext(this.#registry, ctx)))
+-      return ast.evaluate(this.#evaluator, ast, ctx)
+-    }
+-  }
++  #evaluateAST(ast, context) {
++    const ctx = new RootContext(this.#registry, context)
++    if (!ast.checkedType) this.#evalTypeChecker.check(ast, ctx)
++    // One evaluator/budget per invocation, including concurrent parsed calls.
++    const evaluator = new Evaluator({registry: this.#registry, opts: this.opts})
++    return evaluator.run(ast, ctx)
++  }
++
+ }
+ 
+ class Evaluator extends Base {
++  #budget
+   constructor(opts) {
+     super(opts)
+     this.createError = evaluationError
++    this.#budget = new EvaluationBudget(this.opts.limits.maxEvaluationCost)
+   }
+ 
+   #firstMapElement(coll) {
+@@ -155,14 +156,22 @@
+   tryEval(ast, ctx) {
+     try {
+       const res = this.run(ast, ctx)
+-      if (res instanceof Promise) return res.catch((err) => err)
++      if (res instanceof Promise) return res.catch((err) => { if (err instanceof CostLimitError) throw err; return err })
+       return res
+     } catch (err) {
++      if (err instanceof CostLimitError) throw err
+       return err
+     }
+   }
+ 
++  charge(amount = 1) { this.#budget.charge(amount) }
++
++  chargeArguments(args) {
++    for (const value of args) this.charge(sizeCost(value))
++  }
++
+   run(ast, ctx) {
++    this.charge()
+     return ast.evaluate(this, ast, ctx)
+   }
+ }
+--- a/lib/functions.js
++++ b/lib/functions.js
+@@ -1,3 +1,5 @@
++import {RE2JS} from 're2js'
++import {strictTimestamp, shiftTimestamp, zonedWallDate} from './viewstem-timestamp.js'
+ import {evaluationError} from './errors.js'
+ import {TYPES, Type} from './registry.js'
+ import {register as registerOptional} from './optional.js'
+@@ -71,48 +73,31 @@
+     return Number(this.#seconds) * 1000 + this.#nanos / 1_000_000
+   }
+ 
++  static fromNanoseconds(total) {
++    return new Duration(total / billionBigInt, Number(total % billionBigInt))
++  }
++
+   static fromMilliseconds(ms) {
+-    const totalNanos = BigInt(Math.trunc(ms * 1_000_000))
+-    const seconds = totalNanos / billionBigInt
+-    const nanos = Number(totalNanos % billionBigInt)
+-    return new Duration(seconds, nanos)
++    return Duration.fromNanoseconds(BigInt(Math.trunc(ms)) * 1000000n + BigInt(Math.trunc((ms % 1) * 1000000)))
+   }
+ 
+   addDuration(other) {
+-    const nanos = this.#nanos + other.nanos
+-    return new Duration(
+-      this.#seconds + other.seconds + BigInt(Math.floor(nanos / billion)),
+-      nanos % billion
+-    )
++    return Duration.fromNanoseconds((this.#seconds + other.seconds) * billionBigInt + BigInt(this.#nanos + other.nanos))
+   }
+ 
+   subtractDuration(other) {
+-    const nanos = this.#nanos - other.nanos
+-    return new Duration(
+-      this.#seconds - other.seconds + BigInt(Math.floor(nanos / billion)),
+-      (nanos + billion) % billion
+-    )
++    return Duration.fromNanoseconds((this.#seconds - other.seconds) * billionBigInt + BigInt(this.#nanos - other.nanos))
+   }
+ 
+-  extendTimestamp(ts) {
+-    return new Date(
+-      ts.getTime() + Number(this.#seconds) * 1000 + Math.floor(this.#nanos / 1_000_000)
+-    )
+-  }
++  extendTimestamp(ts) { return shiftTimestamp(ts, this.#seconds, this.#nanos, 1) }
+ 
+-  subtractTimestamp(ts) {
+-    return new Date(
+-      ts.getTime() - Number(this.#seconds) * 1000 - Math.floor(this.#nanos / 1_000_000)
+-    )
+-  }
++  subtractTimestamp(ts) { return shiftTimestamp(ts, this.#seconds, this.#nanos, -1) }
+ 
+   toString() {
+-    const nanos = this.#nanos
+-      ? (this.#nanos / billion)
+-          .toLocaleString('en-US', {useGrouping: false, maximumFractionDigits: 9})
+-          .slice(1)
+-      : ''
+-    return `${this.#seconds}${nanos}s`
++    const total = this.#seconds * billionBigInt + BigInt(this.#nanos)
++    const magnitude = total < 0n ? -total : total
++    const fraction = String(magnitude % billionBigInt).padStart(9, '0').replace(/0+$/, '')
++    return `${total < 0n ? '-' : ''}${magnitude / billionBigInt}${fraction ? '.' + fraction : ''}s`
+   }
+ 
+   getHours() {
+@@ -128,7 +113,7 @@
+   }
+ 
+   getMilliseconds() {
+-    return this.#seconds * 1000n + BigInt(Math.floor(this.#nanos / 1000000))
++    return BigInt(Math.trunc(this.#nanos / 1000000))
+   }
+ 
+   get [Symbol.toStringTag]() {
+@@ -223,12 +208,15 @@
+ 
+   functionOverload('int(int): int', identity)
+   functionOverload('int(double): int', (v) => {
+-    if (Number.isFinite(v)) return BigInt(Math.trunc(v))
++    if (Number.isFinite(v)) {
++      const result = BigInt(Math.trunc(v))
++      if (result >= MIN_INT && result <= MAX_INT) return result
++    }
+     throw evaluationError('numeric_overflow', 'int() type error: integer overflow')
+   })
+ 
+   functionOverload('int(string): int', (v) => {
+-    if (v !== v.trim() || v.length > 20 || v.includes('0x')) {
++    if (!v || v !== v.trim() || v.length > 20 || v.includes('0x')) {
+       throw evaluationError('int_conversion_error', 'int() type error: cannot convert to int')
+     }
+ 
+@@ -257,7 +245,7 @@
+   })
+ 
+   functionOverload('uint(string): uint', (v) => {
+-    if (v !== v.trim() || v.length > 20 || v.includes('0x')) {
++    if (!v || v !== v.trim() || v.length > 20 || v.includes('0x')) {
+       throw evaluationError('uint_conversion_error', 'uint() type error: cannot convert to uint')
+     }
+ 
+@@ -282,90 +270,79 @@
+   functionOverload('string.startsWith(string): bool', (a, b) => a.startsWith(b))
+   functionOverload('string.endsWith(string): bool', (a, b) => a.endsWith(b))
+   functionOverload('string.contains(string): bool', (a, b) => a.includes(b))
+-  functionOverload('string.lowerAscii(): string', (a) => a.toLowerCase())
+-  functionOverload('string.upperAscii(): string', (a) => a.toUpperCase())
+-  functionOverload('string.trim(): string', (a) => a.trim())
+-
+-  functionOverload('string.indexOf(string): int', (string, search) =>
+-    BigInt(string.indexOf(search))
+-  )
+-  functionOverload('string.indexOf(string, int): int', (string, search, fromIndex) => {
+-    if (search === '') return fromIndex
+-
+-    fromIndex = Number(fromIndex)
+-    if (fromIndex < 0 || fromIndex >= string.length) {
+-      throw evaluationError(
+-        'index_out_of_range',
+-        'string.indexOf(search, fromIndex): fromIndex out of range'
+-      )
+-    }
+-
+-    return BigInt(string.indexOf(search, fromIndex))
++  functionOverload('string.lowerAscii(): string', (a) => a.replace(/[A-Z]/g, c => c.toLowerCase()))
++  functionOverload('string.upperAscii(): string', (a) => a.replace(/[a-z]/g, c => c.toUpperCase()))
++  // Go unicode.IsSpace / Unicode White_Space: NEL is whitespace; BOM is not.
++  const whiteSpace = /[\u0009-\u000d\u0020\u0085\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]/
++  functionOverload('string.trim(): string', (a) => {
++    let start = 0, end = a.length
++    while (start < end && whiteSpace.test(a[start])) start++
++    while (end > start && whiteSpace.test(a[end - 1])) end--
++    return a.slice(start, end)
+   })
+ 
+-  functionOverload('string.lastIndexOf(string): int', (string, search) =>
+-    BigInt(string.lastIndexOf(search))
+-  )
+-
+-  functionOverload('string.lastIndexOf(string, int): int', (string, search, fromIndex) => {
+-    if (search === '') return fromIndex
+-
+-    fromIndex = Number(fromIndex)
+-    if (fromIndex < 0 || fromIndex >= string.length) {
+-      throw evaluationError(
+-        'index_out_of_range',
+-        'string.lastIndexOf(search, fromIndex): fromIndex out of range'
+-      )
++  // CEL string extensions use code-point offsets, independently of JS UTF-16 units.
++  // Charge comparisons so repetitive near-matches cannot hide quadratic work.
++  function searchString(string, search, offset, backwards = false) {
++    if (offset !== undefined && offset < 0n) {
++      throw evaluationError('index_out_of_range', 'String search offset out of range')
+     }
+-
+-    return BigInt(string.lastIndexOf(search, fromIndex))
+-  })
+-
+-  functionOverload('string.substring(int): string', (string, start) => {
+-    start = Number(start)
+-    if (start < 0 || start > string.length) {
+-      throw evaluationError(
+-        'index_out_of_range',
+-        'string.substring(start, end): start index out of range'
+-      )
++    const points = Array.from(string), pattern = Array.from(search)
++    offset ??= backwards ? BigInt(points.length - (pattern.length ? 1 : 0)) : 0n
++    if (!pattern.length) return offset > BigInt(points.length) ? BigInt(points.length) : offset < 0n ? 0n : offset
++    if (offset >= BigInt(points.length)) return -1n
++    const first = backwards ? Math.min(Number(offset), points.length - pattern.length) : Number(offset)
++    const step = backwards ? -1 : 1
++    for (let i = first; i >= 0 && i <= points.length - pattern.length; i += step) {
++      let found = true
++      for (let j = 0; j < pattern.length; j++) {
++        this.charge()
++        if (points[i + j] !== pattern[j]) { found = false; break }
++      }
++      if (found) return BigInt(i)
+     }
+-
+-    return string.substring(start)
++    return -1n
++  }
++  functionOverload('string.indexOf(string): int', function (string, search) {
++    return searchString.call(this, string, search)
+   })
+-
+-  functionOverload('string.substring(int, int): string', (string, start, end) => {
+-    start = Number(start)
+-    if (start < 0 || start > string.length) {
+-      throw evaluationError(
+-        'index_out_of_range',
+-        'string.substring(start, end): start index out of range'
+-      )
+-    }
+-
+-    end = Number(end)
+-    if (end < start || end > string.length) {
+-      throw evaluationError(
+-        'index_out_of_range',
+-        'string.substring(start, end): end index out of range'
+-      )
+-    }
+-
+-    return string.substring(start, end)
++  functionOverload('string.indexOf(string, int): int', function (string, search, offset) {
++    return searchString.call(this, string, search, offset)
+   })
++  functionOverload('string.lastIndexOf(string): int', function (string, search) {
++    return searchString.call(this, string, search, undefined, true)
++  })
++  functionOverload('string.lastIndexOf(string, int): int', function (string, search, offset) {
++    return searchString.call(this, string, search, offset, true)
++  })
+ 
+-  functionOverload('string.matches(string): bool', (a, b) => {
+-    try {
+-      return new RegExp(b).test(a)
+-    } catch (_err) {
+-      throw evaluationError('invalid_regular_expression', `Invalid regular expression: ${b}`)
++  function substring(string, start, end) {
++    const points = Array.from(string)
++    end ??= BigInt(points.length)
++    if (start < 0n || end < start || end > BigInt(points.length)) {
++      throw evaluationError('index_out_of_range', 'String substring range out of range')
+     }
+-  })
++    return points.slice(Number(start), Number(end)).join('')
++  }
++  functionOverload('string.substring(int): string', substring)
++  functionOverload('string.substring(int, int): string', substring)
+ 
+-  functionOverload('string.split(string): list<string>', (s, sep) => s.split(sep))
++  function matches(a, b) {
++    this.charge(b.length * b.length)
++    let pattern
++    try { pattern = RE2JS.compile(b) }
++    catch { throw evaluationError('invalid_regular_expression', 'Invalid RE2 regular expression') }
++    this.charge((a.length + 1) * pattern.programSize())
++    return pattern.test(a)
++  }
++  functionOverload('string.matches(string): bool', matches)
++  functionOverload('matches(string, string): bool', matches)
++
++  functionOverload('string.split(string): list<string>', (s, sep) => sep === '' ? Array.from(s) : s.split(sep))
+   functionOverload('string.split(string, int): list<string>', (s, sep, l) => {
+     l = Number(l)
+     if (l === 0) return []
+-    const parts = s.split(sep)
++    const parts = sep === '' ? Array.from(s) : s.split(sep)
+     if (l < 0 || parts.length <= l) return parts
+     const limited = parts.slice(0, l - 1)
+     limited.push(parts.slice(l - 1).join(sep))
+@@ -419,7 +396,7 @@
+             ? (b) => b.toBase64()
+             : (b) => btoa(arrayFrom(b, (i) => String.fromCodePoint(i)).join('')),
+           toUtf8: (b) => textDecoder.decode(b),
+-          jsonParse: (b) => JSON.parse(textEncoder.decode(b))
++          jsonParse: (b) => JSON.parse(textDecoder.decode(b))
+         }
+ 
+   functionOverload('bytes.json(): map', ByteOpts.jsonParse)
+@@ -441,29 +418,18 @@
+     protobuf: {Duration: DurationType, Timestamp: TimestampType}
+   })
+ 
+-  function tzDate(d, timeZone) {
+-    return new Date(d.toLocaleString('en-US', {timeZone}))
+-  }
++  const tzDate = zonedWallDate
+ 
+   function getDayOfYear(d, tz) {
+-    const workingDate = tz
+-      ? tzDate(d, tz)
+-      : new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())
+-
+-    const start = new Date(workingDate.getFullYear(), 0, 0)
+-    return BigInt(Math.floor((workingDate - start) / 86_400_000) - 1)
++    const workingDate = tz ? tzDate(d, tz) : d
++    const start = new Date(0)
++    start.setUTCFullYear(workingDate.getUTCFullYear(), 0, 1)
++    start.setUTCHours(0, 0, 0, 0)
++    return BigInt(Math.floor((workingDate - start) / 86400000))
+   }
+ 
+-  functionOverload(`timestamp(string): ${TS}`, (v) => {
+-    if (v.length < 20 || v.length > 30) {
+-      throw evaluationError('invalid_timestamp', 'timestamp() requires a string in ISO 8601 format')
+-    }
++  functionOverload(`timestamp(string): ${TS}`, strictTimestamp)
+ 
+-    const d = new Date(v)
+-    if (d <= 253402300799999 && d >= -62135596800000) return d
+-    throw evaluationError('invalid_timestamp', 'timestamp() requires a string in ISO 8601 format')
+-  })
+-
+   functionOverload(`timestamp(int): ${TS}`, (i) => {
+     i = Number(i) * 1000
+     if (i <= 253402300799999 && i >= -62135596800000) return new Date(i)
+@@ -474,27 +440,27 @@
+   })
+ 
+   functionOverload(`${TS}.getDate(): int`, (d) => BigInt(d.getUTCDate()))
+-  functionOverload(`${TS}.getDate(string): int`, (d, tz) => BigInt(tzDate(d, tz).getDate()))
++  functionOverload(`${TS}.getDate(string): int`, (d, tz) => BigInt(tzDate(d, tz).getUTCDate()))
+   functionOverload(`${TS}.getDayOfMonth(): int`, (d) => BigInt(d.getUTCDate() - 1))
+   functionOverload(`${TS}.getDayOfMonth(string): int`, (d, tz) =>
+-    BigInt(tzDate(d, tz).getDate() - 1)
++    BigInt(tzDate(d, tz).getUTCDate() - 1)
+   )
+   functionOverload(`${TS}.getDayOfWeek(): int`, (d) => BigInt(d.getUTCDay()))
+-  functionOverload(`${TS}.getDayOfWeek(string): int`, (d, tz) => BigInt(tzDate(d, tz).getDay()))
++  functionOverload(`${TS}.getDayOfWeek(string): int`, (d, tz) => BigInt(tzDate(d, tz).getUTCDay()))
+   functionOverload(`${TS}.getDayOfYear(): int`, getDayOfYear)
+   functionOverload(`${TS}.getDayOfYear(string): int`, getDayOfYear)
+   functionOverload(`${TS}.getFullYear(): int`, (d) => BigInt(d.getUTCFullYear()))
+-  functionOverload(`${TS}.getFullYear(string): int`, (d, tz) => BigInt(tzDate(d, tz).getFullYear()))
++  functionOverload(`${TS}.getFullYear(string): int`, (d, tz) => BigInt(tzDate(d, tz).getUTCFullYear()))
+   functionOverload(`${TS}.getHours(): int`, (d) => BigInt(d.getUTCHours()))
+-  functionOverload(`${TS}.getHours(string): int`, (d, tz) => BigInt(tzDate(d, tz).getHours()))
++  functionOverload(`${TS}.getHours(string): int`, (d, tz) => BigInt(tzDate(d, tz).getUTCHours()))
+   functionOverload(`${TS}.getMilliseconds(): int`, (d) => BigInt(d.getUTCMilliseconds()))
+-  functionOverload(`${TS}.getMilliseconds(string): int`, (d) => BigInt(d.getUTCMilliseconds()))
++  functionOverload(`${TS}.getMilliseconds(string): int`, (d, tz) => BigInt(tzDate(d, tz).getUTCMilliseconds()))
+   functionOverload(`${TS}.getMinutes(): int`, (d) => BigInt(d.getUTCMinutes()))
+-  functionOverload(`${TS}.getMinutes(string): int`, (d, tz) => BigInt(tzDate(d, tz).getMinutes()))
++  functionOverload(`${TS}.getMinutes(string): int`, (d, tz) => BigInt(tzDate(d, tz).getUTCMinutes()))
+   functionOverload(`${TS}.getMonth(): int`, (d) => BigInt(d.getUTCMonth()))
+-  functionOverload(`${TS}.getMonth(string): int`, (d, tz) => BigInt(tzDate(d, tz).getMonth()))
++  functionOverload(`${TS}.getMonth(string): int`, (d, tz) => BigInt(tzDate(d, tz).getUTCMonth()))
+   functionOverload(`${TS}.getSeconds(): int`, (d) => BigInt(d.getUTCSeconds()))
+-  functionOverload(`${TS}.getSeconds(string): int`, (d, tz) => BigInt(tzDate(d, tz).getSeconds()))
++  functionOverload(`${TS}.getSeconds(string): int`, (d, tz) => BigInt(tzDate(d, tz).getUTCSeconds()))
+ 
+   const parseDurationPattern = /(\d*\.?\d*)(ns|us|µs|ms|s|m|h)/
+ 
+@@ -509,6 +475,7 @@
+     const isNegative = string[0] === '-'
+     if (string[0] === '-' || string[0] === '+') string = string.slice(1)
+ 
++    if (string === '0') return new Duration(0n)
+     let nanoseconds = BigInt(0)
+     while (true) {
+       const match = parseDurationPattern.exec(string)
+--- a/lib/index.d.ts
++++ b/lib/index.d.ts
+@@ -333,6 +333,8 @@
+  * All limits default to the minimums required by the CEL specification.
+  */
+ export interface Limits {
++  /** Experimental Viewstem non-maskable per-invocation cost budget */
++  maxEvaluationCost: number
+   /** Maximum number of AST nodes that can be produced while parsing */
+   maxAstNodes: number
+   /** Maximum nesting depth for recursive grammar elements (calls, selects, indexes, aggregates) */
+--- a/lib/operators.js
++++ b/lib/operators.js
+@@ -284,6 +284,7 @@
+ }
+ 
+ function callFunctionHandler(handler, ev, args, ast) {
++  ev.chargeArguments(args)
+   try {
+     const result = handler.apply(ev, args)
+     if (result instanceof Promise) {
+@@ -383,8 +384,7 @@
+   if (!isArray(items)) items = toIterable(ev, args, items)
+   const accu = ev.run(args.init, (ctx = args.iterCtx.reuse(ctx)))
+   ctx.accuValue = accu
+-  if (ctx === args.iterCtx) return iterateQuantifier(ev, ctx, args, items, accu, 0)
+-  return continueQuantifier(ev, ctx, args, items, accu, 0)
++  return iterateQuantifier(ev, ctx, args, items, accu, 0)
+ }
+ 
+ function runComprehension(items, args, ev, ctx) {
+--- a/lib/options.js
++++ b/lib/options.js
+@@ -1,6 +1,7 @@
+ import {objFreeze, objKeys} from './globals.js'
+ 
+ const DEFAULT_LIMITS = objFreeze({
++  maxEvaluationCost: 100000,
+   maxAstNodes: 100000,
+   maxDepth: 250,
+   maxListElements: 1000,
+@@ -17,6 +18,7 @@
+   for (const key of keys) {
+     if (!LIMIT_KEYS.has(key)) throw new TypeError(`Unknown limits option: ${key}`)
+     const value = overrides[key]
++    if (key === 'maxEvaluationCost' && (!Number.isSafeInteger(value) || value <= 0)) throw new TypeError('Invalid evaluation cost limit')
+     if (typeof value !== 'number') continue
+     merged[key] = value
+   }
+--- a/lib/overloads.js
++++ b/lib/overloads.js
+@@ -4,7 +4,7 @@
+ 
+ export function registerOverloads(registry) {
+   const unaryOverload = (op, t, h, ret) => registry.unaryOverload(op, t, h, ret, false)
+-  const binaryOverload = (l, op, r, h, ret) => registry.binaryOverload(l, op, r, h, ret, false)
++  const binaryOverload = (l, op, r, h, ret) => registry.binaryOverload(l, op, r, (a, b, ast, ev) => { ev.chargeArguments([a, b]); return h(a, b, ast, ev) }, ret, false)
+ 
+   function verifyInteger(v, ast) {
+     if (v <= MAX_INT && v >= MIN_INT) return v
+@@ -20,7 +20,7 @@
+   }
+ 
+   unaryOverload('!', 'bool', (a) => !a)
+-  unaryOverload('-', 'int', (a) => -a)
++  unaryOverload('-', 'int', (a) => verifyInteger(-a))
+   binaryOverload('dyn<int>', `==`, `double`, (a, b) => a == b) // eslint-disable-line eqeqeq
+   binaryOverload('dyn<int>', `==`, `uint`, (a, b) => a == b.valueOf()) // eslint-disable-line eqeqeq
+   binaryOverload('int', '*', 'int', (a, b, ast) => verifyInteger(a * b, ast))
+@@ -28,7 +28,7 @@
+   binaryOverload('int', '-', 'int', (a, b, ast) => verifyInteger(a - b, ast))
+   binaryOverload('int', '/', 'int', (a, b, ast) => {
+     if (b === MIN_UINT) return throwDivisionByZero(ast)
+-    return a / b
++    return verifyInteger(a / b, ast)
+   })
+   binaryOverload('int', '%', 'int', (a, b, ast) => {
+     if (b === MIN_UINT) return throwModuloByZero(ast)
+@@ -192,6 +192,7 @@
+ }
+ 
+ function isEqual(a, b, ast, ev) {
++  ev.charge()
+   if (a === b) return true
+   switch (typeof a) {
+     case 'undefined':
+--- /dev/null
++++ b/lib/viewstem-budget.js
+@@ -0,0 +1,29 @@
++// Experimental Viewstem cost profile. Not a claim of wall-clock isolation.
++export class CostLimitError extends Error {
++  constructor() {
++    super('CEL evaluation cost limit exceeded')
++    this.name = 'CostLimitError'
++    this.code = 'LIMIT_EXCEEDED'
++  }
++}
++
++export class EvaluationBudget {
++  #remaining
++  #error
++  constructor(limit) { this.#remaining = limit }
++  charge(amount = 1) {
++    if (this.#error) throw this.#error
++    if (!Number.isSafeInteger(amount) || amount < 0 || amount > this.#remaining) {
++      this.#error = new CostLimitError()
++      throw this.#error
++    }
++    this.#remaining -= amount
++  }
++}
++
++export function sizeCost(value) {
++  if (typeof value === 'string' || Array.isArray(value) || value instanceof Uint8Array) return value.length
++  if (value instanceof Map || value instanceof Set) return value.size
++  if (value && (Object.getPrototypeOf(value) === Object.prototype || Object.getPrototypeOf(value) === null)) return Object.keys(value).length
++  return 1
++}
+--- /dev/null
++++ b/lib/viewstem-timestamp.js
+@@ -0,0 +1,40 @@
++import {evaluationError} from './errors.js'
++
++export function shiftTimestamp(timestamp, seconds, nanos, sign) {
++  if (nanos % 1000000 !== 0) throw evaluationError('invalid_timestamp', 'Sub-millisecond timestamp arithmetic is unsupported')
++  const epoch = BigInt(timestamp.getTime()) + BigInt(sign) * (seconds * 1000n + BigInt(nanos / 1000000))
++  if (epoch < -62135596800000n || epoch > 253402300799999n) throw evaluationError('invalid_timestamp', 'Timestamp out of range')
++  return new Date(Number(epoch))
++}
++
++export function zonedWallDate(date, timeZone) {
++  const parts = new Intl.DateTimeFormat('en-US-u-ca-iso8601-nu-latn', {
++    timeZone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23', era: 'short'
++  }).formatToParts(date)
++  const fields = Object.fromEntries(parts.map(part => [part.type, part.value]))
++  const year = fields.era === 'BC' ? 1 - Number(fields.year) : Number(fields.year)
++  const output = new Date(0)
++  output.setUTCFullYear(year, Number(fields.month) - 1, Number(fields.day))
++  output.setUTCHours(Number(fields.hour), Number(fields.minute), Number(fields.second), date.getUTCMilliseconds())
++  return output
++}
++
++// Viewstem's explicitly bounded millisecond timestamp profile.
++export function strictTimestamp(value) {
++  const bad = () => { throw evaluationError('invalid_timestamp', 'Invalid millisecond timestamp') }
++  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?(Z|([+-])(\d{2}):(\d{2}))$/.exec(value)
++  if (!match) return bad()
++  const [, ys, mos, ds, hs, mis, ss, fraction = '', zone, sign, ohs, oms] = match
++  const y = Number(ys), mo = Number(mos), d = Number(ds), h = Number(hs), mi = Number(mis), s = Number(ss)
++  const oh = Number(ohs ?? 0), om = Number(oms ?? 0)
++  const leap = y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)
++  const days = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
++  if (y < 1 || mo < 1 || mo > 12 || d < 1 || d > days[mo - 1] || h > 23 || mi > 59 || s > 59
++    || oh > 23 || om > 59 || zone === '-00:00') return bad()
++  const date = new Date(0)
++  date.setUTCFullYear(y, mo - 1, d)
++  date.setUTCHours(h, mi, s, Number(fraction.padEnd(3, '0')))
++  const epoch = date.getTime() - (sign === '-' ? -1 : 1) * (oh * 60 + om) * 60000
++  if (epoch < -62135596800000 || epoch > 253402300799999) return bad()
++  return new Date(epoch)
++}
+--- a/package.json
++++ b/package.json
+@@ -78,5 +78,8 @@
+     "slug": "marcbachmann/cel-js",
+     "root": "/drone/src",
+     "date": "2026-07-07T10:02:39.403Z"
++  },
++  "dependencies": {
++    "re2js": "2.9.1"
+   }
+ }
