@@ -148,6 +148,12 @@
           "tests": [
             "C08/L02 explicit write during pending baseline survives settlement and releases URL readiness"
           ]
+        },
+        {
+          "file": "packages/core/test/preflight-io.test.mjs",
+          "tests": [
+            "pending View baseline preserves explicit State write and sends it to URL"
+          ]
         }
       ],
       "remaining": ""
@@ -1045,6 +1051,14 @@
             "P57-dynamic-headers-merge-removal-and-data-string",
             "P71-datasource-base-url-reference-is-a-dynamic-value"
           ]
+        },
+        {
+          "file": "packages/core/test/preflight-io.test.mjs",
+          "tests": [
+            "HTTP rejects empty ? baseUrl delimiter in datasource before transport",
+            "HTTP rejects empty # baseUrl delimiter in datasource before transport",
+            "HTTP keeps encoded query/fragment delimiters in base and request paths"
+          ]
         }
       ],
       "remaining": ""
@@ -1115,6 +1129,12 @@
           "file": "packages/core/test/action-acceptance.test.mjs",
           "tests": [
             "A02 Value snapshot and State target identity survive form mutation and port reconnection"
+          ]
+        },
+        {
+          "file": "packages/core/test/preflight-runtime.test.mjs",
+          "tests": [
+            "preflight: inline Action definitions are isolated while an awaited child runs"
           ]
         }
       ],
@@ -1719,6 +1739,12 @@
           "tests": [
             "U08 Grid rejects fixed overlap, partial coordinates, invalid integers and range instead of moving"
           ]
+        },
+        {
+          "file": "packages/core/test/preflight-values.test.mjs",
+          "tests": [
+            "preflight Grid validates last occupied row and preserves maximum safe one-cell coordinates"
+          ]
         }
       ],
       "remaining": ""
@@ -1733,6 +1759,12 @@
           "tests": [
             "U09 Grid reserves fixed nodes first and searches whole rectangles forward in expanded order"
           ]
+        },
+        {
+          "file": "packages/core/test/preflight-values.test.mjs",
+          "tests": [
+            "preflight Grid handles large valid spans and checks automatic row plus span without cell enumeration"
+          ]
         }
       ],
       "remaining": ""
@@ -1746,6 +1778,12 @@
           "file": "packages/core/test/grid.test.mjs",
           "tests": [
             "U10 Grid hidden declarations validate layout but consume no space; unknown layout ids reject"
+          ]
+        },
+        {
+          "file": "packages/core/test/preflight-values.test.mjs",
+          "tests": [
+            "preflight Grid omitted layout treats prototype-named declaration IDs as ordinary IDs"
           ]
         }
       ],
@@ -1852,6 +1890,16 @@
           "file": "packages/core/test/runtime-review-regression.test.mjs",
           "tests": [
             "M01/U05 intermediate staged when=false does not destroy a finally retained instance"
+          ]
+        },
+        {
+          "file": "packages/core/test/preflight-runtime.test.mjs",
+          "tests": [
+            "preflight: failed transaction restores scope lifetime, clocks, handles and final Store cleanup",
+            "preflight: maintained View rejects State kind flip atomically",
+            "preflight: maintained View rejects Derived kind flip atomically",
+            "preflight: maintained Component rejects State kind flip atomically",
+            "preflight: maintained Component rejects Derived kind flip atomically"
           ]
         }
       ],
@@ -2061,6 +2109,12 @@
           "tests": [
             "L02/K08 failed initial remains error baseline when URL key is absent"
           ]
+        },
+        {
+          "file": "packages/core/test/preflight-io.test.mjs",
+          "tests": [
+            "pending pure initialization and URL restore never write URL or run reactions"
+          ]
         }
       ],
       "remaining": ""
@@ -2233,6 +2287,12 @@
           "tests": [
             "L07/M05 URL replacement preflight/missing-state"
           ]
+        },
+        {
+          "file": "packages/core/test/preflight-io.test.mjs",
+          "tests": [
+            "U33 pending replacement initial survives failed old URL cleanup"
+          ]
         }
       ],
       "remaining": ""
@@ -2246,6 +2306,12 @@
           "file": "packages/core/test/url-state.test.mjs",
           "tests": [
             "L08/K18 atomic push+replace batch writes once; same values and restore do not repush"
+          ]
+        },
+        {
+          "file": "packages/core/test/preflight-io.test.mjs",
+          "tests": [
+            "pending View baseline preserves explicit State write and sends it to URL"
           ]
         }
       ],
@@ -2458,6 +2524,12 @@
           "file": "packages/core/test/state-lifecycle.test.mjs",
           "tests": [
             "V08-V09/S06/protected-stable-snapshots"
+          ]
+        },
+        {
+          "file": "packages/core/test/preflight-runtime.test.mjs",
+          "tests": [
+            "preflight: mount/update Value inputs stay isolated through reevaluation; defaults stay omitted"
           ]
         }
       ],
@@ -3380,6 +3452,12 @@
           "tests": [
             "K01 ref and inline Component Query Derived use the same declared inputs and never capture surrounding values"
           ]
+        },
+        {
+          "file": "packages/core/test/preflight-runtime.test.mjs",
+          "tests": [
+            "preflight: shared inline spec validates independently for Query and Component kinds"
+          ]
         }
       ],
       "remaining": ""
@@ -3488,6 +3566,13 @@
           "tests": [
             "K04/followup-write-revalidates-value-permissions-and-generation"
           ]
+        },
+        {
+          "file": "packages/core/test/preflight-values.test.mjs",
+          "tests": [
+            "preflight public State ports ignore enum ordering while preserving distinct Unicode values and ASCII",
+            "preflight public State ports ignore required ordering without normalizing Unicode property names"
+          ]
         }
       ],
       "remaining": ""
@@ -3571,6 +3656,13 @@
           "file": "packages/core/test/values-expression-date.test.mjs",
           "tests": [
             "K07 returned data and unescaped result are never reexecuted; mixed operator syntax fails"
+          ]
+        },
+        {
+          "file": "packages/core/test/preflight-runtime.test.mjs",
+          "tests": [
+            "preflight: child Action/Query input templates unescape @ names once",
+            "preflight: escaped child State and Query names retain capability routing"
           ]
         }
       ],
@@ -3976,6 +4068,12 @@
             "N05/K23 failed update preserves existing State, screen, in-flight Query and initial completion",
             "K23/Q07 replace cancels prior initial and old owner, discarding late Query results",
             "K23 update before initial completion cancels the old completion while preserving the active valid usage"
+          ]
+        },
+        {
+          "file": "packages/core/test/preflight-runtime.test.mjs",
+          "tests": [
+            "preflight: disposing View from commit observer prevents new Query work and scope leaks"
           ]
         }
       ],

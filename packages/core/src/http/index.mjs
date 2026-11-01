@@ -31,7 +31,7 @@ export function joinAddress(baseUrl, path) {
   if (typeof baseUrl !== 'string') invalid();
   let base;
   try { base = new URL(baseUrl); } catch { invalid(); }
-  if (!['http:', 'https:'].includes(base.protocol) || base.username || base.password || base.search || base.hash) invalid();
+  if (!['http:', 'https:'].includes(base.protocol) || base.username || base.password || /[?#]/.test(base.href)) invalid();
   if (typeof path !== 'string' || /^(?:[A-Za-z][A-Za-z0-9+.-]*:|\/\/)/.test(path)
       || /[?#\\\u0000-\u0020]/.test(path)) invalid();
   // Reject decoded traversal/separators rather than relying on URL normalization.

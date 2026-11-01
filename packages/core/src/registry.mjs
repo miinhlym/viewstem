@@ -153,12 +153,12 @@ export class Registry {
     return this;
   }
   #validateAll() {
-    const context = { active: new Set(), done: new Set() };
+    const context = { active: new Set(), done: new WeakMap() };
     for (const definition of this.#definitions.values()) this.#validate(definition.kind, definition.spec, context, this.isCode(definition.kind, definition.id));
   }
   validateDefinition(kind, spec) {
     if (!kinds.has(kind)) invalid(); json(spec);
-    try { this.#validate(kind, spec, { active: new Set(), done: new Set() }, false); } catch (error) { throw safeError(error, 'INVALID_DEFINITION'); }
+    try { this.#validate(kind, spec, { active: new Set(), done: new WeakMap() }, false); } catch (error) { throw safeError(error, 'INVALID_DEFINITION'); }
     return spec;
   }
   target(node, identity) {
@@ -201,7 +201,8 @@ export class Registry {
   #validate(kind, spec, context, code) {
     object(spec);
     if (context.active.has(spec)) invalid();
-    if (context.done.has(spec)) return;
+    const validation = key(kind, code);
+    if (context.done.get(spec)?.has(validation)) return;
     context.active.add(spec);
     const allowed = {
       Type: ['schema'], Variable: ['ports', 'expression'], Datasource: ['kind', 'baseUrl', 'headers', 'params', 'secrets', 'auth'],
@@ -220,7 +221,9 @@ export class Registry {
     else if (kind === 'Query') this.#query(spec, context);
     else if (kind === 'Action') this.#action(spec, context, code);
     else this.#ui(kind, spec, context, code);
-    context.active.delete(spec); context.done.add(spec);
+    context.active.delete(spec);
+    if (!context.done.has(spec)) context.done.set(spec, new Set());
+    context.done.get(spec).add(validation);
   }
   #request(request, roots, allowWhole = false, declarations) {
     object(request);

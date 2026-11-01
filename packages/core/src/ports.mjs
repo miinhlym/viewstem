@@ -13,7 +13,10 @@ const annotations = new Set('$schema title description default examples readOnly
 const schemaMaps = new Set(['properties']);
 const schemaLists = new Set(['allOf', 'anyOf', 'oneOf', 'prefixItems']);
 const schemaSingles = new Set(['not', 'if', 'then', 'else', 'items', 'additionalProperties', 'keys', 'values']);
-const order = values => values.sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b), 'en'));
+const order = values => values.sort((a, b) => {
+  const left = JSON.stringify(a), right = JSON.stringify(b);
+  return left < right ? -1 : left > right ? 1 : 0;
+});
 function cloneValue(value) {
   if (!value || typeof value !== 'object') return value;
   if (value instanceof Set) return new Set([...value].map(cloneValue));

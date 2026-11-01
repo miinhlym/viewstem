@@ -1,4 +1,4 @@
-import { compileSchema } from './schema.mjs';
+import { compileSchema, equal } from './schema.mjs';
 import { fail, safeError } from './errors.mjs';
 const adapterOwners = new WeakMap();
 const connectionTokens = new WeakMap();
@@ -49,25 +49,30 @@ export function connectStateUrl(store,{adapter,bindings,limits:custom={},restore
   for(const key of keys)claims.set(key,token);adapterOwners.set(adapter,claims);
   let readyResolve;const ready=new Promise(resolve=>{readyResolve=resolve;});
   let initialized=prepared.every(binding=>binding.baseline.status!=='pending');
-  let alive=true,revision=0,restoring=false,firstRestore=true;
-  const pendingBaselines=new Set(prepared.filter(b=>b.baseline.status==='pending').map(b=>b.target));
+  let alive=true,revision=0,restoring=false,firstRestore=true,restorePending=restore;
+  const initialPending=new Set(prepared.filter(binding=>binding.baseline.status==='pending').map(binding=>binding.target));
+  let restoreSnapshots=new Map();
   const dirty=new Map(),diagnostics=[];
   const report=(caught,kind,key)=>{const item=Object.freeze({...safeError(caught,'TYPE_MISMATCH'),kind,...(key===undefined?{}:{key})});diagnostics.push(item);try{onError(item);}catch{}};
   const limitOutput=patch=>{
     const owned=parts(mergeOwnedUrl(adapter.read(),patch)).filter(part=>keys.has(part.key));
     if(bytes(owned.map(part=>part.raw).join('&'))>limits.maxOwnedBytes || owned.some(part=>bytes(part.encodedValue)>limits.maxValueBytes))fail('LIMIT_EXCEEDED');
   };
-  const restoreNow=()=>{
-    if(!alive)return;++revision;dirty.clear();
-    if(!initialized){
-      for(const binding of prepared)binding.baseline=store.baseline(binding.target);
-      initialized=prepared.every(binding=>binding.baseline.status!=='pending');
-      if(!initialized)return;
-    }
+  const writeDirty=()=>{
+    if(!alive||!initialized||restoring||!dirty.size)return;
+    const current=++revision,isCurrent=()=>alive&&revision===current;
+    const patch=Object.fromEntries([...dirty].map(([key,item])=>[key,item.value]));
+    const mode=[...dirty.values()].some(item=>item.history==='push')?'push':'replace';
+    try{
+      if([...dirty.values()].some(item=>item.count>limits.maxItems))fail('LIMIT_EXCEEDED');limitOutput(patch);
+      Promise.resolve(adapter.writeOwned(patch,{mode,isCurrent})).then(result=>{if(isCurrent()&&result?.applied!==false)dirty.clear();},caught=>{if(isCurrent())report(caught,'write');});
+    }catch(caught){report(caught,'write');}
+  };
+  const applyRestore=()=>{
     const all=parts(adapter.read()),owned=all.filter(part=>keys.has(part.key));
     const tooLarge=bytes(owned.map(part=>part.raw).join('&'))>limits.maxOwnedBytes;
     const entries=prepared.map(binding=>{
-      if(firstRestore&&pendingBaselines.has(binding.target)&&store.hasWritten(binding.target))return [binding.target,binding.target.snapshot()];
+      if(firstRestore&&(dirty.has(binding.key)||initialPending.has(binding.target)&&store.hasWritten(binding.target)))return [binding.target,binding.target.snapshot()];
       const found=owned.filter(part=>part.key===binding.key);let snapshot=binding.baseline;
       if(snapshot.status==='pending')snapshot={status:'missing'};
       if(found.length)try{
@@ -80,31 +85,48 @@ export function connectStateUrl(store,{adapter,bindings,limits:custom={},restore
       }catch(caught){report(caught,'restore',binding.key);}
       return [binding.target,snapshot];
     });
-    firstRestore=false;restoring=true;try{store.restore(entries);}finally{restoring=false;}readyResolve();
+    // Transaction notifications may arrive after restore() returns. Keep the
+    // expected snapshots until their notification, while allowing reentrant writes.
+    firstRestore=false;restoreSnapshots=new Map(entries);restoring=true;
+    try{store.restore(entries);}finally{restoring=false;}
+    readyResolve();
   };
-  if(restore)restoreNow();else if(initialized)readyResolve();
+  const initialize=()=>{
+    if(!alive||initialized)return;
+    for(const binding of prepared)binding.baseline=store.baseline(binding.target);
+    initialized=prepared.every(binding=>binding.baseline.status!=='pending');
+    if(!initialized)return;
+    if(restorePending)applyRestore();else{firstRestore=false;readyResolve();}
+    writeDirty();
+  };
+  const restoreNow=()=>{
+    if(!alive)return;++revision;dirty.clear();restorePending=true;
+    if(!initialized)initialize();else{applyRestore();writeDirty();}
+  };
   const stopUrl=adapter.subscribe(restoreNow);
-  const stopBaseline=store.observeBaseline(()=>{if(!initialized)restoreNow();});
+  const stopBaseline=store.observeBaseline(initialize);
   const stopStore=store.subscribe(prepared.map(b=>b.target.address),payload=>{
-    if(!alive||restoring||!payload.changes.length)return;
-    if(!initialized){restoreNow();return;}
+    if(!alive||!payload.changes.length)return;
+    if(!restoring)++revision;
     const changed=new Set(payload.changes.map(change=>JSON.stringify([change.target.scopeId,change.target.name])));
-    ++revision;const current=revision,isCurrent=()=>alive&&revision===current;
     for(const binding of prepared)if(changed.has(JSON.stringify([binding.target.address.scopeId,binding.target.address.name]))){
-      let snapshot;try{snapshot=binding.target.snapshot();}catch{continue;}
-      if(snapshot.status==='pending')continue;
+      const snapshot=payload.states[JSON.stringify([binding.target.address.scopeId,binding.target.address.name])];
+      if(!snapshot||snapshot.status==='pending')continue;
+      const restored=restoreSnapshots.get(binding.target);
+      restoreSnapshots.delete(binding.target);
+      if(restored&&snapshot.status===restored.status&&(snapshot.status==='ready'?equal(snapshot.value,restored.value):snapshot.status!=='error'||snapshot.error.code===restored.error.code))continue;
+      // Initial settlement is not a user change. Retain explicit/reaction changes
+      // until every baseline is ready, including writes to already-ready bindings.
+      const baseline=store.baseline(binding.target),wasPending=initialPending.has(binding.target);
+      if(baseline.status!=='pending')initialPending.delete(binding.target);
+      if((!initialized||wasPending)&&snapshot===baseline&&!store.hasWritten(binding.target))continue;
       const value=snapshot.status==='ready'?snapshot.value:undefined;
       const count=value instanceof Set?value.size:Array.isArray(value)?value.length:0;
       dirty.set(binding.key,{value:value===undefined?null:JSON.stringify(value instanceof Set?[...value]:value),count,history:dirty.get(binding.key)?.history==='push'?'push':binding.history});
     }
-    const patch=Object.fromEntries([...dirty].map(([key,item])=>[key,item.value]));
-    const mode=[...dirty.values()].some(item=>item.history==='push')?'push':'replace';
-    if(!dirty.size)return;
-    try{
-      if([...dirty.values()].some(item=>item.count>limits.maxItems))fail('LIMIT_EXCEEDED');limitOutput(patch);
-      Promise.resolve(adapter.writeOwned(patch,{mode,isCurrent})).then(result=>{if(isCurrent()&&result?.applied!==false)dirty.clear();},caught=>{if(isCurrent())report(caught,'write');});
-    }catch(caught){report(caught,'write');}
+    writeDirty();
   });
+  if(initialized){if(restore)applyRestore();else{firstRestore=false;readyResolve();}writeDirty();}
   const connection=Object.freeze({ready,isReady:()=>initialized,restore:restoreNow,diagnostics:()=>[...diagnostics],
     async removeOwned(selected=prepared.map(b=>b.target)){
       const selectedKeys=prepared.filter(b=>selected.includes(b.target)).map(b=>b.key);const current=++revision;

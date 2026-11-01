@@ -183,6 +183,179 @@
           ]
         }
       ]
+    },
+    {
+      "id": "U08",
+      "evidence": [
+        {
+          "file": "packages/core/test/preflight-values.test.mjs",
+          "tests": [
+            "preflight Grid validates last occupied row and preserves maximum safe one-cell coordinates"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "U09",
+      "evidence": [
+        {
+          "file": "packages/core/test/preflight-values.test.mjs",
+          "tests": [
+            "preflight Grid handles large valid spans and checks automatic row plus span without cell enumeration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "U10",
+      "evidence": [
+        {
+          "file": "packages/core/test/preflight-values.test.mjs",
+          "tests": [
+            "preflight Grid omitted layout treats prototype-named declaration IDs as ordinary IDs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "K04",
+      "evidence": [
+        {
+          "file": "packages/core/test/preflight-values.test.mjs",
+          "tests": [
+            "preflight public State ports ignore enum ordering while preserving distinct Unicode values and ASCII",
+            "preflight public State ports ignore required ordering without normalizing Unicode property names"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M01",
+      "evidence": [
+        {
+          "file": "packages/core/test/preflight-runtime.test.mjs",
+          "tests": [
+            "preflight: failed transaction restores scope lifetime, clocks, handles and final Store cleanup",
+            "preflight: maintained View rejects State kind flip atomically",
+            "preflight: maintained View rejects Derived kind flip atomically",
+            "preflight: maintained Component rejects State kind flip atomically",
+            "preflight: maintained Component rejects Derived kind flip atomically"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "K23",
+      "evidence": [
+        {
+          "file": "packages/core/test/preflight-runtime.test.mjs",
+          "tests": [
+            "preflight: disposing View from commit observer prevents new Query work and scope leaks"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "V08",
+      "evidence": [
+        {
+          "file": "packages/core/test/preflight-runtime.test.mjs",
+          "tests": [
+            "preflight: mount/update Value inputs stay isolated through reevaluation; defaults stay omitted"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "A02",
+      "evidence": [
+        {
+          "file": "packages/core/test/preflight-runtime.test.mjs",
+          "tests": [
+            "preflight: inline Action definitions are isolated while an awaited child runs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "K07",
+      "evidence": [
+        {
+          "file": "packages/core/test/preflight-runtime.test.mjs",
+          "tests": [
+            "preflight: child Action/Query input templates unescape @ names once",
+            "preflight: escaped child State and Query names retain capability routing"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "K01",
+      "evidence": [
+        {
+          "file": "packages/core/test/preflight-runtime.test.mjs",
+          "tests": [
+            "preflight: shared inline spec validates independently for Query and Component kinds"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "L07",
+      "evidence": [
+        {
+          "file": "packages/core/test/preflight-io.test.mjs",
+          "tests": [
+            "U33 pending replacement initial survives failed old URL cleanup"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C08",
+      "evidence": [
+        {
+          "file": "packages/core/test/preflight-io.test.mjs",
+          "tests": [
+            "pending View baseline preserves explicit State write and sends it to URL"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "L08",
+      "evidence": [
+        {
+          "file": "packages/core/test/preflight-io.test.mjs",
+          "tests": [
+            "pending View baseline preserves explicit State write and sends it to URL"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "L02",
+      "evidence": [
+        {
+          "file": "packages/core/test/preflight-io.test.mjs",
+          "tests": [
+            "pending pure initialization and URL restore never write URL or run reactions"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "H07",
+      "evidence": [
+        {
+          "file": "packages/core/test/preflight-io.test.mjs",
+          "tests": [
+            "HTTP rejects empty ? baseUrl delimiter in datasource before transport",
+            "HTTP rejects empty # baseUrl delimiter in datasource before transport",
+            "HTTP keeps encoded query/fragment delimiters in base and request paths"
+          ]
+        }
+      ]
     }
   ]
 }

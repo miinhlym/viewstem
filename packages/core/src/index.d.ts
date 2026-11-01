@@ -55,6 +55,8 @@ export interface UrlConnection {
 export class StateStore {
   private readonly __stateStore: never;
   constructor(); createScope(): Scope;
+  /** Synchronous atomic changes; an exception restores values, structure and scope lifetimes. */
+  transaction<T>(run: () => T & (T extends PromiseLike<unknown> ? never : unknown)): T;
   subscribe(selector: null | StateAddress | readonly StateAddress[], listener: (observation: StoreObservation) => void): () => void;
   batch(changes: readonly (readonly [StateHandle<any>, unknown])[], options?: { readonly origin?: 'explicit' | 'initial' }): void;
   reaction(owner: Scope, reaction: { readonly watch: readonly StateHandle<any>[]; readonly target: StateHandle<any>; readonly value: unknown }): () => void;
@@ -179,7 +181,7 @@ export class View {
   replace(target: ViewTarget): Promise<ApplicationResult>; exportDefinition(): ViewSpec;
   getState(name: string, instanceId?: string): StateHandle<unknown>; getQuery(name: string, instanceId?: string): QueryHandle<unknown>;
   snapshot(): ViewSnapshot; subscribe(listener: (snapshot: ViewSnapshot) => void): () => void;
-  emit(target: string | { readonly address: string; readonly generation: number }, event: string, payload: unknown): Promise<unknown>;
+  emit(target: string | NodeSnapshot | { readonly address: string; readonly generation: number }, event: string, payload: unknown): Promise<unknown>;
   dispose(): void;
 }
 export type ViewHandle = View;

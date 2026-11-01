@@ -80,7 +80,7 @@ export class Runtime {
 
 export class View {
   constructor(host,execution=host.execution(host.registry.fork())) {
-    const runtime=execution;this.host=host;this.runtime=runtime;this.alive=true;this.operation=0;this.generation=0;this.instances=new Map();this.owners=new Map();this.connections=new Map();this.listeners=new Set();this.diagnostics=[];this.planning=false;this.queued=false;
+    const runtime=execution;this.host=host;this.runtime=runtime;this.alive=true;this.operation=0;this.application=0;this.generation=0;this.instances=new Map();this.owners=new Map();this.connections=new Map();this.listeners=new Set();this.diagnostics=[];this.planning=false;this.queued=false;
     this.unsubscribe=runtime.stateStore.observe(()=>this.refresh());
   }
   context(owner,extra={}) {
@@ -135,7 +135,7 @@ export class View {
     if(!previous)created.push(owner);
     for(const [name,declaration] of Object.entries(spec.states??{})) {
       const schema=registry.schema(declaration),existing=owner.states.get(name);
-      if(existing) {if(!sameContract(store.contract(existing).schema,schema))fail('TYPE_CONTRACT_MISMATCH');}
+      if(existing) {if(previous.spec.states?.[name]?.kind!==declaration.kind||!sameContract(store.contract(existing).schema,schema))fail('TYPE_CONTRACT_MISMATCH');}
       else owner.states.set(name,owner.scope.registerState(name,{schema}));
     }
     for(const [name,handle] of owner.states)if(!own(spec.states??{},name)){owner.scope.removeState(name);owner.states.delete(name);}
@@ -167,7 +167,7 @@ export class View {
     return owner;
   }
   build(spec,inputs,replace=false,stateWrites) {
-    const runtime=this.runtime,registry=runtime.registry,store=runtime.stateStore;
+    const runtime=this.runtime,registry=runtime.registry,store=runtime.stateStore,application=this.application,operation=this.operation;
     const created=[],newConnections=[],next=new Map(),owners=new Map(),connections=new Map(),aliases=new Set();
     const oldOwners=this.owners;let oldInstances=replace?new Map():this.instances,availableConnections=replace?new Map():this.connections;
     this.planConnections=connections;
@@ -265,6 +265,11 @@ export class View {
         for(const owner of new Set([...oldOwners.values(),...created]))if(!owners.has(owner.id))owner.scope.dispose();
       });
     } catch(caught){for(const connection of newConnections)connection.dispose();for(const owner of created)owner.actionOwner.dispose();throw caught;}
+    if(!this.alive||application!==this.application||operation!==this.operation) {
+      for(const connection of newConnections)connection.dispose();
+      for(const owner of created){owner.actionOwner.dispose();owner.scope.dispose();}
+      fail('CANCELLED');
+    }
     const retainedConnections=new Set([...connections.values()].map(entry=>entry.connection));
     for(const connection of newConnections)if(!retainedConnections.has(connection))connection.dispose();
     for(const [key,entry] of this.connections)if(connections.get(key)?.connection!==entry.connection)entry.connection.dispose();
@@ -277,7 +282,10 @@ export class View {
     this.root=root;this.roots=roots;this.instances=next;this.owners=owners;this.connections=connections;this.planConnections=null;
   }
   configureQueries() {
+    const application=this.application,operation=this.operation;
+    const current=()=>this.alive&&application===this.application&&operation===this.operation;
     for(const owner of this.owners.values())for(const [name,item] of owner.queries) {
+      if(!current())return;
       const use=item.use,spec=use.query??this.runtime.registry.get('Query',use.queryRef).spec,context=this.context(owner);
       let inputs={},ready=true,executeWhen=true,autoRefreshWhen=true,inputError;
       try {
@@ -289,6 +297,7 @@ export class View {
       const settings={...owner.queryDefaults,...use,inputs,ready,executeWhen,autoRefreshWhen,inputError,owner:item};
       if(!item.usage)item.usage=this.runtime.query.createUsage(use,{...settings,onChange:()=>this.schedule(),clock:this.runtime.clock});
       else item.usage.update(settings);
+      if(!current()){item.usage.dispose();return;}
     }
   }
   refresh() {
@@ -298,24 +307,32 @@ export class View {
   }
   schedule(){if(this.queued||!this.alive)return;this.queued=true;queueMicrotask(()=>{this.queued=false;this.refresh();});}
   project() {
-    const snapshot=this.snapshot();for(const listener of this.listeners)try{listener(snapshot);}catch(caught){this.diagnostics.push(safeError(caught));}
+    if(!this.alive)return;
+    const application=this.application,snapshot=this.snapshot();for(const listener of this.listeners){if(!this.alive||application!==this.application)return;try{listener(snapshot);}catch(caught){this.diagnostics.push(safeError(caught));}}
+    if(!this.alive||application!==this.application)return;
     if(this.initial && !this.queued && [...this.owners.values()].every(owner=>[...owner.queries.values()].every(item=>item.usage?.snapshot().status!=='running'))) {
       const queryErrors=[];for(const owner of this.owners.values())for(const [query,item] of owner.queries)if(item.usage?.snapshot().status==='error')queryErrors.push({instanceId:owner.id,query,error:item.usage.snapshot().error});
       this.initial.resolve({generation:this.generation,queryErrors});
     }
   }
   async apply(spec,inputs,replace,stateWrites,urlOptions,restoreUrl=true,execution=this.runtime) {
+    if(!this.alive)fail('CANCELLED');
     const previousExecution=this.runtime;this.runtime=execution;
-    if(!this.alive)fail('CANCELLED');this.runtime.registry.validateDefinition('View',spec);
+    const application=++this.application,operation=this.operation;
+    const check=()=>{if(!this.alive||application!==this.application||operation!==this.operation)fail('CANCELLED');};
     this.planning=true;
-    try{this.build(spec,inputs,replace,stateWrites);
+    try{
+      this.runtime.registry.validateDefinition('View',spec);
+      const prepared=this.prepareInputs(spec,inputs,{},'automatic',true,'View');
+      inputs=Object.freeze(Object.fromEntries(Object.keys(inputs).map(name=>[name,spec.ports[name].kind==='Value'?prepared.ports[name]:inputs[name]])));
+      this.build(spec,inputs,replace,stateWrites);check();
       if(urlOptions) {
         this.url=this.runtime.stateStore.connectUrl({...urlOptions,restore:restoreUrl,bindings:urlOptions.bindings.map(({state,...binding})=>({...binding,target:this.getState(state)})),onError:diagnostic=>this.diagnostics.push(diagnostic)});
         this.url.ready.then(()=>this.schedule());
-        this.build(spec,inputs);
+        check();this.build(spec,inputs);check();
       }
-      this.spec=spec;this.inputs=inputs;this.generation++;this.initial?.reject(error('CANCELLED'));this.initial=deferred();this.configureQueries();this.project();}
-    catch(caught){this.runtime=previousExecution;this.planConnections=null;throw safeError(caught);}finally{this.planning=false;}
+      this.spec=spec;this.inputs=inputs;this.generation++;this.initial?.reject(error('CANCELLED'));this.initial=deferred();this.configureQueries();check();this.project();check();}
+    catch(caught){if(application===this.application)this.runtime=previousExecution;this.planConnections=null;throw safeError(caught);}finally{this.planning=false;}
     this.schedule();return {initial:this.initial.promise};
   }
   async update(spec,{inputs=this.inputs,states}={}) {

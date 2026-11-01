@@ -121,6 +121,8 @@ export function invokeFunction(name,args,functions=[]) {
   try {
     const schema={type:'array',...(fn.inputs.length?{prefixItems:fn.inputs}:{}),items:false,minItems:fn.inputs.length,maxItems:fn.inputs.length};
     const accepted=compileSchema(schema).accept(args,trustedCopies(args));
-    return protect(compileSchema(fn.output).accept(fn.run(...protect(accepted))));
+    const raw = fn.run(...protect(accepted));
+    if (raw && typeof raw.then === 'function') { Promise.resolve(raw).catch(() => {}); fail('TYPE_MISMATCH'); }
+    return protect(compileSchema(fn.output).accept(raw));
   } catch(caught) { throw safeError(caught,'TYPE_MISMATCH'); }
 }

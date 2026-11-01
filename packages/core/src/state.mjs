@@ -24,21 +24,29 @@ export class StateStore {
   #transaction = null;
   #readingStage = null;
   #scopes = new Set();
+  #scopeLifetimes = new WeakMap();
   #url = null;
 
   transaction(run) {
     if (this.#transaction) return run();
     const cells = new Map(this.#cells), reactions = new Map(this.#reactions), scopes = new Set(this.#scopes);
     const previous = new Map([...cells.values()].map(cell => [cell, {...cell}]));
-    const pending = [];
+    const lifetimes = new Map([...scopes].map(scope => [this.#scopeLifetimes.get(scope), this.#scopeLifetimes.get(scope).alive]));
+    const pending = []; pending.createdScopes = new Set(); pending.cleanup = [];
     this.#transaction = pending;
     let result;
     try { result = run(); if (result?.then) fail('INVALID_DEFINITION'); }
     catch (caught) {
+      for (const scope of pending.createdScopes) {
+        const lifetime = this.#scopeLifetimes.get(scope); lifetime.alive = false;
+        for (const stop of lifetime.clockSubscriptions) stop();
+      }
       this.#cells = cells; this.#reactions = reactions; this.#scopes = scopes;
+      for (const [lifetime, alive] of lifetimes) lifetime.alive = alive;
       for (const [cell, fields] of previous) Object.assign(cell, fields);
       throw caught;
     } finally { this.#transaction = null; }
+    for (const cleanup of pending.cleanup) cleanup();
     const changes = new Map();
     for (const change of pending) {
       const key = keyOf(change.target), first = changes.get(key);
@@ -103,15 +111,15 @@ export class StateStore {
 
   createScope() {
     const store = this, scopeId = `scope-${++nextScope}`;
-    let alive = true; const clockSubscriptions = new Set();
-    const current = () => { if (!alive) fail('CANCELLED'); };
+    const lifetime = { alive: true, clockSubscriptions: new Set() }, { clockSubscriptions } = lifetime;
+    const current = () => { if (!lifetime.alive) fail('CANCELLED'); };
     const scope = Object.freeze({ scopeId,
       connectClock(target, clock) {
         current();store.#cellFor(target);
         if(!clock || typeof clock.now !== 'function' || typeof clock.subscribe !== 'function')fail('INVALID_DEFINITION');
         const update=value=>{if(!Number.isSafeInteger(value))fail('TYPE_MISMATCH');target.write(value);};
         update(clock.now());let active=true;
-        const stop=clock.subscribe(value=>{if(active&&alive)update(value);});
+        const stop=clock.subscribe(value=>{if(active&&lifetime.alive)update(value);});
         if(typeof stop!=='function')fail('INVALID_DEFINITION');
         const unsubscribe=()=>{if(!active)return;active=false;clockSubscriptions.delete(unsubscribe);stop();};
         clockSubscriptions.add(unsubscribe);return unsubscribe;
@@ -121,10 +129,11 @@ export class StateStore {
       getState(name) { current(); return store.#lookup({ scopeId, name }).handle; },
       removeState(name) { current(); store.#remove(store.#lookup({ scopeId, name })); },
       dispose() {
-        if (!alive) return;
-        alive = false;
+        if (!lifetime.alive) return;
+        lifetime.alive = false;
         store.#scopes.delete(scope);
-        for(const stop of clockSubscriptions)stop();
+        const cleanup = () => { if (!lifetime.alive) for(const stop of clockSubscriptions)stop(); };
+        if (store.#transaction) store.#transaction.cleanup.push(cleanup); else cleanup();
         store.#perform(() => {
           const removed = [...store.#cells.values()].filter(cell => cell.address.scopeId === scopeId);
           for (const cell of removed) store.#cells.delete(keyOf(cell.address));
@@ -133,7 +142,7 @@ export class StateStore {
         });
       },
     });
-    this.#scopes.add(scope);return scope;
+    this.#scopeLifetimes.set(scope,lifetime);this.#scopes.add(scope);this.#transaction?.createdScopes.add(scope);return scope;
   }
 
   #lookup(address) { return this.#cells.get(keyOf(address)) ?? fail('REFERENCE_NOT_FOUND'); }

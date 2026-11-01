@@ -1,7 +1,7 @@
 import { compileSchema } from './schema.mjs';
 import { compilePorts, boundedState, boundedQuery, createQueryHandle } from './ports.mjs';
 import { protect, trustedCopies } from './immutable.mjs';
-import { evaluate as evaluateValue, pointerKeys, validateTemplate } from './expressions.mjs';
+import { evaluate as evaluateValue, pointerKeys, validateTemplate, dataEntries } from './expressions.mjs';
 import { safeError, error as failure } from './errors.mjs';
 
 // Sequential execution shares the registry, Store, value evaluator and owner lifetimes.
@@ -29,7 +29,7 @@ export class ActionEngine {
         ...(this.#registry.isCode('Action',reference) ? {native:this.#registry.implementation('Action',reference)} : {})}));
       return this.#cache.get(resource);
     }
-    this.#registry.validateDefinition('Action',spec);return spec;
+    this.#registry.validateDefinition('Action',spec);return protect(structuredClone(spec));
   }
   owner() {
     const state = { alive: true, connections: new Set(), ids: new Map(), calls: new Set() }, probe = this;
@@ -182,7 +182,7 @@ export class ActionEngine {
               const inputs = Object.create(null);
               const whole=step.inputs&&Object.hasOwn(step.inputs,'@path')||step.inputs&&Object.hasOwn(step.inputs,'@call');
               if(whole)Object.assign(inputs,evaluate(step.inputs,completed));
-              for (const [name, template] of Object.entries(whole?{}:step.inputs ?? {})) {
+              for (const [name, template] of dataEntries(whole?{}:step.inputs ?? {})) {
                 const kind = child?.ports?.[name]?.kind;
                 inputs[name] = kind === 'State' || kind === 'Query' ? target(template, kind) : await evaluate(template, completed);
               }
