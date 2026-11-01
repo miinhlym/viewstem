@@ -1,0 +1,54 @@
+{
+  "scope": "Runtime modules are frozen; app source files were not modified. Metadata outside t3-ui remains the parent owner responsibility.",
+  "currentTransitiveSourceSha256": {
+    "ui-probe.mjs": "fd8fea7ebd17ca80ccc562f982021785c876fc3abfb4eb833a0d85ba29a48f6d",
+    "value-evaluator.mjs": "42d9047b771651a554e8a01fb355b469742aab748c0d94073c04d3b07a8451c7",
+    "action-bridge.mjs": "7adf4b1f3103a4be37c80822d978d465713ff1ea2429b4b8e9774c39face9b13",
+    "../t2-http-boundary/value-expressions.mjs": "3bd0320dc4e2a978de7a576e1c3df90d456170e9540d8aa667f42d0c1c65a32f",
+    "../verification/errors.mjs": "c9d94483f9314bcf5bad42cb044f7b0ba29cd7d7b9d3ba561f1c9021aa6d7224"
+  },
+  "regeneratedApplicationReports": [
+    {
+      "result": "../t3-application/results/node22.json",
+      "summary": {
+        "executed": 29,
+        "passed": 29,
+        "failed": 0
+      },
+      "runtime": "v22.21.1",
+      "uiDirectHash": "fd8fea7ebd17ca80ccc562f982021785c876fc3abfb4eb833a0d85ba29a48f6d",
+      "matchesCurrent": true
+    },
+    {
+      "result": "../t3-application/results/node24.json",
+      "summary": {
+        "executed": 29,
+        "passed": 29,
+        "failed": 0
+      },
+      "runtime": "v24.19.0",
+      "uiDirectHash": "fd8fea7ebd17ca80ccc562f982021785c876fc3abfb4eb833a0d85ba29a48f6d",
+      "matchesCurrent": true
+    },
+    {
+      "result": "../t3-application/results/chromium.json",
+      "summary": {
+        "executed": 4,
+        "passed": 4,
+        "failed": 0
+      },
+      "runtime": "v22.21.1",
+      "uiDirectHash": "fd8fea7ebd17ca80ccc562f982021785c876fc3abfb4eb833a0d85ba29a48f6d",
+      "matchesCurrent": true
+    }
+  ],
+  "additionalMetadataToRefresh": [
+    "../t3-application/coverage.json",
+    "../verification/coverage.json"
+  ],
+  "note": "Existing application runners hash the direct UI module but do not list its new evaluator module. Pair application results with the current t3-ui full transitive source hashes above and in UI result manifests.",
+  "historicalResults": "archive/u34-dynamic-before/results are intentionally preserved, not refreshed.",
+  "unaffected": "types compiler fixtures do not import the UI runtime; their runtime-independent compilation evidence is not invalidated by this change.",
+  "generatedAt": "2026-10-30T10:20:00.545Z",
+  "parentPlannedFollowup": "Parent will expand the application runner manifest with the new evaluator/shared helper, refresh external coverage metadata and regenerate final reports after documentation updates."
+}

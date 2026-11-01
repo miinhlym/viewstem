@@ -1,0 +1,15 @@
+{
+  "status": "partial-experimental-evidence",
+  "source": "docs/spec/10-value-contracts.md",
+  "testSource": "fixtures.json",
+  "actualResults": ["results/node22.json", "results/node24.json", "results/dart-node22.json", "results/dart-node24.json"],
+  "fixtureCount": 95,
+  "rows": [
+    { "acceptance": ["C12", "V13", "V14", "V17", "V19", "V20", "V23", "V26", "V27", "V28", "V29", "V31"], "tests": ["D01–D19", "D39–D46"], "status": "partial", "verified": "Null/missing/pending/error, private undefined/hole mapping, native collection admission and explicit async result boundary", "remaining": "Production core and Dart reactive dependency scheduling, all nested profiles" },
+    { "acceptance": ["V06", "V07", "V08", "V09", "S06"], "tests": ["D13–D18", "D34–D37"], "status": "partial", "verified": "Native identity/equality, string/number keys, Set/Map order, protected stable snapshots and source isolation", "remaining": "Full Store observation/lifecycle and cross-runtime exported object identity are not claimed" },
+    { "acceptance": ["V36–V56"], "tests": ["D20–D28", "D38", "D47–D49"], "status": "partial", "verified": "Safe integer/binary64/-0 and unsupported host types, explicit integer bridge", "remaining": "Dart CEL arithmetic/function conformance and all type positions" },
+    { "acceptance": ["V58"], "tests": ["D29"], "status": "partial", "verified": "Actual object/list/Set/Map cycle rejection", "remaining": "Production resource/Derived/reaction dependency cycle validation" },
+    { "acceptance": ["V10", "K30", "K31", "K32", "K33", "K35"], "tests": ["D30–D33", "D50–D51"], "status": "partial", "verified": "Strict date/time/datetime, UTC offset normalization, milliseconds/year/YY boundaries, representative IANA gap/overlap rejection", "remaining": "All timezone data and calendar arithmetic, broad schema combinations, HTTP/URL roundtrip" }
+  ],
+  "preservedSeparateEvidence": { "source": "../t1-values/results/dart.json", "candidate": "cel 0.6.1", "knownMismatches": 7, "claim": "Unchanged; this host-value adapter experiment does not resolve candidate CEL mismatches" }
+}

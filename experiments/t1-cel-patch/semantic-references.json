@@ -1,0 +1,41 @@
+{
+  "scope": "Compatibility of already exposed candidate extensions, not adoption of new public functions. Source content hash records retrieved master content; network source updates are not automatic contract updates.",
+  "sources": [
+    {
+      "id": "strings",
+      "url": "https://raw.githubusercontent.com/cel-expr/cel-go/master/ext/strings.go",
+      "retrievedAt": "2026-10-30T10:29:54.162Z",
+      "sha256": "11eb3db9c5669b5a8dca9b91484c4c4f2f923848e922a8a8314d3b6961720bb0",
+      "symbols": "indexOfOffset,lastIndexOfOffset,substrRange,lowerASCII,upperASCII,split,splitN,trimSpace"
+    },
+    {
+      "id": "standard",
+      "url": "https://raw.githubusercontent.com/cel-expr/cel-spec/master/doc/langdef.md",
+      "retrievedAt": "2026-10-30T10:29:54.392Z",
+      "sha256": "7d8c9c7187c22f74e2cae259d0487bed216824b19b1192a809a7302fe12269e6",
+      "symbols": "Standard Environment, String Functions, Bytes Functions"
+    },
+    {
+      "id": "goStrings",
+      "url": "https://raw.githubusercontent.com/golang/go/master/src/strings/strings.go",
+      "retrievedAt": "2026-10-30T10:29:54.748Z",
+      "sha256": "27db263a81f6f9abc80cb226b3e938a46096403e0fc08e056f5de5d913a2ba0d",
+      "symbols": "Split,SplitN,explode,TrimSpace"
+    },
+    {
+      "id": "goUnicode",
+      "url": "https://raw.githubusercontent.com/golang/go/master/src/unicode/graphic.go",
+      "retrievedAt": "2026-10-30T10:29:55.034Z",
+      "sha256": "46a43107a87c88cf17a05a557e00dbf6b0f4bb53ebcd7d3035e02f1e67c428be",
+      "symbols": "IsSpace"
+    }
+  ],
+  "decisions": {
+    "case": "Only ASCII A-Z/a-z is case-mapped; non-ASCII code points remain unchanged.",
+    "search": "Unicode code-point offsets; negative offsets error, empty search clamps to length, non-empty search at/past length returns -1.",
+    "substring": "Unicode code-point half-open range; negative, reversed or out-of-range bounds error.",
+    "split": "Empty separator splits Unicode code points. Existing limit semantics retained.",
+    "trim": "Go Unicode White_Space; U+0085 included, U+FEFF and U+200B excluded.",
+    "bytesJson": "Package extension bug fix only: browser TextDecoder UTF-8 decoding before JSON.parse. No new JSON numeric, scalar or invalid UTF-8 policy."
+  }
+}

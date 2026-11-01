@@ -1,0 +1,1360 @@
+{
+  "generatedAt": "2026-11-02T00:29:12.197Z",
+  "runtime": "v24.19.0",
+  "typescript": "5.9.3",
+  "compilerCLI": "Version 5.9.3",
+  "packageLockSha256": "9c64d1932109c3627692e3e234919ffd2cdad851d5156d99b9cab7fab77ec6d5",
+  "scope": "Compile-only private SDK contract fixture; no runtime/library SDK connection or execution.",
+  "dependency": {
+    "version": "5.9.3",
+    "resolved": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
+    "integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
+    "dev": true,
+    "license": "Apache-2.0",
+    "bin": {
+      "tsc": "bin/tsc",
+      "tsserver": "bin/tsserver"
+    },
+    "engines": {
+      "node": ">=14.17"
+    }
+  },
+  "sourceSha256": {
+    "contracts.ts": "d1090d144af912a6091d8b12b7b7f91e5757e5dc3fda31dfe26c8dd20b24c13b",
+    "positive.ts": "46732fddcc833b1690fe2a70dfb20868c335a9c528638a88b421854118d1e6e3",
+    "negative.ts": "b73effce5607ce38758fcdfbdb8d884e18c42e29de35e0e858779e5fdead501b",
+    "runtime-limits.ts": "af201df8a5f5b9cb72e3dc1bc2ed7e0e9dcdeed89eab948799df0ab9f49e6a1a",
+    "run.mjs": "a6cd2511a224d1c0a1ca2b35ca0f4e12915f979892054c12a9b89be3259229dd",
+    "tsconfig.json": "8ac8919a4cae9923acf2ca0c8e54981e79ada1d940f1958fc4878ac82e23a013",
+    "tsconfig.positive.json": "51194c373c2cf57705880e877e851bfe044216013d572381b869f20828603b73",
+    "tsconfig.limits.json": "a9ad9bbc8694c4678349186aef8c3ef0dbaecd8afe31121427fb1585b6050b30",
+    "package.json": "c5bff3bea2b8f24234f8e3a275f90624cab41139774553167104507fced89170",
+    "package-lock.json": "9c64d1932109c3627692e3e234919ffd2cdad851d5156d99b9cab7fab77ec6d5",
+    "../../../docs/spec/07-host-integration.md": "bc0a6d4747b6afaaf08ab781198edda5606913c437fc7fdeae49b24331c61401",
+    "../../../docs/spec/04-action.md": "882deeaa7304a9d17f56d014c46512ed9f6f19a84072dd20b1ae7983daaabd24",
+    "../../../docs/spec/02-query.md": "84c549e37ba7fd5109f348be70d1425f2f92a3b93a92b42e905298d70f3b5af2",
+    "../../../docs/spec/10-value-contracts.md": "267d526405fe081704bb13a14ca98cf9ec762ffa22aad7b51015c8f29f463b63"
+  },
+  "compilerSha256": {
+    "node_modules/typescript/bin/tsc": "8d5fa5bd883fec0979fc2004f1fe1d99aef40570155d550eadc0b03b55513bf0",
+    "node_modules/typescript/lib/tsc.js": "2cffde0b8c6760dfb0b5b0382bbb7e00ba6a8b2d981b9205b256a700a481d983",
+    "node_modules/typescript/lib/_tsc.js": "e8f349eabd48486bdb2bf9dc1a00c89d58297270c54b745838879e2859194419",
+    "node_modules/typescript/lib/typescript.js": "3ae902c92cc44dace175c0e69e13a4b0899f6983c6121d76b9ab8dd5795e7675"
+  },
+  "passed": true,
+  "summary": {
+    "compilerPinMatches": true,
+    "positiveCompilationPassed": true,
+    "guardedNegativeCompilationPassed": true,
+    "negativeCasesExpected": 56,
+    "negativeCasesDetected": 56,
+    "unusedExpectErrorDirectives": 0,
+    "unexpectedDiagnostics": 0,
+    "unmaskedNegativeRejected": true,
+    "runtimeLimitExamplesCompile": true
+  },
+  "stages": {
+    "positive": {
+      "command": [
+        "/opt/homebrew/Cellar/node@24/24.19.0/bin/node",
+        "/Users/minholim/dev/minh/viewstem/experiments/t3-application/types/node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "--strict",
+        "--pretty",
+        "false",
+        "--project",
+        "tsconfig.positive.json"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "diagnostics": []
+    },
+    "guardedNegative": {
+      "command": [
+        "/opt/homebrew/Cellar/node@24/24.19.0/bin/node",
+        "/Users/minholim/dev/minh/viewstem/experiments/t3-application/types/node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "--strict",
+        "--pretty",
+        "false",
+        "--project",
+        "tsconfig.json"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "diagnostics": []
+    },
+    "unmaskedNegative": {
+      "command": [
+        "/opt/homebrew/Cellar/node@24/24.19.0/bin/node",
+        "/Users/minholim/dev/minh/viewstem/experiments/t3-application/types/node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "--strict",
+        "--pretty",
+        "false",
+        "--project",
+        ".tsconfig-unmasked-18058.json"
+      ],
+      "exitCode": 2,
+      "signal": null,
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 17,
+          "column": 7,
+          "code": 2322,
+          "message": "Type '{ schema: { type: string; }; typeRef: string; }' is not assignable to type 'TypeContract'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 19,
+          "column": 7,
+          "code": 2322,
+          "message": "Type '{}' is not assignable to type 'TypeContract'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 21,
+          "column": 7,
+          "code": 2375,
+          "message": "Type '{ schema: undefined; }' is not assignable to type 'TypeContract' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 23,
+          "column": 57,
+          "code": 2322,
+          "message": "Type '{ ports: { value: { kind: \"Value\"; schema: { type: string; }; typeRef: string; }; }; render: { id: string; componentRef: string; }; }' is not assignable to type 'ActionSpec | QuerySpec | ComponentSpec | ViewSpec | { readonly schema: Schema; } | { readonly ports?: Readonly<Record<string, ValuePort>>; readonly expression: string; } | { ...; }'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 25,
+          "column": 80,
+          "code": 2322,
+          "message": "Type '{ schema: { type: string; }; typeRef: string; }' is not assignable to type 'TypeContract'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 27,
+          "column": 78,
+          "code": 2322,
+          "message": "Type 'string' is not assignable to type 'number'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 29,
+          "column": 13,
+          "code": 2345,
+          "message": "Argument of type 'string' is not assignable to parameter of type 'number'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 31,
+          "column": 13,
+          "code": 2345,
+          "message": "Argument of type 'undefined' is not assignable to parameter of type 'number'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 33,
+          "column": 7,
+          "code": 2322,
+          "message": "Type 'number | undefined' is not assignable to type 'number'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 35,
+          "column": 44,
+          "code": 2339,
+          "message": "Property 'value' does not exist on type 'ValueSnapshot<number>'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 37,
+          "column": 15,
+          "code": 2540,
+          "message": "Cannot assign to 'name' because it is a read-only property."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 39,
+          "column": 7,
+          "code": 2339,
+          "message": "Property 'write' does not exist on type 'QueryHandle<readonly { id: string; }[]>'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 41,
+          "column": 7,
+          "code": 2322,
+          "message": "Type 'void' is not assignable to type 'readonly string[]'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 43,
+          "column": 15,
+          "code": 2540,
+          "message": "Cannot assign to 'status' because it is a read-only property."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 45,
+          "column": 21,
+          "code": 2339,
+          "message": "Property 'push' does not exist on type 'readonly { readonly id: string; }[]'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 47,
+          "column": 52,
+          "code": 2540,
+          "message": "Cannot assign to 'id' because it is a read-only property."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 49,
+          "column": 16,
+          "code": 2540,
+          "message": "Cannot assign to 'form' because it is a read-only property."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 51,
+          "column": 21,
+          "code": 2540,
+          "message": "Cannot assign to 'title' because it is a read-only property."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 53,
+          "column": 26,
+          "code": 2339,
+          "message": "Property 'push' does not exist on type 'readonly string[]'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 55,
+          "column": 30,
+          "code": 2339,
+          "message": "Property 'set' does not exist on type 'ReadonlyMap<string, { readonly label: string; }>'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 57,
+          "column": 40,
+          "code": 2540,
+          "message": "Cannot assign to 'label' because it is a read-only property."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 59,
+          "column": 30,
+          "code": 2339,
+          "message": "Property 'add' does not exist on type 'ReadonlySet<string>'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 61,
+          "column": 9,
+          "code": 2339,
+          "message": "Property 'runtime' does not exist on type 'NativeContext<Inputs>'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 63,
+          "column": 9,
+          "code": 2339,
+          "message": "Property 'stateStore' does not exist on type 'NativeContext<Inputs>'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 65,
+          "column": 31,
+          "code": 2339,
+          "message": "Property 'event' does not exist on type 'NativeContext<Inputs>'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 67,
+          "column": 9,
+          "code": 2540,
+          "message": "Cannot assign to 'signal' because it is a read-only property."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 69,
+          "column": 88,
+          "code": 2322,
+          "message": "Type 'number' is not assignable to type 'void | Promise<void>'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 71,
+          "column": 95,
+          "code": 2322,
+          "message": "Type 'Promise<number>' is not assignable to type 'void | Promise<void>'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 73,
+          "column": 135,
+          "code": 2322,
+          "message": "Type 'string' is not assignable to type 'boolean | Promise<boolean>'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 75,
+          "column": 137,
+          "code": 2322,
+          "message": "Type 'undefined' is not assignable to type 'boolean | Promise<boolean>'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 77,
+          "column": 53,
+          "code": 2322,
+          "message": "Type 'null' is not assignable to type 'string | Promise<string>'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 79,
+          "column": 93,
+          "code": 2322,
+          "message": "Type '{}' is not assignable to type 'NativeActionSpec<{}, boolean>'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 81,
+          "column": 90,
+          "code": 2322,
+          "message": "Type '{ schema: { type: string; }; }' is not assignable to type 'never'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 83,
+          "column": 139,
+          "code": 2322,
+          "message": "Type 'number' is not assignable to type 'never'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 85,
+          "column": 58,
+          "code": 2322,
+          "message": "Type '{ schema: { type: string; }; }' is not assignable to type 'TypeContract & { readonly value: JsonValue; }'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 87,
+          "column": 7,
+          "code": 2322,
+          "message": "Type '{ actionRef: string; action: { steps: never[]; }; }' is not assignable to type 'ActionCall'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 89,
+          "column": 7,
+          "code": 2322,
+          "message": "Type '{ inputs: {}; }' is not assignable to type 'ActionCall'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 91,
+          "column": 7,
+          "code": 2322,
+          "message": "Type '{ queryRef: string; query: { sources: {}; }; }' is not assignable to type 'QueryUse'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 93,
+          "column": 7,
+          "code": 2322,
+          "message": "Type '{ inputs: {}; }' is not assignable to type 'QueryUse'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 95,
+          "column": 7,
+          "code": 2322,
+          "message": "Type '{ id: string; componentRef: string; component: { render: { id: string; componentRef: string; }; }; }' is not assignable to type 'ComponentNode'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 97,
+          "column": 7,
+          "code": 2322,
+          "message": "Type '{ id: string; }' is not assignable to type 'ComponentNode'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 99,
+          "column": 21,
+          "code": 2345,
+          "message": "Argument of type '{ viewRef: string; view: { render: { id: string; componentRef: string; }; }; }' is not assignable to parameter of type 'ViewTarget'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 101,
+          "column": 21,
+          "code": 2345,
+          "message": "Argument of type '{ inputs: {}; }' is not assignable to parameter of type 'ViewTarget'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 103,
+          "column": 28,
+          "code": 2345,
+          "message": "Argument of type '{ actionRef: string; action: { steps: never[]; }; owner: ViewHandle; }' is not assignable to parameter of type 'ReferenceOrInline<\"actionRef\", \"action\", ActionSpec> & { readonly inputs?: Readonly<Record<string, unknown>>; readonly owner: ViewHandle; }'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 105,
+          "column": 28,
+          "code": 2345,
+          "message": "Argument of type '{ actionRef: string; }' is not assignable to parameter of type 'ReferenceOrInline<\"actionRef\", \"action\", ActionSpec> & { readonly inputs?: Readonly<Record<string, unknown>>; readonly owner: ViewHandle; }'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 107,
+          "column": 15,
+          "code": 2345,
+          "message": "Argument of type '{}' is not assignable to parameter of type '{ readonly registry: Registry; readonly stateStore?: StateStore; readonly requestExecutor?: (plan: HttpExecutionPlan, context: { readonly signal: AbortSignal; }) => Promise<...>; readonly resourceResolver?: (kind: ResourceKind, id: string) => Awaitable<...>; }'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 109,
+          "column": 7,
+          "code": 2741,
+          "message": "Property '[storeBrand]' is missing in type '{ createScope: () => never; subscribe: () => () => void; }' but required in type 'StateStore'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 111,
+          "column": 19,
+          "code": 2540,
+          "message": "Cannot assign to 'data' because it is a read-only property."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 113,
+          "column": 21,
+          "code": 2339,
+          "message": "Property 'push' does not exist on type 'readonly PublicError[]'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 115,
+          "column": 19,
+          "code": 2339,
+          "message": "Property 'refresh' does not exist on type 'ActionObservation<number>'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 117,
+          "column": 22,
+          "code": 2345,
+          "message": "Argument of type '{ actionRef: string; action: { steps: never[]; }; }' is not assignable to parameter of type 'ChildActionRequest'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 119,
+          "column": 22,
+          "code": 2345,
+          "message": "Argument of type '{ inputs: {}; }' is not assignable to parameter of type 'ChildActionRequest'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 121,
+          "column": 40,
+          "code": 2322,
+          "message": "Type 'ViewHandle' is not assignable to type 'never'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 123,
+          "column": 40,
+          "code": 2322,
+          "message": "Type 'string' is not assignable to type 'never'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 125,
+          "column": 7,
+          "code": 2322,
+          "message": "Type 'unknown' is not assignable to type 'boolean'."
+        },
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 127,
+          "column": 9,
+          "code": 2540,
+          "message": "Cannot assign to 'invokeAction' because it is a read-only property."
+        }
+      ]
+    },
+    "runtimeLimits": {
+      "command": [
+        "/opt/homebrew/Cellar/node@24/24.19.0/bin/node",
+        "/Users/minholim/dev/minh/viewstem/experiments/t3-application/types/node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "--strict",
+        "--pretty",
+        "false",
+        "--project",
+        "tsconfig.limits.json"
+      ],
+      "exitCode": 0,
+      "signal": null,
+      "diagnostics": []
+    }
+  },
+  "negativeCases": [
+    {
+      "id": "XOR_SCHEMA_BOTH",
+      "line": 17,
+      "source": "const bothSchema: TypeContract = { schema: { type: 'number' }, typeRef: 'number' };",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 17,
+          "column": 7,
+          "code": 2322,
+          "message": "Type '{ schema: { type: string; }; typeRef: string; }' is not assignable to type 'TypeContract'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "XOR_SCHEMA_NEITHER",
+      "line": 19,
+      "source": "const neitherSchema: TypeContract = {};",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 19,
+          "column": 7,
+          "code": 2322,
+          "message": "Type '{}' is not assignable to type 'TypeContract'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "XOR_SCHEMA_UNDEFINED",
+      "line": 21,
+      "source": "const explicitUndefined: TypeContract = { schema: undefined };",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 21,
+          "column": 7,
+          "code": 2375,
+          "message": "Type '{ schema: undefined; }' is not assignable to type 'TypeContract' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "RESOURCE_NESTED_SCHEMA_XOR",
+      "line": 23,
+      "source": "registry.registerResources([{ kind: 'View', id: 'both', spec: { ports: { value: { kind: 'Value', schema: { type: 'number' }, typeRef: 'number' } }, render: { id: 'text', componentRef: 'Text' } } }]);",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 23,
+          "column": 57,
+          "code": 2322,
+          "message": "Type '{ ports: { value: { kind: \"Value\"; schema: { type: string; }; typeRef: string; }; }; render: { id: string; componentRef: string; }; }' is not assignable to type 'ActionSpec | QuerySpec | ComponentSpec | ViewSpec | { readonly schema: Schema; } | { readonly ports?: Readonly<Record<string, ValuePort>>; readonly expression: string; } | { ...; }'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "COMPONENT_EVENT_SCHEMA_XOR",
+      "line": 25,
+      "source": "registry.registerComponent({ kind: 'Component', id: 'event', spec: { events: { click: { schema: { type: 'object' }, typeRef: 'event' } } } });",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 25,
+          "column": 80,
+          "code": 2322,
+          "message": "Type '{ schema: { type: string; }; typeRef: string; }' is not assignable to type 'TypeContract'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "STATE_INITIAL_TYPE",
+      "line": 27,
+      "source": "const initialWrong: StateDeclaration<number> = { schema: { type: 'number' }, initial: 'wrong' };",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 27,
+          "column": 78,
+          "code": 2322,
+          "message": "Type 'string' is not assignable to type 'number'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "STATE_WRITE_TYPE",
+      "line": 29,
+      "source": "state.write('wrong');",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 29,
+          "column": 13,
+          "code": 2345,
+          "message": "Argument of type 'string' is not assignable to parameter of type 'number'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "STATE_WRITE_UNDEFINED",
+      "line": 31,
+      "source": "state.write(undefined);",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 31,
+          "column": 13,
+          "code": 2345,
+          "message": "Argument of type 'undefined' is not assignable to parameter of type 'number'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "STATE_READ_MISSING",
+      "line": 33,
+      "source": "const unguardedRead: number = state.read();",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 33,
+          "column": 7,
+          "code": 2322,
+          "message": "Type 'number | undefined' is not assignable to type 'number'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "STATE_SNAPSHOT_NARROW",
+      "line": 35,
+      "source": "const unguardedSnapshot: number = snapshot.value;",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 35,
+          "column": 44,
+          "code": 2339,
+          "message": "Property 'value' does not exist on type 'ValueSnapshot<number>'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "STATE_ADDRESS_READONLY",
+      "line": 37,
+      "source": "state.address.name = 'renamed';",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 37,
+          "column": 15,
+          "code": 2540,
+          "message": "Cannot assign to 'name' because it is a read-only property."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "QUERY_NO_WRITE",
+      "line": 39,
+      "source": "query.write([]);",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 39,
+          "column": 7,
+          "code": 2339,
+          "message": "Property 'write' does not exist on type 'QueryHandle<readonly { id: string; }[]>'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "QUERY_REFRESH_VOID",
+      "line": 41,
+      "source": "const refreshedRows: readonly string[] = await query.refresh();",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 41,
+          "column": 7,
+          "code": 2322,
+          "message": "Type 'void' is not assignable to type 'readonly string[]'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "QUERY_STATUS_READONLY",
+      "line": 43,
+      "source": "querySnapshot.status = 'success';",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 43,
+          "column": 15,
+          "code": 2540,
+          "message": "Cannot assign to 'status' because it is a read-only property."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "QUERY_DATA_READONLY",
+      "line": 45,
+      "source": "querySnapshot.data?.push({ id: 'new' });",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 45,
+          "column": 21,
+          "code": 2339,
+          "message": "Property 'push' does not exist on type 'readonly { readonly id: string; }[]'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "QUERY_NESTED_READONLY",
+      "line": 47,
+      "source": "if (querySnapshot.data?.[0]) querySnapshot.data[0].id = 'changed';",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 47,
+          "column": 52,
+          "code": 2540,
+          "message": "Cannot assign to 'id' because it is a read-only property."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_INPUT_RECORD_READONLY",
+      "line": 49,
+      "source": "context.inputs.form = { title: 'new', tags: [], metadata: new Map(), selected: new Set() };",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 49,
+          "column": 16,
+          "code": 2540,
+          "message": "Cannot assign to 'form' because it is a read-only property."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_INPUT_OBJECT_READONLY",
+      "line": 51,
+      "source": "context.inputs.form.title = 'changed';",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 51,
+          "column": 21,
+          "code": 2540,
+          "message": "Cannot assign to 'title' because it is a read-only property."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_INPUT_ARRAY_READONLY",
+      "line": 53,
+      "source": "context.inputs.form.tags.push('new');",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 53,
+          "column": 26,
+          "code": 2339,
+          "message": "Property 'push' does not exist on type 'readonly string[]'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_INPUT_MAP_READONLY",
+      "line": 55,
+      "source": "context.inputs.form.metadata.set('x', { label: 'changed' });",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 55,
+          "column": 30,
+          "code": 2339,
+          "message": "Property 'set' does not exist on type 'ReadonlyMap<string, { readonly label: string; }>'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_INPUT_MAP_VALUE_READONLY",
+      "line": 57,
+      "source": "context.inputs.form.metadata.get('x')!.label = 'changed';",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 57,
+          "column": 40,
+          "code": 2540,
+          "message": "Cannot assign to 'label' because it is a read-only property."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_INPUT_SET_READONLY",
+      "line": 59,
+      "source": "context.inputs.form.selected.add('x');",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 59,
+          "column": 30,
+          "code": 2339,
+          "message": "Property 'add' does not exist on type 'ReadonlySet<string>'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_NO_RUNTIME",
+      "line": 61,
+      "source": "context.runtime.mount({ viewRef: 'x' });",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 61,
+          "column": 9,
+          "code": 2339,
+          "message": "Property 'runtime' does not exist on type 'NativeContext<Inputs>'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_NO_STORE",
+      "line": 63,
+      "source": "context.stateStore.createScope();",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 63,
+          "column": 9,
+          "code": 2339,
+          "message": "Property 'stateStore' does not exist on type 'NativeContext<Inputs>'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_NO_EVENT",
+      "line": 65,
+      "source": "const implicitEvent = context.event;",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 65,
+          "column": 31,
+          "code": 2339,
+          "message": "Property 'event' does not exist on type 'NativeContext<Inputs>'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_SIGNAL_READONLY",
+      "line": 67,
+      "source": "context.signal = new AbortController().signal;",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 67,
+          "column": 9,
+          "code": 2540,
+          "message": "Cannot assign to 'signal' because it is a read-only property."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_VOID_SYNC_RESULT",
+      "line": 69,
+      "source": "registry.registerAction<{}>({ kind: 'Action', id: 'wrong-void-sync', spec: {} }, () => 42);",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 69,
+          "column": 88,
+          "code": 2322,
+          "message": "Type 'number' is not assignable to type 'void | Promise<void>'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_VOID_ASYNC_RESULT",
+      "line": 71,
+      "source": "registry.registerAction<{}>({ kind: 'Action', id: 'wrong-void-async', spec: {} }, async () => 42);",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 71,
+          "column": 95,
+          "code": 2322,
+          "message": "Type 'Promise<number>' is not assignable to type 'void | Promise<void>'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_TYPED_WRONG_RESULT",
+      "line": 73,
+      "source": "registry.registerAction<{}, boolean>({ kind: 'Action', id: 'wrong-result', spec: { output: { schema: { type: 'boolean' } } } }, () => 'wrong');",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 73,
+          "column": 135,
+          "code": 2322,
+          "message": "Type 'string' is not assignable to type 'boolean | Promise<boolean>'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_TYPED_UNDEFINED",
+      "line": 75,
+      "source": "registry.registerAction<{}, boolean>({ kind: 'Action', id: 'missing-result', spec: { output: { schema: { type: 'boolean' } } } }, () => undefined);",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 75,
+          "column": 137,
+          "code": 2322,
+          "message": "Type 'undefined' is not assignable to type 'boolean | Promise<boolean>'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_NULL_NOT_DECLARED",
+      "line": 77,
+      "source": "const nonNullable: NativeAction<{}, string> = () => null;",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 77,
+          "column": 53,
+          "code": 2322,
+          "message": "Type 'null' is not assignable to type 'string | Promise<string>'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_TYPED_OUTPUT_REQUIRED",
+      "line": 79,
+      "source": "const noTypedOutput: NativeActionDefinition<{}, boolean> = { kind: 'Action', id: 'missing', spec: {} };",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 79,
+          "column": 93,
+          "code": 2322,
+          "message": "Type '{}' is not assignable to type 'NativeActionSpec<{}, boolean>'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_VOID_OUTPUT_FORBIDDEN",
+      "line": 81,
+      "source": "const voidWithOutput: NativeActionDefinition<{}> = { kind: 'Action', id: 'void', spec: { output: { schema: { type: 'number' } } } };",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 81,
+          "column": 90,
+          "code": 2322,
+          "message": "Type '{ schema: { type: string; }; }' is not assignable to type 'never'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "NATIVE_OUTPUT_NO_VALUE",
+      "line": 83,
+      "source": "const nativeWithValue: NativeActionDefinition<{}, number> = { kind: 'Action', id: 'native', spec: { output: { schema: { type: 'number' }, value: 1 } } };",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 83,
+          "column": 139,
+          "code": 2322,
+          "message": "Type 'number' is not assignable to type 'never'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "DECLARATIVE_OUTPUT_NEEDS_VALUE",
+      "line": 85,
+      "source": "const declarativeMissingValue: ActionSpec = { steps: [], output: { schema: { type: 'number' } } };",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 85,
+          "column": 58,
+          "code": 2322,
+          "message": "Type '{ schema: { type: string; }; }' is not assignable to type 'TypeContract & { readonly value: JsonValue; }'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "ACTION_CALL_BOTH",
+      "line": 87,
+      "source": "const bothAction: ActionCall = { actionRef: 'a', action: { steps: [] } };",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 87,
+          "column": 7,
+          "code": 2322,
+          "message": "Type '{ actionRef: string; action: { steps: never[]; }; }' is not assignable to type 'ActionCall'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "ACTION_CALL_NEITHER",
+      "line": 89,
+      "source": "const neitherAction: ActionCall = { inputs: {} };",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 89,
+          "column": 7,
+          "code": 2322,
+          "message": "Type '{ inputs: {}; }' is not assignable to type 'ActionCall'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "QUERY_CALL_BOTH",
+      "line": 91,
+      "source": "const bothQuery: QueryUse = { queryRef: 'q', query: { sources: {} } };",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 91,
+          "column": 7,
+          "code": 2322,
+          "message": "Type '{ queryRef: string; query: { sources: {}; }; }' is not assignable to type 'QueryUse'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "QUERY_CALL_NEITHER",
+      "line": 93,
+      "source": "const neitherQuery: QueryUse = { inputs: {} };",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 93,
+          "column": 7,
+          "code": 2322,
+          "message": "Type '{ inputs: {}; }' is not assignable to type 'QueryUse'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "COMPONENT_CALL_BOTH",
+      "line": 95,
+      "source": "const bothComponent: ComponentNode = { id: 'node', componentRef: 'Text', component: { render: { id: 'inner', componentRef: 'Text' } } };",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 95,
+          "column": 7,
+          "code": 2322,
+          "message": "Type '{ id: string; componentRef: string; component: { render: { id: string; componentRef: string; }; }; }' is not assignable to type 'ComponentNode'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "COMPONENT_CALL_NEITHER",
+      "line": 97,
+      "source": "const neitherComponent: ComponentNode = { id: 'node' };",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 97,
+          "column": 7,
+          "code": 2322,
+          "message": "Type '{ id: string; }' is not assignable to type 'ComponentNode'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "MOUNT_CALL_BOTH",
+      "line": 99,
+      "source": "await runtime.mount({ viewRef: 'v', view: { render: { id: 'label', componentRef: 'Text' } } });",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 99,
+          "column": 21,
+          "code": 2345,
+          "message": "Argument of type '{ viewRef: string; view: { render: { id: string; componentRef: string; }; }; }' is not assignable to parameter of type 'ViewTarget'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "MOUNT_CALL_NEITHER",
+      "line": 101,
+      "source": "await runtime.mount({ inputs: {} });",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 101,
+          "column": 21,
+          "code": 2345,
+          "message": "Argument of type '{ inputs: {}; }' is not assignable to parameter of type 'ViewTarget'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "INVOKE_CALL_BOTH",
+      "line": 103,
+      "source": "await runtime.invokeAction({ actionRef: 'a', action: { steps: [] }, owner: view });",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 103,
+          "column": 28,
+          "code": 2345,
+          "message": "Argument of type '{ actionRef: string; action: { steps: never[]; }; owner: ViewHandle; }' is not assignable to parameter of type 'ReferenceOrInline<\"actionRef\", \"action\", ActionSpec> & { readonly inputs?: Readonly<Record<string, unknown>>; readonly owner: ViewHandle; }'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "INVOKE_OWNER_REQUIRED",
+      "line": 105,
+      "source": "await runtime.invokeAction({ actionRef: 'a' });",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 105,
+          "column": 28,
+          "code": 2345,
+          "message": "Argument of type '{ actionRef: string; }' is not assignable to parameter of type 'ReferenceOrInline<\"actionRef\", \"action\", ActionSpec> & { readonly inputs?: Readonly<Record<string, unknown>>; readonly owner: ViewHandle; }'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "RUNTIME_REGISTRY_REQUIRED",
+      "line": 107,
+      "source": "createRuntime({});",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 107,
+          "column": 15,
+          "code": 2345,
+          "message": "Argument of type '{}' is not assignable to parameter of type '{ readonly registry: Registry; readonly stateStore?: StateStore; readonly requestExecutor?: (plan: HttpExecutionPlan, context: { readonly signal: AbortSignal; }) => Promise<...>; readonly resourceResolver?: (kind: ResourceKind, id: string) => Awaitable<...>; }'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "STORE_NOMINAL",
+      "line": 109,
+      "source": "const duckStore: StateStore = { createScope: () => { throw Error(); }, subscribe: () => () => {} };",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 109,
+          "column": 7,
+          "code": 2741,
+          "message": "Property '[storeBrand]' is missing in type '{ createScope: () => never; subscribe: () => () => void; }' but required in type 'StateStore'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "ACTION_OBSERVATION_READONLY",
+      "line": 111,
+      "source": "actionObservation.data = 2;",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 111,
+          "column": 19,
+          "code": 2540,
+          "message": "Cannot assign to 'data' because it is a read-only property."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "INITIAL_REPORT_READONLY",
+      "line": 113,
+      "source": "initial.queryErrors.push({ code: 'INTERNAL_ERROR', message: 'x' });",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 113,
+          "column": 21,
+          "code": 2339,
+          "message": "Property 'push' does not exist on type 'readonly PublicError[]'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "ACTION_OBSERVATION_NO_REFRESH",
+      "line": 115,
+      "source": "actionObservation.refresh();",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 115,
+          "column": 19,
+          "code": 2339,
+          "message": "Property 'refresh' does not exist on type 'ActionObservation<number>'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "CHILD_CALL_BOTH",
+      "line": 117,
+      "source": "context.invokeAction({ actionRef: 'a', action: { steps: [] } });",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 117,
+          "column": 22,
+          "code": 2345,
+          "message": "Argument of type '{ actionRef: string; action: { steps: never[]; }; }' is not assignable to parameter of type 'ChildActionRequest'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "CHILD_CALL_NEITHER",
+      "line": 119,
+      "source": "context.invokeAction({ inputs: {} });",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 119,
+          "column": 22,
+          "code": 2345,
+          "message": "Argument of type '{ inputs: {}; }' is not assignable to parameter of type 'ChildActionRequest'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "CHILD_OWNER_FORBIDDEN",
+      "line": 121,
+      "source": "context.invokeAction({ actionRef: 'a', owner: view });",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 121,
+          "column": 40,
+          "code": 2322,
+          "message": "Type 'ViewHandle' is not assignable to type 'never'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "CHILD_ID_FORBIDDEN",
+      "line": 123,
+      "source": "context.invokeAction({ actionRef: 'a', id: 'alias' });",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 123,
+          "column": 40,
+          "code": 2322,
+          "message": "Type 'string' is not assignable to type 'never'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "CHILD_OUTPUT_UNKNOWN",
+      "line": 125,
+      "source": "const childBoolean: boolean = await context.invokeAction({ actionRef: 'a' });",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 125,
+          "column": 7,
+          "code": 2322,
+          "message": "Type 'unknown' is not assignable to type 'boolean'."
+        }
+      ],
+      "detected": true
+    },
+    {
+      "id": "CHILD_CAPABILITY_READONLY",
+      "line": 127,
+      "source": "context.invokeAction = async () => undefined;",
+      "diagnostics": [
+        {
+          "file": ".negative-unmasked-18058.ts",
+          "line": 127,
+          "column": 9,
+          "code": 2540,
+          "message": "Cannot assign to 'invokeAction' because it is a read-only property."
+        }
+      ],
+      "detected": true
+    }
+  ],
+  "runtimeLimits": [
+    "Arbitrary schema/typeRef semantics and generic/schema relationship",
+    "Finite/safe numeric range",
+    "Dynamic reference registration, authority and lifetime",
+    "Previously erased () => void callback actual return value"
+  ],
+  "unexpected": []
+}

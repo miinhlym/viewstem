@@ -1,0 +1,702 @@
+{
+  "generatedAt": "2026-10-30T08:34:02.642Z",
+  "runtime": "v24.19.0",
+  "icu": "78.3",
+  "tz": "2026a",
+  "scope": "Patched pinned cel-js in Node/Chromium, experimental bounded cost and millisecond date profile; not full CEL or security certification",
+  "sourceSha256": {
+    "run.mjs": "64d23656782e0ae3728749d2ceadf98c40ff0c873dfb1428265f24ef7ea03880",
+    "cases.mjs": "5c027f3ce3380ad262b8dc51353e0f047219eddafb08c15cf22c1eddcf98dc7d",
+    "prepare.mjs": "4341a4776452dc6dcdf274eab39c0d05be9e2f9f6fbdac9169f9970f66006418",
+    "cel-js-8.0.0.patch": "7152ffaa54adecdf4c292063ee2325553aac66814bd65514835cfba67a3029dc",
+    "upstream-sha256.json": "19172ed8004970d5801f3c8b52991b25d074d0305fac01cc87fcbbaf97ec61f2",
+    "patched-sha256.json": "8e838e56798de1afdd3ec77603118a6da2493c18ec54583189ab88c826053223",
+    "../t1-values/fixtures/cel.json": "730c9feaa026dd6395ed2aba2d248c2eef1f3546c9bccacb585e1fbcde9f0da9",
+    "../t1-values/package.json": "91c1223f73e2fd6f660452b15a66f9e8674580b85b9f0e618098c0effc305ae1",
+    "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+    "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+    "../verification/package.json": "d97d2800d878f0de8b61be14767453a366160a32b08709ef0e3897f4c46b4933",
+    "../verification/package-lock.json": "40ecf5a20bb2596dcbd642559eeba9cd48a4fb4d361003568d668b43b12d1454",
+    "../t2-url-races/package.json": "d1f2b402b41e6d62766d5002af5475706ae8434b13c4e35c6a8818947aa361fc",
+    "../t2-url-races/package-lock.json": "d5f2c042db6f40f0ef311e4c24958a57d4ce1048d27d7cc87b467e805b66dc8b"
+  },
+  "patchSha256": "7152ffaa54adecdf4c292063ee2325553aac66814bd65514835cfba67a3029dc",
+  "verifiedPatchedFiles": 25,
+  "browser": "151.0.7922.34",
+  "pageErrors": [],
+  "summary": {
+    "executed": 157,
+    "passed": 147,
+    "failed": 10
+  },
+  "results": [
+    {
+      "id": "node/golden/C01",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C02",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C03",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C04",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C05",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C06",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C07",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C08",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C09",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C10",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C11",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C12",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C13",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C14",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C15",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C16",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C17",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C18",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C19",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C20",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C21",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C22",
+      "passed": true
+    },
+    {
+      "id": "node/cost/all",
+      "passed": true
+    },
+    {
+      "id": "node/cost/exists",
+      "passed": true
+    },
+    {
+      "id": "node/cost/exists-one",
+      "passed": true
+    },
+    {
+      "id": "node/cost/map",
+      "passed": true
+    },
+    {
+      "id": "node/cost/filter",
+      "passed": true
+    },
+    {
+      "id": "node/cost/nested",
+      "passed": true
+    },
+    {
+      "id": "node/cost/or-cannot-mask",
+      "passed": true
+    },
+    {
+      "id": "node/cost/and-cannot-mask",
+      "passed": true
+    },
+    {
+      "id": "node/cost/quantifier-cannot-mask",
+      "passed": true
+    },
+    {
+      "id": "node/cost/function-string",
+      "passed": true
+    },
+    {
+      "id": "node/cost/list-equality",
+      "passed": true
+    },
+    {
+      "id": "node/cost/membership",
+      "passed": true
+    },
+    {
+      "id": "node/cost/exact-boundary",
+      "passed": true
+    },
+    {
+      "id": "node/cost/skipped-branch",
+      "passed": true
+    },
+    {
+      "id": "node/cost/evaluate-resets",
+      "passed": true
+    },
+    {
+      "id": "node/cost/parsed-resets",
+      "passed": true
+    },
+    {
+      "id": "node/cost/failed-invocation-isolated",
+      "passed": true
+    },
+    {
+      "id": "node/cost/async-fatal",
+      "passed": true
+    },
+    {
+      "id": "node/cost/concurrent-parsed-isolation",
+      "passed": true
+    },
+    {
+      "id": "node/cost/charge-before-host-function",
+      "passed": true
+    },
+    {
+      "id": "node/cost/invalid-limit-zero",
+      "passed": true
+    },
+    {
+      "id": "node/cost/invalid-limit-negative",
+      "passed": true
+    },
+    {
+      "id": "node/cost/invalid-limit-fraction",
+      "passed": true
+    },
+    {
+      "id": "node/cost/invalid-limit-infinity",
+      "passed": true
+    },
+    {
+      "id": "node/cost/invalid-limit-nan",
+      "passed": true
+    },
+    {
+      "id": "node/cost/invalid-limit-string",
+      "passed": true
+    },
+    {
+      "id": "node/cost/invalid-limit-null",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/valid-2000-02-29T23:59:59.123Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/valid-2026-10-30T09:30:00+09:00",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/valid-0001-01-01T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/valid-9999-12-31T23:59:59.999Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/valid-0099-01-01T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/valid-2026-10-30T00:00:00.1-09:30",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-1900-02-29T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-02-30T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-04-31T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-13-01T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-00T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01T24:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01T00:60:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01T00:00:60Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01T00:00:00-00:00",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01T00:00:00+24:00",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01T00:00:00+01:60",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-0000-01-01T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-0001-01-01T00:00:00+14:00",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-9999-12-31T23:59:59-12:00",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01T00:00:00.1234Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01T00:00:00",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01 00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/errors/ordinary-CEL-error-can-still-short-circuit",
+      "passed": true
+    },
+    {
+      "id": "node/integer/division-min-overflow",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "Expected numeric_overflow"
+      }
+    },
+    {
+      "id": "node/integer/unary-min-overflow",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "Expected numeric_overflow"
+      }
+    },
+    {
+      "id": "node/timestamp/arithmetic-overflow",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "Expected invalid_timestamp"
+      }
+    },
+    {
+      "id": "node/timestamp/arithmetic-millisecond-loss",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "Expected invalid_timestamp"
+      }
+    },
+    {
+      "id": "node/timestamp/year-0099-calendar-getter",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "ASSERTION"
+      }
+    },
+    {
+      "id": "chromium/golden/C01",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C02",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C03",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C04",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C05",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C06",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C07",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C08",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C09",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C10",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C11",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C12",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C13",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C14",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C15",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C16",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C17",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C18",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C19",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C20",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C21",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C22",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/all",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/exists",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/exists-one",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/map",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/filter",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/nested",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/or-cannot-mask",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/and-cannot-mask",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/quantifier-cannot-mask",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/function-string",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/list-equality",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/membership",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/exact-boundary",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/skipped-branch",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/evaluate-resets",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/parsed-resets",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/failed-invocation-isolated",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/async-fatal",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/concurrent-parsed-isolation",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/charge-before-host-function",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/invalid-limit-zero",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/invalid-limit-negative",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/invalid-limit-fraction",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/invalid-limit-infinity",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/invalid-limit-nan",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/invalid-limit-string",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/invalid-limit-null",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/valid-2000-02-29T23:59:59.123Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/valid-2026-10-30T09:30:00+09:00",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/valid-0001-01-01T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/valid-9999-12-31T23:59:59.999Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/valid-0099-01-01T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/valid-2026-10-30T00:00:00.1-09:30",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-1900-02-29T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-02-30T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-04-31T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-13-01T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-00T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01T24:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01T00:60:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01T00:00:60Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01T00:00:00-00:00",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01T00:00:00+24:00",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01T00:00:00+01:60",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-0000-01-01T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-0001-01-01T00:00:00+14:00",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-9999-12-31T23:59:59-12:00",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01T00:00:00.1234Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01T00:00:00",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01 00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/errors/ordinary-CEL-error-can-still-short-circuit",
+      "passed": true
+    },
+    {
+      "id": "chromium/integer/division-min-overflow",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "Expected numeric_overflow"
+      }
+    },
+    {
+      "id": "chromium/integer/unary-min-overflow",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "Expected numeric_overflow"
+      }
+    },
+    {
+      "id": "chromium/timestamp/arithmetic-overflow",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "Expected invalid_timestamp"
+      }
+    },
+    {
+      "id": "chromium/timestamp/arithmetic-millisecond-loss",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "Expected invalid_timestamp"
+      }
+    },
+    {
+      "id": "chromium/timestamp/year-0099-calendar-getter",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "ASSERTION"
+      }
+    },
+    {
+      "id": "browser/no-uncaught-errors",
+      "passed": true
+    }
+  ]
+}

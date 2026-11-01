@@ -1,0 +1,10 @@
+{
+  "name": "viewstem-t2-http-boundary-experiment",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "node header-tests.mjs",
+    "probe:raw": "node run.mjs"
+  }
+}

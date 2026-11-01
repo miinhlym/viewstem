@@ -1,0 +1,274 @@
+{
+  "generatedAt": "2026-10-30T02:34:18.301Z",
+  "runtime": "v24.19.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "scope": "Independent Node fetch executor over real loopback HTTP with controlled whole-plan clock; no core integration",
+  "stopOnFirstProblem": true,
+  "stoppedAt": "P30-token-extraction-cannot-read-secrets",
+  "sourceSha256": {
+    "package.json": "b07eabf40c18ca1e4a45a951848c41d1abc8e6b1a20c49854741ffba51a982e4",
+    "http-probe.mjs": "9875d9eabb6c18eca3ddf398d3bd2fd3c932f748e37d570e1a4c0fb4d087a750",
+    "http-tests.mjs": "8abcbb674a9fc157db9b68126dc5f09b00cd68cd7dad82614a2a929fa7ed791f",
+    "header-profile.mjs": "6d4f17b66aae3b4405f05da9b1160a3ceb04c46f670f0bfb65726003ebdc5407"
+  },
+  "results": [
+    {
+      "id": "P01-public-methods-and-current-definition",
+      "passed": true,
+      "requestCount": 7
+    },
+    {
+      "id": "P02-secret-without-login",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P03-login-isolation-and-request-overrides",
+      "passed": true,
+      "requestCount": 2
+    },
+    {
+      "id": "P04-concurrent-login-no-sharing",
+      "passed": true,
+      "requestCount": 8
+    },
+    {
+      "id": "P05-invalid-token-missing",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P05-invalid-token-number",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P05-invalid-token-empty",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P05-invalid-token-control",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P06-login-failure",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P06-login-redirect",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P07-authority-not-from-plan",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P08-reserved-name-before-login-datasource",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P08-reserved-name-before-login-request",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P08-reserved-name-before-login-login",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P09-timeout-during-login",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P10-one-budget-login-plus-api",
+      "passed": true,
+      "requestCount": 2
+    },
+    {
+      "id": "P11-cancel-before-start",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P12-cancel-login",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P12-cancel-data",
+      "passed": true,
+      "requestCount": 2
+    },
+    {
+      "id": "P13-ignore-abort-late-login-no-api",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P14-cancel-during-secret-resolution",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P15-timeout-in-response-body",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P16-large-timeout-is-chunked",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P17-body-encodings",
+      "passed": true,
+      "requestCount": 5
+    },
+    {
+      "id": "P18-response-redirect",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P18-response-failure",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P18-response-invalid-json",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P18-response-non-finite-json",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P18-response-binary",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P19-empty-response-204",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P19-empty-response-205",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P20-transport-error-sanitized",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P21-upstream-reflected-secret",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P22-api-response-headers-belong-to-api",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P23-internal-login-data-not-added-or-logged",
+      "passed": true,
+      "requestCount": 2
+    },
+    {
+      "id": "P24-authorize-error-sanitized",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P24-resolveSecret-error-sanitized",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P25-denied-secret-reference-no-transport",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P26-denied-destination-login",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P26-denied-destination-data",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P27-denied-path-on-allowed-origin",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P28-final-query-policy-denial",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P29-context-denial-login-request",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P29-context-denial-data-request",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P29-context-denial-token-extraction",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P30-token-extraction-cannot-read-secrets",
+      "passed": false,
+      "requestCount": 2,
+      "evidence": {
+        "expected": "Reject forbidden token-extraction context; no second secret lookup or data request",
+        "outcome": {
+          "kind": "success",
+          "status": 200
+        },
+        "secretLookupCount": 2,
+        "emptyDestinationLookupCount": 1,
+        "loginRequests": 1,
+        "dataRequests": 1,
+        "dataAuthorizationUsedSecretInsteadOfLoginToken": true
+      },
+      "failure": {
+        "name": "AssertionError",
+        "message": "Expected values to be strictly equal:\n+ actual - expected\n\n+ undefined\n- 'REFERENCE_NOT_FOUND'\n"
+      }
+    }
+  ],
+  "summary": {
+    "executed": 46,
+    "passed": 45,
+    "failed": 1
+  },
+  "notRun": [
+    "Browser response/body compatibility",
+    "Service authorization and secret store integration",
+    "Minimal SDK types",
+    "Core/renderer integration"
+  ]
+}

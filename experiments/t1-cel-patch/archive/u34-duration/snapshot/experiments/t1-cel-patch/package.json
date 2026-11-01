@@ -1,0 +1,7 @@
+{
+  "name": "viewstem-t1-cel-patch-experiment",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "dependencies": { "re2js": "2.9.1" }
+}

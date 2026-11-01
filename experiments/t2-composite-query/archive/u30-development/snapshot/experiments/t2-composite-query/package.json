@@ -1,0 +1,7 @@
+{
+  "name": "viewstem-t2-composite-query-experiment",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": { "test": "node run.mjs" }
+}

@@ -1,0 +1,90 @@
+{
+  "generatedAt": "2026-10-30T10:12:48.397Z",
+  "runtime": "v22.21.1",
+  "icu": "77.1",
+  "tz": "2025b",
+  "scope": "Expected contract tests executed against the preserved, unmodified pre-fix UI source. Failures demonstrate the defects.",
+  "sourceSha256": {
+    "ui-probe.mjs": "06caf8edf98b35315bc62400eedb7bb824085a1a690809e68faa0021bdbc7f15",
+    "reproduction.mjs": "5dde1c3f21486bd1951f146f46b6563f9b5a3d9bc58ba8c26e53d0de6b18a2e4"
+  },
+  "summary": {
+    "executed": 9,
+    "passed": 0,
+    "failed": 9
+  },
+  "results": [
+    {
+      "id": "BEFORE.array-length-rejected",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "Expected rejection"
+      }
+    },
+    {
+      "id": "BEFORE.owner-root-rejected",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "Expected rejection"
+      }
+    },
+    {
+      "id": "BEFORE.noncanonical-array-index-rejected",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "Expected rejection"
+      }
+    },
+    {
+      "id": "BEFORE.invalid-pointer-escape-rejected",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "Expected rejection"
+      }
+    },
+    {
+      "id": "BEFORE.concat-supported",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "Expected AB, got [object Object]"
+      }
+    },
+    {
+      "id": "BEFORE.static-mixed-rejected",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "Expected rejection"
+      }
+    },
+    {
+      "id": "BEFORE.initial-expression-evaluated",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "SCHEMA"
+      }
+    },
+    {
+      "id": "BEFORE.initial-omission-is-missing",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "BEFORE.initial-cycle-rejected",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "Expected rejection"
+      }
+    }
+  ]
+}

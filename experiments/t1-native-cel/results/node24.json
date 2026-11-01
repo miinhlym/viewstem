@@ -1,0 +1,278 @@
+{
+  "generatedAt": "2026-10-30T10:30:26.642Z",
+  "runtime": "v24.1.0",
+  "icu": "77.1",
+  "tz": "2025b",
+  "scope": "Pinned patched CEL plus private typed native adapter, real protected State snapshots in Node/Chromium; partial fixture schemas, not core/SDK/full JSON Schema or CEL conformance",
+  "sourceSha256": {
+    "run.mjs": "4bd7215ccc0caa6493c64b153fb6b4d7bac6592ec21535a4845e4949ffa056d8",
+    "adapter.mjs": "02b47cb8ae06e803baf287545d0f1408b2676d06047f2468810b41e819436aa9",
+    "cases.mjs": "f02949c6de5c30975812fd476bb52dd4211d482e1b6625e8df2fc4c26ba416a3",
+    "README.md": "ff514f6191604cfb0a91e267ccd77773af980b9f83d2c5b87c4da7ddda0af60a",
+    "coverage.json": "7b2b92c7d926552bc23ca27f23530f7b3e73ba4bf104dcec809c4b883ee051a2",
+    "../t1-cel-patch/prepare.mjs": "4cf29b202e72093e63fa9205d0a593781f4bdac1aaa2fcc6bb8c738baabe876d",
+    "../t1-cel-patch/cel-js-8.0.0.patch": "62dd517376de54a08018f6166b250d9013b907e87b11ab75d0f07e264de0da63",
+    "../t1-cel-patch/upstream-sha256.json": "19172ed8004970d5801f3c8b52991b25d074d0305fac01cc87fcbbaf97ec61f2",
+    "../t1-cel-patch/patched-sha256.json": "bd38774ee6ef0dd3683422afe4d6c8fd5f862b0d3e530ebc65163e000d5e17dd",
+    "../t1-cel-patch/package.json": "b8db9a73ffaff8644e1cb30fea9d0074685e1c7843fc889b3ea74b619c204bb2",
+    "../t1-cel-patch/package-lock.json": "c58a647127865e61e697fa3d6f9087660c08e6553050671d98709f99b4fd9b55",
+    "../t1-cel-patch/node_modules/re2js/build/index.js": "4e31fa6284914b14a23cc677be509f7ad8e43c00ff8d48bbe3486a30e3120373",
+    "../t3-state/state-probe.mjs": "501e0e0d78c8b8bf4fa1a9d465fe844e8cbeb06752013bc9ac6c765a0f5edbaa",
+    "../t3-state/immutable.mjs": "e86391873075d434ce26169043dece6e28b9082ddb20f9aab84c4dbaa78790f4",
+    "../t1-values/schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+    "../t1-values/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+    "../t1-values/values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+    "../t1-values/package.json": "91c1223f73e2fd6f660452b15a66f9e8674580b85b9f0e618098c0effc305ae1",
+    "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+    "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+    "../verification/errors.mjs": "c9d94483f9314bcf5bad42cb044f7b0ba29cd7d7b9d3ba561f1c9021aa6d7224",
+    "../verification/package.json": "d97d2800d878f0de8b61be14767453a366160a32b08709ef0e3897f4c46b4933",
+    "../verification/package-lock.json": "40ecf5a20bb2596dcbd642559eeba9cd48a4fb4d361003568d668b43b12d1454",
+    "../t2-url-races/package.json": "d1f2b402b41e6d62766d5002af5475706ae8434b13c4e35c6a8818947aa361fc",
+    "../t2-url-races/package-lock.json": "d5f2c042db6f40f0ef311e4c24958a57d4ce1048d27d7cc87b467e805b66dc8b"
+  },
+  "patchSha256": "62dd517376de54a08018f6166b250d9013b907e87b11ab75d0f07e264de0da63",
+  "verifiedPatchedFiles": 25,
+  "browser": "151.0.7922.34",
+  "pageErrors": [],
+  "populations": {
+    "node": 27,
+    "chromium": 27,
+    "browserErrorCheck": 1
+  },
+  "supportedSchemas": "direct scalar/nullable, closed declared objects, homogeneous arrays, typed Set/Map, explicit date/time/datetime",
+  "limitations": [
+    "No arbitrary JSON Schema conversion or Dart evidence",
+    "probe functions and opaque names are private fixture extensions",
+    "Trusted zero-argument producers are synchronous, not sandboxed",
+    "Payload size/depth/cycle admission complements patched AST budget; host callback wall-clock cost is not metered",
+    "State snapshot input is ready data; Variable scheduling/missing/pending/error propagation is not included"
+  ],
+  "summary": {
+    "executed": 55,
+    "passed": 55,
+    "failed": 0
+  },
+  "results": [
+    {
+      "id": "node/N01/Set-stored-object-identity-survives-adapter",
+      "passed": true
+    },
+    {
+      "id": "node/N02/Set-order-ignored-separate-object-members-kept",
+      "passed": true
+    },
+    {
+      "id": "node/N03/Set-is-not-silently-a-CEL-list-and-has-no-value-field",
+      "passed": true
+    },
+    {
+      "id": "node/N04/native-primitive-Set-membership-null-and-negative-zero",
+      "passed": true
+    },
+    {
+      "id": "node/N05/Map-number-fractional-and-string-keys-stay-distinct",
+      "passed": true
+    },
+    {
+      "id": "node/N06/Map-explicit-null-versus-absent-key",
+      "passed": true
+    },
+    {
+      "id": "node/N07/nested-native-output-keeps-source-and-readonly-graph",
+      "passed": true
+    },
+    {
+      "id": "node/N08/nested-field-and-Map-result-return-source-objects",
+      "passed": true
+    },
+    {
+      "id": "node/N09/typed-integer-versus-number-input-and-result",
+      "passed": true
+    },
+    {
+      "id": "node/N10/safe-integer-output-rejects-wider-CEL-int-and-keeps-State",
+      "passed": true
+    },
+    {
+      "id": "node/N11/binary64-and-fractional-Map-key-preserved",
+      "passed": true
+    },
+    {
+      "id": "node/N12/direct-typed-output-list-and-object-integer-conversion",
+      "passed": true
+    },
+    {
+      "id": "node/N13/date-time-datetime-explicit-types-and-canonical-strings",
+      "passed": true
+    },
+    {
+      "id": "node/N14/ordinary-string-is-not-auto-parsed-as-date",
+      "passed": true
+    },
+    {
+      "id": "node/N15/nullable-date-null-and-explicit-timestamp-conversion",
+      "passed": true
+    },
+    {
+      "id": "node/N16/reused-normalization-undefined-objects-and-native-rejections",
+      "passed": true
+    },
+    {
+      "id": "node/N17/registration-errors-and-unsupported-schema-subsets-are-visible",
+      "passed": true
+    },
+    {
+      "id": "node/N18/hidden-custom-input-payload-node-byte-depth-limits",
+      "passed": true
+    },
+    {
+      "id": "node/N19/hidden-custom-output-payload-size-limits-not-wrapper-size",
+      "passed": true
+    },
+    {
+      "id": "node/N20/native-payload-cycles-rejected-on-input-and-producer-output",
+      "passed": true
+    },
+    {
+      "id": "node/N21/output-producer-depth-and-input-accessor-rejected",
+      "passed": true
+    },
+    {
+      "id": "node/N22/patched-AST-budget-active-through-native-function-calls",
+      "passed": true
+    },
+    {
+      "id": "node/N23/expression-length-and-result-schema-validation",
+      "passed": true
+    },
+    {
+      "id": "node/N24/Set-array-members-retain-stored-reference-through-CEL-lists",
+      "passed": true
+    },
+    {
+      "id": "node/N25/nested-array-native-membership-output-and-protection",
+      "passed": true
+    },
+    {
+      "id": "node/N26/list-origin-does-not-bypass-typed-numeric-output-validation",
+      "passed": true
+    },
+    {
+      "id": "node/N27/array-member-path-retains-output-limits-and-patched-budget",
+      "passed": true
+    },
+    {
+      "id": "chromium/N01/Set-stored-object-identity-survives-adapter",
+      "passed": true
+    },
+    {
+      "id": "chromium/N02/Set-order-ignored-separate-object-members-kept",
+      "passed": true
+    },
+    {
+      "id": "chromium/N03/Set-is-not-silently-a-CEL-list-and-has-no-value-field",
+      "passed": true
+    },
+    {
+      "id": "chromium/N04/native-primitive-Set-membership-null-and-negative-zero",
+      "passed": true
+    },
+    {
+      "id": "chromium/N05/Map-number-fractional-and-string-keys-stay-distinct",
+      "passed": true
+    },
+    {
+      "id": "chromium/N06/Map-explicit-null-versus-absent-key",
+      "passed": true
+    },
+    {
+      "id": "chromium/N07/nested-native-output-keeps-source-and-readonly-graph",
+      "passed": true
+    },
+    {
+      "id": "chromium/N08/nested-field-and-Map-result-return-source-objects",
+      "passed": true
+    },
+    {
+      "id": "chromium/N09/typed-integer-versus-number-input-and-result",
+      "passed": true
+    },
+    {
+      "id": "chromium/N10/safe-integer-output-rejects-wider-CEL-int-and-keeps-State",
+      "passed": true
+    },
+    {
+      "id": "chromium/N11/binary64-and-fractional-Map-key-preserved",
+      "passed": true
+    },
+    {
+      "id": "chromium/N12/direct-typed-output-list-and-object-integer-conversion",
+      "passed": true
+    },
+    {
+      "id": "chromium/N13/date-time-datetime-explicit-types-and-canonical-strings",
+      "passed": true
+    },
+    {
+      "id": "chromium/N14/ordinary-string-is-not-auto-parsed-as-date",
+      "passed": true
+    },
+    {
+      "id": "chromium/N15/nullable-date-null-and-explicit-timestamp-conversion",
+      "passed": true
+    },
+    {
+      "id": "chromium/N16/reused-normalization-undefined-objects-and-native-rejections",
+      "passed": true
+    },
+    {
+      "id": "chromium/N17/registration-errors-and-unsupported-schema-subsets-are-visible",
+      "passed": true
+    },
+    {
+      "id": "chromium/N18/hidden-custom-input-payload-node-byte-depth-limits",
+      "passed": true
+    },
+    {
+      "id": "chromium/N19/hidden-custom-output-payload-size-limits-not-wrapper-size",
+      "passed": true
+    },
+    {
+      "id": "chromium/N20/native-payload-cycles-rejected-on-input-and-producer-output",
+      "passed": true
+    },
+    {
+      "id": "chromium/N21/output-producer-depth-and-input-accessor-rejected",
+      "passed": true
+    },
+    {
+      "id": "chromium/N22/patched-AST-budget-active-through-native-function-calls",
+      "passed": true
+    },
+    {
+      "id": "chromium/N23/expression-length-and-result-schema-validation",
+      "passed": true
+    },
+    {
+      "id": "chromium/N24/Set-array-members-retain-stored-reference-through-CEL-lists",
+      "passed": true
+    },
+    {
+      "id": "chromium/N25/nested-array-native-membership-output-and-protection",
+      "passed": true
+    },
+    {
+      "id": "chromium/N26/list-origin-does-not-bypass-typed-numeric-output-validation",
+      "passed": true
+    },
+    {
+      "id": "chromium/N27/array-member-path-retains-output-limits-and-patched-budget",
+      "passed": true
+    },
+    {
+      "id": "chromium/no-page-errors",
+      "passed": true
+    }
+  ]
+}

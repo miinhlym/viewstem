@@ -1,0 +1,1771 @@
+{
+  "generatedAt": "2026-10-30T10:30:05.845Z",
+  "runtime": "v22.21.1",
+  "icu": "77.1",
+  "tz": "2025b",
+  "scope": "Patched pinned cel-js in Node/Chromium, experimental bounded cost, millisecond date profile and focused default extension compatibility; not full CEL, v1 catalog approval or security certification",
+  "sourceSha256": {
+    "run.mjs": "51bd638f879e8403bc4d7f87aaa509d58d10a398ea1966f0a748416d821dd173",
+    "cases.mjs": "56f7ac01edef44a5fd4dee1dc8ffd46d150f346cd8e2e235c1754c08590e19c5",
+    "extension-cases.mjs": "d3d272ba2ad7ff4027bc6f8f42d33c58c3cdccd1571848237a12fbcd3c65ed05",
+    "guarded.mjs": "501a506a3ce6d4a47e48d4d38fd705f947df7b9a1244ff9bfa177d27915c10d6",
+    "prepare.mjs": "4cf29b202e72093e63fa9205d0a593781f4bdac1aaa2fcc6bb8c738baabe876d",
+    "cel-js-8.0.0.patch": "62dd517376de54a08018f6166b250d9013b907e87b11ab75d0f07e264de0da63",
+    "upstream-sha256.json": "19172ed8004970d5801f3c8b52991b25d074d0305fac01cc87fcbbaf97ec61f2",
+    "patched-sha256.json": "bd38774ee6ef0dd3683422afe4d6c8fd5f862b0d3e530ebc65163e000d5e17dd",
+    "package.json": "b8db9a73ffaff8644e1cb30fea9d0074685e1c7843fc889b3ea74b619c204bb2",
+    "package-lock.json": "c58a647127865e61e697fa3d6f9087660c08e6553050671d98709f99b4fd9b55",
+    "node_modules/re2js/build/index.js": "4e31fa6284914b14a23cc677be509f7ad8e43c00ff8d48bbe3486a30e3120373",
+    "../t1-values/fixtures/cel.json": "730c9feaa026dd6395ed2aba2d248c2eef1f3546c9bccacb585e1fbcde9f0da9",
+    "../t1-values/package.json": "91c1223f73e2fd6f660452b15a66f9e8674580b85b9f0e618098c0effc305ae1",
+    "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+    "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+    "../verification/package.json": "d97d2800d878f0de8b61be14767453a366160a32b08709ef0e3897f4c46b4933",
+    "../verification/package-lock.json": "40ecf5a20bb2596dcbd642559eeba9cd48a4fb4d361003568d668b43b12d1454",
+    "../t2-url-races/package.json": "d1f2b402b41e6d62766d5002af5475706ae8434b13c4e35c6a8818947aa361fc",
+    "../t2-url-races/package-lock.json": "d5f2c042db6f40f0ef311e4c24958a57d4ce1048d27d7cc87b467e805b66dc8b"
+  },
+  "patchSha256": "62dd517376de54a08018f6166b250d9013b907e87b11ab75d0f07e264de0da63",
+  "verifiedPatchedFiles": 25,
+  "browser": "151.0.7922.34",
+  "pageErrors": [],
+  "summary": {
+    "executed": 433,
+    "passed": 433,
+    "failed": 0
+  },
+  "results": [
+    {
+      "id": "node/golden/C01",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C02",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C03",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C04",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C05",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C06",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C07",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C08",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C09",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C10",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C11",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C12",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C13",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C14",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C15",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C16",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C17",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C18",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C19",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C20",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C21",
+      "passed": true
+    },
+    {
+      "id": "node/golden/C22",
+      "passed": true
+    },
+    {
+      "id": "node/cost/all",
+      "passed": true
+    },
+    {
+      "id": "node/cost/exists",
+      "passed": true
+    },
+    {
+      "id": "node/cost/exists-one",
+      "passed": true
+    },
+    {
+      "id": "node/cost/map",
+      "passed": true
+    },
+    {
+      "id": "node/cost/filter",
+      "passed": true
+    },
+    {
+      "id": "node/cost/nested",
+      "passed": true
+    },
+    {
+      "id": "node/cost/or-cannot-mask",
+      "passed": true
+    },
+    {
+      "id": "node/cost/and-cannot-mask",
+      "passed": true
+    },
+    {
+      "id": "node/cost/quantifier-cannot-mask",
+      "passed": true
+    },
+    {
+      "id": "node/cost/function-string",
+      "passed": true
+    },
+    {
+      "id": "node/cost/list-equality",
+      "passed": true
+    },
+    {
+      "id": "node/cost/membership",
+      "passed": true
+    },
+    {
+      "id": "node/cost/exact-boundary",
+      "passed": true
+    },
+    {
+      "id": "node/cost/skipped-branch",
+      "passed": true
+    },
+    {
+      "id": "node/cost/evaluate-resets",
+      "passed": true
+    },
+    {
+      "id": "node/cost/parsed-resets",
+      "passed": true
+    },
+    {
+      "id": "node/cost/failed-invocation-isolated",
+      "passed": true
+    },
+    {
+      "id": "node/cost/async-fatal",
+      "passed": true
+    },
+    {
+      "id": "node/cost/concurrent-parsed-isolation",
+      "passed": true
+    },
+    {
+      "id": "node/cost/charge-before-host-function",
+      "passed": true
+    },
+    {
+      "id": "node/cost/invalid-limit-zero",
+      "passed": true
+    },
+    {
+      "id": "node/cost/invalid-limit-negative",
+      "passed": true
+    },
+    {
+      "id": "node/cost/invalid-limit-fraction",
+      "passed": true
+    },
+    {
+      "id": "node/cost/invalid-limit-infinity",
+      "passed": true
+    },
+    {
+      "id": "node/cost/invalid-limit-nan",
+      "passed": true
+    },
+    {
+      "id": "node/cost/invalid-limit-string",
+      "passed": true
+    },
+    {
+      "id": "node/cost/invalid-limit-null",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/valid-2000-02-29T23:59:59.123Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/valid-2026-10-30T09:30:00+09:00",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/valid-0001-01-01T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/valid-9999-12-31T23:59:59.999Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/valid-0099-01-01T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/valid-2026-10-30T00:00:00.1-09:30",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-1900-02-29T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-02-30T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-04-31T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-13-01T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-00T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01T24:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01T00:60:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01T00:00:60Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01T00:00:00-00:00",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01T00:00:00+24:00",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01T00:00:00+01:60",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-0000-01-01T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-0001-01-01T00:00:00+14:00",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-9999-12-31T23:59:59-12:00",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01T00:00:00.1234Z",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01T00:00:00",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/invalid-2026-01-01 00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "node/errors/ordinary-CEL-error-can-still-short-circuit",
+      "passed": true
+    },
+    {
+      "id": "node/integer/division-min-overflow",
+      "passed": true
+    },
+    {
+      "id": "node/integer/unary-min-overflow",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/arithmetic-overflow",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/arithmetic-millisecond-loss",
+      "passed": true
+    },
+    {
+      "id": "node/timestamp/year-0099-calendar-getter",
+      "passed": true
+    },
+    {
+      "id": "node/regex/substring/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/substring/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/anchored/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/anchored/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/unicode-codepoint/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/unicode-codepoint/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/unicode-group/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/unicode-group/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/case-flag/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/case-flag/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/multiline/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/multiline/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/nested-repetition/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/nested-repetition/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/alternation/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/alternation/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/empty/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/empty/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/counted-repeat/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/counted-repeat/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "node/regex/reject-backref",
+      "passed": true
+    },
+    {
+      "id": "node/regex/reject-lookahead",
+      "passed": true
+    },
+    {
+      "id": "node/regex/reject-lookbehind",
+      "passed": true
+    },
+    {
+      "id": "node/regex/reject-bad",
+      "passed": true
+    },
+    {
+      "id": "node/regex/reject-repeat-limit",
+      "passed": true
+    },
+    {
+      "id": "node/regex/cost-cannot-be-masked",
+      "passed": true
+    },
+    {
+      "id": "node/regex/expanded-program-cost",
+      "passed": true
+    },
+    {
+      "id": "node/integer/double-conversion-overflow",
+      "passed": true
+    },
+    {
+      "id": "node/integer/empty-string",
+      "passed": true
+    },
+    {
+      "id": "node/duration/duration(\"1.234s\").getMilliseconds()",
+      "passed": true
+    },
+    {
+      "id": "node/duration/duration(\"-1.234s\").getMilliseconds()",
+      "passed": true
+    },
+    {
+      "id": "node/duration/(duration(\"-0.5s\") + duration(\"0s\")) == duration(\"-0.5s\")",
+      "passed": true
+    },
+    {
+      "id": "node/duration/(duration(\"0s\") - duration(\"0.5s\")) == duration(\"-0.5s\")",
+      "passed": true
+    },
+    {
+      "id": "node/duration/duration(\"0\").getSeconds()",
+      "passed": true
+    },
+    {
+      "id": "node/duration/(timestamp(\"9999-12-31T23:59:59.999Z\") - timestamp(\"0001-01-01T00:00:00Z\")).getMilliseconds()",
+      "passed": true
+    },
+    {
+      "id": "node/admission/expression-before-host-call",
+      "passed": true
+    },
+    {
+      "id": "node/admission/input-count",
+      "passed": true
+    },
+    {
+      "id": "node/admission/input-depth",
+      "passed": true
+    },
+    {
+      "id": "node/admission/input-bytes",
+      "passed": true
+    },
+    {
+      "id": "node/admission/nonfinite",
+      "passed": true
+    },
+    {
+      "id": "node/admission/undefined",
+      "passed": true
+    },
+    {
+      "id": "node/admission/sparse",
+      "passed": true
+    },
+    {
+      "id": "node/admission/function",
+      "passed": true
+    },
+    {
+      "id": "node/admission/bigint-range",
+      "passed": true
+    },
+    {
+      "id": "node/admission/cycle",
+      "passed": true
+    },
+    {
+      "id": "node/admission/accessor-not-executed",
+      "passed": true
+    },
+    {
+      "id": "node/admission/output-count",
+      "passed": true
+    },
+    {
+      "id": "node/admission/output-bytes",
+      "passed": true
+    },
+    {
+      "id": "node/admission/output-nonfinite",
+      "passed": true
+    },
+    {
+      "id": "node/admission/unknown-function-registration",
+      "passed": true
+    },
+    {
+      "id": "node/admission/unknown-variable-registration",
+      "passed": true
+    },
+    {
+      "id": "node/admission/declared-unused-missing",
+      "passed": true
+    },
+    {
+      "id": "node/admission/shared-noncyclic",
+      "passed": true
+    },
+    {
+      "id": "node/admission/async-output-check",
+      "passed": true
+    },
+    {
+      "id": "node/admission/limits-validated",
+      "passed": true
+    },
+    {
+      "id": "node/extension/ascii/s.lowerAscii()",
+      "passed": true
+    },
+    {
+      "id": "node/extension/ascii/s.upperAscii()",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/astral-index",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/astral-match",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/astral-offset",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/multi-point-pattern",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/combining-offset",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/empty-default",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/empty-start",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/empty-middle",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/empty-end",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/empty-over",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/empty-max-int",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/start",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/end",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/over",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/max-int",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/not-found",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/pattern-longer",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/empty-target",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/both-empty",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/empty-target-offset",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/negative-empty",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/indexOf/negative-x",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/astral-index",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/astral-match",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/astral-offset",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/multi-point-pattern",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/combining-offset",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/empty-default",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/empty-start",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/empty-middle",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/empty-end",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/empty-over",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/empty-max-int",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/start",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/end",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/over",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/max-int",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/not-found",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/pattern-longer",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/empty-target",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/both-empty",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/empty-target-offset",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/negative-empty",
+      "passed": true
+    },
+    {
+      "id": "node/extension/search/lastIndexOf/negative-x",
+      "passed": true
+    },
+    {
+      "id": "node/extension/substring/astral",
+      "passed": true
+    },
+    {
+      "id": "node/extension/substring/after-astral",
+      "passed": true
+    },
+    {
+      "id": "node/extension/substring/tail",
+      "passed": true
+    },
+    {
+      "id": "node/extension/substring/end",
+      "passed": true
+    },
+    {
+      "id": "node/extension/substring/empty-range",
+      "passed": true
+    },
+    {
+      "id": "node/extension/substring/end-range",
+      "passed": true
+    },
+    {
+      "id": "node/extension/substring/empty-target",
+      "passed": true
+    },
+    {
+      "id": "node/extension/substring/combining-codepoints",
+      "passed": true
+    },
+    {
+      "id": "node/extension/substring/reject-s.substring(-1)",
+      "passed": true
+    },
+    {
+      "id": "node/extension/substring/reject-s.substring(3)",
+      "passed": true
+    },
+    {
+      "id": "node/extension/substring/reject-s.substring(0,3)",
+      "passed": true
+    },
+    {
+      "id": "node/extension/substring/reject-s.substring(2,1)",
+      "passed": true
+    },
+    {
+      "id": "node/extension/substring/reject-s.substring(0,-1)",
+      "passed": true
+    },
+    {
+      "id": "node/extension/substring/reject-s.substring(-1,1)",
+      "passed": true
+    },
+    {
+      "id": "node/extension/substring/reject-s.substring(9223372036854775807)",
+      "passed": true
+    },
+    {
+      "id": "node/extension/substring/reject-s.substring(0,9223372036854775807)",
+      "passed": true
+    },
+    {
+      "id": "node/extension/split/s.split('')",
+      "passed": true
+    },
+    {
+      "id": "node/extension/split/s.split('', 1)",
+      "passed": true
+    },
+    {
+      "id": "node/extension/split/s.split('', 2)",
+      "passed": true
+    },
+    {
+      "id": "node/extension/split/s.split('', -1)",
+      "passed": true
+    },
+    {
+      "id": "node/extension/split/s.split('', 0)",
+      "passed": true
+    },
+    {
+      "id": "node/extension/split/empty-target-empty-separator",
+      "passed": true
+    },
+    {
+      "id": "node/extension/trim/unicode-whitespace",
+      "passed": true
+    },
+    {
+      "id": "node/extension/trim/keep-non-whitespace",
+      "passed": true
+    },
+    {
+      "id": "node/extension/bytes-json/object-unicode",
+      "passed": true
+    },
+    {
+      "id": "node/extension/bytes-json/nested-empty-object",
+      "passed": true
+    },
+    {
+      "id": "node/extension/bytes-json/invalid-json",
+      "passed": true
+    },
+    {
+      "id": "node/extension/cost/large-input/s.lowerAscii()",
+      "passed": true
+    },
+    {
+      "id": "node/extension/cost/large-input/s.upperAscii()",
+      "passed": true
+    },
+    {
+      "id": "node/extension/cost/large-input/s.indexOf(\"x\")",
+      "passed": true
+    },
+    {
+      "id": "node/extension/cost/large-input/s.lastIndexOf(\"x\")",
+      "passed": true
+    },
+    {
+      "id": "node/extension/cost/large-input/s.substring(0,1)",
+      "passed": true
+    },
+    {
+      "id": "node/extension/cost/large-input/s.split(\"\")",
+      "passed": true
+    },
+    {
+      "id": "node/extension/cost/large-input/s.trim()",
+      "passed": true
+    },
+    {
+      "id": "node/extension/cost/large-input/bytes(s).json()",
+      "passed": true
+    },
+    {
+      "id": "node/extension/cost/search-comparisons/indexOf",
+      "passed": true
+    },
+    {
+      "id": "node/extension/cost/search-comparisons/lastIndexOf",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C01",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C02",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C03",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C04",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C05",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C06",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C07",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C08",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C09",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C10",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C11",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C12",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C13",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C14",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C15",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C16",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C17",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C18",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C19",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C20",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C21",
+      "passed": true
+    },
+    {
+      "id": "chromium/golden/C22",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/all",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/exists",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/exists-one",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/map",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/filter",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/nested",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/or-cannot-mask",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/and-cannot-mask",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/quantifier-cannot-mask",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/function-string",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/list-equality",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/membership",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/exact-boundary",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/skipped-branch",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/evaluate-resets",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/parsed-resets",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/failed-invocation-isolated",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/async-fatal",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/concurrent-parsed-isolation",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/charge-before-host-function",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/invalid-limit-zero",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/invalid-limit-negative",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/invalid-limit-fraction",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/invalid-limit-infinity",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/invalid-limit-nan",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/invalid-limit-string",
+      "passed": true
+    },
+    {
+      "id": "chromium/cost/invalid-limit-null",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/valid-2000-02-29T23:59:59.123Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/valid-2026-10-30T09:30:00+09:00",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/valid-0001-01-01T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/valid-9999-12-31T23:59:59.999Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/valid-0099-01-01T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/valid-2026-10-30T00:00:00.1-09:30",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-1900-02-29T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-02-30T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-04-31T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-13-01T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-00T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01T24:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01T00:60:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01T00:00:60Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01T00:00:00-00:00",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01T00:00:00+24:00",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01T00:00:00+01:60",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-0000-01-01T00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-0001-01-01T00:00:00+14:00",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-9999-12-31T23:59:59-12:00",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01T00:00:00.1234Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01T00:00:00",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/invalid-2026-01-01 00:00:00Z",
+      "passed": true
+    },
+    {
+      "id": "chromium/errors/ordinary-CEL-error-can-still-short-circuit",
+      "passed": true
+    },
+    {
+      "id": "chromium/integer/division-min-overflow",
+      "passed": true
+    },
+    {
+      "id": "chromium/integer/unary-min-overflow",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/arithmetic-overflow",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/arithmetic-millisecond-loss",
+      "passed": true
+    },
+    {
+      "id": "chromium/timestamp/year-0099-calendar-getter",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/substring/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/substring/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/anchored/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/anchored/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/unicode-codepoint/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/unicode-codepoint/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/unicode-group/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/unicode-group/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/case-flag/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/case-flag/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/multiline/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/multiline/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/nested-repetition/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/nested-repetition/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/alternation/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/alternation/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/empty/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/empty/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/counted-repeat/s.matches(p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/counted-repeat/matches(s,p)",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/reject-backref",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/reject-lookahead",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/reject-lookbehind",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/reject-bad",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/reject-repeat-limit",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/cost-cannot-be-masked",
+      "passed": true
+    },
+    {
+      "id": "chromium/regex/expanded-program-cost",
+      "passed": true
+    },
+    {
+      "id": "chromium/integer/double-conversion-overflow",
+      "passed": true
+    },
+    {
+      "id": "chromium/integer/empty-string",
+      "passed": true
+    },
+    {
+      "id": "chromium/duration/duration(\"1.234s\").getMilliseconds()",
+      "passed": true
+    },
+    {
+      "id": "chromium/duration/duration(\"-1.234s\").getMilliseconds()",
+      "passed": true
+    },
+    {
+      "id": "chromium/duration/(duration(\"-0.5s\") + duration(\"0s\")) == duration(\"-0.5s\")",
+      "passed": true
+    },
+    {
+      "id": "chromium/duration/(duration(\"0s\") - duration(\"0.5s\")) == duration(\"-0.5s\")",
+      "passed": true
+    },
+    {
+      "id": "chromium/duration/duration(\"0\").getSeconds()",
+      "passed": true
+    },
+    {
+      "id": "chromium/duration/(timestamp(\"9999-12-31T23:59:59.999Z\") - timestamp(\"0001-01-01T00:00:00Z\")).getMilliseconds()",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/expression-before-host-call",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/input-count",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/input-depth",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/input-bytes",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/nonfinite",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/undefined",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/sparse",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/function",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/bigint-range",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/cycle",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/accessor-not-executed",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/output-count",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/output-bytes",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/output-nonfinite",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/unknown-function-registration",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/unknown-variable-registration",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/declared-unused-missing",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/shared-noncyclic",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/async-output-check",
+      "passed": true
+    },
+    {
+      "id": "chromium/admission/limits-validated",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/ascii/s.lowerAscii()",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/ascii/s.upperAscii()",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/astral-index",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/astral-match",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/astral-offset",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/multi-point-pattern",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/combining-offset",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/empty-default",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/empty-start",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/empty-middle",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/empty-end",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/empty-over",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/empty-max-int",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/start",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/end",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/over",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/max-int",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/not-found",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/pattern-longer",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/empty-target",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/both-empty",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/empty-target-offset",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/negative-empty",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/indexOf/negative-x",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/astral-index",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/astral-match",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/astral-offset",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/multi-point-pattern",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/combining-offset",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/empty-default",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/empty-start",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/empty-middle",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/empty-end",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/empty-over",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/empty-max-int",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/start",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/end",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/over",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/max-int",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/not-found",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/pattern-longer",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/empty-target",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/both-empty",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/empty-target-offset",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/negative-empty",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/search/lastIndexOf/negative-x",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/substring/astral",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/substring/after-astral",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/substring/tail",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/substring/end",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/substring/empty-range",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/substring/end-range",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/substring/empty-target",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/substring/combining-codepoints",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/substring/reject-s.substring(-1)",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/substring/reject-s.substring(3)",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/substring/reject-s.substring(0,3)",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/substring/reject-s.substring(2,1)",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/substring/reject-s.substring(0,-1)",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/substring/reject-s.substring(-1,1)",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/substring/reject-s.substring(9223372036854775807)",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/substring/reject-s.substring(0,9223372036854775807)",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/split/s.split('')",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/split/s.split('', 1)",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/split/s.split('', 2)",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/split/s.split('', -1)",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/split/s.split('', 0)",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/split/empty-target-empty-separator",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/trim/unicode-whitespace",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/trim/keep-non-whitespace",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/bytes-json/object-unicode",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/bytes-json/nested-empty-object",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/bytes-json/invalid-json",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/cost/large-input/s.lowerAscii()",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/cost/large-input/s.upperAscii()",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/cost/large-input/s.indexOf(\"x\")",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/cost/large-input/s.lastIndexOf(\"x\")",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/cost/large-input/s.substring(0,1)",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/cost/large-input/s.split(\"\")",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/cost/large-input/s.trim()",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/cost/large-input/bytes(s).json()",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/cost/search-comparisons/indexOf",
+      "passed": true
+    },
+    {
+      "id": "chromium/extension/cost/search-comparisons/lastIndexOf",
+      "passed": true
+    },
+    {
+      "id": "browser/no-uncaught-errors",
+      "passed": true
+    }
+  ]
+}

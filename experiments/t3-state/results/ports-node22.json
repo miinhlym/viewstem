@@ -1,0 +1,155 @@
+{
+  "generatedAt": "2026-10-30T09:17:14.697Z",
+  "runtime": "v22.21.1",
+  "icu": "77.1",
+  "tz": "2025b",
+  "scope": "Independent private port registration/preparation and State schema-contract model; no production SDK, core Action scheduler, Query implementation or renderer",
+  "sourceSha256": {
+    "ports-tests.mjs": "feaea4f172e8c26a03c0f29fb87c9581459295060624d4d16ff670ae56e665e2",
+    "ports-probe.mjs": "b7cc988b6f9da94081acd54a7757e35fd19e0db3619032a0c04915f42893815a",
+    "state-probe.mjs": "501e0e0d78c8b8bf4fa1a9d465fe844e8cbeb06752013bc9ac6c765a0f5edbaa",
+    "immutable.mjs": "e86391873075d434ce26169043dece6e28b9082ddb20f9aab84c4dbaa78790f4",
+    "../t1-values/schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+    "../t1-values/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+    "../t1-values/values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+    "../t1-values/package.json": "91c1223f73e2fd6f660452b15a66f9e8674580b85b9f0e618098c0effc305ae1",
+    "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+    "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+    "../verification/errors.mjs": "c9d94483f9314bcf5bad42cb044f7b0ba29cd7d7b9d3ba561f1c9021aa6d7224"
+  },
+  "acceptance": [
+    "C01",
+    "C02",
+    "C04",
+    "C05",
+    "K02",
+    "K03",
+    "K04",
+    "A22"
+  ],
+  "limitations": [
+    "Query handles are explicitly branded fixture delegates, not a Query runtime",
+    "Expression snapshots are fixture callbacks, not the shared expression evaluator",
+    "Readiness is a single preparation pass; reactive scheduling belongs to later core integration",
+    "A22 input-key diagnostics are exercised here; complete Action observation remains separate"
+  ],
+  "summary": {
+    "executed": 28,
+    "passed": 28,
+    "failed": 0
+  },
+  "results": [
+    {
+      "id": "C01/schema-typeRef-exactly-one-and-query-untyped",
+      "passed": true
+    },
+    {
+      "id": "C01/schema-registration-profile-and-json-admission",
+      "passed": true
+    },
+    {
+      "id": "C02/port-required-and-object-required-are-separate",
+      "passed": true
+    },
+    {
+      "id": "C04/all-resource-kind-port-matrix",
+      "passed": true
+    },
+    {
+      "id": "K02/default-only-on-omission-and-falsy-values",
+      "passed": true
+    },
+    {
+      "id": "K02/invalid-default-declarations-and-unknown-inputs",
+      "passed": true
+    },
+    {
+      "id": "K02/defaults-are-literals-and-isolated-between-calls",
+      "passed": true
+    },
+    {
+      "id": "K03/required-structural-failure-precedes-expression-evaluation",
+      "passed": true
+    },
+    {
+      "id": "K03/missing-pending-auto-wait-and-explicit-zero-execution",
+      "passed": true
+    },
+    {
+      "id": "K02-K03/explicit-dependency-states-never-use-default",
+      "passed": true
+    },
+    {
+      "id": "K03/schema-validation-waits-until-value-ready",
+      "passed": true
+    },
+    {
+      "id": "C05/value-object-native-input-cannot-mutate-source-state",
+      "passed": true
+    },
+    {
+      "id": "C05/external-value-source-is-not-frozen-or-retained",
+      "passed": true
+    },
+    {
+      "id": "K04/number-cell-current-integer-does-not-pass-integer-contract",
+      "passed": true
+    },
+    {
+      "id": "K04/common-Type-missing-cell-connects-before-readiness",
+      "passed": true
+    },
+    {
+      "id": "K04/contracts-ignore-key-required-enum-type-order-and-annotations",
+      "passed": true
+    },
+    {
+      "id": "K04/local-refs-expand-with-escaped-pointers-and-siblings",
+      "passed": true
+    },
+    {
+      "id": "K04/const-enum-data-annotation-names-remain-constraints",
+      "passed": true
+    },
+    {
+      "id": "K04/no-general-logical-equivalence-or-subsumption-inference",
+      "passed": true
+    },
+    {
+      "id": "K04/readonly-derived-values-and-query-results-are-not-state-targets",
+      "passed": true
+    },
+    {
+      "id": "K04/followup-write-revalidates-value-permissions-and-generation",
+      "passed": true
+    },
+    {
+      "id": "integration/state-value-query-identities-and-preparation-transition",
+      "passed": true
+    },
+    {
+      "id": "integration/pending-initial-error-propagates-without-default-or-execution",
+      "passed": true
+    },
+    {
+      "id": "integration/nested-State-ports-reconnect-without-bypassing-ancestor-guards",
+      "passed": true
+    },
+    {
+      "id": "integration/nested-State-handles-retain-store-and-generation-boundaries",
+      "passed": true
+    },
+    {
+      "id": "integration/Query-delegate-branding-identity-and-nested-cancellation",
+      "passed": true
+    },
+    {
+      "id": "A22/preparation-errors-identify-exact-structural-type-and-expression-input",
+      "passed": true
+    },
+    {
+      "id": "A22/error-input-metadata-is-owned-and-does-not-copy-hostile-error-fields",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,903 @@
+{
+  "generatedAt": "2026-10-30T05:20:50.606Z",
+  "runtime": "v24.19.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "browser": "151.0.7922.34",
+  "playwrightVersion": "1.62.1",
+  "scope": "Shared independent executor in Node and Chromium over loopback HTTP, including native timers; no core integration",
+  "stopOnFirstProblem": true,
+  "stoppedAt": null,
+  "sourceSha256": {
+    "package.json": "b07eabf40c18ca1e4a45a951848c41d1abc8e6b1a20c49854741ffba51a982e4",
+    "transport-tests.mjs": "9ef2eee39a7eb430fd6c7d306a0fca34bce2fd3662abacb9562f3aaad06e2d0f",
+    "http-probe.mjs": "8e54143ff0ae01e941129a4d3133fde7c770f61b14da13eed3e09ca4b9c88850",
+    "header-profile.mjs": "6d4f17b66aae3b4405f05da9b1160a3ceb04c46f670f0bfb65726003ebdc5407",
+    "../t2-url-races/package.json": "d1f2b402b41e6d62766d5002af5475706ae8434b13c4e35c6a8818947aa361fc",
+    "../t2-url-races/package-lock.json": "d5f2c042db6f40f0ef311e4c24958a57d4ce1048d27d7cc87b467e805b66dc8b"
+  },
+  "results": [
+    {
+      "id": "T01-method-GET",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-HEAD",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-POST",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-PUT",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-PATCH",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-DELETE",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-OPTIONS",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-null",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-json-object",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-utf8-string",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-empty-string",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-explicit-json-string",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-vendor-json",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-form",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T03-params-merge",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-json-null",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-vendor-json",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-text",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-204",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-205",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-invalid-json",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-nonfinite-json",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-binary",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-redirect",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-http-error",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T06-invalid-request-get-body",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T06-invalid-request-head-body",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T06-invalid-request-binary-body",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T06-invalid-request-nested-params",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T07-native-timeout-hold",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T07-native-timeout-hold-body",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T08-pointer-array-index",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T08-pointer-object-length",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T08-pointer-denial-array-length",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T08-pointer-denial-leading-zero",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T08-pointer-denial-nested-array-length",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-array",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-null",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-string",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-number",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-boolean",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-common-array-cannot-be-hidden",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-login-array",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-object-merge",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T10-header-object-reference",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T10-dynamic-header-merge",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T10-dynamic-forbidden-Host-string",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-Host-null",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-Cookie-string",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-Cookie-null",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-Sec-Future-string",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-Sec-Future-null",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-Proxy-Authorization-string",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-Proxy-Authorization-null",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-X-HTTP-Method-Override-string",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-X-HTTP-Method-Override-null",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-invalid-resolved-headers-array",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-invalid-resolved-headers-duplicate-case",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-static-forbidden-still-before-login",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-login-forbidden",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-cannot-be-hidden",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-dynamic-path-relative",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T11-dynamic-path-leading-slash",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T11-invalid-dynamic-path-absolute",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-invalid-dynamic-path-network",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-invalid-dynamic-path-parent",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-invalid-dynamic-path-encoded-parent",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-invalid-dynamic-path-query",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-invalid-dynamic-path-fragment",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-invalid-dynamic-path-null",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-resolved-destination-denied",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-invalid-dynamic-login-path",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-no-secret-capability-before-address",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T01-method-GET",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-HEAD",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-POST",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-PUT",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-PATCH",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-DELETE",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-OPTIONS",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-null",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-json-object",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-utf8-string",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-empty-string",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-explicit-json-string",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-vendor-json",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-form",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T03-params-merge",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-json-null",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-vendor-json",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-text",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-204",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-205",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-invalid-json",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-nonfinite-json",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-binary",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-redirect",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-http-error",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T06-invalid-request-get-body",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T06-invalid-request-head-body",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T06-invalid-request-binary-body",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T06-invalid-request-nested-params",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T07-native-timeout-hold",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T07-native-timeout-hold-body",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T08-pointer-array-index",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T08-pointer-object-length",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T08-pointer-denial-array-length",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T08-pointer-denial-leading-zero",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T08-pointer-denial-nested-array-length",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-array",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-null",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-string",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-number",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-boolean",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-common-array-cannot-be-hidden",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-login-array",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-object-merge",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T10-header-object-reference",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T10-dynamic-header-merge",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T10-dynamic-forbidden-Host-string",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-Host-null",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-Cookie-string",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-Cookie-null",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-Sec-Future-string",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-Sec-Future-null",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-Proxy-Authorization-string",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-Proxy-Authorization-null",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-X-HTTP-Method-Override-string",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-X-HTTP-Method-Override-null",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-invalid-resolved-headers-array",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-invalid-resolved-headers-duplicate-case",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-static-forbidden-still-before-login",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-login-forbidden",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T10-dynamic-forbidden-cannot-be-hidden",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-dynamic-path-relative",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T11-dynamic-path-leading-slash",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T11-invalid-dynamic-path-absolute",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-invalid-dynamic-path-network",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-invalid-dynamic-path-parent",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-invalid-dynamic-path-encoded-parent",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-invalid-dynamic-path-query",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-invalid-dynamic-path-fragment",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-invalid-dynamic-path-null",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-resolved-destination-denied",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-invalid-dynamic-login-path",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T11-no-secret-capability-before-address",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    }
+  ],
+  "pageErrors": [],
+  "summary": {
+    "executed": 146,
+    "passed": 146,
+    "failed": 0
+  }
+}

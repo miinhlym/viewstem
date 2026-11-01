@@ -1,0 +1,3210 @@
+{
+  "scope": "T1 bounded experiment; NOT core/StateStore/full conformance",
+  "sourceSha256": {
+    "run.mjs": "b1a72742f0ae460e28b43ad542b3b1d8db0ff977b9d36e1802bb7db2f989d897",
+    "values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+    "schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+    "schema-probe.mjs": "8b76b6efde8f5c3dc5717905dc552ebb1412e5543dfd35a59d1bb76fb0880a31",
+    "cel-probe.mjs": "4078bab16e5d1d0d1561610fa81dd2f99ceb3a6b31f13d24ebdecaccc41426d5",
+    "limit-worker.mjs": "7a83c66e916aa1882723e20cce133c6b6703b6557937d60f44a4f64230a49429",
+    "fixtures/cel.json": "730c9feaa026dd6395ed2aba2d248c2eef1f3546c9bccacb585e1fbcde9f0da9",
+    "package.json": "91c1223f73e2fd6f660452b15a66f9e8674580b85b9f0e618098c0effc305ae1",
+    "package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+    "dart/bin/probe.dart": "ecb4d010ac806ab6776c68180a5630933ea823254f29242c8966aa1a7efea165",
+    "dart/pubspec.yaml": "7eaef1ada570d3eaea9b7c20699bb066eabe612c4d5bf0d5cdc08bdb3699dd2e",
+    "dart/pubspec.lock": "a41c53712974f7c8e832c28a3f45ad1717e695d16cd3524c7e9e0edefb534db1"
+  },
+  "node": "v24.19.0",
+  "platform": "darwin/arm64",
+  "icu": "78.3",
+  "tz": "2026a",
+  "dart": "3.11.1 (stable) (Tue Feb 24 00:03:07 2026 -0800)",
+  "packages": {
+    "@bufbuild/cel": "0.6.1",
+    "@hyperjump/json-schema": "1.18.0",
+    "@js-temporal/polyfill": "0.5.1",
+    "@marcbachmann/cel-js": "8.0.0",
+    "ajv": "8.20.0"
+  },
+  "summary": {
+    "schema": {
+      "matched": 48,
+      "total": 48
+    },
+    "schema-mutation": {
+      "matched": 48,
+      "total": 48
+    },
+    "cel": {
+      "matched": 57,
+      "total": 66
+    },
+    "registration": {
+      "matched": 3,
+      "total": 6
+    },
+    "native-raw": {
+      "matched": 2,
+      "total": 4
+    },
+    "adapter": {
+      "matched": 93,
+      "total": 93
+    },
+    "raw-gap": {
+      "matched": 0,
+      "total": 2
+    },
+    "readiness": {
+      "matched": 12,
+      "total": 12
+    },
+    "readiness-access": {
+      "matched": 12,
+      "total": 12
+    },
+    "containment": {
+      "matched": 3,
+      "total": 3
+    }
+  },
+  "rows": [
+    {
+      "group": "schema",
+      "id": "ajv/S01",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": true,
+      "input": null,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S01",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S01",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": true,
+      "input": null,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S01",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S02",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": false,
+      "input": null,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S02",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S02",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": false,
+      "input": null,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S02",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S03",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "number"
+      },
+      "input": "42",
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S03",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S03",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "number"
+      },
+      "input": "42",
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S03",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S04",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": {
+        "type": "integer"
+      },
+      "input": 9007199254740991,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S04",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S04",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": {
+        "type": "integer"
+      },
+      "input": 9007199254740991,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S04",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S05",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "integer"
+      },
+      "input": 1.25,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S05",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S05",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "integer"
+      },
+      "input": 1.25,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S05",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S06",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "number",
+        "minimum": 1,
+        "exclusiveMaximum": 3
+      },
+      "input": 3,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S06",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S06",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "number",
+        "minimum": 1,
+        "exclusiveMaximum": 3
+      },
+      "input": 3,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S06",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S07",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1
+      },
+      "input": "😀",
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S07",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S07",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1
+      },
+      "input": "😀",
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S07",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S08",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "string",
+        "pattern": "^a+$"
+      },
+      "input": "baa",
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S08",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S08",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "string",
+        "pattern": "^a+$"
+      },
+      "input": "baa",
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S08",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S09",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "n": {
+            "type": "integer",
+            "default": 3
+          }
+        },
+        "required": [
+          "n"
+        ]
+      },
+      "input": {},
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S09",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S09",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "n": {
+            "type": "integer",
+            "default": 3
+          }
+        },
+        "required": [
+          "n"
+        ]
+      },
+      "input": {},
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S09",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S10",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "n": {
+            "default": 3
+          }
+        }
+      },
+      "input": {},
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S10",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S10",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "n": {
+            "default": 3
+          }
+        }
+      },
+      "input": {},
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S10",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S11",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "n": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": false
+      },
+      "input": {
+        "n": 1,
+        "extra": 2
+      },
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S11",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S11",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "n": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": false
+      },
+      "input": {
+        "n": 1,
+        "extra": 2
+      },
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S11",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S12",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "object",
+        "minProperties": 1,
+        "maxProperties": 2
+      },
+      "input": {},
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S12",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S12",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "object",
+        "minProperties": 1,
+        "maxProperties": 2
+      },
+      "input": {},
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S12",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S13",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": {
+        "type": "array",
+        "prefixItems": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          }
+        ],
+        "items": false
+      },
+      "input": [
+        "x",
+        1
+      ],
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S13",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S13",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": {
+        "type": "array",
+        "prefixItems": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          }
+        ],
+        "items": false
+      },
+      "input": [
+        "x",
+        1
+      ],
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S13",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S14",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "array",
+        "prefixItems": [
+          {
+            "type": "string"
+          }
+        ],
+        "items": false
+      },
+      "input": [
+        "x",
+        1
+      ],
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S14",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S14",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "array",
+        "prefixItems": [
+          {
+            "type": "string"
+          }
+        ],
+        "items": false
+      },
+      "input": [
+        "x",
+        1
+      ],
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S14",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S15",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "minItems": 1,
+        "maxItems": 2
+      },
+      "input": [
+        1,
+        "2"
+      ],
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S15",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S15",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "minItems": 1,
+        "maxItems": 2
+      },
+      "input": [
+        1,
+        "2"
+      ],
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S15",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S16",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "array",
+        "uniqueItems": true
+      },
+      "input": [
+        {
+          "a": 1,
+          "b": 2
+        },
+        {
+          "b": 2,
+          "a": 1
+        }
+      ],
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S16",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S16",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "type": "array",
+        "uniqueItems": true
+      },
+      "input": [
+        {
+          "a": 1,
+          "b": 2
+        },
+        {
+          "b": 2,
+          "a": 1
+        }
+      ],
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S16",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S17",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": {
+        "enum": [
+          null,
+          false,
+          0
+        ]
+      },
+      "input": false,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S17",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S17",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": {
+        "enum": [
+          null,
+          false,
+          0
+        ]
+      },
+      "input": false,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S17",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S18",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": {
+        "const": {
+          "a": 1,
+          "b": 2
+        }
+      },
+      "input": {
+        "b": 2,
+        "a": 1
+      },
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S18",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S18",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": {
+        "const": {
+          "a": 1,
+          "b": 2
+        }
+      },
+      "input": {
+        "b": 2,
+        "a": 1
+      },
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S18",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S19",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "allOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "minimum": 2
+          }
+        ]
+      },
+      "input": 1,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S19",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S19",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "allOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "minimum": 2
+          }
+        ]
+      },
+      "input": 1,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S19",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S20",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "input": null,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S20",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S20",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "input": null,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S20",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S21",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "integer"
+          }
+        ]
+      },
+      "input": 1,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S21",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S21",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "oneOf": [
+          {
+            "type": "number"
+          },
+          {
+            "type": "integer"
+          }
+        ]
+      },
+      "input": 1,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S21",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S22",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": {
+        "not": {
+          "type": "string"
+        }
+      },
+      "input": 2,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S22",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S22",
+      "expected": true,
+      "actual": true,
+      "matches": true,
+      "schema": {
+        "not": {
+          "type": "string"
+        }
+      },
+      "input": 2,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S22",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S23",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "if": {
+          "type": "integer"
+        },
+        "then": {
+          "minimum": 0
+        },
+        "else": {
+          "type": "string"
+        }
+      },
+      "input": -1,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S23",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S23",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "if": {
+          "type": "integer"
+        },
+        "then": {
+          "minimum": 0
+        },
+        "else": {
+          "type": "string"
+        }
+      },
+      "input": -1,
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S23",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "ajv/S24",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "$defs": {
+          "n": {
+            "type": "integer"
+          }
+        },
+        "type": "object",
+        "properties": {
+          "n": {
+            "$ref": "#/$defs/n"
+          }
+        }
+      },
+      "input": {
+        "n": "1"
+      },
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "ajv/S24",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "schema",
+      "id": "hyperjump/S24",
+      "expected": false,
+      "actual": false,
+      "matches": true,
+      "schema": {
+        "$defs": {
+          "n": {
+            "type": "integer"
+          }
+        },
+        "type": "object",
+        "properties": {
+          "n": {
+            "$ref": "#/$defs/n"
+          }
+        }
+      },
+      "input": {
+        "n": "1"
+      },
+      "unchanged": true
+    },
+    {
+      "group": "schema-mutation",
+      "id": "hyperjump/S24",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "cel",
+      "id": "marc/C01",
+      "expected": {
+        "type": "int",
+        "value": "3"
+      },
+      "actual": {
+        "type": "int",
+        "value": "3"
+      },
+      "matches": true,
+      "expression": "1+2"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C01",
+      "expected": {
+        "type": "int",
+        "value": "3"
+      },
+      "actual": {
+        "type": "int",
+        "value": "3"
+      },
+      "matches": true,
+      "expression": "1+2"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C02",
+      "expected": {
+        "type": "int",
+        "value": "2"
+      },
+      "actual": {
+        "type": "int",
+        "value": "2"
+      },
+      "matches": true,
+      "expression": "size(plants)"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C02",
+      "expected": {
+        "type": "int",
+        "value": "2"
+      },
+      "actual": {
+        "type": "int",
+        "value": "2"
+      },
+      "matches": true,
+      "expression": "size(plants)"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C03",
+      "expected": {
+        "type": "int",
+        "value": "3"
+      },
+      "actual": {
+        "type": "int",
+        "value": "3"
+      },
+      "matches": true,
+      "expression": "n+1"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C03",
+      "expected": {
+        "type": "int",
+        "value": "3"
+      },
+      "actual": {
+        "type": "int",
+        "value": "3"
+      },
+      "matches": true,
+      "expression": "n+1"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C04",
+      "expected": {
+        "type": "double",
+        "value": 3
+      },
+      "actual": {
+        "type": "double",
+        "value": 3
+      },
+      "matches": true,
+      "expression": "n+1.0"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C04",
+      "expected": {
+        "type": "double",
+        "value": 3
+      },
+      "actual": {
+        "type": "double",
+        "value": 3
+      },
+      "matches": true,
+      "expression": "n+1.0"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C05",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": true,
+      "expression": "n+1",
+      "detail": "no such overload: dyn<double> + int\n\n>    1 | n+1\n         ^"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C05",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": true,
+      "expression": "n+1",
+      "detail": "found no matching overload for '_+_' applied to '(double, int)'"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C06",
+      "expected": {
+        "type": "double",
+        "value": 0.30000000000000004
+      },
+      "actual": {
+        "type": "double",
+        "value": 0.30000000000000004
+      },
+      "matches": true,
+      "expression": "0.1+0.2"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C06",
+      "expected": {
+        "type": "double",
+        "value": 0.30000000000000004
+      },
+      "actual": {
+        "type": "double",
+        "value": 0.30000000000000004
+      },
+      "matches": true,
+      "expression": "0.1+0.2"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C07",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": true,
+      "expression": "1/0",
+      "detail": "division by zero\n\n>    1 | 1/0\n         ^"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C07",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": true,
+      "expression": "1/0",
+      "detail": "int divide by zero"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C08",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": true,
+      "expression": "9223372036854775807+1",
+      "detail": "integer overflow: 9223372036854775808\n\n>    1 | 9223372036854775807+1\n         ^"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C08",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": true,
+      "expression": "9223372036854775807+1",
+      "detail": "int overflow during _+_"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C09",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": true,
+      "expression": "1+\"a\"",
+      "detail": "no such overload: int + string\n\n>    1 | 1+\"a\"\n         ^"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C09",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": true,
+      "expression": "1+\"a\"",
+      "detail": "found no matching overload for '_+_' applied to '(int, string)'"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C10",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": true,
+      "expression": "obj.absent",
+      "detail": "No such key: absent\n\n>    1 | obj.absent\n             ^"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C10",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": true,
+      "expression": "obj.absent",
+      "detail": "field not found: absent"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C11",
+      "expected": {
+        "type": "bool",
+        "value": false
+      },
+      "actual": {
+        "type": "bool",
+        "value": false
+      },
+      "matches": true,
+      "expression": "has(obj.absent)"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C11",
+      "expected": {
+        "type": "bool",
+        "value": false
+      },
+      "actual": {
+        "type": "bool",
+        "value": false
+      },
+      "matches": true,
+      "expression": "has(obj.absent)"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C12",
+      "expected": {
+        "type": "bool",
+        "value": false
+      },
+      "actual": {
+        "type": "bool",
+        "value": false
+      },
+      "matches": true,
+      "expression": "false && missing > 0"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C12",
+      "expected": {
+        "type": "bool",
+        "value": false
+      },
+      "actual": {
+        "type": "bool",
+        "value": false
+      },
+      "matches": true,
+      "expression": "false && missing > 0"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C13",
+      "expected": {
+        "type": "int",
+        "value": "7"
+      },
+      "actual": {
+        "type": "int",
+        "value": "7"
+      },
+      "matches": true,
+      "expression": "false ? missing : 7"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C13",
+      "expected": {
+        "type": "int",
+        "value": "7"
+      },
+      "actual": {
+        "type": "int",
+        "value": "7"
+      },
+      "matches": true,
+      "expression": "false ? missing : 7"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C14",
+      "expected": {
+        "type": "list",
+        "value": [
+          {
+            "type": "int",
+            "value": "4"
+          },
+          {
+            "type": "int",
+            "value": "6"
+          }
+        ]
+      },
+      "actual": {
+        "type": "list",
+        "value": [
+          {
+            "type": "int",
+            "value": "4"
+          },
+          {
+            "type": "int",
+            "value": "6"
+          }
+        ]
+      },
+      "matches": true,
+      "expression": "xs.filter(x,x>1).map(x,x*2)"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C14",
+      "expected": {
+        "type": "list",
+        "value": [
+          {
+            "type": "int",
+            "value": "4"
+          },
+          {
+            "type": "int",
+            "value": "6"
+          }
+        ]
+      },
+      "actual": {
+        "type": "list",
+        "value": [
+          {
+            "type": "int",
+            "value": "4"
+          },
+          {
+            "type": "int",
+            "value": "6"
+          }
+        ]
+      },
+      "matches": true,
+      "expression": "xs.filter(x,x>1).map(x,x*2)"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C15",
+      "expected": {
+        "type": "bool",
+        "value": true
+      },
+      "actual": {
+        "type": "bool",
+        "value": true
+      },
+      "matches": true,
+      "expression": "m[1] != m[\"1\"]"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C15",
+      "expected": {
+        "type": "bool",
+        "value": true
+      },
+      "actual": {
+        "type": "bool",
+        "value": true
+      },
+      "matches": true,
+      "expression": "m[1] != m[\"1\"]"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C16",
+      "expected": {
+        "type": "int",
+        "value": "3"
+      },
+      "actual": {
+        "type": "int",
+        "value": "3"
+      },
+      "matches": true,
+      "expression": "obj.count+1"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C16",
+      "expected": {
+        "type": "int",
+        "value": "3"
+      },
+      "actual": {
+        "type": "int",
+        "value": "3"
+      },
+      "matches": true,
+      "expression": "obj.count+1"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C17",
+      "expected": {
+        "type": "int",
+        "value": "9"
+      },
+      "actual": {
+        "type": "int",
+        "value": "9"
+      },
+      "matches": true,
+      "expression": "timestamp(\"2026-10-29T00:00:00Z\").getHours(\"Asia/Seoul\")"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C17",
+      "expected": {
+        "type": "int",
+        "value": "9"
+      },
+      "actual": {
+        "type": "int",
+        "value": "9"
+      },
+      "matches": true,
+      "expression": "timestamp(\"2026-10-29T00:00:00Z\").getHours(\"Asia/Seoul\")"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C18",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "int",
+        "value": "2"
+      },
+      "matches": false,
+      "expression": "timestamp(\"2026-02-30T00:00:00Z\").getDate()"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C18",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "int",
+        "value": "2"
+      },
+      "matches": false,
+      "expression": "timestamp(\"2026-02-30T00:00:00Z\").getDate()"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C19",
+      "expected": {
+        "type": "int",
+        "value": "1"
+      },
+      "actual": {
+        "type": "int",
+        "value": "1"
+      },
+      "matches": true,
+      "expression": "size(\"😀\")"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C19",
+      "expected": {
+        "type": "int",
+        "value": "1"
+      },
+      "actual": {
+        "type": "int",
+        "value": "1"
+      },
+      "matches": true,
+      "expression": "size(\"😀\")"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C20",
+      "expected": {
+        "type": "bool",
+        "value": true
+      },
+      "actual": {
+        "type": "bool",
+        "value": true
+      },
+      "matches": true,
+      "expression": "null==null"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C20",
+      "expected": {
+        "type": "bool",
+        "value": true
+      },
+      "actual": {
+        "type": "bool",
+        "value": true
+      },
+      "matches": true,
+      "expression": "null==null"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C21",
+      "expected": {
+        "type": "bool",
+        "value": true
+      },
+      "actual": {
+        "type": "bool",
+        "value": true
+      },
+      "matches": true,
+      "expression": "type(n)==double"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C21",
+      "expected": {
+        "type": "bool",
+        "value": true
+      },
+      "actual": {
+        "type": "bool",
+        "value": true
+      },
+      "matches": true,
+      "expression": "type(n)==double"
+    },
+    {
+      "group": "cel",
+      "id": "marc/C22",
+      "expected": {
+        "type": "uint",
+        "value": "1"
+      },
+      "actual": {
+        "type": "uint",
+        "value": "1"
+      },
+      "matches": true,
+      "expression": "1u"
+    },
+    {
+      "group": "cel",
+      "id": "buf/C22",
+      "expected": {
+        "type": "uint",
+        "value": "1"
+      },
+      "actual": {
+        "type": "uint",
+        "value": "1"
+      },
+      "matches": true,
+      "expression": "1u"
+    },
+    {
+      "group": "registration",
+      "id": "marc/unknownFn(1)",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "registration",
+      "id": "buf/unknownFn(1)",
+      "expected": true,
+      "actual": false,
+      "matches": false
+    },
+    {
+      "group": "registration",
+      "id": "marc/1+\"a\"",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "registration",
+      "id": "buf/1+\"a\"",
+      "expected": true,
+      "actual": false,
+      "matches": false
+    },
+    {
+      "group": "registration",
+      "id": "marc/missing+1",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "registration",
+      "id": "buf/missing+1",
+      "expected": true,
+      "actual": false,
+      "matches": false
+    },
+    {
+      "group": "native-raw",
+      "id": "marc/set",
+      "expected": {
+        "type": "int",
+        "value": "2"
+      },
+      "actual": {
+        "type": "int",
+        "value": "2"
+      },
+      "matches": true
+    },
+    {
+      "group": "native-raw",
+      "id": "buf/set",
+      "expected": {
+        "type": "int",
+        "value": "2"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": false
+    },
+    {
+      "group": "native-raw",
+      "id": "marc/fractional-map",
+      "expected": {
+        "type": "string",
+        "value": "kept"
+      },
+      "actual": {
+        "type": "string",
+        "value": "kept"
+      },
+      "matches": true
+    },
+    {
+      "group": "native-raw",
+      "id": "buf/fractional-map",
+      "expected": {
+        "type": "string",
+        "value": "kept"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": false
+    },
+    {
+      "group": "adapter",
+      "id": "opaque/setSize(s)",
+      "expected": {
+        "type": "int",
+        "value": "2"
+      },
+      "actual": {
+        "type": "int",
+        "value": "2"
+      },
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "opaque/mapGet(m,1.5)",
+      "expected": {
+        "type": "string",
+        "value": "number"
+      },
+      "actual": {
+        "type": "string",
+        "value": "number"
+      },
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "opaque/mapGet(m,\"1.5\")",
+      "expected": {
+        "type": "string",
+        "value": "string"
+      },
+      "actual": {
+        "type": "string",
+        "value": "string"
+      },
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "opaque/same-reference",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "opaque/same-content",
+      "expected": false,
+      "actual": false,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "pure-date-function",
+      "expected": "2026-10-29T00:30:00.000Z",
+      "actual": "2026-10-29T00:30:00.000Z",
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "pure-date-function-invalid",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "marc/integer-roundtrip",
+      "expected": 3,
+      "actual": 3,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "buf/integer-roundtrip",
+      "expected": 3,
+      "actual": 3,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "value/undefined",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "nested/undefined",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "value/NaN",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "nested/NaN",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "value/Infinity",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "nested/Infinity",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "value/negative-Infinity",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "nested/negative-Infinity",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "value/bigint",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "nested/bigint",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "value/symbol",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "nested/symbol",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "value/function",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "nested/function",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "value/promise",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "nested/promise",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "value/weak-map",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "nested/weak-map",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "value/weak-set",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "nested/weak-set",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "value/date-object",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "nested/date-object",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "object/omit-undefined",
+      "expected": "{\"nested\":{},\"nullable\":null}",
+      "actual": "{\"nested\":{},\"nullable\":null}",
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "object/source-preserved",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "array/hole",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "set/undefined",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "map/undefined",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "map/null-key",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "map/nan-key",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "set/identity",
+      "expected": 2,
+      "actual": 2,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "map/key-distinction",
+      "expected": [
+        "number",
+        "string",
+        "fraction"
+      ],
+      "actual": [
+        "number",
+        "string",
+        "fraction"
+      ],
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "cycle/object",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "cycle/array",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "cycle/set",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "cycle/map",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "graph/shared-noncycle",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "number/minus-zero",
+      "expected": false,
+      "actual": false,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "number/no-rounding",
+      "expected": 0.30000000000000004,
+      "actual": 0.30000000000000004,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "number/large-double",
+      "expected": 1e+100,
+      "actual": 1e+100,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "integer/-9007199254740991",
+      "expected": -9007199254740991,
+      "actual": -9007199254740991,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "integer/0",
+      "expected": 0,
+      "actual": 0,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "integer/9007199254740991",
+      "expected": 9007199254740991,
+      "actual": 9007199254740991,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "integer/reject--9007199254740992",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "integer/reject-9007199254740992",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "integer/reject-1.5",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "integer/reject-42",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "integer/nested-unsafe",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "integer/result-unsafe",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "set/invalid-item",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "set/typed-size",
+      "expected": 2,
+      "actual": 2,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "map/typed-value",
+      "expected": 0,
+      "actual": 0,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/nullable",
+      "expected": null,
+      "actual": null,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/date",
+      "expected": "2026-10-29",
+      "actual": "2026-10-29",
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/leap-date",
+      "expected": "2024-02-29",
+      "actual": "2024-02-29",
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/time",
+      "expected": "09:30:00.000",
+      "actual": "09:30:00.000",
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/time-fraction",
+      "expected": "09:30:01.100",
+      "actual": "09:30:01.100",
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/datetime",
+      "expected": "2026-10-29T00:30:00.000Z",
+      "actual": "2026-10-29T00:30:00.000Z",
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/early-year",
+      "expected": "0001-01-01T00:00:00.000Z",
+      "actual": "0001-01-01T00:00:00.000Z",
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/reject-2026-02-29",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/reject-0000-01-01",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/reject-24:00",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/reject-09:30:00.1234",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/reject-2026-02-30T00:00:00Z",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/reject-2026-10-29T09:30:00",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/reject-2026-10-29T09:30:00-00:00",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/reject-2026-10-29T09:30:60Z",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/reject-0001-01-01T00:00:00+01:00",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/same-instant",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/ordinary-string",
+      "expected": "2026-02-30",
+      "actual": "2026-02-30",
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/json-roundtrip",
+      "expected": "2026-10-29",
+      "actual": "2026-10-29",
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/seoul",
+      "expected": "2026-10-29T00:30:00.000Z",
+      "actual": "2026-10-29T00:30:00.000Z",
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/missing-zone",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/invalid-zone",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/dst-gap",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/dst-overlap",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/calendar-day-not-24h",
+      "expected": 23,
+      "actual": 23,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "date/ambient-zone-independent",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "profile/format",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "profile/unknown",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "profile/external-ref",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "profile/cycle",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "profile/dynamic",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "profile/multiple-of",
+      "expected": true,
+      "actual": true,
+      "matches": true
+    },
+    {
+      "group": "raw-gap",
+      "id": "ajv/unsafe-integer",
+      "expected": false,
+      "actual": true,
+      "matches": false
+    },
+    {
+      "group": "raw-gap",
+      "id": "ajv/unknown-extension",
+      "expected": false,
+      "actual": true,
+      "matches": false
+    },
+    {
+      "group": "readiness",
+      "id": "marc/missing/false",
+      "expected": {
+        "type": "int",
+        "value": "7"
+      },
+      "actual": {
+        "type": "int",
+        "value": "7"
+      },
+      "matches": true,
+      "reads": 0
+    },
+    {
+      "group": "readiness-access",
+      "id": "marc/missing/false",
+      "expected": 0,
+      "actual": 0,
+      "matches": true
+    },
+    {
+      "group": "readiness",
+      "id": "marc/missing/true",
+      "expected": "blocked",
+      "actual": "blocked",
+      "matches": true,
+      "reads": 1
+    },
+    {
+      "group": "readiness-access",
+      "id": "marc/missing/true",
+      "expected": 1,
+      "actual": 1,
+      "matches": true
+    },
+    {
+      "group": "readiness",
+      "id": "marc/pending/false",
+      "expected": {
+        "type": "int",
+        "value": "7"
+      },
+      "actual": {
+        "type": "int",
+        "value": "7"
+      },
+      "matches": true,
+      "reads": 0
+    },
+    {
+      "group": "readiness-access",
+      "id": "marc/pending/false",
+      "expected": 0,
+      "actual": 0,
+      "matches": true
+    },
+    {
+      "group": "readiness",
+      "id": "marc/pending/true",
+      "expected": "blocked",
+      "actual": "blocked",
+      "matches": true,
+      "reads": 1
+    },
+    {
+      "group": "readiness-access",
+      "id": "marc/pending/true",
+      "expected": 1,
+      "actual": 1,
+      "matches": true
+    },
+    {
+      "group": "readiness",
+      "id": "marc/error/false",
+      "expected": {
+        "type": "int",
+        "value": "7"
+      },
+      "actual": {
+        "type": "int",
+        "value": "7"
+      },
+      "matches": true,
+      "reads": 0
+    },
+    {
+      "group": "readiness-access",
+      "id": "marc/error/false",
+      "expected": 0,
+      "actual": 0,
+      "matches": true
+    },
+    {
+      "group": "readiness",
+      "id": "marc/error/true",
+      "expected": "blocked",
+      "actual": "blocked",
+      "matches": true,
+      "reads": 1
+    },
+    {
+      "group": "readiness-access",
+      "id": "marc/error/true",
+      "expected": 1,
+      "actual": 1,
+      "matches": true
+    },
+    {
+      "group": "readiness",
+      "id": "buf/missing/false",
+      "expected": {
+        "type": "int",
+        "value": "7"
+      },
+      "actual": {
+        "type": "int",
+        "value": "7"
+      },
+      "matches": true,
+      "reads": 0
+    },
+    {
+      "group": "readiness-access",
+      "id": "buf/missing/false",
+      "expected": 0,
+      "actual": 0,
+      "matches": true
+    },
+    {
+      "group": "readiness",
+      "id": "buf/missing/true",
+      "expected": "blocked",
+      "actual": "blocked",
+      "matches": true,
+      "reads": 1
+    },
+    {
+      "group": "readiness-access",
+      "id": "buf/missing/true",
+      "expected": 1,
+      "actual": 1,
+      "matches": true
+    },
+    {
+      "group": "readiness",
+      "id": "buf/pending/false",
+      "expected": {
+        "type": "int",
+        "value": "7"
+      },
+      "actual": {
+        "type": "int",
+        "value": "7"
+      },
+      "matches": true,
+      "reads": 0
+    },
+    {
+      "group": "readiness-access",
+      "id": "buf/pending/false",
+      "expected": 0,
+      "actual": 0,
+      "matches": true
+    },
+    {
+      "group": "readiness",
+      "id": "buf/pending/true",
+      "expected": "blocked",
+      "actual": "blocked",
+      "matches": true,
+      "reads": 1
+    },
+    {
+      "group": "readiness-access",
+      "id": "buf/pending/true",
+      "expected": 1,
+      "actual": 1,
+      "matches": true
+    },
+    {
+      "group": "readiness",
+      "id": "buf/error/false",
+      "expected": {
+        "type": "int",
+        "value": "7"
+      },
+      "actual": {
+        "type": "int",
+        "value": "7"
+      },
+      "matches": true,
+      "reads": 0
+    },
+    {
+      "group": "readiness-access",
+      "id": "buf/error/false",
+      "expected": 0,
+      "actual": 0,
+      "matches": true
+    },
+    {
+      "group": "readiness",
+      "id": "buf/error/true",
+      "expected": "blocked",
+      "actual": "blocked",
+      "matches": true,
+      "reads": 1
+    },
+    {
+      "group": "readiness-access",
+      "id": "buf/error/true",
+      "expected": 1,
+      "actual": 1,
+      "matches": true
+    },
+    {
+      "group": "adapter",
+      "id": "limit/marc-parse",
+      "expected": false,
+      "actual": false,
+      "matches": true
+    },
+    {
+      "group": "containment",
+      "id": "marc",
+      "expected": "deadline",
+      "actual": "deadline",
+      "matches": true,
+      "kind": "deadline",
+      "budgetMs": 200,
+      "elapsedMs": 238,
+      "startupMs": 35,
+      "executionMs": 203,
+      "terminated": true
+    },
+    {
+      "group": "containment",
+      "id": "buf",
+      "expected": "deadline",
+      "actual": "deadline",
+      "matches": true,
+      "kind": "deadline",
+      "budgetMs": 200,
+      "elapsedMs": 350,
+      "startupMs": 146,
+      "executionMs": 204,
+      "terminated": true
+    },
+    {
+      "group": "containment",
+      "id": "schema-regex",
+      "expected": "deadline",
+      "actual": "deadline",
+      "matches": true,
+      "kind": "deadline",
+      "budgetMs": 200,
+      "elapsedMs": 275,
+      "startupMs": 70,
+      "executionMs": 205,
+      "terminated": true
+    },
+    {
+      "group": "cel",
+      "id": "dart/C01",
+      "expected": {
+        "type": "int",
+        "value": "3"
+      },
+      "actual": {
+        "type": "int",
+        "value": "3"
+      },
+      "matches": true,
+      "expression": "1+2"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C02",
+      "expected": {
+        "type": "int",
+        "value": "2"
+      },
+      "actual": {
+        "type": "int",
+        "value": "2"
+      },
+      "matches": true,
+      "expression": "size(plants)"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C03",
+      "expected": {
+        "type": "int",
+        "value": "3"
+      },
+      "actual": {
+        "type": "int",
+        "value": "3"
+      },
+      "matches": true,
+      "expression": "n+1"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C04",
+      "expected": {
+        "type": "double",
+        "value": 3
+      },
+      "actual": {
+        "type": "double",
+        "value": 3
+      },
+      "matches": true,
+      "expression": "n+1.0"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C05",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "double",
+        "value": 3
+      },
+      "matches": false,
+      "expression": "n+1"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C06",
+      "expected": {
+        "type": "double",
+        "value": 0.30000000000000004
+      },
+      "actual": {
+        "type": "double",
+        "value": 0.30000000000000004
+      },
+      "matches": true,
+      "expression": "0.1+0.2"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C07",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": true,
+      "expression": "1/0",
+      "detail": "IntegerDivisionByZeroException"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C08",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "int",
+        "value": "-9223372036854775808"
+      },
+      "matches": false,
+      "expression": "9223372036854775807+1"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C09",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": true,
+      "expression": "1+\"a\"",
+      "detail": "type 'String' is not a subtype of type 'num'"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C10",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": true,
+      "expression": "obj.absent",
+      "detail": "Bad state: no_such_field: the map has no key absent."
+    },
+    {
+      "group": "cel",
+      "id": "dart/C11",
+      "expected": {
+        "type": "bool",
+        "value": false
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": false,
+      "expression": "has(obj.absent)",
+      "detail": "Unsupported operation: Function has with one argument is not implemented by this runtime."
+    },
+    {
+      "group": "cel",
+      "id": "dart/C12",
+      "expected": {
+        "type": "bool",
+        "value": false
+      },
+      "actual": {
+        "type": "bool",
+        "value": false
+      },
+      "matches": true,
+      "expression": "false && missing > 0"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C13",
+      "expected": {
+        "type": "int",
+        "value": "7"
+      },
+      "actual": {
+        "type": "int",
+        "value": "7"
+      },
+      "matches": true,
+      "expression": "false ? missing : 7"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C14",
+      "expected": {
+        "type": "list",
+        "value": [
+          {
+            "type": "int",
+            "value": "4"
+          },
+          {
+            "type": "int",
+            "value": "6"
+          }
+        ]
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": false,
+      "expression": "xs.filter(x,x>1).map(x,x*2)",
+      "detail": "Unsupported operation: Function filter. Only Binary functions are supported for now."
+    },
+    {
+      "group": "cel",
+      "id": "dart/C15",
+      "expected": {
+        "type": "bool",
+        "value": true
+      },
+      "actual": {
+        "type": "bool",
+        "value": true
+      },
+      "matches": true,
+      "expression": "m[1] != m[\"1\"]"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C16",
+      "expected": {
+        "type": "int",
+        "value": "3"
+      },
+      "actual": {
+        "type": "int",
+        "value": "3"
+      },
+      "matches": true,
+      "expression": "obj.count+1"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C17",
+      "expected": {
+        "type": "int",
+        "value": "9"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": false,
+      "expression": "timestamp(\"2026-10-29T00:00:00Z\").getHours(\"Asia/Seoul\")",
+      "detail": "Unsupported operation: Function timestamp with one argument is not implemented by this runtime."
+    },
+    {
+      "group": "cel",
+      "id": "dart/C18",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": true,
+      "expression": "timestamp(\"2026-02-30T00:00:00Z\").getDate()",
+      "detail": "Unsupported operation: Function timestamp with one argument is not implemented by this runtime."
+    },
+    {
+      "group": "cel",
+      "id": "dart/C19",
+      "expected": {
+        "type": "int",
+        "value": "1"
+      },
+      "actual": {
+        "type": "int",
+        "value": "1"
+      },
+      "matches": true,
+      "expression": "size(\"😀\")"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C20",
+      "expected": {
+        "type": "bool",
+        "value": true
+      },
+      "actual": {
+        "type": "bool",
+        "value": true
+      },
+      "matches": true,
+      "expression": "null==null"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C21",
+      "expected": {
+        "type": "bool",
+        "value": true
+      },
+      "actual": {
+        "type": "error"
+      },
+      "matches": false,
+      "expression": "type(n)==double",
+      "detail": "Unsupported operation: Function type with one argument is not implemented by this runtime."
+    },
+    {
+      "group": "cel",
+      "id": "dart/C22",
+      "expected": {
+        "type": "uint",
+        "value": "1"
+      },
+      "actual": {
+        "type": "int",
+        "value": "1"
+      },
+      "matches": false,
+      "expression": "1u"
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "generatedAt": "2026-10-30T07:43:44.634Z",
+  "runtime": "v22.21.1",
+  "icu": "77.1",
+  "tz": "2025b",
+  "scope": "Existing direct date-schema and local-time adapters; not CEL/Dart/core/HTTP/URL date integration",
+  "sourceSha256": {
+    "date-boundaries.mjs": "660163c06769017bd6f2517fb9b36d5aaeb79d60cacddd28cf0cb2b053c3560f",
+    "values.mjs": "7100a1ee1457ecb375cf017e69f4f65e57bb00b7a2062821e76b18d55f9d5d15",
+    "package.json": "91c1223f73e2fd6f660452b15a66f9e8674580b85b9f0e618098c0effc305ae1",
+    "package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be"
+  },
+  "results": [
+    {
+      "id": "date/canonical-const",
+      "passed": true
+    },
+    {
+      "id": "date/reject-const",
+      "passed": true
+    },
+    {
+      "id": "date/reject-enum",
+      "passed": true
+    },
+    {
+      "id": "date/reject-pattern",
+      "passed": true
+    },
+    {
+      "id": "date/reject-minLength",
+      "passed": true
+    },
+    {
+      "id": "date/reject-maxLength",
+      "passed": true
+    },
+    {
+      "id": "date/canonical-length",
+      "passed": true
+    },
+    {
+      "id": "date/nullable",
+      "passed": true
+    },
+    {
+      "id": "time/canonical-const",
+      "passed": true
+    },
+    {
+      "id": "time/reject-const",
+      "passed": true
+    },
+    {
+      "id": "time/reject-enum",
+      "passed": true
+    },
+    {
+      "id": "time/reject-pattern",
+      "passed": true
+    },
+    {
+      "id": "time/reject-minLength",
+      "passed": true
+    },
+    {
+      "id": "time/reject-maxLength",
+      "passed": true
+    },
+    {
+      "id": "time/canonical-length",
+      "passed": true
+    },
+    {
+      "id": "time/nullable",
+      "passed": true
+    },
+    {
+      "id": "datetime/canonical-const",
+      "passed": true
+    },
+    {
+      "id": "datetime/reject-const",
+      "passed": true
+    },
+    {
+      "id": "datetime/reject-enum",
+      "passed": true
+    },
+    {
+      "id": "datetime/reject-pattern",
+      "passed": true
+    },
+    {
+      "id": "datetime/reject-minLength",
+      "passed": true
+    },
+    {
+      "id": "datetime/reject-maxLength",
+      "passed": true
+    },
+    {
+      "id": "datetime/canonical-length",
+      "passed": true
+    },
+    {
+      "id": "datetime/nullable",
+      "passed": true
+    },
+    {
+      "id": "date/invalid-1900-02-29",
+      "passed": true
+    },
+    {
+      "id": "date/invalid-0000-01-01",
+      "passed": true
+    },
+    {
+      "id": "date/invalid-2026-04-31",
+      "passed": true
+    },
+    {
+      "id": "time/invalid-24:00",
+      "passed": true
+    },
+    {
+      "id": "time/invalid-23:59:60",
+      "passed": true
+    },
+    {
+      "id": "time/invalid-00:00:00.1234",
+      "passed": true
+    },
+    {
+      "id": "datetime/invalid-0001-01-01T00:00:00+14:00",
+      "passed": true
+    },
+    {
+      "id": "datetime/invalid-9999-12-31T23:59:59-12:00",
+      "passed": true
+    },
+    {
+      "id": "datetime/invalid-2026-10-30T00:00:00-00:00",
+      "passed": true
+    },
+    {
+      "id": "local/utc-underflow",
+      "passed": true
+    },
+    {
+      "id": "local/utc-overflow",
+      "passed": true
+    },
+    {
+      "id": "local/dst-gap",
+      "passed": true
+    },
+    {
+      "id": "local/dst-overlap",
+      "passed": true
+    },
+    {
+      "id": "local/normal",
+      "passed": true
+    },
+    {
+      "id": "datetime/offset-const-is-not-normalized-as-schema",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "executed": 39,
+    "passed": 39,
+    "failed": 0
+  }
+}

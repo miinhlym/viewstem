@@ -1,0 +1,8 @@
+{
+  "name": "viewstem-t4-charts-contract-probe",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": { "test": "node run.mjs", "test:browser": "node browser-run.mjs" },
+  "dependencies": { "echarts": "6.1.0" }
+}

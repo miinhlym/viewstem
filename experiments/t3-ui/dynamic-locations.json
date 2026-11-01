@@ -1,0 +1,163 @@
+{
+  "scope": "All seven UI dynamic locations in this probe; not a complete core location audit.",
+  "commonExpressionCount": 40,
+  "commonExpressionFixture": "dynamic-scenarios.mjs",
+  "commonEvaluators": [
+    "value-evaluator.mjs",
+    "../t2-http-boundary/value-expressions.mjs"
+  ],
+  "locations": [
+    {
+      "location": "node.inputs",
+      "source": "ui-probe.mjs",
+      "evaluator": "value-evaluator.mjs",
+      "positiveTestIds": [
+        "MATRIX.node.inputs.path",
+        "MATRIX.node.inputs.concat",
+        "MATRIX.node.inputs.formatString"
+      ],
+      "negativeTestIds": [
+        "MATRIX.node.inputs.mixed",
+        "MATRIX.node.inputs.blocked-owner",
+        "MATRIX.node.inputs.blocked-secrets",
+        "MATRIX.node.inputs.blocked-auth",
+        "MATRIX.node.inputs.pointer",
+        "MATRIX.node.inputs.call-type"
+      ],
+      "context": "Author scope; own roots only, repeat alias available after key expansion.",
+      "status": "verified-experiment"
+    },
+    {
+      "location": "when",
+      "source": "ui-probe.mjs",
+      "evaluator": "value-evaluator.mjs",
+      "positiveTestIds": [
+        "MATRIX.when.path"
+      ],
+      "negativeTestIds": [
+        "MATRIX.when.mixed",
+        "MATRIX.when.blocked-owner",
+        "MATRIX.when.blocked-secrets",
+        "MATRIX.when.blocked-auth",
+        "MATRIX.when.pointer",
+        "MATRIX.when.call-type",
+        "MATRIX.when.string-call-result-type"
+      ],
+      "context": "Author scope; own roots only, repeat alias available after key expansion.",
+      "status": "verified-experiment"
+    },
+    {
+      "location": "repeat.items",
+      "source": "ui-probe.mjs",
+      "evaluator": "value-evaluator.mjs",
+      "positiveTestIds": [
+        "MATRIX.repeat.items.path"
+      ],
+      "negativeTestIds": [
+        "MATRIX.repeat.items.mixed",
+        "MATRIX.repeat.items.blocked-owner",
+        "MATRIX.repeat.items.blocked-secrets",
+        "MATRIX.repeat.items.blocked-auth",
+        "MATRIX.repeat.items.pointer",
+        "MATRIX.repeat.items.call-type",
+        "MATRIX.repeat.items.string-call-result-type"
+      ],
+      "context": "Author scope; own roots only, repeat alias available after key expansion.",
+      "status": "verified-experiment"
+    },
+    {
+      "location": "repeat.key",
+      "source": "ui-probe.mjs",
+      "evaluator": "value-evaluator.mjs",
+      "positiveTestIds": [
+        "MATRIX.repeat.key.path",
+        "MATRIX.repeat.key.concat",
+        "MATRIX.repeat.key.formatString"
+      ],
+      "negativeTestIds": [
+        "MATRIX.repeat.key.mixed",
+        "MATRIX.repeat.key.blocked-owner",
+        "MATRIX.repeat.key.blocked-secrets",
+        "MATRIX.repeat.key.blocked-auth",
+        "MATRIX.repeat.key.pointer",
+        "MATRIX.repeat.key.call-type"
+      ],
+      "context": "Author scope; own roots only, repeat alias available after key expansion.",
+      "status": "verified-experiment"
+    },
+    {
+      "location": "on.inputs",
+      "source": "ui-probe.mjs",
+      "evaluator": "value-evaluator.mjs",
+      "positiveTestIds": [
+        "MATRIX.on.inputs.path",
+        "MATRIX.on.inputs.concat",
+        "MATRIX.on.inputs.formatString"
+      ],
+      "negativeTestIds": [
+        "MATRIX.on.inputs.mixed",
+        "MATRIX.on.inputs.blocked-owner",
+        "MATRIX.on.inputs.blocked-secrets",
+        "MATRIX.on.inputs.blocked-auth",
+        "MATRIX.on.inputs.pointer",
+        "MATRIX.on.inputs.call-type"
+      ],
+      "context": "Author scope plus explicit event payload; optional private Action snapshots.",
+      "status": "verified-experiment"
+    },
+    {
+      "location": "emit.payload",
+      "source": "ui-probe.mjs",
+      "evaluator": "value-evaluator.mjs",
+      "positiveTestIds": [
+        "MATRIX.emit.payload.path",
+        "MATRIX.emit.payload.concat",
+        "MATRIX.emit.payload.formatString"
+      ],
+      "negativeTestIds": [
+        "MATRIX.emit.payload.mixed",
+        "MATRIX.emit.payload.blocked-owner",
+        "MATRIX.emit.payload.blocked-secrets",
+        "MATRIX.emit.payload.blocked-auth",
+        "MATRIX.emit.payload.pointer",
+        "MATRIX.emit.payload.call-type"
+      ],
+      "context": "Author scope plus explicit event payload; optional private Action snapshots.",
+      "status": "verified-experiment"
+    },
+    {
+      "location": "State.initial",
+      "source": "ui-probe.mjs",
+      "evaluator": "value-evaluator.mjs",
+      "positiveTestIds": [
+        "MATRIX.State.initial.path",
+        "MATRIX.State.initial.concat",
+        "MATRIX.State.initial.formatString"
+      ],
+      "negativeTestIds": [
+        "MATRIX.State.initial.mixed",
+        "MATRIX.State.initial.blocked-owner",
+        "MATRIX.State.initial.blocked-secrets",
+        "MATRIX.State.initial.blocked-auth",
+        "MATRIX.State.initial.pointer",
+        "MATRIX.State.initial.call-type"
+      ],
+      "context": "New own scope: explicit ports and own State dependency graph in topological order, independent of declaration key order. No ambient parent/repeat/actions/event.",
+      "status": "verified-experiment"
+    }
+  ],
+  "results": [
+    "results/node22.json",
+    "results/node24.json",
+    "results/chromium.json"
+  ],
+  "initializationTestIds": [
+    "INITIAL.own-ports-dependent-state-and-no-reinitialization",
+    "INITIAL.component-ports-update-preserves-initial-remove-readd-reinitializes",
+    "INITIAL.port-default-is-literal-returned-data-not-reexecuted",
+    "INITIAL.missing-null-undefined-and-cycles",
+    "INITIAL.forward-dependencies-independent-of-declaration-order",
+    "INITIAL.dynamic-format-template-forward-dependency-and-cycle",
+    "INITIAL.unknown-state-and-unready-dependent-state"
+  ]
+}

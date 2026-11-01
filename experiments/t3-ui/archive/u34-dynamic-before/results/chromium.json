@@ -1,0 +1,332 @@
+{
+  "generatedAt": "2026-10-30T09:24:48.998Z",
+  "runtime": "v22.21.1",
+  "icu": "77.1",
+  "tz": "2025b",
+  "scope": "Same independent model in Chromium plus actual DOM event/slot/geometry checks; no production core/Svelte renderer.",
+  "sourceSha256": {
+    "ui-probe.mjs": "06caf8edf98b35315bc62400eedb7bb824085a1a690809e68faa0021bdbc7f15",
+    "scenarios.mjs": "2af52858771ba6b1b7969850c4a1ea1b18eeee2ebf5b0e4f4f538cd27e8fe56f",
+    "run.mjs": "f4261e9c9425871311bdc13d1a5a6aa8d90927349d58e4b5c4da0f40171a7131",
+    "browser-run.mjs": "e95b21f34ae53161726b8150637d05e8ef046e3e62ae86665716f4efce92b1f0",
+    "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+    "../t1-values/schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+    "../t1-values/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+    "../t1-values/values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+    "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+    "../../docs/spec/05-component-view.md": "44938a424cfeb16541bb18585474f7d84b51e38a63fdbe4a3fce2be1ff2ebb0e",
+    "../../docs/VIEWSTEM-SPEC.md": "00981b4b6592b77958dfede22100a33883b5b7a9d6ebc44652391ebe2467797e"
+  },
+  "browser": "151.0.7922.34",
+  "pageErrors": [],
+  "populations": {
+    "model": 44,
+    "actualDOM": 7,
+    "browserErrorCheck": 1
+  },
+  "summary": {
+    "executed": 52,
+    "passed": 52,
+    "failed": 0
+  },
+  "results": [
+    {
+      "id": "U01.required-empty-optional-absent",
+      "passed": true
+    },
+    {
+      "id": "U01.unknown-and-array-item-slot-ref-rejected",
+      "passed": true
+    },
+    {
+      "id": "U02.slot-author-state-and-forwarding",
+      "passed": true
+    },
+    {
+      "id": "U03.multiple-slot-nodes-preserve-order",
+      "passed": true
+    },
+    {
+      "id": "U04.invalid-payload-zero-actions-and-input-isolation",
+      "passed": true
+    },
+    {
+      "id": "U04.no-implicit-event-and-no-bubbling",
+      "passed": true
+    },
+    {
+      "id": "U04.emit-validates-public-payload",
+      "passed": true
+    },
+    {
+      "id": "U04.emit-invalid-payload-blocks-outer-action",
+      "passed": true
+    },
+    {
+      "id": "U04.static-event-handler-and-schema-errors",
+      "passed": true
+    },
+    {
+      "id": "U05.when-false-skips-input-and-query",
+      "passed": true
+    },
+    {
+      "id": "U05.when-false-true-new-lifetime-external-state",
+      "passed": true
+    },
+    {
+      "id": "U05.false-does-not-hide-static-reference-or-structure",
+      "passed": true
+    },
+    {
+      "id": "U05.strict-boolean",
+      "passed": true
+    },
+    {
+      "id": "U06.reorder-preserves-state-remove-readd-new-lifetime",
+      "passed": true
+    },
+    {
+      "id": "U06.keys-type-distinction-and-negative-zero",
+      "passed": true
+    },
+    {
+      "id": "U06.invalid-and-missing-key-rejected",
+      "passed": true
+    },
+    {
+      "id": "U07.same-owner-row-move-preserves-state-and-inline-identity",
+      "passed": true
+    },
+    {
+      "id": "U07.definition-change-creates-new-instance",
+      "passed": true
+    },
+    {
+      "id": "U07.other-owner-move-creates-new-instance",
+      "passed": true
+    },
+    {
+      "id": "U07.input-change-keeps-instance",
+      "passed": true
+    },
+    {
+      "id": "U08.fixed-overlap-range-partial-and-positive-integer",
+      "passed": true
+    },
+    {
+      "id": "U09.fixed-reserved-before-auto-regardless-of-source-order",
+      "passed": true
+    },
+    {
+      "id": "U09.rectangle-search-checks-lower-row-and-no-dense-backfill",
+      "passed": true
+    },
+    {
+      "id": "U09.repeat-expanded-order-default-span-and-repeat-fixed-rejected",
+      "passed": true
+    },
+    {
+      "id": "U10.hidden-declaration-valid-no-space-unknown-key-rejected",
+      "passed": true
+    },
+    {
+      "id": "U10.grid-coordinate-change-preserves-child-state",
+      "passed": true
+    },
+    {
+      "id": "U11.unused-direct-cycle-register-error-query-zero",
+      "passed": true
+    },
+    {
+      "id": "U11.unused-mutual-and-inline-cycle-rejected",
+      "passed": true
+    },
+    {
+      "id": "U11.acyclic-shared-child-and-kind-specific-registration",
+      "passed": true
+    },
+    {
+      "id": "U12.duplicate-node-across-rows-even-hidden-rejected",
+      "passed": true
+    },
+    {
+      "id": "U12.same-local-node-in-separate-components-independent",
+      "passed": true
+    },
+    {
+      "id": "U12.action-alias-duplicate-in-owner-and-repeat-rejected",
+      "passed": true
+    },
+    {
+      "id": "U12.action-alias-separate-owner-and-projected-duplicate",
+      "passed": true
+    },
+    {
+      "id": "U13.nested-repeat-parent-local-key-and-explicit-inputs",
+      "passed": true
+    },
+    {
+      "id": "U13.both-alias-values-explicitly-available",
+      "passed": true
+    },
+    {
+      "id": "K21.repeat-key-before-when-and-hidden-input-query-zero",
+      "passed": true
+    },
+    {
+      "id": "K21.hidden-duplicate-full-key-pass-before-any-query",
+      "passed": true
+    },
+    {
+      "id": "K21.hidden-dynamic-input-not-evaluated",
+      "passed": true
+    },
+    {
+      "id": "K21.nested-shadow-rejected-sibling-reuse-valid",
+      "passed": true
+    },
+    {
+      "id": "K21.repeat-root-and-nonarray-items-rejected",
+      "passed": true
+    },
+    {
+      "id": "UI.invalid-plan-preserves-tree-and-does-not-start-query",
+      "passed": true
+    },
+    {
+      "id": "UI.removed-event-connection-rejected",
+      "passed": true
+    },
+    {
+      "id": "UI.inline-update-revalidates-own-static-tree",
+      "passed": true
+    },
+    {
+      "id": "UI.same-lifetime-event-reference-survives-layout-update",
+      "passed": true
+    },
+    {
+      "id": "DOM.U02-U03.receiver-row-multiple-siblings-author-context",
+      "passed": true,
+      "evidence": {
+        "children": [
+          "a",
+          "b"
+        ],
+        "text": "authorB",
+        "flexDirection": "row",
+        "geometry": [
+          {
+            "left": 8,
+            "top": 8,
+            "width": 40.875,
+            "height": 18
+          },
+          {
+            "left": 48.875,
+            "top": 8,
+            "width": 10.671875,
+            "height": 18
+          }
+        ]
+      }
+    },
+    {
+      "id": "DOM.U04.native-event-stays-in-adapter",
+      "passed": true,
+      "evidence": {
+        "calls": [
+          {
+            "value": "typed"
+          }
+        ],
+        "nativeEventRejected": true
+      }
+    },
+    {
+      "id": "DOM.U05-U06.removal-reorder-and-new-generation-visible",
+      "passed": true,
+      "evidence": {
+        "initialGenerations": [
+          "2",
+          "4"
+        ],
+        "finalGenerations": [
+          "4",
+          "6"
+        ],
+        "finalText": [
+          "0",
+          "0"
+        ]
+      }
+    },
+    {
+      "id": "DOM.U07.row-move-retains-core-state",
+      "passed": true,
+      "evidence": {
+        "generation": "3",
+        "movedText": "8"
+      }
+    },
+    {
+      "id": "DOM.U09-U10.grid-fixed-first-source-order-geometry",
+      "passed": true,
+      "evidence": {
+        "domOrder": [
+          "auto",
+          "fixed",
+          "next"
+        ],
+        "relativeGeometry": [
+          [
+            160,
+            0,
+            160,
+            60
+          ],
+          [
+            80,
+            30,
+            80,
+            30
+          ],
+          [
+            320,
+            0,
+            80,
+            30
+          ]
+        ]
+      }
+    },
+    {
+      "id": "DOM.U01.required-empty-does-not-create-wrapper-child",
+      "passed": true,
+      "evidence": {
+        "slotChildElementCount": 0
+      }
+    },
+    {
+      "id": "DOM.U09.grid-repeat-expansion-and-slot-forwarded-ids",
+      "passed": true,
+      "evidence": {
+        "domTextOrder": [
+          "B",
+          "A",
+          "F"
+        ],
+        "relativeLeft": [
+          160,
+          320,
+          0
+        ]
+      }
+    },
+    {
+      "id": "DOM.no-page-errors",
+      "passed": true
+    }
+  ]
+}

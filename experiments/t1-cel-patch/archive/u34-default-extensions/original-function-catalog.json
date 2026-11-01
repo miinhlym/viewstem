@@ -1,0 +1,230 @@
+{
+  "package": "@marcbachmann/cel-js@8.0.0",
+  "source": "default Environment.getDefinitions() from patched build-7b2e5605b35a1dc6d32d",
+  "defaultEnvironment": {
+    "optionalTypes": false
+  },
+  "counts": {
+    "registeredFunctions": 108,
+    "registeredMacros": 10
+  },
+  "variables": [
+    {
+      "name": "string",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "bool",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "int",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "uint",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "double",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "map",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "list",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "bytes",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "null_type",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "type",
+      "description": null,
+      "type": "type"
+    },
+    {
+      "name": "google",
+      "description": null,
+      "type": "map<string, map<string, type>>"
+    },
+    {
+      "name": "optional",
+      "description": null,
+      "type": "OptionalNamespace"
+    },
+    {
+      "name": "cel",
+      "description": null,
+      "type": "CelNamespace"
+    }
+  ],
+  "functionSignatures": [
+    "dyn(dyn): dyn",
+    "type(string): type",
+    "type(bool): type",
+    "type(int): type",
+    "type(uint): type",
+    "type(double): type",
+    "type(map<dyn, dyn>): type",
+    "type(list<dyn>): type",
+    "type(bytes): type",
+    "type(null): type",
+    "type(type): type",
+    "bool(bool): bool",
+    "bool(string): bool",
+    "size(string): int",
+    "size(bytes): int",
+    "size(list<dyn>): int",
+    "size(map<dyn, dyn>): int",
+    "string.size(): int",
+    "bytes.size(): int",
+    "list<dyn>.size(): int",
+    "map<dyn, dyn>.size(): int",
+    "bytes(string): bytes",
+    "bytes(bytes): bytes",
+    "double(double): double",
+    "double(int): double",
+    "double(uint): double",
+    "double(string): double",
+    "int(int): int",
+    "int(double): int",
+    "int(string): int",
+    "uint(uint): uint",
+    "uint(int): uint",
+    "uint(double): uint",
+    "uint(string): uint",
+    "string(string): string",
+    "string(bool): string",
+    "string(int): string",
+    "string(uint): string",
+    "string(bytes): string",
+    "string(double): string",
+    "string.startsWith(string): bool",
+    "string.endsWith(string): bool",
+    "string.contains(string): bool",
+    "string.lowerAscii(): string",
+    "string.upperAscii(): string",
+    "string.trim(): string",
+    "string.indexOf(string): int",
+    "string.indexOf(string, int): int",
+    "string.lastIndexOf(string): int",
+    "string.lastIndexOf(string, int): int",
+    "string.substring(int): string",
+    "string.substring(int, int): string",
+    "string.matches(string): bool",
+    "matches(string, string): bool",
+    "string.split(string): list<string>",
+    "string.split(string, int): list<string>",
+    "list<string>.join(): string",
+    "list<string>.join(string): string",
+    "bytes.json(): map<dyn, dyn>",
+    "bytes.hex(): string",
+    "bytes.string(): string",
+    "bytes.base64(): string",
+    "bytes.at(int): int",
+    "type(google.protobuf.Timestamp): type",
+    "type(google.protobuf.Duration): type",
+    "timestamp(string): google.protobuf.Timestamp",
+    "timestamp(int): google.protobuf.Timestamp",
+    "google.protobuf.Timestamp.getDate(): int",
+    "google.protobuf.Timestamp.getDate(string): int",
+    "google.protobuf.Timestamp.getDayOfMonth(): int",
+    "google.protobuf.Timestamp.getDayOfMonth(string): int",
+    "google.protobuf.Timestamp.getDayOfWeek(): int",
+    "google.protobuf.Timestamp.getDayOfWeek(string): int",
+    "google.protobuf.Timestamp.getDayOfYear(): int",
+    "google.protobuf.Timestamp.getDayOfYear(string): int",
+    "google.protobuf.Timestamp.getFullYear(): int",
+    "google.protobuf.Timestamp.getFullYear(string): int",
+    "google.protobuf.Timestamp.getHours(): int",
+    "google.protobuf.Timestamp.getHours(string): int",
+    "google.protobuf.Timestamp.getMilliseconds(): int",
+    "google.protobuf.Timestamp.getMilliseconds(string): int",
+    "google.protobuf.Timestamp.getMinutes(): int",
+    "google.protobuf.Timestamp.getMinutes(string): int",
+    "google.protobuf.Timestamp.getMonth(): int",
+    "google.protobuf.Timestamp.getMonth(string): int",
+    "google.protobuf.Timestamp.getSeconds(): int",
+    "google.protobuf.Timestamp.getSeconds(string): int",
+    "duration(string): google.protobuf.Duration",
+    "google.protobuf.Duration.getHours(): int",
+    "google.protobuf.Duration.getMinutes(): int",
+    "google.protobuf.Duration.getSeconds(): int",
+    "google.protobuf.Duration.getMilliseconds(): int",
+    "type(OptionalNamespace): type",
+    "optional<dyn>.hasValue(): bool",
+    "optional<A>.value(): A",
+    "OptionalNamespace.none(): optional<T>",
+    "OptionalNamespace.of(A): optional<A>",
+    "optional<dyn>.or(ast): optional<dyn>",
+    "optional<dyn>.orValue(ast): dyn",
+    "has(ast): bool",
+    "list<dyn>.all(ast, ast): bool",
+    "list<dyn>.exists(ast, ast): bool",
+    "list<dyn>.exists_one(ast, ast): bool",
+    "list<dyn>.map(ast, ast): list<dyn>",
+    "list<dyn>.map(ast, ast, ast): list<dyn>",
+    "list<dyn>.filter(ast, ast): list<dyn>",
+    "type(CelNamespace): type",
+    "CelNamespace.bind(ast, dyn, ast): dyn"
+  ],
+  "macros": [
+    {
+      "signature": "has(ast): bool",
+      "kind": "CEL core macro"
+    },
+    {
+      "signature": "list.all(ast, ast): bool",
+      "kind": "CEL core macro"
+    },
+    {
+      "signature": "list.exists(ast, ast): bool",
+      "kind": "CEL core macro"
+    },
+    {
+      "signature": "list.exists_one(ast, ast): bool",
+      "kind": "CEL core macro"
+    },
+    {
+      "signature": "list.map(ast, ast): list<dyn>",
+      "kind": "CEL macro"
+    },
+    {
+      "signature": "list.map(ast, ast, ast): list<dyn>",
+      "kind": "CEL macro"
+    },
+    {
+      "signature": "list.filter(ast, ast): list<dyn>",
+      "kind": "CEL macro"
+    },
+    {
+      "signature": "optional.or(ast): optional<dyn>",
+      "kind": "optional extension macro; disabled in default Environment"
+    },
+    {
+      "signature": "optional.orValue(ast): dyn",
+      "kind": "optional extension macro; disabled in default Environment"
+    },
+    {
+      "signature": "CelNamespace.bind(ast, dyn, ast): dyn",
+      "kind": "cel-js package namespace macro"
+    }
+  ]
+}

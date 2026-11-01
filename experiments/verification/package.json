@@ -1,0 +1,7 @@
+{
+  "name": "viewstem-verification-tools",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "devDependencies": { "esbuild": "0.25.12" }
+}

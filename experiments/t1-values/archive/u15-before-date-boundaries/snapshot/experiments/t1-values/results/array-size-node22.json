@@ -1,0 +1,167 @@
+{
+  "generatedAt": "2026-10-30T03:41:53.814Z",
+  "runtime": "v22.21.1",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "engine": "@marcbachmann/cel-js@8.0.0",
+  "scope": "CEL array size, checking and safe integer result adapter; no core/renderer or Dart integration",
+  "stopOnFirstProblem": true,
+  "stoppedAt": null,
+  "sourceSha256": {
+    "package.json": "91c1223f73e2fd6f660452b15a66f9e8674580b85b9f0e618098c0effc305ae1",
+    "package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+    "values.mjs": "b17c3ba841e9c76d385084febf91b6292c28f362599feeed55f76240df91f050",
+    "array-size-tests.mjs": "73c31838385e389d87d16b10f6583ef332ef9fd43440514556b3a3fdc9593bc0"
+  },
+  "results": [
+    {
+      "id": "empty/size(items)",
+      "expression": "size(items)",
+      "expected": 0,
+      "observed": 0,
+      "rawType": "bigint",
+      "passed": true
+    },
+    {
+      "id": "empty/items.size()",
+      "expression": "items.size()",
+      "expected": 0,
+      "observed": 0,
+      "rawType": "bigint",
+      "passed": true
+    },
+    {
+      "id": "strings/size(items)",
+      "expression": "size(items)",
+      "expected": 2,
+      "observed": 2,
+      "rawType": "bigint",
+      "passed": true
+    },
+    {
+      "id": "strings/items.size()",
+      "expression": "items.size()",
+      "expected": 2,
+      "observed": 2,
+      "rawType": "bigint",
+      "passed": true
+    },
+    {
+      "id": "null-is-an-element/size(items)",
+      "expression": "size(items)",
+      "expected": 1,
+      "observed": 1,
+      "rawType": "bigint",
+      "passed": true
+    },
+    {
+      "id": "null-is-an-element/items.size()",
+      "expression": "items.size()",
+      "expected": 1,
+      "observed": 1,
+      "rawType": "bigint",
+      "passed": true
+    },
+    {
+      "id": "duplicates-count/size(items)",
+      "expression": "size(items)",
+      "expected": 2,
+      "observed": 2,
+      "rawType": "bigint",
+      "passed": true
+    },
+    {
+      "id": "duplicates-count/items.size()",
+      "expression": "items.size()",
+      "expected": 2,
+      "observed": 2,
+      "rawType": "bigint",
+      "passed": true
+    },
+    {
+      "id": "nested-counts-outer-elements/size(items)",
+      "expression": "size(items)",
+      "expected": 2,
+      "observed": 2,
+      "rawType": "bigint",
+      "passed": true
+    },
+    {
+      "id": "nested-counts-outer-elements/items.size()",
+      "expression": "items.size()",
+      "expected": 2,
+      "observed": 2,
+      "rawType": "bigint",
+      "passed": true
+    },
+    {
+      "id": "objects-count-as-elements/size(items)",
+      "expression": "size(items)",
+      "expected": 2,
+      "observed": 2,
+      "rawType": "bigint",
+      "passed": true
+    },
+    {
+      "id": "objects-count-as-elements/items.size()",
+      "expression": "items.size()",
+      "expected": 2,
+      "observed": 2,
+      "rawType": "bigint",
+      "passed": true
+    },
+    {
+      "id": "large-list/size(items)",
+      "expression": "size(items)",
+      "expected": 10000,
+      "observed": 10000,
+      "rawType": "bigint",
+      "passed": true
+    },
+    {
+      "id": "large-list/items.size()",
+      "expression": "items.size()",
+      "expected": 10000,
+      "observed": 10000,
+      "rawType": "bigint",
+      "passed": true
+    },
+    {
+      "id": "empty-condition",
+      "expression": "size(items) == 0",
+      "expected": true,
+      "observed": true,
+      "rawType": "boolean",
+      "passed": true
+    },
+    {
+      "id": "selection-limit",
+      "expression": "items.size() <= 2",
+      "expected": false,
+      "observed": false,
+      "rawType": "boolean",
+      "passed": true
+    },
+    {
+      "id": "filtered-count",
+      "expression": "size(items.filter(x, x.selected))",
+      "expected": 2,
+      "observed": 2,
+      "rawType": "bigint",
+      "passed": true
+    },
+    {
+      "id": "nested-count",
+      "expression": "size(items[0])",
+      "expected": 3,
+      "observed": 3,
+      "rawType": "bigint",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "executed": 18,
+    "passed": 18,
+    "failed": 0
+  }
+}

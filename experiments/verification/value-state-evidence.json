@@ -1,0 +1,2271 @@
+{
+  "scope": "C01-C17, S01-S06, V01-V62, K01-K37; independent-experiment evidence mapping only",
+  "countExpected": 122,
+  "records": [
+    {
+      "id": "C01",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t1-values/schema-registration.mjs",
+        "experiments/t3-state/ports-tests.mjs",
+        "experiments/t3-state/ports-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/ports-node22.json",
+        "experiments/t3-state/results/ports-node24.json"
+      ],
+      "testIds": [
+        "C01/schema-typeRef-exactly-one-and-query-untyped",
+        "C01/schema-registration-profile-and-json-admission"
+      ],
+      "status": "partial",
+      "remaining": "schema/typeRef exactly-one/required 위치와 Query untyped를 검사. Component-only ID 및 kind별 queryRef lookup/fallback 오류는 아직 직접 시험하지 않음."
+    },
+    {
+      "id": "C02",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t1-values/schema-registration.mjs",
+        "experiments/t3-state/ports-tests.mjs",
+        "experiments/t3-state/ports-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/ports-node22.json",
+        "experiments/t3-state/results/ports-node24.json"
+      ],
+      "testIds": [
+        "C02/port-required-and-object-required-are-separate"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "C03",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs",
+        "experiments/t3-state/ports-tests.mjs",
+        "experiments/t3-state/ports-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/ports-node22.json",
+        "experiments/t3-state/results/ports-node24.json"
+      ],
+      "testIds": [],
+      "status": "pending",
+      "remaining": "Component-only ID 또는 미등록 ID의 kind별 queryRef 오류 및 다른 kind fallback 거절을 확인하는 사례 없음."
+    },
+    {
+      "id": "C04",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs",
+        "experiments/t3-state/ports-tests.mjs",
+        "experiments/t3-state/ports-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/ports-node22.json",
+        "experiments/t3-state/results/ports-node24.json"
+      ],
+      "testIds": [
+        "C04/all-resource-kind-port-matrix"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "C05",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs",
+        "experiments/t3-state/ports-tests.mjs",
+        "experiments/t3-state/ports-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json",
+        "experiments/t3-state/results/ports-node22.json",
+        "experiments/t3-state/results/ports-node24.json"
+      ],
+      "testIds": [
+        "C05/value-object-native-input-cannot-mutate-source-state",
+        "C05/external-value-source-is-not-frozen-or-retained"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "C06",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "C06-C07-C15/scope-ownership-and-shared-handles"
+      ],
+      "status": "partial",
+      "remaining": "동일 Store handle 공유와 두 scope의 로컬 분리는 확인. 두 실제 State 포트에 연결하는 port resolver/identity assertion은 없음."
+    },
+    {
+      "id": "C07",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "C06-C07-C15/scope-ownership-and-shared-handles"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "C08",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "C08-C09/initial-write-race-reset-baseline"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "C09",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "C08-C09/initial-write-race-reset-baseline"
+      ],
+      "status": "partial",
+      "remaining": "pending initial 뒤 explicit write와 고정 baseline reset은 확인. 날짜/시간 값이 흐르는 동안 current time을 재계산하지 않는 사례는 없음."
+    },
+    {
+      "id": "C10",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "C10/derived-failure-and-cycle"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "C11",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "C11-C13/reaction-explicit-priority-and-atomic-derived"
+      ],
+      "status": "partial",
+      "remaining": "Derived/reaction atomic priority와 명시 같은 값 우선은 확인. URL 초기 복원 후 initial reaction 미발화 및 Query 계산 순서는 직접 assertion 없음."
+    },
+    {
+      "id": "C12",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs",
+        "experiments/t1-values/schema-runtime-tests.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json",
+        "experiments/t1-values/results/schema-runtime-node22.json",
+        "experiments/t1-values/results/schema-runtime-node24.json"
+      ],
+      "testIds": [
+        "V08-V09/S06/protected-stable-snapshots",
+        "normalize/native",
+        "normalize/nullable",
+        "normalize/nullable-null"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "C13",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "C11-C13/reaction-explicit-priority-and-atomic-derived"
+      ],
+      "status": "partial",
+      "remaining": "동일 대상의 cross-owner duplicate reaction 거절은 확인. 별도 local 셀의 같은 이름이 duplicate로 처리되지 않는 반례는 없음."
+    },
+    {
+      "id": "C14",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [],
+      "testIds": [],
+      "status": "pending",
+      "remaining": "Library-created Store와 임의 외부 Store injection의 구별/호환 거절에 대한 실행 증거 없음."
+    },
+    {
+      "id": "C15",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "C06-C07-C15/scope-ownership-and-shared-handles"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "C16",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [],
+      "testIds": [],
+      "status": "pending",
+      "remaining": "같은 ID를 Query와 Component로 등록하고 ref 종류별 해석하는 등록 시험은 없음."
+    },
+    {
+      "id": "C17",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [],
+      "testIds": [],
+      "status": "pending",
+      "remaining": "동일 kind/id의 중복 등록 및 code/declarative resource 중복 거절 시험은 없음."
+    },
+    {
+      "id": "S01",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "S01-S05/atomic-scoped-observation-and-generations"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "S02",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "S01-S05/atomic-scoped-observation-and-generations"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "S03",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "S01-S05/atomic-scoped-observation-and-generations",
+        "S03/reentrant-writes-next-batch"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "S04",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "S01-S05/atomic-scoped-observation-and-generations"
+      ],
+      "status": "partial",
+      "remaining": "added/removed/replaced와 null-key 부재를 검사. changes 목록에서 updated kind의 정확한 분류를 별도로 assert하는 부분이 없음."
+    },
+    {
+      "id": "S05",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "S01-S05/atomic-scoped-observation-and-generations"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "S06",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V08-V09/S06/protected-stable-snapshots"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V01",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t1-cel-patch/cases.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [],
+      "testIds": [],
+      "status": "pending",
+      "remaining": "현재 시각을 명시 입력으로 받는 Variable의 해당 입력 변경 재계산/무관 State 비변경 test id를 찾지 못함."
+    },
+    {
+      "id": "V02",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-http-boundary/transport-tests.mjs",
+        "experiments/t2-http-boundary/path-audit-cases.mjs"
+      ],
+      "result": [
+        "experiments/t2-http-boundary/results/transport-node22.json",
+        "experiments/t2-http-boundary/results/transport-node24.json",
+        "experiments/t2-http-boundary/results/path-audit-node22.json",
+        "experiments/t2-http-boundary/results/path-audit-node24.json",
+        "experiments/t2-http-boundary/results/http-node22.json",
+        "experiments/t2-http-boundary/results/http-node24.json"
+      ],
+      "testIds": [
+        "T12-format-and-escape",
+        "P58-referenced-headers-are-data-not-expressions"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V03",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-http-boundary/transport-tests.mjs",
+        "experiments/t2-http-boundary/path-audit-cases.mjs"
+      ],
+      "result": [
+        "experiments/t2-http-boundary/results/transport-node22.json",
+        "experiments/t2-http-boundary/results/transport-node24.json",
+        "experiments/t2-http-boundary/results/path-audit-node22.json",
+        "experiments/t2-http-boundary/results/path-audit-node24.json"
+      ],
+      "testIds": [
+        "T08-pointer-array-index",
+        "T08-pointer-object-length",
+        "T12-format-and-escape",
+        "T12-data-all-fields"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V04",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-http-boundary/http-tests.mjs",
+        "experiments/t2-http-boundary/transport-tests.mjs",
+        "experiments/t2-http-boundary/path-audit-cases.mjs",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-http-boundary/results/http-node22.json",
+        "experiments/t2-http-boundary/results/http-node24.json",
+        "experiments/t2-http-boundary/results/transport-node22.json",
+        "experiments/t2-http-boundary/results/transport-node24.json",
+        "experiments/t2-http-boundary/results/path-audit-node22.json",
+        "experiments/t2-http-boundary/results/path-audit-node24.json",
+        "experiments/t2-composite-query/results/node22.json",
+        "experiments/t2-composite-query/results/node24.json"
+      ],
+      "testIds": [
+        "P50-header-value-reference-datasource",
+        "P50-header-value-reference-request",
+        "P50-header-value-reference-login",
+        "P61-request-path-reference-is-a-dynamic-value",
+        "P71-datasource-base-url-reference-is-a-dynamic-value",
+        "T12-data-all-fields",
+        "C15-concat-order-duplicates-and-heterogeneous-data"
+      ],
+      "status": "partial",
+      "remaining": "HTTP/Query 동적 문맥은 조사됨. UI Component/View 동적 필드에서 동일 evaluator 문맥을 확인한 실행 결과 없음."
+    },
+    {
+      "id": "V05",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V05-V07/content-and-native-membership"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V06",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V05-V07/content-and-native-membership"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V07",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V05-V07/content-and-native-membership"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V08",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V08-V09/S06/protected-stable-snapshots"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V09",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V08-V09/S06/protected-stable-snapshots"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V10",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t1-values/date-boundaries.mjs",
+        "experiments/t1-values/schema-runtime-tests.mjs"
+      ],
+      "result": [
+        "experiments/t1-values/results/date-boundaries-node22.json",
+        "experiments/t1-values/results/date-boundaries-node24.json",
+        "experiments/t1-values/results/schema-runtime-node22.json",
+        "experiments/t1-values/results/schema-runtime-node24.json"
+      ],
+      "testIds": [
+        "date/invalid-2026-04-31",
+        "date/invalid-1900-02-29",
+        "time/invalid-00:00:00.1234"
+      ],
+      "status": "partial",
+      "remaining": "날짜 유효성/정밀도는 확인. 날짜 덧셈 함수에서 소수 증감값 거절 assertion은 없음."
+    },
+    {
+      "id": "V11",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t1-values/date-boundaries.mjs",
+        "experiments/t1-cel-patch/cases.mjs"
+      ],
+      "result": [
+        "experiments/t1-values/results/date-boundaries-node22.json",
+        "experiments/t1-values/results/date-boundaries-node24.json",
+        "experiments/t1-cel-patch/results/node22.json",
+        "experiments/t1-cel-patch/results/node24.json"
+      ],
+      "testIds": [],
+      "status": "pending",
+      "remaining": "YY의 00/68/69/99 pivot을 명시적으로 검사하는 fixture/result 없음."
+    },
+    {
+      "id": "V12",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t1-cel-patch/cases.mjs"
+      ],
+      "result": [
+        "experiments/t1-cel-patch/results/node22.json",
+        "experiments/t1-cel-patch/results/node24.json"
+      ],
+      "testIds": [
+        "node/timestamp/valid-2026-10-30T09:30:00+09:00",
+        "node/timestamp/valid-0001-01-01T00:00:00Z",
+        "node/timestamp/valid-9999-12-31T23:59:59.999Z"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V13",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V13-V18/object-normalization-and-atomic-failure"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V14",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V13-V18/object-normalization-and-atomic-failure"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V15",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V13-V18/object-normalization-and-atomic-failure"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V16",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V13-V18/object-normalization-and-atomic-failure"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V17",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V13-V18/object-normalization-and-atomic-failure"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V18",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V13-V18/object-normalization-and-atomic-failure"
+      ],
+      "status": "partial",
+      "remaining": "undefined 속성 정규화/equality는 확인. 원 입력 키 목록을 정규화 전에 보존해야 하는 별도 host 사례는 없음."
+    },
+    {
+      "id": "V19",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V19-V22/arrays-and-positions"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V20",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V19-V22/arrays-and-positions"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V21",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V19-V22/arrays-and-positions"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V22",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V19-V22/arrays-and-positions"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V23",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V23-V26/sets-undefined-null-identity"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V24",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V23-V26/sets-undefined-null-identity"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V25",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V23-V26/sets-undefined-null-identity"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V26",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V23-V26/sets-undefined-null-identity"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V27",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V27-V30/maps-undefined-null-objects"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V28",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V27-V30/maps-undefined-null-objects"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V29",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V27-V30/maps-undefined-null-objects"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V30",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V27-V30/maps-undefined-null-objects"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V31",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V31-V35/missing-null-falsy-reference"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V32",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V31-V35/missing-null-falsy-reference"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V33",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V31-V35/missing-null-falsy-reference"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V34",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V31-V35/missing-null-falsy-reference"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V35",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V31-V35/missing-null-falsy-reference"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V36",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V36-V40/nonfinite-recursive-and-map-keys"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V37",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V36-V40/nonfinite-recursive-and-map-keys"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V38",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V36-V40/nonfinite-recursive-and-map-keys"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V39",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V36-V40/nonfinite-recursive-and-map-keys"
+      ],
+      "status": "partial",
+      "remaining": "직접 비유한 값 State 거절은 확인. CEL/Query transform의 계산 결과를 core 데이터로 연결해 기존 실패 전파까지 보는 실행 증거 없음."
+    },
+    {
+      "id": "V40",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V36-V40/nonfinite-recursive-and-map-keys"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V41",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V41-V45/safe-integer-recursive"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V42",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V41-V45/safe-integer-recursive"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V43",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V41-V45/safe-integer-recursive"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V44",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V41-V45/safe-integer-recursive"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V45",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V41-V45/safe-integer-recursive"
+      ],
+      "status": "partial",
+      "remaining": "직접 및 중첩 입력 safe-integer 범위는 확인. 계산 결과 9007199254740992를 State integer에 연결하는 실행 assertion은 없음."
+    },
+    {
+      "id": "V46",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V46-V49/binary64-preserved"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V47",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V46-V49/binary64-preserved"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V48",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V46-V49/binary64-preserved"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V49",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V46-V49/binary64-preserved"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V50",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V50-V55/negative-zero-and-notifications"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V51",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V50-V55/negative-zero-and-notifications"
+      ],
+      "status": "partial",
+      "remaining": "-0 정규화와 State 구독의 추가 알림 없음은 확인. Derived/reaction/Query 재평가도 없음을 직접 함께 검사하지 않음."
+    },
+    {
+      "id": "V52",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V50-V55/negative-zero-and-notifications"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V53",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V50-V55/negative-zero-and-notifications"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V54",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V50-V55/negative-zero-and-notifications"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V55",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V50-V55/negative-zero-and-notifications"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V56",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V56/unsupported-values-not-executed"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V57",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V56/unsupported-values-not-executed"
+      ],
+      "status": "pending",
+      "remaining": "코드형 Action의 정상 async output과 같은 값의 데이터 필드 구별은 Action 실행 fixture/result 없음."
+    },
+    {
+      "id": "V58",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V58-V59/cycles-and-shared-graph"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V59",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V58-V59/cycles-and-shared-graph"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V60",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V60-V62/equality-coercion-default-extra"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V61",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V60-V62/equality-coercion-default-extra"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "V62",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/run.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "V60-V62/equality-coercion-default-extra"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K01",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs",
+        "experiments/t1-values/schema-registration.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json",
+        "experiments/t2-composite-query/results/node24.json"
+      ],
+      "testIds": [
+        "C21-inline-query-equals-reference",
+        "S04-inline-ref-xor"
+      ],
+      "status": "partial",
+      "remaining": "Query inline/ref 동등·XOR는 일부 확인. Component/Derived 동등 및 암묵 scope 캡처 금지 검사는 없음."
+    },
+    {
+      "id": "K02",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t1-values/schema-registration.mjs",
+        "experiments/t3-state/state-probe.mjs",
+        "experiments/t3-state/ports-tests.mjs",
+        "experiments/t3-state/ports-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/ports-node22.json",
+        "experiments/t3-state/results/ports-node24.json"
+      ],
+      "testIds": [
+        "K02/default-only-on-omission-and-falsy-values",
+        "K02/invalid-default-declarations-and-unknown-inputs",
+        "K02/defaults-are-literals-and-isolated-between-calls"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K03",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-races/scenarios.mjs",
+        "experiments/t2-query-polling/scenarios.mjs",
+        "experiments/t2-query-http/scenarios.mjs",
+        "experiments/t3-state/ports-tests.mjs",
+        "experiments/t3-state/ports-probe.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-races/results/latest.json",
+        "experiments/t2-query-races/results/node24.json",
+        "experiments/t2-query-polling/results/node22.json",
+        "experiments/t2-query-polling/results/node24.json",
+        "experiments/t2-query-http/results/node22.json",
+        "experiments/t2-query-http/results/node24.json",
+        "experiments/t3-state/results/ports-node22.json",
+        "experiments/t3-state/results/ports-node24.json"
+      ],
+      "testIds": [
+        "K03/required-structural-failure-precedes-expression-evaluation",
+        "K03/missing-pending-auto-wait-and-explicit-zero-execution",
+        "K02-K03/explicit-dependency-states-never-use-default",
+        "K03/schema-validation-waits-until-value-ready"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K04",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs",
+        "experiments/t3-state/ports-tests.mjs",
+        "experiments/t3-state/ports-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/ports-node22.json",
+        "experiments/t3-state/results/ports-node24.json"
+      ],
+      "testIds": [
+        "K04/number-cell-current-integer-does-not-pass-integer-contract",
+        "K04/common-Type-missing-cell-connects-before-readiness",
+        "K04/contracts-ignore-key-required-enum-type-order-and-annotations",
+        "K04/local-refs-expand-with-escaped-pointers-and-siblings",
+        "K04/const-enum-data-annotation-names-remain-constraints",
+        "K04/no-general-logical-equivalence-or-subsumption-inference",
+        "K04/readonly-derived-values-and-query-results-are-not-state-targets",
+        "K04/followup-write-revalidates-value-permissions-and-generation"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K05",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs",
+        "experiments/t2-composite-query/boundaries.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json",
+        "experiments/t2-composite-query/results/node24.json"
+      ],
+      "testIds": [
+        "S01-cycle-unused-definition",
+        "S02-indirect-inline-cycle",
+        "S04-inline-ref-xor"
+      ],
+      "status": "partial",
+      "remaining": "Query 직접/간접/미사용 순환은 검증. Action 재귀와 조건 분기 안의 Action/Query 전체 등록 검사는 없음."
+    },
+    {
+      "id": "K06",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t1-values/schema-registration.mjs"
+      ],
+      "result": [
+        "experiments/t1-values/results/schema-registration-node22.json",
+        "experiments/t1-values/results/schema-registration-node24.json"
+      ],
+      "testIds": [
+        "registration/all-keywords",
+        "registration/native-local-ref",
+        "registration/escaped-local-ref",
+        "registration/percent-local-ref",
+        "reject/unknown",
+        "reject/external-ref",
+        "reject/root-ref",
+        "reject/self-cycle",
+        "reject/indirect-cycle"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K07",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-http-boundary/transport-tests.mjs",
+        "experiments/t2-http-boundary/path-audit-cases.mjs",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-http-boundary/results/transport-node22.json",
+        "experiments/t2-http-boundary/results/transport-node24.json",
+        "experiments/t2-http-boundary/results/path-audit-node22.json",
+        "experiments/t2-http-boundary/results/path-audit-node24.json",
+        "experiments/t2-composite-query/results/node22.json",
+        "experiments/t2-composite-query/results/node24.json",
+        "experiments/t2-http-boundary/results/http-node22.json",
+        "experiments/t2-http-boundary/results/http-node24.json"
+      ],
+      "testIds": [
+        "T12-format-and-escape",
+        "P58-referenced-headers-are-data-not-expressions",
+        "C35-response-expression-shaped-data-is-not-evaluated"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K08",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs",
+        "experiments/t1-values/values.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "K08/initial-error-and-snapshot-status",
+        "V31-V35/missing-null-falsy-reference"
+      ],
+      "status": "partial",
+      "remaining": "State detail snapshot missing/pending/error와 missing/null 값은 확인. 간단 read의 undefined→VALUE_PENDING→null→원인 오류 precedence 전체 assertion 없음."
+    },
+    {
+      "id": "K09",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-http-boundary/http-tests.mjs",
+        "experiments/t2-http-boundary/transport-tests.mjs"
+      ],
+      "result": [
+        "experiments/t2-http-boundary/results/http-node22.json",
+        "experiments/t2-http-boundary/results/http-node24.json",
+        "experiments/t2-http-boundary/results/transport-node22.json",
+        "experiments/t2-http-boundary/results/transport-node24.json"
+      ],
+      "testIds": [
+        "P45-params-object-from-port-repeated-value",
+        "P45-params-object-from-port-null-removes-key",
+        "P46-params-container-array-is-not-a-map",
+        "P49-valid-params-merge-removal-order",
+        "P50-header-value-reference-request",
+        "P57-dynamic-headers-merge-removal-and-data-string",
+        "T03-params-merge"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K10",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-http-boundary/http-tests.mjs",
+        "experiments/t2-http-boundary/transport-tests.mjs"
+      ],
+      "result": [
+        "experiments/t2-http-boundary/results/http-node22.json",
+        "experiments/t2-http-boundary/results/http-node24.json",
+        "experiments/t2-http-boundary/results/transport-node22.json",
+        "experiments/t2-http-boundary/results/transport-node24.json"
+      ],
+      "testIds": [
+        "P17-body-encodings",
+        "P18-response-redirect",
+        "P18-response-invalid-json",
+        "P19-empty-response-204",
+        "T01-method-GET",
+        "T06-invalid-request-get-body"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K11",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-http-boundary/http-tests.mjs",
+        "experiments/t2-query-http/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-http-boundary/results/http-node22.json",
+        "experiments/t2-http-boundary/results/http-node24.json",
+        "experiments/t2-query-http/results/node22.json",
+        "experiments/t2-query-http/results/node24.json"
+      ],
+      "testIds": [
+        "P04-concurrent-login-no-sharing",
+        "P06-login-failure",
+        "P09-timeout-during-login",
+        "P10-one-budget-login-plus-api",
+        "P13-ignore-abort-late-login-no-api",
+        "P23-internal-login-data-not-added-or-logged",
+        "I27-login-and-data-share-one-deadline"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K12",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-polling/scenarios.mjs",
+        "experiments/t2-query-races/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-polling/results/node22.json",
+        "experiments/t2-query-polling/results/node24.json",
+        "experiments/t2-query-races/results/latest.json",
+        "experiments/t2-query-races/results/node24.json"
+      ],
+      "testIds": [
+        "P09-refresh-disabled-keeps-initial-input-and-retry",
+        "R30-active-fresh-waiter-rejected-when-gate-closes"
+      ],
+      "status": "partial",
+      "remaining": "refresh:false의 QUERY_REFRESH_DISABLED와 gate false 오류는 직접 확인. RefreshQuery Action의 후속 Action 중단 및 기존 외부 효과 유지/rollback 없음은 Action fixture 없음."
+    },
+    {
+      "id": "K13",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-races/scenarios.mjs",
+        "experiments/t2-query-polling/scenarios.mjs",
+        "experiments/t2-query-http/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-races/results/latest.json",
+        "experiments/t2-query-races/results/node24.json",
+        "experiments/t2-query-polling/results/node22.json",
+        "experiments/t2-query-polling/results/node24.json",
+        "experiments/t2-query-http/results/node22.json",
+        "experiments/t2-query-http/results/node24.json"
+      ],
+      "testIds": [
+        "R06-refresh-waves",
+        "R07-refresh-follows-new-input-after-start",
+        "P06-latest-pending-has-priority-over-poll",
+        "I03-refresh-waves",
+        "I04-refresh-follows-input-after-start"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K14",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-polling/scenarios.mjs",
+        "experiments/t2-query-races/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-polling/results/node22.json",
+        "experiments/t2-query-polling/results/node24.json",
+        "experiments/t2-query-races/results/latest.json",
+        "experiments/t2-query-races/results/node24.json"
+      ],
+      "testIds": [
+        "P09-refresh-disabled-keeps-initial-input-and-retry",
+        "R23-refresh-disabled-first-input-retry-allowed"
+      ],
+      "status": "partial",
+      "remaining": "error retry 허용과 refresh:false의 일반 refresh 제외는 확인. 닫힌 gate·폐기 호출에서 retry 거절을 한 fixture로 검증하지 않음."
+    },
+    {
+      "id": "K15",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [],
+      "testIds": [],
+      "status": "pending",
+      "remaining": "Assert 분기·message lazy evaluation·후속 단계 중단에 대한 Action 실행 사례 없음."
+    },
+    {
+      "id": "K16",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-races/scenarios.mjs",
+        "experiments/t2-query-http/scenarios.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-races/results/latest.json",
+        "experiments/t2-query-races/results/node24.json",
+        "experiments/t2-query-http/results/node22.json",
+        "experiments/t2-query-http/results/node24.json",
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "R15-caller-cancellation-preserves-shared-query",
+        "I08-caller-cancel-keeps-shared-query",
+        "I28-cancel-waiter-after-fresh-start"
+      ],
+      "status": "partial",
+      "remaining": "Query waiter 취소·공유 Query/다른 owner 보존은 확인. 취소된 코드 Action이 State/Query 핸들로 새 호출·쓰기 하는 검증은 없음."
+    },
+    {
+      "id": "K17",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "S01-S05/atomic-scoped-observation-and-generations",
+        "C06-C07-C15/scope-ownership-and-shared-handles",
+        "lifecycle/replaced-and-disposed-dependency-invalidates-atomically"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K18",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "C11-C13/reaction-explicit-priority-and-atomic-derived"
+      ],
+      "status": "partial",
+      "remaining": "cross-owner duplicate target rejection과 명시 batch target 우선은 확인. 초기/URL 복원 reaction 미발화는 없음."
+    },
+    {
+      "id": "K19",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-url-races/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-url-races/results/latest.json",
+        "experiments/t2-url-races/results/node24.json",
+        "experiments/t2-url-races/results/chromium.json"
+      ],
+      "testIds": [
+        "U12-oversized-output-is-atomic",
+        "U16-duplicate-decoded-key-falls-back",
+        "U20-explicit-baseline-value-is-not-omitted",
+        "U23-connection-and-key-collisions",
+        "U29-cleanup-exact-keys-not-prefix",
+        "U28-list-limit-keeps-state-and-url"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K20",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-url-races/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-url-races/results/latest.json",
+        "experiments/t2-url-races/results/node24.json",
+        "experiments/t2-url-races/results/chromium.json"
+      ],
+      "testIds": [
+        "U01-newest-write-wins",
+        "U05-restore-invalidates-pending-write",
+        "U09-check-after-asynchronous-preparation",
+        "U31-write-ABA-is-not-current-by-value"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K21",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [],
+      "testIds": [],
+      "status": "pending",
+      "remaining": "Component when/repeat, key, alias shadowing 및 숨겨진 항목의 inputs/Query 0건 UI 실행 결과 없음."
+    },
+    {
+      "id": "K22",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs",
+        "experiments/t2-composite-query/boundaries.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json",
+        "experiments/t2-composite-query/results/node24.json"
+      ],
+      "testIds": [
+        "C15-concat-order-duplicates-and-heterogeneous-data",
+        "C17-join-order-collision-and-unmatched/left",
+        "C17-join-order-collision-and-unmatched/inner",
+        "C17-join-order-collision-and-unmatched/right",
+        "S08-join-key/null-unmatched",
+        "S09-join-invalid-key/missing",
+        "S10-join-compound-key-and-cartesian-matches",
+        "C24-static-query-needs-no-http-source"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K23",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [],
+      "testIds": [],
+      "status": "pending",
+      "remaining": "mount/update/replace initial projection과 구조 실패 보존, 개별 Query 오류 포함 및 교체 CANCELLED 시험 없음."
+    },
+    {
+      "id": "K24",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs",
+        "experiments/t1-cel-patch/cases.mjs"
+      ],
+      "result": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json",
+        "experiments/t1-cel-patch/results/node22.json",
+        "experiments/t1-cel-patch/results/node24.json"
+      ],
+      "testIds": [
+        "C08-C09/initial-write-race-reset-baseline",
+        "C10/derived-failure-and-cycle"
+      ],
+      "status": "partial",
+      "remaining": "고정 initial reset·derived dependency 일부 확인. 명시 Clock input 재평가, 폐기 후 구독, 날짜/시간 current time 재계산 금지는 미검증."
+    },
+    {
+      "id": "K25",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-races/scenarios.mjs",
+        "experiments/t2-query-http/scenarios.mjs",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-races/results/latest.json",
+        "experiments/t2-query-races/results/node24.json",
+        "experiments/t2-query-http/results/node22.json",
+        "experiments/t2-query-http/results/node24.json",
+        "experiments/t2-composite-query/results/node22.json",
+        "experiments/t2-composite-query/results/node24.json"
+      ],
+      "testIds": [
+        "R20-last-success-failure-retry",
+        "I01-body-and-retention/null",
+        "I13-http-body-timeout-retains-success-and-retries",
+        "C04-source-failure-preserves-location-and-old-pair"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K26",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-races/scenarios.mjs",
+        "experiments/t2-query-http/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-races/results/latest.json",
+        "experiments/t2-query-races/results/node24.json",
+        "experiments/t2-query-http/results/node22.json",
+        "experiments/t2-query-http/results/node24.json"
+      ],
+      "testIds": [
+        "R21-preserve-null",
+        "R21-preserve-false",
+        "R21-preserve-zero",
+        "R21-preserve-empty-string",
+        "R21-preserve-empty-array",
+        "I01-body-and-retention/null",
+        "I01-body-and-retention/false",
+        "I01-body-and-retention/zero",
+        "I01-body-and-retention/empty-string",
+        "I01-body-and-retention/empty-array"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K27",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-races/scenarios.mjs",
+        "experiments/t2-query-http/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-races/results/latest.json",
+        "experiments/t2-query-races/results/node24.json",
+        "experiments/t2-query-http/results/node22.json",
+        "experiments/t2-query-http/results/node24.json"
+      ],
+      "testIds": [
+        "R20-last-success-failure-retry",
+        "I13-http-body-timeout-retains-success-and-retries"
+      ],
+      "status": "partial",
+      "remaining": "기존 snapshot/stale 재시도와 재실패 일부 확인. 실행 시작 시 error:null 및 success에서 data/dataInputs 원자 교체 assertion 전체가 연결되지 않음."
+    },
+    {
+      "id": "K28",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-races/scenarios.mjs",
+        "experiments/t2-query-http/scenarios.mjs",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-races/results/latest.json",
+        "experiments/t2-query-races/results/node24.json",
+        "experiments/t2-query-http/results/node22.json",
+        "experiments/t2-query-http/results/node24.json",
+        "experiments/t2-composite-query/results/node22.json",
+        "experiments/t2-composite-query/results/node24.json"
+      ],
+      "testIds": [
+        "R28-fresh-failure-stops-awaiting-step",
+        "I24-fresh-http-failure-rejects-waiter-keeps-success",
+        "C04-source-failure-preserves-location-and-old-pair",
+        "C09-first-source-failure-is-not-empty-success",
+        "S11-explicit-execution-does-not-use-owner-cache"
+      ],
+      "status": "partial",
+      "remaining": "복합 partial source 성공 차단·fresh 오류·대기 후속 코드 중단은 확인. 명시 Action Query가 이전 data를 반환하지 않는 contract를 직접 호출해 검증하는 fixture는 없음."
+    },
+    {
+      "id": "K29",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-races/scenarios.mjs",
+        "experiments/t2-query-http/scenarios.mjs",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-races/results/latest.json",
+        "experiments/t2-query-races/results/node24.json",
+        "experiments/t2-query-http/results/node22.json",
+        "experiments/t2-query-http/results/node24.json",
+        "experiments/t2-composite-query/results/node22.json",
+        "experiments/t2-composite-query/results/node24.json"
+      ],
+      "testIds": [
+        "R01-obsolete-success",
+        "R02-obsolete-error",
+        "R12-replace-same-address-late-success",
+        "R13-replace-same-address-late-error",
+        "I10-dispose-during-login",
+        "I11-replace-owner-during-response-body",
+        "C08-owner-replacement-and-old-response"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K30",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t1-values/date-boundaries.mjs",
+        "experiments/t1-values/schema-runtime-tests.mjs",
+        "experiments/verification/date-integration-cases.mjs",
+        "experiments/t1-cel-patch/cases.mjs",
+        "experiments/t3-state/run.mjs"
+      ],
+      "result": [
+        "experiments/t1-values/results/date-boundaries-node22.json",
+        "experiments/t1-values/results/date-boundaries-node24.json",
+        "experiments/t1-values/results/schema-runtime-node22.json",
+        "experiments/t1-values/results/schema-runtime-node24.json",
+        "experiments/verification/results/date-integration-node22.json",
+        "experiments/verification/results/date-integration-node24.json",
+        "experiments/t1-cel-patch/results/node22.json",
+        "experiments/t1-cel-patch/results/node24.json",
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "testIds": [
+        "date/canonical-const",
+        "time/canonical-const",
+        "datetime/canonical-const",
+        "node/http/date/body-roundtrip",
+        "node/http/time/body-roundtrip",
+        "node/http/datetime/body-roundtrip",
+        "node/timestamp/valid-2026-10-30T09:30:00+09:00",
+        "V56/unsupported-values-not-executed"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K31",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t1-values/date-boundaries.mjs",
+        "experiments/t1-values/schema-runtime-tests.mjs",
+        "experiments/verification/date-integration-cases.mjs"
+      ],
+      "result": [
+        "experiments/t1-values/results/date-boundaries-node22.json",
+        "experiments/t1-values/results/date-boundaries-node24.json",
+        "experiments/t1-values/results/schema-runtime-node22.json",
+        "experiments/t1-values/results/schema-runtime-node24.json",
+        "experiments/verification/results/date-integration-node22.json",
+        "experiments/verification/results/date-integration-node24.json"
+      ],
+      "testIds": [
+        "date/invalid-2026-04-31",
+        "time/invalid-24:00",
+        "datetime/invalid-0001-01-01T00:00:00+14:00",
+        "reject-ambiguous/date-or-string",
+        "node/url/date/invalid",
+        "node/url/date/no-schema-guess"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K32",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t1-values/date-boundaries.mjs",
+        "experiments/t1-values/schema-runtime-tests.mjs",
+        "experiments/verification/date-integration-cases.mjs"
+      ],
+      "result": [
+        "experiments/t1-values/results/date-boundaries-node22.json",
+        "experiments/t1-values/results/date-boundaries-node24.json",
+        "experiments/t1-values/results/schema-runtime-node22.json",
+        "experiments/t1-values/results/schema-runtime-node24.json",
+        "experiments/verification/results/date-integration-node22.json",
+        "experiments/verification/results/date-integration-node24.json"
+      ],
+      "testIds": [
+        "datetime/offset-const-is-not-normalized-as-schema",
+        "normalize/nullable",
+        "node/url/datetime/equivalent",
+        "node/http/date/body-roundtrip",
+        "node/http/date/params-roundtrip",
+        "node/http/invalid-response-revalidated"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K33",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t1-cel-patch/cases.mjs",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [],
+      "testIds": [],
+      "status": "pending",
+      "remaining": "timezone argument 누락/missing/잘못된 이름의 오류 분류, 명시 timezone에서 기기 timezone 변경 불변성 및 해당 입력 의존 Variable 사례의 직접 실행 증거가 없음."
+    },
+    {
+      "id": "K34",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t1-values/date-boundaries.mjs",
+        "experiments/t1-cel-patch/cases.mjs"
+      ],
+      "result": [
+        "experiments/t1-values/results/date-boundaries-node22.json",
+        "experiments/t1-values/results/date-boundaries-node24.json",
+        "experiments/t1-cel-patch/results/node22.json",
+        "experiments/t1-cel-patch/results/node24.json"
+      ],
+      "testIds": [
+        "local/dst-gap",
+        "local/dst-overlap"
+      ],
+      "status": "partial",
+      "remaining": "America/New_York의 nonexistent/ambiguous local time 거절은 확인. 지역 다음 날 경계를 고정 24h 덧셈하지 않는 직접 비교 사례가 없음."
+    },
+    {
+      "id": "K35",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t1-values/schema-registration.mjs",
+        "experiments/t1-values/schema-runtime-tests.mjs",
+        "experiments/t1-values/date-boundaries.mjs"
+      ],
+      "result": [
+        "experiments/t1-values/results/schema-registration-node22.json",
+        "experiments/t1-values/results/schema-registration-node24.json",
+        "experiments/t1-values/results/schema-runtime-node22.json",
+        "experiments/t1-values/results/schema-runtime-node24.json",
+        "experiments/t1-values/results/date-boundaries-node22.json",
+        "experiments/t1-values/results/date-boundaries-node24.json"
+      ],
+      "testIds": [
+        "reject/format",
+        "registration/native-date",
+        "normalize/nullable",
+        "normalize/nullable-null",
+        "reject-ambiguous/date-or-string",
+        "date/canonical-const",
+        "date/reject-pattern"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K36",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [],
+      "testIds": [],
+      "status": "pending",
+      "remaining": "선언형 Try/Catch/Finally 거절 및 등록 코드 Action 복구/미처리 오류/정리 실패 실행 없음."
+    },
+    {
+      "id": "K37",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t3-state/state-probe.mjs"
+      ],
+      "result": [],
+      "testIds": [],
+      "status": "pending",
+      "remaining": "Action 단계 실패 뒤 완료한 State/외부 효과 유지와 취소 catch 후 늦은 핸들/결과 거절을 검증하는 실행 없음."
+    }
+  ],
+  "integrity": {
+    "inventory": "C01-C17=17, S01-S06=6, V01-V62=62, K01-K37=37; 122 unique IDs checked.",
+    "t3State": {
+      "results": [
+        "experiments/t3-state/results/node22.json",
+        "experiments/t3-state/results/node24.json"
+      ],
+      "summary": "각 27/27 통과; 현재 기록 소스 해시 10/10 일치."
+    },
+    "portsProbe": {
+      "results": [
+        "experiments/t3-state/results/ports-node22.json",
+        "experiments/t3-state/results/ports-node24.json"
+      ],
+      "summary": "각 23/23 통과; 현재 기록 소스 해시 11/11 일치."
+    },
+    "otherSuites": "schema-registration 78/78, schema-runtime 83/83, date-boundaries 39/39, date-integration 62/62, CEL patch 267/267의 Node 22/24 기록을 항목별로만 인용. Suite 총계만으로 ID를 통과 처리하지 않음."
+  }
+}

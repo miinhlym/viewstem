@@ -1,0 +1,831 @@
+{
+  "scope": "Q01-Q22, H01-H09, L01-L13; independent experiment evidence only",
+  "statusDefinitions": "verified-experiment means the listed independent experiment directly asserts all acceptance clauses; partial means at least one concrete clause lacks direct evidence; pending means no matching executed evidence was found.",
+  "records": [
+    {
+      "id": "Q01",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs",
+        "experiments/t2-composite-query/boundaries.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [
+        "C24-static-query-needs-no-http-source",
+        "S01-cycle-unused-definition"
+      ],
+      "status": "partial",
+      "remaining": "미사용 정의 오류 및 HTTP 없는 정적 Query는 검사했으나 등록만 한 미사용 Query/Component가 요청 0건임을 직접 검사한 fixture 없음."
+    },
+    {
+      "id": "Q02",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [
+        "C21-inline-query-equals-reference"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "Q03",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs",
+        "experiments/t2-composite-query/boundaries.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [
+        "S05-transform-input-required",
+        "S06-concat-with-required",
+        "S07-join-key-required",
+        "C18-missing-required-child-binding-is-registration-error",
+        "C27-dynamic-missing-child-input-identifies-child-port",
+        "S13-escaped-input-name-satisfies-required-port"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "Q04",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [
+        "C25-source-map-order-is-not-an-execution-dependency"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "Q05",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [
+        "S08-join-key/strict-types",
+        "S08-join-key/null-unmatched",
+        "S09-join-invalid-key/missing",
+        "S10-join-compound-key-and-cartesian-matches",
+        "C17-join-order-collision-and-unmatched/{left,inner,right}"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "Q06",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs",
+        "experiments/t2-composite-query/boundaries.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [
+        "C15-concat-order-duplicates-and-heterogeneous-data",
+        "S15-sequential-transforms-preserve-original-sources"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "Q07",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-races/scenarios.mjs",
+        "experiments/t2-query-http/scenarios.mjs",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-races/results/latest.json",
+        "experiments/t2-query-http/results/node22.json",
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [
+        "R01-obsolete-success",
+        "R02-obsolete-error",
+        "R03-input-ABA",
+        "I05-obsolete-http-failure",
+        "I19-input-ABA-with-real-http",
+        "C06-obsolete-run-cannot-seed-current-cache",
+        "C04-source-failure-preserves-location-and-old-pair"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "Q08",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-races/scenarios.mjs",
+        "experiments/t2-query-http/scenarios.mjs",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-races/results/latest.json",
+        "experiments/t2-query-http/results/node22.json",
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [
+        "R05-latest-pending-burst",
+        "I02-input-burst-during-login",
+        "C03-all-changed-inputs-wait-for-all-new-results"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "Q09",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-races/scenarios.mjs",
+        "experiments/t2-query-polling/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-races/results/latest.json",
+        "experiments/t2-query-polling/results/node22.json"
+      ],
+      "testIds": [
+        "R08-gate-closes-pending",
+        "R09-gate-close-reopen-ABA",
+        "R30-active-fresh-waiter-rejected-when-gate-closes",
+        "P10-closed-gate-does-not-start-or-reserve",
+        "P12-gate-closing-clears-pending-and-completion-cannot-poll"
+      ],
+      "status": "partial",
+      "remaining": "executeWhen:false 차단·fresh 오류·전송 차단은 독립 Query에서 확인. Action RefreshQuery 실패 후 후속 단계/output 평가가 0회인 실행 증거는 없음."
+    },
+    {
+      "id": "Q10",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-polling/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-polling/results/node22.json"
+      ],
+      "testIds": [
+        "P08-auto-condition-affects-only-periodic-execution",
+        "P04-manual-refresh-cancels-old-poll-reservation",
+        "P09-refresh-disabled-keeps-initial-input-and-retry"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "Q11",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-races/scenarios.mjs",
+        "experiments/t2-query-http/scenarios.mjs",
+        "experiments/t2-composite-query/scenarios.mjs",
+        "experiments/t2-query-polling/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-races/results/latest.json",
+        "experiments/t2-query-http/results/node22.json",
+        "experiments/t2-composite-query/results/node22.json",
+        "experiments/t2-query-polling/results/node22.json"
+      ],
+      "testIds": [
+        "R06-refresh-waves",
+        "R07-refresh-follows-new-input-after-start",
+        "I03-refresh-waves",
+        "I04-refresh-follows-input-after-start",
+        "C11-refresh-follows-latest-input-and-forces-fresh-children",
+        "P06-latest-pending-has-priority-over-poll"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "Q12",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/boundaries.mjs",
+        "experiments/t2-query-polling/scenarios.mjs",
+        "experiments/t2-query-races/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json",
+        "experiments/t2-query-polling/results/node22.json",
+        "experiments/t2-query-races/results/latest.json"
+      ],
+      "testIds": [
+        "S11-explicit-execution-does-not-use-owner-cache",
+        "R25-no-implicit-retry"
+      ],
+      "status": "partial",
+      "remaining": "명시 실행에서 owner cache를 공유하지 않으며 자동 retry가 없음을 일부 검사. 구독·inflight 공유 없음까지 함께 검증하는 Action Query fixture는 없음."
+    },
+    {
+      "id": "Q13",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-polling/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-polling/results/node22.json"
+      ],
+      "testIds": [
+        "P09-refresh-disabled-keeps-initial-input-and-retry",
+        "P31-resume-and-input-changes-coalesce-latest-input"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "Q14",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs",
+        "experiments/t2-composite-query/boundaries.mjs",
+        "experiments/t2-composite-query/composite-probe.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [
+        "C16-transform-error-location-and-no-partial-cache",
+        "S06-concat-with-required",
+        "S14-concat-many-arrays-does-not-use-call-argument-limit"
+      ],
+      "status": "partial",
+      "remaining": "C16에서 Concat 추가 source가 비배열인 경우 오류를 확인. Concat.input 자체의 비배열 오류 및 step.with 전체가 비배열인 경우의 직접 기대 assertion은 없음."
+    },
+    {
+      "id": "Q15",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs",
+        "experiments/t2-composite-query/boundaries.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [],
+      "status": "pending",
+      "remaining": "해당 Query callback inputs의 중첩 Set/Map 재귀 변환과 원본 State 보존에 대한 T2 증거를 찾지 못함."
+    },
+    {
+      "id": "Q16",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [
+        "C04-source-failure-preserves-location-and-old-pair",
+        "C09-first-source-failure-is-not-empty-success",
+        "C10-independent-owner-not-blocked",
+        "C31-first-failure-aborts-siblings-and-ignores-late-rejection"
+      ],
+      "status": "partial",
+      "remaining": "부분 성공 게시 금지·실패 위치·독립 owner 비차단은 확인. 무관한 View/UI 유지 clause는 직접 검사하지 않음."
+    },
+    {
+      "id": "Q17",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [
+        "C16-transform-error-location-and-no-partial-cache",
+        "C24-static-query-needs-no-http-source"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "Q18",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-races/scenarios.mjs",
+        "experiments/t2-query-polling/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-races/results/latest.json",
+        "experiments/t2-query-polling/results/node22.json"
+      ],
+      "testIds": [
+        "R10-atomic-gate-and-input",
+        "P11-gate-transition-cancels-idle-poll-and-reopens-once"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "Q19",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-query-races/scenarios.mjs",
+        "experiments/t2-query-http/scenarios.mjs",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-query-races/results/latest.json",
+        "experiments/t2-query-http/results/node22.json",
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [
+        "R08-gate-closes-pending",
+        "R09-gate-close-reopen-ABA",
+        "I06-gate-closes-during-login",
+        "I26-gate-closes-after-fresh-start",
+        "C06-obsolete-run-cannot-seed-current-cache"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "Q20",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [
+        "C17-join-order-collision-and-unmatched/{left,inner,right}",
+        "S08-join-key/null-unmatched",
+        "S10-join-compound-key-and-cartesian-matches"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "Q21",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs",
+        "experiments/t2-composite-query/boundaries.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [
+        "C21-inline-query-equals-reference",
+        "C15-concat-order-duplicates-and-heterogeneous-data",
+        "S11-explicit-execution-does-not-use-owner-cache"
+      ],
+      "status": "partial",
+      "remaining": "명시 복수 Query 경로·배열 데이터는 부분 확인. 선택 목록 기반 자동 fanout 제외는 독립 동작 assertion이 아니며 자동 생성 부재를 증명하는 fixture 없음."
+    },
+    {
+      "id": "Q22",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [
+        "C02-reuse-only-unchanged-child-query",
+        "C03-all-changed-inputs-wait-for-all-new-results",
+        "C04-source-failure-preserves-location-and-old-pair",
+        "C10-independent-owner-not-blocked"
+      ],
+      "status": "partial",
+      "remaining": "A 변경 중 B 재사용, 이전 조합 stale 구분, 새 A 뒤 결합 갱신은 확인. 무관한 UI 유지 clause는 직접 검사하지 않음."
+    },
+    {
+      "id": "H01",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-http-boundary/http-tests.mjs",
+        "experiments/t2-composite-query/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-http-boundary/results/http-node22.json",
+        "experiments/t2-composite-query/results/node22.json"
+      ],
+      "testIds": [
+        "P01-public-methods-and-current-definition",
+        "H01-real-http-composite-and-polling"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "H02",
+      "source": [
+        "docs/handoff/acceptance-matrix.md"
+      ],
+      "result": [
+        "experiments/t2-http-boundary/results/http-node22.json"
+      ],
+      "testIds": [],
+      "status": "pending",
+      "remaining": "저장소 원본을 변경한 뒤 화면이 현재 정의를 유지하는지 검증한 사례 없음."
+    },
+    {
+      "id": "H03",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-http-boundary/http-tests.mjs"
+      ],
+      "result": [
+        "experiments/t2-http-boundary/results/http-node22.json",
+        "experiments/t2-query-http/results/node22.json"
+      ],
+      "testIds": [
+        "P07-authority-not-from-plan",
+        "P25-denied-secret-reference-no-transport",
+        "P26-denied-destination-login",
+        "P26-denied-destination-data",
+        "P27-denied-path-on-allowed-origin",
+        "P28-final-query-policy-denial",
+        "I16-preflight-failure-is-query-error-without-network"
+      ],
+      "status": "partial",
+      "remaining": "합성 authorize 정책의 거절과 전송 차단은 확인. 실제 서비스 서버의 사용권한 판정/정책 연결은 없음."
+    },
+    {
+      "id": "H04",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-http-boundary/http-tests.mjs"
+      ],
+      "result": [
+        "experiments/t2-http-boundary/results/http-node22.json",
+        "experiments/t2-query-http/results/node22.json"
+      ],
+      "testIds": [
+        "P34-resolver-opaque-error-undefined",
+        "P34-resolver-opaque-error-null",
+        "P34-resolver-opaque-error-string",
+        "P34-resolver-opaque-error-number",
+        "P34-resolver-opaque-error-plain-object",
+        "P34-resolver-opaque-error-unknown-code",
+        "P34-resolver-opaque-error-non-string-code",
+        "P02-secret-without-login",
+        "P14-cancel-during-secret-resolution",
+        "P20-transport-error-sanitized",
+        "P23-internal-login-data-not-added-or-logged",
+        "P24-authorize-error-sanitized",
+        "I18-input-snapshot-and-private-login-separation",
+        "I22-api-response-content-remains-api-responsibility"
+      ],
+      "status": "partial",
+      "remaining": "실험 내부 결과/오류의 비밀값 비혼입 확인. 실제 secret store·서비스 로그/agent 경계는 미검증."
+    },
+    {
+      "id": "H05",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-http-boundary/http-tests.mjs",
+        "experiments/t2-query-http/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-http-boundary/results/http-node22.json",
+        "experiments/t2-query-http/results/node22.json"
+      ],
+      "testIds": [
+        "P05-invalid-token-missing",
+        "P05-invalid-token-number",
+        "P05-invalid-token-empty",
+        "P05-invalid-token-control",
+        "P06-login-failure",
+        "P06-login-redirect",
+        "I15-login-failure/status",
+        "I15-login-failure/missing-token",
+        "I15-login-failure/non-string-token",
+        "I15-login-failure/malformed-json"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "H06",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-http-boundary/http-tests.mjs",
+        "experiments/t2-http-boundary/transport-tests.mjs"
+      ],
+      "result": [
+        "experiments/t2-http-boundary/results/http-node22.json",
+        "experiments/t2-http-boundary/results/transport-node22.json"
+      ],
+      "testIds": [
+        "P03-login-isolation-and-request-overrides",
+        "P04-concurrent-login-no-sharing",
+        "T12-login-all-fields",
+        "T12-whole-login-request"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "H07",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-http-boundary/transport-tests.mjs"
+      ],
+      "result": [
+        "experiments/t2-http-boundary/results/transport-node22.json"
+      ],
+      "testIds": [
+        "T03-params-merge",
+        "T10-dynamic-header-merge",
+        "T01-method-GET",
+        "T12-request-base-override"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "H08",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-http-boundary/http-tests.mjs"
+      ],
+      "result": [
+        "experiments/t2-http-boundary/results/http-node22.json"
+      ],
+      "testIds": [
+        "P06-login-redirect"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "H09",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-http-boundary/http-tests.mjs"
+      ],
+      "result": [
+        "experiments/t2-http-boundary/results/http-node22.json"
+      ],
+      "testIds": [
+        "P01-public-methods-and-current-definition",
+        "P02-secret-without-login",
+        "P03-login-isolation-and-request-overrides",
+        "P05-invalid-token-missing",
+        "P05-invalid-token-number",
+        "P05-invalid-token-empty",
+        "P05-invalid-token-control",
+        "P06-login-failure",
+        "P06-login-redirect"
+      ],
+      "status": "partial",
+      "remaining": "공개·API Key header·Login/Bearer의 일부를 검사. 10.1.1–7의 7가지 예시 각각과 secret 경계를 전부 연결하는 fixture 증거는 없음(특히 API Key params, Login 후 custom header/params)."
+    },
+    {
+      "id": "L01",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-url-races/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-url-races/results/latest.json"
+      ],
+      "testIds": [
+        "U16-duplicate-decoded-key-falls-back",
+        "U17-restore-always-starts-at-baseline",
+        "U18-null-string-null-empty-and-absence",
+        "U32-missing-baseline-is-not-null"
+      ],
+      "status": "partial",
+      "remaining": "고정 baseline·invalid/missing/null 처리 일부. 서로 다른 직전 State를 둔 acceptance 조합 전부는 직접 매핑되지 않음."
+    },
+    {
+      "id": "L02",
+      "source": [
+        "docs/handoff/acceptance-matrix.md"
+      ],
+      "result": [
+        "experiments/t2-url-races/results/latest.json"
+      ],
+      "testIds": [],
+      "status": "pending",
+      "remaining": "초기값→URL 복원→입력 안정화 후 Query 및 중간 조회/reaction 순서 증거 없음."
+    },
+    {
+      "id": "L03",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-url-races/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-url-races/results/latest.json"
+      ],
+      "testIds": [
+        "U19-array-and-set-codec",
+        "U24-invalid-limits-and-unsupported-bindings",
+        "U26-primitives-no-coercion",
+        "U28-list-limit-keeps-state-and-url"
+      ],
+      "status": "partial",
+      "remaining": "scalar 및 string/number array/Set 일부. nullable·객체/Map/객체 Set·모든 unsupported 조합 미검증."
+    },
+    {
+      "id": "L04",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-url-races/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-url-races/results/latest.json"
+      ],
+      "testIds": [
+        "U18-null-string-null-empty-and-absence",
+        "U19-array-and-set-codec"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "L05",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-url-races/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-url-races/results/latest.json"
+      ],
+      "testIds": [
+        "U03-merge-latest-external-url",
+        "U04-independent-connections",
+        "U23-connection-and-key-collisions",
+        "U29-cleanup-exact-keys-not-prefix",
+        "U39-percent-encoded-duplicate-key-is-rejected"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "L06",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-url-races/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-url-races/results/latest.json"
+      ],
+      "testIds": [
+        "U11-write-failure-keeps-state",
+        "U12-oversized-output-is-atomic",
+        "U14-limit-counts-percent-encoded-bytes",
+        "U15-input-byte-limit-before-json-parse",
+        "U28-list-limit-keeps-state-and-url",
+        "U33-invalid-state-write-preserves-valid-pending"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "L07",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-url-races/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-url-races/results/latest.json"
+      ],
+      "testIds": [
+        "U06-dispose-keeps-url-and-blocks-write",
+        "U07-replace-cleans-only-owned-keys",
+        "U49-cleanup-failure-finishes-replacement-and-reports-error",
+        "U51-cleanup-error-does-not-prevent-next-replacement",
+        "U55-invalid-new-connection-does-not-invalidate-pending-replacement"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "L08",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-url-races/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-url-races/results/latest.json"
+      ],
+      "testIds": [
+        "U20-explicit-baseline-value-is-not-omitted",
+        "U21-one-batch-push-dominates",
+        "U22-no-duplicate-history-entry",
+        "U27-real-history-back-forward-restoration",
+        "U36-only-actually-changed-fields-select-push"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "L09",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-url-races/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-url-races/results/latest.json"
+      ],
+      "testIds": [
+        "U01-newest-write-wins",
+        "U02-coalesce-distinct-dirty-keys",
+        "U05-restore-invalidates-pending-write",
+        "U09-check-after-asynchronous-preparation",
+        "U31-write-ABA-is-not-current-by-value",
+        "U34-oversized-new-write-invalidates-older-work"
+      ],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "L10",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/t2-url-races/scenarios.mjs"
+      ],
+      "result": [
+        "experiments/t2-url-races/results/latest.json"
+      ],
+      "testIds": [
+        "U23-connection-and-key-collisions",
+        "U04-independent-connections"
+      ],
+      "status": "partial",
+      "remaining": "중복 연결/key collision 및 독립 연결 일부는 검사. 공용 서비스 URL 연결을 소비 renderer 하나의 dispose로 유지하는 정확한 수명 assertion은 확인되지 않음."
+    },
+    {
+      "id": "L11",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/verification/date-integration-cases.mjs"
+      ],
+      "result": [
+        "experiments/verification/results/date-integration-node22.json",
+        "experiments/verification/results/date-integration-node24.json"
+      ],
+      "testIds": [],
+      "status": "partial",
+      "remaining": "date-integration은 date/time/datetime URL restore/baseline을 확인하지만 날짜 initial 계산 후 timezone만 다른 URL 복원 및 재계산 금지 시나리오는 없음."
+    },
+    {
+      "id": "L12",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/verification/date-integration-cases.mjs"
+      ],
+      "result": [
+        "experiments/verification/results/date-integration-node22.json",
+        "experiments/verification/results/date-integration-node24.json"
+      ],
+      "testIds": [
+        "node/url/date/write",
+        "node/url/date/restore",
+        "node/url/date/baseline",
+        "chromium/url/date/write",
+        "chromium/url/date/restore",
+        "chromium/url/date/baseline"
+      ],
+      "status": "partial",
+      "remaining": "날짜 타입의 URL write/restore/baseline 일부. 10/14↔10/13 및 새 baseline 10/15인 구체 링크 시나리오는 없음."
+    },
+    {
+      "id": "L13",
+      "source": [
+        "docs/handoff/acceptance-matrix.md",
+        "experiments/verification/date-integration-cases.mjs"
+      ],
+      "result": [
+        "experiments/verification/results/date-integration-node22.json",
+        "experiments/verification/results/date-integration-node24.json"
+      ],
+      "testIds": [
+        "node/url/date/baseline",
+        "node/url/datetime/baseline",
+        "chromium/url/date/baseline",
+        "chromium/url/datetime/baseline"
+      ],
+      "status": "partial",
+      "remaining": "누락 key에서 baseline을 읽는 date/datetime 결과 확인. 초기 URL 기록 없음 및 restore로 인한 재push 없음의 직접 assertion은 부족함."
+    }
+  ]
+}

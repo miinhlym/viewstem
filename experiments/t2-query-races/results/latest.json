@@ -1,0 +1,5968 @@
+{
+  "generatedAt": "2026-10-30T07:10:35.393Z",
+  "runtime": "v22.21.1",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "sourceSha256": {
+    "package.json": "692fa567879dbcf87d42acb454fa750728be9679ac0e788ecf6eef42f0eee241",
+    "harness.mjs": "50ecc928adac2275688262d9934c61a2d10bbeec6003d7049fd1769a13cfc228",
+    "query-probe.mjs": "8cbf8a9e3b2344a33258490271d3ed68020a05171db6b64a28f000df7f70b6a6",
+    "scenarios.mjs": "9606c1cc2c21c5a9650605c35db09c36e0ba9851f9cf9b74fdbf1d7d70e85658",
+    "run.mjs": "05e9569593bbd0ed0a23faba5ea5b09811a46633d5e8972b99e767fbcdc2314c"
+  },
+  "scope": "Independent JSON-valued Query scheduling prototype, not production core or full T2",
+  "summary": {
+    "scenarios": 36,
+    "passed": 36,
+    "mutationControls": 4,
+    "detected": 4,
+    "burstSeeds": 100,
+    "seedsPassed": 100,
+    "generatedInputUpdates": 4000
+  },
+  "results": [
+    {
+      "id": "R01-obsolete-success",
+      "contracts": [
+        "Q07",
+        "K29"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "latest-pending",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 1,
+          "code": null
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 1,
+          "inputs": {
+            "term": "B"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 1,
+          "currentGeneration": 1,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "new-B",
+            "dataInputs": {
+              "term": "B"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R02-obsolete-error",
+      "contracts": [
+        "Q07",
+        "K29"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "latest-pending",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 1,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 1,
+          "inputs": {
+            "term": "B"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 1,
+          "currentGeneration": 1,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "B",
+            "dataInputs": {
+              "term": "B"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R03-input-ABA",
+      "contracts": [
+        "Q07",
+        "Q08",
+        "K29"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "latest-pending",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 2,
+          "reason": "latest-pending",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 2,
+          "code": null
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 2,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 2,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 2,
+          "currentGeneration": 2,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 2,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "second-A",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R04-completion-queued-before-input-change",
+      "contracts": [
+        "Q07",
+        "K29"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "latest-pending",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 1,
+          "code": null
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 1,
+          "inputs": {
+            "term": "B"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 1,
+          "currentGeneration": 1,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "B",
+            "dataInputs": {
+              "term": "B"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R05-latest-pending-burst",
+      "contracts": [
+        "Q08"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "latest-pending",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 2,
+          "reason": "latest-pending",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 3,
+          "reason": "latest-pending",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 4,
+          "reason": "latest-pending",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 4,
+          "code": null
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 4,
+          "inputs": {
+            "term": "E"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 4,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 4,
+          "currentGeneration": 4,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 4,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "E",
+            "dataInputs": {
+              "term": "E"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R06-refresh-waves",
+      "contracts": [
+        "Q11",
+        "K13"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "initial",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": "initial",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "fresh-1",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 3,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": "fresh-1",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 3,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 3,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "fresh-2",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R07-refresh-follows-new-input-after-start",
+      "contracts": [
+        "K13"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "initial-A",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": "initial-A",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "latest-pending",
+          "state": {
+            "status": "running",
+            "data": "initial-A",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": true,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 1,
+          "code": null
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 3,
+          "owner": 1,
+          "generation": 1,
+          "inputs": {
+            "term": "B"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": "initial-A",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": true,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 3,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 3,
+          "generation": 1,
+          "currentGeneration": 1,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "fresh-B",
+            "dataInputs": {
+              "term": "B"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R08-gate-closes-pending",
+      "contracts": [
+        "Q09",
+        "Q19",
+        "K12",
+        "K13"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "gate-closed",
+          "state": {
+            "status": "waiting",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": "EXECUTION_BLOCKED"
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 1,
+          "code": null
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R09-gate-close-reopen-ABA",
+      "contracts": [
+        "Q18",
+        "Q19",
+        "K29"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "gate-closed",
+          "state": {
+            "status": "waiting",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": "EXECUTION_BLOCKED"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 2,
+          "reason": "latest-pending",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 2,
+          "code": null
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 2,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 2,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 2,
+          "currentGeneration": 2,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 2,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "after-open",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R10-atomic-gate-and-input",
+      "contracts": [
+        "Q18"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "gate-closed",
+          "state": {
+            "status": "waiting",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": "EXECUTION_BLOCKED"
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 1,
+          "code": null
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 2,
+          "inputs": {
+            "term": "B"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 2,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 2,
+          "currentGeneration": 2,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 2,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "B",
+            "dataInputs": {
+              "term": "B"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R11-unready-input-and-refresh-waiter",
+      "contracts": [
+        "K03",
+        "K13"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "input-not-ready",
+          "state": {
+            "status": "waiting",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": "INPUT_NOT_READY"
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 1,
+          "code": null
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 2,
+          "inputs": {
+            "term": "B"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 2,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 2,
+          "currentGeneration": 2,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 2,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "B",
+            "dataInputs": {
+              "term": "B"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R12-replace-same-address-late-success",
+      "contracts": [
+        "K29"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "abort-observed-but-ignored",
+          "at": 0,
+          "id": 1
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 2,
+          "generation": 0,
+          "inputs": {
+            "term": "B"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 2,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 2,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 2,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "new-owner-B",
+            "dataInputs": {
+              "term": "B"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 2
+        }
+      ]
+    },
+    {
+      "id": "R13-replace-same-address-late-error",
+      "contracts": [
+        "K29"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "abort-observed-but-ignored",
+          "at": 0,
+          "id": 1
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 2,
+          "generation": 0,
+          "inputs": {
+            "term": "B"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 2,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 2,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 2,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "B",
+            "dataInputs": {
+              "term": "B"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 2
+        }
+      ]
+    },
+    {
+      "id": "R14-dispose-all-waiters-no-new-request",
+      "contracts": [
+        "K29",
+        "K16"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "abort-observed-but-ignored",
+          "at": 0,
+          "id": 1
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        }
+      ]
+    },
+    {
+      "id": "R15-caller-cancellation-preserves-shared-query",
+      "contracts": [
+        "K16"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "initial",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": "initial",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "fresh",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R16-timeout-late-success-after-retry",
+      "contracts": [
+        "K11",
+        "K27",
+        "K29"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "abort-observed-but-ignored",
+          "at": 30000,
+          "id": 1
+        },
+        {
+          "kind": "accept",
+          "at": 30000,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": "TIMEOUT"
+        },
+        {
+          "kind": "snapshot",
+          "at": 30000,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-error",
+          "state": {
+            "status": "error",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": {
+              "code": "TIMEOUT",
+              "message": "TIMEOUT"
+            },
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 30000,
+          "id": 2,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 30000,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 30000,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 30000,
+          "owner": 1,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 30000,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "retry-success",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 30000,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "discard-terminal",
+          "at": 30000,
+          "owner": 1,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "dispose",
+          "at": 30000,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R17-timeout-late-error-during-fresh-run",
+      "contracts": [
+        "K11",
+        "K29"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "abort-observed-but-ignored",
+          "at": 30000,
+          "id": 1
+        },
+        {
+          "kind": "accept",
+          "at": 30000,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": "TIMEOUT"
+        },
+        {
+          "kind": "snapshot",
+          "at": 30000,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-error",
+          "state": {
+            "status": "error",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": {
+              "code": "TIMEOUT",
+              "message": "TIMEOUT"
+            },
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 30000,
+          "id": 2,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 30000,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 30000,
+          "id": 1,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "discard-terminal",
+          "at": 30000,
+          "owner": 1,
+          "id": 1,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "transport-completion",
+          "at": 30000,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 30000,
+          "owner": 1,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 30000,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "fresh",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 30000,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R18-response-before-deadline",
+      "contracts": [
+        "K11"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 29999,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 29999,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 29999,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "on-time",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 30001,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R19-timeout-queued-first-at-same-deadline",
+      "contracts": [
+        "K11",
+        "K29"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "abort-observed-but-ignored",
+          "at": 30000,
+          "id": 1
+        },
+        {
+          "kind": "accept",
+          "at": 30000,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": "TIMEOUT"
+        },
+        {
+          "kind": "snapshot",
+          "at": 30000,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-error",
+          "state": {
+            "status": "error",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": {
+              "code": "TIMEOUT",
+              "message": "TIMEOUT"
+            },
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 30000,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "discard-terminal",
+          "at": 30000,
+          "owner": 1,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "dispose",
+          "at": 30000,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R20-last-success-failure-retry",
+      "contracts": [
+        "K25",
+        "K27"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": {
+              "rows": [
+                "A"
+              ]
+            },
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 1,
+          "inputs": {
+            "term": "B"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "rows": [
+                "A"
+              ]
+            },
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": true,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 1,
+          "currentGeneration": 1,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-error",
+          "state": {
+            "status": "error",
+            "data": {
+              "rows": [
+                "A"
+              ]
+            },
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": {
+              "code": "HTTP_ERROR",
+              "message": "HTTP_ERROR"
+            },
+            "stale": true,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 3,
+          "owner": 1,
+          "generation": 1,
+          "inputs": {
+            "term": "B"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "rows": [
+                "A"
+              ]
+            },
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": true,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 3,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 3,
+          "generation": 1,
+          "currentGeneration": 1,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": {
+              "rows": [
+                "B"
+              ]
+            },
+            "dataInputs": {
+              "term": "B"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R21-preserve-null",
+      "contracts": [
+        "K26"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": null,
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": null,
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-error",
+          "state": {
+            "status": "error",
+            "data": null,
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": {
+              "code": "HTTP_ERROR",
+              "message": "HTTP_ERROR"
+            },
+            "stale": true,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R21-preserve-false",
+      "contracts": [
+        "K26"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": false,
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": false,
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-error",
+          "state": {
+            "status": "error",
+            "data": false,
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": {
+              "code": "HTTP_ERROR",
+              "message": "HTTP_ERROR"
+            },
+            "stale": true,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R21-preserve-zero",
+      "contracts": [
+        "K26"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": 0,
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": 0,
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-error",
+          "state": {
+            "status": "error",
+            "data": 0,
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": {
+              "code": "HTTP_ERROR",
+              "message": "HTTP_ERROR"
+            },
+            "stale": true,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R21-preserve-empty-string",
+      "contracts": [
+        "K26"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": "",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-error",
+          "state": {
+            "status": "error",
+            "data": "",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": {
+              "code": "HTTP_ERROR",
+              "message": "HTTP_ERROR"
+            },
+            "stale": true,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R21-preserve-empty-array",
+      "contracts": [
+        "K26"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": [],
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": [],
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-error",
+          "state": {
+            "status": "error",
+            "data": [],
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": {
+              "code": "HTTP_ERROR",
+              "message": "HTTP_ERROR"
+            },
+            "stale": true,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R22-first-failure-no-data",
+      "contracts": [
+        "K25"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-error",
+          "state": {
+            "status": "error",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": {
+              "code": "HTTP_ERROR",
+              "message": "HTTP_ERROR"
+            },
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R23-refresh-disabled-first-input-retry-allowed",
+      "contracts": [
+        "K12",
+        "K14"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "abort-observed-but-ignored",
+          "at": 0,
+          "id": 1
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 2,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 2,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 2,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 2,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "initial",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 3,
+          "owner": 2,
+          "generation": 1,
+          "inputs": {
+            "term": "B"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 2,
+          "generation": 1,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": "initial",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": true,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 3,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 2,
+          "id": 3,
+          "generation": 1,
+          "currentGeneration": 1,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 2,
+          "generation": 1,
+          "reason": "run-error",
+          "state": {
+            "status": "error",
+            "data": "initial",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": {
+              "code": "HTTP_ERROR",
+              "message": "HTTP_ERROR"
+            },
+            "stale": true,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 4,
+          "owner": 2,
+          "generation": 1,
+          "inputs": {
+            "term": "B"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 2,
+          "generation": 1,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": "initial",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": true,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 4,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 2,
+          "id": 4,
+          "generation": 1,
+          "currentGeneration": 1,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 2,
+          "generation": 1,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "B",
+            "dataInputs": {
+              "term": "B"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 2
+        }
+      ]
+    },
+    {
+      "id": "R24-auto-refresh-gate-does-not-block-manual",
+      "contracts": [
+        "Q10"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "initial",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": "initial",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "manual",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R25-no-implicit-retry",
+      "contracts": [
+        "K14"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-error",
+          "state": {
+            "status": "error",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": {
+              "code": "HTTP_ERROR",
+              "message": "HTTP_ERROR"
+            },
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 100000,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R26-independent-owners",
+      "contracts": [
+        "K16",
+        "K29"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 2,
+          "generation": 0,
+          "inputs": {
+            "term": "C"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 2,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "abort-observed-but-ignored",
+          "at": 0,
+          "id": 1
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 2,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 2,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "other-initial",
+            "dataInputs": {
+              "term": "C"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 3,
+          "owner": 2,
+          "generation": 0,
+          "inputs": {
+            "term": "C"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 2,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": "other-initial",
+            "dataInputs": {
+              "term": "C"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 3,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 2,
+          "id": 3,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 2,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "other-fresh",
+            "dataInputs": {
+              "term": "C"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 2
+        }
+      ]
+    },
+    {
+      "id": "R27-input-and-result-snapshot-isolation",
+      "contracts": [
+        "K29"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "latest-pending",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 1,
+          "code": null
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 1,
+          "inputs": {
+            "term": "B",
+            "filter": {
+              "enabled": true
+            }
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 1,
+          "currentGeneration": 1,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": {
+              "rows": [
+                "B"
+              ]
+            },
+            "dataInputs": {
+              "term": "B",
+              "filter": {
+                "enabled": true
+              }
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R28-fresh-failure-stops-awaiting-step",
+      "contracts": [
+        "Q11",
+        "K28"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "initial",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": "initial",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-error",
+          "state": {
+            "status": "error",
+            "data": "initial",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": {
+              "code": "HTTP_ERROR",
+              "message": "HTTP_ERROR"
+            },
+            "stale": true,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R29-dispose-after-transport-completion-before-microtask",
+      "contracts": [
+        "K29"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "abort-observed-but-ignored",
+          "at": 0,
+          "id": 1
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        }
+      ]
+    },
+    {
+      "id": "R30-active-fresh-waiter-rejected-when-gate-closes",
+      "contracts": [
+        "K13"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 0,
+          "currentGeneration": 0,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "initial",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 2,
+          "owner": 1,
+          "generation": 0,
+          "inputs": {
+            "term": "A"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": "initial",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "gate-closed",
+          "state": {
+            "status": "waiting",
+            "data": "initial",
+            "dataInputs": {
+              "term": "A"
+            },
+            "error": null,
+            "stale": true,
+            "waitingReason": "EXECUTION_BLOCKED"
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 2,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "discard-obsolete",
+          "at": 0,
+          "owner": 1,
+          "id": 2,
+          "generation": 0,
+          "currentGeneration": 1,
+          "code": "HTTP_ERROR"
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R31-initial-gate-blocked",
+      "contracts": [
+        "Q09",
+        "Q18"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "gate-closed",
+          "state": {
+            "status": "waiting",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": "EXECUTION_BLOCKED"
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 1,
+          "inputs": {
+            "term": "B"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 1,
+          "currentGeneration": 1,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": "B",
+            "dataInputs": {
+              "term": "B"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    },
+    {
+      "id": "R32-initial-input-unready",
+      "contracts": [
+        "K03"
+      ],
+      "passed": true,
+      "trace": [
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 0,
+          "reason": "input-not-ready",
+          "state": {
+            "status": "waiting",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": "INPUT_NOT_READY"
+          }
+        },
+        {
+          "kind": "request",
+          "at": 0,
+          "id": 1,
+          "owner": 1,
+          "generation": 1,
+          "inputs": {
+            "term": "B"
+          }
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-start",
+          "state": {
+            "status": "running",
+            "data": {
+              "$missing": true
+            },
+            "dataInputs": {
+              "$missing": true
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "transport-completion",
+          "at": 0,
+          "id": 1,
+          "code": null
+        },
+        {
+          "kind": "accept",
+          "at": 0,
+          "owner": 1,
+          "id": 1,
+          "generation": 1,
+          "currentGeneration": 1,
+          "code": null
+        },
+        {
+          "kind": "snapshot",
+          "at": 0,
+          "owner": 1,
+          "generation": 1,
+          "reason": "run-success",
+          "state": {
+            "status": "success",
+            "data": null,
+            "dataInputs": {
+              "term": "B"
+            },
+            "error": null,
+            "stale": false,
+            "waitingReason": null
+          }
+        },
+        {
+          "kind": "dispose",
+          "at": 0,
+          "owner": 1
+        }
+      ]
+    }
+  ],
+  "mutations": [
+    {
+      "switchName": "skipGenerationGuard",
+      "scenario": "R03-input-ABA",
+      "detected": true,
+      "error": "Expected values to be strictly equal:\n+ actual - expected\n\n+ 'first-A'\n- undefined\n"
+    },
+    {
+      "switchName": "skipLifetimeGuard",
+      "scenario": "R12-replace-same-address-late-success",
+      "detected": true,
+      "error": "Expected \"actual\" to be reference-equal to \"expected\":\n+ actual - expected\n\n  {\n+   data: 'disposed-owner-A',\n-   data: 'new-owner-B',\n    dataInputs: {\n+     term: 'A'\n-     term: 'B'\n    },\n    error: null,\n    stale: false,\n    status: 'success',\n    waitingReason: null\n"
+    },
+    {
+      "switchName": "skipTerminalGuard",
+      "scenario": "R16-timeout-late-success-after-retry",
+      "detected": true,
+      "error": "Expected \"actual\" to be reference-equal to \"expected\":\n+ actual - expected\n\n  {\n+   data: 'late-timeout-result',\n-   data: 'retry-success',\n    dataInputs: {\n      term: 'A'\n    },\n    error: null,\n    stale: false,\n"
+    },
+    {
+      "switchName": "completeRefreshOnActive",
+      "scenario": "R06-refresh-waves",
+      "detected": true,
+      "error": "Expected values to be strictly equal:\n+ actual - expected\n\n+ 'fulfilled'\n- 'pending'\n"
+    }
+  ],
+  "seeds": [
+    {
+      "seed": 1,
+      "changes": 40,
+      "refreshCalls": 18,
+      "requestTerms": [
+        "A",
+        "B"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 2,
+      "changes": 40,
+      "refreshCalls": 15,
+      "requestTerms": [
+        "A",
+        "B"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 3,
+      "changes": 40,
+      "refreshCalls": 10,
+      "requestTerms": [
+        "A",
+        "B"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 4,
+      "changes": 40,
+      "refreshCalls": 11,
+      "requestTerms": [
+        "A",
+        "B"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 5,
+      "changes": 40,
+      "refreshCalls": 17,
+      "requestTerms": [
+        "A",
+        "B"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 6,
+      "changes": 40,
+      "refreshCalls": 13,
+      "requestTerms": [
+        "A",
+        "B"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 7,
+      "changes": 40,
+      "refreshCalls": 14,
+      "requestTerms": [
+        "A",
+        "B"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 8,
+      "changes": 40,
+      "refreshCalls": 22,
+      "requestTerms": [
+        "A",
+        "B"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 9,
+      "changes": 40,
+      "refreshCalls": 13,
+      "requestTerms": [
+        "A",
+        "B"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 10,
+      "changes": 40,
+      "refreshCalls": 15,
+      "requestTerms": [
+        "A",
+        "B"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 11,
+      "changes": 40,
+      "refreshCalls": 11,
+      "requestTerms": [
+        "A",
+        "B"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 12,
+      "changes": 40,
+      "refreshCalls": 17,
+      "requestTerms": [
+        "A",
+        "B"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 13,
+      "changes": 40,
+      "refreshCalls": 11,
+      "requestTerms": [
+        "A",
+        "B"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 14,
+      "changes": 40,
+      "refreshCalls": 19,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 15,
+      "changes": 40,
+      "refreshCalls": 16,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 16,
+      "changes": 40,
+      "refreshCalls": 13,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 17,
+      "changes": 40,
+      "refreshCalls": 12,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 18,
+      "changes": 40,
+      "refreshCalls": 11,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 19,
+      "changes": 40,
+      "refreshCalls": 15,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 20,
+      "changes": 40,
+      "refreshCalls": 13,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 21,
+      "changes": 40,
+      "refreshCalls": 16,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 22,
+      "changes": 40,
+      "refreshCalls": 12,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 23,
+      "changes": 40,
+      "refreshCalls": 15,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 24,
+      "changes": 40,
+      "refreshCalls": 16,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 25,
+      "changes": 40,
+      "refreshCalls": 12,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 26,
+      "changes": 40,
+      "refreshCalls": 15,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 27,
+      "changes": 40,
+      "refreshCalls": 14,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 28,
+      "changes": 40,
+      "refreshCalls": 18,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 29,
+      "changes": 40,
+      "refreshCalls": 12,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 30,
+      "changes": 40,
+      "refreshCalls": 11,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 31,
+      "changes": 40,
+      "refreshCalls": 10,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 32,
+      "changes": 40,
+      "refreshCalls": 10,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 33,
+      "changes": 40,
+      "refreshCalls": 18,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 34,
+      "changes": 40,
+      "refreshCalls": 19,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 35,
+      "changes": 40,
+      "refreshCalls": 14,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 36,
+      "changes": 40,
+      "refreshCalls": 16,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 37,
+      "changes": 40,
+      "refreshCalls": 13,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 38,
+      "changes": 40,
+      "refreshCalls": 11,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 39,
+      "changes": 40,
+      "refreshCalls": 12,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 40,
+      "changes": 40,
+      "refreshCalls": 13,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 41,
+      "changes": 40,
+      "refreshCalls": 23,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 42,
+      "changes": 40,
+      "refreshCalls": 10,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 43,
+      "changes": 40,
+      "refreshCalls": 15,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 44,
+      "changes": 40,
+      "refreshCalls": 16,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 45,
+      "changes": 40,
+      "refreshCalls": 13,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 46,
+      "changes": 40,
+      "refreshCalls": 17,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 47,
+      "changes": 40,
+      "refreshCalls": 15,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 48,
+      "changes": 40,
+      "refreshCalls": 15,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 49,
+      "changes": 40,
+      "refreshCalls": 13,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 50,
+      "changes": 40,
+      "refreshCalls": 11,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 51,
+      "changes": 40,
+      "refreshCalls": 11,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 52,
+      "changes": 40,
+      "refreshCalls": 10,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 53,
+      "changes": 40,
+      "refreshCalls": 10,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 54,
+      "changes": 40,
+      "refreshCalls": 17,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 55,
+      "changes": 40,
+      "refreshCalls": 15,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 56,
+      "changes": 40,
+      "refreshCalls": 9,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 57,
+      "changes": 40,
+      "refreshCalls": 13,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 58,
+      "changes": 40,
+      "refreshCalls": 16,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 59,
+      "changes": 40,
+      "refreshCalls": 12,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 60,
+      "changes": 40,
+      "refreshCalls": 16,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 61,
+      "changes": 40,
+      "refreshCalls": 14,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 62,
+      "changes": 40,
+      "refreshCalls": 17,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 63,
+      "changes": 40,
+      "refreshCalls": 17,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 64,
+      "changes": 40,
+      "refreshCalls": 12,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 65,
+      "changes": 40,
+      "refreshCalls": 13,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 66,
+      "changes": 40,
+      "refreshCalls": 15,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 67,
+      "changes": 40,
+      "refreshCalls": 18,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 68,
+      "changes": 40,
+      "refreshCalls": 20,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 69,
+      "changes": 40,
+      "refreshCalls": 10,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 70,
+      "changes": 40,
+      "refreshCalls": 13,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 71,
+      "changes": 40,
+      "refreshCalls": 14,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 72,
+      "changes": 40,
+      "refreshCalls": 15,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 73,
+      "changes": 40,
+      "refreshCalls": 18,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 74,
+      "changes": 40,
+      "refreshCalls": 13,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 75,
+      "changes": 40,
+      "refreshCalls": 12,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 76,
+      "changes": 40,
+      "refreshCalls": 14,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 77,
+      "changes": 40,
+      "refreshCalls": 13,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 78,
+      "changes": 40,
+      "refreshCalls": 12,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 79,
+      "changes": 40,
+      "refreshCalls": 13,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 80,
+      "changes": 40,
+      "refreshCalls": 17,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 81,
+      "changes": 40,
+      "refreshCalls": 11,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 82,
+      "changes": 40,
+      "refreshCalls": 15,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 83,
+      "changes": 40,
+      "refreshCalls": 16,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 84,
+      "changes": 40,
+      "refreshCalls": 11,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 85,
+      "changes": 40,
+      "refreshCalls": 18,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 86,
+      "changes": 40,
+      "refreshCalls": 10,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 87,
+      "changes": 40,
+      "refreshCalls": 13,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 88,
+      "changes": 40,
+      "refreshCalls": 15,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 89,
+      "changes": 40,
+      "refreshCalls": 17,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 90,
+      "changes": 40,
+      "refreshCalls": 11,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 91,
+      "changes": 40,
+      "refreshCalls": 15,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 92,
+      "changes": 40,
+      "refreshCalls": 10,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 93,
+      "changes": 40,
+      "refreshCalls": 19,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 94,
+      "changes": 40,
+      "refreshCalls": 10,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 95,
+      "changes": 40,
+      "refreshCalls": 14,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 96,
+      "changes": 40,
+      "refreshCalls": 18,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 97,
+      "changes": 40,
+      "refreshCalls": 15,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 98,
+      "changes": 40,
+      "refreshCalls": 14,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 99,
+      "changes": 40,
+      "refreshCalls": 12,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    },
+    {
+      "seed": 100,
+      "changes": 40,
+      "refreshCalls": 11,
+      "requestTerms": [
+        "A",
+        "A"
+      ],
+      "passed": true
+    }
+  ]
+}

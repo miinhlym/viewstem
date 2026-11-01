@@ -1,0 +1,74 @@
+{
+  "generatedAt": "2026-11-02T00:34:52.280Z",
+  "runtime": "v24.19.0",
+  "icu": "78.3",
+  "tz": "2026a",
+  "scope": "Actual UIProbe expanded instance/generation/author-owner lifetimes reconciled with ActionProbe connect/invoke/dispose by a private dispatch adapter; includes StateProbe-triggered self-removal. No production core, renderer, UI action-observation initialization, native dynamic-child API, or public API claim.",
+  "sourceSha256": {
+    "action-ui-integration.mjs": "993a42025634b6cef3811ba769add755cd7e1d431343e5ac787f12b580eb975f",
+    "report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+    "errors.mjs": "c9d94483f9314bcf5bad42cb044f7b0ba29cd7d7b9d3ba561f1c9021aa6d7224",
+    "../t3-ui/ui-probe.mjs": "fd8fea7ebd17ca80ccc562f982021785c876fc3abfb4eb833a0d85ba29a48f6d",
+    "../t3-ui/value-evaluator.mjs": "42d9047b771651a554e8a01fb355b469742aab748c0d94073c04d3b07a8451c7",
+    "../t3-action/action-probe.mjs": "9fc53689cd4c95405c8910a0a1fe50429cd89ea3327c8b63b68a2e8e7c4a7c8c",
+    "../t3-state/state-probe.mjs": "501e0e0d78c8b8bf4fa1a9d465fe844e8cbeb06752013bc9ac6c765a0f5edbaa",
+    "../t3-state/ports-probe.mjs": "b7cc988b6f9da94081acd54a7757e35fd19e0db3619032a0c04915f42893815a",
+    "../t3-state/immutable.mjs": "e86391873075d434ce26169043dece6e28b9082ddb20f9aab84c4dbaa78790f4",
+    "../t2-http-boundary/value-expressions.mjs": "3bd0320dc4e2a978de7a576e1c3df90d456170e9540d8aa667f42d0c1c65a32f",
+    "../t1-values/schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+    "../t1-values/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+    "../t1-values/values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+    "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be"
+  },
+  "summary": {
+    "executed": 11,
+    "passed": 11,
+    "failed": 0
+  },
+  "results": [
+    {
+      "id": "A12-A15-U05/UI-when-removal-recreated-local-id-rejects-late-result",
+      "passed": true
+    },
+    {
+      "id": "A15/UI-on-removal-keeps-node-and-recreates-fresh-connection",
+      "passed": true
+    },
+    {
+      "id": "A12-A15/UI-actionRef-replacement-keeps-node-and-renews-connection",
+      "passed": true
+    },
+    {
+      "id": "A12-A15-U07/UI-componentRef-replacement-renews-generation-and-blocks-late-result",
+      "passed": true
+    },
+    {
+      "id": "A02-A11-A21-U06/UI-repeat-reorder-retains-idless-running-connections-and-value-snapshots",
+      "passed": true
+    },
+    {
+      "id": "A12-A13-U06/UI-removing-one-repeat-item-keeps-other-call-running",
+      "passed": true
+    },
+    {
+      "id": "A12-A21/UI-component-owners-isolate-same-on-id-and-owner-disposal",
+      "passed": true
+    },
+    {
+      "id": "U07/UI-row-move-preserves-author-owner-node-definition-and-running-call",
+      "passed": true
+    },
+    {
+      "id": "M01/UI-invalid-structural-apply-preserves-existing-call-and-tree",
+      "passed": true
+    },
+    {
+      "id": "A12-K16/UI-connection-removal-cancels-declarative-parent-child-and-followups",
+      "passed": true
+    },
+    {
+      "id": "A16/State-write-removes-own-when-connection-before-next-step",
+      "passed": true
+    }
+  ]
+}

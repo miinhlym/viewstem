@@ -1,0 +1,60 @@
+{
+  "generatedAt": "2026-10-30T10:28:58.788Z",
+  "runtime": "v24.1.0",
+  "icu": "77.1",
+  "tz": "2025b",
+  "scope": "Default candidate registry inventory equality, not whole function conformance or v1 public profile approval",
+  "sourceSha256": {
+    "catalog.mjs": "4072e7867f71ac8f382948d44c22ded8276af1c3ffc508776c99f82868b507ea",
+    "function-catalog.json": "04f3e757277a4312b12fb2cb2fecf02c71e21a9f9677bac6533c518eb0394e05",
+    "prepare.mjs": "4cf29b202e72093e63fa9205d0a593781f4bdac1aaa2fcc6bb8c738baabe876d",
+    "cel-js-8.0.0.patch": "62dd517376de54a08018f6166b250d9013b907e87b11ab75d0f07e264de0da63",
+    "upstream-sha256.json": "19172ed8004970d5801f3c8b52991b25d074d0305fac01cc87fcbbaf97ec61f2",
+    "patched-sha256.json": "bd38774ee6ef0dd3683422afe4d6c8fd5f862b0d3e530ebc65163e000d5e17dd",
+    "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594"
+  },
+  "patchSha256": "62dd517376de54a08018f6166b250d9013b907e87b11ab75d0f07e264de0da63",
+  "macroSignatures": [
+    "optional<dyn>.or(ast): optional<dyn>",
+    "optional<dyn>.orValue(ast): dyn",
+    "has(ast): bool",
+    "list<dyn>.all(ast, ast): bool",
+    "list<dyn>.exists(ast, ast): bool",
+    "list<dyn>.exists_one(ast, ast): bool",
+    "list<dyn>.map(ast, ast): list<dyn>",
+    "list<dyn>.map(ast, ast, ast): list<dyn>",
+    "list<dyn>.filter(ast, ast): list<dyn>",
+    "CelNamespace.bind(ast, dyn, ast): dyn"
+  ],
+  "summary": {
+    "executed": 6,
+    "passed": 6,
+    "failed": 0
+  },
+  "results": [
+    {
+      "id": "catalog/exact-108-signatures",
+      "passed": true
+    },
+    {
+      "id": "catalog/exact-10-overlapping-macros",
+      "passed": true
+    },
+    {
+      "id": "catalog/default-enableOptionalTypes-false",
+      "passed": true
+    },
+    {
+      "id": "catalog/variables-match",
+      "passed": true
+    },
+    {
+      "id": "catalog/classifications-cover-all",
+      "passed": true
+    },
+    {
+      "id": "catalog/patch-provenance",
+      "passed": true
+    }
+  ]
+}

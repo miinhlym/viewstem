@@ -1,0 +1,335 @@
+{
+  "generatedAt": "2026-10-30T08:50:19.921Z",
+  "runtime": "v24.19.0",
+  "icu": "78.3",
+  "tz": "2026a",
+  "scope": "v1 schema registration profile and syntax, not full normalization/State/core",
+  "sourceSha256": {
+    "schema-registration.mjs": "70a38ae4cfd9e9d7d8f0d5cb74c71e29475aaa4d69b9d4f3b7f2c622e8e25091",
+    "schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+    "schema-probe.mjs": "8b76b6efde8f5c3dc5717905dc552ebb1412e5543dfd35a59d1bb76fb0880a31",
+    "values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+    "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+    "package.json": "91c1223f73e2fd6f660452b15a66f9e8674580b85b9f0e618098c0effc305ae1",
+    "package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be"
+  },
+  "summary": {
+    "executed": 78,
+    "passed": 78,
+    "failed": 0
+  },
+  "results": [
+    {
+      "id": "standard/S01",
+      "passed": true
+    },
+    {
+      "id": "standard/S02",
+      "passed": true
+    },
+    {
+      "id": "standard/S03",
+      "passed": true
+    },
+    {
+      "id": "standard/S04",
+      "passed": true
+    },
+    {
+      "id": "standard/S05",
+      "passed": true
+    },
+    {
+      "id": "standard/S06",
+      "passed": true
+    },
+    {
+      "id": "standard/S07",
+      "passed": true
+    },
+    {
+      "id": "standard/S08",
+      "passed": true
+    },
+    {
+      "id": "standard/S09",
+      "passed": true
+    },
+    {
+      "id": "standard/S10",
+      "passed": true
+    },
+    {
+      "id": "standard/S11",
+      "passed": true
+    },
+    {
+      "id": "standard/S12",
+      "passed": true
+    },
+    {
+      "id": "standard/S13",
+      "passed": true
+    },
+    {
+      "id": "standard/S14",
+      "passed": true
+    },
+    {
+      "id": "standard/S15",
+      "passed": true
+    },
+    {
+      "id": "standard/S16",
+      "passed": true
+    },
+    {
+      "id": "standard/S17",
+      "passed": true
+    },
+    {
+      "id": "standard/S18",
+      "passed": true
+    },
+    {
+      "id": "standard/S19",
+      "passed": true
+    },
+    {
+      "id": "standard/S20",
+      "passed": true
+    },
+    {
+      "id": "standard/S21",
+      "passed": true
+    },
+    {
+      "id": "standard/S22",
+      "passed": true
+    },
+    {
+      "id": "standard/S23",
+      "passed": true
+    },
+    {
+      "id": "standard/S24",
+      "passed": true
+    },
+    {
+      "id": "registration/dialect",
+      "passed": true
+    },
+    {
+      "id": "registration/annotations",
+      "passed": true
+    },
+    {
+      "id": "registration/bounds",
+      "passed": true
+    },
+    {
+      "id": "registration/all-keywords",
+      "passed": true
+    },
+    {
+      "id": "registration/native-set",
+      "passed": true
+    },
+    {
+      "id": "registration/native-map",
+      "passed": true
+    },
+    {
+      "id": "registration/native-date",
+      "passed": true
+    },
+    {
+      "id": "registration/native-time",
+      "passed": true
+    },
+    {
+      "id": "registration/native-datetime",
+      "passed": true
+    },
+    {
+      "id": "registration/native-local-ref",
+      "passed": true
+    },
+    {
+      "id": "registration/escaped-local-ref",
+      "passed": true
+    },
+    {
+      "id": "registration/percent-local-ref",
+      "passed": true
+    },
+    {
+      "id": "registration/empty-enum",
+      "passed": true
+    },
+    {
+      "id": "registration/annotation-not-schema",
+      "passed": true
+    },
+    {
+      "id": "registration/complete-keyword-inventory",
+      "passed": true
+    },
+    {
+      "id": "reject/undefined",
+      "passed": true
+    },
+    {
+      "id": "reject/null",
+      "passed": true
+    },
+    {
+      "id": "reject/array",
+      "passed": true
+    },
+    {
+      "id": "reject/unknown",
+      "passed": true
+    },
+    {
+      "id": "reject/format",
+      "passed": true
+    },
+    {
+      "id": "reject/unknown-native",
+      "passed": true
+    },
+    {
+      "id": "reject/native-null",
+      "passed": true
+    },
+    {
+      "id": "reject/dialect-0",
+      "passed": true
+    },
+    {
+      "id": "reject/dialect-1",
+      "passed": true
+    },
+    {
+      "id": "reject/dialect-2",
+      "passed": true
+    },
+    {
+      "id": "reject/dialect-3",
+      "passed": true
+    },
+    {
+      "id": "reject/type-and-native",
+      "passed": true
+    },
+    {
+      "id": "reject/set-without-items",
+      "passed": true
+    },
+    {
+      "id": "reject/map-without-keys",
+      "passed": true
+    },
+    {
+      "id": "reject/map-without-values",
+      "passed": true
+    },
+    {
+      "id": "reject/native-key-null",
+      "passed": true
+    },
+    {
+      "id": "reject/native-value-syntax",
+      "passed": true
+    },
+    {
+      "id": "reject/map-fields-on-json",
+      "passed": true
+    },
+    {
+      "id": "reject/external-ref",
+      "passed": true
+    },
+    {
+      "id": "reject/root-ref",
+      "passed": true
+    },
+    {
+      "id": "reject/null-ref",
+      "passed": true
+    },
+    {
+      "id": "reject/absent-ref",
+      "passed": true
+    },
+    {
+      "id": "reject/prototype-ref",
+      "passed": true
+    },
+    {
+      "id": "reject/bad-escape",
+      "passed": true
+    },
+    {
+      "id": "reject/bad-percent",
+      "passed": true
+    },
+    {
+      "id": "reject/self-cycle",
+      "passed": true
+    },
+    {
+      "id": "reject/indirect-cycle",
+      "passed": true
+    },
+    {
+      "id": "reject/properties-null",
+      "passed": true
+    },
+    {
+      "id": "reject/defs-list",
+      "passed": true
+    },
+    {
+      "id": "reject/anyOf-object",
+      "passed": true
+    },
+    {
+      "id": "reject/oneOf-empty",
+      "passed": true
+    },
+    {
+      "id": "reject/items-null",
+      "passed": true
+    },
+    {
+      "id": "reject/bad-min",
+      "passed": true
+    },
+    {
+      "id": "reject/bad-type",
+      "passed": true
+    },
+    {
+      "id": "reject/duplicate-required",
+      "passed": true
+    },
+    {
+      "id": "reject/bad-regex",
+      "passed": true
+    },
+    {
+      "id": "pointer/uri-decoding-before-tokenization",
+      "passed": true
+    },
+    {
+      "id": "pointer/tilde-before-percent-key",
+      "passed": true
+    },
+    {
+      "id": "declaration-before-input",
+      "passed": true
+    }
+  ]
+}

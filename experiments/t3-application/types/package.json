@@ -1,0 +1,8 @@
+{
+  "name": "viewstem-t3-types-contract-fixture",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": { "test": "node run.mjs", "check": "tsc --noEmit --strict" },
+  "devDependencies": { "typescript": "5.9.3" }
+}

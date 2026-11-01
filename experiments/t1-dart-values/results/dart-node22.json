@@ -1,0 +1,906 @@
+{
+  "runtime": "3.11.1 (stable) (Tue Feb 24 00:03:07 2026 -0800) on \"macos_arm64\"",
+  "os": "macos",
+  "timezonePackage": "0.11.2",
+  "nativeDateTimeParseRollsInvalidDay": true,
+  "rows": [
+    {
+      "id": "D01/null-explicit",
+      "actual": {
+        "status": "ready",
+        "value": null
+      }
+    },
+    {
+      "id": "D02/falsy-zero",
+      "actual": {
+        "status": "ready",
+        "value": 0.0
+      }
+    },
+    {
+      "id": "D02/falsy-false",
+      "actual": {
+        "status": "ready",
+        "value": false
+      }
+    },
+    {
+      "id": "D02/falsy-empty",
+      "actual": {
+        "status": "ready",
+        "value": ""
+      }
+    },
+    {
+      "id": "D03/undefined-top",
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D04/object-undefined-omitted",
+      "actual": {
+        "status": "ready",
+        "value": {}
+      }
+    },
+    {
+      "id": "D05/required-undefined-omitted",
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D06/nested-undefined-object-retained",
+      "actual": {
+        "status": "ready",
+        "value": {
+          "profile": {}
+        }
+      }
+    },
+    {
+      "id": "D07/array-object-undefined",
+      "actual": {
+        "status": "ready",
+        "value": [
+          {}
+        ]
+      }
+    },
+    {
+      "id": "D08/array-undefined",
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D09/array-hole",
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D10/array-null-position",
+      "actual": {
+        "status": "ready",
+        "value": [
+          1.0,
+          null,
+          3.0
+        ]
+      }
+    },
+    {
+      "id": "D11/Set-undefined",
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D12/Set-null",
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            null
+          ]
+        }
+      }
+    },
+    {
+      "id": "D13/Set-separate-normalized-objects",
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            {},
+            {}
+          ]
+        }
+      }
+    },
+    {
+      "id": "D14/Set-repeated-reference",
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            {
+              "n": 1.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "D15/Map-undefined-value",
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D16/Map-null-value",
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              "a",
+              null
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "D17/Map-object-normalized",
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              "a",
+              {}
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "D18/Map-string-number-fraction",
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              1.0,
+              "number"
+            ],
+            [
+              "1",
+              "string"
+            ],
+            [
+              1.5,
+              "fraction"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "D19/Map-invalid-key-20",
+      "actual": {
+        "status": "error",
+        "category": "MAP_KEY"
+      }
+    },
+    {
+      "id": "D19/Map-invalid-key-21",
+      "actual": {
+        "status": "error",
+        "category": "MAP_KEY"
+      }
+    },
+    {
+      "id": "D19/Map-invalid-key-22",
+      "actual": {
+        "status": "error",
+        "category": "MAP_KEY"
+      }
+    },
+    {
+      "id": "D19/Map-invalid-key-23",
+      "actual": {
+        "status": "error",
+        "category": "MAP_KEY"
+      }
+    },
+    {
+      "id": "D20/safe-integer--9007199254740991",
+      "actual": {
+        "status": "ready",
+        "value": -9007199254740991.0
+      }
+    },
+    {
+      "id": "D20/safe-integer-9007199254740991",
+      "actual": {
+        "status": "ready",
+        "value": 9007199254740991.0
+      }
+    },
+    {
+      "id": "D21/invalid-integer--9007199254740992",
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D21/invalid-integer-9007199254740992",
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D21/invalid-integer-1.5",
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D21/invalid-integer-42",
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D22/number-large-finite",
+      "actual": {
+        "status": "ready",
+        "value": 1e+100
+      }
+    },
+    {
+      "id": "D23/number-binary64",
+      "actual": {
+        "status": "ready",
+        "value": 0.30000000000000004
+      }
+    },
+    {
+      "id": "D24/nonfinite-nan",
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "D25/nested-nonfinite-nan",
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "D24/nonfinite-infinity",
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "D25/nested-nonfinite-infinity",
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "D24/nonfinite-negativeInfinity",
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "D25/nested-nonfinite-negativeInfinity",
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "D26/negative-zero",
+      "actual": {
+        "status": "ready",
+        "value": 0.0
+      }
+    },
+    {
+      "id": "D27/native-zero-merging",
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              0.0,
+              "replaced"
+            ],
+            [
+              "-0",
+              "string"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "D28/unsupported-bigint",
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D28/unsupported-function",
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D28/unsupported-future",
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D28/unsupported-dateObject",
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D28/unsupported-symbol",
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D29/cycle-object",
+      "actual": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      }
+    },
+    {
+      "id": "D29/cycle-array",
+      "actual": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      }
+    },
+    {
+      "id": "D29/cycle-set",
+      "actual": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      }
+    },
+    {
+      "id": "D29/cycle-map",
+      "actual": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      }
+    },
+    {
+      "id": "D30/date-valid-49",
+      "actual": {
+        "status": "ready",
+        "value": "2026-10-29"
+      }
+    },
+    {
+      "id": "D30/date-valid-50",
+      "actual": {
+        "status": "ready",
+        "value": "09:30:00.000"
+      }
+    },
+    {
+      "id": "D30/date-valid-51",
+      "actual": {
+        "status": "ready",
+        "value": "09:30:01.100"
+      }
+    },
+    {
+      "id": "D30/date-valid-52",
+      "actual": {
+        "status": "ready",
+        "value": "2026-10-29T00:30:00.000Z"
+      }
+    },
+    {
+      "id": "D30/date-valid-53",
+      "actual": {
+        "status": "ready",
+        "value": "0099-01-01T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "D30/date-valid-54",
+      "actual": {
+        "status": "ready",
+        "value": "0001-01-01T00:00:00.001Z"
+      }
+    },
+    {
+      "id": "D30/date-valid-55",
+      "actual": {
+        "status": "ready",
+        "value": "2000-02-29"
+      }
+    },
+    {
+      "id": "D31/date-invalid-56",
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-57",
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-58",
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-59",
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-60",
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-61",
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-62",
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-63",
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-64",
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-65",
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-66",
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D32/ordinary-string-not-date",
+      "actual": {
+        "status": "ready",
+        "value": "2026-02-30T09:30:00"
+      }
+    },
+    {
+      "id": "D33/nullable-date-null",
+      "actual": {
+        "status": "ready",
+        "value": null
+      }
+    },
+    {
+      "id": "D34/native-collection-equality",
+      "actual": {
+        "setObjects": 2,
+        "sameReference": true,
+        "sameContent": false,
+        "mapKeys": 3
+      }
+    },
+    {
+      "id": "D35/stored-Set-membership",
+      "actual": {
+        "size": 2,
+        "sameReference": true,
+        "sameContent": false,
+        "reorderedEqual": true
+      }
+    },
+    {
+      "id": "D36/Map-order-null-absence",
+      "actual": {
+        "reorderedEqual": true,
+        "hasNull": true,
+        "nullValue": null,
+        "hasAbsent": false
+      }
+    },
+    {
+      "id": "D37/snapshot-readonly-source-stable",
+      "actual": {
+        "sourceMutable": true,
+        "sourceIsolated": true,
+        "blockedMutations": 8,
+        "stableRead": true,
+        "oldSnapshotStable": true
+      }
+    },
+    {
+      "id": "D38/negative-zero-normalized-deep",
+      "actual": {
+        "negativeZero": false,
+        "setSize": 1,
+        "mapSize": 2
+      }
+    },
+    {
+      "id": "D39/missing-read",
+      "actual": {
+        "status": "missing",
+        "simple": "missing"
+      }
+    },
+    {
+      "id": "D40/pending-read",
+      "actual": {
+        "status": "pending",
+        "simpleError": "VALUE_PENDING"
+      }
+    },
+    {
+      "id": "D41/error-read",
+      "actual": {
+        "status": "error",
+        "simpleError": "TIMEOUT"
+      }
+    },
+    {
+      "id": "D42/null-ready",
+      "actual": {
+        "status": "ready",
+        "value": null,
+        "simple": null
+      }
+    },
+    {
+      "id": "D43/required-missing-auto",
+      "actual": {
+        "status": "waiting"
+      }
+    },
+    {
+      "id": "D44/required-pending-explicit",
+      "actual": {
+        "status": "error",
+        "category": "INPUT_NOT_READY"
+      }
+    },
+    {
+      "id": "D45/error-propagated",
+      "actual": {
+        "status": "error",
+        "category": "TIMEOUT"
+      }
+    },
+    {
+      "id": "D46/async-result-is-not-data-Future",
+      "actual": {
+        "status": "ready",
+        "value": 3.0
+      }
+    },
+    {
+      "id": "D47/integer-adapter-result",
+      "actual": {
+        "status": "ready",
+        "value": 3.0
+      }
+    },
+    {
+      "id": "D48/integer-adapter-result-range",
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D49/typed-native-roundtrip",
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              1.5,
+              "fraction"
+            ],
+            [
+              "1.5",
+              "text"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "D50/YY-00",
+      "actual": 2000
+    },
+    {
+      "id": "D50/YY-68",
+      "actual": 2068
+    },
+    {
+      "id": "D50/YY-69",
+      "actual": 1969
+    },
+    {
+      "id": "D50/YY-99",
+      "actual": 1999
+    },
+    {
+      "id": "D51/timezone-seoul",
+      "actual": {
+        "status": "ready",
+        "value": "2026-10-29T00:30:00.000Z"
+      }
+    },
+    {
+      "id": "D51/timezone-ny-valid",
+      "actual": {
+        "status": "ready",
+        "value": "2026-03-08T07:30:00.000Z"
+      }
+    },
+    {
+      "id": "D51/timezone-ny-gap",
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D51/timezone-ny-overlap",
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D51/timezone-bad-zone",
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D51/timezone-year-underflow",
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D52/stored-Set-reinput-array",
+      "actual": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": [
+          1.0,
+          2.0
+        ]
+      }
+    },
+    {
+      "id": "D52/stored-Set-reinput-object-array",
+      "actual": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": [
+            1.0,
+            2.0
+          ]
+        }
+      }
+    },
+    {
+      "id": "D52/stored-Set-reinput-object-datetime",
+      "actual": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "2026-10-29T00:30:00.000Z"
+        }
+      }
+    },
+    {
+      "id": "D52/stored-Set-reinput-object-time",
+      "actual": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "09:30:00.000"
+        }
+      }
+    },
+    {
+      "id": "D52/stored-Set-reinput-object-date",
+      "actual": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "2026-10-29"
+        }
+      }
+    },
+    {
+      "id": "D53/additionalProperties-integer-valid",
+      "actual": {
+        "status": "ready",
+        "value": {
+          "extra": 3.0,
+          "name": "kept"
+        }
+      }
+    },
+    {
+      "id": "D53/additionalProperties-integer-invalid",
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D54/additionalProperties-nested-valid",
+      "actual": {
+        "status": "ready",
+        "value": {
+          "outer": {
+            "rows": [
+              1.0,
+              2.0
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "D54/additionalProperties-nested-invalid",
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D55/additionalProperties-date-normalization",
+      "actual": {
+        "status": "ready",
+        "value": {
+          "instant": "2026-10-29T00:30:00.000Z"
+        }
+      }
+    },
+    {
+      "id": "D55/additionalProperties-date-invalid",
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D56/additionalProperties-true",
+      "actual": {
+        "status": "ready",
+        "value": {
+          "free": [
+            1.0,
+            "text"
+          ]
+        }
+      }
+    },
+    {
+      "id": "D56/additionalProperties-false",
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D57/native-adapter-array-membership",
+      "actual": {
+        "sameStored": true,
+        "newEqualContent": false,
+        "nativeReturnOrigin": true,
+        "readonly": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "generatedAt": "2026-10-30T09:07:29.713Z",
+  "runtime": "v24.19.0",
+  "icu": "78.3",
+  "tz": "2026a",
+  "scope": "Independent State lifecycle/immutable graph model, no production StateStore/renderer; explicit fixture hooks for initial and derived evaluation",
+  "sourceSha256": {
+    "run.mjs": "b829ad597cbcf375f3e580fb9a52bebad0e521eb136093754fb8314837ffa143",
+    "state-probe.mjs": "b3257019e2cc00e6ddbfe236ac99b82affec61ba9010a59045695967bf05631c",
+    "immutable.mjs": "e86391873075d434ce26169043dece6e28b9082ddb20f9aab84c4dbaa78790f4",
+    "../t1-values/schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+    "../t1-values/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+    "../t1-values/values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+    "../t1-values/package.json": "91c1223f73e2fd6f660452b15a66f9e8674580b85b9f0e618098c0effc305ae1",
+    "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+    "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594"
+  },
+  "summary": {
+    "executed": 27,
+    "passed": 22,
+    "failed": 5
+  },
+  "results": [
+    {
+      "id": "V31-V35/missing-null-falsy-reference",
+      "passed": true
+    },
+    {
+      "id": "V13-V18/object-normalization-and-atomic-failure",
+      "passed": true
+    },
+    {
+      "id": "V19-V22/arrays-and-positions",
+      "passed": true
+    },
+    {
+      "id": "V23-V26/sets-undefined-null-identity",
+      "passed": true
+    },
+    {
+      "id": "V27-V30/maps-undefined-null-objects",
+      "passed": true
+    },
+    {
+      "id": "V36-V40/nonfinite-recursive-and-map-keys",
+      "passed": true
+    },
+    {
+      "id": "V41-V45/safe-integer-recursive",
+      "passed": true
+    },
+    {
+      "id": "V46-V49/binary64-preserved",
+      "passed": true
+    },
+    {
+      "id": "V50-V55/negative-zero-and-notifications",
+      "passed": true
+    },
+    {
+      "id": "V56/unsupported-values-not-executed",
+      "passed": true
+    },
+    {
+      "id": "V58-V59/cycles-and-shared-graph",
+      "passed": true
+    },
+    {
+      "id": "V60-V62/equality-coercion-default-extra",
+      "passed": true
+    },
+    {
+      "id": "V05-V07/content-and-native-membership",
+      "passed": true
+    },
+    {
+      "id": "V08-V09/S06/protected-stable-snapshots",
+      "passed": true
+    },
+    {
+      "id": "S01-S05/atomic-scoped-observation-and-generations",
+      "passed": true
+    },
+    {
+      "id": "S03/reentrant-writes-next-batch",
+      "passed": true
+    },
+    {
+      "id": "C08-C09/initial-write-race-reset-baseline",
+      "passed": true
+    },
+    {
+      "id": "K08/initial-error-and-snapshot-status",
+      "passed": true
+    },
+    {
+      "id": "C11-C13/reaction-explicit-priority-and-atomic-derived",
+      "passed": true
+    },
+    {
+      "id": "C10/derived-failure-and-cycle",
+      "passed": true
+    },
+    {
+      "id": "C06-C07-C15/scope-ownership-and-shared-handles",
+      "passed": true
+    },
+    {
+      "id": "atomic/reject-whole-batch-and-replacement",
+      "passed": true
+    },
+    {
+      "id": "lifecycle/removed-dependency-cannot-retain-stale-success",
+      "passed": false,
+      "error": {
+        "name": "AssertionError",
+        "message": "Expected values to be strictly equal:\n\n'ready' !== 'error'\n",
+        "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'ready' !== 'error'\n\n    at file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/run.mjs:202:10\n    at test (file:///Users/minholim/dev/minh/viewstem/experiments/verification/report.mjs:7:17)\n    at file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/run.mjs:198:7"
+      }
+    },
+    {
+      "id": "lifecycle/replaced-and-disposed-dependency-invalidates-atomically",
+      "passed": false,
+      "error": {
+        "name": "AssertionError",
+        "message": "Expected values to be strictly equal:\n\n'ready' !== 'error'\n",
+        "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'ready' !== 'error'\n\n    at file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/run.mjs:211:12\n    at test (file:///Users/minholim/dev/minh/viewstem/experiments/verification/report.mjs:7:17)\n    at file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/run.mjs:206:7"
+      }
+    },
+    {
+      "id": "errors/hostile-initial-error-does-not-stay-pending",
+      "passed": false,
+      "error": {
+        "name": "AssertionError",
+        "message": "Expected values to be strictly equal:\n+ actual - expected\n\n+ 'TYPE_MISMATCH'\n- 'INTERNAL_ERROR'\n",
+        "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'TYPE_MISMATCH'\n- 'INTERNAL_ERROR'\n\n    at file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/run.mjs:221:59\n    at async test (file:///Users/minholim/dev/minh/viewstem/experiments/verification/report.mjs:7:11)\n    at async file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/run.mjs:215:1"
+      }
+    },
+    {
+      "id": "errors/observer-failure-cannot-prevent-other-observers",
+      "passed": false,
+      "error": {
+        "name": "Error",
+        "message": "secret",
+        "stack": "Error: secret\n    at Object.get (file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/run.mjs:228:97)\n    at errorState (file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/state-probe.mjs:8:96)\n    at #notify (file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/state-probe.mjs:186:86)\n    at #commit (file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/state-probe.mjs:162:17)\n    at file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/state-probe.mjs:117:19\n    at #perform (file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/state-probe.mjs:167:5)\n    at StateProbe.batch (file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/state-probe.mjs:114:18)\n    at Object.write (file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/state-probe.mjs:65:28)\n    at file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/run.mjs:231:10\n    at test (file:///Users/minholim/dev/minh/viewstem/experiments/verification/report.mjs:7:17)"
+      }
+    },
+    {
+      "id": "observation/initial-listener-isolation-and-reentrancy",
+      "passed": false,
+      "error": {
+        "name": "AssertionError",
+        "message": "Got unwanted exception.\nActual message: \"secret\"",
+        "stack": "AssertionError [ERR_ASSERTION]: Got unwanted exception.\nActual message: \"secret\"\n    at file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/run.mjs:237:10\n    at test (file:///Users/minholim/dev/minh/viewstem/experiments/verification/report.mjs:7:17)\n    at file:///Users/minholim/dev/minh/viewstem/experiments/t3-state/run.mjs:234:7"
+      }
+    }
+  ]
+}

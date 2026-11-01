@@ -1,0 +1,329 @@
+{
+  "scope": "A01-A25, Q09, Q11, Q12, Q15, K05, K12, K15, K16, K28, K36, K37, V57; independent experiment evidence only",
+  "statusDefinitions": "verified-experiment means listed independent experiments directly assert every acceptance clause; partial means a concrete clause is missing or a relevant case fails; pending means no executed matching evidence was found.",
+  "hashValidation": {
+    "method": "Read-only SHA-256 comparison of each sourceSha256 entry in the cited result files against the current source file.",
+    "validatedResults": [
+      "experiments/t3-action/results/dynamic-reentry-node22.json",
+      "experiments/t3-action/results/dynamic-reentry-node24.json",
+      "experiments/t3-ui/results/node22.json",
+      "experiments/t3-ui/results/node24.json",
+      "experiments/t3-ui/results/chromium.json",
+      "experiments/t3-state/results/node22.json",
+      "experiments/t3-state/results/node24.json",
+      "experiments/t2-composite-query/results/node22.json",
+      "experiments/t2-composite-query/results/node24.json",
+      "experiments/t2-query-polling/results/node22.json",
+      "experiments/t2-query-races/results/latest.json"
+    ],
+    "mismatches": []
+  },
+  "records": [
+    {
+      "id": "A01",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A01/first-failure-runs-no-later-step-or-output", "A01-A08-A23/sequence-stops-and-preserves-completed-effects"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A02",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A02/value-snapshot-and-state-target-identity"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A03",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A03-K05/registration-xor-cycles-and-unused-definitions"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A04",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A04/native-and-declared-false-is-successful-raw-step-value"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A05",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A05-A06/explicit-output-and-void"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A06",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A05-A06/explicit-output-and-void"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A07",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A07/nullable-output-and-void-reference-error"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A08",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A01-A08-A23/sequence-stops-and-preserves-completed-effects"],
+      "status": "partial",
+      "remaining": "output의 잘못된 값에 대한 타입 검증 실패는 검사했으나, output 표현식 자체의 평가 실패 뒤 Action 실패·효과 보존은 직접 검사하지 않음."
+    },
+    {
+      "id": "A09",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A09-A17-K15/strict-conditions-lazy-message-and-no-catch", "A01/first-failure-runs-no-later-step-or-output"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A10",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A10-A18/branch-results-lexical-scope"],
+      "status": "partial",
+      "remaining": "미래 단계와 분기 결과의 외부 참조는 거절됨. 한 분기에서 다른 분기의 로컬 결과를 읽는 직접 사례는 없음."
+    },
+    {
+      "id": "A11",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A11-A21/duplicates-ignored-per-connection-without-id"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A12",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A12-A13-A15-K16/removed-call-late-value-and-shared-state", "native/error-sanitization-cancellation-finally-and-permission", "K16/nested-action-capabilities-and-query-cancellation"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A13",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A12-A13-A15-K16/removed-call-late-value-and-shared-state"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A14",
+      "source": ["docs/handoff/acceptance-matrix.md", "docs/spec/04-action.md", "experiments/t3-ui/scenarios.mjs", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-ui/results/node22.json", "experiments/t3-ui/results/node24.json", "experiments/t3-ui/results/chromium.json", "experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["U04.invalid-payload-zero-actions-and-input-isolation", "A20-A21/owner-observation-ids"],
+      "status": "partial",
+      "remaining": "UI fixture는 이벤트 입력을 callback에 넘기고 Action fixture는 owner snapshot을 검사하지만, /actions/id를 UI 입력으로 평가하는 초기화 순서(연결 등록→초기 관찰값→Component inputs)와 JSON 속성 순서 독립성을 함께 직접 검사하는 사례가 없음."
+    },
+    {
+      "id": "A15",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-ui/scenarios.mjs", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-ui/results/node22.json", "experiments/t3-ui/results/node24.json", "experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["UI.removed-event-connection-rejected", "A12-A13-A15-K16/removed-call-late-value-and-shared-state"],
+      "status": "partial",
+      "remaining": "UI는 제거된 이벤트 참조 거절, Action은 폐기된 호출 취소와 새 연결 생성까지 검사. 이전 native 결과를 새 동일-id 연결 생성 뒤 완료시킨 후 새 연결의 관찰 상태가 변하지 않는 assertion은 없음."
+    },
+    {
+      "id": "A16",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A16/self-removal-after-write-stops-child-output"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A17",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A03-K05/registration-xor-cycles-and-unused-definitions", "A09-A17-K15/strict-conditions-lazy-message-and-no-catch"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A18",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A07/nullable-output-and-void-reference-error", "A10-A18/branch-results-lexical-scope"],
+      "status": "partial",
+      "remaining": "바깥의 앞선 결과 읽기와 분기 결과의 외부 읽기 거절, If/void 결과 참조 오류는 검사. 반대 분기의 로컬 결과를 읽지 못함을 직접 assertion한 경우는 없음."
+    },
+    {
+      "id": "A19",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A19-K15/assert-message-failure-default-and-nonstring", "A01/first-failure-runs-no-later-step-or-output"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A20",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-ui/scenarios.mjs", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-ui/results/node22.json", "experiments/t3-ui/results/node24.json", "experiments/t3-ui/results/chromium.json", "experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["U12.action-alias-duplicate-in-owner-and-repeat-rejected", "U12.action-alias-separate-owner-and-projected-duplicate", "A20-A21/owner-observation-ids"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A21",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-ui/scenarios.mjs", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-ui/results/node22.json", "experiments/t3-ui/results/node24.json", "experiments/t3-ui/results/chromium.json", "experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["U12.action-alias-separate-owner-and-projected-duplicate", "A11-A21/duplicates-ignored-per-connection-without-id", "A20-A21/owner-observation-ids"],
+      "status": "partial",
+      "remaining": "다른 Component의 같은 id가 허용됨과 무-id 중복 호출 무시 및 서로 다른 연결 실행은 확인. 두 Component의 /actions/id 관찰 상태가 독립적으로 달라짐을 직접 읽어 비교하는 assertion은 없음."
+    },
+    {
+      "id": "A22",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A22/input-errors-run-zero-steps-and-identify-port"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A23",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A01-A08-A23/sequence-stops-and-preserves-completed-effects"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A24",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A24-A25/full-replacement-and-invalid-targets"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "A25",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs", "experiments/t3-state/ports-probe.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A24-A25/full-replacement-and-invalid-targets"],
+      "status": "partial",
+      "remaining": "Value 입력을 대상으로 한 쓰기 거절과 잘못된 State 대상 오류는 확인. 미연결·쓰기 금지/Derived·Query data·계산 결과 대상과 실제 쓰기 타입 불일치는 각각 직접 시험하지 않음."
+    },
+    {
+      "id": "Q09",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs", "experiments/t2-query-races/query-probe.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["Q09-Q13-K12/refresh-failure-stops-action-and-keeps-write"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "Q11",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs", "experiments/t2-query-races/query-probe.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["Q11/action-awaits-fresh-run-not-old-active"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "Q12",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs", "experiments/t2-composite-query/boundaries.mjs", "experiments/t2-query-races/scenarios.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json", "experiments/t2-composite-query/results/node22.json", "experiments/t2-query-races/results/latest.json"],
+      "testIds": ["Q15/query-callback-native-conversion-and-state-isolation", "S11-explicit-execution-does-not-use-owner-cache", "R25-no-implicit-retry"],
+      "status": "partial",
+      "remaining": "명시 실행의 owner cache 비공유와 자동 retry 없음은 기존 Query 실험에서 확인. Action Query 경로의 구독 비개시와 inflight 미공유를 검증하는 호출 fixture는 없음."
+    },
+    {
+      "id": "Q15",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs", "experiments/t3-state/ports-probe.mjs", "experiments/t3-state/state-probe.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["Q15/query-callback-native-conversion-and-state-isolation"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K05",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t2-composite-query/scenarios.mjs", "experiments/t2-composite-query/boundaries.mjs", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t2-composite-query/results/node22.json", "experiments/t2-composite-query/results/node24.json", "experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["S01-cycle-unused-definition", "S02-indirect-inline-cycle", "A03-K05/registration-xor-cycles-and-unused-definitions", "K05/dynamic-native-reentry-after-await"],
+      "status": "partial",
+      "remaining": "미사용 Query/인라인 Query 순환의 등록 거절, 선언 Action 순환 거절, 비순환 공통 하위 참조 허용과 등록 중 실행 0회는 통과. K05/dynamic-native-reentry-after-await는 Node 22·24 모두 실패하며 await 뒤 public invoke 재진입을 ACTION_RECURSION으로 거절하지 못함. 실패를 사용자 결정 대기로 바꾸지 않음."
+    },
+    {
+      "id": "K12",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["Q09-Q13-K12/refresh-failure-stops-action-and-keeps-write"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K15",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A09-A17-K15/strict-conditions-lazy-message-and-no-catch", "A19-K15/assert-message-failure-default-and-nonstring", "A01/first-failure-runs-no-later-step-or-output"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K16",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A12-A13-A15-K16/removed-call-late-value-and-shared-state", "K16/nested-action-capabilities-and-query-cancellation"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K28",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs", "experiments/t2-composite-query/scenarios.mjs", "experiments/t2-composite-query/boundaries.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json", "experiments/t2-composite-query/results/node22.json", "experiments/t2-composite-query/results/node24.json"],
+      "testIds": ["Q09-Q13-K12/refresh-failure-stops-action-and-keeps-write", "C04-source-failure-preserves-location-and-old-pair", "C09-first-source-failure-is-not-empty-success", "S11-explicit-execution-does-not-use-owner-cache"],
+      "status": "partial",
+      "remaining": "복합 Query의 partial source 실패 거절과 Action RefreshQuery 실패 중단은 검사. 보존된 이전 data가 있는 명시 Action Query 실패에서 stale data를 반환하지 않는 결합 fixture는 없음."
+    },
+    {
+      "id": "K36",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["K36/native-handled-error-and-finally-failure", "native/error-sanitization-cancellation-finally-and-permission"],
+      "status": "verified-experiment",
+      "remaining": ""
+    },
+    {
+      "id": "K37",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["A01-A08-A23/sequence-stops-and-preserves-completed-effects", "native/error-sanitization-cancellation-finally-and-permission", "K16/nested-action-capabilities-and-query-cancellation"],
+      "status": "partial",
+      "remaining": "실패 후 완료한 State 효과 유지와 취소 뒤 캡처 핸들의 쓰기/Query 갱신 차단은 검사. native 코드가 취소 오류를 catch한 뒤 정상값을 반환해도 호출 결과가 CANCELLED로 남는 직접 사례는 없음."
+    },
+    {
+      "id": "V57",
+      "source": ["docs/handoff/acceptance-matrix.md", "experiments/t3-state/run.mjs", "experiments/t3-action/run.mjs"],
+      "result": ["experiments/t3-state/results/node22.json", "experiments/t3-state/results/node24.json", "experiments/t3-action/results/dynamic-reentry-node22.json", "experiments/t3-action/results/dynamic-reentry-node24.json"],
+      "testIds": ["V56/unsupported-values-not-executed", "A04/native-and-declared-false-is-successful-raw-step-value", "K36/native-handled-error-and-finally-failure"],
+      "status": "verified-experiment",
+      "remaining": ""
+    }
+  ],
+  "coverageStatusSuggestions": [
+    {"id": "Q09", "currentCoverageStatus": "partial", "suggestedStatus": "verified-experiment", "reason": "Q09-Q13-K12 directly asserts executeWhen:false and refresh:false errors, zero Action Query requests, and preservation of the preceding State write; a later Query or invalid output replacing the expected refresh error would fail the assertion."},
+    {"id": "Q15", "currentCoverageStatus": "pending", "suggestedStatus": "verified-experiment", "reason": "Q15/query-callback-native-conversion-and-state-isolation directly passes a nested Map<Set> as callback inputs, mutates the converted callback value, and asserts both pair/array conversion and unchanged original State."},
+    {"id": "K12", "currentCoverageStatus": "partial", "suggestedStatus": "verified-experiment", "reason": "Q09-Q13-K12 directly checks both refresh:false and gate-false Action refresh failure, exact error codes, zero following Query callback requests, and retained preceding State write."},
+    {"id": "K15", "currentCoverageStatus": "pending", "suggestedStatus": "verified-experiment", "reason": "Action assertions directly prove true skips a failing message expression, false with omitted message uses the default ASSERTION_FAILED message, and failed assertions do not proceed to a later Query or output."},
+    {"id": "K16", "currentCoverageStatus": "partial", "suggestedStatus": "verified-experiment", "reason": "The nested cancellation case asserts captured State write is rejected, captured Query refresh/retry are rejected, late native completion cannot change State, and no Query call starts; the shared-other-call behavior is separately asserted in A12-A13-A15-K16."},
+    {"id": "K36", "currentCoverageStatus": "pending", "suggestedStatus": "verified-experiment", "reason": "Native handled error returns false through a valid boolean output; unhandled throw sanitizes to INTERNAL_ERROR, finally throw also fails, and declaration catch/finally forms are rejected."},
+    {"id": "K37", "currentCoverageStatus": "pending", "suggestedStatus": "partial", "reason": "Action failure preserves completed State effects and cancellation invalidates captured handles, but cancellation caught by native code and followed by normal return is not directly exercised."},
+    {"id": "V57", "currentCoverageStatus": "pending", "suggestedStatus": "verified-experiment", "reason": "An async registered native Action completes with a schema-valid output while the State value experiment rejects Promise/function data values without executing the function; together these test execution value versus stored data handling."}
+  ]
+}

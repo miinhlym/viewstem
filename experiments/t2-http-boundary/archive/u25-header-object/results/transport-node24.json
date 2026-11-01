@@ -1,0 +1,555 @@
+{
+  "generatedAt": "2026-10-30T03:53:13.802Z",
+  "runtime": "v24.19.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "browser": "151.0.7922.34",
+  "playwrightVersion": "1.62.1",
+  "scope": "Shared independent executor in Node and Chromium over loopback HTTP, including native timers; no core integration",
+  "stopOnFirstProblem": true,
+  "stoppedAt": null,
+  "sourceSha256": {
+    "package.json": "b07eabf40c18ca1e4a45a951848c41d1abc8e6b1a20c49854741ffba51a982e4",
+    "transport-tests.mjs": "c4bf41a751db76ac4a1f036a8a64fe192a6589bec4d61f225c1064231fb7cae6",
+    "http-probe.mjs": "2b0da3db8df2c4024b176383ae36b2970aa0555a5826998189faa7a2fcba90d9",
+    "header-profile.mjs": "6d4f17b66aae3b4405f05da9b1160a3ceb04c46f670f0bfb65726003ebdc5407",
+    "../t2-url-races/package.json": "d1f2b402b41e6d62766d5002af5475706ae8434b13c4e35c6a8818947aa361fc",
+    "../t2-url-races/package-lock.json": "d5f2c042db6f40f0ef311e4c24958a57d4ce1048d27d7cc87b467e805b66dc8b"
+  },
+  "results": [
+    {
+      "id": "T01-method-GET",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-HEAD",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-POST",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-PUT",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-PATCH",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-DELETE",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-OPTIONS",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-null",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-json-object",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-utf8-string",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-empty-string",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-explicit-json-string",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-vendor-json",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-form",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T03-params-merge",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-json-null",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-vendor-json",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-text",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-204",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-205",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-invalid-json",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-nonfinite-json",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-binary",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-redirect",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-http-error",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T06-invalid-request-get-body",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T06-invalid-request-head-body",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T06-invalid-request-binary-body",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T06-invalid-request-nested-params",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T07-native-timeout-hold",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T07-native-timeout-hold-body",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T08-pointer-array-index",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T08-pointer-object-length",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T08-pointer-denial-array-length",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T08-pointer-denial-leading-zero",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T08-pointer-denial-nested-array-length",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-array",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-null",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-string",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-number",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-boolean",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-common-array-cannot-be-hidden",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-login-array",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-object-merge",
+      "runtime": "node-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-GET",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-HEAD",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-POST",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-PUT",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-PATCH",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-DELETE",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T01-method-OPTIONS",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-null",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-json-object",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-utf8-string",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-empty-string",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-explicit-json-string",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-vendor-json",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T02-body-form",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T03-params-merge",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-json-null",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-vendor-json",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-text",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-204",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T04-response-205",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-invalid-json",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-nonfinite-json",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-binary",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-redirect",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T05-response-error-http-error",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T06-invalid-request-get-body",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T06-invalid-request-head-body",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T06-invalid-request-binary-body",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T06-invalid-request-nested-params",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T07-native-timeout-hold",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T07-native-timeout-hold-body",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T08-pointer-array-index",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T08-pointer-object-length",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "T08-pointer-denial-array-length",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T08-pointer-denial-leading-zero",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T08-pointer-denial-nested-array-length",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-array",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-null",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-string",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-number",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-params-container-boolean",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-common-array-cannot-be-hidden",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-login-array",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "T09-object-merge",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    }
+  ],
+  "pageErrors": [],
+  "summary": {
+    "executed": 88,
+    "passed": 88,
+    "failed": 0
+  }
+}

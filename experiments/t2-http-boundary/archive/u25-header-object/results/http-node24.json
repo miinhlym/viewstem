@@ -1,0 +1,809 @@
+{
+  "generatedAt": "2026-10-30T03:53:31.635Z",
+  "runtime": "v24.19.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "scope": "Independent Node fetch executor over real loopback HTTP with controlled whole-plan clock; no core integration",
+  "stopOnFirstProblem": true,
+  "stoppedAt": "P51-header-object-reference-is-a-dynamic-value",
+  "sourceSha256": {
+    "package.json": "b07eabf40c18ca1e4a45a951848c41d1abc8e6b1a20c49854741ffba51a982e4",
+    "http-probe.mjs": "2b0da3db8df2c4024b176383ae36b2970aa0555a5826998189faa7a2fcba90d9",
+    "http-tests.mjs": "63ffa167646590c68ff6c94898698eb9892034e3dd68ea69894709b916e5e066",
+    "header-profile.mjs": "6d4f17b66aae3b4405f05da9b1160a3ceb04c46f670f0bfb65726003ebdc5407"
+  },
+  "results": [
+    {
+      "id": "P01-public-methods-and-current-definition",
+      "passed": true,
+      "requestCount": 7
+    },
+    {
+      "id": "P02-secret-without-login",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P03-login-isolation-and-request-overrides",
+      "passed": true,
+      "requestCount": 2
+    },
+    {
+      "id": "P04-concurrent-login-no-sharing",
+      "passed": true,
+      "requestCount": 8
+    },
+    {
+      "id": "P05-invalid-token-missing",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P05-invalid-token-number",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P05-invalid-token-empty",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P05-invalid-token-control",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P06-login-failure",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P06-login-redirect",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P07-authority-not-from-plan",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P08-reserved-name-before-login-datasource",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P08-reserved-name-before-login-request",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P08-reserved-name-before-login-login",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P09-timeout-during-login",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P10-one-budget-login-plus-api",
+      "passed": true,
+      "requestCount": 2
+    },
+    {
+      "id": "P11-cancel-before-start",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P12-cancel-login",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P12-cancel-data",
+      "passed": true,
+      "requestCount": 2
+    },
+    {
+      "id": "P13-ignore-abort-late-login-no-api",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P14-cancel-during-secret-resolution",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P15-timeout-in-response-body",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P16-large-timeout-is-chunked",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P17-body-encodings",
+      "passed": true,
+      "requestCount": 5
+    },
+    {
+      "id": "P18-response-redirect",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P18-response-failure",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P18-response-invalid-json",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P18-response-non-finite-json",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P18-response-binary",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P19-empty-response-204",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P19-empty-response-205",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P20-transport-error-sanitized",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P21-upstream-reflected-secret",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P22-api-response-headers-belong-to-api",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P23-internal-login-data-not-added-or-logged",
+      "passed": true,
+      "requestCount": 2
+    },
+    {
+      "id": "P24-authorize-error-sanitized",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P24-resolveSecret-error-sanitized",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P25-denied-secret-reference-no-transport",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P26-denied-destination-login",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P26-denied-destination-data",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P27-denied-path-on-allowed-origin",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P28-final-query-policy-denial",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P29-context-denial-login-request",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P29-context-denial-data-request",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P29-context-denial-token-extraction",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P30-token-extraction-cannot-read-secrets",
+      "passed": true,
+      "requestCount": 1,
+      "evidence": {
+        "expected": "Reject forbidden token-extraction context; no second secret lookup or data request",
+        "outcome": {
+          "kind": "error",
+          "code": "REFERENCE_NOT_FOUND"
+        },
+        "secretLookupCount": 1,
+        "emptyDestinationLookupCount": 0,
+        "loginRequests": 1,
+        "dataRequests": 0,
+        "dataAuthorizationUsedSecretInsteadOfLoginToken": false
+      }
+    },
+    {
+      "id": "P31-token-nested-context-denial-secrets",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P31-token-nested-context-denial-ports",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P31-token-nested-context-denial-states",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P31-token-nested-context-denial-auth",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P31-token-nested-context-denial-responseLike",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P32-token-invalid-pointer-relative",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P32-token-invalid-pointer-fragment",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P32-token-invalid-pointer-bad-escape",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P32-token-invalid-pointer-non-string",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P33-token-response-read-escaped-key",
+      "passed": true,
+      "requestCount": 2
+    },
+    {
+      "id": "P33-token-response-read-response-header",
+      "passed": true,
+      "requestCount": 2
+    },
+    {
+      "id": "P33-token-response-read-nested-function",
+      "passed": true,
+      "requestCount": 2
+    },
+    {
+      "id": "P33-token-response-read-response-field-named-secrets",
+      "passed": true,
+      "requestCount": 2
+    },
+    {
+      "id": "P33-token-response-read-returned-string-is-data",
+      "passed": true,
+      "requestCount": 2
+    },
+    {
+      "id": "P34-resolver-opaque-error-undefined",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P34-resolver-opaque-error-null",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P34-resolver-opaque-error-string",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P34-resolver-opaque-error-number",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P34-resolver-opaque-error-plain-object",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P34-resolver-opaque-error-unknown-code",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P34-resolver-opaque-error-non-string-code",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P35-resolver-error-code-accessor-throws",
+      "passed": true,
+      "requestCount": 0,
+      "evidence": {
+        "expected": "Sanitized HTTP_ERROR without internal values or native exception/stack",
+        "actualCode": "HTTP_ERROR",
+        "nativeErrorReturned": false,
+        "publicMessageContainsInternalSecret": false,
+        "publicStackContainsInternalSecret": false,
+        "requests": 0
+      }
+    },
+    {
+      "id": "P36-error-metadata-own-getter",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P36-error-metadata-inherited-getter",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P36-error-metadata-proxy-get",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P36-error-metadata-proxy-descriptor-throws",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P36-error-metadata-revoked-proxy",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P36-error-metadata-code-coercion",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P36-error-metadata-symbol-code",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P36-error-metadata-poison-other-fields",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P37-error-boundary-authorize",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P37-error-boundary-transport",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P38-late-opaque-error-preserves-CANCELLED",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P38-late-opaque-error-preserves-TIMEOUT",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P39-pointer-valid-array-index",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P39-pointer-valid-object-field-named-length",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P40-pointer-invalid-array-index--",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P40-pointer-invalid-array-index-01",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P40-pointer-invalid-array-index--1",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P40-pointer-invalid-array-index-1.0",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P40-pointer-invalid-array-index-2",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P41-array-length-is-not-a-json-pointer-element",
+      "passed": true,
+      "requestCount": 0,
+      "evidence": {
+        "expected": "Array traversal accepts existing integer elements only; reject length before transport",
+        "outcome": {
+          "kind": "error",
+          "code": "REFERENCE_NOT_FOUND"
+        },
+        "requests": 0,
+        "submittedBody": null
+      }
+    },
+    {
+      "id": "P42-array-own-non-index-\"length\"",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P42-array-own-non-index-\"label\"",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P42-array-own-non-index-\"01\"",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P42-array-own-non-index-\"-1\"",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P42-array-own-non-index-\"1.0\"",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P42-array-own-non-index-\"1e0\"",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P42-array-own-non-index-\"+1\"",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P42-array-own-non-index-\" 1\"",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P42-array-own-non-index-\"\"",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P42-array-own-non-index-\"4294967295\"",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P42-array-own-non-index-\"9007199254740992\"",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P43-array-object-path-first-index",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P43-array-object-path-nested-index",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P43-array-object-path-object-length-after-index",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P43-array-object-path-object-numeric-looking-key",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P43-array-object-path-null-element",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P44-array-path-denial-empty",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P44-array-path-denial-nested-length",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P44-array-path-denial-nested-outside",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P45-params-object-from-port-repeated-value",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P45-params-object-from-port-null-removes-key",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P45-params-object-from-port-empty-object",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P46-params-container-array-is-not-a-map",
+      "passed": true,
+      "requestCount": 0,
+      "evidence": {
+        "expected": "Reject a non-object params container before transport; arrays are allowed only as parameter values",
+        "outcome": {
+          "kind": "error",
+          "code": "INVALID_DEFINITION"
+        },
+        "requests": 0,
+        "submittedQuery": null
+      }
+    },
+    {
+      "id": "P47-params-container-datasource-array",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-datasource-null",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-datasource-string",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-datasource-number",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-datasource-boolean",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-datasource-map",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-datasource-set",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-datasource-date",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P48-literal-params-array-datasource",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-request-array",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-request-null",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-request-string",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-request-number",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-request-boolean",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-request-map",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-request-set",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-request-date",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P48-literal-params-array-request",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-login-array",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-login-null",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-login-string",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-login-number",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-login-boolean",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-login-map",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-login-set",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P47-params-container-login-date",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P48-literal-params-array-login",
+      "passed": true,
+      "requestCount": 0
+    },
+    {
+      "id": "P49-valid-params-omitted",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P49-valid-params-empty",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P49-valid-params-merge-removal-order",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P49-valid-params-object-prototype-looking-keys",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P50-header-value-reference-datasource",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P50-header-value-reference-request",
+      "passed": true,
+      "requestCount": 1
+    },
+    {
+      "id": "P50-header-value-reference-login",
+      "passed": true,
+      "requestCount": 2
+    },
+    {
+      "id": "P51-header-object-reference-is-a-dynamic-value",
+      "passed": false,
+      "requestCount": 0,
+      "evidence": {
+        "expected": "Evaluate a header object reference, validate the resolved names/values, and send the allowed X-Custom header",
+        "outcome": {
+          "kind": "error",
+          "code": "INVALID_DEFINITION"
+        },
+        "requests": 0,
+        "receivedHeader": null
+      },
+      "failure": {
+        "name": "AssertionError",
+        "message": "Expected values to be strictly equal:\n+ actual - expected\n\n+ {\n+   code: 'INVALID_DEFINITION',\n+   message: 'Invalid HTTP definition'\n+ }\n- undefined\n"
+      }
+    }
+  ],
+  "summary": {
+    "executed": 146,
+    "passed": 145,
+    "failed": 1
+  },
+  "notRun": [
+    "Browser response/body compatibility",
+    "Service authorization and secret store integration",
+    "Minimal SDK types",
+    "Core/renderer integration"
+  ]
+}

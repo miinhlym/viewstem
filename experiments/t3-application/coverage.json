@@ -1,0 +1,604 @@
+{
+  "scope": "Independent application/registry protocol evidence; production core/SDK/service authentication are not claimed.",
+  "statusMeaning": "verified-experiment means the listed acceptance clauses were executed in the bounded private protocol fixtures. Production integration is tracked separately.",
+  "environments": [
+    {
+      "result": "results/node22.json",
+      "runtime": "v22.21.1",
+      "summary": {
+        "executed": 29,
+        "passed": 29,
+        "failed": 0
+      },
+      "populations": {
+        "protocol": 29,
+        "actualDOM": 0
+      },
+      "sourceSha256": {
+        "application-probe.mjs": "ce75ff88015cc417991ca899b951fe8b707273b5485010ba86203e5767cc0ef6",
+        "scenarios.mjs": "c209f2689e92a8f42bfeefedd503475626d4e5ce12b94ef8530f98fb9a939e2f",
+        "run.mjs": "d728b43e2b57a19673e0ff60f5d371d9fbb22f0b6fe59b634d7b20b9b5257c92",
+        "browser-run.mjs": "b8f182a825187361cf3968a473818b8824ad349fdd8e63e93f0dfa7243ce07a7",
+        "../t3-ui/ui-probe.mjs": "fd8fea7ebd17ca80ccc562f982021785c876fc3abfb4eb833a0d85ba29a48f6d",
+        "../t3-ui/value-evaluator.mjs": "42d9047b771651a554e8a01fb355b469742aab748c0d94073c04d3b07a8451c7",
+        "../t2-http-boundary/value-expressions.mjs": "3bd0320dc4e2a978de7a576e1c3df90d456170e9540d8aa667f42d0c1c65a32f",
+        "../t3-state/state-probe.mjs": "501e0e0d78c8b8bf4fa1a9d465fe844e8cbeb06752013bc9ac6c765a0f5edbaa",
+        "../t3-state/immutable.mjs": "e86391873075d434ce26169043dece6e28b9082ddb20f9aab84c4dbaa78790f4",
+        "../verification/errors.mjs": "c9d94483f9314bcf5bad42cb044f7b0ba29cd7d7b9d3ba561f1c9021aa6d7224",
+        "../t1-values/schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+        "../t1-values/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+        "../t1-values/values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+        "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+        "../t2-query-races/query-probe.mjs": "8cbf8a9e3b2344a33258490271d3ed68020a05171db6b64a28f000df7f70b6a6",
+        "../t2-query-races/harness.mjs": "50ecc928adac2275688262d9934c61a2d10bbeec6003d7049fd1769a13cfc228",
+        "../t2-url-races/url-probe.mjs": "015585ca45a7af6743cebfd7d8ad0a18baae972152c6695b0e78985e59375cbf",
+        "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+        "../../docs/spec/07-host-integration.md": "bc0a6d4747b6afaaf08ab781198edda5606913c437fc7fdeae49b24331c61401",
+        "../../docs/spec/09-preserved-contracts.md": "1498066d08e000c5424f85c0da2b6b0d50fa88f5895ecd15cd7e1e11211356c7",
+        "../../docs/VIEWSTEM-SPEC.md": "d1facd953aa429331d531ffdf3275de886a54f7e894c2cd47707c6fc0a42080c"
+      }
+    },
+    {
+      "result": "results/node24.json",
+      "runtime": "v24.19.0",
+      "summary": {
+        "executed": 29,
+        "passed": 29,
+        "failed": 0
+      },
+      "populations": {
+        "protocol": 29,
+        "actualDOM": 0
+      },
+      "sourceSha256": {
+        "application-probe.mjs": "ce75ff88015cc417991ca899b951fe8b707273b5485010ba86203e5767cc0ef6",
+        "scenarios.mjs": "c209f2689e92a8f42bfeefedd503475626d4e5ce12b94ef8530f98fb9a939e2f",
+        "run.mjs": "d728b43e2b57a19673e0ff60f5d371d9fbb22f0b6fe59b634d7b20b9b5257c92",
+        "browser-run.mjs": "b8f182a825187361cf3968a473818b8824ad349fdd8e63e93f0dfa7243ce07a7",
+        "../t3-ui/ui-probe.mjs": "fd8fea7ebd17ca80ccc562f982021785c876fc3abfb4eb833a0d85ba29a48f6d",
+        "../t3-ui/value-evaluator.mjs": "42d9047b771651a554e8a01fb355b469742aab748c0d94073c04d3b07a8451c7",
+        "../t2-http-boundary/value-expressions.mjs": "3bd0320dc4e2a978de7a576e1c3df90d456170e9540d8aa667f42d0c1c65a32f",
+        "../t3-state/state-probe.mjs": "501e0e0d78c8b8bf4fa1a9d465fe844e8cbeb06752013bc9ac6c765a0f5edbaa",
+        "../t3-state/immutable.mjs": "e86391873075d434ce26169043dece6e28b9082ddb20f9aab84c4dbaa78790f4",
+        "../verification/errors.mjs": "c9d94483f9314bcf5bad42cb044f7b0ba29cd7d7b9d3ba561f1c9021aa6d7224",
+        "../t1-values/schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+        "../t1-values/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+        "../t1-values/values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+        "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+        "../t2-query-races/query-probe.mjs": "8cbf8a9e3b2344a33258490271d3ed68020a05171db6b64a28f000df7f70b6a6",
+        "../t2-query-races/harness.mjs": "50ecc928adac2275688262d9934c61a2d10bbeec6003d7049fd1769a13cfc228",
+        "../t2-url-races/url-probe.mjs": "015585ca45a7af6743cebfd7d8ad0a18baae972152c6695b0e78985e59375cbf",
+        "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+        "../../docs/spec/07-host-integration.md": "bc0a6d4747b6afaaf08ab781198edda5606913c437fc7fdeae49b24331c61401",
+        "../../docs/spec/09-preserved-contracts.md": "1498066d08e000c5424f85c0da2b6b0d50fa88f5895ecd15cd7e1e11211356c7",
+        "../../docs/VIEWSTEM-SPEC.md": "d1facd953aa429331d531ffdf3275de886a54f7e894c2cd47707c6fc0a42080c"
+      }
+    },
+    {
+      "result": "results/chromium.json",
+      "runtime": "v24.19.0",
+      "browser": "151.0.7922.34",
+      "summary": {
+        "executed": 4,
+        "passed": 4,
+        "failed": 0
+      },
+      "populations": {
+        "actualDOM": 3,
+        "browserErrorCheck": 1
+      },
+      "sourceSha256": {
+        "application-probe.mjs": "ce75ff88015cc417991ca899b951fe8b707273b5485010ba86203e5767cc0ef6",
+        "scenarios.mjs": "c209f2689e92a8f42bfeefedd503475626d4e5ce12b94ef8530f98fb9a939e2f",
+        "run.mjs": "d728b43e2b57a19673e0ff60f5d371d9fbb22f0b6fe59b634d7b20b9b5257c92",
+        "browser-run.mjs": "b8f182a825187361cf3968a473818b8824ad349fdd8e63e93f0dfa7243ce07a7",
+        "../t3-ui/ui-probe.mjs": "fd8fea7ebd17ca80ccc562f982021785c876fc3abfb4eb833a0d85ba29a48f6d",
+        "../t3-ui/value-evaluator.mjs": "42d9047b771651a554e8a01fb355b469742aab748c0d94073c04d3b07a8451c7",
+        "../t2-http-boundary/value-expressions.mjs": "3bd0320dc4e2a978de7a576e1c3df90d456170e9540d8aa667f42d0c1c65a32f",
+        "../t3-state/state-probe.mjs": "501e0e0d78c8b8bf4fa1a9d465fe844e8cbeb06752013bc9ac6c765a0f5edbaa",
+        "../t3-state/immutable.mjs": "e86391873075d434ce26169043dece6e28b9082ddb20f9aab84c4dbaa78790f4",
+        "../verification/errors.mjs": "c9d94483f9314bcf5bad42cb044f7b0ba29cd7d7b9d3ba561f1c9021aa6d7224",
+        "../t1-values/schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+        "../t1-values/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+        "../t1-values/values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+        "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+        "../t2-query-races/query-probe.mjs": "8cbf8a9e3b2344a33258490271d3ed68020a05171db6b64a28f000df7f70b6a6",
+        "../t2-query-races/harness.mjs": "50ecc928adac2275688262d9934c61a2d10bbeec6003d7049fd1769a13cfc228",
+        "../t2-url-races/url-probe.mjs": "015585ca45a7af6743cebfd7d8ad0a18baae972152c6695b0e78985e59375cbf",
+        "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+        "../../docs/spec/07-host-integration.md": "bc0a6d4747b6afaaf08ab781198edda5606913c437fc7fdeae49b24331c61401",
+        "../../docs/spec/09-preserved-contracts.md": "1498066d08e000c5424f85c0da2b6b0d50fa88f5895ecd15cd7e1e11211356c7",
+        "../../docs/VIEWSTEM-SPEC.md": "d1facd953aa429331d531ffdf3275de886a54f7e894c2cd47707c6fc0a42080c"
+      },
+      "pageErrors": []
+    }
+  ],
+  "records": [
+    {
+      "id": "C03",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| C03 | Component만 있는 ID를 queryRef로 지정 / 어떤 종류에도 없는 ID | 기대 종류의 Query가 없어 참조 오류; 다른 종류로 fallback 없음 | E39, U01 |",
+      "clauses": [
+        "Component-only ID in queryRef rejected",
+        "Unknown ID rejected",
+        "No kind fallback; failed batch leaves registry unchanged"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json"
+      ],
+      "testIds": [
+        "C03.lookup-never-falls-back-to-component-or-missing-kind"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "C14",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| C14 | 라이브러리 생성 Store / 같은 메서드의 임의 외부 Store 주입 | 전자 지원, 후자는 별도 확장 계약 없이 호환으로 취급하지 않음 | E51 |",
+      "clauses": [
+        "Private generated-Store fixture accepted",
+        "Duck-typed Store rejected",
+        "Unbranded StateProbe rejected; actual production Store is not claimed"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json"
+      ],
+      "testIds": [
+        "C14.fixture-brand-accepts-created-store-rejects-duck-and-unbranded"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "C16",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| C16 | Query와 Component를 같은 ID로 등록 후 각각 queryRef/componentRef 사용 | 둘 다 등록 가능; 필드가 기대하는 종류의 정의로 각각 해석 | U01 |",
+      "clauses": [
+        "Query and Component same ID accepted",
+        "componentRef resolves Component projection",
+        "queryRef resolves Query and returned data"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json"
+      ],
+      "testIds": [
+        "C16.same-id-query-component-resolve-in-expected-kind"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "C17",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| C17 | 같은 종류·ID의 두 정의 등록; 코드형/선언형 Component 또는 Action 중복 포함 | 모두 등록 오류; 구현 방식별 별도 중복 허용·fallback 없음 | U01 |",
+      "clauses": [
+        "Same-kind duplicate batch is atomic error",
+        "Code/declarative Action duplicates both registration orders rejected",
+        "Code/declarative Component duplicates both orders rejected",
+        "Repeated code Action registration rejected"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json"
+      ],
+      "testIds": [
+        "C17.same-kind-batch-and-code-declarative-duplicates-atomic"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "M01",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| M01 | 유효하지 않은 State+구성 일괄 변경 | 부분 적용 0건 | E18 |",
+      "clauses": [
+        "Invalid State plus valid configuration changes nothing",
+        "Valid State plus invalid configuration changes nothing",
+        "No partial observer notification",
+        "Valid combined change emits coherent State+projection"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json"
+      ],
+      "testIds": [
+        "M01.invalid-state-plus-valid-config-and-reverse-zero-partial",
+        "M01.valid-state-plus-config-one-coherent-projection"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "M02",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| M02 | 구성 적용 후 Query 실패 | 구성 유지, 데이터 오류로 표시 | E18 |",
+      "clauses": [
+        "Committed configuration survives asynchronous Query failure",
+        "Synchronous service throw becomes Query data failure",
+        "Initial reports individual queryErrors and visible error status"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json"
+      ],
+      "testIds": [
+        "M02.commit-survives-query-error-and-reports-data-error",
+        "M02.synchronous-query-callback-error-is-data-error",
+        "K23.query-error-report-on-mount-update-and-replace"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "M03",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| M03 | A 인스턴스만 변경 | B·공용 원본 자동 변경 없음 | E17, E19 |",
+      "clauses": [
+        "Only A instance is changed",
+        "B projection/state generation unchanged",
+        "Common registered definition unchanged"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json"
+      ],
+      "testIds": [
+        "M03.instance-A-only-update-leaves-B-and-common-definition"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "M04",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| M04 | 공용 정의 DB 수정 | 기존 실행 화면 자동 추종 없음 | E19 |",
+      "clauses": [
+        "Database object edit does not change registry snapshot",
+        "Registry definition edit does not automatically change mounted screen",
+        "Ordinary update preserves injected definitions; explicit replacement uses new registry snapshot"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json"
+      ],
+      "testIds": [
+        "M04.database-and-registry-edits-do-not-auto-follow"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "M05",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| M05 | 같은 renderer setResource | 이전 화면 소유 상태/URL 정리, 서비스 상태 유지 | [초기 적용/이관](../spec/09-preserved-contracts.md#초기-적용-완료의-확정-관찰-의미) |",
+      "clauses": [
+        "Same application view handle explicitly replaced with new lifetime",
+        "Old owned State handle invalidated and new initial value created",
+        "Old owned URL key removed; external/service keys preserved",
+        "Service Store/cell survives replacement and repeated view disposal"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json"
+      ],
+      "testIds": [
+        "M05.same-runtime-replace-cleans-owned-url-state-preserves-service"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "M06",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| M06 | 상태 변경 / 현재 화면 구성 변경 / 재사용 리소스 정의 수정 후 변경 정의 추출 | 세 변경 대상 모두 지원; 추출과 실제 DB 저장은 구별하고 서비스의 명시적 저장 연결 없이는 자동 저장하지 않음 | E17 |",
+      "clauses": [
+        "State changes supported",
+        "Current configuration changes supported",
+        "Reusable definition edits and definition extraction supported",
+        "Export is isolated definition rather than live State snapshot",
+        "No automatic save; explicit service save remains separate"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json"
+      ],
+      "testIds": [
+        "M06.three-change-targets-export-without-auto-save"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "M07",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| M07 | 에이전트가 목록·설명에서 본 Action 또는 변경 기능 호출 | 서비스가 정한 노출·호출 권한을 같은 코어 경로에서 검사; 목록에 보인다는 이유로 실행 허용하지 않음; 별도 에이전트 상태 엔진을 만들지 않음 | E20, E05 |",
+      "clauses": [
+        "Listing visibility grants no invocation",
+        "Private host actor grants/public allowlist/owner identity checked",
+        "Input type checked before code callback",
+        "Forged actor/owner and hidden Action rejected",
+        "UI and agent use the same invocation/change path and shared State"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json"
+      ],
+      "testIds": [
+        "M07.listing-not-permission-public-owner-input-checks"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "N01",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| N01 | 모든 정의가 inline이고 정적 데이터만 쓰는 화면을 서비스 조회 콜백 없이 적용 | 리소스 조회·Query 실행 콜백이 없다는 이유만으로 실패하지 않음 | E68 |",
+      "clauses": [
+        "Inline business View/Component with static data applies without resolver or Query executor",
+        "Terminal code Text contract/adapter explicitly pre-registered; no automatic builtin claimed"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json"
+      ],
+      "testIds": [
+        "N01.inline-business-definitions-static-no-resolver-no-executor"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "N02",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| N02 | 실제 참조 조회 또는 서비스 Query 실행이 필요한 구성인데 해당 연결이 없음 | 필요한 연결 누락을 명확한 오류로 알림; 임의 데이터·성공값으로 대체하지 않음 | E68 |",
+      "clauses": [
+        "Missing needed resource resolver returns explicit reference error",
+        "Missing needed Query executor fails preparation without commit",
+        "Waiting-only Queries do not need an executor yet",
+        "Definition resolution may run during preparation but data Query starts only after commit"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json"
+      ],
+      "testIds": [
+        "N02.only-needed-resolver-and-executor-missing-errors",
+        "N02.definition-resolution-allowed-data-query-starts-after-commit"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "N03",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| N03 | 최초 실행 가능한 Query 중 하나는 먼저 성공하고 다른 하나는 아직 진행 중 | 준비된 UI는 먼저 표시; 적용 완료 통지는 실행 가능한 최초 조회·화면 반영의 첫 주기가 정리될 때까지 기다림 | E61 |",
+      "clauses": [
+        "Prepared static UI projects before Queries complete",
+        "First Query result projects while second remains running",
+        "Initial stays pending until both first-cycle Queries settle and projection acknowledgement completes",
+        "Same observations confirmed through actual Chromium DOM"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "N03.progressive-projection-first-query-before-second-initial",
+        "DOM.N03.first-query-visible-while-second-pending"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "N04",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| N04 | 최초 Query 일부 오류 / 외부 입력 미준비 또는 executeWhen으로 대기하는 Query | 개별 Query 오류는 해당 화면의 오류로 정리하며 구조 적용 실패로 취급하지 않음; 실행할 수 없는 대기 Query 때문에 적용 완료를 무기한 막지 않음 | E61 |",
+      "clauses": [
+        "Individual Query failure is data error, not structural rollback",
+        "External missing input remains waiting without blocking initial",
+        "Closed executeWhen remains waiting without blocking initial",
+        "Later input readiness starts Query and settles new generation"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json"
+      ],
+      "testIds": [
+        "N04.query-errors-waiting-input-and-closed-gate-complete",
+        "N04.waiting-with-no-executor-does-not-block-initial"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "N05",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| N05 | 새 리소스 준비 중 구조·참조·타입·소유 충돌로 적용 실패 | 기존 화면·Store를 유지하고 새 구성을 부분 적용하지 않음; 전환 후 개별 Query 실패와 구별 | E61, E18 |",
+      "clauses": [
+        "Structural failure preserves old screen/State",
+        "Reference failure preserves old screen/State",
+        "Retained-State type and service-cell connection mismatch rejected",
+        "URL ownership conflict rejected",
+        "Existing handles/URL connection remain alive; cleanup is not scheduled"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json"
+      ],
+      "testIds": [
+        "N05.structural-reference-type-owner-conflicts-preserve-live"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "K23",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/07-host-integration.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "application-probe.mjs",
+        "scenarios.mjs",
+        "browser-run.mjs"
+      ],
+      "contractRow": "| K23 | mount/update/replace의 구조 실패·개별 Query 실패·완료 전 교체 | 구조 실패는 기존 화면 보존·데이터 Query/Action 실행 없음. Query 오류는 initial 보고에 포함, 옛 initial은 CANCELLED | U13, O14 |",
+      "clauses": [
+        "mount/update/replace structural failures execute no data Query/code Action and preserve existing screen",
+        "Query failures on mount/update/replace appear in generation-specific initial reports",
+        "Update preserves State/Query lifetime; replace creates new lifetime",
+        "Commit of newer generation or disposal cancels old initial",
+        "Failed candidate preparation preserves old pending initial",
+        "Obsolete prepared candidate cannot commit; obsolete response/renderer acknowledgement cannot replace current screen",
+        "Core initial includes projection delivery; renderer initial additionally waits for actual paint acknowledgement"
+      ],
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "K23.no-data-query-or-action-during-failed-preparation",
+        "K23.query-error-report-on-mount-update-and-replace",
+        "K23.update-retains-state-query-replace-new-lifetime-cancels-initial",
+        "K23.replace-before-initial-cancels-old-late-response-discarded",
+        "K23.failed-candidate-does-not-cancel-old-initial",
+        "K23.dispose-cancels-initial-and-repeated-dispose-safe",
+        "K23.core-projection-vs-delayed-renderer-ack",
+        "K23.obsolete-renderer-ack-and-prepared-candidate-do-not-commit",
+        "M02.commit-survives-query-error-and-reports-data-error",
+        "M02.synchronous-query-callback-error-is-data-error",
+        "DOM.K23.initial-waits-for-real-DOM-application-ack",
+        "DOM.K23.obsolete-ack-cannot-paint-after-replacement"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    }
+  ],
+  "integrationRemaining": [
+    "Actual library Store/registry/core/SDK; fixture-brand behavior is distinct from a production brand.",
+    "Full resource grammar/reference/cycle/schema compatibility and general State/Query ports; this fixture uses known positions and identical retained schema structures.",
+    "General renderer Query expressions/Svelte, renderer failure policy, actual router/History cleanup races and service persistence/network.",
+    "Real service authentication/server permissions; the host actor grants and public Action allowlist are explicit private fixtures.",
+    "Dynamic native child calls are verified separately by U35 Action experiments; this registry/application fixture does not execute that protocol."
+  ],
+  "additionalTestIds": [
+    "REG.unused-registration-does-not-run-query-or-action"
+  ]
+}

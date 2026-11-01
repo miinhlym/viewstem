@@ -1,0 +1,224 @@
+{
+  "scope": "Read-only source/result audit of the existing Dart CEL candidate; not a package adoption decision or production conformance claim",
+  "package": {
+    "name": "cel",
+    "version": "0.6.1",
+    "pubspec": "experiments/t1-values/dart/pubspec.yaml",
+    "lockfile": "experiments/t1-values/dart/pubspec.lock",
+    "lockfileSha256": "a41c53712974f7c8e832c28a3f45ad1717e695d16cd3524c7e9e0edefb534db1",
+    "lockedArchiveSha256": "36048193ae78b83970a54916a86aa82a58c0ad64e92fa4d79b427542d3cb2c3a",
+    "packageConfig": "experiments/t1-values/dart/.dart_tool/package_config.json",
+    "installedSourceRoot": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1",
+    "observedRuntime": "Dart 3.11.1 VM, macOS arm64 (from existing T1 result)",
+    "dependencyNote": "pubspec.lock pins cel 0.6.1 and its transitive packages; Dart result is from the installed source path above. No new install or execution was performed."
+  },
+  "results": {
+    "fixture": "experiments/t1-values/fixtures/cel.json",
+    "dartRows": "experiments/t1-values/results/dart.json",
+    "crossCandidateSummaryAndSourceHashes": "experiments/t1-values/results/latest.json",
+    "dartFixtureCount": 22,
+    "dartMatches": 15,
+    "dartMismatches": 7,
+    "currentSourceHashCheck": {
+      "resultSourceSha256Entries": 12,
+      "mismatches": [],
+      "checkedFilesInclude": [
+        "experiments/t1-values/dart/bin/probe.dart",
+        "experiments/t1-values/dart/pubspec.yaml",
+        "experiments/t1-values/dart/pubspec.lock",
+        "experiments/t1-values/fixtures/cel.json",
+        "experiments/t1-values/cel-probe.mjs",
+        "experiments/t1-values/values.mjs",
+        "experiments/t1-values/run.mjs"
+      ]
+    },
+    "resultFormatCaveat": "probe.dart maps thrown exceptions to {type:error}; matching error rows do not identify the failure reason. In particular dart/C18 matches the expected error only because timestamp() is unsupported, so it does not demonstrate rejection of an invalid calendar date."
+  },
+  "mismatchFindings": [
+    {
+      "fixtureId": "C05",
+      "expression": "n+1 where n is double 2",
+      "expected": {"type": "error"},
+      "observed": {"type": "double", "value": 3},
+      "classification": "library-semantics",
+      "confidence": "high",
+      "evidence": [
+        {"path": "experiments/t1-values/fixtures/cel.json", "lines": "63-74"},
+        {"path": "experiments/t1-values/results/dart.json", "lines": "59-69"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/common/types/double.dart", "symbol": "DoubleValue.add", "lines": "35-38"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/interpreter/functions/standard.dart", "symbol": "standardOverloads, add overload", "lines": "66-72"}
+      ],
+      "finding": "The library delegates double + int to Dart's dynamic numeric addition and returns DoubleValue; this is not a result-encoding mismatch. The fixture expects CEL's same-type double overload rather than mixed double/int promotion."
+    },
+    {
+      "fixtureId": "C08",
+      "expression": "9223372036854775807+1",
+      "expected": {"type": "error"},
+      "observed": {"type": "int", "value": "-9223372036854775808"},
+      "classification": "library-semantics",
+      "confidence": "high",
+      "evidence": [
+        {"path": "experiments/t1-values/fixtures/cel.json", "lines": "93-99"},
+        {"path": "experiments/t1-values/results/dart.json", "lines": "96-106"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/common/types/int.dart", "symbol": "IntValue.add", "lines": "17-27"}
+      ],
+      "finding": "IntValue.add has no signed 64-bit overflow check; the existing VM result wraps to the minimum signed int. Probe encoding faithfully labels that Dart int as int."
+    },
+    {
+      "fixtureId": "C11",
+      "expression": "has(obj.absent)",
+      "expected": {"type": "bool", "value": false},
+      "observed": {"type": "error"},
+      "classification": "library-runtime-gap",
+      "confidence": "high",
+      "evidence": [
+        {"path": "experiments/t1-values/fixtures/cel.json", "lines": "122-134"},
+        {"path": "experiments/t1-values/results/dart.json", "lines": "132-143"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/cel/library.dart", "symbol": "StandardLibrary.compileEnvironmentOptions", "lines": "33-38"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/interpreter/planner.dart", "symbol": "Planner.planCall", "lines": "51-94"}
+      ],
+      "finding": "StandardLibrary explicitly leaves macros unimplemented. has is a macro requiring AST-level presence semantics; the current planner instead reports an unsupported unary function. This is not the adapter's error mapping creating the mismatch."
+    },
+    {
+      "fixtureId": "C14",
+      "expression": "xs.filter(x,x>1).map(x,x*2)",
+      "expected": {"type": "list", "value": [{"type": "int", "value": "4"}, {"type": "int", "value": "6"}]},
+      "observed": {"type": "error"},
+      "classification": "library-runtime-gap",
+      "confidence": "high",
+      "evidence": [
+        {"path": "experiments/t1-values/fixtures/cel.json", "lines": "154-190"},
+        {"path": "experiments/t1-values/results/dart.json", "lines": "171-192"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/cel/library.dart", "symbol": "StandardLibrary.compileEnvironmentOptions", "lines": "33-38"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/interpreter/planner.dart", "symbol": "Planner.planCall", "lines": "51-94"}
+      ],
+      "finding": "The library documents macros as unsupported. The planner accepts only one- or two-operand function calls; comprehension macro expansion for filter/map is absent. The captured UnsupportedError comes from that runtime limitation."
+    },
+    {
+      "fixtureId": "C17",
+      "expression": "timestamp(\"2026-10-29T00:00:00Z\").getHours(\"Asia/Seoul\")",
+      "expected": {"type": "int", "value": "9"},
+      "observed": {"type": "error"},
+      "classification": "library-runtime-gap",
+      "confidence": "high",
+      "evidence": [
+        {"path": "experiments/t1-values/fixtures/cel.json", "lines": "244-250"},
+        {"path": "experiments/t1-values/results/dart.json", "lines": "219-230"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/cel/environment.dart", "symbol": "Environment.standard", "lines": "20-28"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/common/types/provider.dart", "symbol": "newRegistry", "lines": "15-32"}
+      ],
+      "finding": "The package explicitly says timestamp protos are unsupported and comments TimestampType out of its type registry. No timezone-aware timestamp receiver/getHours implementation is present."
+    },
+    {
+      "fixtureId": "C21",
+      "expression": "type(n)==double",
+      "expected": {"type": "bool", "value": true},
+      "observed": {"type": "error"},
+      "classification": "library-runtime-gap",
+      "confidence": "high",
+      "evidence": [
+        {"path": "experiments/t1-values/fixtures/cel.json", "lines": "279-290"},
+        {"path": "experiments/t1-values/results/dart.json", "lines": "270-281"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/interpreter/planner.dart", "symbol": "Planner.planCall", "lines": "76-94"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/README.md", "section": "Differences with cel-go", "lines": "25-28"}
+      ],
+      "finding": "The package README lists type as unsupported; the planner has no type overload and reports a runtime UnsupportedError. The error is not an adapter classification."
+    },
+    {
+      "fixtureId": "C22",
+      "expression": "1u",
+      "expected": {"type": "uint", "value": "1"},
+      "observed": {"type": "int", "value": "1"},
+      "classification": "library-value-model",
+      "confidence": "high",
+      "evidence": [
+        {"path": "experiments/t1-values/fixtures/cel.json", "lines": "293-300"},
+        {"path": "experiments/t1-values/results/dart.json", "lines": "283-294"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/parser/parser.dart", "symbol": "visitUint", "lines": "190-199"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/cel/expr.dart", "symbol": "IntLiteralExpr", "lines": "40-48"},
+        {"path": "experiments/t1-values/dart/bin/probe.dart", "symbol": "encode", "lines": "18-26"}
+      ],
+      "finding": "visitUint strips the suffix and constructs IntLiteralExpr; the AST has no uint literal node. encode then observes the returned Dart int. This is an upstream value-model loss, not a formatter-only mistake."
+    }
+  ],
+  "nonMismatchCaveat": {
+    "fixtureId": "C18",
+    "observed": {"type": "error"},
+    "expected": {"type": "error"},
+    "classification": "false-positive-match-for-date-validation",
+    "evidence": [
+      {"path": "experiments/t1-values/fixtures/cel.json", "lines": "253-259"},
+      {"path": "experiments/t1-values/results/dart.json", "lines": "232-242"},
+      {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/cel/environment.dart", "symbol": "Environment.standard", "lines": "25-28"}
+    ],
+    "finding": "The invalid date expression errors because timestamp() is not implemented, not because 2026-02-30 was parsed and rejected. Count it as a coincidental shape match only; malformed-date validation remains untested."
+  },
+  "implementationGaps": [
+    {
+      "topic": "CEL runtime semantics",
+      "priority": "required for candidate conformance",
+      "evidence": [
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/common/types/int.dart", "symbol": "IntValue.add", "lines": "24-27"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/common/types/double.dart", "symbol": "DoubleValue.add", "lines": "35-38"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/parser/parser.dart", "symbol": "visitUint", "lines": "190-199"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/cel/library.dart", "symbol": "StandardLibrary.compileEnvironmentOptions", "lines": "33-38"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/interpreter/planner.dart", "symbol": "Planner.planCall", "lines": "51-94"}
+      ],
+      "neededWork": "Preserve int/double/uint distinctions and the signed CEL int range; add missing type and has semantics and standard filter/map macro expansion; rerun the shared 22 fixtures."
+    },
+    {
+      "topic": "registration and static condition checking",
+      "priority": "required by the current CEL contract",
+      "evidence": [
+        {"path": "experiments/t1-values/dart/bin/probe.dart", "symbol": "main", "lines": "29-59"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/cel/environment.dart", "symbol": "Environment.compile/makeProgram", "lines": "30-42"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/cel/program.dart", "symbol": "_astToCheckedExpr/_initInterpretable", "lines": "59-73"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/checker/standard.dart", "symbol": "standardDeclarations", "lines": "7-13"}
+      ],
+      "neededWork": "The probe parses, plans and evaluates each fixture; it contains no Dart registration or static type-check experiment. Environment.compile is parser-only, makeProgram wraps the expression in CheckedExpression without checking it, and the environment's declarations are not used by the planner. Add a real non-evaluating checker that rejects undeclared variables/functions and invalid overloads at registration. Syntax errors can still be caught during parsing; the gap is semantic checking."
+    },
+    {
+      "topic": "evaluation cost, interruption and regex",
+      "priority": "required; currently unimplemented",
+      "evidence": [
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/cel/program.dart", "symbol": "Program.evaluate", "lines": "51-56"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/interpreter/interpretable.dart", "symbol": "Interpretable.evaluate and recursive node evaluators", "lines": "10-40, 68-115, 117-155, 158-184"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/common/types/string.dart", "symbol": "StringValue.match", "lines": "44-47"},
+        {"path": "docs/spec/03-variable-type.md", "lines": "124, 131"},
+        {"path": "experiments/t1-values/README.md", "lines": "30-32"}
+      ],
+      "neededWork": "There is no evaluation budget, operation-cost counter or cancellation/decorator hook; Program.evaluate is synchronous. matches directly calls Dart RegExp.hasMatch, with no RE2 conformance or per-match bound. Implement and verify the contract's non-recoverable evaluation budget and RE2-compatible, bounded regex path; the synchronous call cannot be interrupted from the same isolate. A Worker/isolate deadline alone would not establish cost accounting."
+    },
+    {
+      "topic": "strict timestamp and timezone support",
+      "priority": "required for date CEL support; currently absent",
+      "evidence": [
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/cel/environment.dart", "symbol": "Environment.standard", "lines": "20-28"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/common/types/provider.dart", "symbol": "newRegistry", "lines": "15-32"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/cel/library.dart", "symbol": "StandardLibrary.programOptions", "lines": "27-38"},
+        {"path": "docs/spec/03-variable-type.md", "lines": "125"},
+        {"path": "docs/spec/10-value-contracts.md", "lines": "284-304"}
+      ],
+      "neededWork": "Implement strict CEL timestamp parsing/representation and the required receiver getters at the runtime type/provider and standard-library function paths. Validate actual calendar date, offset, milliseconds, range, and timezone semantics; timestamp() must not bypass the strict parser. Date/timezone helper package/API viability and Dart VM versus Flutter/web parity were not tested here."
+    },
+    {
+      "topic": "public extension surface",
+      "priority": "uncertain integration risk",
+      "evidence": [
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/cel.dart", "lines": "1-7"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/cel/options.dart", "lines": "5-16"},
+        {"path": "/Users/minholim/.pub-cache/hosted/pub.dev/cel-0.6.1/lib/src/cel/environment.dart", "symbol": "Environment.standard", "lines": "27-33"}
+      ],
+      "neededWork": "The package's public barrel exports only Ast, Environment and Program. The observed custom function/type plumbing relies on package:cel/src internals and there is no public Environment constructor/options API in this version. Confirm whether the required patches are maintained as a fork or whether upstream exposes a stable extension API before relying on these hooks."
+    }
+  ],
+  "conclusion": {
+    "classification": "not-currently-suitable-without-substantial-patching-and-new-conformance-evidence",
+    "basis": "Seven of 22 shared CEL fixtures mismatch for package-level semantics or missing functions/types. Static semantic checking, cost limits, bounded RE2 semantics, and strict timestamp support are also absent from the inspected 0.6.1 source. The existing Node worker deadline, JS/calendar experiments, and adapters do not verify these Dart capabilities.",
+    "uncertainties": [
+      "No Dart/browser/Flutter execution or new package run was performed; the evidence is the existing Dart 3.11.1 VM result and installed source inspection.",
+      "Runtime behavior outside the recorded macOS arm64 Dart VM, particularly Dart web integer representation, regular-expression behavior, and timezone database parity, remains unverified.",
+      "The mismatch list is the seven rows marked mismatches in existing T1 results; error-row details are probe-caught Dart exceptions and do not establish compatible error codes or all edge cases."
+    ]
+  }
+}

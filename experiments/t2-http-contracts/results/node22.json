@@ -1,0 +1,1688 @@
+{
+  "generatedAt": "2026-10-30T09:52:39.047Z",
+  "runtime": "v22.21.1",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "scope": "Seven documented HTTP authentication variants and trusted callback contracts over real loopback Node HTTP; not production service security or core SDK implementation",
+  "sourceSha256": {
+    "package.json": "301f357cd55b3c5c5f381a353aa27cab839ef122937240f166b5d020b22da710",
+    "harness.mjs": "8cb595ec885c23648d2721d0dec849259b3e3912bc1963fa37796f4df1728c61",
+    "scenarios.mjs": "e9d31476b04385c39096c23907657473dea1fc71bfac45c00627565691000451",
+    "run.mjs": "6cee6732aeecb5dc49541d3fb97db25310dda4f2b5e826668c0773595633d613",
+    "coverage.json": "55305dd0093f64e8201f8dfad3d23e86218ae5afb1703bc8c46eb407961c32e4",
+    "../t2-http-boundary/http-probe.mjs": "b1e7969f4893022358b99872ed1bbb91f593375a5770e6f5b78e3b89236edd0b",
+    "../t2-http-boundary/value-expressions.mjs": "3bd0320dc4e2a978de7a576e1c3df90d456170e9540d8aa667f42d0c1c65a32f",
+    "../t2-http-boundary/header-profile.mjs": "6d4f17b66aae3b4405f05da9b1160a3ceb04c46f670f0bfb65726003ebdc5407"
+  },
+  "summary": {
+    "executed": 62,
+    "passed": 62,
+    "failed": 0
+  },
+  "coverage": {
+    "scope": "Bounded real Node loopback HTTP evidence; status does not claim production service security or core SDK implementation.",
+    "records": [
+      {
+        "id": "H01",
+        "source": [
+          "docs/handoff/acceptance-matrix.md",
+          "docs/spec/01-datasource-auth.md",
+          "experiments/t2-http-contracts/harness.mjs",
+          "experiments/t2-http-contracts/scenarios.mjs",
+          "experiments/t2-http-boundary/http-probe.mjs",
+          "experiments/t2-http-boundary/value-expressions.mjs"
+        ],
+        "result": [
+          "experiments/t2-http-contracts/results/node22.json",
+          "experiments/t2-http-contracts/results/node24.json"
+        ],
+        "testIds": [
+          "A1/public/wire-and-private-boundary",
+          "S1/current-resource-snapshot-without-database-reload"
+        ],
+        "status": "verified-experiment",
+        "remaining": "Current independent HTTP execution protocol is verified; production core SDK and service integration remain outside this experiment."
+      },
+      {
+        "id": "H02",
+        "source": [
+          "docs/handoff/acceptance-matrix.md",
+          "docs/spec/01-datasource-auth.md",
+          "experiments/t2-http-contracts/harness.mjs",
+          "experiments/t2-http-contracts/scenarios.mjs",
+          "experiments/t2-http-boundary/http-probe.mjs",
+          "experiments/t2-http-boundary/value-expressions.mjs"
+        ],
+        "result": [
+          "experiments/t2-http-contracts/results/node22.json",
+          "experiments/t2-http-contracts/results/node24.json"
+        ],
+        "testIds": [
+          "S1/current-resource-snapshot-without-database-reload"
+        ],
+        "status": "verified-experiment",
+        "remaining": "Current independent HTTP execution protocol is verified; production core SDK and service integration remain outside this experiment."
+      },
+      {
+        "id": "H03",
+        "source": [
+          "docs/handoff/acceptance-matrix.md",
+          "docs/spec/01-datasource-auth.md",
+          "experiments/t2-http-contracts/harness.mjs",
+          "experiments/t2-http-contracts/scenarios.mjs",
+          "experiments/t2-http-boundary/http-probe.mjs",
+          "experiments/t2-http-boundary/value-expressions.mjs"
+        ],
+        "result": [
+          "experiments/t2-http-contracts/results/node22.json",
+          "experiments/t2-http-contracts/results/node24.json"
+        ],
+        "testIds": [
+          "P1/public/untrusted-caller-claim",
+          "P2/public/destination-denied-before-secret",
+          "P1/api-key-header/untrusted-caller-claim",
+          "P2/api-key-header/destination-denied-before-secret",
+          "P3/api-key-header/resolver-enforces-caller",
+          "P4/api-key-header/resolver-enforces-destination",
+          "P1/api-key-params/untrusted-caller-claim",
+          "P2/api-key-params/destination-denied-before-secret",
+          "P3/api-key-params/resolver-enforces-caller",
+          "P4/api-key-params/resolver-enforces-destination",
+          "P1/bearer/untrusted-caller-claim",
+          "P2/bearer/destination-denied-before-secret",
+          "P3/bearer/resolver-enforces-caller",
+          "P4/bearer/resolver-enforces-destination",
+          "P1/login-bearer/untrusted-caller-claim",
+          "P2/login-bearer/destination-denied-before-secret",
+          "P3/login-bearer/resolver-enforces-caller",
+          "P4/login-bearer/resolver-enforces-destination",
+          "P1/login-header/untrusted-caller-claim",
+          "P2/login-header/destination-denied-before-secret",
+          "P3/login-header/resolver-enforces-caller",
+          "P4/login-header/resolver-enforces-destination",
+          "P1/login-params/untrusted-caller-claim",
+          "P2/login-params/destination-denied-before-secret",
+          "P3/login-params/resolver-enforces-caller",
+          "P4/login-params/resolver-enforces-destination",
+          "P6/final-query-destination-rechecked"
+        ],
+        "status": "verified-experiment",
+        "remaining": "Trusted authorize/resolveSecret callback contract and synthetic policy are verified; production identity, secret storage, network/DNS policy, service authorization, browser/Dart and core SDK integration are outside this experiment."
+      },
+      {
+        "id": "H04",
+        "source": [
+          "docs/handoff/acceptance-matrix.md",
+          "docs/spec/01-datasource-auth.md",
+          "experiments/t2-http-contracts/harness.mjs",
+          "experiments/t2-http-contracts/scenarios.mjs",
+          "experiments/t2-http-boundary/http-probe.mjs",
+          "experiments/t2-http-boundary/value-expressions.mjs"
+        ],
+        "result": [
+          "experiments/t2-http-contracts/results/node22.json",
+          "experiments/t2-http-contracts/results/node24.json"
+        ],
+        "testIds": [
+          "A2/api-key-header/wire-and-private-boundary",
+          "P3/api-key-header/resolver-enforces-caller",
+          "P4/api-key-header/resolver-enforces-destination",
+          "P5/api-key-header/undeclared-secret-blocks-data",
+          "E1/api-key-header/api-owned-credential-echo",
+          "A3/api-key-params/wire-and-private-boundary",
+          "P3/api-key-params/resolver-enforces-caller",
+          "P4/api-key-params/resolver-enforces-destination",
+          "P5/api-key-params/undeclared-secret-blocks-data",
+          "E1/api-key-params/api-owned-credential-echo",
+          "A4/bearer/wire-and-private-boundary",
+          "P3/bearer/resolver-enforces-caller",
+          "P4/bearer/resolver-enforces-destination",
+          "P5/bearer/undeclared-secret-blocks-data",
+          "E1/bearer/api-owned-credential-echo",
+          "A5/login-bearer/wire-and-private-boundary",
+          "P3/login-bearer/resolver-enforces-caller",
+          "P4/login-bearer/resolver-enforces-destination",
+          "P5/login-bearer/undeclared-secret-blocks-data",
+          "E1/login-bearer/api-owned-credential-echo",
+          "A6/login-header/wire-and-private-boundary",
+          "P3/login-header/resolver-enforces-caller",
+          "P4/login-header/resolver-enforces-destination",
+          "P5/login-header/undeclared-secret-blocks-data",
+          "E1/login-header/api-owned-credential-echo",
+          "A7/login-params/wire-and-private-boundary",
+          "P3/login-params/resolver-enforces-caller",
+          "P4/login-params/resolver-enforces-destination",
+          "P5/login-params/undeclared-secret-blocks-data",
+          "E1/login-params/api-owned-credential-echo"
+        ],
+        "status": "verified-experiment",
+        "remaining": "Trusted authorize/resolveSecret callback contract and synthetic policy are verified; production identity, secret storage, network/DNS policy, service authorization, browser/Dart and core SDK integration are outside this experiment."
+      },
+      {
+        "id": "H05",
+        "source": [
+          "docs/handoff/acceptance-matrix.md",
+          "docs/spec/01-datasource-auth.md",
+          "experiments/t2-http-contracts/harness.mjs",
+          "experiments/t2-http-contracts/scenarios.mjs",
+          "experiments/t2-http-boundary/http-probe.mjs",
+          "experiments/t2-http-boundary/value-expressions.mjs"
+        ],
+        "result": [
+          "experiments/t2-http-contracts/results/node22.json",
+          "experiments/t2-http-contracts/results/node24.json"
+        ],
+        "testIds": [
+          "L1/login-bearer/http-blocks-data",
+          "L1/login-bearer/missing-blocks-data",
+          "L1/login-bearer/non-string-blocks-data",
+          "L1/login-header/http-blocks-data",
+          "L1/login-header/missing-blocks-data",
+          "L1/login-header/non-string-blocks-data",
+          "L1/login-params/http-blocks-data",
+          "L1/login-params/missing-blocks-data",
+          "L1/login-params/non-string-blocks-data"
+        ],
+        "status": "verified-experiment",
+        "remaining": "Current independent HTTP execution protocol is verified; production core SDK and service integration remain outside this experiment."
+      },
+      {
+        "id": "H06",
+        "source": [
+          "docs/handoff/acceptance-matrix.md",
+          "docs/spec/01-datasource-auth.md",
+          "experiments/t2-http-contracts/harness.mjs",
+          "experiments/t2-http-contracts/scenarios.mjs",
+          "experiments/t2-http-boundary/http-probe.mjs",
+          "experiments/t2-http-boundary/value-expressions.mjs"
+        ],
+        "result": [
+          "experiments/t2-http-contracts/results/node22.json",
+          "experiments/t2-http-contracts/results/node24.json"
+        ],
+        "testIds": [
+          "L2/login-bearer/concurrent-and-sequential-independent-login",
+          "L3/login-bearer/outer-unused-secret-not-inherited",
+          "L2/login-header/concurrent-and-sequential-independent-login",
+          "L3/login-header/outer-unused-secret-not-inherited",
+          "L2/login-params/concurrent-and-sequential-independent-login",
+          "L3/login-params/outer-unused-secret-not-inherited"
+        ],
+        "status": "verified-experiment",
+        "remaining": "Current independent HTTP execution protocol is verified; production core SDK and service integration remain outside this experiment."
+      },
+      {
+        "id": "H09",
+        "source": [
+          "docs/handoff/acceptance-matrix.md",
+          "docs/spec/01-datasource-auth.md",
+          "experiments/t2-http-contracts/harness.mjs",
+          "experiments/t2-http-contracts/scenarios.mjs",
+          "experiments/t2-http-boundary/http-probe.mjs",
+          "experiments/t2-http-boundary/value-expressions.mjs"
+        ],
+        "result": [
+          "experiments/t2-http-contracts/results/node22.json",
+          "experiments/t2-http-contracts/results/node24.json"
+        ],
+        "testIds": [
+          "A1/public/wire-and-private-boundary",
+          "P1/public/untrusted-caller-claim",
+          "P2/public/destination-denied-before-secret",
+          "A2/api-key-header/wire-and-private-boundary",
+          "P1/api-key-header/untrusted-caller-claim",
+          "P2/api-key-header/destination-denied-before-secret",
+          "P3/api-key-header/resolver-enforces-caller",
+          "P4/api-key-header/resolver-enforces-destination",
+          "P5/api-key-header/undeclared-secret-blocks-data",
+          "E1/api-key-header/api-owned-credential-echo",
+          "A3/api-key-params/wire-and-private-boundary",
+          "P1/api-key-params/untrusted-caller-claim",
+          "P2/api-key-params/destination-denied-before-secret",
+          "P3/api-key-params/resolver-enforces-caller",
+          "P4/api-key-params/resolver-enforces-destination",
+          "P5/api-key-params/undeclared-secret-blocks-data",
+          "E1/api-key-params/api-owned-credential-echo",
+          "A4/bearer/wire-and-private-boundary",
+          "P1/bearer/untrusted-caller-claim",
+          "P2/bearer/destination-denied-before-secret",
+          "P3/bearer/resolver-enforces-caller",
+          "P4/bearer/resolver-enforces-destination",
+          "P5/bearer/undeclared-secret-blocks-data",
+          "E1/bearer/api-owned-credential-echo",
+          "A5/login-bearer/wire-and-private-boundary",
+          "P1/login-bearer/untrusted-caller-claim",
+          "P2/login-bearer/destination-denied-before-secret",
+          "P3/login-bearer/resolver-enforces-caller",
+          "P4/login-bearer/resolver-enforces-destination",
+          "P5/login-bearer/undeclared-secret-blocks-data",
+          "E1/login-bearer/api-owned-credential-echo",
+          "A6/login-header/wire-and-private-boundary",
+          "P1/login-header/untrusted-caller-claim",
+          "P2/login-header/destination-denied-before-secret",
+          "P3/login-header/resolver-enforces-caller",
+          "P4/login-header/resolver-enforces-destination",
+          "P5/login-header/undeclared-secret-blocks-data",
+          "E1/login-header/api-owned-credential-echo",
+          "A7/login-params/wire-and-private-boundary",
+          "P1/login-params/untrusted-caller-claim",
+          "P2/login-params/destination-denied-before-secret",
+          "P3/login-params/resolver-enforces-caller",
+          "P4/login-params/resolver-enforces-destination",
+          "P5/login-params/undeclared-secret-blocks-data",
+          "E1/login-params/api-owned-credential-echo",
+          "L1/login-bearer/http-blocks-data",
+          "L1/login-bearer/missing-blocks-data",
+          "L1/login-bearer/non-string-blocks-data",
+          "L2/login-bearer/concurrent-and-sequential-independent-login",
+          "L3/login-bearer/outer-unused-secret-not-inherited",
+          "L1/login-header/http-blocks-data",
+          "L1/login-header/missing-blocks-data",
+          "L1/login-header/non-string-blocks-data",
+          "L2/login-header/concurrent-and-sequential-independent-login",
+          "L3/login-header/outer-unused-secret-not-inherited",
+          "L1/login-params/http-blocks-data",
+          "L1/login-params/missing-blocks-data",
+          "L1/login-params/non-string-blocks-data",
+          "L2/login-params/concurrent-and-sequential-independent-login",
+          "L3/login-params/outer-unused-secret-not-inherited"
+        ],
+        "status": "verified-experiment",
+        "remaining": "All seven documented authentication configurations are verified over real loopback HTTP, including trusted callback denials. Real service authentication infrastructure, browser/Dart and production core integration are outside this experiment."
+      }
+    ],
+    "authenticationVariants": [
+      {
+        "id": "H09/10.1.1/public",
+        "source": [
+          "docs/handoff/acceptance-matrix.md",
+          "docs/spec/01-datasource-auth.md",
+          "experiments/t2-http-contracts/harness.mjs",
+          "experiments/t2-http-contracts/scenarios.mjs",
+          "experiments/t2-http-boundary/http-probe.mjs",
+          "experiments/t2-http-boundary/value-expressions.mjs"
+        ],
+        "result": [
+          "experiments/t2-http-contracts/results/node22.json",
+          "experiments/t2-http-contracts/results/node24.json"
+        ],
+        "testIds": [
+          "A1/public/wire-and-private-boundary",
+          "P1/public/untrusted-caller-claim",
+          "P2/public/destination-denied-before-secret"
+        ],
+        "status": "verified-experiment",
+        "remaining": "Actual external services and production core integration are outside this experiment."
+      },
+      {
+        "id": "H09/10.1.2/api-key-header",
+        "source": [
+          "docs/handoff/acceptance-matrix.md",
+          "docs/spec/01-datasource-auth.md",
+          "experiments/t2-http-contracts/harness.mjs",
+          "experiments/t2-http-contracts/scenarios.mjs",
+          "experiments/t2-http-boundary/http-probe.mjs",
+          "experiments/t2-http-boundary/value-expressions.mjs"
+        ],
+        "result": [
+          "experiments/t2-http-contracts/results/node22.json",
+          "experiments/t2-http-contracts/results/node24.json"
+        ],
+        "testIds": [
+          "A2/api-key-header/wire-and-private-boundary",
+          "P1/api-key-header/untrusted-caller-claim",
+          "P2/api-key-header/destination-denied-before-secret",
+          "P3/api-key-header/resolver-enforces-caller",
+          "P4/api-key-header/resolver-enforces-destination",
+          "P5/api-key-header/undeclared-secret-blocks-data",
+          "E1/api-key-header/api-owned-credential-echo"
+        ],
+        "status": "verified-experiment",
+        "remaining": "Actual external services and production core integration are outside this experiment."
+      },
+      {
+        "id": "H09/10.1.3/api-key-params",
+        "source": [
+          "docs/handoff/acceptance-matrix.md",
+          "docs/spec/01-datasource-auth.md",
+          "experiments/t2-http-contracts/harness.mjs",
+          "experiments/t2-http-contracts/scenarios.mjs",
+          "experiments/t2-http-boundary/http-probe.mjs",
+          "experiments/t2-http-boundary/value-expressions.mjs"
+        ],
+        "result": [
+          "experiments/t2-http-contracts/results/node22.json",
+          "experiments/t2-http-contracts/results/node24.json"
+        ],
+        "testIds": [
+          "A3/api-key-params/wire-and-private-boundary",
+          "P1/api-key-params/untrusted-caller-claim",
+          "P2/api-key-params/destination-denied-before-secret",
+          "P3/api-key-params/resolver-enforces-caller",
+          "P4/api-key-params/resolver-enforces-destination",
+          "P5/api-key-params/undeclared-secret-blocks-data",
+          "E1/api-key-params/api-owned-credential-echo"
+        ],
+        "status": "verified-experiment",
+        "remaining": "Actual external services and production core integration are outside this experiment."
+      },
+      {
+        "id": "H09/10.1.4/bearer",
+        "source": [
+          "docs/handoff/acceptance-matrix.md",
+          "docs/spec/01-datasource-auth.md",
+          "experiments/t2-http-contracts/harness.mjs",
+          "experiments/t2-http-contracts/scenarios.mjs",
+          "experiments/t2-http-boundary/http-probe.mjs",
+          "experiments/t2-http-boundary/value-expressions.mjs"
+        ],
+        "result": [
+          "experiments/t2-http-contracts/results/node22.json",
+          "experiments/t2-http-contracts/results/node24.json"
+        ],
+        "testIds": [
+          "A4/bearer/wire-and-private-boundary",
+          "P1/bearer/untrusted-caller-claim",
+          "P2/bearer/destination-denied-before-secret",
+          "P3/bearer/resolver-enforces-caller",
+          "P4/bearer/resolver-enforces-destination",
+          "P5/bearer/undeclared-secret-blocks-data",
+          "E1/bearer/api-owned-credential-echo"
+        ],
+        "status": "verified-experiment",
+        "remaining": "Actual external services and production core integration are outside this experiment."
+      },
+      {
+        "id": "H09/10.1.5/login-bearer",
+        "source": [
+          "docs/handoff/acceptance-matrix.md",
+          "docs/spec/01-datasource-auth.md",
+          "experiments/t2-http-contracts/harness.mjs",
+          "experiments/t2-http-contracts/scenarios.mjs",
+          "experiments/t2-http-boundary/http-probe.mjs",
+          "experiments/t2-http-boundary/value-expressions.mjs"
+        ],
+        "result": [
+          "experiments/t2-http-contracts/results/node22.json",
+          "experiments/t2-http-contracts/results/node24.json"
+        ],
+        "testIds": [
+          "A5/login-bearer/wire-and-private-boundary",
+          "P1/login-bearer/untrusted-caller-claim",
+          "P2/login-bearer/destination-denied-before-secret",
+          "P3/login-bearer/resolver-enforces-caller",
+          "P4/login-bearer/resolver-enforces-destination",
+          "P5/login-bearer/undeclared-secret-blocks-data",
+          "E1/login-bearer/api-owned-credential-echo",
+          "L1/login-bearer/http-blocks-data",
+          "L1/login-bearer/missing-blocks-data",
+          "L1/login-bearer/non-string-blocks-data",
+          "L2/login-bearer/concurrent-and-sequential-independent-login",
+          "L3/login-bearer/outer-unused-secret-not-inherited"
+        ],
+        "status": "verified-experiment",
+        "remaining": "Actual external services and production core integration are outside this experiment."
+      },
+      {
+        "id": "H09/10.1.6/login-header",
+        "source": [
+          "docs/handoff/acceptance-matrix.md",
+          "docs/spec/01-datasource-auth.md",
+          "experiments/t2-http-contracts/harness.mjs",
+          "experiments/t2-http-contracts/scenarios.mjs",
+          "experiments/t2-http-boundary/http-probe.mjs",
+          "experiments/t2-http-boundary/value-expressions.mjs"
+        ],
+        "result": [
+          "experiments/t2-http-contracts/results/node22.json",
+          "experiments/t2-http-contracts/results/node24.json"
+        ],
+        "testIds": [
+          "A6/login-header/wire-and-private-boundary",
+          "P1/login-header/untrusted-caller-claim",
+          "P2/login-header/destination-denied-before-secret",
+          "P3/login-header/resolver-enforces-caller",
+          "P4/login-header/resolver-enforces-destination",
+          "P5/login-header/undeclared-secret-blocks-data",
+          "E1/login-header/api-owned-credential-echo",
+          "L1/login-header/http-blocks-data",
+          "L1/login-header/missing-blocks-data",
+          "L1/login-header/non-string-blocks-data",
+          "L2/login-header/concurrent-and-sequential-independent-login",
+          "L3/login-header/outer-unused-secret-not-inherited"
+        ],
+        "status": "verified-experiment",
+        "remaining": "Actual external services and production core integration are outside this experiment."
+      },
+      {
+        "id": "H09/10.1.7/login-params",
+        "source": [
+          "docs/handoff/acceptance-matrix.md",
+          "docs/spec/01-datasource-auth.md",
+          "experiments/t2-http-contracts/harness.mjs",
+          "experiments/t2-http-contracts/scenarios.mjs",
+          "experiments/t2-http-boundary/http-probe.mjs",
+          "experiments/t2-http-boundary/value-expressions.mjs"
+        ],
+        "result": [
+          "experiments/t2-http-contracts/results/node22.json",
+          "experiments/t2-http-contracts/results/node24.json"
+        ],
+        "testIds": [
+          "A7/login-params/wire-and-private-boundary",
+          "P1/login-params/untrusted-caller-claim",
+          "P2/login-params/destination-denied-before-secret",
+          "P3/login-params/resolver-enforces-caller",
+          "P4/login-params/resolver-enforces-destination",
+          "P5/login-params/undeclared-secret-blocks-data",
+          "E1/login-params/api-owned-credential-echo",
+          "L1/login-params/http-blocks-data",
+          "L1/login-params/missing-blocks-data",
+          "L1/login-params/non-string-blocks-data",
+          "L2/login-params/concurrent-and-sequential-independent-login",
+          "L3/login-params/outer-unused-secret-not-inherited"
+        ],
+        "status": "verified-experiment",
+        "remaining": "Actual external services and production core integration are outside this experiment."
+      }
+    ]
+  },
+  "results": [
+    {
+      "id": "A1/public/wire-and-private-boundary",
+      "contracts": [
+        "H09",
+        "H01"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 0,
+      "dataRequests": 1,
+      "authorizationCalls": 2,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P1/public/untrusted-caller-claim",
+      "contracts": [
+        "H03",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P2/public/destination-denied-before-secret",
+      "contracts": [
+        "H03",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "A2/api-key-header/wire-and-private-boundary",
+      "contracts": [
+        "H09",
+        "H04"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 0,
+      "dataRequests": 1,
+      "authorizationCalls": 2,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P1/api-key-header/untrusted-caller-claim",
+      "contracts": [
+        "H03",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P2/api-key-header/destination-denied-before-secret",
+      "contracts": [
+        "H03",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P3/api-key-header/resolver-enforces-caller",
+      "contracts": [
+        "H03",
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P4/api-key-header/resolver-enforces-destination",
+      "contracts": [
+        "H03",
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P5/api-key-header/undeclared-secret-blocks-data",
+      "contracts": [
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "E1/api-key-header/api-owned-credential-echo",
+      "contracts": [
+        "H04",
+        "H09",
+        "U21"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 0,
+      "dataRequests": 1,
+      "authorizationCalls": 2,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "A3/api-key-params/wire-and-private-boundary",
+      "contracts": [
+        "H09",
+        "H04"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 0,
+      "dataRequests": 1,
+      "authorizationCalls": 2,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P1/api-key-params/untrusted-caller-claim",
+      "contracts": [
+        "H03",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P2/api-key-params/destination-denied-before-secret",
+      "contracts": [
+        "H03",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P3/api-key-params/resolver-enforces-caller",
+      "contracts": [
+        "H03",
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P4/api-key-params/resolver-enforces-destination",
+      "contracts": [
+        "H03",
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P5/api-key-params/undeclared-secret-blocks-data",
+      "contracts": [
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "E1/api-key-params/api-owned-credential-echo",
+      "contracts": [
+        "H04",
+        "H09",
+        "U21"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 0,
+      "dataRequests": 1,
+      "authorizationCalls": 2,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "A4/bearer/wire-and-private-boundary",
+      "contracts": [
+        "H09",
+        "H04"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 0,
+      "dataRequests": 1,
+      "authorizationCalls": 2,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P1/bearer/untrusted-caller-claim",
+      "contracts": [
+        "H03",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P2/bearer/destination-denied-before-secret",
+      "contracts": [
+        "H03",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P3/bearer/resolver-enforces-caller",
+      "contracts": [
+        "H03",
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P4/bearer/resolver-enforces-destination",
+      "contracts": [
+        "H03",
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P5/bearer/undeclared-secret-blocks-data",
+      "contracts": [
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "E1/bearer/api-owned-credential-echo",
+      "contracts": [
+        "H04",
+        "H09",
+        "U21"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 0,
+      "dataRequests": 1,
+      "authorizationCalls": 2,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "A5/login-bearer/wire-and-private-boundary",
+      "contracts": [
+        "H09",
+        "H04"
+      ],
+      "passed": true,
+      "requests": 2,
+      "loginRequests": 1,
+      "dataRequests": 1,
+      "authorizationCalls": 4,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P1/login-bearer/untrusted-caller-claim",
+      "contracts": [
+        "H03",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P2/login-bearer/destination-denied-before-secret",
+      "contracts": [
+        "H03",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P3/login-bearer/resolver-enforces-caller",
+      "contracts": [
+        "H03",
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P4/login-bearer/resolver-enforces-destination",
+      "contracts": [
+        "H03",
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P5/login-bearer/undeclared-secret-blocks-data",
+      "contracts": [
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "E1/login-bearer/api-owned-credential-echo",
+      "contracts": [
+        "H04",
+        "H09",
+        "U21"
+      ],
+      "passed": true,
+      "requests": 2,
+      "loginRequests": 1,
+      "dataRequests": 1,
+      "authorizationCalls": 4,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "A6/login-header/wire-and-private-boundary",
+      "contracts": [
+        "H09",
+        "H04"
+      ],
+      "passed": true,
+      "requests": 2,
+      "loginRequests": 1,
+      "dataRequests": 1,
+      "authorizationCalls": 4,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P1/login-header/untrusted-caller-claim",
+      "contracts": [
+        "H03",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P2/login-header/destination-denied-before-secret",
+      "contracts": [
+        "H03",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P3/login-header/resolver-enforces-caller",
+      "contracts": [
+        "H03",
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P4/login-header/resolver-enforces-destination",
+      "contracts": [
+        "H03",
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P5/login-header/undeclared-secret-blocks-data",
+      "contracts": [
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "E1/login-header/api-owned-credential-echo",
+      "contracts": [
+        "H04",
+        "H09",
+        "U21"
+      ],
+      "passed": true,
+      "requests": 2,
+      "loginRequests": 1,
+      "dataRequests": 1,
+      "authorizationCalls": 4,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "A7/login-params/wire-and-private-boundary",
+      "contracts": [
+        "H09",
+        "H04"
+      ],
+      "passed": true,
+      "requests": 2,
+      "loginRequests": 1,
+      "dataRequests": 1,
+      "authorizationCalls": 4,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P1/login-params/untrusted-caller-claim",
+      "contracts": [
+        "H03",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P2/login-params/destination-denied-before-secret",
+      "contracts": [
+        "H03",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P3/login-params/resolver-enforces-caller",
+      "contracts": [
+        "H03",
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P4/login-params/resolver-enforces-destination",
+      "contracts": [
+        "H03",
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P5/login-params/undeclared-secret-blocks-data",
+      "contracts": [
+        "H04",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 1,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "E1/login-params/api-owned-credential-echo",
+      "contracts": [
+        "H04",
+        "H09",
+        "U21"
+      ],
+      "passed": true,
+      "requests": 2,
+      "loginRequests": 1,
+      "dataRequests": 1,
+      "authorizationCalls": 4,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "L1/login-bearer/http-blocks-data",
+      "contracts": [
+        "H05",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 1,
+      "dataRequests": 0,
+      "authorizationCalls": 2,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "L1/login-bearer/missing-blocks-data",
+      "contracts": [
+        "H05",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 1,
+      "dataRequests": 0,
+      "authorizationCalls": 2,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "L1/login-bearer/non-string-blocks-data",
+      "contracts": [
+        "H05",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 1,
+      "dataRequests": 0,
+      "authorizationCalls": 2,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "L2/login-bearer/concurrent-and-sequential-independent-login",
+      "contracts": [
+        "H06",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 6,
+      "loginRequests": 3,
+      "dataRequests": 3,
+      "authorizationCalls": 12,
+      "secretResolutions": 6,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "L3/login-bearer/outer-unused-secret-not-inherited",
+      "contracts": [
+        "H06",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 1,
+      "dataRequests": 0,
+      "authorizationCalls": 3,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "L1/login-header/http-blocks-data",
+      "contracts": [
+        "H05",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 1,
+      "dataRequests": 0,
+      "authorizationCalls": 2,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "L1/login-header/missing-blocks-data",
+      "contracts": [
+        "H05",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 1,
+      "dataRequests": 0,
+      "authorizationCalls": 2,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "L1/login-header/non-string-blocks-data",
+      "contracts": [
+        "H05",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 1,
+      "dataRequests": 0,
+      "authorizationCalls": 2,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "L2/login-header/concurrent-and-sequential-independent-login",
+      "contracts": [
+        "H06",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 6,
+      "loginRequests": 3,
+      "dataRequests": 3,
+      "authorizationCalls": 12,
+      "secretResolutions": 6,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "L3/login-header/outer-unused-secret-not-inherited",
+      "contracts": [
+        "H06",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 1,
+      "dataRequests": 0,
+      "authorizationCalls": 3,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "L1/login-params/http-blocks-data",
+      "contracts": [
+        "H05",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 1,
+      "dataRequests": 0,
+      "authorizationCalls": 2,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "L1/login-params/missing-blocks-data",
+      "contracts": [
+        "H05",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 1,
+      "dataRequests": 0,
+      "authorizationCalls": 2,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "L1/login-params/non-string-blocks-data",
+      "contracts": [
+        "H05",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 1,
+      "dataRequests": 0,
+      "authorizationCalls": 2,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "L2/login-params/concurrent-and-sequential-independent-login",
+      "contracts": [
+        "H06",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 6,
+      "loginRequests": 3,
+      "dataRequests": 3,
+      "authorizationCalls": 12,
+      "secretResolutions": 6,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "L3/login-params/outer-unused-secret-not-inherited",
+      "contracts": [
+        "H06",
+        "H09"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 1,
+      "dataRequests": 0,
+      "authorizationCalls": 3,
+      "secretResolutions": 2,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "P6/final-query-destination-rechecked",
+      "contracts": [
+        "H03"
+      ],
+      "passed": true,
+      "requests": 0,
+      "loginRequests": 0,
+      "dataRequests": 0,
+      "authorizationCalls": 2,
+      "secretResolutions": 1,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    },
+    {
+      "id": "S1/current-resource-snapshot-without-database-reload",
+      "contracts": [
+        "H01",
+        "H02"
+      ],
+      "passed": true,
+      "requests": 1,
+      "loginRequests": 0,
+      "dataRequests": 1,
+      "authorizationCalls": 2,
+      "secretResolutions": 0,
+      "cleanup": {
+        "listeningServers": 0,
+        "sockets": 0,
+        "requestTimers": 0,
+        "activeOwnedHandles": 0
+      }
+    }
+  ],
+  "unhandled": []
+}

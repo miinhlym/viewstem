@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-10-30T08:36:56.788Z",
+  "runtime": "v24.19.0",
+  "icu": "78.3",
+  "tz": "2026a",
+  "scope": "Controlled worker observation of native RegExp; deadline termination is a gap, not conformance success",
+  "sourceSha256": {
+    "regex-probe.mjs": "8110a5c7e3542aaece46106f8424390bcc5732e42a37c171b1073ea6242a92b0",
+    "regex-worker.mjs": "2ae286669830a53226528a256ca324311d87f65e222c7afe4d6e6a34e558d19b",
+    "prepare.mjs": "4341a4776452dc6dcdf274eab39c0d05be9e2f9f6fbdac9169f9970f66006418",
+    "cel-js-8.0.0.patch": "dc18df16ad38c08e43b893c03353fb5a42627e730407860d0378eafbe0311186",
+    "upstream-sha256.json": "19172ed8004970d5801f3c8b52991b25d074d0305fac01cc87fcbbaf97ec61f2",
+    "patched-sha256.json": "63430b265b360e7e76892b32f524626e8895bdf4223fd77c7a0112c38fe88a88",
+    "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594"
+  },
+  "patchSha256": "dc18df16ad38c08e43b893c03353fb5a42627e730407860d0378eafbe0311186",
+  "summary": {
+    "executed": 2,
+    "passed": 1,
+    "failed": 1
+  },
+  "results": [
+    {
+      "id": "upstream-regex-control",
+      "passed": true,
+      "observation": {
+        "terminated": true,
+        "deadlineMs": 300
+      }
+    },
+    {
+      "id": "patched-regex-must-complete",
+      "passed": false,
+      "observation": {
+        "terminated": true,
+        "deadlineMs": 300
+      }
+    }
+  ]
+}

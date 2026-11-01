@@ -1,0 +1,782 @@
+{
+  "generatedAt": "2026-10-29T10:14:49.993Z",
+  "runtime": "v22.21.1",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "browser": "151.0.7922.34",
+  "playwrightVersion": "1.62.1",
+  "scope": "Independent header guard with real loopback HTTP; not a production Viewstem executor",
+  "stopOnFirstProblem": true,
+  "stoppedAt": null,
+  "sourceSha256": {
+    "package.json": "b07eabf40c18ca1e4a45a951848c41d1abc8e6b1a20c49854741ffba51a982e4",
+    "header-profile.mjs": "6d4f17b66aae3b4405f05da9b1160a3ceb04c46f670f0bfb65726003ebdc5407",
+    "header-tests.mjs": "1377334233a20d6e03957aeb5e2831729557c0afa43406ca6f69647552692d86",
+    "../t2-url-races/package.json": "d1f2b402b41e6d62766d5002af5475706ae8434b13c4e35c6a8818947aa361fc",
+    "../t2-url-races/package-lock.json": "d5f2c042db6f40f0ef311e4c24958a57d4ce1048d27d7cc87b467e805b66dc8b"
+  },
+  "results": [
+    {
+      "id": "reject-Accept-Charset",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Accept-Charset",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Accept-Encoding",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Accept-Encoding",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Access-Control-Request-Headers",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Access-Control-Request-Headers",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Access-Control-Request-Method",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Access-Control-Request-Method",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Connection",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Connection",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Content-Length",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Content-Length",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Cookie",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Cookie",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Cookie2",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Cookie2",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Date",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Date",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-DNT",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-DNT",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Expect",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Expect",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Host",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Host",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Keep-Alive",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Keep-Alive",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Origin",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Origin",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Referer",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Referer",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Set-Cookie",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Set-Cookie",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-TE",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-TE",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Trailer",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Trailer",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Transfer-Encoding",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Transfer-Encoding",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Upgrade",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Upgrade",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Via",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Via",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-User-Agent",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-User-Agent",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-X-HTTP-Method",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-X-HTTP-Method",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-X-HTTP-Method-Override",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-X-HTTP-Method-Override",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-X-Method-Override",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-X-Method-Override",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Proxy-Authorization",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Proxy-Authorization",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Sec-Future-Header",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Sec-Future-Header",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-hidden-by-override",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-casing-duplicate",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-crlf",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-invalid-name",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-unencoded-unicode",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-number-value",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "ordinary-headers",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "merge-remove-normalize",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "token-valid-property-names",
+      "runtime": "node:http",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "reject-Accept-Charset",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Accept-Charset",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Accept-Encoding",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Accept-Encoding",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Access-Control-Request-Headers",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Access-Control-Request-Headers",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Access-Control-Request-Method",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Access-Control-Request-Method",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Connection",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Connection",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Content-Length",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Content-Length",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Cookie",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Cookie",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Cookie2",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Cookie2",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Date",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Date",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-DNT",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-DNT",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Expect",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Expect",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Host",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Host",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Keep-Alive",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Keep-Alive",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Origin",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Origin",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Referer",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Referer",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Set-Cookie",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Set-Cookie",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-TE",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-TE",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Trailer",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Trailer",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Transfer-Encoding",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Transfer-Encoding",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Upgrade",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Upgrade",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Via",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Via",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-User-Agent",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-User-Agent",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-X-HTTP-Method",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-X-HTTP-Method",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-X-HTTP-Method-Override",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-X-HTTP-Method-Override",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-X-Method-Override",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-X-Method-Override",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Proxy-Authorization",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Proxy-Authorization",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-Sec-Future-Header",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-null-Sec-Future-Header",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-hidden-by-override",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-casing-duplicate",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-crlf",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-invalid-name",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-unencoded-unicode",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "reject-number-value",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 0
+    },
+    {
+      "id": "ordinary-headers",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "merge-remove-normalize",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    },
+    {
+      "id": "token-valid-property-names",
+      "runtime": "browser-fetch",
+      "passed": true,
+      "sentRequests": 1
+    }
+  ],
+  "summary": {
+    "executed": 126,
+    "passed": 126,
+    "failed": 0,
+    "sentRequests": 6
+  }
+}

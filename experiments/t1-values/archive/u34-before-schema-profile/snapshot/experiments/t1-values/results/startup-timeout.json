@@ -1,0 +1,38 @@
+{
+  "node": "v22.21.1",
+  "scope": "Observed before separating startup watchdog from execution deadline",
+  "rows": [
+    {
+      "group": "containment",
+      "id": "marc",
+      "expected": "deadline",
+      "actual": "deadline",
+      "matches": true,
+      "kind": "deadline",
+      "budgetMs": 200,
+      "elapsedMs": 4787,
+      "terminated": true
+    },
+    {
+      "group": "containment",
+      "id": "buf",
+      "expected": "deadline",
+      "actual": "deadline",
+      "matches": true,
+      "kind": "deadline",
+      "budgetMs": 200,
+      "elapsedMs": 8571,
+      "terminated": true
+    },
+    {
+      "group": "containment",
+      "id": "schema-regex",
+      "expected": "deadline",
+      "actual": "startup-timeout",
+      "matches": false,
+      "kind": "startup-timeout",
+      "elapsedMs": 10123,
+      "terminated": true
+    }
+  ]
+}

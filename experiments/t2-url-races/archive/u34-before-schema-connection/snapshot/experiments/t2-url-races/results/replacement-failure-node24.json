@@ -1,0 +1,96 @@
+{
+  "generatedAt": "2026-10-30T07:39:12.377Z",
+  "runtime": "v24.19.0",
+  "platform": "darwin",
+  "status": "passed",
+  "contractVerdict": "U33 replacement completes and reports URL cleanup failure",
+  "scope": "Memory endpoint; injected cleanup write failure; private connection model, no View/renderer",
+  "sourceSha256": {
+    "replacement-failure.mjs": "620183ea9830593a127328e3378eb7d01645c60361355a92456ab635317dc1f5",
+    "url-probe.mjs": "86c5016e932c11c275ba092850065f1fd28a0438c78265bed3c0675897889e06",
+    "endpoints.mjs": "c34a88e785ea05afdeff95ef10e5921d4269631f159996d10a9420e93f8d9579",
+    "package.json": "d1f2b402b41e6d62766d5002af5475706ae8434b13c4e35c6a8818947aa361fc"
+  },
+  "ordinaryFailure": {
+    "result": {
+      "applied": false,
+      "code": "URL_WRITE_FAILED"
+    },
+    "connectionAlive": true,
+    "state": {
+      "filter": "new-filter"
+    },
+    "url": "/view?foreign=keep&p.filter=%22old-filter%22#section",
+    "diagnostics": [
+      {
+        "kind": "write",
+        "code": "URL_WRITE_FAILED"
+      }
+    ]
+  },
+  "replacementFailure": {
+    "outcome": {
+      "status": "fulfilled"
+    },
+    "oldConnectionAlive": false,
+    "activeStoreCount": 1,
+    "activeSubscriptionCount": 1,
+    "replacementCount": 0,
+    "url": "/view?foreign=keep&p.filter=%22old-filter%22#section",
+    "newConnectionCreated": true,
+    "newState": {
+      "filter": "next-baseline"
+    },
+    "diagnostics": [
+      {
+        "kind": "replace-cleanup",
+        "code": "URL_WRITE_FAILED",
+        "keys": [
+          "p.filter"
+        ]
+      }
+    ]
+  },
+  "trace": [
+    {
+      "kind": "queued",
+      "id": 1,
+      "patch": {
+        "p.filter": "\"old-filter\""
+      },
+      "mode": "replace"
+    },
+    {
+      "kind": "committed",
+      "id": 1,
+      "mode": "replace",
+      "url": "/view?foreign=keep&p.filter=%22old-filter%22#section"
+    },
+    {
+      "kind": "queued",
+      "id": 2,
+      "patch": {
+        "p.filter": "\"new-filter\""
+      },
+      "mode": "replace"
+    },
+    {
+      "kind": "failed",
+      "id": 2,
+      "code": "URL_WRITE_FAILED"
+    },
+    {
+      "kind": "queued",
+      "id": 3,
+      "patch": {
+        "p.filter": null
+      },
+      "mode": "replace"
+    },
+    {
+      "kind": "failed",
+      "id": 3,
+      "code": "URL_WRITE_FAILED"
+    }
+  ]
+}

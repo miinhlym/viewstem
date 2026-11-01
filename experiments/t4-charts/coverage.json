@@ -1,0 +1,532 @@
+{
+  "scope": "T4 optional charts only; independent disposable probe, no production core/SDK/Svelte integration or full-engine conformance.",
+  "statusMeaning": "verified-experiment means the named clauses are observed within the explicitly bounded fixture/module support profile, including direct reuse of existing State/port models for X01. This status does not assert production conformance.",
+  "environments": [
+    {
+      "result": "results/node22.json",
+      "resultSha256": "07f3e9255dc232672126d72c85c3577afc068e510f12e2a18038f97d98d5a2d6",
+      "runtime": "v22.21.1",
+      "echarts": "6.1.0",
+      "summary": {
+        "executed": 139,
+        "passed": 139,
+        "failed": 0
+      },
+      "populations": {
+        "contract": 139,
+        "actualBrowser": 0
+      },
+      "sourceSha256": {
+        "probe.mjs": "6c75c4a6f8ad8fa46eee7c8ad716476c55333c073597c81600aa9ff0ddfc992a",
+        "scenarios.mjs": "8b83cb53c2d9dcb5445755b8050b75cd3eea1c6f1492c445ed371436b2bb193f",
+        "state-chart-probe.mjs": "02f6529cc47ad2d7148052c8c00346d3f35a66d445fa93ac836209c08986e663",
+        "state-scenarios.mjs": "234cf84aedc90b02ea8dabe9a013a5f1d3c50d09142aefd1b6d817a6bc450628",
+        "browser-scenarios.mjs": "f25c438012d4ba4718519f95db8c3627777c8d78fea13cf3392f1b9be3aaabff",
+        "browser-run.mjs": "06a5762429b59a2c61f3090e171eef00e51de27ab178b2f865dc01792e637f1a",
+        "run.mjs": "20ac862a05994c3e4754c566057cae5859c273a7f72fcc04a022c67c6ed254c1",
+        "update-coverage.mjs": "148d455d000bd4bd84f1e530207327b2a48914d746408b978578351dd79675f1",
+        "package.json": "b45c6ad6deee714e2df50c1594e2c35a39140ae45a094dfa22229879bb82c890",
+        "package-lock.json": "6287ccc214a2384f63ed305acbf1e7a4c3546cbd48931aad3e8fff2a078062af",
+        "node_modules/echarts/package.json": "3b5f84e135d641960271dd2d7d63b5486896a471fee8e0e841f822fa3846bb28",
+        "node_modules/zrender/package.json": "8be4c394a66a94267e172f1b0b9843405b47201c66591acee2c9ad1b3f55ff1f",
+        "../t3-state/state-probe.mjs": "501e0e0d78c8b8bf4fa1a9d465fe844e8cbeb06752013bc9ac6c765a0f5edbaa",
+        "../t3-state/ports-probe.mjs": "b7cc988b6f9da94081acd54a7757e35fd19e0db3619032a0c04915f42893815a",
+        "../t3-state/immutable.mjs": "e86391873075d434ce26169043dece6e28b9082ddb20f9aab84c4dbaa78790f4",
+        "../t1-values/schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+        "../t1-values/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+        "../t1-values/values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+        "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+        "../verification/errors.mjs": "c9d94483f9314bcf5bad42cb044f7b0ba29cd7d7b9d3ba561f1c9021aa6d7224",
+        "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+        "../verification/node_modules/esbuild/package.json": "cb7d5b1fe478f8cbaae566a86031b6fdf5f7d444354f35d1cb3cba9adf6d2935",
+        "../t2-url-races/node_modules/playwright/package.json": "ca170ec143a88ed3043ac953eb3b2377b2b97304104f4e1e23316684ce2c35af"
+      }
+    },
+    {
+      "result": "results/node24.json",
+      "resultSha256": "33a44a76b82fb7bcc180d2a71f30632fa4531d979192c7aecef64ad5f90097bf",
+      "runtime": "v24.19.0",
+      "echarts": "6.1.0",
+      "summary": {
+        "executed": 139,
+        "passed": 139,
+        "failed": 0
+      },
+      "populations": {
+        "contract": 139,
+        "actualBrowser": 0
+      },
+      "sourceSha256": {
+        "probe.mjs": "6c75c4a6f8ad8fa46eee7c8ad716476c55333c073597c81600aa9ff0ddfc992a",
+        "scenarios.mjs": "8b83cb53c2d9dcb5445755b8050b75cd3eea1c6f1492c445ed371436b2bb193f",
+        "state-chart-probe.mjs": "02f6529cc47ad2d7148052c8c00346d3f35a66d445fa93ac836209c08986e663",
+        "state-scenarios.mjs": "234cf84aedc90b02ea8dabe9a013a5f1d3c50d09142aefd1b6d817a6bc450628",
+        "browser-scenarios.mjs": "f25c438012d4ba4718519f95db8c3627777c8d78fea13cf3392f1b9be3aaabff",
+        "browser-run.mjs": "06a5762429b59a2c61f3090e171eef00e51de27ab178b2f865dc01792e637f1a",
+        "run.mjs": "20ac862a05994c3e4754c566057cae5859c273a7f72fcc04a022c67c6ed254c1",
+        "update-coverage.mjs": "148d455d000bd4bd84f1e530207327b2a48914d746408b978578351dd79675f1",
+        "package.json": "b45c6ad6deee714e2df50c1594e2c35a39140ae45a094dfa22229879bb82c890",
+        "package-lock.json": "6287ccc214a2384f63ed305acbf1e7a4c3546cbd48931aad3e8fff2a078062af",
+        "node_modules/echarts/package.json": "3b5f84e135d641960271dd2d7d63b5486896a471fee8e0e841f822fa3846bb28",
+        "node_modules/zrender/package.json": "8be4c394a66a94267e172f1b0b9843405b47201c66591acee2c9ad1b3f55ff1f",
+        "../t3-state/state-probe.mjs": "501e0e0d78c8b8bf4fa1a9d465fe844e8cbeb06752013bc9ac6c765a0f5edbaa",
+        "../t3-state/ports-probe.mjs": "b7cc988b6f9da94081acd54a7757e35fd19e0db3619032a0c04915f42893815a",
+        "../t3-state/immutable.mjs": "e86391873075d434ce26169043dece6e28b9082ddb20f9aab84c4dbaa78790f4",
+        "../t1-values/schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+        "../t1-values/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+        "../t1-values/values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+        "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+        "../verification/errors.mjs": "c9d94483f9314bcf5bad42cb044f7b0ba29cd7d7b9d3ba561f1c9021aa6d7224",
+        "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+        "../verification/node_modules/esbuild/package.json": "cb7d5b1fe478f8cbaae566a86031b6fdf5f7d444354f35d1cb3cba9adf6d2935",
+        "../t2-url-races/node_modules/playwright/package.json": "ca170ec143a88ed3043ac953eb3b2377b2b97304104f4e1e23316684ce2c35af"
+      }
+    },
+    {
+      "result": "results/chromium22.json",
+      "resultSha256": "22b2d27a88b54d8f8a202c92616528338568042f82ae929cb37defee3eca81ae",
+      "runtime": "v22.21.1",
+      "browser": "151.0.7922.34",
+      "echarts": "6.1.0",
+      "summary": {
+        "executed": 173,
+        "passed": 173,
+        "failed": 0
+      },
+      "populations": {
+        "contract": 139,
+        "actualBrowser": 34
+      },
+      "screenshot": {
+        "file": "chromium22.png",
+        "sha256": "d8db7e388d44eea4a4807eb77bbbcd94a55016eaa34762d93b3b184feacb6e6a"
+      },
+      "sourceSha256": {
+        "probe.mjs": "6c75c4a6f8ad8fa46eee7c8ad716476c55333c073597c81600aa9ff0ddfc992a",
+        "scenarios.mjs": "8b83cb53c2d9dcb5445755b8050b75cd3eea1c6f1492c445ed371436b2bb193f",
+        "state-chart-probe.mjs": "02f6529cc47ad2d7148052c8c00346d3f35a66d445fa93ac836209c08986e663",
+        "state-scenarios.mjs": "234cf84aedc90b02ea8dabe9a013a5f1d3c50d09142aefd1b6d817a6bc450628",
+        "browser-scenarios.mjs": "f25c438012d4ba4718519f95db8c3627777c8d78fea13cf3392f1b9be3aaabff",
+        "browser-run.mjs": "06a5762429b59a2c61f3090e171eef00e51de27ab178b2f865dc01792e637f1a",
+        "run.mjs": "20ac862a05994c3e4754c566057cae5859c273a7f72fcc04a022c67c6ed254c1",
+        "update-coverage.mjs": "148d455d000bd4bd84f1e530207327b2a48914d746408b978578351dd79675f1",
+        "package.json": "b45c6ad6deee714e2df50c1594e2c35a39140ae45a094dfa22229879bb82c890",
+        "package-lock.json": "6287ccc214a2384f63ed305acbf1e7a4c3546cbd48931aad3e8fff2a078062af",
+        "node_modules/echarts/package.json": "3b5f84e135d641960271dd2d7d63b5486896a471fee8e0e841f822fa3846bb28",
+        "node_modules/zrender/package.json": "8be4c394a66a94267e172f1b0b9843405b47201c66591acee2c9ad1b3f55ff1f",
+        "../t3-state/state-probe.mjs": "501e0e0d78c8b8bf4fa1a9d465fe844e8cbeb06752013bc9ac6c765a0f5edbaa",
+        "../t3-state/ports-probe.mjs": "b7cc988b6f9da94081acd54a7757e35fd19e0db3619032a0c04915f42893815a",
+        "../t3-state/immutable.mjs": "e86391873075d434ce26169043dece6e28b9082ddb20f9aab84c4dbaa78790f4",
+        "../t1-values/schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+        "../t1-values/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+        "../t1-values/values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+        "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+        "../verification/errors.mjs": "c9d94483f9314bcf5bad42cb044f7b0ba29cd7d7b9d3ba561f1c9021aa6d7224",
+        "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+        "../verification/node_modules/esbuild/package.json": "cb7d5b1fe478f8cbaae566a86031b6fdf5f7d444354f35d1cb3cba9adf6d2935",
+        "../t2-url-races/node_modules/playwright/package.json": "ca170ec143a88ed3043ac953eb3b2377b2b97304104f4e1e23316684ce2c35af"
+      }
+    },
+    {
+      "result": "results/chromium24.json",
+      "resultSha256": "934d88e99ebb4ef6a5bddd0924e219318898653af759e460baf93ba0ca3b1659",
+      "runtime": "v24.19.0",
+      "browser": "151.0.7922.34",
+      "echarts": "6.1.0",
+      "summary": {
+        "executed": 173,
+        "passed": 173,
+        "failed": 0
+      },
+      "populations": {
+        "contract": 139,
+        "actualBrowser": 34
+      },
+      "screenshot": {
+        "file": "chromium24.png",
+        "sha256": "d8db7e388d44eea4a4807eb77bbbcd94a55016eaa34762d93b3b184feacb6e6a"
+      },
+      "sourceSha256": {
+        "probe.mjs": "6c75c4a6f8ad8fa46eee7c8ad716476c55333c073597c81600aa9ff0ddfc992a",
+        "scenarios.mjs": "8b83cb53c2d9dcb5445755b8050b75cd3eea1c6f1492c445ed371436b2bb193f",
+        "state-chart-probe.mjs": "02f6529cc47ad2d7148052c8c00346d3f35a66d445fa93ac836209c08986e663",
+        "state-scenarios.mjs": "234cf84aedc90b02ea8dabe9a013a5f1d3c50d09142aefd1b6d817a6bc450628",
+        "browser-scenarios.mjs": "f25c438012d4ba4718519f95db8c3627777c8d78fea13cf3392f1b9be3aaabff",
+        "browser-run.mjs": "06a5762429b59a2c61f3090e171eef00e51de27ab178b2f865dc01792e637f1a",
+        "run.mjs": "20ac862a05994c3e4754c566057cae5859c273a7f72fcc04a022c67c6ed254c1",
+        "update-coverage.mjs": "148d455d000bd4bd84f1e530207327b2a48914d746408b978578351dd79675f1",
+        "package.json": "b45c6ad6deee714e2df50c1594e2c35a39140ae45a094dfa22229879bb82c890",
+        "package-lock.json": "6287ccc214a2384f63ed305acbf1e7a4c3546cbd48931aad3e8fff2a078062af",
+        "node_modules/echarts/package.json": "3b5f84e135d641960271dd2d7d63b5486896a471fee8e0e841f822fa3846bb28",
+        "node_modules/zrender/package.json": "8be4c394a66a94267e172f1b0b9843405b47201c66591acee2c9ad1b3f55ff1f",
+        "../t3-state/state-probe.mjs": "501e0e0d78c8b8bf4fa1a9d465fe844e8cbeb06752013bc9ac6c765a0f5edbaa",
+        "../t3-state/ports-probe.mjs": "b7cc988b6f9da94081acd54a7757e35fd19e0db3619032a0c04915f42893815a",
+        "../t3-state/immutable.mjs": "e86391873075d434ce26169043dece6e28b9082ddb20f9aab84c4dbaa78790f4",
+        "../t1-values/schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+        "../t1-values/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+        "../t1-values/values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+        "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+        "../verification/errors.mjs": "c9d94483f9314bcf5bad42cb044f7b0ba29cd7d7b9d3ba561f1c9021aa6d7224",
+        "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+        "../verification/node_modules/esbuild/package.json": "cb7d5b1fe478f8cbaae566a86031b6fdf5f7d444354f35d1cb3cba9adf6d2935",
+        "../t2-url-races/node_modules/playwright/package.json": "ca170ec143a88ed3043ac953eb3b2377b2b97304104f4e1e23316684ce2c35af"
+      }
+    }
+  ],
+  "records": [
+    {
+      "id": "X01",
+      "source": [
+        "../../docs/spec/11-optional-charts.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "../../docs/handoff/open-contracts.md",
+        "probe.mjs",
+        "scenarios.mjs",
+        "browser-scenarios.mjs",
+        "state-chart-probe.mjs",
+        "state-scenarios.mjs",
+        "../t3-state/state-probe.mjs",
+        "../t3-state/ports-probe.mjs",
+        "../../docs/VIEWSTEM-SPEC.md"
+      ],
+      "contractRow": "| X01 | LineChart와 TimeSeries 등록·사용 | 별도 차트 종류 유지, 공통 데이터·series·상태 연결 계약을 따름; core 자동 등록 없음 | E62 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium22.json",
+        "results/chromium24.json"
+      ],
+      "testIds": [
+        "X01.explicit-distinct-registrations",
+        "X01.state.canvas.LineChart.explicit-component-ports-reactivity",
+        "X01.state.canvas.LineChart.schema-mismatch-and-no-implicit-inputs",
+        "X01.state.canvas.TimeSeries.explicit-component-ports-reactivity",
+        "X01.state.canvas.TimeSeries.schema-mismatch-and-no-implicit-inputs",
+        "X01.state.canvas.BarChart.explicit-component-ports-reactivity",
+        "X01.state.canvas.BarChart.schema-mismatch-and-no-implicit-inputs",
+        "X01.state.echarts.LineChart.explicit-component-ports-reactivity",
+        "X01.state.echarts.LineChart.schema-mismatch-and-no-implicit-inputs",
+        "X01.state.echarts.TimeSeries.explicit-component-ports-reactivity",
+        "X01.state.echarts.TimeSeries.schema-mismatch-and-no-implicit-inputs",
+        "X01.state.echarts.BarChart.explicit-component-ports-reactivity",
+        "X01.state.echarts.BarChart.schema-mismatch-and-no-implicit-inputs",
+        "DOM.X01.canvas.LineChart.actual-render",
+        "DOM.X01.canvas.TimeSeries.actual-render",
+        "DOM.X01.canvas.BarChart.actual-render",
+        "DOM.X01.echarts.LineChart.actual-render",
+        "DOM.X01.echarts.TimeSeries.actual-render",
+        "DOM.X01.echarts.BarChart.actual-render",
+        "DOM.X01.state.canvas.LineChart.store-write-render-dispose",
+        "DOM.X01.state.canvas.TimeSeries.store-write-render-dispose",
+        "DOM.X01.state.canvas.BarChart.store-write-render-dispose",
+        "DOM.X01.state.echarts.LineChart.store-write-render-dispose",
+        "DOM.X01.state.echarts.TimeSeries.store-write-render-dispose",
+        "DOM.X01.state.echarts.BarChart.store-write-render-dispose"
+      ],
+      "status": "verified-experiment",
+      "observed": "Separate explicit Component descriptors for LineChart/TimeSeries/BarChart, declared input schemas/empty events, empty initial registry and duplicate ID rejection. Existing StateProbe/compilePorts connect service data State reads through Value ports plus explicit identical-cell State ports for all three kinds/both engines. Store writes update actual Canvas/SVG pixels; mismatched schemas/read-only targets/bad Value input reject before rendering; input and historic snapshots stay intact and renderer disposal preserves external State.",
+      "remaining": "Production Component SDK/Svelte/core integration and automatic expression dependency tracking are not asserted. Host explicitly supplies watched State addresses in this fixture. Option/series base object schemas are complemented by the existing recursive engine allowlist validator. TimeSeries additional behavior beyond the documented common contract is not inferred."
+    },
+    {
+      "id": "X02",
+      "source": [
+        "../../docs/spec/11-optional-charts.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "../../docs/handoff/open-contracts.md",
+        "probe.mjs",
+        "scenarios.mjs",
+        "browser-scenarios.mjs"
+      ],
+      "contractRow": "| X02 | Canvas 구현 범위 밖의 ECharts option 전달 | 지원 범위 밖임을 드러내며 지원했다고 표시하거나 다른 엔진으로 자동 전환하지 않음 | E62 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium22.json",
+        "results/chromium24.json"
+      ],
+      "testIds": [
+        "X02.canvas.reject-unknown-root",
+        "X02.canvas.reject-unknown-nested",
+        "X02.canvas.reject-dataset-injection",
+        "X02.canvas.reject-axis-data-injection",
+        "X02.canvas.reject-transform",
+        "X02.canvas.reject-bad-type",
+        "X02.canvas.reject-bad-color",
+        "X02.canvas.reject-zero-width",
+        "X02.canvas.reject-line-bar-option",
+        "X02.canvas.reject-crossed-extent",
+        "X02.echarts.reject-unknown-root",
+        "X02.echarts.reject-unknown-nested",
+        "X02.echarts.reject-dataset-injection",
+        "X02.echarts.reject-axis-data-injection",
+        "X02.echarts.reject-transform",
+        "X02.echarts.reject-bad-type",
+        "X02.echarts.reject-bad-color",
+        "X02.echarts.reject-zero-width",
+        "X02.echarts.reject-line-bar-option",
+        "X02.echarts.reject-crossed-extent",
+        "X02.canvas.reject-echarts-title-without-fallback",
+        "X02.canvas.reject-echarts-smooth-without-fallback",
+        "X02.canvas.reject-echarts-showSymbol-without-fallback",
+        "X02.canvas.reject-echarts-symbolSize-without-fallback",
+        "X02.canvas.reject-echarts-grid-without-fallback",
+        "DOM.X02.echarts.exercised-option-leaves",
+        "DOM.X02.canvas.bar-width-color",
+        "DOM.X02.echarts.bar-width-color"
+      ],
+      "status": "verified-experiment",
+      "observed": "Exact bounded leaf-option support list and recursive rejection outside it; Canvas rejects ECharts-only title/grid/smooth/symbol settings and does not switch engines. Supported styles/layout are actually rendered.",
+      "remaining": "Only the published experimental allowlist is implemented, not the full ECharts option language, renderer event features or all option combinations."
+    },
+    {
+      "id": "X03",
+      "source": [
+        "../../docs/spec/11-optional-charts.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "../../docs/handoff/open-contracts.md",
+        "probe.mjs",
+        "scenarios.mjs",
+        "browser-scenarios.mjs"
+      ],
+      "contractRow": "| X03 | time/value 축 LineChart에 순서가 바뀐 X와 중복 X 전달 | 최종 입력 순서·중복 유지; 정렬은 명시적 upstream 변환에서만 수행 | E63 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium22.json",
+        "results/chromium24.json"
+      ],
+      "testIds": [
+        "X03.canvas.value.order-duplicates",
+        "X03.canvas.time.order-duplicates",
+        "X03.echarts.value.order-duplicates",
+        "X03.echarts.time.order-duplicates",
+        "DOM.X03.canvas.value.ordered-path",
+        "DOM.X03.canvas.time.ordered-path",
+        "DOM.X03.echarts.value.ordered-path",
+        "DOM.X03.echarts.time.ordered-path"
+      ],
+      "status": "verified-experiment",
+      "observed": "Both value/time LineChart preserve unsorted X and duplicate X in data and actual Canvas/SVG path vertex order.",
+      "remaining": "Numeric x/epoch-millisecond fixture only; category axis, upstream Query transforms and production integration are outside the probe. No TimeSeries sorting policy is added."
+    },
+    {
+      "id": "X04",
+      "source": [
+        "../../docs/spec/11-optional-charts.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "../../docs/handoff/open-contracts.md",
+        "probe.mjs",
+        "scenarios.mjs",
+        "browser-scenarios.mjs"
+      ],
+      "contractRow": "| X04 | 동적 series 재정렬·추가 후 ID별 overrides 적용 | 안정적인 데이터 생성 series ID를 따라 같은 series에 적용; 배열 위치로 다른 series에 이동하지 않음 | E65 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium22.json",
+        "results/chromium24.json"
+      ],
+      "testIds": [
+        "X04.canvas.LineChart.stable-id-override-reorder-add-remove",
+        "X04.canvas.TimeSeries.stable-id-override-reorder-add-remove",
+        "X04.canvas.BarChart.stable-id-override-reorder-add-remove",
+        "X04.echarts.LineChart.stable-id-override-reorder-add-remove",
+        "X04.echarts.TimeSeries.stable-id-override-reorder-add-remove",
+        "X04.echarts.BarChart.stable-id-override-reorder-add-remove",
+        "DOM.X04.canvas.LineChart.live-reorder-id-style",
+        "DOM.X04.canvas.TimeSeries.live-reorder-id-style",
+        "DOM.X04.canvas.BarChart.live-reorder-id-style",
+        "DOM.X04.echarts.LineChart.live-reorder-id-style",
+        "DOM.X04.echarts.TimeSeries.live-reorder-id-style",
+        "DOM.X04.echarts.BarChart.live-reorder-id-style"
+      ],
+      "status": "verified-experiment",
+      "observed": "All three kinds preserve overrides on data-generated stable IDs through reorder/add/remove/re-add; deep defaults inheritance and same-live-renderer updates inspected.",
+      "remaining": "Stable IDs are explicit data keys in this fixture API; production data-binding/State/resource integration remains unimplemented."
+    },
+    {
+      "id": "X05",
+      "source": [
+        "../../docs/spec/11-optional-charts.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "../../docs/handoff/open-contracts.md",
+        "probe.mjs",
+        "scenarios.mjs",
+        "browser-scenarios.mjs"
+      ],
+      "contractRow": "| X05 | 차트 설정에 option.series 또는 series.data 제공 | 설정 오류; runtime 소유 series·데이터를 옵션으로 덮지 못함 | E65 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium22.json",
+        "results/chromium24.json"
+      ],
+      "testIds": [
+        "X05.canvas.reject-option-series",
+        "X05.canvas.reject-option-series-null",
+        "X05.canvas.reject-series-data",
+        "X05.canvas.reject-defaults-data",
+        "X05.canvas.reject-override-data",
+        "X05.canvas.reject-defaults-id",
+        "X05.canvas.reject-override-type",
+        "X05.echarts.reject-option-series",
+        "X05.echarts.reject-option-series-null",
+        "X05.echarts.reject-series-data",
+        "X05.echarts.reject-defaults-data",
+        "X05.echarts.reject-override-data",
+        "X05.echarts.reject-defaults-id",
+        "X05.echarts.reject-override-type"
+      ],
+      "status": "verified-experiment",
+      "observed": "option.series, series.data and nested defaults/override data are rejected; id/type injection also rejected; runtime series/data only comes from validated rows.",
+      "remaining": "This is the independent validator, not the production module schema or a security audit of JavaScript proxy/accessor objects."
+    },
+    {
+      "id": "X06",
+      "source": [
+        "../../docs/spec/11-optional-charts.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "../../docs/handoff/open-contracts.md",
+        "probe.mjs",
+        "scenarios.mjs",
+        "browser-scenarios.mjs"
+      ],
+      "contractRow": "| X06 | 세 차트에 유한·비유한 number·숫자 문자열·Y 필드 누락 전달 | 유한한 number 허용, 비유한 숫자·숫자 문자열·필드 누락 오류; 암묵 coercion·null 보충 없음 | E66, U08 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium22.json",
+        "results/chromium24.json"
+      ],
+      "testIds": [
+        "X06.canvas.LineChart.finite-null-zero",
+        "X06.canvas.LineChart.reject-nan",
+        "X06.canvas.LineChart.reject-positive-infinity",
+        "X06.canvas.LineChart.reject-negative-infinity",
+        "X06.canvas.LineChart.reject-numeric-string",
+        "X06.canvas.LineChart.reject-boolean",
+        "X06.canvas.LineChart.reject-undefined",
+        "X06.canvas.LineChart.reject-object",
+        "X06.canvas.LineChart.reject-missing",
+        "X06.canvas.LineChart.reject-inherited-y",
+        "X06.canvas.TimeSeries.finite-null-zero",
+        "X06.canvas.TimeSeries.reject-nan",
+        "X06.canvas.TimeSeries.reject-positive-infinity",
+        "X06.canvas.TimeSeries.reject-negative-infinity",
+        "X06.canvas.TimeSeries.reject-numeric-string",
+        "X06.canvas.TimeSeries.reject-boolean",
+        "X06.canvas.TimeSeries.reject-undefined",
+        "X06.canvas.TimeSeries.reject-object",
+        "X06.canvas.TimeSeries.reject-missing",
+        "X06.canvas.TimeSeries.reject-inherited-y",
+        "X06.canvas.BarChart.finite-null-zero",
+        "X06.canvas.BarChart.reject-nan",
+        "X06.canvas.BarChart.reject-positive-infinity",
+        "X06.canvas.BarChart.reject-negative-infinity",
+        "X06.canvas.BarChart.reject-numeric-string",
+        "X06.canvas.BarChart.reject-boolean",
+        "X06.canvas.BarChart.reject-undefined",
+        "X06.canvas.BarChart.reject-object",
+        "X06.canvas.BarChart.reject-missing",
+        "X06.canvas.BarChart.reject-inherited-y",
+        "X06.echarts.LineChart.finite-null-zero",
+        "X06.echarts.LineChart.reject-nan",
+        "X06.echarts.LineChart.reject-positive-infinity",
+        "X06.echarts.LineChart.reject-negative-infinity",
+        "X06.echarts.LineChart.reject-numeric-string",
+        "X06.echarts.LineChart.reject-boolean",
+        "X06.echarts.LineChart.reject-undefined",
+        "X06.echarts.LineChart.reject-object",
+        "X06.echarts.LineChart.reject-missing",
+        "X06.echarts.LineChart.reject-inherited-y",
+        "X06.echarts.TimeSeries.finite-null-zero",
+        "X06.echarts.TimeSeries.reject-nan",
+        "X06.echarts.TimeSeries.reject-positive-infinity",
+        "X06.echarts.TimeSeries.reject-negative-infinity",
+        "X06.echarts.TimeSeries.reject-numeric-string",
+        "X06.echarts.TimeSeries.reject-boolean",
+        "X06.echarts.TimeSeries.reject-undefined",
+        "X06.echarts.TimeSeries.reject-object",
+        "X06.echarts.TimeSeries.reject-missing",
+        "X06.echarts.TimeSeries.reject-inherited-y",
+        "X06.echarts.BarChart.finite-null-zero",
+        "X06.echarts.BarChart.reject-nan",
+        "X06.echarts.BarChart.reject-positive-infinity",
+        "X06.echarts.BarChart.reject-negative-infinity",
+        "X06.echarts.BarChart.reject-numeric-string",
+        "X06.echarts.BarChart.reject-boolean",
+        "X06.echarts.BarChart.reject-undefined",
+        "X06.echarts.BarChart.reject-object",
+        "X06.echarts.BarChart.reject-missing",
+        "X06.echarts.BarChart.reject-inherited-y"
+      ],
+      "status": "verified-experiment",
+      "observed": "Both engines/all three kinds accept finite doubles including signed zero/extremes and explicit null; NaN/Infinity/string/missing/undefined/bool/object Y are rejected with paths, without coercion.",
+      "remaining": "Double extrema are validated/transferred in plan tests; numerical/visual stability across the entire finite-double domain is not established by the small browser fixtures. Production adapters remain separate."
+    },
+    {
+      "id": "X07",
+      "source": [
+        "../../docs/spec/11-optional-charts.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "../../docs/handoff/open-contracts.md",
+        "probe.mjs",
+        "scenarios.mjs",
+        "browser-scenarios.mjs"
+      ],
+      "contractRow": "| X07 | 명시적 null과 0을 포함한 선 데이터, 결측 연결/단절 표시 | null과 0 구별; 연결/단절 선택이 null 데이터를 0으로 바꾸거나 입력 오류를 숨기지 않음 | E66 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium22.json",
+        "results/chromium24.json"
+      ],
+      "testIds": [
+        "X07.canvas.LineChart.false.retains-data",
+        "X07.canvas.LineChart.true.retains-data",
+        "X07.canvas.TimeSeries.false.retains-data",
+        "X07.canvas.TimeSeries.true.retains-data",
+        "X07.echarts.LineChart.false.retains-data",
+        "X07.echarts.LineChart.true.retains-data",
+        "X07.echarts.TimeSeries.false.retains-data",
+        "X07.echarts.TimeSeries.true.retains-data",
+        "DOM.X07.canvas.LineChart.false.pixel-gap-zero",
+        "DOM.X07.canvas.LineChart.true.pixel-gap-zero",
+        "DOM.X07.canvas.TimeSeries.false.pixel-gap-zero",
+        "DOM.X07.canvas.TimeSeries.true.pixel-gap-zero",
+        "DOM.X07.echarts.LineChart.false.pixel-gap-zero",
+        "DOM.X07.echarts.LineChart.true.pixel-gap-zero",
+        "DOM.X07.echarts.TimeSeries.false.pixel-gap-zero",
+        "DOM.X07.echarts.TimeSeries.true.pixel-gap-zero"
+      ],
+      "status": "verified-experiment",
+      "observed": "Both line kinds/engines retain null and 0 in actual renderer inputs; gap/connect selection verified by M segments, gap pixels, zero endpoint pixels and no fabricated zero at null X.",
+      "remaining": "Representative static line fixtures only; stacked/area, smoothing plus null, animation, streaming and all boundary combinations are untested."
+    },
+    {
+      "id": "X08",
+      "source": [
+        "../../docs/spec/11-optional-charts.md",
+        "../../docs/spec/09-preserved-contracts.md",
+        "../../docs/handoff/open-contracts.md",
+        "probe.mjs",
+        "scenarios.mjs",
+        "browser-scenarios.mjs"
+      ],
+      "contractRow": "| X08 | 동적 series가 필요한 차트와 필요 없는 위젯 구성 | 전자는 전체 option과 defaults/ID overrides 계약 적용, 후자에 동일 구조를 일괄 강제하지 않음 | E65 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium22.json",
+        "results/chromium24.json"
+      ],
+      "testIds": [
+        "X08.canvas.source-isolation-and-no-global-series-requirement",
+        "X08.echarts.source-isolation-and-no-global-series-requirement"
+      ],
+      "status": "verified-experiment",
+      "observed": "Dynamic series uses whole-chart option plus defaults/ID overrides; plain widget accepts label without series structure; input isolation is verified.",
+      "remaining": "The simple widget is a separate fixture, not a complete production widget or code Component schema registry."
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "generatedAt": "2026-10-30T05:42:47.125Z",
+  "runtime": "v24.19.0",
+  "scope": "Six isolated mutations, synthetic transport only; production files unchanged",
+  "sourceSha256": {
+    "package.json": "b07eabf40c18ca1e4a45a951848c41d1abc8e6b1a20c49854741ffba51a982e4",
+    "http-probe.mjs": "b1e7969f4893022358b99872ed1bbb91f593375a5770e6f5b78e3b89236edd0b",
+    "value-expressions.mjs": "3bd0320dc4e2a978de7a576e1c3df90d456170e9540d8aa667f42d0c1c65a32f",
+    "header-profile.mjs": "6d4f17b66aae3b4405f05da9b1160a3ceb04c46f670f0bfb65726003ebdc5407",
+    "path-audit-cases.mjs": "314288dfb0dd87a69a17366d1d25d1dccbaa7787d543919938d583c721247e20",
+    "path-audit-mutations.mjs": "61a9d03f193e82d2c934cd137e6106652d455d35868d4257f3c9b8819864c799"
+  },
+  "results": [
+    {
+      "id": "skip-base-evaluation",
+      "passed": true,
+      "witness": "field/datasource.baseUrl",
+      "rejectedBy": [
+        "field/datasource.baseUrl",
+        "base-cross-origin-denied",
+        "login-base-fallback"
+      ]
+    },
+    {
+      "id": "skip-method-evaluation",
+      "passed": true,
+      "witness": "field/request.method",
+      "rejectedBy": [
+        "field/request.method",
+        "field/datasource.auth.request.method",
+        "method/GET",
+        "method/HEAD",
+        "method/POST",
+        "method/PUT",
+        "method/PATCH",
+        "method/DELETE",
+        "method/OPTIONS",
+        "address-secret-denial/method"
+      ]
+    },
+    {
+      "id": "allow-mixed-path",
+      "passed": true,
+      "witness": "shape/request.body",
+      "rejectedBy": [
+        "shape/datasource.baseUrl",
+        "shape/datasource.headers",
+        "shape/datasource.params",
+        "shape/request.baseUrl",
+        "shape/request.method",
+        "shape/request.path",
+        "shape/request.headers",
+        "shape/request.params",
+        "shape/request.body",
+        "shape/datasource.auth.request",
+        "shape/datasource.auth.request.baseUrl",
+        "shape/datasource.auth.request.method",
+        "shape/datasource.auth.request.path",
+        "shape/datasource.auth.request.headers",
+        "shape/datasource.auth.request.params",
+        "shape/datasource.auth.request.body",
+        "shape/datasource.auth.token",
+        "invalid-expression/{\"@path\":\"/ports/value\",\"@call\":\"concat\",\"args\":[]}"
+      ]
+    },
+    {
+      "id": "skip-key-escape",
+      "passed": true,
+      "witness": "escape-once",
+      "rejectedBy": [
+        "escape-once"
+      ]
+    },
+    {
+      "id": "expose-inputs-to-token",
+      "passed": true,
+      "witness": "token-scope/ports",
+      "rejectedBy": [
+        "token-scope/ports"
+      ]
+    },
+    {
+      "id": "skip-forbidden-name",
+      "passed": true,
+      "witness": "resolved-header-guard/{\"Host\":\"fixture\"}",
+      "rejectedBy": [
+        "resolved-header-guard/{\"Host\":\"fixture\"}",
+        "resolved-header-guard/{\"HOST\":null}"
+      ]
+    }
+  ],
+  "summary": {
+    "executed": 6,
+    "passed": 6,
+    "failed": 0
+  }
+}

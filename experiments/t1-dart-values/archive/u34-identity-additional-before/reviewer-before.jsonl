@@ -1,0 +1,4 @@
+{"kind":{"type":"array","items":{"type":"integer"}},"sameMember":false,"keptSnapshot":false,"equal":false,"newSetHasOldMember":false}
+{"kind":{"type":"object","properties":{"a":{"type":"array","items":{"type":"integer"}}},"additionalProperties":false},"sameMember":false,"keptSnapshot":false,"equal":false,"newSetHasOldMember":false}
+{"kind":{"type":"object","properties":{"a":{"x-viewstem-type":"datetime"}},"additionalProperties":false},"sameMember":false,"keptSnapshot":false,"equal":false,"newSetHasOldMember":false}
+{"typedAdditionalProperties":{"bad":"text"}}

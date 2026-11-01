@@ -1,0 +1,2175 @@
+{
+  "generatedAt": "2026-10-30T05:42:47.738Z",
+  "runtime": "v24.19.0",
+  "browser": "151.0.7922.34",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "playwrightVersion": "1.62.1",
+  "scope": "All 17 implemented HTTP/Login dynamic locations plus expression/path contracts; synthetic transport in Node and real Chromium, not core/renderer integration",
+  "coverage": [
+    "datasource.baseUrl",
+    "datasource.headers",
+    "datasource.params",
+    "request.baseUrl",
+    "request.method",
+    "request.path",
+    "request.headers",
+    "request.params",
+    "request.body",
+    "datasource.auth.request",
+    "datasource.auth.request.baseUrl",
+    "datasource.auth.request.method",
+    "datasource.auth.request.path",
+    "datasource.auth.request.headers",
+    "datasource.auth.request.params",
+    "datasource.auth.request.body",
+    "datasource.auth.token"
+  ],
+  "stopOnFirstProblem": false,
+  "sourceSha256": {
+    "package.json": "b07eabf40c18ca1e4a45a951848c41d1abc8e6b1a20c49854741ffba51a982e4",
+    "http-probe.mjs": "b1e7969f4893022358b99872ed1bbb91f593375a5770e6f5b78e3b89236edd0b",
+    "value-expressions.mjs": "3bd0320dc4e2a978de7a576e1c3df90d456170e9540d8aa667f42d0c1c65a32f",
+    "header-profile.mjs": "6d4f17b66aae3b4405f05da9b1160a3ceb04c46f670f0bfb65726003ebdc5407",
+    "path-audit-cases.mjs": "314288dfb0dd87a69a17366d1d25d1dccbaa7787d543919938d583c721247e20",
+    "path-audit-tests.mjs": "72a2c2cfcabb0bb9fa8dae93e9ae45e18bf714a0d031f289c0e1bca9e53fee68",
+    "../t2-url-races/package.json": "d1f2b402b41e6d62766d5002af5475706ae8434b13c4e35c6a8818947aa361fc",
+    "../t2-url-races/package-lock.json": "d5f2c042db6f40f0ef311e4c24958a57d4ce1048d27d7cc87b467e805b66dc8b"
+  },
+  "results": [
+    {
+      "runtime": "node",
+      "id": "field/datasource.baseUrl",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/datasource.baseUrl",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "field/datasource.headers",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/datasource.headers",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "field/datasource.params",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/datasource.params",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "field/request.baseUrl",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/request.baseUrl",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "field/request.method",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/request.method",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "field/request.path",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/request.path",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "field/request.headers",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/request.headers",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "field/request.params",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/request.params",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "field/request.body",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/request.body",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "field/datasource.auth.request",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/datasource.auth.request",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "field/datasource.auth.request.baseUrl",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/datasource.auth.request.baseUrl",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "field/datasource.auth.request.method",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/datasource.auth.request.method",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "field/datasource.auth.request.path",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/datasource.auth.request.path",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "field/datasource.auth.request.headers",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/datasource.auth.request.headers",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "field/datasource.auth.request.params",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/datasource.auth.request.params",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "field/datasource.auth.request.body",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/datasource.auth.request.body",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "field/datasource.auth.token",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shape/datasource.auth.token",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "method/GET",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "method/HEAD",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "method/POST",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "method/PUT",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "method/PATCH",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "method/DELETE",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "method/OPTIONS",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "method-invalid/\"get\"",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "method-invalid/\"TRACE\"",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "method-invalid/\"\"",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "method-invalid/null",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "method-invalid/7",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "method-invalid/{}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "method-body/GET",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "method-body/HEAD",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "base-invalid/null",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "base-invalid/number",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "base-invalid/object",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "base-invalid/array",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "base-invalid/relative",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "base-invalid/protocol",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "base-invalid/userinfo",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "base-invalid/query",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "base-invalid/fragment",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "base-override-unused-fallback",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "base-null-is-not-fallback",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "base-missing-is-not-fallback",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "base-cross-origin-denied",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "login-base-override",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "login-base-fallback",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "address-secret-denial/baseUrl",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "address-secret-denial/method",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "address-secret-denial/path",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-key/0",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-key/1",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-key/2",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-key/3",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-key/4",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-key/5",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-key/6",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-key/7",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-key/8",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-key/9",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-key/10",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-key/11",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "preserve-type/null",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "preserve-type/false",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "preserve-type/0",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "preserve-type/\"\"",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "preserve-type/[\"a\",null]",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "preserve-type/{\"a\":1}",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-syntax/\"\"",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-syntax/\"ports/x\"",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-syntax/\"#/ports/x\"",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-syntax/\"/ports/~\"",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-syntax/\"/ports/~2\"",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-syntax/1",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "pointer-syntax/null",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "array-index/length",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "array-index/01",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "array-index/-1",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "array-index/1.0",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "array-index/1e0",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "array-index/+1",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "array-index/-",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "array-index/3",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "array-index/9007199254740992",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "array-existing-index",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "unregistered-port",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "missing-property/absent",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "missing-property/toString",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "missing-property/constructor",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "path-container/null",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "path-container/string",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "path-container/number",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "path-container/map",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "path-container/set",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "path-container/date",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "invalid-expression/{\"@path\":\"/ports/value\",\"@call\":\"concat\",\"args\":[]}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "invalid-expression/{\"@unknown\":1}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "invalid-expression/{\"@call\":\"unknown\",\"args\":[]}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "invalid-expression/{\"@call\":\"concat\",\"args\":[],\"extra\":true}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "invalid-expression/{\"@call\":\"concat\"}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "invalid-expression/{\"@call\":\"formatString\",\"args\":{}}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "recursive-arrays-and-objects",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "escape-once",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "returned-expression-is-data",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "input-snapshot-not-interpreted",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "native-body-no-silent-coercion/map",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "native-body-no-silent-coercion/set",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "native-body-no-silent-coercion/date",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "cyclic-template",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "cyclic-referenced-data",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "shared-acyclic-data",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "format-path-scalar-types",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "format-escape-and-returned-text",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "format-template-reference",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "format-unclosed",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "format-syntax-before-login",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "format-relative",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "format-missing",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "format-object",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "concat-nested-reference",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "concat-no-coercion",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "token-scope/ports",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "token-scope/secrets",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "token-scope/auth",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "token-scope/states",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "token-format-response",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "login-no-auth-context",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "data-no-response-context",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "data-secret-authorized",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 1
+    },
+    {
+      "runtime": "node",
+      "id": "login-request-data-not-reexecuted",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "static-definition-not-expression",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "resolved-header-guard/{\"Host\":\"fixture\"}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "resolved-header-guard/{\"HOST\":null}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "resolved-header-guard/{\"Sec-Future\":\"fixture\"}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "node",
+      "id": "resolved-header-guard/{\"Accept\":\"a\",\"accept\":null}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/datasource.baseUrl",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/datasource.baseUrl",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/datasource.headers",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/datasource.headers",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/datasource.params",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/datasource.params",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/request.baseUrl",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/request.baseUrl",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/request.method",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/request.method",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/request.path",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/request.path",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/request.headers",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/request.headers",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/request.params",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/request.params",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/request.body",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/request.body",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/datasource.auth.request",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/datasource.auth.request",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/datasource.auth.request.baseUrl",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/datasource.auth.request.baseUrl",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/datasource.auth.request.method",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/datasource.auth.request.method",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/datasource.auth.request.path",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/datasource.auth.request.path",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/datasource.auth.request.headers",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/datasource.auth.request.headers",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/datasource.auth.request.params",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/datasource.auth.request.params",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/datasource.auth.request.body",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/datasource.auth.request.body",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "field/datasource.auth.token",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shape/datasource.auth.token",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "method/GET",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "method/HEAD",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "method/POST",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "method/PUT",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "method/PATCH",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "method/DELETE",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "method/OPTIONS",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "method-invalid/\"get\"",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "method-invalid/\"TRACE\"",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "method-invalid/\"\"",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "method-invalid/null",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "method-invalid/7",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "method-invalid/{}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "method-body/GET",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "method-body/HEAD",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "base-invalid/null",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "base-invalid/number",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "base-invalid/object",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "base-invalid/array",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "base-invalid/relative",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "base-invalid/protocol",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "base-invalid/userinfo",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "base-invalid/query",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "base-invalid/fragment",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "base-override-unused-fallback",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "base-null-is-not-fallback",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "base-missing-is-not-fallback",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "base-cross-origin-denied",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "login-base-override",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "login-base-fallback",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "address-secret-denial/baseUrl",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "address-secret-denial/method",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "address-secret-denial/path",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-key/0",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-key/1",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-key/2",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-key/3",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-key/4",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-key/5",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-key/6",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-key/7",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-key/8",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-key/9",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-key/10",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-key/11",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "preserve-type/null",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "preserve-type/false",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "preserve-type/0",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "preserve-type/\"\"",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "preserve-type/[\"a\",null]",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "preserve-type/{\"a\":1}",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-syntax/\"\"",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-syntax/\"ports/x\"",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-syntax/\"#/ports/x\"",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-syntax/\"/ports/~\"",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-syntax/\"/ports/~2\"",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-syntax/1",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "pointer-syntax/null",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "array-index/length",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "array-index/01",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "array-index/-1",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "array-index/1.0",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "array-index/1e0",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "array-index/+1",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "array-index/-",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "array-index/3",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "array-index/9007199254740992",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "array-existing-index",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "unregistered-port",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "missing-property/absent",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "missing-property/toString",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "missing-property/constructor",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "path-container/null",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "path-container/string",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "path-container/number",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "path-container/map",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "path-container/set",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "path-container/date",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "invalid-expression/{\"@path\":\"/ports/value\",\"@call\":\"concat\",\"args\":[]}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "invalid-expression/{\"@unknown\":1}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "invalid-expression/{\"@call\":\"unknown\",\"args\":[]}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "invalid-expression/{\"@call\":\"concat\",\"args\":[],\"extra\":true}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "invalid-expression/{\"@call\":\"concat\"}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "invalid-expression/{\"@call\":\"formatString\",\"args\":{}}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "recursive-arrays-and-objects",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "escape-once",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "returned-expression-is-data",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "input-snapshot-not-interpreted",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "native-body-no-silent-coercion/map",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "native-body-no-silent-coercion/set",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "native-body-no-silent-coercion/date",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "cyclic-template",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "cyclic-referenced-data",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "shared-acyclic-data",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "format-path-scalar-types",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "format-escape-and-returned-text",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "format-template-reference",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "format-unclosed",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "format-syntax-before-login",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "format-relative",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "format-missing",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "format-object",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "concat-nested-reference",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "concat-no-coercion",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "token-scope/ports",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "token-scope/secrets",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "token-scope/auth",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "token-scope/states",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "token-format-response",
+      "passed": true,
+      "requests": 2,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "login-no-auth-context",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "data-no-response-context",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "data-secret-authorized",
+      "passed": true,
+      "requests": 1,
+      "secretReads": 1
+    },
+    {
+      "runtime": "chromium",
+      "id": "login-request-data-not-reexecuted",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "static-definition-not-expression",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "resolved-header-guard/{\"Host\":\"fixture\"}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "resolved-header-guard/{\"HOST\":null}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "resolved-header-guard/{\"Sec-Future\":\"fixture\"}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    },
+    {
+      "runtime": "chromium",
+      "id": "resolved-header-guard/{\"Accept\":\"a\",\"accept\":null}",
+      "passed": true,
+      "requests": 0,
+      "secretReads": 0
+    }
+  ],
+  "pageErrors": [],
+  "summary": {
+    "executed": 304,
+    "passed": 304,
+    "failed": 0
+  }
+}

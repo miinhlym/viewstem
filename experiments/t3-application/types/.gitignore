@@ -1,0 +1,4 @@
+node_modules/
+.negative-unmasked-*.ts
+.tsconfig-unmasked-*.json
+.tsc-output/

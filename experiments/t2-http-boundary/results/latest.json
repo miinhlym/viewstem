@@ -1,0 +1,104 @@
+{
+  "generatedAt": "2026-10-29T10:00:55.931Z",
+  "runtime": "v24.19.0",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "browser": "151.0.7922.34",
+  "playwrightVersion": "1.62.1",
+  "scope": "Real loopback HTTP and browser transport boundary; no Viewstem executor implementation",
+  "stopOnFirstProblem": true,
+  "stoppedAt": "H04-browser-host-header",
+  "sourceSha256": {
+    "package.json": "fa56d3ed62592ce8c46074a63b5dd6e76bae3cd980cf2a178495e0755bf38529",
+    "run.mjs": "63e07b45e1124b64be2c3d43df2e80057e602fd7f1346eaf90a30b0558cd1808",
+    "../t2-url-races/package.json": "d1f2b402b41e6d62766d5002af5475706ae8434b13c4e35c6a8818947aa361fc",
+    "../t2-url-races/package-lock.json": "d5f2c042db6f40f0ef311e4c24958a57d4ce1048d27d7cc87b467e805b66dc8b"
+  },
+  "results": [
+    {
+      "id": "H01-node-custom-header",
+      "runtime": "node:http",
+      "header": "X-Viewstem-Probe",
+      "value": "fixture-only",
+      "field": "probe",
+      "expected": "Preserve the explicit header in the successful request",
+      "actual": {
+        "outcome": "sent",
+        "status": 200,
+        "body": {
+          "host": "127.0.0.1:55957",
+          "probe": "fixture-only"
+        }
+      },
+      "sentRequests": 1,
+      "passed": true
+    },
+    {
+      "id": "H02-node-host-header",
+      "runtime": "node:http",
+      "header": "Host",
+      "value": "viewstem-probe.invalid",
+      "field": "host",
+      "expected": "Preserve the explicit header in the successful request",
+      "actual": {
+        "outcome": "sent",
+        "status": 200,
+        "body": {
+          "host": "viewstem-probe.invalid",
+          "probe": null
+        }
+      },
+      "sentRequests": 1,
+      "passed": true
+    },
+    {
+      "id": "H03-browser-custom-header",
+      "runtime": "browser-fetch",
+      "header": "X-Viewstem-Probe",
+      "value": "fixture-only",
+      "field": "probe",
+      "expected": "Preserve the explicit header in the successful request",
+      "actual": {
+        "outcome": "sent",
+        "status": 200,
+        "body": {
+          "host": "127.0.0.1:55957",
+          "probe": "fixture-only"
+        }
+      },
+      "sentRequests": 1,
+      "passed": true
+    },
+    {
+      "id": "H04-browser-host-header",
+      "runtime": "browser-fetch",
+      "header": "Host",
+      "value": "viewstem-probe.invalid",
+      "field": "host",
+      "allowExplicitRejection": true,
+      "expected": "Preserve the explicit header or reject before sending; no silent successful rewrite",
+      "actual": {
+        "outcome": "sent",
+        "status": 200,
+        "body": {
+          "host": "127.0.0.1:55957",
+          "probe": null
+        }
+      },
+      "sentRequests": 1,
+      "passed": false
+    }
+  ],
+  "summary": {
+    "executed": 4,
+    "passed": 3,
+    "failed": 1
+  },
+  "notRun": [
+    "Login isolation and token validation",
+    "Whole-plan timeout and cancellation",
+    "Secret and login-response non-disclosure",
+    "Minimal SDK type contracts",
+    "Other remaining conformance work"
+  ]
+}

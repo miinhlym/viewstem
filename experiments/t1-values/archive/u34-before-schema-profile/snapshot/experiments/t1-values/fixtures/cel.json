@@ -1,0 +1,301 @@
+[
+  {
+    "id": "C01",
+    "expression": "1+2",
+    "bindings": {},
+    "expected": {
+      "type": "int",
+      "value": "3"
+    }
+  },
+  {
+    "id": "C02",
+    "expression": "size(plants)",
+    "bindings": {
+      "plants": {
+        "type": "list",
+        "value": [
+          {
+            "type": "string",
+            "value": "a"
+          },
+          {
+            "type": "string",
+            "value": "b"
+          }
+        ]
+      }
+    },
+    "expected": {
+      "type": "int",
+      "value": "2"
+    }
+  },
+  {
+    "id": "C03",
+    "expression": "n+1",
+    "bindings": {
+      "n": {
+        "type": "int",
+        "value": "2"
+      }
+    },
+    "expected": {
+      "type": "int",
+      "value": "3"
+    }
+  },
+  {
+    "id": "C04",
+    "expression": "n+1.0",
+    "bindings": {
+      "n": {
+        "type": "double",
+        "value": 2
+      }
+    },
+    "expected": {
+      "type": "double",
+      "value": 3
+    }
+  },
+  {
+    "id": "C05",
+    "expression": "n+1",
+    "bindings": {
+      "n": {
+        "type": "double",
+        "value": 2
+      }
+    },
+    "expected": {
+      "type": "error"
+    }
+  },
+  {
+    "id": "C06",
+    "expression": "0.1+0.2",
+    "bindings": {},
+    "expected": {
+      "type": "double",
+      "value": 0.30000000000000004
+    }
+  },
+  {
+    "id": "C07",
+    "expression": "1/0",
+    "bindings": {},
+    "expected": {
+      "type": "error"
+    }
+  },
+  {
+    "id": "C08",
+    "expression": "9223372036854775807+1",
+    "bindings": {},
+    "expected": {
+      "type": "error"
+    }
+  },
+  {
+    "id": "C09",
+    "expression": "1+\"a\"",
+    "bindings": {},
+    "expected": {
+      "type": "error"
+    }
+  },
+  {
+    "id": "C10",
+    "expression": "obj.absent",
+    "bindings": {
+      "obj": {
+        "type": "object",
+        "value": {}
+      }
+    },
+    "expected": {
+      "type": "error"
+    }
+  },
+  {
+    "id": "C11",
+    "expression": "has(obj.absent)",
+    "bindings": {
+      "obj": {
+        "type": "object",
+        "value": {}
+      }
+    },
+    "expected": {
+      "type": "bool",
+      "value": false
+    }
+  },
+  {
+    "id": "C12",
+    "expression": "false && missing > 0",
+    "bindings": {},
+    "expected": {
+      "type": "bool",
+      "value": false
+    }
+  },
+  {
+    "id": "C13",
+    "expression": "false ? missing : 7",
+    "bindings": {},
+    "expected": {
+      "type": "int",
+      "value": "7"
+    }
+  },
+  {
+    "id": "C14",
+    "expression": "xs.filter(x,x>1).map(x,x*2)",
+    "bindings": {
+      "xs": {
+        "type": "list",
+        "value": [
+          {
+            "type": "int",
+            "value": "1"
+          },
+          {
+            "type": "int",
+            "value": "2"
+          },
+          {
+            "type": "int",
+            "value": "3"
+          }
+        ]
+      }
+    },
+    "expected": {
+      "type": "list",
+      "value": [
+        {
+          "type": "int",
+          "value": "4"
+        },
+        {
+          "type": "int",
+          "value": "6"
+        }
+      ]
+    }
+  },
+  {
+    "id": "C15",
+    "expression": "m[1] != m[\"1\"]",
+    "bindings": {
+      "m": {
+        "type": "map",
+        "value": [
+          [
+            {
+              "type": "int",
+              "value": "1"
+            },
+            {
+              "type": "string",
+              "value": "number"
+            }
+          ],
+          [
+            {
+              "type": "string",
+              "value": "1"
+            },
+            {
+              "type": "string",
+              "value": "string"
+            }
+          ]
+        ]
+      }
+    },
+    "expected": {
+      "type": "bool",
+      "value": true
+    }
+  },
+  {
+    "id": "C16",
+    "expression": "obj.count+1",
+    "bindings": {
+      "obj": {
+        "type": "object",
+        "value": {
+          "count": {
+            "type": "int",
+            "value": "2"
+          }
+        }
+      }
+    },
+    "expected": {
+      "type": "int",
+      "value": "3"
+    }
+  },
+  {
+    "id": "C17",
+    "expression": "timestamp(\"2026-10-29T00:00:00Z\").getHours(\"Asia/Seoul\")",
+    "bindings": {},
+    "expected": {
+      "type": "int",
+      "value": "9"
+    }
+  },
+  {
+    "id": "C18",
+    "expression": "timestamp(\"2026-02-30T00:00:00Z\").getDate()",
+    "bindings": {},
+    "expected": {
+      "type": "error"
+    }
+  },
+  {
+    "id": "C19",
+    "expression": "size(\"😀\")",
+    "bindings": {},
+    "expected": {
+      "type": "int",
+      "value": "1"
+    }
+  },
+  {
+    "id": "C20",
+    "expression": "null==null",
+    "bindings": {},
+    "expected": {
+      "type": "bool",
+      "value": true
+    }
+  },
+  {
+    "id": "C21",
+    "expression": "type(n)==double",
+    "bindings": {
+      "n": {
+        "type": "double",
+        "value": 2
+      }
+    },
+    "expected": {
+      "type": "bool",
+      "value": true
+    }
+  },
+  {
+    "id": "C22",
+    "expression": "1u",
+    "bindings": {},
+    "expected": {
+      "type": "uint",
+      "value": "1"
+    }
+  }
+]

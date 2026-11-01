@@ -1,0 +1,2066 @@
+{
+  "format": "private-host-fixture-v1-not-production-wire",
+  "cases": [
+    {
+      "id": "D01/null-explicit",
+      "op": "accept",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "input": null,
+      "expected": {
+        "status": "ready",
+        "value": null
+      }
+    },
+    {
+      "id": "D02/falsy-zero",
+      "op": "accept",
+      "schema": {
+        "type": "integer"
+      },
+      "input": 0,
+      "expected": {
+        "status": "ready",
+        "value": 0
+      }
+    },
+    {
+      "id": "D02/falsy-false",
+      "op": "accept",
+      "schema": {
+        "type": "boolean"
+      },
+      "input": false,
+      "expected": {
+        "status": "ready",
+        "value": false
+      }
+    },
+    {
+      "id": "D02/falsy-empty",
+      "op": "accept",
+      "schema": {
+        "type": "string"
+      },
+      "input": "",
+      "expected": {
+        "status": "ready",
+        "value": ""
+      }
+    },
+    {
+      "id": "D03/undefined-top",
+      "op": "accept",
+      "schema": true,
+      "input": {
+        "$fixture": "undefined"
+      },
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D04/object-undefined-omitted",
+      "op": "accept",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "n": {
+            "type": "integer"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "input": {
+        "n": {
+          "$fixture": "undefined"
+        }
+      },
+      "expected": {
+        "status": "ready",
+        "value": {}
+      }
+    },
+    {
+      "id": "D05/required-undefined-omitted",
+      "op": "accept",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "n": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "additionalProperties": false
+      },
+      "input": {
+        "n": {
+          "$fixture": "undefined"
+        }
+      },
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D06/nested-undefined-object-retained",
+      "op": "accept",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "profile": {
+            "type": "object",
+            "properties": {
+              "n": {
+                "type": "integer"
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "input": {
+        "profile": {
+          "n": {
+            "$fixture": "undefined"
+          }
+        }
+      },
+      "expected": {
+        "status": "ready",
+        "value": {
+          "profile": {}
+        }
+      }
+    },
+    {
+      "id": "D07/array-object-undefined",
+      "op": "accept",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "n": {
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "input": [
+        {
+          "n": {
+            "$fixture": "undefined"
+          }
+        }
+      ],
+      "expected": {
+        "status": "ready",
+        "value": [
+          {}
+        ]
+      }
+    },
+    {
+      "id": "D08/array-undefined",
+      "op": "accept",
+      "schema": {
+        "type": "array",
+        "items": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "input": [
+        1,
+        {
+          "$fixture": "undefined"
+        },
+        3
+      ],
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D09/array-hole",
+      "op": "accept",
+      "schema": {
+        "type": "array",
+        "items": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "input": [
+        1,
+        {
+          "$fixture": "hole"
+        },
+        3
+      ],
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D10/array-null-position",
+      "op": "accept",
+      "schema": {
+        "type": "array",
+        "items": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "input": [
+        1,
+        null,
+        3
+      ],
+      "expected": {
+        "status": "ready",
+        "value": [
+          1,
+          null,
+          3
+        ]
+      }
+    },
+    {
+      "id": "D11/Set-undefined",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "set",
+        "items": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "input": {
+        "$fixture": "set",
+        "values": [
+          1,
+          {
+            "$fixture": "undefined"
+          }
+        ]
+      },
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D12/Set-null",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "set",
+        "items": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "input": {
+        "$fixture": "set",
+        "values": [
+          null
+        ]
+      },
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            null
+          ]
+        }
+      }
+    },
+    {
+      "id": "D13/Set-separate-normalized-objects",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "set",
+        "items": {
+          "type": "object",
+          "properties": {
+            "n": {
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "input": {
+        "$fixture": "set",
+        "values": [
+          {},
+          {
+            "n": {
+              "$fixture": "undefined"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            {},
+            {}
+          ]
+        }
+      }
+    },
+    {
+      "id": "D14/Set-repeated-reference",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "set",
+        "items": {
+          "type": "object",
+          "properties": {
+            "n": {
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "input": {
+        "$fixture": "set",
+        "values": [
+          {
+            "$fixture": "object",
+            "id": "a",
+            "value": {
+              "n": 1
+            }
+          },
+          {
+            "$fixture": "ref",
+            "id": "a"
+          }
+        ]
+      },
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            {
+              "n": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "D15/Map-undefined-value",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "map",
+        "keys": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "values": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "input": {
+        "$fixture": "map",
+        "entries": [
+          [
+            "a",
+            {
+              "$fixture": "undefined"
+            }
+          ]
+        ]
+      },
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D16/Map-null-value",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "map",
+        "keys": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "values": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "input": {
+        "$fixture": "map",
+        "entries": [
+          [
+            "a",
+            null
+          ]
+        ]
+      },
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              "a",
+              null
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "D17/Map-object-normalized",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "map",
+        "keys": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "n": {
+              "type": "integer"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "input": {
+        "$fixture": "map",
+        "entries": [
+          [
+            "a",
+            {
+              "n": {
+                "$fixture": "undefined"
+              }
+            }
+          ]
+        ]
+      },
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              "a",
+              {}
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "D18/Map-string-number-fraction",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "map",
+        "keys": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "values": {
+          "type": "string"
+        }
+      },
+      "input": {
+        "$fixture": "map",
+        "entries": [
+          [
+            1,
+            "number"
+          ],
+          [
+            "1",
+            "string"
+          ],
+          [
+            1.5,
+            "fraction"
+          ]
+        ]
+      },
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              1,
+              "number"
+            ],
+            [
+              "1",
+              "string"
+            ],
+            [
+              1.5,
+              "fraction"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "D19/Map-invalid-key-20",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "map",
+        "keys": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "values": {
+          "type": "integer"
+        }
+      },
+      "input": {
+        "$fixture": "map",
+        "entries": [
+          [
+            null,
+            1
+          ]
+        ]
+      },
+      "expected": {
+        "status": "error",
+        "category": "MAP_KEY"
+      }
+    },
+    {
+      "id": "D19/Map-invalid-key-21",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "map",
+        "keys": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "values": {
+          "type": "integer"
+        }
+      },
+      "input": {
+        "$fixture": "map",
+        "entries": [
+          [
+            true,
+            1
+          ]
+        ]
+      },
+      "expected": {
+        "status": "error",
+        "category": "MAP_KEY"
+      }
+    },
+    {
+      "id": "D19/Map-invalid-key-22",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "map",
+        "keys": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "values": {
+          "type": "integer"
+        }
+      },
+      "input": {
+        "$fixture": "map",
+        "entries": [
+          [
+            {},
+            1
+          ]
+        ]
+      },
+      "expected": {
+        "status": "error",
+        "category": "MAP_KEY"
+      }
+    },
+    {
+      "id": "D19/Map-invalid-key-23",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "map",
+        "keys": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "values": {
+          "type": "integer"
+        }
+      },
+      "input": {
+        "$fixture": "map",
+        "entries": [
+          [
+            {
+              "$fixture": "undefined"
+            },
+            1
+          ]
+        ]
+      },
+      "expected": {
+        "status": "error",
+        "category": "MAP_KEY"
+      }
+    },
+    {
+      "id": "D20/safe-integer--9007199254740991",
+      "op": "accept",
+      "schema": {
+        "type": "integer"
+      },
+      "input": -9007199254740991,
+      "expected": {
+        "status": "ready",
+        "value": -9007199254740991
+      }
+    },
+    {
+      "id": "D20/safe-integer-9007199254740991",
+      "op": "accept",
+      "schema": {
+        "type": "integer"
+      },
+      "input": 9007199254740991,
+      "expected": {
+        "status": "ready",
+        "value": 9007199254740991
+      }
+    },
+    {
+      "id": "D21/invalid-integer--9007199254740992",
+      "op": "accept",
+      "schema": {
+        "type": "integer"
+      },
+      "input": -9007199254740992,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D21/invalid-integer-9007199254740992",
+      "op": "accept",
+      "schema": {
+        "type": "integer"
+      },
+      "input": 9007199254740992,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D21/invalid-integer-1.5",
+      "op": "accept",
+      "schema": {
+        "type": "integer"
+      },
+      "input": 1.5,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D21/invalid-integer-42",
+      "op": "accept",
+      "schema": {
+        "type": "integer"
+      },
+      "input": "42",
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D22/number-large-finite",
+      "op": "accept",
+      "schema": {
+        "type": "number"
+      },
+      "input": 1e+100,
+      "expected": {
+        "status": "ready",
+        "value": 1e+100
+      }
+    },
+    {
+      "id": "D23/number-binary64",
+      "op": "accept",
+      "schema": {
+        "type": "number"
+      },
+      "input": {
+        "$fixture": "sum",
+        "a": 0.1,
+        "b": 0.2
+      },
+      "expected": {
+        "status": "ready",
+        "value": 0.30000000000000004
+      }
+    },
+    {
+      "id": "D24/nonfinite-nan",
+      "op": "accept",
+      "schema": {
+        "type": "number"
+      },
+      "input": {
+        "$fixture": "nan"
+      },
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "D25/nested-nonfinite-nan",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "map",
+        "keys": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "values": {
+          "type": "number"
+        }
+      },
+      "input": {
+        "$fixture": "map",
+        "entries": [
+          [
+            "n",
+            {
+              "$fixture": "nan"
+            }
+          ]
+        ]
+      },
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "D24/nonfinite-infinity",
+      "op": "accept",
+      "schema": {
+        "type": "number"
+      },
+      "input": {
+        "$fixture": "infinity"
+      },
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "D25/nested-nonfinite-infinity",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "map",
+        "keys": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "values": {
+          "type": "number"
+        }
+      },
+      "input": {
+        "$fixture": "map",
+        "entries": [
+          [
+            "n",
+            {
+              "$fixture": "infinity"
+            }
+          ]
+        ]
+      },
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "D24/nonfinite-negativeInfinity",
+      "op": "accept",
+      "schema": {
+        "type": "number"
+      },
+      "input": {
+        "$fixture": "negativeInfinity"
+      },
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "D25/nested-nonfinite-negativeInfinity",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "map",
+        "keys": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "values": {
+          "type": "number"
+        }
+      },
+      "input": {
+        "$fixture": "map",
+        "entries": [
+          [
+            "n",
+            {
+              "$fixture": "negativeInfinity"
+            }
+          ]
+        ]
+      },
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "D26/negative-zero",
+      "op": "accept",
+      "schema": {
+        "type": "number"
+      },
+      "input": {
+        "$fixture": "negativeZero"
+      },
+      "expected": {
+        "status": "ready",
+        "value": 0
+      }
+    },
+    {
+      "id": "D27/native-zero-merging",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "map",
+        "keys": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "values": {
+          "type": "string"
+        }
+      },
+      "input": {
+        "$fixture": "map",
+        "entries": [
+          [
+            {
+              "$fixture": "negativeZero"
+            },
+            "numeric"
+          ],
+          [
+            "-0",
+            "string"
+          ],
+          [
+            0,
+            "replaced"
+          ]
+        ]
+      },
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              0,
+              "replaced"
+            ],
+            [
+              "-0",
+              "string"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "D28/unsupported-bigint",
+      "op": "accept",
+      "schema": true,
+      "input": {
+        "$fixture": "bigint"
+      },
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D28/unsupported-function",
+      "op": "accept",
+      "schema": true,
+      "input": {
+        "$fixture": "function"
+      },
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D28/unsupported-future",
+      "op": "accept",
+      "schema": true,
+      "input": {
+        "$fixture": "future"
+      },
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D28/unsupported-dateObject",
+      "op": "accept",
+      "schema": true,
+      "input": {
+        "$fixture": "dateObject"
+      },
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D28/unsupported-symbol",
+      "op": "accept",
+      "schema": true,
+      "input": {
+        "$fixture": "symbol"
+      },
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "D29/cycle-object",
+      "op": "accept",
+      "schema": true,
+      "input": {
+        "$fixture": "cycle",
+        "kind": "object"
+      },
+      "expected": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      }
+    },
+    {
+      "id": "D29/cycle-array",
+      "op": "accept",
+      "schema": true,
+      "input": {
+        "$fixture": "cycle",
+        "kind": "array"
+      },
+      "expected": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      }
+    },
+    {
+      "id": "D29/cycle-set",
+      "op": "accept",
+      "schema": true,
+      "input": {
+        "$fixture": "cycle",
+        "kind": "set"
+      },
+      "expected": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      }
+    },
+    {
+      "id": "D29/cycle-map",
+      "op": "accept",
+      "schema": true,
+      "input": {
+        "$fixture": "cycle",
+        "kind": "map"
+      },
+      "expected": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      }
+    },
+    {
+      "id": "D30/date-valid-49",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "date"
+      },
+      "input": "2026-10-29",
+      "expected": {
+        "status": "ready",
+        "value": "2026-10-29"
+      }
+    },
+    {
+      "id": "D30/date-valid-50",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "time"
+      },
+      "input": "09:30",
+      "expected": {
+        "status": "ready",
+        "value": "09:30:00.000"
+      }
+    },
+    {
+      "id": "D30/date-valid-51",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "time"
+      },
+      "input": "09:30:01.1",
+      "expected": {
+        "status": "ready",
+        "value": "09:30:01.100"
+      }
+    },
+    {
+      "id": "D30/date-valid-52",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "datetime"
+      },
+      "input": "2026-10-29T09:30:00+09:00",
+      "expected": {
+        "status": "ready",
+        "value": "2026-10-29T00:30:00.000Z"
+      }
+    },
+    {
+      "id": "D30/date-valid-53",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "datetime"
+      },
+      "input": "0099-01-01T01:00:00+01:00",
+      "expected": {
+        "status": "ready",
+        "value": "0099-01-01T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "D30/date-valid-54",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "datetime"
+      },
+      "input": "0001-01-01T00:00:00.001Z",
+      "expected": {
+        "status": "ready",
+        "value": "0001-01-01T00:00:00.001Z"
+      }
+    },
+    {
+      "id": "D30/date-valid-55",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "date"
+      },
+      "input": "2000-02-29",
+      "expected": {
+        "status": "ready",
+        "value": "2000-02-29"
+      }
+    },
+    {
+      "id": "D31/date-invalid-56",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "date"
+      },
+      "input": "2026-02-30",
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-57",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "date"
+      },
+      "input": "1900-02-29",
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-58",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "date"
+      },
+      "input": "0000-01-01",
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-59",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "time"
+      },
+      "input": "24:00",
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-60",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "time"
+      },
+      "input": "09:30:00.0001",
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-61",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "datetime"
+      },
+      "input": "2026-10-29T09:30:00",
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-62",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "datetime"
+      },
+      "input": "2026-10-29T09:30:60Z",
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-63",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "datetime"
+      },
+      "input": "2026-10-29T09:30:00-00:00",
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-64",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "datetime"
+      },
+      "input": "2026-10-29T09:30:00+24:00",
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-65",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "datetime"
+      },
+      "input": "0001-01-01T00:00:00+00:01",
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D31/date-invalid-66",
+      "op": "accept",
+      "schema": {
+        "x-viewstem-type": "datetime"
+      },
+      "input": "9999-12-31T23:59:59-00:01",
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D32/ordinary-string-not-date",
+      "op": "accept",
+      "schema": {
+        "type": "string"
+      },
+      "input": "2026-02-30T09:30:00",
+      "expected": {
+        "status": "ready",
+        "value": "2026-02-30T09:30:00"
+      }
+    },
+    {
+      "id": "D33/nullable-date-null",
+      "op": "accept",
+      "schema": {
+        "anyOf": [
+          {
+            "x-viewstem-type": "date"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "input": null,
+      "expected": {
+        "status": "ready",
+        "value": null
+      }
+    },
+    {
+      "id": "D34/native-collection-equality",
+      "op": "nativeEquality",
+      "expected": {
+        "setObjects": 2,
+        "sameReference": true,
+        "sameContent": false,
+        "mapKeys": 3
+      }
+    },
+    {
+      "id": "D35/stored-Set-membership",
+      "op": "setIdentity",
+      "expected": {
+        "size": 2,
+        "sameReference": true,
+        "sameContent": false,
+        "reorderedEqual": true
+      }
+    },
+    {
+      "id": "D36/Map-order-null-absence",
+      "op": "mapIdentity",
+      "expected": {
+        "reorderedEqual": true,
+        "hasNull": true,
+        "nullValue": null,
+        "hasAbsent": false
+      }
+    },
+    {
+      "id": "D37/snapshot-readonly-source-stable",
+      "op": "readonly",
+      "expected": {
+        "sourceMutable": true,
+        "sourceIsolated": true,
+        "blockedMutations": 8,
+        "stableRead": true,
+        "oldSnapshotStable": true
+      }
+    },
+    {
+      "id": "D38/negative-zero-normalized-deep",
+      "op": "zero",
+      "expected": {
+        "negativeZero": false,
+        "setSize": 1,
+        "mapSize": 2
+      }
+    },
+    {
+      "id": "D39/missing-read",
+      "op": "readiness",
+      "state": "missing",
+      "expected": {
+        "status": "missing",
+        "simple": "missing"
+      }
+    },
+    {
+      "id": "D40/pending-read",
+      "op": "readiness",
+      "state": "pending",
+      "expected": {
+        "status": "pending",
+        "simpleError": "VALUE_PENDING"
+      }
+    },
+    {
+      "id": "D41/error-read",
+      "op": "readiness",
+      "state": "error",
+      "expected": {
+        "status": "error",
+        "simpleError": "TIMEOUT"
+      }
+    },
+    {
+      "id": "D42/null-ready",
+      "op": "readiness",
+      "state": "ready",
+      "value": null,
+      "expected": {
+        "status": "ready",
+        "value": null,
+        "simple": null
+      }
+    },
+    {
+      "id": "D43/required-missing-auto",
+      "op": "prepare",
+      "state": "missing",
+      "mode": "automatic",
+      "expected": {
+        "status": "waiting"
+      }
+    },
+    {
+      "id": "D44/required-pending-explicit",
+      "op": "prepare",
+      "state": "pending",
+      "mode": "explicit",
+      "expected": {
+        "status": "error",
+        "category": "INPUT_NOT_READY"
+      }
+    },
+    {
+      "id": "D45/error-propagated",
+      "op": "prepare",
+      "state": "error",
+      "mode": "automatic",
+      "expected": {
+        "status": "error",
+        "category": "TIMEOUT"
+      }
+    },
+    {
+      "id": "D46/async-result-is-not-data-Future",
+      "op": "asyncResult",
+      "input": 3,
+      "schema": {
+        "type": "integer"
+      },
+      "expected": {
+        "status": "ready",
+        "value": 3
+      }
+    },
+    {
+      "id": "D47/integer-adapter-result",
+      "op": "intResult",
+      "input": 2,
+      "expected": {
+        "status": "ready",
+        "value": 3
+      }
+    },
+    {
+      "id": "D48/integer-adapter-result-range",
+      "op": "intResult",
+      "input": 9007199254740991,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D49/typed-native-roundtrip",
+      "op": "adapterRoundtrip",
+      "schema": {
+        "x-viewstem-type": "map",
+        "keys": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "values": {
+          "type": "string"
+        }
+      },
+      "input": {
+        "$fixture": "map",
+        "entries": [
+          [
+            1.5,
+            "fraction"
+          ],
+          [
+            "1.5",
+            "text"
+          ]
+        ]
+      },
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              1.5,
+              "fraction"
+            ],
+            [
+              "1.5",
+              "text"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "D50/YY-00",
+      "op": "yy",
+      "input": "00",
+      "expected": 2000
+    },
+    {
+      "id": "D50/YY-68",
+      "op": "yy",
+      "input": "68",
+      "expected": 2068
+    },
+    {
+      "id": "D50/YY-69",
+      "op": "yy",
+      "input": "69",
+      "expected": 1969
+    },
+    {
+      "id": "D50/YY-99",
+      "op": "yy",
+      "input": "99",
+      "expected": 1999
+    },
+    {
+      "id": "D51/timezone-seoul",
+      "op": "timezone",
+      "date": "2026-10-29",
+      "time": "09:30",
+      "zone": "Asia/Seoul",
+      "expected": {
+        "status": "ready",
+        "value": "2026-10-29T00:30:00.000Z"
+      }
+    },
+    {
+      "id": "D51/timezone-ny-valid",
+      "op": "timezone",
+      "date": "2026-03-08",
+      "time": "03:30",
+      "zone": "America/New_York",
+      "expected": {
+        "status": "ready",
+        "value": "2026-03-08T07:30:00.000Z"
+      }
+    },
+    {
+      "id": "D51/timezone-ny-gap",
+      "op": "timezone",
+      "date": "2026-03-08",
+      "time": "02:30",
+      "zone": "America/New_York",
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D51/timezone-ny-overlap",
+      "op": "timezone",
+      "date": "2026-11-01",
+      "time": "01:30",
+      "zone": "America/New_York",
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D51/timezone-bad-zone",
+      "op": "timezone",
+      "date": "2026-10-29",
+      "time": "09:30",
+      "zone": "Not/AZone",
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D51/timezone-year-underflow",
+      "op": "timezone",
+      "date": "0001-01-01",
+      "time": "00:00",
+      "zone": "Asia/Seoul",
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D52/stored-Set-reinput-array",
+      "op": "setElementReinput",
+      "kind": "array",
+      "schema": {
+        "x-viewstem-type": "set",
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      },
+      "input": {
+        "$fixture": "set",
+        "values": [
+          [
+            1,
+            2
+          ],
+          [
+            1,
+            2
+          ]
+        ]
+      },
+      "expected": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": [
+          1,
+          2
+        ]
+      }
+    },
+    {
+      "id": "D52/stored-Set-reinput-object-array",
+      "op": "setElementReinput",
+      "kind": "object-array",
+      "schema": {
+        "x-viewstem-type": "set",
+        "items": {
+          "type": "object",
+          "properties": {
+            "a": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "input": {
+        "$fixture": "set",
+        "values": [
+          {
+            "a": [
+              1,
+              2
+            ]
+          },
+          {
+            "a": [
+              1,
+              2
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": [
+            1,
+            2
+          ]
+        }
+      }
+    },
+    {
+      "id": "D52/stored-Set-reinput-object-datetime",
+      "op": "setElementReinput",
+      "kind": "object-datetime",
+      "schema": {
+        "x-viewstem-type": "set",
+        "items": {
+          "type": "object",
+          "properties": {
+            "a": {
+              "x-viewstem-type": "datetime"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "input": {
+        "$fixture": "set",
+        "values": [
+          {
+            "a": "2026-10-29T09:30:00+09:00"
+          },
+          {
+            "a": "2026-10-29T09:30:00+09:00"
+          }
+        ]
+      },
+      "expected": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "2026-10-29T00:30:00.000Z"
+        }
+      }
+    },
+    {
+      "id": "D52/stored-Set-reinput-object-time",
+      "op": "setElementReinput",
+      "kind": "object-time",
+      "schema": {
+        "x-viewstem-type": "set",
+        "items": {
+          "type": "object",
+          "properties": {
+            "a": {
+              "x-viewstem-type": "time"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "input": {
+        "$fixture": "set",
+        "values": [
+          {
+            "a": "09:30"
+          },
+          {
+            "a": "09:30"
+          }
+        ]
+      },
+      "expected": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "09:30:00.000"
+        }
+      }
+    },
+    {
+      "id": "D52/stored-Set-reinput-object-date",
+      "op": "setElementReinput",
+      "kind": "object-date",
+      "schema": {
+        "x-viewstem-type": "set",
+        "items": {
+          "type": "object",
+          "properties": {
+            "a": {
+              "x-viewstem-type": "date"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "input": {
+        "$fixture": "set",
+        "values": [
+          {
+            "a": "2026-10-29"
+          },
+          {
+            "a": "2026-10-29"
+          }
+        ]
+      },
+      "expected": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "2026-10-29"
+        }
+      }
+    },
+    {
+      "id": "D53/additionalProperties-integer-valid",
+      "op": "accept",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": {
+          "type": "integer"
+        }
+      },
+      "input": {
+        "name": "kept",
+        "extra": 3
+      },
+      "expected": {
+        "status": "ready",
+        "value": {
+          "name": "kept",
+          "extra": 3
+        }
+      }
+    },
+    {
+      "id": "D53/additionalProperties-integer-invalid",
+      "op": "accept",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": {
+          "type": "integer"
+        }
+      },
+      "input": {
+        "name": "kept",
+        "bad": "text"
+      },
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D54/additionalProperties-nested-valid",
+      "op": "accept",
+      "schema": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "input": {
+        "outer": {
+          "rows": [
+            1,
+            2
+          ]
+        }
+      },
+      "expected": {
+        "status": "ready",
+        "value": {
+          "outer": {
+            "rows": [
+              1,
+              2
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "D54/additionalProperties-nested-invalid",
+      "op": "accept",
+      "schema": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "input": {
+        "outer": {
+          "rows": [
+            1,
+            "text"
+          ]
+        }
+      },
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D55/additionalProperties-date-normalization",
+      "op": "accept",
+      "schema": {
+        "type": "object",
+        "additionalProperties": {
+          "x-viewstem-type": "datetime"
+        }
+      },
+      "input": {
+        "instant": "2026-10-29T09:30:00+09:00"
+      },
+      "expected": {
+        "status": "ready",
+        "value": {
+          "instant": "2026-10-29T00:30:00.000Z"
+        }
+      }
+    },
+    {
+      "id": "D55/additionalProperties-date-invalid",
+      "op": "accept",
+      "schema": {
+        "type": "object",
+        "additionalProperties": {
+          "x-viewstem-type": "datetime"
+        }
+      },
+      "input": {
+        "instant": "2026-02-30T09:30:00Z"
+      },
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "D56/additionalProperties-true",
+      "op": "accept",
+      "schema": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "input": {
+        "free": [
+          1,
+          "text"
+        ]
+      },
+      "expected": {
+        "status": "ready",
+        "value": {
+          "free": [
+            1,
+            "text"
+          ]
+        }
+      }
+    },
+    {
+      "id": "D56/additionalProperties-false",
+      "op": "accept",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "input": {
+        "name": "kept",
+        "extra": 1
+      },
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "D57/native-adapter-array-membership",
+      "op": "adapterSetArrayMember",
+      "expected": {
+        "sameStored": true,
+        "newEqualContent": false,
+        "nativeReturnOrigin": true,
+        "readonly": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "generatedAt": "2026-10-30T10:30:05.815Z",
+  "runtime": "v22.21.1",
+  "icu": "77.1",
+  "tz": "2025b",
+  "scope": "Controlled worker observation of native RegExp; deadline termination is a gap, not conformance success",
+  "sourceSha256": {
+    "regex-probe.mjs": "55f19ba80f479bd48a7f458e8aa96788dae925c79aa906f96de38d9691b455e2",
+    "regex-worker.mjs": "2ae286669830a53226528a256ca324311d87f65e222c7afe4d6e6a34e558d19b",
+    "prepare.mjs": "4cf29b202e72093e63fa9205d0a593781f4bdac1aaa2fcc6bb8c738baabe876d",
+    "cel-js-8.0.0.patch": "62dd517376de54a08018f6166b250d9013b907e87b11ab75d0f07e264de0da63",
+    "upstream-sha256.json": "19172ed8004970d5801f3c8b52991b25d074d0305fac01cc87fcbbaf97ec61f2",
+    "patched-sha256.json": "bd38774ee6ef0dd3683422afe4d6c8fd5f862b0d3e530ebc65163e000d5e17dd",
+    "package.json": "b8db9a73ffaff8644e1cb30fea9d0074685e1c7843fc889b3ea74b619c204bb2",
+    "package-lock.json": "c58a647127865e61e697fa3d6f9087660c08e6553050671d98709f99b4fd9b55",
+    "node_modules/re2js/build/index.js": "4e31fa6284914b14a23cc677be509f7ad8e43c00ff8d48bbe3486a30e3120373",
+    "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594"
+  },
+  "patchSha256": "62dd517376de54a08018f6166b250d9013b907e87b11ab75d0f07e264de0da63",
+  "summary": {
+    "executed": 2,
+    "passed": 2,
+    "failed": 0
+  },
+  "results": [
+    {
+      "id": "upstream-regex-control",
+      "passed": true,
+      "observation": {
+        "terminated": true,
+        "deadlineMs": 300
+      }
+    },
+    {
+      "id": "patched-regex-must-complete",
+      "passed": true,
+      "observation": {
+        "completed": true,
+        "value": false
+      }
+    }
+  ]
+}

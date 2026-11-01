@@ -1,0 +1,295 @@
+{
+  "runtime": "3.11.1 (stable) (Tue Feb 24 00:03:07 2026 -0800)",
+  "package": "cel 0.6.1",
+  "rows": [
+    {
+      "group": "cel",
+      "id": "dart/C01",
+      "expected": {
+        "type": "int",
+        "value": "3"
+      },
+      "actual": {
+        "type": "int",
+        "value": "3"
+      },
+      "expression": "1+2"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C02",
+      "expected": {
+        "type": "int",
+        "value": "2"
+      },
+      "actual": {
+        "type": "int",
+        "value": "2"
+      },
+      "expression": "size(plants)"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C03",
+      "expected": {
+        "type": "int",
+        "value": "3"
+      },
+      "actual": {
+        "type": "int",
+        "value": "3"
+      },
+      "expression": "n+1"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C04",
+      "expected": {
+        "type": "double",
+        "value": 3
+      },
+      "actual": {
+        "type": "double",
+        "value": 3.0
+      },
+      "expression": "n+1.0"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C05",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "double",
+        "value": 3.0
+      },
+      "expression": "n+1"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C06",
+      "expected": {
+        "type": "double",
+        "value": 0.30000000000000004
+      },
+      "actual": {
+        "type": "double",
+        "value": 0.30000000000000004
+      },
+      "expression": "0.1+0.2"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C07",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "expression": "1/0",
+      "detail": "IntegerDivisionByZeroException"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C08",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "int",
+        "value": "-9223372036854775808"
+      },
+      "expression": "9223372036854775807+1"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C09",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "expression": "1+\"a\"",
+      "detail": "type 'String' is not a subtype of type 'num'"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C10",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "expression": "obj.absent",
+      "detail": "Bad state: no_such_field: the map has no key absent."
+    },
+    {
+      "group": "cel",
+      "id": "dart/C11",
+      "expected": {
+        "type": "bool",
+        "value": false
+      },
+      "actual": {
+        "type": "error"
+      },
+      "expression": "has(obj.absent)",
+      "detail": "Unsupported operation: Function has with one argument is not implemented by this runtime."
+    },
+    {
+      "group": "cel",
+      "id": "dart/C12",
+      "expected": {
+        "type": "bool",
+        "value": false
+      },
+      "actual": {
+        "type": "bool",
+        "value": false
+      },
+      "expression": "false && missing > 0"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C13",
+      "expected": {
+        "type": "int",
+        "value": "7"
+      },
+      "actual": {
+        "type": "int",
+        "value": "7"
+      },
+      "expression": "false ? missing : 7"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C14",
+      "expected": {
+        "type": "list",
+        "value": [
+          {
+            "type": "int",
+            "value": "4"
+          },
+          {
+            "type": "int",
+            "value": "6"
+          }
+        ]
+      },
+      "actual": {
+        "type": "error"
+      },
+      "expression": "xs.filter(x,x>1).map(x,x*2)",
+      "detail": "Unsupported operation: Function filter. Only Binary functions are supported for now."
+    },
+    {
+      "group": "cel",
+      "id": "dart/C15",
+      "expected": {
+        "type": "bool",
+        "value": true
+      },
+      "actual": {
+        "type": "bool",
+        "value": true
+      },
+      "expression": "m[1] != m[\"1\"]"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C16",
+      "expected": {
+        "type": "int",
+        "value": "3"
+      },
+      "actual": {
+        "type": "int",
+        "value": "3"
+      },
+      "expression": "obj.count+1"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C17",
+      "expected": {
+        "type": "int",
+        "value": "9"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "expression": "timestamp(\"2026-10-29T00:00:00Z\").getHours(\"Asia/Seoul\")",
+      "detail": "Unsupported operation: Function timestamp with one argument is not implemented by this runtime."
+    },
+    {
+      "group": "cel",
+      "id": "dart/C18",
+      "expected": {
+        "type": "error"
+      },
+      "actual": {
+        "type": "error"
+      },
+      "expression": "timestamp(\"2026-02-30T00:00:00Z\").getDate()",
+      "detail": "Unsupported operation: Function timestamp with one argument is not implemented by this runtime."
+    },
+    {
+      "group": "cel",
+      "id": "dart/C19",
+      "expected": {
+        "type": "int",
+        "value": "1"
+      },
+      "actual": {
+        "type": "int",
+        "value": "1"
+      },
+      "expression": "size(\"😀\")"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C20",
+      "expected": {
+        "type": "bool",
+        "value": true
+      },
+      "actual": {
+        "type": "bool",
+        "value": true
+      },
+      "expression": "null==null"
+    },
+    {
+      "group": "cel",
+      "id": "dart/C21",
+      "expected": {
+        "type": "bool",
+        "value": true
+      },
+      "actual": {
+        "type": "error"
+      },
+      "expression": "type(n)==double",
+      "detail": "Unsupported operation: Function type with one argument is not implemented by this runtime."
+    },
+    {
+      "group": "cel",
+      "id": "dart/C22",
+      "expected": {
+        "type": "uint",
+        "value": "1"
+      },
+      "actual": {
+        "type": "int",
+        "value": "1"
+      },
+      "expression": "1u"
+    }
+  ]
+}

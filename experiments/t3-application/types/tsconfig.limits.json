@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.json",
+  "files": ["contracts.ts", "runtime-limits.ts"]
+}

@@ -1,0 +1,357 @@
+{
+  "generatedAt": "2026-10-30T09:09:17.884Z",
+  "runtime": "v22.21.1",
+  "icu": "77.1",
+  "tz": "2025b",
+  "scope": "Independent v1 normalization/schema prototype; bounded differential corpus, not production or arbitrary-schema completeness",
+  "sourceSha256": {
+    "schema-runtime-tests.mjs": "ed137d61f15c7cdf4df59f8d9036bf9e50901cc41850b1808647bd16c6da24df",
+    "schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+    "schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+    "schema-probe.mjs": "8b76b6efde8f5c3dc5717905dc552ebb1412e5543dfd35a59d1bb76fb0880a31",
+    "values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+    "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+    "package.json": "91c1223f73e2fd6f660452b15a66f9e8674580b85b9f0e618098c0effc305ae1",
+    "package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be"
+  },
+  "jsonDifferentialInputs": 3036,
+  "summary": {
+    "executed": 83,
+    "passed": 83,
+    "failed": 0
+  },
+  "results": [
+    {
+      "id": "json-differential/S01",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S02",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S03",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S04",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S05",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S06",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S07",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S08",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S09",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S10",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S11",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S12",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S13",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S14",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S15",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S16",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S17",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S18",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S19",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S20",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S21",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S22",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S23",
+      "passed": true
+    },
+    {
+      "id": "json-differential/S24",
+      "passed": true
+    },
+    {
+      "id": "normalize/native",
+      "passed": true
+    },
+    {
+      "id": "normalize/nullable",
+      "passed": true
+    },
+    {
+      "id": "normalize/nullable-null",
+      "passed": true
+    },
+    {
+      "id": "normalize/ref",
+      "passed": true
+    },
+    {
+      "id": "normalize/allOf",
+      "passed": true
+    },
+    {
+      "id": "normalize/anyOf-same-kind",
+      "passed": true
+    },
+    {
+      "id": "normalize/oneOf",
+      "passed": true
+    },
+    {
+      "id": "normalize/if-canonical",
+      "passed": true
+    },
+    {
+      "id": "normalize/then-else-same",
+      "passed": true
+    },
+    {
+      "id": "normalize/not-const",
+      "passed": true
+    },
+    {
+      "id": "normalize/object-no-explicit-type",
+      "passed": true
+    },
+    {
+      "id": "normalize/object-ref",
+      "passed": true
+    },
+    {
+      "id": "normalize/additional",
+      "passed": true
+    },
+    {
+      "id": "normalize/array",
+      "passed": true
+    },
+    {
+      "id": "normalize/prefix",
+      "passed": true
+    },
+    {
+      "id": "normalize/untyped-prefix",
+      "passed": true
+    },
+    {
+      "id": "normalize/nested-union",
+      "passed": true
+    },
+    {
+      "id": "normalize/set",
+      "passed": true
+    },
+    {
+      "id": "normalize/map",
+      "passed": true
+    },
+    {
+      "id": "normalize/native-in-array",
+      "passed": true
+    },
+    {
+      "id": "normalize/ordinary-string",
+      "passed": true
+    },
+    {
+      "id": "reject-ambiguous/date-or-string",
+      "passed": true
+    },
+    {
+      "id": "reject-ambiguous/date-or-true",
+      "passed": true
+    },
+    {
+      "id": "reject-ambiguous/date-or-time",
+      "passed": true
+    },
+    {
+      "id": "reject-ambiguous/nested",
+      "passed": true
+    },
+    {
+      "id": "reject-ambiguous/variant-property",
+      "passed": true
+    },
+    {
+      "id": "reject-ambiguous/additional-branch",
+      "passed": true
+    },
+    {
+      "id": "reject-ambiguous/conditional",
+      "passed": true
+    },
+    {
+      "id": "reject-ambiguous/local-ref",
+      "passed": true
+    },
+    {
+      "id": "reject-ambiguous/map-value",
+      "passed": true
+    },
+    {
+      "id": "reject-ambiguous/set-item",
+      "passed": true
+    },
+    {
+      "id": "reject-value/nullable-sibling-const",
+      "passed": true
+    },
+    {
+      "id": "reject-value/oneOf-two-matches",
+      "passed": true
+    },
+    {
+      "id": "reject-value/const-not-rewritten",
+      "passed": true
+    },
+    {
+      "id": "reject-value/native-date-invalid",
+      "passed": true
+    },
+    {
+      "id": "reject-value/allOf-extra",
+      "passed": true
+    },
+    {
+      "id": "reject-value/integer-union",
+      "passed": true
+    },
+    {
+      "id": "reject-value/integer-ref",
+      "passed": true
+    },
+    {
+      "id": "reject-value/integer-nested",
+      "passed": true
+    },
+    {
+      "id": "reject-value/set-size",
+      "passed": true
+    },
+    {
+      "id": "reject-value/map-value",
+      "passed": true
+    },
+    {
+      "id": "reject-value/map-key",
+      "passed": true
+    },
+    {
+      "id": "reject-value/not-native",
+      "passed": true
+    },
+    {
+      "id": "enum/empty-is-unsatisfiable-schema",
+      "passed": true
+    },
+    {
+      "id": "enum/duplicate-is-valid",
+      "passed": true
+    },
+    {
+      "id": "integer/number-union-permits-binary64",
+      "passed": true
+    },
+    {
+      "id": "annotations/no-native-detection-in-data",
+      "passed": true
+    },
+    {
+      "id": "schema/snapshot-isolation",
+      "passed": true
+    },
+    {
+      "id": "normalization/map-key-collision",
+      "passed": true
+    },
+    {
+      "id": "normalization/non-string-negative-branch",
+      "passed": true
+    },
+    {
+      "id": "set/no-object-deduplication",
+      "passed": true
+    },
+    {
+      "id": "isolation/failed-validation-preserves-input",
+      "passed": true
+    },
+    {
+      "id": "normalization/shared-graph-distinct-paths",
+      "passed": true
+    },
+    {
+      "id": "json/generated-boundary-combinations",
+      "passed": true
+    },
+    {
+      "id": "admission/branch-explosion",
+      "passed": true
+    },
+    {
+      "id": "admission/deep-schema",
+      "passed": true
+    },
+    {
+      "id": "admission/large-annotation",
+      "passed": true
+    },
+    {
+      "id": "admission/annotation-accessor",
+      "passed": true
+    },
+    {
+      "id": "admission/long-reference-chain",
+      "passed": true
+    }
+  ]
+}

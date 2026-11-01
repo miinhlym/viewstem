@@ -1,0 +1,620 @@
+{
+  "scope": "Independent U01-U13,K21 UI evidence plus common dynamic values, A14 ActionProbe snapshots and the Component portion of K01.",
+  "statusMeaning": "verified-experiment: all clauses in that acceptance row observed by an executed independent model/DOM fixture. Production integration remains a separate boundary.",
+  "environments": [
+    {
+      "result": "results/node22.json",
+      "runtime": "v22.21.1",
+      "summary": {
+        "executed": 158,
+        "passed": 158,
+        "failed": 0
+      },
+      "populations": {
+        "model": 158,
+        "actualDOM": 0
+      },
+      "sourceSha256": {
+        "ui-probe.mjs": "fd8fea7ebd17ca80ccc562f982021785c876fc3abfb4eb833a0d85ba29a48f6d",
+        "value-evaluator.mjs": "42d9047b771651a554e8a01fb355b469742aab748c0d94073c04d3b07a8451c7",
+        "action-bridge.mjs": "7adf4b1f3103a4be37c80822d978d465713ff1ea2429b4b8e9774c39face9b13",
+        "dynamic-scenarios.mjs": "148aa5761a825a4d2394b1d0f5cae41144979a72efd9d8c6988a05d5da73a92c",
+        "scenarios.mjs": "078afb0d797eb1240fd551f19814c1ac4dffd30eb328647e46ad46ea13920c0f",
+        "run.mjs": "f77cf92d148b6a1b61748771d6206e40aaf7580e54514c52e096217e70b4f0fc",
+        "browser-run.mjs": "b86adc09a0e19a7b3cc642978fd94caa92ef2763e7f827ba39641c606b27dbf5",
+        "../t2-http-boundary/value-expressions.mjs": "3bd0320dc4e2a978de7a576e1c3df90d456170e9540d8aa667f42d0c1c65a32f",
+        "../verification/errors.mjs": "c9d94483f9314bcf5bad42cb044f7b0ba29cd7d7b9d3ba561f1c9021aa6d7224",
+        "../t3-action/action-probe.mjs": "9fc53689cd4c95405c8910a0a1fe50429cd89ea3327c8b63b68a2e8e7c4a7c8c",
+        "../t3-state/state-probe.mjs": "501e0e0d78c8b8bf4fa1a9d465fe844e8cbeb06752013bc9ac6c765a0f5edbaa",
+        "../t3-state/ports-probe.mjs": "b7cc988b6f9da94081acd54a7757e35fd19e0db3619032a0c04915f42893815a",
+        "../t3-state/immutable.mjs": "e86391873075d434ce26169043dece6e28b9082ddb20f9aab84c4dbaa78790f4",
+        "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+        "../t1-values/schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+        "../t1-values/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+        "../t1-values/values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+        "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+        "../../docs/spec/05-component-view.md": "44938a424cfeb16541bb18585474f7d84b51e38a63fdbe4a3fce2be1ff2ebb0e",
+        "../../docs/spec/10-value-contracts.md": "267d526405fe081704bb13a14ca98cf9ec762ffa22aad7b51015c8f29f463b63",
+        "../../docs/VIEWSTEM-SPEC.md": "d1facd953aa429331d531ffdf3275de886a54f7e894c2cd47707c6fc0a42080c"
+      }
+    },
+    {
+      "result": "results/node24.json",
+      "runtime": "v24.19.0",
+      "summary": {
+        "executed": 158,
+        "passed": 158,
+        "failed": 0
+      },
+      "populations": {
+        "model": 158,
+        "actualDOM": 0
+      },
+      "sourceSha256": {
+        "ui-probe.mjs": "fd8fea7ebd17ca80ccc562f982021785c876fc3abfb4eb833a0d85ba29a48f6d",
+        "value-evaluator.mjs": "42d9047b771651a554e8a01fb355b469742aab748c0d94073c04d3b07a8451c7",
+        "action-bridge.mjs": "7adf4b1f3103a4be37c80822d978d465713ff1ea2429b4b8e9774c39face9b13",
+        "dynamic-scenarios.mjs": "148aa5761a825a4d2394b1d0f5cae41144979a72efd9d8c6988a05d5da73a92c",
+        "scenarios.mjs": "078afb0d797eb1240fd551f19814c1ac4dffd30eb328647e46ad46ea13920c0f",
+        "run.mjs": "f77cf92d148b6a1b61748771d6206e40aaf7580e54514c52e096217e70b4f0fc",
+        "browser-run.mjs": "b86adc09a0e19a7b3cc642978fd94caa92ef2763e7f827ba39641c606b27dbf5",
+        "../t2-http-boundary/value-expressions.mjs": "3bd0320dc4e2a978de7a576e1c3df90d456170e9540d8aa667f42d0c1c65a32f",
+        "../verification/errors.mjs": "c9d94483f9314bcf5bad42cb044f7b0ba29cd7d7b9d3ba561f1c9021aa6d7224",
+        "../t3-action/action-probe.mjs": "9fc53689cd4c95405c8910a0a1fe50429cd89ea3327c8b63b68a2e8e7c4a7c8c",
+        "../t3-state/state-probe.mjs": "501e0e0d78c8b8bf4fa1a9d465fe844e8cbeb06752013bc9ac6c765a0f5edbaa",
+        "../t3-state/ports-probe.mjs": "b7cc988b6f9da94081acd54a7757e35fd19e0db3619032a0c04915f42893815a",
+        "../t3-state/immutable.mjs": "e86391873075d434ce26169043dece6e28b9082ddb20f9aab84c4dbaa78790f4",
+        "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+        "../t1-values/schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+        "../t1-values/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+        "../t1-values/values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+        "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+        "../../docs/spec/05-component-view.md": "44938a424cfeb16541bb18585474f7d84b51e38a63fdbe4a3fce2be1ff2ebb0e",
+        "../../docs/spec/10-value-contracts.md": "267d526405fe081704bb13a14ca98cf9ec762ffa22aad7b51015c8f29f463b63",
+        "../../docs/VIEWSTEM-SPEC.md": "d1facd953aa429331d531ffdf3275de886a54f7e894c2cd47707c6fc0a42080c"
+      }
+    },
+    {
+      "result": "results/chromium.json",
+      "runtime": "v24.19.0",
+      "browser": "151.0.7922.34",
+      "summary": {
+        "executed": 168,
+        "passed": 168,
+        "failed": 0
+      },
+      "populations": {
+        "model": 158,
+        "actualDOM": 9,
+        "browserErrorCheck": 1
+      },
+      "sourceSha256": {
+        "ui-probe.mjs": "fd8fea7ebd17ca80ccc562f982021785c876fc3abfb4eb833a0d85ba29a48f6d",
+        "value-evaluator.mjs": "42d9047b771651a554e8a01fb355b469742aab748c0d94073c04d3b07a8451c7",
+        "action-bridge.mjs": "7adf4b1f3103a4be37c80822d978d465713ff1ea2429b4b8e9774c39face9b13",
+        "dynamic-scenarios.mjs": "148aa5761a825a4d2394b1d0f5cae41144979a72efd9d8c6988a05d5da73a92c",
+        "scenarios.mjs": "078afb0d797eb1240fd551f19814c1ac4dffd30eb328647e46ad46ea13920c0f",
+        "run.mjs": "f77cf92d148b6a1b61748771d6206e40aaf7580e54514c52e096217e70b4f0fc",
+        "browser-run.mjs": "b86adc09a0e19a7b3cc642978fd94caa92ef2763e7f827ba39641c606b27dbf5",
+        "../t2-http-boundary/value-expressions.mjs": "3bd0320dc4e2a978de7a576e1c3df90d456170e9540d8aa667f42d0c1c65a32f",
+        "../verification/errors.mjs": "c9d94483f9314bcf5bad42cb044f7b0ba29cd7d7b9d3ba561f1c9021aa6d7224",
+        "../t3-action/action-probe.mjs": "9fc53689cd4c95405c8910a0a1fe50429cd89ea3327c8b63b68a2e8e7c4a7c8c",
+        "../t3-state/state-probe.mjs": "501e0e0d78c8b8bf4fa1a9d465fe844e8cbeb06752013bc9ac6c765a0f5edbaa",
+        "../t3-state/ports-probe.mjs": "b7cc988b6f9da94081acd54a7757e35fd19e0db3619032a0c04915f42893815a",
+        "../t3-state/immutable.mjs": "e86391873075d434ce26169043dece6e28b9082ddb20f9aab84c4dbaa78790f4",
+        "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+        "../t1-values/schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+        "../t1-values/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+        "../t1-values/values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+        "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+        "../../docs/spec/05-component-view.md": "44938a424cfeb16541bb18585474f7d84b51e38a63fdbe4a3fce2be1ff2ebb0e",
+        "../../docs/spec/10-value-contracts.md": "267d526405fe081704bb13a14ca98cf9ec762ffa22aad7b51015c8f29f463b63",
+        "../../docs/VIEWSTEM-SPEC.md": "d1facd953aa429331d531ffdf3275de886a54f7e894c2cd47707c6fc0a42080c"
+      },
+      "pageErrors": []
+    }
+  ],
+  "records": [
+    {
+      "id": "U01",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/05-component-view.md",
+        "../../docs/VIEWSTEM-SPEC.md",
+        "ui-probe.mjs",
+        "scenarios.mjs"
+      ],
+      "contractRow": "| U01 | required slot에 [] / 선택 slot 생략 | 유효 빈 슬롯 / 빈 내용 | E41 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "U01.required-empty-optional-absent",
+        "U01.unknown-and-array-item-slot-ref-rejected",
+        "DOM.U01.required-empty-does-not-create-wrapper-child"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "U02",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/05-component-view.md",
+        "../../docs/VIEWSTEM-SPEC.md",
+        "ui-probe.mjs",
+        "scenarios.mjs"
+      ],
+      "contractRow": "| U02 | 외부 슬롯 노드가 /states 값을 읽음 | 작성자 문맥; 수신자 상태로 재바인딩 금지 | E41 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "U02.slot-author-state-and-forwarding",
+        "DOM.U02-U03.receiver-row-multiple-siblings-author-context"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "U03",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/05-component-view.md",
+        "../../docs/VIEWSTEM-SPEC.md",
+        "ui-probe.mjs",
+        "scenarios.mjs"
+      ],
+      "contractRow": "| U03 | 슬롯에 여러 노드 | 수신 DOM/CSS 배치; 암묵 Column/max1 없음 | E41 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "U03.multiple-slot-nodes-preserve-order",
+        "DOM.U02-U03.receiver-row-multiple-siblings-author-context"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "U04",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/05-component-view.md",
+        "../../docs/VIEWSTEM-SPEC.md",
+        "ui-probe.mjs",
+        "scenarios.mjs"
+      ],
+      "contractRow": "| U04 | 이벤트 payload 타입 오류 | Action 호출 0회; DOM 이벤트/핸들 비공개 | E41 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "U04.invalid-payload-zero-actions-and-input-isolation",
+        "U04.no-implicit-event-and-no-bubbling",
+        "U04.emit-validates-public-payload",
+        "U04.emit-invalid-payload-blocks-outer-action",
+        "U04.static-event-handler-and-schema-errors",
+        "DOM.U04.native-event-stays-in-adapter"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "U05",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/05-component-view.md",
+        "../../docs/VIEWSTEM-SPEC.md",
+        "ui-probe.mjs",
+        "scenarios.mjs"
+      ],
+      "contractRow": "| U05 | when false→true | 폐기 후 새 내부 수명; 외부 State 유지 | E41 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "U05.when-false-skips-input-and-query",
+        "U05.when-false-true-new-lifetime-external-state",
+        "U05.false-does-not-hide-static-reference-or-structure",
+        "U05.strict-boolean",
+        "DOM.U05-U06.removal-reorder-and-new-generation-visible"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "U06",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/05-component-view.md",
+        "../../docs/VIEWSTEM-SPEC.md",
+        "ui-probe.mjs",
+        "scenarios.mjs"
+      ],
+      "contractRow": "| U06 | repeat reorder / remove-readd / duplicate key | 상태 유지 / 새 수명 / 오류 | E41 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "U06.reorder-preserves-state-remove-readd-new-lifetime",
+        "U06.keys-type-distinction-and-negative-zero",
+        "U06.invalid-and-missing-key-rejected",
+        "DOM.U05-U06.removal-reorder-and-new-generation-visible"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "U07",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/05-component-view.md",
+        "../../docs/VIEWSTEM-SPEC.md",
+        "ui-probe.mjs",
+        "scenarios.mjs"
+      ],
+      "contractRow": "| U07 | 단순 Row 간 재배치 / 다른 owner로 이동 | 같은 owner·ID·definition이면 유지 / 새 인스턴스 | E14 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "U07.same-owner-row-move-preserves-state-and-inline-identity",
+        "U07.definition-change-creates-new-instance",
+        "U07.other-owner-move-creates-new-instance",
+        "U07.input-change-keeps-instance",
+        "DOM.U07.row-move-retains-core-state"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "U08",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/05-component-view.md",
+        "../../docs/VIEWSTEM-SPEC.md",
+        "ui-probe.mjs",
+        "scenarios.mjs"
+      ],
+      "contractRow": "| U08 | Grid 고정 겹침·범위초과·한 좌표만 | 오류, 자동 밀기 없음 | E41 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "U08.fixed-overlap-range-partial-and-positive-integer"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "U09",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/05-component-view.md",
+        "../../docs/VIEWSTEM-SPEC.md",
+        "ui-probe.mjs",
+        "scenarios.mjs"
+      ],
+      "contractRow": "| U09 | Grid repeat·auto 배치 | 고정 먼저 예약, 원래 확장 순서로 전진 전체 사각형 검색 | E41 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "U09.fixed-reserved-before-auto-regardless-of-source-order",
+        "U09.rectangle-search-checks-lower-row-and-no-dense-backfill",
+        "U09.repeat-expanded-order-default-span-and-repeat-fixed-rejected",
+        "DOM.U09-U10.grid-fixed-first-source-order-geometry",
+        "DOM.U09.grid-repeat-expansion-and-slot-forwarded-ids"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "U10",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/05-component-view.md",
+        "../../docs/VIEWSTEM-SPEC.md",
+        "ui-probe.mjs",
+        "scenarios.mjs"
+      ],
+      "contractRow": "| U10 | when:false 선언 layout ID / 없는 ID | 공간 없음·선언 유효 / 오류 | E41 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "U10.hidden-declaration-valid-no-space-unknown-key-rejected",
+        "U10.grid-coordinate-change-preserves-child-state",
+        "DOM.U09-U10.grid-fixed-first-source-order-geometry"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "U11",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/05-component-view.md",
+        "../../docs/VIEWSTEM-SPEC.md",
+        "ui-probe.mjs",
+        "scenarios.mjs"
+      ],
+      "contractRow": "| U11 | 미사용 선언형 Component에 자기 포함 또는 A→B→A 포함 순환을 등록 | 참조/인라인 위치와 무관하게 등록의 정의 검증에서 오류; 실제 인스턴스 생성까지 미루지 않으며 Query 실행 0건 | E13 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "U11.unused-direct-cycle-register-error-query-zero",
+        "U11.unused-mutual-and-inline-cycle-rejected",
+        "U11.acyclic-shared-child-and-kind-specific-registration"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "U12",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/05-component-view.md",
+        "../../docs/VIEWSTEM-SPEC.md",
+        "ui-probe.mjs",
+        "scenarios.mjs"
+      ],
+      "contractRow": "| U12 | 같은 owner의 서로 다른 Row에 동일 노드 id / 서로 다른 Component 인스턴스 안의 동일 로컬 id | 전자는 범위 내 중복 오류, 후자는 독립 인스턴스; Row/Column 배치가 새 이름 공간을 만들지 않음 | E14 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "U12.duplicate-node-across-rows-even-hidden-rejected",
+        "U12.same-local-node-in-separate-components-independent",
+        "U12.action-alias-duplicate-in-owner-and-repeat-rejected",
+        "U12.action-alias-separate-owner-and-projected-duplicate"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "U13",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/05-component-view.md",
+        "../../docs/VIEWSTEM-SPEC.md",
+        "ui-probe.mjs",
+        "scenarios.mjs"
+      ],
+      "contractRow": "| U13 | 중첩 repeat에서 바깥·안쪽 항목 별칭을 inputs에 명시하고 부모별로 같은 항목 key 사용 | 서로 다른 별칭의 항목을 함께 읽음; key는 반복 템플릿·부모 항목 아래에서 구분; 항목을 자식 Component에 암묵 주입하지 않음 | E41 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "U13.nested-repeat-parent-local-key-and-explicit-inputs",
+        "U13.both-alias-values-explicitly-available"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "K21",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/05-component-view.md",
+        "../../docs/VIEWSTEM-SPEC.md",
+        "ui-probe.mjs",
+        "scenarios.mjs"
+      ],
+      "contractRow": "| K21 | 같은 노드 repeat+when, 숨겨질 항목의 중복 key, 중첩/형제 as 중복 | 항목 문맥에서 when 평가·false의 inputs/Query 없음. 전체 key 중복·중첩 shadowing 오류, 형제 별칭 허용 | U13, O12 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "K21.repeat-key-before-when-and-hidden-input-query-zero",
+        "K21.hidden-duplicate-full-key-pass-before-any-query",
+        "K21.hidden-dynamic-input-not-evaluated",
+        "K21.nested-shadow-rejected-sibling-reuse-valid",
+        "K21.repeat-root-and-nonarray-items-rejected"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "A14",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/10-value-contracts.md",
+        "dynamic-scenarios.mjs",
+        "action-bridge.mjs"
+      ],
+      "contractRow": "| A14 | UI 입력이 /actions/id 참조 | 연결 등록과 초기 상태 후 평가; JSON 속성 순서 무관 | §7.2 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "A14.actual-action-idle-before-inputs-field-and-sibling-order-independent",
+        "A14.separate-owner-actions-id-data-and-explicit-inputs",
+        "DOM.A14.actual-action-snapshots-visible-in-own-UI"
+      ],
+      "status": "verified-experiment",
+      "remaining": []
+    },
+    {
+      "id": "K01",
+      "source": [
+        "../../docs/handoff/acceptance-matrix.md",
+        "../../docs/spec/10-value-contracts.md",
+        "dynamic-scenarios.mjs",
+        "action-bridge.mjs"
+      ],
+      "contractRow": "| K01 | 같은 Component/Query/Derived를 ref와 해당 인라인 본문으로 각각 사용; 둘 다 지정 | 전자는 같은 입력·검증 의미, 후자는 XOR 오류. 주변 상태 암묵 캡처 없음 | U13, O01 |",
+      "result": [
+        "results/node22.json",
+        "results/node24.json",
+        "results/chromium.json"
+      ],
+      "testIds": [
+        "K01.Component-ref-inline-same-input-contract-and-own-initial",
+        "K01.Component-ref-inline-no-ambient-parent-capture"
+      ],
+      "status": "partial",
+      "remaining": [
+        "Only the Component ref/inline portion is tested here; Query/Derived require their separate suites."
+      ]
+    }
+  ],
+  "integrationRemaining": [
+    "Actual StateStore State/Query ports and UI Query scheduler; external State is a service-owned fixture.",
+    "The A14 bridge remains unconditional/non-repeated; U35 separately tests actual UI expansion and Action lifetime, including actionRef/componentRef replacement, in experiments/verification/action-ui-integration.mjs. Production integration is not implemented.",
+    "Async State initial readiness is covered by StateProbe rather than this synchronous UI initializer.",
+    "Svelte/full core, extra registered functions/full resource grammar and other browsers/focus/accessibility."
+  ],
+  "additionalRegressionTestIds": [
+    "UI.invalid-plan-preserves-tree-and-does-not-start-query",
+    "UI.removed-event-connection-rejected",
+    "UI.inline-update-revalidates-own-static-tree",
+    "UI.same-lifetime-event-reference-survives-layout-update"
+  ],
+  "dynamicValueTests": [
+    "VALUE.common.concat",
+    "VALUE.common.concat-empty",
+    "VALUE.common.format",
+    "VALUE.common.format-dollar",
+    "VALUE.common.pointer-escapes",
+    "VALUE.common.object-length",
+    "VALUE.common.object-01",
+    "VALUE.common.array-0",
+    "VALUE.common.array-length",
+    "VALUE.common.array-extra",
+    "VALUE.common.array-01",
+    "VALUE.common.array-negative",
+    "VALUE.common.array-fraction",
+    "VALUE.common.array-outside",
+    "VALUE.common.array-unsafe",
+    "VALUE.common.pointer-invalid",
+    "VALUE.common.pointer-relative",
+    "VALUE.common.missing-port",
+    "VALUE.common.missing-data",
+    "VALUE.common.prototype",
+    "VALUE.common.null-traversal",
+    "VALUE.common.scalar-traversal",
+    "VALUE.common.set-traversal",
+    "VALUE.common.map-traversal",
+    "VALUE.common.native-set-not-syntax",
+    "VALUE.common.native-map-not-syntax",
+    "VALUE.common.returned-not-syntax",
+    "VALUE.common.native-original-set",
+    "VALUE.common.native-original-map",
+    "VALUE.common.escaped-once",
+    "VALUE.common.ordinary-keys",
+    "VALUE.common.nested",
+    "VALUE.common.mixed",
+    "VALUE.common.unknown-call",
+    "VALUE.common.concat-type",
+    "VALUE.common.format-object",
+    "VALUE.common.format-invalid",
+    "VALUE.common.blocked-owner",
+    "VALUE.common.blocked-secrets",
+    "VALUE.common.blocked-auth",
+    "MATRIX.node.inputs.path",
+    "MATRIX.node.inputs.mixed",
+    "MATRIX.node.inputs.blocked-owner",
+    "MATRIX.node.inputs.blocked-secrets",
+    "MATRIX.node.inputs.blocked-auth",
+    "MATRIX.node.inputs.pointer",
+    "MATRIX.node.inputs.call-type",
+    "MATRIX.node.inputs.concat",
+    "MATRIX.node.inputs.formatString",
+    "MATRIX.when.path",
+    "MATRIX.when.mixed",
+    "MATRIX.when.blocked-owner",
+    "MATRIX.when.blocked-secrets",
+    "MATRIX.when.blocked-auth",
+    "MATRIX.when.pointer",
+    "MATRIX.when.call-type",
+    "MATRIX.when.string-call-result-type",
+    "MATRIX.repeat.items.path",
+    "MATRIX.repeat.items.mixed",
+    "MATRIX.repeat.items.blocked-owner",
+    "MATRIX.repeat.items.blocked-secrets",
+    "MATRIX.repeat.items.blocked-auth",
+    "MATRIX.repeat.items.pointer",
+    "MATRIX.repeat.items.call-type",
+    "MATRIX.repeat.items.string-call-result-type",
+    "MATRIX.repeat.key.path",
+    "MATRIX.repeat.key.mixed",
+    "MATRIX.repeat.key.blocked-owner",
+    "MATRIX.repeat.key.blocked-secrets",
+    "MATRIX.repeat.key.blocked-auth",
+    "MATRIX.repeat.key.pointer",
+    "MATRIX.repeat.key.call-type",
+    "MATRIX.repeat.key.concat",
+    "MATRIX.repeat.key.formatString",
+    "MATRIX.on.inputs.path",
+    "MATRIX.on.inputs.mixed",
+    "MATRIX.on.inputs.blocked-owner",
+    "MATRIX.on.inputs.blocked-secrets",
+    "MATRIX.on.inputs.blocked-auth",
+    "MATRIX.on.inputs.pointer",
+    "MATRIX.on.inputs.call-type",
+    "MATRIX.on.inputs.concat",
+    "MATRIX.on.inputs.formatString",
+    "MATRIX.emit.payload.path",
+    "MATRIX.emit.payload.mixed",
+    "MATRIX.emit.payload.blocked-owner",
+    "MATRIX.emit.payload.blocked-secrets",
+    "MATRIX.emit.payload.blocked-auth",
+    "MATRIX.emit.payload.pointer",
+    "MATRIX.emit.payload.call-type",
+    "MATRIX.emit.payload.concat",
+    "MATRIX.emit.payload.formatString",
+    "MATRIX.State.initial.path",
+    "MATRIX.State.initial.mixed",
+    "MATRIX.State.initial.blocked-owner",
+    "MATRIX.State.initial.blocked-secrets",
+    "MATRIX.State.initial.blocked-auth",
+    "MATRIX.State.initial.pointer",
+    "MATRIX.State.initial.call-type",
+    "MATRIX.State.initial.concat",
+    "MATRIX.State.initial.formatString",
+    "VALUE.current-scope-only-and-safe-errors",
+    "INITIAL.own-ports-dependent-state-and-no-reinitialization",
+    "INITIAL.component-ports-update-preserves-initial-remove-readd-reinitializes",
+    "INITIAL.port-default-is-literal-returned-data-not-reexecuted",
+    "INITIAL.missing-null-undefined-and-cycles",
+    "INITIAL.forward-dependencies-independent-of-declaration-order",
+    "INITIAL.dynamic-format-template-forward-dependency-and-cycle",
+    "INITIAL.unknown-state-and-unready-dependent-state",
+    "VALUE.slot-pointer-escaped-static-name",
+    "DOM.VALUE.concat-format-and-initial-visible"
+  ],
+  "priorEvidence": "archive/u34-dynamic-before/README.md"
+}

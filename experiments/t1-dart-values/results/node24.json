@@ -1,0 +1,3674 @@
+{
+  "generatedAt": "2026-10-30T10:30:27.127Z",
+  "runtime": "v24.1.0",
+  "icu": "77.1",
+  "tz": "2025b",
+  "scope": "Independent direct-schema value/normalization/readiness/date fixture model, JS State/schema/native adapter versus Dart VM native values; not Dart CEL or core implementation",
+  "sourceSha256": {
+    "run.mjs": "b84d16be91505a4432831132bef4eae572123af603e7e4796726df6749d63254",
+    "js-oracle.mjs": "e4dc8607d2086f5a5a34ea98dcb0b616ed8f62335ef66e66b330dad7ce00948d",
+    "build-fixtures.mjs": "a2ff61defc5e8c8d05f5603a3b48800788ba13438f6b874c699607cb5f75d090",
+    "fixtures.json": "48008f2cefb66f255a80fcf4ab95ff46a599f60bef6ee289d04fd659bf6fc07d",
+    "bin/probe.dart": "6cd7e03b02d3d6494ca51460220c6d38cdeeba547b184bf57d1bf72dd47b49af",
+    "pubspec.yaml": "9698f8892f4f91b5d181fe14e80e1e1cd76dff576f804acd88982cc3c80f2683",
+    "pubspec.lock": "23545783508091f030bdb38107a8b8d38d9660942648cbb07ed8070f1d94a005",
+    "README.md": "a0d5c0a2ccb2aa132bdf4d968488e49f565f727355412e4cd0eda77fe36881f0",
+    "coverage.json": "f66ae3caed8ff238f229bba6bcf5b01ea9348a70882fbaeb8c5248f82faf79a2",
+    "../t1-values/schema-runtime.mjs": "6dd9a4c70d45308b540c22e8807f38793b199c32f45c7d1ee09eac1ec6585e1c",
+    "../t1-values/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
+    "../t1-values/values.mjs": "cf32aed0952bca56beb4bd27f8f2225d458ecf982724514a1059f5133814027b",
+    "../t1-values/package.json": "91c1223f73e2fd6f660452b15a66f9e8674580b85b9f0e618098c0effc305ae1",
+    "../t1-values/package-lock.json": "72842859524970712740a6b88079c0829ac3f8abb27c64cc5b7bdca6eef877be",
+    "../t3-state/state-probe.mjs": "501e0e0d78c8b8bf4fa1a9d465fe844e8cbeb06752013bc9ac6c765a0f5edbaa",
+    "../t3-state/immutable.mjs": "e86391873075d434ce26169043dece6e28b9082ddb20f9aab84c4dbaa78790f4",
+    "../t3-state/ports-probe.mjs": "b7cc988b6f9da94081acd54a7757e35fd19e0db3619032a0c04915f42893815a",
+    "../t1-native-cel/adapter.mjs": "02b47cb8ae06e803baf287545d0f1408b2676d06047f2468810b41e819436aa9",
+    "../t1-cel-patch/prepare.mjs": "4cf29b202e72093e63fa9205d0a593781f4bdac1aaa2fcc6bb8c738baabe876d",
+    "../t1-cel-patch/cel-js-8.0.0.patch": "62dd517376de54a08018f6166b250d9013b907e87b11ab75d0f07e264de0da63",
+    "../t1-cel-patch/upstream-sha256.json": "19172ed8004970d5801f3c8b52991b25d074d0305fac01cc87fcbbaf97ec61f2",
+    "../t1-cel-patch/patched-sha256.json": "bd38774ee6ef0dd3683422afe4d6c8fd5f862b0d3e530ebc65163e000d5e17dd",
+    "../t1-cel-patch/package.json": "b8db9a73ffaff8644e1cb30fea9d0074685e1c7843fc889b3ea74b619c204bb2",
+    "../t1-cel-patch/package-lock.json": "c58a647127865e61e697fa3d6f9087660c08e6553050671d98709f99b4fd9b55",
+    "../verification/report.mjs": "0b5e3ce28ea1f8a59cff8b613e25e10404e8cf2b7dfaec9356eb514dba366594",
+    "../verification/errors.mjs": "c9d94483f9314bcf5bad42cb044f7b0ba29cd7d7b9d3ba561f1c9021aa6d7224"
+  },
+  "fixtureCount": 109,
+  "populations": {
+    "js": 109,
+    "dart": 109,
+    "crossComparison": 109
+  },
+  "dart": {
+    "runtime": "3.11.1 (stable) (Tue Feb 24 00:03:07 2026 -0800) on \"macos_arm64\"",
+    "os": "macos",
+    "nativeDateTimeParseRollsInvalidDay": true,
+    "actualFile": "results/dart-node24.json",
+    "actualSha256": "ad84e36da68951d5dafc41e8e6d3e3395e106a1c13a58d4eec4307221e1c0b5e"
+  },
+  "timezone": {
+    "package": "timezone",
+    "version": "0.11.2",
+    "databaseHeader": "// This is a generated file. Do not edit.\n// Timezone data version: 2026e\nimport 'dart:typed_data';",
+    "sourceSha256": {
+      "pubspec.yaml": "ef7eb51002960c27c79e5c11c8b4be29528873b0ae9599004fbbcc6c127cf482",
+      "lib/data/latest.dart": "e33aaeb8f1c3b2778e7f31633fe8127938294fe099d74e686bf145091fdf0138",
+      "lib/src/location.dart": "8217a743b270b9fe8812071451264705a0f0091677ad1c29d7c6da1231c0587b",
+      "lib/src/date_time.dart": "5257d56366e7e48851fa86770748fae1aa54a757ad62f544dcf99ee92a99cbd5"
+    },
+    "nodeTz": "2025b"
+  },
+  "patchSha256": "62dd517376de54a08018f6166b250d9013b907e87b11ab75d0f07e264de0da63",
+  "preservedCELCandidate": {
+    "source": "../t1-values/results/dart.json",
+    "sha256": "a8233b0cf15ca372bdc8b4c86c6b016ea321edcfe5ac7dadb56a0508b7ba2e1c",
+    "mismatches": 7,
+    "unchangedByThisExperiment": true
+  },
+  "limitations": [
+    "No Dart CEL evaluator is imported; existing cel 0.6.1 candidate differences remain",
+    "Fixture tags/ref IDs are private test construction, not production transport",
+    "Direct typed schema subset only, not full JSON Schema registration or conversion",
+    "Dart VM only; no Flutter/web runtime evidence",
+    "Readiness is a small explicit host-value model, not reactive scheduling",
+    "Timezone cases are representative; Node and Dart data versions differ"
+  ],
+  "summary": {
+    "executed": 327,
+    "passed": 327,
+    "failed": 0
+  },
+  "results": [
+    {
+      "id": "js/D01/null-explicit",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": null
+      },
+      "actual": {
+        "status": "ready",
+        "value": null
+      }
+    },
+    {
+      "id": "dart/D01/null-explicit",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": null
+      },
+      "actual": {
+        "status": "ready",
+        "value": null
+      }
+    },
+    {
+      "id": "cross/D01/null-explicit",
+      "passed": true
+    },
+    {
+      "id": "js/D02/falsy-zero",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": 0
+      },
+      "actual": {
+        "status": "ready",
+        "value": 0
+      }
+    },
+    {
+      "id": "dart/D02/falsy-zero",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": 0
+      },
+      "actual": {
+        "status": "ready",
+        "value": 0
+      }
+    },
+    {
+      "id": "cross/D02/falsy-zero",
+      "passed": true
+    },
+    {
+      "id": "js/D02/falsy-false",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": false
+      },
+      "actual": {
+        "status": "ready",
+        "value": false
+      }
+    },
+    {
+      "id": "dart/D02/falsy-false",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": false
+      },
+      "actual": {
+        "status": "ready",
+        "value": false
+      }
+    },
+    {
+      "id": "cross/D02/falsy-false",
+      "passed": true
+    },
+    {
+      "id": "js/D02/falsy-empty",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": ""
+      },
+      "actual": {
+        "status": "ready",
+        "value": ""
+      }
+    },
+    {
+      "id": "dart/D02/falsy-empty",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": ""
+      },
+      "actual": {
+        "status": "ready",
+        "value": ""
+      }
+    },
+    {
+      "id": "cross/D02/falsy-empty",
+      "passed": true
+    },
+    {
+      "id": "js/D03/undefined-top",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "dart/D03/undefined-top",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "cross/D03/undefined-top",
+      "passed": true
+    },
+    {
+      "id": "js/D04/object-undefined-omitted",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {}
+      },
+      "actual": {
+        "status": "ready",
+        "value": {}
+      }
+    },
+    {
+      "id": "dart/D04/object-undefined-omitted",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {}
+      },
+      "actual": {
+        "status": "ready",
+        "value": {}
+      }
+    },
+    {
+      "id": "cross/D04/object-undefined-omitted",
+      "passed": true
+    },
+    {
+      "id": "js/D05/required-undefined-omitted",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "dart/D05/required-undefined-omitted",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "cross/D05/required-undefined-omitted",
+      "passed": true
+    },
+    {
+      "id": "js/D06/nested-undefined-object-retained",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "profile": {}
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "profile": {}
+        }
+      }
+    },
+    {
+      "id": "dart/D06/nested-undefined-object-retained",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "profile": {}
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "profile": {}
+        }
+      }
+    },
+    {
+      "id": "cross/D06/nested-undefined-object-retained",
+      "passed": true
+    },
+    {
+      "id": "js/D07/array-object-undefined",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": [
+          {}
+        ]
+      },
+      "actual": {
+        "status": "ready",
+        "value": [
+          {}
+        ]
+      }
+    },
+    {
+      "id": "dart/D07/array-object-undefined",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": [
+          {}
+        ]
+      },
+      "actual": {
+        "status": "ready",
+        "value": [
+          {}
+        ]
+      }
+    },
+    {
+      "id": "cross/D07/array-object-undefined",
+      "passed": true
+    },
+    {
+      "id": "js/D08/array-undefined",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "dart/D08/array-undefined",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "cross/D08/array-undefined",
+      "passed": true
+    },
+    {
+      "id": "js/D09/array-hole",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "dart/D09/array-hole",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "cross/D09/array-hole",
+      "passed": true
+    },
+    {
+      "id": "js/D10/array-null-position",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": [
+          1,
+          null,
+          3
+        ]
+      },
+      "actual": {
+        "status": "ready",
+        "value": [
+          1,
+          null,
+          3
+        ]
+      }
+    },
+    {
+      "id": "dart/D10/array-null-position",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": [
+          1,
+          null,
+          3
+        ]
+      },
+      "actual": {
+        "status": "ready",
+        "value": [
+          1,
+          null,
+          3
+        ]
+      }
+    },
+    {
+      "id": "cross/D10/array-null-position",
+      "passed": true
+    },
+    {
+      "id": "js/D11/Set-undefined",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "dart/D11/Set-undefined",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "cross/D11/Set-undefined",
+      "passed": true
+    },
+    {
+      "id": "js/D12/Set-null",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            null
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            null
+          ]
+        }
+      }
+    },
+    {
+      "id": "dart/D12/Set-null",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            null
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            null
+          ]
+        }
+      }
+    },
+    {
+      "id": "cross/D12/Set-null",
+      "passed": true
+    },
+    {
+      "id": "js/D13/Set-separate-normalized-objects",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            {},
+            {}
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            {},
+            {}
+          ]
+        }
+      }
+    },
+    {
+      "id": "dart/D13/Set-separate-normalized-objects",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            {},
+            {}
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            {},
+            {}
+          ]
+        }
+      }
+    },
+    {
+      "id": "cross/D13/Set-separate-normalized-objects",
+      "passed": true
+    },
+    {
+      "id": "js/D14/Set-repeated-reference",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            {
+              "n": 1
+            }
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            {
+              "n": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "dart/D14/Set-repeated-reference",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            {
+              "n": 1
+            }
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$set": [
+            {
+              "n": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cross/D14/Set-repeated-reference",
+      "passed": true
+    },
+    {
+      "id": "js/D15/Map-undefined-value",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "dart/D15/Map-undefined-value",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "cross/D15/Map-undefined-value",
+      "passed": true
+    },
+    {
+      "id": "js/D16/Map-null-value",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              "a",
+              null
+            ]
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              "a",
+              null
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "dart/D16/Map-null-value",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              "a",
+              null
+            ]
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              "a",
+              null
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "cross/D16/Map-null-value",
+      "passed": true
+    },
+    {
+      "id": "js/D17/Map-object-normalized",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              "a",
+              {}
+            ]
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              "a",
+              {}
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "dart/D17/Map-object-normalized",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              "a",
+              {}
+            ]
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              "a",
+              {}
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "cross/D17/Map-object-normalized",
+      "passed": true
+    },
+    {
+      "id": "js/D18/Map-string-number-fraction",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              1,
+              "number"
+            ],
+            [
+              "1",
+              "string"
+            ],
+            [
+              1.5,
+              "fraction"
+            ]
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              1,
+              "number"
+            ],
+            [
+              "1",
+              "string"
+            ],
+            [
+              1.5,
+              "fraction"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "dart/D18/Map-string-number-fraction",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              1,
+              "number"
+            ],
+            [
+              "1",
+              "string"
+            ],
+            [
+              1.5,
+              "fraction"
+            ]
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              1,
+              "number"
+            ],
+            [
+              "1",
+              "string"
+            ],
+            [
+              1.5,
+              "fraction"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "cross/D18/Map-string-number-fraction",
+      "passed": true
+    },
+    {
+      "id": "js/D19/Map-invalid-key-20",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "MAP_KEY"
+      },
+      "actual": {
+        "status": "error",
+        "category": "MAP_KEY"
+      }
+    },
+    {
+      "id": "dart/D19/Map-invalid-key-20",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "MAP_KEY"
+      },
+      "actual": {
+        "status": "error",
+        "category": "MAP_KEY"
+      }
+    },
+    {
+      "id": "cross/D19/Map-invalid-key-20",
+      "passed": true
+    },
+    {
+      "id": "js/D19/Map-invalid-key-21",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "MAP_KEY"
+      },
+      "actual": {
+        "status": "error",
+        "category": "MAP_KEY"
+      }
+    },
+    {
+      "id": "dart/D19/Map-invalid-key-21",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "MAP_KEY"
+      },
+      "actual": {
+        "status": "error",
+        "category": "MAP_KEY"
+      }
+    },
+    {
+      "id": "cross/D19/Map-invalid-key-21",
+      "passed": true
+    },
+    {
+      "id": "js/D19/Map-invalid-key-22",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "MAP_KEY"
+      },
+      "actual": {
+        "status": "error",
+        "category": "MAP_KEY"
+      }
+    },
+    {
+      "id": "dart/D19/Map-invalid-key-22",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "MAP_KEY"
+      },
+      "actual": {
+        "status": "error",
+        "category": "MAP_KEY"
+      }
+    },
+    {
+      "id": "cross/D19/Map-invalid-key-22",
+      "passed": true
+    },
+    {
+      "id": "js/D19/Map-invalid-key-23",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "MAP_KEY"
+      },
+      "actual": {
+        "status": "error",
+        "category": "MAP_KEY"
+      }
+    },
+    {
+      "id": "dart/D19/Map-invalid-key-23",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "MAP_KEY"
+      },
+      "actual": {
+        "status": "error",
+        "category": "MAP_KEY"
+      }
+    },
+    {
+      "id": "cross/D19/Map-invalid-key-23",
+      "passed": true
+    },
+    {
+      "id": "js/D20/safe-integer--9007199254740991",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": -9007199254740991
+      },
+      "actual": {
+        "status": "ready",
+        "value": -9007199254740991
+      }
+    },
+    {
+      "id": "dart/D20/safe-integer--9007199254740991",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": -9007199254740991
+      },
+      "actual": {
+        "status": "ready",
+        "value": -9007199254740991
+      }
+    },
+    {
+      "id": "cross/D20/safe-integer--9007199254740991",
+      "passed": true
+    },
+    {
+      "id": "js/D20/safe-integer-9007199254740991",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": 9007199254740991
+      },
+      "actual": {
+        "status": "ready",
+        "value": 9007199254740991
+      }
+    },
+    {
+      "id": "dart/D20/safe-integer-9007199254740991",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": 9007199254740991
+      },
+      "actual": {
+        "status": "ready",
+        "value": 9007199254740991
+      }
+    },
+    {
+      "id": "cross/D20/safe-integer-9007199254740991",
+      "passed": true
+    },
+    {
+      "id": "js/D21/invalid-integer--9007199254740992",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "dart/D21/invalid-integer--9007199254740992",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "cross/D21/invalid-integer--9007199254740992",
+      "passed": true
+    },
+    {
+      "id": "js/D21/invalid-integer-9007199254740992",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "dart/D21/invalid-integer-9007199254740992",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "cross/D21/invalid-integer-9007199254740992",
+      "passed": true
+    },
+    {
+      "id": "js/D21/invalid-integer-1.5",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "dart/D21/invalid-integer-1.5",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "cross/D21/invalid-integer-1.5",
+      "passed": true
+    },
+    {
+      "id": "js/D21/invalid-integer-42",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "dart/D21/invalid-integer-42",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "cross/D21/invalid-integer-42",
+      "passed": true
+    },
+    {
+      "id": "js/D22/number-large-finite",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": 1e+100
+      },
+      "actual": {
+        "status": "ready",
+        "value": 1e+100
+      }
+    },
+    {
+      "id": "dart/D22/number-large-finite",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": 1e+100
+      },
+      "actual": {
+        "status": "ready",
+        "value": 1e+100
+      }
+    },
+    {
+      "id": "cross/D22/number-large-finite",
+      "passed": true
+    },
+    {
+      "id": "js/D23/number-binary64",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": 0.30000000000000004
+      },
+      "actual": {
+        "status": "ready",
+        "value": 0.30000000000000004
+      }
+    },
+    {
+      "id": "dart/D23/number-binary64",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": 0.30000000000000004
+      },
+      "actual": {
+        "status": "ready",
+        "value": 0.30000000000000004
+      }
+    },
+    {
+      "id": "cross/D23/number-binary64",
+      "passed": true
+    },
+    {
+      "id": "js/D24/nonfinite-nan",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "dart/D24/nonfinite-nan",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "cross/D24/nonfinite-nan",
+      "passed": true
+    },
+    {
+      "id": "js/D25/nested-nonfinite-nan",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "dart/D25/nested-nonfinite-nan",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "cross/D25/nested-nonfinite-nan",
+      "passed": true
+    },
+    {
+      "id": "js/D24/nonfinite-infinity",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "dart/D24/nonfinite-infinity",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "cross/D24/nonfinite-infinity",
+      "passed": true
+    },
+    {
+      "id": "js/D25/nested-nonfinite-infinity",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "dart/D25/nested-nonfinite-infinity",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "cross/D25/nested-nonfinite-infinity",
+      "passed": true
+    },
+    {
+      "id": "js/D24/nonfinite-negativeInfinity",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "dart/D24/nonfinite-negativeInfinity",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "cross/D24/nonfinite-negativeInfinity",
+      "passed": true
+    },
+    {
+      "id": "js/D25/nested-nonfinite-negativeInfinity",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "dart/D25/nested-nonfinite-negativeInfinity",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "NON_FINITE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "NON_FINITE"
+      }
+    },
+    {
+      "id": "cross/D25/nested-nonfinite-negativeInfinity",
+      "passed": true
+    },
+    {
+      "id": "js/D26/negative-zero",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": 0
+      },
+      "actual": {
+        "status": "ready",
+        "value": 0
+      }
+    },
+    {
+      "id": "dart/D26/negative-zero",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": 0
+      },
+      "actual": {
+        "status": "ready",
+        "value": 0
+      }
+    },
+    {
+      "id": "cross/D26/negative-zero",
+      "passed": true
+    },
+    {
+      "id": "js/D27/native-zero-merging",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              0,
+              "replaced"
+            ],
+            [
+              "-0",
+              "string"
+            ]
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              0,
+              "replaced"
+            ],
+            [
+              "-0",
+              "string"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "dart/D27/native-zero-merging",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              0,
+              "replaced"
+            ],
+            [
+              "-0",
+              "string"
+            ]
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              0,
+              "replaced"
+            ],
+            [
+              "-0",
+              "string"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "cross/D27/native-zero-merging",
+      "passed": true
+    },
+    {
+      "id": "js/D28/unsupported-bigint",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "dart/D28/unsupported-bigint",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "cross/D28/unsupported-bigint",
+      "passed": true
+    },
+    {
+      "id": "js/D28/unsupported-function",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "dart/D28/unsupported-function",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "cross/D28/unsupported-function",
+      "passed": true
+    },
+    {
+      "id": "js/D28/unsupported-future",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "dart/D28/unsupported-future",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "cross/D28/unsupported-future",
+      "passed": true
+    },
+    {
+      "id": "js/D28/unsupported-dateObject",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "dart/D28/unsupported-dateObject",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "cross/D28/unsupported-dateObject",
+      "passed": true
+    },
+    {
+      "id": "js/D28/unsupported-symbol",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "dart/D28/unsupported-symbol",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "UNSUPPORTED_VALUE"
+      }
+    },
+    {
+      "id": "cross/D28/unsupported-symbol",
+      "passed": true
+    },
+    {
+      "id": "js/D29/cycle-object",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      }
+    },
+    {
+      "id": "dart/D29/cycle-object",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      }
+    },
+    {
+      "id": "cross/D29/cycle-object",
+      "passed": true
+    },
+    {
+      "id": "js/D29/cycle-array",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      }
+    },
+    {
+      "id": "dart/D29/cycle-array",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      }
+    },
+    {
+      "id": "cross/D29/cycle-array",
+      "passed": true
+    },
+    {
+      "id": "js/D29/cycle-set",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      }
+    },
+    {
+      "id": "dart/D29/cycle-set",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      }
+    },
+    {
+      "id": "cross/D29/cycle-set",
+      "passed": true
+    },
+    {
+      "id": "js/D29/cycle-map",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      }
+    },
+    {
+      "id": "dart/D29/cycle-map",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      },
+      "actual": {
+        "status": "error",
+        "category": "CYCLIC_VALUE"
+      }
+    },
+    {
+      "id": "cross/D29/cycle-map",
+      "passed": true
+    },
+    {
+      "id": "js/D30/date-valid-49",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "2026-10-29"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "2026-10-29"
+      }
+    },
+    {
+      "id": "dart/D30/date-valid-49",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "2026-10-29"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "2026-10-29"
+      }
+    },
+    {
+      "id": "cross/D30/date-valid-49",
+      "passed": true
+    },
+    {
+      "id": "js/D30/date-valid-50",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "09:30:00.000"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "09:30:00.000"
+      }
+    },
+    {
+      "id": "dart/D30/date-valid-50",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "09:30:00.000"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "09:30:00.000"
+      }
+    },
+    {
+      "id": "cross/D30/date-valid-50",
+      "passed": true
+    },
+    {
+      "id": "js/D30/date-valid-51",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "09:30:01.100"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "09:30:01.100"
+      }
+    },
+    {
+      "id": "dart/D30/date-valid-51",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "09:30:01.100"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "09:30:01.100"
+      }
+    },
+    {
+      "id": "cross/D30/date-valid-51",
+      "passed": true
+    },
+    {
+      "id": "js/D30/date-valid-52",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "2026-10-29T00:30:00.000Z"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "2026-10-29T00:30:00.000Z"
+      }
+    },
+    {
+      "id": "dart/D30/date-valid-52",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "2026-10-29T00:30:00.000Z"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "2026-10-29T00:30:00.000Z"
+      }
+    },
+    {
+      "id": "cross/D30/date-valid-52",
+      "passed": true
+    },
+    {
+      "id": "js/D30/date-valid-53",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "0099-01-01T00:00:00.000Z"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "0099-01-01T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "dart/D30/date-valid-53",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "0099-01-01T00:00:00.000Z"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "0099-01-01T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "cross/D30/date-valid-53",
+      "passed": true
+    },
+    {
+      "id": "js/D30/date-valid-54",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "0001-01-01T00:00:00.001Z"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "0001-01-01T00:00:00.001Z"
+      }
+    },
+    {
+      "id": "dart/D30/date-valid-54",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "0001-01-01T00:00:00.001Z"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "0001-01-01T00:00:00.001Z"
+      }
+    },
+    {
+      "id": "cross/D30/date-valid-54",
+      "passed": true
+    },
+    {
+      "id": "js/D30/date-valid-55",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "2000-02-29"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "2000-02-29"
+      }
+    },
+    {
+      "id": "dart/D30/date-valid-55",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "2000-02-29"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "2000-02-29"
+      }
+    },
+    {
+      "id": "cross/D30/date-valid-55",
+      "passed": true
+    },
+    {
+      "id": "js/D31/date-invalid-56",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "dart/D31/date-invalid-56",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "cross/D31/date-invalid-56",
+      "passed": true
+    },
+    {
+      "id": "js/D31/date-invalid-57",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "dart/D31/date-invalid-57",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "cross/D31/date-invalid-57",
+      "passed": true
+    },
+    {
+      "id": "js/D31/date-invalid-58",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "dart/D31/date-invalid-58",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "cross/D31/date-invalid-58",
+      "passed": true
+    },
+    {
+      "id": "js/D31/date-invalid-59",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "dart/D31/date-invalid-59",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "cross/D31/date-invalid-59",
+      "passed": true
+    },
+    {
+      "id": "js/D31/date-invalid-60",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "dart/D31/date-invalid-60",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "cross/D31/date-invalid-60",
+      "passed": true
+    },
+    {
+      "id": "js/D31/date-invalid-61",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "dart/D31/date-invalid-61",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "cross/D31/date-invalid-61",
+      "passed": true
+    },
+    {
+      "id": "js/D31/date-invalid-62",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "dart/D31/date-invalid-62",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "cross/D31/date-invalid-62",
+      "passed": true
+    },
+    {
+      "id": "js/D31/date-invalid-63",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "dart/D31/date-invalid-63",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "cross/D31/date-invalid-63",
+      "passed": true
+    },
+    {
+      "id": "js/D31/date-invalid-64",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "dart/D31/date-invalid-64",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "cross/D31/date-invalid-64",
+      "passed": true
+    },
+    {
+      "id": "js/D31/date-invalid-65",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "dart/D31/date-invalid-65",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "cross/D31/date-invalid-65",
+      "passed": true
+    },
+    {
+      "id": "js/D31/date-invalid-66",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "dart/D31/date-invalid-66",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "cross/D31/date-invalid-66",
+      "passed": true
+    },
+    {
+      "id": "js/D32/ordinary-string-not-date",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "2026-02-30T09:30:00"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "2026-02-30T09:30:00"
+      }
+    },
+    {
+      "id": "dart/D32/ordinary-string-not-date",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "2026-02-30T09:30:00"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "2026-02-30T09:30:00"
+      }
+    },
+    {
+      "id": "cross/D32/ordinary-string-not-date",
+      "passed": true
+    },
+    {
+      "id": "js/D33/nullable-date-null",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": null
+      },
+      "actual": {
+        "status": "ready",
+        "value": null
+      }
+    },
+    {
+      "id": "dart/D33/nullable-date-null",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": null
+      },
+      "actual": {
+        "status": "ready",
+        "value": null
+      }
+    },
+    {
+      "id": "cross/D33/nullable-date-null",
+      "passed": true
+    },
+    {
+      "id": "js/D34/native-collection-equality",
+      "passed": true,
+      "expected": {
+        "setObjects": 2,
+        "sameReference": true,
+        "sameContent": false,
+        "mapKeys": 3
+      },
+      "actual": {
+        "setObjects": 2,
+        "sameReference": true,
+        "sameContent": false,
+        "mapKeys": 3
+      }
+    },
+    {
+      "id": "dart/D34/native-collection-equality",
+      "passed": true,
+      "expected": {
+        "setObjects": 2,
+        "sameReference": true,
+        "sameContent": false,
+        "mapKeys": 3
+      },
+      "actual": {
+        "setObjects": 2,
+        "sameReference": true,
+        "sameContent": false,
+        "mapKeys": 3
+      }
+    },
+    {
+      "id": "cross/D34/native-collection-equality",
+      "passed": true
+    },
+    {
+      "id": "js/D35/stored-Set-membership",
+      "passed": true,
+      "expected": {
+        "size": 2,
+        "sameReference": true,
+        "sameContent": false,
+        "reorderedEqual": true
+      },
+      "actual": {
+        "size": 2,
+        "sameReference": true,
+        "sameContent": false,
+        "reorderedEqual": true
+      }
+    },
+    {
+      "id": "dart/D35/stored-Set-membership",
+      "passed": true,
+      "expected": {
+        "size": 2,
+        "sameReference": true,
+        "sameContent": false,
+        "reorderedEqual": true
+      },
+      "actual": {
+        "size": 2,
+        "sameReference": true,
+        "sameContent": false,
+        "reorderedEqual": true
+      }
+    },
+    {
+      "id": "cross/D35/stored-Set-membership",
+      "passed": true
+    },
+    {
+      "id": "js/D36/Map-order-null-absence",
+      "passed": true,
+      "expected": {
+        "reorderedEqual": true,
+        "hasNull": true,
+        "nullValue": null,
+        "hasAbsent": false
+      },
+      "actual": {
+        "reorderedEqual": true,
+        "hasNull": true,
+        "nullValue": null,
+        "hasAbsent": false
+      }
+    },
+    {
+      "id": "dart/D36/Map-order-null-absence",
+      "passed": true,
+      "expected": {
+        "reorderedEqual": true,
+        "hasNull": true,
+        "nullValue": null,
+        "hasAbsent": false
+      },
+      "actual": {
+        "reorderedEqual": true,
+        "hasNull": true,
+        "nullValue": null,
+        "hasAbsent": false
+      }
+    },
+    {
+      "id": "cross/D36/Map-order-null-absence",
+      "passed": true
+    },
+    {
+      "id": "js/D37/snapshot-readonly-source-stable",
+      "passed": true,
+      "expected": {
+        "sourceMutable": true,
+        "sourceIsolated": true,
+        "blockedMutations": 8,
+        "stableRead": true,
+        "oldSnapshotStable": true
+      },
+      "actual": {
+        "sourceMutable": true,
+        "sourceIsolated": true,
+        "blockedMutations": 8,
+        "stableRead": true,
+        "oldSnapshotStable": true
+      }
+    },
+    {
+      "id": "dart/D37/snapshot-readonly-source-stable",
+      "passed": true,
+      "expected": {
+        "sourceMutable": true,
+        "sourceIsolated": true,
+        "blockedMutations": 8,
+        "stableRead": true,
+        "oldSnapshotStable": true
+      },
+      "actual": {
+        "sourceMutable": true,
+        "sourceIsolated": true,
+        "blockedMutations": 8,
+        "stableRead": true,
+        "oldSnapshotStable": true
+      }
+    },
+    {
+      "id": "cross/D37/snapshot-readonly-source-stable",
+      "passed": true
+    },
+    {
+      "id": "js/D38/negative-zero-normalized-deep",
+      "passed": true,
+      "expected": {
+        "negativeZero": false,
+        "setSize": 1,
+        "mapSize": 2
+      },
+      "actual": {
+        "negativeZero": false,
+        "setSize": 1,
+        "mapSize": 2
+      }
+    },
+    {
+      "id": "dart/D38/negative-zero-normalized-deep",
+      "passed": true,
+      "expected": {
+        "negativeZero": false,
+        "setSize": 1,
+        "mapSize": 2
+      },
+      "actual": {
+        "negativeZero": false,
+        "setSize": 1,
+        "mapSize": 2
+      }
+    },
+    {
+      "id": "cross/D38/negative-zero-normalized-deep",
+      "passed": true
+    },
+    {
+      "id": "js/D39/missing-read",
+      "passed": true,
+      "expected": {
+        "status": "missing",
+        "simple": "missing"
+      },
+      "actual": {
+        "status": "missing",
+        "simple": "missing"
+      }
+    },
+    {
+      "id": "dart/D39/missing-read",
+      "passed": true,
+      "expected": {
+        "status": "missing",
+        "simple": "missing"
+      },
+      "actual": {
+        "status": "missing",
+        "simple": "missing"
+      }
+    },
+    {
+      "id": "cross/D39/missing-read",
+      "passed": true
+    },
+    {
+      "id": "js/D40/pending-read",
+      "passed": true,
+      "expected": {
+        "status": "pending",
+        "simpleError": "VALUE_PENDING"
+      },
+      "actual": {
+        "status": "pending",
+        "simpleError": "VALUE_PENDING"
+      }
+    },
+    {
+      "id": "dart/D40/pending-read",
+      "passed": true,
+      "expected": {
+        "status": "pending",
+        "simpleError": "VALUE_PENDING"
+      },
+      "actual": {
+        "status": "pending",
+        "simpleError": "VALUE_PENDING"
+      }
+    },
+    {
+      "id": "cross/D40/pending-read",
+      "passed": true
+    },
+    {
+      "id": "js/D41/error-read",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "simpleError": "TIMEOUT"
+      },
+      "actual": {
+        "status": "error",
+        "simpleError": "TIMEOUT"
+      }
+    },
+    {
+      "id": "dart/D41/error-read",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "simpleError": "TIMEOUT"
+      },
+      "actual": {
+        "status": "error",
+        "simpleError": "TIMEOUT"
+      }
+    },
+    {
+      "id": "cross/D41/error-read",
+      "passed": true
+    },
+    {
+      "id": "js/D42/null-ready",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": null,
+        "simple": null
+      },
+      "actual": {
+        "status": "ready",
+        "value": null,
+        "simple": null
+      }
+    },
+    {
+      "id": "dart/D42/null-ready",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": null,
+        "simple": null
+      },
+      "actual": {
+        "status": "ready",
+        "value": null,
+        "simple": null
+      }
+    },
+    {
+      "id": "cross/D42/null-ready",
+      "passed": true
+    },
+    {
+      "id": "js/D43/required-missing-auto",
+      "passed": true,
+      "expected": {
+        "status": "waiting"
+      },
+      "actual": {
+        "status": "waiting"
+      }
+    },
+    {
+      "id": "dart/D43/required-missing-auto",
+      "passed": true,
+      "expected": {
+        "status": "waiting"
+      },
+      "actual": {
+        "status": "waiting"
+      }
+    },
+    {
+      "id": "cross/D43/required-missing-auto",
+      "passed": true
+    },
+    {
+      "id": "js/D44/required-pending-explicit",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "INPUT_NOT_READY"
+      },
+      "actual": {
+        "status": "error",
+        "category": "INPUT_NOT_READY"
+      }
+    },
+    {
+      "id": "dart/D44/required-pending-explicit",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "INPUT_NOT_READY"
+      },
+      "actual": {
+        "status": "error",
+        "category": "INPUT_NOT_READY"
+      }
+    },
+    {
+      "id": "cross/D44/required-pending-explicit",
+      "passed": true
+    },
+    {
+      "id": "js/D45/error-propagated",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TIMEOUT"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TIMEOUT"
+      }
+    },
+    {
+      "id": "dart/D45/error-propagated",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TIMEOUT"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TIMEOUT"
+      }
+    },
+    {
+      "id": "cross/D45/error-propagated",
+      "passed": true
+    },
+    {
+      "id": "js/D46/async-result-is-not-data-Future",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": 3
+      },
+      "actual": {
+        "status": "ready",
+        "value": 3
+      }
+    },
+    {
+      "id": "dart/D46/async-result-is-not-data-Future",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": 3
+      },
+      "actual": {
+        "status": "ready",
+        "value": 3
+      }
+    },
+    {
+      "id": "cross/D46/async-result-is-not-data-Future",
+      "passed": true
+    },
+    {
+      "id": "js/D47/integer-adapter-result",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": 3
+      },
+      "actual": {
+        "status": "ready",
+        "value": 3
+      }
+    },
+    {
+      "id": "dart/D47/integer-adapter-result",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": 3
+      },
+      "actual": {
+        "status": "ready",
+        "value": 3
+      }
+    },
+    {
+      "id": "cross/D47/integer-adapter-result",
+      "passed": true
+    },
+    {
+      "id": "js/D48/integer-adapter-result-range",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "dart/D48/integer-adapter-result-range",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "cross/D48/integer-adapter-result-range",
+      "passed": true
+    },
+    {
+      "id": "js/D49/typed-native-roundtrip",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              1.5,
+              "fraction"
+            ],
+            [
+              "1.5",
+              "text"
+            ]
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              1.5,
+              "fraction"
+            ],
+            [
+              "1.5",
+              "text"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "dart/D49/typed-native-roundtrip",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              1.5,
+              "fraction"
+            ],
+            [
+              "1.5",
+              "text"
+            ]
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "$map": [
+            [
+              1.5,
+              "fraction"
+            ],
+            [
+              "1.5",
+              "text"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "cross/D49/typed-native-roundtrip",
+      "passed": true
+    },
+    {
+      "id": "js/D50/YY-00",
+      "passed": true,
+      "expected": 2000,
+      "actual": 2000
+    },
+    {
+      "id": "dart/D50/YY-00",
+      "passed": true,
+      "expected": 2000,
+      "actual": 2000
+    },
+    {
+      "id": "cross/D50/YY-00",
+      "passed": true
+    },
+    {
+      "id": "js/D50/YY-68",
+      "passed": true,
+      "expected": 2068,
+      "actual": 2068
+    },
+    {
+      "id": "dart/D50/YY-68",
+      "passed": true,
+      "expected": 2068,
+      "actual": 2068
+    },
+    {
+      "id": "cross/D50/YY-68",
+      "passed": true
+    },
+    {
+      "id": "js/D50/YY-69",
+      "passed": true,
+      "expected": 1969,
+      "actual": 1969
+    },
+    {
+      "id": "dart/D50/YY-69",
+      "passed": true,
+      "expected": 1969,
+      "actual": 1969
+    },
+    {
+      "id": "cross/D50/YY-69",
+      "passed": true
+    },
+    {
+      "id": "js/D50/YY-99",
+      "passed": true,
+      "expected": 1999,
+      "actual": 1999
+    },
+    {
+      "id": "dart/D50/YY-99",
+      "passed": true,
+      "expected": 1999,
+      "actual": 1999
+    },
+    {
+      "id": "cross/D50/YY-99",
+      "passed": true
+    },
+    {
+      "id": "js/D51/timezone-seoul",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "2026-10-29T00:30:00.000Z"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "2026-10-29T00:30:00.000Z"
+      }
+    },
+    {
+      "id": "dart/D51/timezone-seoul",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "2026-10-29T00:30:00.000Z"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "2026-10-29T00:30:00.000Z"
+      }
+    },
+    {
+      "id": "cross/D51/timezone-seoul",
+      "passed": true
+    },
+    {
+      "id": "js/D51/timezone-ny-valid",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "2026-03-08T07:30:00.000Z"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "2026-03-08T07:30:00.000Z"
+      }
+    },
+    {
+      "id": "dart/D51/timezone-ny-valid",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": "2026-03-08T07:30:00.000Z"
+      },
+      "actual": {
+        "status": "ready",
+        "value": "2026-03-08T07:30:00.000Z"
+      }
+    },
+    {
+      "id": "cross/D51/timezone-ny-valid",
+      "passed": true
+    },
+    {
+      "id": "js/D51/timezone-ny-gap",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "dart/D51/timezone-ny-gap",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "cross/D51/timezone-ny-gap",
+      "passed": true
+    },
+    {
+      "id": "js/D51/timezone-ny-overlap",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "dart/D51/timezone-ny-overlap",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "cross/D51/timezone-ny-overlap",
+      "passed": true
+    },
+    {
+      "id": "js/D51/timezone-bad-zone",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "dart/D51/timezone-bad-zone",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "cross/D51/timezone-bad-zone",
+      "passed": true
+    },
+    {
+      "id": "js/D51/timezone-year-underflow",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "dart/D51/timezone-year-underflow",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "cross/D51/timezone-year-underflow",
+      "passed": true
+    },
+    {
+      "id": "js/D52/stored-Set-reinput-array",
+      "passed": true,
+      "expected": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": [
+          1,
+          2
+        ]
+      },
+      "actual": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": [
+          1,
+          2
+        ]
+      }
+    },
+    {
+      "id": "dart/D52/stored-Set-reinput-array",
+      "passed": true,
+      "expected": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": [
+          1,
+          2
+        ]
+      },
+      "actual": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": [
+          1,
+          2
+        ]
+      }
+    },
+    {
+      "id": "cross/D52/stored-Set-reinput-array",
+      "passed": true
+    },
+    {
+      "id": "js/D52/stored-Set-reinput-object-array",
+      "passed": true,
+      "expected": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": [
+            1,
+            2
+          ]
+        }
+      },
+      "actual": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": [
+            1,
+            2
+          ]
+        }
+      }
+    },
+    {
+      "id": "dart/D52/stored-Set-reinput-object-array",
+      "passed": true,
+      "expected": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": [
+            1,
+            2
+          ]
+        }
+      },
+      "actual": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": [
+            1,
+            2
+          ]
+        }
+      }
+    },
+    {
+      "id": "cross/D52/stored-Set-reinput-object-array",
+      "passed": true
+    },
+    {
+      "id": "js/D52/stored-Set-reinput-object-datetime",
+      "passed": true,
+      "expected": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "2026-10-29T00:30:00.000Z"
+        }
+      },
+      "actual": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "2026-10-29T00:30:00.000Z"
+        }
+      }
+    },
+    {
+      "id": "dart/D52/stored-Set-reinput-object-datetime",
+      "passed": true,
+      "expected": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "2026-10-29T00:30:00.000Z"
+        }
+      },
+      "actual": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "2026-10-29T00:30:00.000Z"
+        }
+      }
+    },
+    {
+      "id": "cross/D52/stored-Set-reinput-object-datetime",
+      "passed": true
+    },
+    {
+      "id": "js/D52/stored-Set-reinput-object-time",
+      "passed": true,
+      "expected": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "09:30:00.000"
+        }
+      },
+      "actual": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "09:30:00.000"
+        }
+      }
+    },
+    {
+      "id": "dart/D52/stored-Set-reinput-object-time",
+      "passed": true,
+      "expected": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "09:30:00.000"
+        }
+      },
+      "actual": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "09:30:00.000"
+        }
+      }
+    },
+    {
+      "id": "cross/D52/stored-Set-reinput-object-time",
+      "passed": true
+    },
+    {
+      "id": "js/D52/stored-Set-reinput-object-date",
+      "passed": true,
+      "expected": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "2026-10-29"
+        }
+      },
+      "actual": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "2026-10-29"
+        }
+      }
+    },
+    {
+      "id": "dart/D52/stored-Set-reinput-object-date",
+      "passed": true,
+      "expected": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "2026-10-29"
+        }
+      },
+      "actual": {
+        "size": 2,
+        "sameMember": true,
+        "keptSnapshot": true,
+        "equal": true,
+        "newSetHasOldMember": true,
+        "readonly": true,
+        "sourceIsolated": true,
+        "canonical": {
+          "a": "2026-10-29"
+        }
+      }
+    },
+    {
+      "id": "cross/D52/stored-Set-reinput-object-date",
+      "passed": true
+    },
+    {
+      "id": "js/D53/additionalProperties-integer-valid",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "name": "kept",
+          "extra": 3
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "extra": 3,
+          "name": "kept"
+        }
+      }
+    },
+    {
+      "id": "dart/D53/additionalProperties-integer-valid",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "name": "kept",
+          "extra": 3
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "extra": 3,
+          "name": "kept"
+        }
+      }
+    },
+    {
+      "id": "cross/D53/additionalProperties-integer-valid",
+      "passed": true
+    },
+    {
+      "id": "js/D53/additionalProperties-integer-invalid",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "dart/D53/additionalProperties-integer-invalid",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "cross/D53/additionalProperties-integer-invalid",
+      "passed": true
+    },
+    {
+      "id": "js/D54/additionalProperties-nested-valid",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "outer": {
+            "rows": [
+              1,
+              2
+            ]
+          }
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "outer": {
+            "rows": [
+              1,
+              2
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "dart/D54/additionalProperties-nested-valid",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "outer": {
+            "rows": [
+              1,
+              2
+            ]
+          }
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "outer": {
+            "rows": [
+              1,
+              2
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "cross/D54/additionalProperties-nested-valid",
+      "passed": true
+    },
+    {
+      "id": "js/D54/additionalProperties-nested-invalid",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "dart/D54/additionalProperties-nested-invalid",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "cross/D54/additionalProperties-nested-invalid",
+      "passed": true
+    },
+    {
+      "id": "js/D55/additionalProperties-date-normalization",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "instant": "2026-10-29T00:30:00.000Z"
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "instant": "2026-10-29T00:30:00.000Z"
+        }
+      }
+    },
+    {
+      "id": "dart/D55/additionalProperties-date-normalization",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "instant": "2026-10-29T00:30:00.000Z"
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "instant": "2026-10-29T00:30:00.000Z"
+        }
+      }
+    },
+    {
+      "id": "cross/D55/additionalProperties-date-normalization",
+      "passed": true
+    },
+    {
+      "id": "js/D55/additionalProperties-date-invalid",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "dart/D55/additionalProperties-date-invalid",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      },
+      "actual": {
+        "status": "error",
+        "category": "DATE_INVALID"
+      }
+    },
+    {
+      "id": "cross/D55/additionalProperties-date-invalid",
+      "passed": true
+    },
+    {
+      "id": "js/D56/additionalProperties-true",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "free": [
+            1,
+            "text"
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "free": [
+            1,
+            "text"
+          ]
+        }
+      }
+    },
+    {
+      "id": "dart/D56/additionalProperties-true",
+      "passed": true,
+      "expected": {
+        "status": "ready",
+        "value": {
+          "free": [
+            1,
+            "text"
+          ]
+        }
+      },
+      "actual": {
+        "status": "ready",
+        "value": {
+          "free": [
+            1,
+            "text"
+          ]
+        }
+      }
+    },
+    {
+      "id": "cross/D56/additionalProperties-true",
+      "passed": true
+    },
+    {
+      "id": "js/D56/additionalProperties-false",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "dart/D56/additionalProperties-false",
+      "passed": true,
+      "expected": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      },
+      "actual": {
+        "status": "error",
+        "category": "TYPE_MISMATCH"
+      }
+    },
+    {
+      "id": "cross/D56/additionalProperties-false",
+      "passed": true
+    },
+    {
+      "id": "js/D57/native-adapter-array-membership",
+      "passed": true,
+      "expected": {
+        "sameStored": true,
+        "newEqualContent": false,
+        "nativeReturnOrigin": true,
+        "readonly": true
+      },
+      "actual": {
+        "sameStored": true,
+        "newEqualContent": false,
+        "nativeReturnOrigin": true,
+        "readonly": true
+      }
+    },
+    {
+      "id": "dart/D57/native-adapter-array-membership",
+      "passed": true,
+      "expected": {
+        "sameStored": true,
+        "newEqualContent": false,
+        "nativeReturnOrigin": true,
+        "readonly": true
+      },
+      "actual": {
+        "sameStored": true,
+        "newEqualContent": false,
+        "nativeReturnOrigin": true,
+        "readonly": true
+      }
+    },
+    {
+      "id": "cross/D57/native-adapter-array-membership",
+      "passed": true
+    }
+  ]
+}

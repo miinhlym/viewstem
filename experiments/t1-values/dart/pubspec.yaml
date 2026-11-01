@@ -1,0 +1,6 @@
+name: viewstem_t1_probe
+publish_to: none
+environment:
+  sdk: '>=3.8.1 <4.0.0'
+dependencies:
+  cel: 0.6.1
