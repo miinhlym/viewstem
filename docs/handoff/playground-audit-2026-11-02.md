@@ -42,6 +42,18 @@ Stack·Row·Card·Text·TextInput·NumberInput·Checkbox·Button·Json의 9개 �
 
 IME 검사는 CDP로 Chromium의 조합 처리를 구동한다. 파일 읽기 경합은 실제 File.text의 완료만 의도적으로 지연해 재현했다. 서버 종료 재현은 별도 자식 프로세스에서 수행해 사용자가 보고 있는 서버와 분리했다. 이 통제 조건과 일반 실제 HTTP/DOM 실행을 구별한다.
 
+## 플레이그라운드 전체 변경 preflight
+
+`f5a8564..8777942`의 구현·테스트·문서 3개 커밋, 23개 파일 전체를 검토했다. 원격 `origin/main`은 fetch 후에도 `af86b95`이므로 이전 core 작업까지 포함한 원격 diff와 이번 플레이그라운드 검토 범위를 구별한다. 작업 시작 시 staged·unstaged·untracked 변경은 없었다. 이번 범위의 완료 판단을 앞선 core 커밋 전체에 대한 새 검토로 확대하지 않는다.
+
+검토 범위는 실행·DOM·배치·예제·서버 7개 파일, 브라우저 테스트 2개 파일, 실행 명령·CI·ignore 3개 파일, 사용법·계약·인수·결정 이력·검증 기록 11개 파일이다. 공개 core API 사용, 취소·교체·IME·파일 읽기 경합, 텍스트 삽입 경계, localhost 서버의 경로 제한, 키보드 조작, 문서의 지원 범위와 검증 연결을 함께 확인했다. 불필요한 구조 변경이나 지원 범위 변경은 하지 않았다.
+
+새로 재현한 결함은 **주소가 없는 `when`/`repeat` 대기 노드의 DOM 키 충돌**이다. 두 입력이 미준비일 때 둘 다 `undefined:undefined` 키로 저장되어 안내 하나가 사라졌다. 실제 패키지와 브라우저를 사용하는 회귀에서 수정 전 실패를 확인했다. 미리보기 어댑터는 주소가 없는 진단 노드를 각 snapshot 객체별로 구별하고, 주소·세대가 있는 실제 인스턴스만 snapshot 사이에 DOM을 유지하도록 수정했다. 별도 slot의 두 대기 안내와 각각의 준비 완료를 검증했다. core·공개 타입·의존성 변경은 없다.
+
+수정 후 `npm run test:playground`와 Node 24의 같은 브라우저 suite, 구문 검사, 문서 링크, `git diff --check`를 확인했다. 정확한 실행 수·실패 전후 보고서·소스 해시는 [검증 결과](playground-verification-results.json)의 `preflight`와 `browser`가 소유한다. 변경하지 않은 core의 기록 대상 소스 128개와 산출물 8개 해시를 대조해 기존 검증을 재사용했다.
+
+설정 회귀도 확인했다. `playground/test/*.test.mjs`는 기본·경계 테스트 두 파일만 포함하고, `test/results/`의 수정 전 사본·보고서·화면 이미지는 테스트 glob과 Git 추적에서 제외된다. 두 npm 명령은 먼저 core를 빌드하며, CI는 `npm ci --ignore-scripts`·core 검사·Chromium 설치 뒤 playground 검사를 수행한다. 기존 lockfile·workspace·core 패키지 포함 파일은 바뀌지 않았다. 원격 CI는 push 후 확인할 후속 gate이며 이번 실행에서 수행하지 않았다.
+
 ## 검증 경계
 
 - 브라우저는 Chromium이다. 다른 엔진과 실제 모바일 장치의 터치·키보드·IME는 미검증이다.

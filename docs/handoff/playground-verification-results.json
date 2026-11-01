@@ -21,7 +21,7 @@
     "results": [
       {
         "nodeVersion": "v22.21.1",
-        "passed": 40,
+        "passed": 41,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -65,6 +65,10 @@
           {
             "file": "playground/test/edge-cases.test.mjs",
             "name": "named slots retain their order and duplicate repeat keys are rejected before replacing the running view"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "unresolved when and repeat nodes remain distinct across slots and resolve independently"
           },
           {
             "file": "playground/test/edge-cases.test.mjs",
@@ -190,12 +194,13 @@
         "failures": [],
         "skippedTests": [],
         "todoTests": [],
-        "reportSha256": "7930890b3944b6ad5953d0221396709680fd653af355067e2334d9fd06f932e0",
-        "localReport": "playground/test/results/node22.json"
+        "reportFormat": "TAP from npm run test:playground; test names mapped to their source files",
+        "reportSha256": "bb802579b8798ac0d284983e07b22624df34ddc45d329affff21452a4f43dfdf",
+        "localReport": "playground/test/results/preflight-node22.tap"
       },
       {
         "nodeVersion": "v24.1.0",
-        "passed": 40,
+        "passed": 41,
         "failed": 0,
         "skipped": 0,
         "todo": 0,
@@ -239,6 +244,10 @@
           {
             "file": "playground/test/edge-cases.test.mjs",
             "name": "named slots retain their order and duplicate repeat keys are rejected before replacing the running view"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "unresolved when and repeat nodes remain distinct across slots and resolve independently"
           },
           {
             "file": "playground/test/edge-cases.test.mjs",
@@ -364,8 +373,8 @@
         "failures": [],
         "skippedTests": [],
         "todoTests": [],
-        "reportSha256": "46650cfcd17122975407f15d004b563e1edd849d5d3310fe7c839c1c8b1358b9",
-        "localReport": "playground/test/results/node24.json"
+        "reportSha256": "9ea3b2fd82eb1863aedc3f5d4499fecfa9b6620faa8b9c2e567ee659e11058ec",
+        "localReport": "playground/test/results/preflight-node24.json"
       }
     ],
     "uncaughtPageErrors": 0,
@@ -374,7 +383,8 @@
   "visual": {
     "inspected": [
       "Desktop 1512x982: compact toolbar, full-height JSON editor, preview/inspector split, no page overflow",
-      "Mobile 390x844: exclusive JSON/preview/inspector panes with reachable controls and no page overflow"
+      "Mobile 390x844: exclusive JSON/preview/inspector panes with reachable controls and no page overflow",
+      "Preflight 1280x800: independent when/repeat waiting notices visible together with both missing States"
     ],
     "automatedAdditionalViewport": "800x650: splitter minimum widths and horizontal overflow",
     "interactions": [
@@ -385,10 +395,11 @@
     ],
     "reference": "https://www.typescriptlang.org/play/",
     "screenshots": {
-      "playground/test/results/desktop.png": "7b3e24dcbb07b88da299647e25fc2ff9846f4ecf94a796749dd5670182ac956a",
+      "playground/test/results/desktop.png": "5ed90ecaeb98ff1345f8cdb1d7c81745b74fc08a13cd96fdfa95e59958700abd",
       "playground/test/results/mobile-editor.png": "acf8706563f6b2d1707ce6ee5304ca3e7c5d169037ca8dd565667f61405d4c9b",
       "playground/test/results/mobile-preview.png": "72c951752fe5372482c9a7a76e1f9b6345ce72b44da456f0c91cfddf77b9faf9",
-      "playground/test/results/mobile-inspector.png": "e5cc118a913c95def42a0f7c5f6da6d43bca72eb665bbc7e48a210a7f4d4b351"
+      "playground/test/results/mobile-inspector.png": "e5cc118a913c95def42a0f7c5f6da6d43bca72eb665bbc7e48a210a7f4d4b351",
+      "playground/test/results/preflight-pending-nodes.png": "74f8d2d702ee42b598df8cb163934077069abde713fdacf03f39c6a65d3e0e16"
     }
   },
   "coreIntegration": {
@@ -418,7 +429,7 @@
   "sourceSha256": {
     "playground/README.md": "1ab5526f8851c524deb7fad94aabb2d3e22d16c2e60a82e4e88a8e1e037d882c",
     "playground/app.mjs": "ad0053b0a65e05e5f824ac1af24231f01b01eedc657cb37497c29d94d2580cc2",
-    "playground/components.mjs": "8dcad90ca39914e33b25c3a22d1c30821c2cf1bd3d9891cd8ffcfb3fca80a5d8",
+    "playground/components.mjs": "73d167d8b2457ff223d4b4dc0ba07ff0a04564a832c8405af9340241a43599f8",
     "playground/index.html": "8ac3e92ae9f10440bdc7df5cff531a1d6553e98801f5064d2586e19c116107f8",
     "playground/layout.mjs": "de2e0b1919d334554fc6dbac454a421faf9550f37a27a5831c68cdaf9f63d913",
     "playground/samples.mjs": "11b32c6afb971d7582ecbaa3e4ea2c12e0c66d0ce29e76a3997d3cfc2dc298ef",
@@ -429,7 +440,7 @@
     "package-lock.json": "15c84c14d4f420bf412291d720ae3cdb457b0a880ca4d01eed6652041bd9f607",
     ".github/workflows/core.yml": "1ef32d2f76aea20ff8115671fb1a5c6c055412918f9e4231488b55a9dda3588a",
     ".gitignore": "889dc9a8e55baa2f5698f2f7efe33734d9a6e3fe068e66138fc4c97091d24be0",
-    "playground/test/edge-cases.test.mjs": "744626035d26b6086c749bde57b3e6464cb7e89aabe35244f073537574235c5c"
+    "playground/test/edge-cases.test.mjs": "9a1fcb9778c8eabf425201f122ba0ee9a33c16a73f4abc2d44731af51a55e281"
   },
   "documentationSha256": {
     "README.md": "eac1778babb05a656a9c56037889f9569f3a89bb0b2d84e827b0e0c8df8fe8b9",
@@ -440,7 +451,7 @@
     "docs/history/decision-register.md": "654a33f3a0c55ff0a3703431ee4157c6471c24e417bdbd7f68d349e077f80c57",
     "docs/history/evidence-index.md": "fc30fc3f660e6a97e8184f96a07ca418427d0257340f818a5bbab7dbf94bbf5f",
     "docs/handoff/playground-implementation-2026-11-02.md": "390ce7eadd39e59e456dea163efd6912189a7f9816da7e06dd2c12be39b4345d",
-    "docs/handoff/playground-audit-2026-11-02.md": "c87e489091341432974cc7138ea460a83b39a7c94ab95c4599ac20d638f2436b"
+    "docs/handoff/playground-audit-2026-11-02.md": "c52d62a673b1c16d1f83e65cbaa6ac2a3e618db99a6ff33fe9b9d1cc7cad7805"
   },
   "remainingKnownFailures": [],
   "limitations": [
@@ -764,5 +775,141 @@
     "verification": "All recorded playground source and documentation hashes and both 40-test reports matched before committing. Existing core evidence remains applicable; no source or test changes made during split-commit preparation.",
     "excluded": "Ignored local test outputs, screenshots, before-fix working copies, build outputs and dependency caches remain local.",
     "publication": "Local commits only; no push or npm publication."
+  },
+  "preflight": {
+    "date": "2026-11-02",
+    "verdict": "PATCHED — READY FOR HANDOFF",
+    "scope": "All 23 files in the three playground commits plus the explained working-tree correction. Earlier core commits are not newly reviewed in this task.",
+    "reviewBaseSha": "f5a856401d99cffc14ae32ed6df5b73ee3350127",
+    "baseRef": "main",
+    "baseSha": "af86b953a31ac08cf476ad6c812bf3397b396efb",
+    "headSha": "8777942cb6015675b132d87cf21385be94996915",
+    "baseEvidence": "Successful non-destructive origin fetch; configured upstream origin/main. Review scope is anchored by the playground implementation/test/documentation commits after f5a8564. Remote diff also contains earlier core work.",
+    "reviewedFiles": [
+      ".github/workflows/core.yml",
+      ".gitignore",
+      "README.md",
+      "docs/README.md",
+      "docs/VIEWSTEM-SPEC.md",
+      "docs/handoff/implementation-start.md",
+      "docs/handoff/open-contracts.md",
+      "docs/handoff/playground-audit-2026-11-02.md",
+      "docs/handoff/playground-implementation-2026-11-02.md",
+      "docs/handoff/playground-verification-results.json",
+      "docs/history/decision-register.md",
+      "docs/history/evidence-index.md",
+      "package.json",
+      "playground/README.md",
+      "playground/app.mjs",
+      "playground/components.mjs",
+      "playground/index.html",
+      "playground/layout.mjs",
+      "playground/samples.mjs",
+      "playground/server.mjs",
+      "playground/style.css",
+      "playground/test/edge-cases.test.mjs",
+      "playground/test/playground.test.mjs"
+    ],
+    "initialWorktreeState": "clean",
+    "worktreeState": "dirty",
+    "finding": {
+      "id": "PG-P01",
+      "priority": "P2",
+      "area": "Preview identity",
+      "cause": "Unresolved when/repeat projections have optional address/generation. Both produced the cache key undefined:undefined, so multiple waiting notices reused one DOM subtree.",
+      "fix": "Use each unresolved snapshot node object as a diagnostic key; preserve address/generation identity for real component instances. No core or public contract change."
+    },
+    "before": {
+      "localEvidenceDirectory": "playground/test/results/preflight-before/",
+      "componentSha256": "8dcad90ca39914e33b25c3a22d1c30821c2cf1bd3d9891cd8ffcfb3fca80a5d8",
+      "priorVerificationSha256": "c7fd73fb6f922f7c1eefd308421dab3322e511ca1c42a311ecf3bbcbeb609303",
+      "regression": {
+        "nodeVersion": "v22.21.1",
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "todo": 0,
+        "tests": [],
+        "failures": [
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "unresolved when and repeat nodes remain distinct across slots and resolve independently",
+            "message": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n-   'conditional: 입력 대기',\n    'rows: 입력 대기'\n  ]\n"
+          }
+        ],
+        "skippedTests": [],
+        "todoTests": []
+      },
+      "regressionReportSha256": "ed82db252f02a4cf6f4cb2f3e5f8057f5dbe30ebeed1a399c4289abfeb19a665",
+      "previousBrowserResults": [
+        {
+          "nodeVersion": "v22.21.1",
+          "passed": 40,
+          "failed": 0,
+          "localReport": "playground/test/results/node22.json",
+          "reportSha256": "7930890b3944b6ad5953d0221396709680fd653af355067e2334d9fd06f932e0"
+        },
+        {
+          "nodeVersion": "v24.1.0",
+          "passed": 40,
+          "failed": 0,
+          "localReport": "playground/test/results/node24.json",
+          "reportSha256": "46650cfcd17122975407f15d004b563e1edd849d5d3310fe7c839c1c8b1358b9"
+        }
+      ]
+    },
+    "verification": {
+      "commands": [
+        "npm run test:playground",
+        "/Users/minholim/.nvm/versions/node/v24.1.0/bin/node --test --test-reporter=tap --test-reporter-destination=playground/test/results/preflight-node24.tap --test-reporter=./packages/core/scripts/test-reporter.mjs --test-reporter-destination=playground/test/results/preflight-node24.json playground/test/*.test.mjs"
+      ],
+      "suiteResults": "See browser.results for current exact names, counts and raw report hashes. One affected-gate revalidation round; both suites passed.",
+      "syntax": "node --check passed for all seven playground .mjs source/test files",
+      "whitespace": "git diff --check passed",
+      "links": "All local Markdown file links in changed documentation resolve",
+      "visual": "Inspected the independent waiting notices in the current 1280x800 Chromium screenshot",
+      "reusedCore": {
+        "sourceFilesMatched": 128,
+        "buildArtifactsMatched": 8,
+        "record": "docs/handoff/core-verification-results.json",
+        "reason": "Only root package.json differs from the historical core source inventory, adding the two reviewed playground scripts. Core source, lockfile and artifacts are unchanged; existing Node 22/24, strict types, 216 acceptance, browser and tarball evidence remains applicable."
+      }
+    },
+    "workflowRegression": {
+      "testGlob": "playground/test/*.test.mjs",
+      "included": [
+        "playground/test/edge-cases.test.mjs",
+        "playground/test/playground.test.mjs"
+      ],
+      "excluded": "Nested test/results before-fix copies, reports and screenshots are outside the nonrecursive test glob and ignored by Git",
+      "buildOrder": "Both playground scripts build core first; CI installs pinned dependencies, runs core/package checks, installs Chromium, then runs browser and playground checks",
+      "dependencies": "No dependency, lockfile, workspace, core package export or package files changes",
+      "generatedOwner": "Core dist is owned by the existing core build; playground bundles stay in memory; test results remain ignored"
+    },
+    "documentation": {
+      "skill": "docs-alignment",
+      "owners": [
+        "docs/handoff/playground-audit-2026-11-02.md",
+        "docs/handoff/playground-verification-results.json"
+      ],
+      "result": "Record the implementation defect and verified correction under existing evidence owners; no new support or product decision, no rationale missing"
+    },
+    "remainingFindings": [],
+    "deferredGates": [
+      "Remote CI after push; no push or CI execution performed"
+    ],
+    "handoffEvidenceFile": "playground/test/results/preflight-handoff.json",
+    "reusableReadiness": false,
+    "reuseLimit": "Dirty worktree evidence describes this scoped playground review and is not an immutable readiness snapshot for all eight unpushed commits. Recompute affected clean evidence after a later commit.",
+    "recordPhase": "Historical preflight snapshot before the split commits recorded in commitPreparation; headSha and dirty worktreeState describe that review, not the later repository state.",
+    "commitPreparation": {
+      "date": "2026-11-02",
+      "implementationCommit": "dc0581696cecc86b56000fe705d7923e7e780b40",
+      "testsCommit": "d9f07af0b336441c79282fcb3e6c74c605443f00",
+      "documentationCommit": "This record and the preflight audit are included in the separate preflight documentation commit.",
+      "verification": "All 14 recorded source/configuration hashes, nine documentation hashes and both 41-test reports matched before split commits. The implementation and regression test bytes are unchanged from the verified preflight. Execution results are reused; this does not promote the historical dirty readiness evidence to a new whole-branch readiness verdict.",
+      "excluded": "Ignored local reports, screenshots, before-fix source copies and handoff fingerprints remain local.",
+      "publication": "Local commits only; no push, remote CI execution or package publication."
+    }
   }
 }
