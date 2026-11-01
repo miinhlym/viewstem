@@ -120,7 +120,9 @@ export function createPreview(container, sendEvent) {
     const used = new Set(); let visited = 0;
     const visit = node => {
       if (++visited > 3000) throw Error('미리보기는 최대 3,000개 노드까지 표시합니다.');
-      const key = `${node.address}:${node.generation}`;
+      // Unresolved when/repeat projections have no runtime address or lifetime.
+      // Keep these diagnostics distinct; only real instances retain DOM across snapshots.
+      const key = node.address === undefined ? node : `${node.address}:${node.generation}`;
       let entry = entries.get(key);
       if (!entry) { entry = create(node); entries.set(key, entry); }
       used.add(key); entry.node = node;
