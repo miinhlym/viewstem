@@ -1,5 +1,4 @@
 import {readFile,writeFile} from 'node:fs/promises';
-import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 const root=new URL('../../../',import.meta.url),read=async path=>JSON.parse(await readFile(new URL(path,root),'utf8'));
 const original=await read('experiments/verification/coverage.json'),evidence=new Map();

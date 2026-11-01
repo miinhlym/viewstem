@@ -10,7 +10,7 @@
 
 ## 현재 인계 상태 · 2026-11-02
 
-U37 요청으로 구현 보류를 해제하고 `packages/core`의 실제 JS/TS 패키지를 구현했다. Node 22·24에서 각각 1,017개 검사와 core 인수 216개의 실제 실행 대조, Chromium·독립 tarball 소비자 검증을 마쳤다. [구현 인수인계](handoff/core-implementation-2026-11-02.md), [제품 인수 대응표](handoff/core-acceptance-coverage.json), [검증 결과](handoff/core-verification-results.json)를 현재 상태로 사용한다. Svelte·Dart/Flutter·선택 차트 제품 및 공개 발행은 후속이다. 아래 날짜별 실험 기록은 보존하며 현재 core 미구현으로 해석하지 않는다.
+U37 요청으로 구현 보류를 해제하고 `packages/core`의 실제 JS/TS 패키지를 구현했다. Node 22·24에서 각각 1,060개 검사와 core 인수 216개의 실제 실행 대조, Chromium·독립 tarball 소비자 검증을 마쳤다. [구현 인수인계](handoff/core-implementation-2026-11-02.md), [제품 인수 대응표](handoff/core-acceptance-coverage.json), [검증 결과](handoff/core-verification-results.json)를 현재 상태로 사용한다. Svelte·Dart/Flutter·선택 차트 제품 및 공개 발행은 후속이다. 아래 날짜별 실험 기록은 보존하며 현재 core 미구현으로 해석하지 않는다.
 
 ## 처음 참여했다면
 

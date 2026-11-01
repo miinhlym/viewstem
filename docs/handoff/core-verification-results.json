@@ -18,15 +18,21 @@
   "node": [
     {
       "node": "v22.21.1",
-      "passed": 1017,
+      "passed": 1060,
       "failed": 0,
-      "testNamesSha256": "53c0f072277a5aa57e8ff27d7a5212aaa7d7cb0895559df7ffa77d5eec2c2038"
+      "skipped": 0,
+      "todo": 0,
+      "testFileAndNameSha256": "8547951198f20d43272c09cd0b83d1469ec57b71adc5f9df5039db2633979404",
+      "reportSha256": "689d3e6d064479e7b80c1ff2bb9cfc237b7eb4686636006220f11d94b160259e"
     },
     {
       "node": "v24.1.0",
-      "passed": 1017,
+      "passed": 1060,
       "failed": 0,
-      "testNamesSha256": "53c0f072277a5aa57e8ff27d7a5212aaa7d7cb0895559df7ffa77d5eec2c2038"
+      "skipped": 0,
+      "todo": 0,
+      "testFileAndNameSha256": "8547951198f20d43272c09cd0b83d1469ec57b71adc5f9df5039db2633979404",
+      "reportSha256": "3344e7e22adf1141fe493b11f5414aa32b8c414f39c3b758a38114bbfd0e7716"
     }
   ],
   "coverage": {
@@ -38,7 +44,7 @@
   "typecheck": {
     "result": "passed",
     "mode": "strict, exactOptionalPropertyTypes, noUncheckedIndexedAccess, no skipLibCheck",
-    "positiveAndNegativeConsumerFiles": 5
+    "positiveAndNegativeConsumerFiles": 6
   },
   "celBrowser": {
     "nodeVersion": "v22.21.1",
@@ -91,59 +97,60 @@
       "dist/THIRD-PARTY-NOTICES.txt",
       "package.json"
     ],
-    "integrity": "sha512-GKuDp8X23qXsgRZopYn8Yo2I/Pq8x8PNs3GD1+y2qd+4xOOHSwkNPAEaXEYl0qwG5vKzbIGjKOWYkzelN1la5A==",
-    "bytes": 270515,
-    "unpackedBytes": 1179607,
+    "integrity": "sha512-EQhoWLrpoqSNUTCi9430jCtTCP7jjuhNpkMkQNZBYIm5TvwFIP3GFKxEtokbah+cCsT3E3L/l9kHL/Jgt34H7Q==",
+    "bytes": 273539,
+    "unpackedBytes": 1193493,
     "runtime": "passed",
-    "types": "passed"
+    "types": "passed",
+    "readmeSha256": "d1c3bb131528b8439af1d1511f1776738647efccbdb0481d618cb0036cdde949"
   },
   "repeatedBuildByteIdentical": true,
   "artifactSha256": {
-    "packages/core/dist/index.js": "1d44990857b7e279b293a0dac1fd66a7063c5fcf9dd3d59d90e69b86f4892cc3",
-    "packages/core/dist/http.d.ts": "949fc184602e479445bd5d5fa896a489c660a2e50c0ca99dca6270bf12c4e240",
-    "packages/core/dist/http.js.map": "b3d294be90c0f761089f8da2544c3ba2a4602a1eb0765543cfaa84d013688035",
-    "packages/core/dist/index.js.map": "f4582cc45bb2e35140d35319491ea971340f8163048e1c4ad504e3bf7fba2e7d",
     "packages/core/dist/THIRD-PARTY-NOTICES.txt": "251e67ccbf506c58d0ae3a687605aa8557582f0b36914e4d0f43d99b34f1180c",
     "packages/core/dist/cel-support.json": "44a3bf64ce1ec773a67026db104de2f9529ddd1588ebbdd1f985ae8e21bdbc7d",
-    "packages/core/dist/index.d.ts": "782f97157f067025758fb31957d7e4e1cc69872cb503d6667aa77ca3c5bb8d96",
-    "packages/core/dist/http.js": "1019d8a529c4b53059a042e7ce81a2a36697a96fbe546b708a3b80711fab4832"
+    "packages/core/dist/http.d.ts": "949fc184602e479445bd5d5fa896a489c660a2e50c0ca99dca6270bf12c4e240",
+    "packages/core/dist/http.js": "dd720a68469b6bcd7c941b0968ca63e1c9e6c8c17ad0ea2dd3d6662ba5b204d2",
+    "packages/core/dist/http.js.map": "5bf522110a937f2bf5ea291421056b57fee9cc287213f8e32d6eb5d0fce7ee91",
+    "packages/core/dist/index.d.ts": "5cab98752fa88203ae8ba301f3a5722665803070d90107f02d923e6812e5bd7f",
+    "packages/core/dist/index.js": "cee0f3857a90a7c595b2f46e75d7f5892ce2c8f03d7a4a45efc82ff7ef5bd4e2",
+    "packages/core/dist/index.js.map": "d7ba9e01ce1b36d6cc192939b4787d7b845b3858c2a66b28e7ed0c23d2c4ecac"
   },
   "sourceSha256": {
     "package-lock.json": "15c84c14d4f420bf412291d720ae3cdb457b0a880ca4d01eed6652041bd9f607",
     "package.json": "15a05d066a5e5ddbf62d92dbeca109553d90dbc820da17ff6d9ed22f9198076c",
     "packages/core/package.json": "e76b7a8d89c73d1908006472afbe58f0bfc5dff931b2ecd1a7a833050a9159f9",
-    "packages/core/scripts/build-coverage.mjs": "95fc3d72920883947031d98151b90478caf78f1c382ece0ed5b635dcabedece4",
-    "packages/core/scripts/build.mjs": "ff419afccfd4818bbf3a5ae5f884a4f3908818f26d8943bbe00567ad1a8a67f0",
-    "packages/core/scripts/check-coverage.mjs": "523960067444e7ed0fcaa879645c039889b128c0190c97fc6bc9881bf9598c68",
+    "packages/core/scripts/build-coverage.mjs": "6b73138ccea5311ffdc4274689c61d3a1c1f2aa1d1b676cb84adca77027873b9",
+    "packages/core/scripts/build.mjs": "a19af8426a77d6297a9242618d452f75a53f98dad330f56b53814dc855c7362b",
+    "packages/core/scripts/check-coverage.mjs": "a4ad105fad8ffca7f352f011c1d7fb342bc88015f0c28229d7917967cd39f49e",
     "packages/core/scripts/prepare-cel.mjs": "417cdf490c542b91bda55b81ff834c930622643f34445d349458a66c3f3de9f1",
-    "packages/core/scripts/run-tests.mjs": "3c511dc7f129873191724e96fe0a0ce3f4079858e90d7654d5dc42e2f52307ea",
-    "packages/core/scripts/test-package.mjs": "df5348a8264d1abef4cc8c9397b41e864536a0e621476c02f4a604537d87d8a3",
-    "packages/core/scripts/test-reporter.mjs": "ccfd43489272b97fc341839bf3935a810d18c472cb559ae54ae6f0a13cf81495",
-    "packages/core/src/action.mjs": "0e667df9efad3c1858b3b4fb9ef1b69f6eb96f67323b57e4196f73f29264004f",
+    "packages/core/scripts/run-tests.mjs": "56be922301dfafdd0568e94e3388748f6d084c76d55e5abe1b2df40d46490feb",
+    "packages/core/scripts/test-package.mjs": "f1ce9c617337f876198be736210eb95c22c5860c59946b9e515f1c11befc0684",
+    "packages/core/scripts/test-reporter.mjs": "d5c779c03ee620e797c00b3c77816700f46352fd88a4f3ad9c29b2c1123c0c04",
+    "packages/core/src/action.mjs": "f96f477fc874b5e260d34de84c6bffeae1d6e57aa4b37f08ddbb5a663495d34e",
     "packages/core/src/cel/calendar.mjs": "52982989ddfcf53e7f154542fe3c9f7489d271145c65ed57c71847bfca6fa512",
     "packages/core/src/cel/index.mjs": "2f2f5de886b1757906d25c83a8374beb7db280f07a31a7e7d6f262b479b0791c",
     "packages/core/src/cel/limits.mjs": "0d78e91b6f45e97c5efd38193870be2da491ad7cb15ada747325328fce2aee98",
     "packages/core/src/cel/supported-functions.json": "44a3bf64ce1ec773a67026db104de2f9529ddd1588ebbdd1f985ae8e21bdbc7d",
     "packages/core/src/errors.mjs": "17bcc886db69feabd25ba175e128804fcf8b0dd8995dea570410fff6ec03b1e0",
     "packages/core/src/expression-syntax.mjs": "beb5f8c654cedf8e1e641eb6cfab030f018cfe946acb33d19bdf30c631f8b95d",
-    "packages/core/src/expressions.mjs": "54b737fa2e6b80b5a9c851d0f300633a1f5837924dbbfa58c80fc8766ad6e055",
-    "packages/core/src/grid.mjs": "dc09ba2285b106b02960fe23d7283e1e2d9f8e6c48996ac82d3afcac109cb3a6",
+    "packages/core/src/expressions.mjs": "46a6eeda81ca4e8c8bfee24ece325593d4076a5ba09525f36683294fe7a96cf0",
+    "packages/core/src/grid.mjs": "e91c7c398aa84d4619cb255584dc9bde68333388c01490f622472d45a59cfe2c",
+    "packages/core/src/http.d.ts": "949fc184602e479445bd5d5fa896a489c660a2e50c0ca99dca6270bf12c4e240",
     "packages/core/src/http/expressions.mjs": "66b5252d4767e025ef83df4cb6c454bda7d8c5bdbbe4965c059777da1695b31c",
     "packages/core/src/http/headers.mjs": "7036c88576f1b25da434dfd30e3beed5a49ad83b34ac20bb8617adeb0b97bd70",
-    "packages/core/src/http/index.mjs": "1c9ffe7a3712d07a810d0df46f794f5ab5727b81afe56aee1ef2e827b9ad624d",
-    "packages/core/src/http.d.ts": "949fc184602e479445bd5d5fa896a489c660a2e50c0ca99dca6270bf12c4e240",
+    "packages/core/src/http/index.mjs": "e3c76f9013c072b6cbebc1ab43509f54cc7a23bb26e3ccbc0a17abef5cdd7d96",
     "packages/core/src/immutable.mjs": "d4965c708f3eaff7d91cf0e02939a958a7cfe02fb1e9cf22a840e40c363ca528",
-    "packages/core/src/index.d.ts": "782f97157f067025758fb31957d7e4e1cc69872cb503d6667aa77ca3c5bb8d96",
+    "packages/core/src/index.d.ts": "5cab98752fa88203ae8ba301f3a5722665803070d90107f02d923e6812e5bd7f",
     "packages/core/src/index.mjs": "52f4ae5e4024f1c1f3b9e846fccffd2026328ca7564d3f4c05c75edcd28cce81",
-    "packages/core/src/ports.mjs": "7b478d0e787f8fe81b1217daba76aec57deabd7bbeba28831cc5adc788a17e32",
+    "packages/core/src/ports.mjs": "cf53461f41cbc2c8125842091784d20b98b54f7a7b713db53ecad94fc2ebfa30",
     "packages/core/src/query/index.mjs": "eaeabdf1ed2df8013416614cf19b8413119b069907128e4d2893ddde58ba9e61",
     "packages/core/src/query/usage.mjs": "46878d42ee45a1b2a0c2b06295a45f991994a050006dc133fdcb1d38f5640b2b",
-    "packages/core/src/registry.mjs": "ffa9e5f398e1a471cedf61c7a85b9d2c4b303dc749642c6bde54f064ae937063",
-    "packages/core/src/runtime.mjs": "6f664d8e9daf881d953259b36211272cae1a85e809abbaccbdbc4a98f8547cf8",
+    "packages/core/src/registry.mjs": "fbca52d70434744f47ae6ca29e2ac0a59fcd5b7de5b20af89552f9c576524827",
+    "packages/core/src/runtime.mjs": "7b04dad8aea7e897d778bc05ca6abfc437900f5ab96220ad7757427efa577278",
     "packages/core/src/schema-profile.mjs": "26337e6d10ebe82d11fa7d2ecb8452fb6c80a6cdf78f719137c8de576c6ca1cf",
     "packages/core/src/schema.mjs": "dbbd5bd7f1ae0debf1902cfe06364c32e939da4e697af472dd5b02b5454363b6",
-    "packages/core/src/state.mjs": "150ef9fbd47b67e4a6b12a26f12d081dad6790041f94e8d69dbdbc4473559ca7",
-    "packages/core/src/url.mjs": "bacb4c01fa488ab5112527ce74ee2558307b7c58a4c432655d970b7ac8218861",
+    "packages/core/src/state.mjs": "162dee4b3dbd170567f1dd7446f47eeb7ac2b55d8f593d9619eca5d11b1f3c73",
+    "packages/core/src/url.mjs": "3ca362f7bdd4e0edc2966c13bc54e83f4784423369d8badcbb8264bbbbc9666d",
     "packages/core/src/values.mjs": "c253a3a02983c6c7de780de196ce166914b40d7a80641e441f6a06fd98aa4669",
     "packages/core/test/action-acceptance.test.mjs": "cd9eeb74020fdef497546a6fe17c3f8d2546ef5c54e2af930cb7869436fc578b",
     "packages/core/test/action.test.mjs": "c242c2955124e9a43fe3b9c1c94d00356574ef95bfbc0a0ae93332d61356821d",
@@ -159,7 +166,7 @@
     "packages/core/test/coverage-action.json": "818738188f1db39f07e2c48dad3933a11c09bf178131fa34ac9b2349a6b8b1c0",
     "packages/core/test/coverage-management-ui.json": "ecd4fe6d4c85e5755ae1f635b39a36fd2182b4e529796ce5ffb8298ca94db16a",
     "packages/core/test/coverage-query-http.json": "a6578813139c6b8a423e7b15eccf8c40281c42ff15c8a1333056b347d52e61ab",
-    "packages/core/test/coverage-runtime.json": "7139c62d6f526695ce38a087057746f45b355859ea942a1adba3c2c9e663b44c",
+    "packages/core/test/coverage-runtime.json": "0610b982c770d976e043dd6e7233a54d1a47c256d1fe67491eab1281bf816126",
     "packages/core/test/fixtures/state/README.md": "ad5f666c9e26aaedd0dad470291051034147167a293326a4045586a0e1eb413f",
     "packages/core/test/fixtures/state/core-acceptance-coverage.json": "268f1e3275dfb147893091041eff54f3e1d9d3cd90711571309f275a7909dc1f",
     "packages/core/test/fixtures/state/schema-cases.mjs": "962e068ac0ac264be066ff4a86b5ebe50bd0ce4964ac55e7333317e0f02d7a74",
@@ -168,6 +175,10 @@
     "packages/core/test/http-contracts.test.mjs": "ed83c9e3eee327f98581c451036ff5d0a6c57d91c66e3b0d9a725e72f64010a2",
     "packages/core/test/http-path-cases.mjs": "314288dfb0dd87a69a17366d1d25d1dccbaa7787d543919938d583c721247e20",
     "packages/core/test/http-paths.test.mjs": "d7179f484d103f3d616a543d5f1e48c892bc1ef7cd8b0d7ed6ba11591c7db39c",
+    "packages/core/test/preflight-io.test.mjs": "3d1fae9fef220065e5afe663b07fe02821bb1b4d6e161866fd138224d948bcf1",
+    "packages/core/test/preflight-runtime.test.mjs": "658dd8861fd9ff4066c327c224419ca74a06cc8b22abc2461b7c57e5b36e1ae8",
+    "packages/core/test/preflight-tooling.test.mjs": "1b7a99e2caf3a0869d8749a980560f1119a16c30dfc8b286705f17530b8a2010",
+    "packages/core/test/preflight-values.test.mjs": "e9a5a4bd949df4eab922a4ea91bc6728bdd879ead6185873ae30fd777186ae5f",
     "packages/core/test/query-acceptance-gaps.test.mjs": "cb21520a3ec37d9a3074692933d3430b9cd103f7d04b1d4bb14c5c4994ff4e20",
     "packages/core/test/query-composite-boundaries.mjs": "78893f5a711852688fa33b8f4ebcd9c62ad34c8396883d1e76075f6f2650d88d",
     "packages/core/test/query-composite-cases.mjs": "1192d908385b0f3de3effcb907ce851bed84efa5f36d558ca52bf2be94a61848",
@@ -194,6 +205,7 @@
     "packages/core/test/types/inferred-output.ts": "e4ba26f4a59161cc8e88ee4d9b74e7cbdc29ce112661e493ccc729b99850960f",
     "packages/core/test/types/negative.ts": "4d5f7acb107de0f43ade82429929b61694f7c160e5c5f22fd499ce736e54d259",
     "packages/core/test/types/positive.ts": "59884ed98b35312cd01be0554305c17ce6788032fe9f2826dfd1324c755cbd71",
+    "packages/core/test/types/preflight.ts": "a514dce4e0d047afdf70b7b2810148e88fb4c2773015316ff41ed5b9a6ad1af1",
     "packages/core/test/types/runtime-limits.ts": "062d3e61daa99e427fde35fa43b01fcaebbe887307ba899338cd83c5e59308ba",
     "packages/core/test/types/tsconfig.json": "e94e6900ee17ef2f26e0e0e7f09f9571d6cc93355787b26dc71075bd205a3359",
     "packages/core/test/url-runtime.test.mjs": "6dc25ca1fadc730238cd536c9526eaba6cddee2082c28111a271630f6c324b98",
@@ -202,6 +214,7 @@
     "packages/core/test/values-schema-registration.test.mjs": "5a8a1c1f7f8746dc9274f77e697101ef313d68a936371ffca4df7e0e33492aa4",
     "packages/core/test/values-schema-runtime.test.mjs": "13ddc011789d50ff6b76ce2bcba76000459a0b611f6fb48e12048a7f14358af1",
     "packages/core/vendor/README.md": "144042a662d606122e1d1f030869b25b56c9763be6ca8f3b16e749319057a168",
+    "packages/core/vendor/cel-js-8.0.0.patch": "62dd517376de54a08018f6166b250d9013b907e87b11ab75d0f07e264de0da63",
     "packages/core/vendor/cel-js/LICENSE": "4b70ef5f828132a9ac1c550d40e2144b93fe361f92f4c2c1ed29985fb0611694",
     "packages/core/vendor/cel-js/README.md": "ae558615e8962339a45a7dcebde25708925a0160d023e068a8e4206e5822b007",
     "packages/core/vendor/cel-js/bin/cel-evaluate.js": "2a35a3a2171c1d45953352ab82b92f27791daf491db9c521dd79afbac4f8aae5",
@@ -227,7 +240,6 @@
     "packages/core/vendor/cel-js/lib/viewstem-budget.js": "0b92021730d2154ca51d2e8dcc28f276bb8b390db88027b17bc390532f797ecf",
     "packages/core/vendor/cel-js/lib/viewstem-timestamp.js": "c2141f34f7209e25229fa8500fc5cc927bd572b7c36067f3643f44b5c9875c1e",
     "packages/core/vendor/cel-js/package.json": "3dcac27213ddda15e8268f71b0424de2faa0c797de4203d46b16313825c6e687",
-    "packages/core/vendor/cel-js-8.0.0.patch": "62dd517376de54a08018f6166b250d9013b907e87b11ab75d0f07e264de0da63",
     "packages/core/vendor/patched-sha256.json": "bd38774ee6ef0dd3683422afe4d6c8fd5f862b0d3e530ebc65163e000d5e17dd",
     "packages/core/vendor/production-fixes.patch": "ae10b2b12750ee2f6d75d0c2592f57a4b3b8dee8a3159b901965ed1fbfafcf26",
     "packages/core/vendor/production-sha256.json": "e16a7552887a643698f9b10ff03c6f3bf90519f3fea37dce657ffa8c9262b039",
@@ -244,5 +256,411 @@
     "checks": "Node 22/24 full suites, strict types, coverage and isolated package install rerun after EOF whitespace cleanup",
     "browserEvidence": "Reused: executable dist/index.js and dist/http.js hashes unchanged",
     "pinnedCelPatches": "Byte-preserved; Git whitespace attributes recognize unified patch context formatting"
+  },
+  "testIdentityHashAlgorithm": "SHA-256 of UTF-8 JSON array of [repository-relative file, exact test name], sorted lexicographically; compact JSON separators, Unicode preserved",
+  "preflight": {
+    "date": "2026-11-02",
+    "verdict": "PATCHED — READY FOR HANDOFF",
+    "reviewScopeBaseSha": "10a326b9c623aaf2763375b8628635dd70ba65d8",
+    "reviewedHeadSha": "adbad431b9e92f58cacf1dae72e88bbf6efbe254",
+    "remoteBaseRef": "main",
+    "remoteBaseSha": "af86b953a31ac08cf476ad6c812bf3397b396efb",
+    "worktreeState": "dirty",
+    "reusableLifecycleReadiness": false,
+    "readinessBoundary": "Human-readable verdict for the explicitly requested implementation delta and explained local fixes. Remote main precedes that baseline; no clean immutable lifecycle evidence is claimed.",
+    "inventory": {
+      "originalFiles": 142,
+      "categories": {
+        "configuration": 6,
+        "documentation": 15,
+        "scripts": 7,
+        "productionSource": 26,
+        "tests": 56,
+        "vendor": 32
+      },
+      "additionalFiles": [
+        "packages/core/test/preflight-io.test.mjs",
+        "packages/core/test/preflight-runtime.test.mjs",
+        "packages/core/test/preflight-tooling.test.mjs",
+        "packages/core/test/preflight-values.test.mjs",
+        "packages/core/test/types/preflight.ts"
+      ],
+      "reviewedFiles": [
+        ".gitattributes",
+        ".github/workflows/core.yml",
+        ".gitignore",
+        "README.md",
+        "docs/README.md",
+        "docs/VIEWSTEM-SPEC.md",
+        "docs/handoff/acceptance-matrix.md",
+        "docs/handoff/core-acceptance-coverage.json",
+        "docs/handoff/core-cel-support.md",
+        "docs/handoff/core-implementation-2026-11-02.md",
+        "docs/handoff/core-verification-results.json",
+        "docs/handoff/implementation-start.md",
+        "docs/handoff/open-contracts.md",
+        "docs/handoff/verification-ledger.md",
+        "docs/history/decision-register.md",
+        "docs/history/evidence-index.md",
+        "docs/spec/07-host-integration.md",
+        "package-lock.json",
+        "package.json",
+        "packages/core/README.md",
+        "packages/core/package.json",
+        "packages/core/scripts/build-coverage.mjs",
+        "packages/core/scripts/build.mjs",
+        "packages/core/scripts/check-coverage.mjs",
+        "packages/core/scripts/prepare-cel.mjs",
+        "packages/core/scripts/run-tests.mjs",
+        "packages/core/scripts/test-package.mjs",
+        "packages/core/scripts/test-reporter.mjs",
+        "packages/core/src/action.mjs",
+        "packages/core/src/cel/calendar.mjs",
+        "packages/core/src/cel/index.mjs",
+        "packages/core/src/cel/limits.mjs",
+        "packages/core/src/cel/supported-functions.json",
+        "packages/core/src/errors.mjs",
+        "packages/core/src/expression-syntax.mjs",
+        "packages/core/src/expressions.mjs",
+        "packages/core/src/grid.mjs",
+        "packages/core/src/http.d.ts",
+        "packages/core/src/http/expressions.mjs",
+        "packages/core/src/http/headers.mjs",
+        "packages/core/src/http/index.mjs",
+        "packages/core/src/immutable.mjs",
+        "packages/core/src/index.d.ts",
+        "packages/core/src/index.mjs",
+        "packages/core/src/ports.mjs",
+        "packages/core/src/query/index.mjs",
+        "packages/core/src/query/usage.mjs",
+        "packages/core/src/registry.mjs",
+        "packages/core/src/runtime.mjs",
+        "packages/core/src/schema-profile.mjs",
+        "packages/core/src/schema.mjs",
+        "packages/core/src/state.mjs",
+        "packages/core/src/url.mjs",
+        "packages/core/src/values.mjs",
+        "packages/core/test/action-acceptance.test.mjs",
+        "packages/core/test/action.test.mjs",
+        "packages/core/test/browser-fixture.mjs",
+        "packages/core/test/browser.mjs",
+        "packages/core/test/cel-browser-cases.mjs",
+        "packages/core/test/cel-browser.mjs",
+        "packages/core/test/cel-engine-cases.mjs",
+        "packages/core/test/cel-engine-extensions.mjs",
+        "packages/core/test/cel-engine-guarded.mjs",
+        "packages/core/test/cel-golden.json",
+        "packages/core/test/cel.test.mjs",
+        "packages/core/test/coverage-action.json",
+        "packages/core/test/coverage-management-ui.json",
+        "packages/core/test/coverage-query-http.json",
+        "packages/core/test/coverage-runtime.json",
+        "packages/core/test/fixtures/state/README.md",
+        "packages/core/test/fixtures/state/core-acceptance-coverage.json",
+        "packages/core/test/fixtures/state/schema-cases.mjs",
+        "packages/core/test/fixtures/state/url-adapter.mjs",
+        "packages/core/test/grid.test.mjs",
+        "packages/core/test/http-contracts.test.mjs",
+        "packages/core/test/http-path-cases.mjs",
+        "packages/core/test/http-paths.test.mjs",
+        "packages/core/test/query-acceptance-gaps.test.mjs",
+        "packages/core/test/query-composite-boundaries.mjs",
+        "packages/core/test/query-composite-cases.mjs",
+        "packages/core/test/query-composite-fixtures.mjs",
+        "packages/core/test/query-composite.test.mjs",
+        "packages/core/test/query-fixtures.mjs",
+        "packages/core/test/query-http.test.mjs",
+        "packages/core/test/query-polling-cases.mjs",
+        "packages/core/test/query-polling.test.mjs",
+        "packages/core/test/query-races-cases.mjs",
+        "packages/core/test/query-races.test.mjs",
+        "packages/core/test/query.test.mjs",
+        "packages/core/test/registry.test.mjs",
+        "packages/core/test/runtime-composition.test.mjs",
+        "packages/core/test/runtime-management.test.mjs",
+        "packages/core/test/runtime-query.test.mjs",
+        "packages/core/test/runtime-review-regression.test.mjs",
+        "packages/core/test/runtime-ui-review.test.mjs",
+        "packages/core/test/runtime.test.mjs",
+        "packages/core/test/state-integration.test.mjs",
+        "packages/core/test/state-lifecycle.test.mjs",
+        "packages/core/test/state-ports.test.mjs",
+        "packages/core/test/types/inference.ts",
+        "packages/core/test/types/inferred-output.ts",
+        "packages/core/test/types/negative.ts",
+        "packages/core/test/types/positive.ts",
+        "packages/core/test/types/runtime-limits.ts",
+        "packages/core/test/types/tsconfig.json",
+        "packages/core/test/url-runtime.test.mjs",
+        "packages/core/test/url-state.test.mjs",
+        "packages/core/test/values-expression-date.test.mjs",
+        "packages/core/test/values-schema-registration.test.mjs",
+        "packages/core/test/values-schema-runtime.test.mjs",
+        "packages/core/vendor/README.md",
+        "packages/core/vendor/cel-js-8.0.0.patch",
+        "packages/core/vendor/cel-js/LICENSE",
+        "packages/core/vendor/cel-js/README.md",
+        "packages/core/vendor/cel-js/bin/cel-evaluate.js",
+        "packages/core/vendor/cel-js/lib/errors.js",
+        "packages/core/vendor/cel-js/lib/evaluator.d.ts",
+        "packages/core/vendor/cel-js/lib/evaluator.js",
+        "packages/core/vendor/cel-js/lib/functions.d.ts",
+        "packages/core/vendor/cel-js/lib/functions.js",
+        "packages/core/vendor/cel-js/lib/globals.js",
+        "packages/core/vendor/cel-js/lib/index.d.ts",
+        "packages/core/vendor/cel-js/lib/index.js",
+        "packages/core/vendor/cel-js/lib/macros.js",
+        "packages/core/vendor/cel-js/lib/operators.js",
+        "packages/core/vendor/cel-js/lib/optional.js",
+        "packages/core/vendor/cel-js/lib/options.js",
+        "packages/core/vendor/cel-js/lib/overloads.js",
+        "packages/core/vendor/cel-js/lib/parser.js",
+        "packages/core/vendor/cel-js/lib/registry.d.ts",
+        "packages/core/vendor/cel-js/lib/registry.js",
+        "packages/core/vendor/cel-js/lib/serialize.d.ts",
+        "packages/core/vendor/cel-js/lib/serialize.js",
+        "packages/core/vendor/cel-js/lib/type-checker.js",
+        "packages/core/vendor/cel-js/lib/viewstem-budget.js",
+        "packages/core/vendor/cel-js/lib/viewstem-timestamp.js",
+        "packages/core/vendor/cel-js/package.json",
+        "packages/core/vendor/patched-sha256.json",
+        "packages/core/vendor/production-fixes.patch",
+        "packages/core/vendor/production-sha256.json",
+        "packages/core/vendor/upstream-function-catalog.json",
+        "packages/core/vendor/upstream-sha256.json"
+      ]
+    },
+    "exclusions": [
+      "Generated node_modules/dist/test results are excluded from source review; dist is separately built and consumed.",
+      "Unchanged upstream vendor implementation is verified by provenance manifests; its two local patches are reviewed.",
+      "Dart/Flutter, Svelte product renderer, optional charts, other browsers, live service policies and operational load are outside core preflight."
+    ],
+    "fixedFindings": {
+      "P1": 2,
+      "P2": 16,
+      "detail": "docs/handoff/core-implementation-2026-11-02.md"
+    },
+    "unresolvedFindings": [],
+    "newRegressions": [
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "U33 pending replacement initial survives failed old URL cleanup"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "pending View initialization restores URL without writing it back"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "pending View baseline preserves explicit State write and sends it to URL"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "restore:false suppresses initial restore only, pending=false, trigger=restore"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "restore:false suppresses initial restore only, pending=false, trigger=navigate"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "restore:false suppresses initial restore only, pending=true, trigger=restore"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "restore:false suppresses initial restore only, pending=true, trigger=navigate"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "pending explicit writes accumulate once with replace history and restore without reactions"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "pending explicit writes accumulate once with push history and restore without reactions"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "pending pure initialization and URL restore never write URL or run reactions"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "reentrant write from initial/URL notification 3 is retained and synchronized"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "reentrant write from initial/URL notification 8 is retained and synchronized"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "HTTP rejects empty ? baseUrl delimiter in datasource before transport"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "HTTP rejects empty ? baseUrl delimiter in request before transport"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "HTTP rejects empty ? baseUrl delimiter in login before transport"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "HTTP rejects empty # baseUrl delimiter in datasource before transport"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "HTTP rejects empty # baseUrl delimiter in request before transport"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "HTTP rejects empty # baseUrl delimiter in login before transport"
+      },
+      {
+        "file": "packages/core/test/preflight-io.test.mjs",
+        "name": "HTTP keeps encoded query/fragment delimiters in base and request paths"
+      },
+      {
+        "file": "packages/core/test/preflight-runtime.test.mjs",
+        "name": "preflight: disposing View from commit observer prevents new Query work and scope leaks"
+      },
+      {
+        "file": "packages/core/test/preflight-runtime.test.mjs",
+        "name": "preflight: failed transaction restores scope lifetime, clocks, handles and final Store cleanup"
+      },
+      {
+        "file": "packages/core/test/preflight-runtime.test.mjs",
+        "name": "preflight: committed scope disposal releases clock and cells exactly once"
+      },
+      {
+        "file": "packages/core/test/preflight-runtime.test.mjs",
+        "name": "preflight: mount/update Value inputs stay isolated through reevaluation; defaults stay omitted"
+      },
+      {
+        "file": "packages/core/test/preflight-runtime.test.mjs",
+        "name": "preflight: retained State and Query inputs preserve capabilities"
+      },
+      {
+        "file": "packages/core/test/preflight-runtime.test.mjs",
+        "name": "preflight: inline Action definitions are isolated while an awaited child runs"
+      },
+      {
+        "file": "packages/core/test/preflight-runtime.test.mjs",
+        "name": "preflight: maintained View rejects State kind flip atomically"
+      },
+      {
+        "file": "packages/core/test/preflight-runtime.test.mjs",
+        "name": "preflight: maintained Component rejects State kind flip atomically"
+      },
+      {
+        "file": "packages/core/test/preflight-runtime.test.mjs",
+        "name": "preflight: maintained View rejects Derived kind flip atomically"
+      },
+      {
+        "file": "packages/core/test/preflight-runtime.test.mjs",
+        "name": "preflight: maintained Component rejects Derived kind flip atomically"
+      },
+      {
+        "file": "packages/core/test/preflight-runtime.test.mjs",
+        "name": "preflight: child Action/Query input templates unescape @ names once"
+      },
+      {
+        "file": "packages/core/test/preflight-runtime.test.mjs",
+        "name": "preflight: escaped child State and Query names retain capability routing"
+      },
+      {
+        "file": "packages/core/test/preflight-runtime.test.mjs",
+        "name": "preflight: shared inline spec validates independently for Query and Component kinds"
+      },
+      {
+        "file": "packages/core/test/preflight-tooling.test.mjs",
+        "name": "preflight reporter never records skipped or todo cases as executed passes"
+      },
+      {
+        "file": "packages/core/test/preflight-tooling.test.mjs",
+        "name": "preflight test runner includes top-level suites, excludes fixtures, and fails on unexecuted cases"
+      },
+      {
+        "file": "packages/core/test/preflight-tooling.test.mjs",
+        "name": "preflight acceptance verification requires an executed report"
+      },
+      {
+        "file": "packages/core/test/preflight-tooling.test.mjs",
+        "name": "preflight build requires declarations, preserves prior output on failure, and removes obsolete distribution files"
+      },
+      {
+        "file": "packages/core/test/preflight-values.test.mjs",
+        "name": "preflight Grid validates last occupied row and preserves maximum safe one-cell coordinates"
+      },
+      {
+        "file": "packages/core/test/preflight-values.test.mjs",
+        "name": "preflight Grid handles large valid spans and checks automatic row plus span without cell enumeration"
+      },
+      {
+        "file": "packages/core/test/preflight-values.test.mjs",
+        "name": "preflight Grid omitted layout treats prototype-named declaration IDs as ordinary IDs"
+      },
+      {
+        "file": "packages/core/test/preflight-values.test.mjs",
+        "name": "preflight public State ports ignore enum ordering while preserving distinct Unicode values and ASCII"
+      },
+      {
+        "file": "packages/core/test/preflight-values.test.mjs",
+        "name": "preflight public State ports ignore required ordering without normalizing Unicode property names"
+      },
+      {
+        "file": "packages/core/test/preflight-values.test.mjs",
+        "name": "preflight registered @call remains synchronous and validates ordinary results"
+      },
+      {
+        "file": "packages/core/test/preflight-values.test.mjs",
+        "name": "preflight rejecting async @call and arbitrary thenables report synchronous TYPE_MISMATCH without unhandled rejection"
+      }
+    ],
+    "newTypeFixture": "packages/core/test/types/preflight.ts",
+    "targeted": {
+      "runtimeSource": {
+        "passed": 55,
+        "failed": 0
+      },
+      "urlHttpSourceFirst": {
+        "passed": 464,
+        "failed": 1,
+        "cause": "Same U33 fix needed to retain suppression of delayed transaction initialization notifications"
+      },
+      "urlHttpSourceFinal": {
+        "passed": 466,
+        "failed": 0
+      },
+      "valuesBuiltPackage": {
+        "passed": 48,
+        "failed": 0
+      },
+      "rootRegressions": {
+        "passed": 36,
+        "failed": 0
+      }
+    },
+    "gridCompatibility": {
+      "seed": 20261102,
+      "cases": 5000,
+      "matchingPlacements": 4190,
+      "matchingErrors": 810,
+      "result": "passed",
+      "oracleSource": "packages/core/test/results/preflight-grid-oracle.mjs",
+      "oracleSourceSha256": "385acc9921133f0dfca3b457e6ad9f0d53e0e0a431ca3ec37b126dabe489f4cb"
+    },
+    "workflowRegressionEvidence": [
+      "Reporter excludes skip/todo from passes",
+      "Runner includes top-level *.test.mjs, excludes helper files and nested fixture suites",
+      "Runner fails skipped/todo suites",
+      "Coverage verification rejects missing execution report",
+      "Missing mandatory declaration fails build and preserves previous dist",
+      "Successful build removes obsolete distribution files",
+      "Tarball contains exactly eight dist artifacts, README.md and package.json"
+    ],
+    "reusedEvidence": [
+      "Prior npm ci --ignore-scripts installation: dependency manifests, lockfile and tool versions unchanged"
+    ],
+    "beforeEvidence": "packages/core/test/results/preflight-before-adbad43/ (ignored local original reports/repros); committed source and documents at adbad431",
+    "remoteActions": "No commit, push, PR, remote CI, version change or publication"
   }
 }

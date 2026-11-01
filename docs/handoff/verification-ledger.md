@@ -4,7 +4,9 @@
 
 ## U37 실제 패키지 결과 · 2026-11-02
 
-JS/TS core 구현 보류를 해제하고 실제 `@viewstem/core`를 구현했다. [구현 결과·범위·잔여](core-implementation-2026-11-02.md), [제품 224개 목록](core-acceptance-coverage.json), [실행 결과](core-verification-results.json)를 현재 제품 증거로 사용한다. core 216개는 실제 실행 파일·이름 대조를 통과했고 선택 차트 8개는 후속으로 명시했다. Node 22.21.1·24.1.0 각각 1,017/1,017, CEL Chromium 25/25, 실제 DOM/History/HTTP 결합 7개, strict TypeScript·tarball 독립 소비자·해시 고정 빌드가 통과했다. 원격 CI·발행은 하지 않았다.
+JS/TS core 구현 보류를 해제하고 실제 `@viewstem/core`를 구현했다. [구현 결과·범위·잔여](core-implementation-2026-11-02.md), [제품 224개 목록](core-acceptance-coverage.json), [실행 결과](core-verification-results.json)를 현재 제품 증거로 사용한다. core 216개는 실제 실행 파일·이름 대조를 통과했고 선택 차트 8개는 후속으로 명시했다. Node 22.21.1·24.1.0 각각 1,060/1,060, CEL Chromium 25/25, 실제 DOM/History/HTTP 결합 7개, strict TypeScript·tarball 독립 소비자·해시 고정 빌드가 통과했다. 원격 CI·발행은 하지 않았다.
+
+전체 구현 branch-preflight에서 확인한 P1 2건·P2 16건을 로컬 수정하고 회귀 43개를 추가했다. 최종 실패·skip·todo는 0이며 구체적 발견, 수정 전 증거, 검증 도구 회귀, 미커밋 상태는 위 구현 인수인계에 기록했다.
 
 이하 U34–U35의 실험 완료 기준과 결과는 당시 기록이다. 해당 실험의 core 미구현·보류 표기를 현재 상태로 적용하지 않는다.
 

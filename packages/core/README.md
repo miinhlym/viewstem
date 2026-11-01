@@ -29,7 +29,7 @@ runtime.dispose();
 ## API 경계
 
 - `createRegistry`: `(kind, id)` 등록·검증, 코드형 Component/Action 등록, 목록·설명·정의 추출·명시적 정의 교체.
-- `createStateStore`: scope, State/Derived, 원자적 batch/transaction, 안정적인 읽기 snapshot, reaction, Clock·URL 연결. 외부에서 주입한 Store는 runtime 폐기로 제거하지 않습니다.
+- `createStateStore`: scope, State/Derived, 원자적 batch/동기 transaction, 안정적인 읽기 snapshot, reaction, Clock·URL 연결. 외부에서 주입한 Store는 runtime 폐기로 제거하지 않습니다.
 - `createRuntime`: `mount`, `invokeAction`, `listResources`, `describeResource`, `dispose`. `view`는 `update`, `replace`, `emit`, `snapshot`, `subscribe`, `getState`, `getQuery`, `exportDefinition`을 제공합니다.
 - `compileCel`: 고정 패치 CEL과 스키마 기반 native 값 경계. `evaluate`는 `@path`/`@call` 값 표현식입니다.
 - `createQueryEngine`: 직접 사용 가능한 Query 실행 및 사용 인스턴스. 화면 실행과 동일한 구현입니다.
@@ -42,7 +42,7 @@ runtime.dispose();
 
 렌더러는 `view.snapshot()` 또는 `subscribe()`의 `roots`를 그립니다. 각 노드는 `instanceId`, `generation`, `status`, `inputs`, `children`, 이름별 `slots`를 포함합니다. 이벤트는 선언된 payload만 `view.emit(node, event, payload)`로 전달합니다. DOM 이벤트 객체를 전달하지 않습니다. `when:false`/실제 제거는 수명을 끝내지만 일시적인 입력 대기는 기존 상태·실행 연결을 유지합니다.
 
-기존 화면은 주입 시점의 리소스 정의를 유지합니다. `registry.updateResource`는 공용 정의를 변경하고 `view.replace`나 새 mount에서 이를 주입합니다. `view.update`는 현재 화면 구성만 바꿉니다. State·현재 화면·공용 정의의 변경/추출은 DB 저장과 별개입니다.
+기존 화면은 주입 시점의 리소스 정의를 유지합니다. `registry.updateResource`는 공용 정의를 변경하고 `view.replace`나 새 mount에서 이를 주입합니다. `view.update`는 현재 화면 구성만 바꿉니다. 유지하는 셀의 State↔Derived 변경은 쓰기 계약 불일치로 거절합니다. State·현재 화면·공용 정의의 변경/추출은 DB 저장과 별개입니다.
 
 `authorize({operation, owner, definition})`는 Action 실행과 `view.update`/기존 화면 `replace`의 변경 권한을 검사합니다. 반환값이 `true`일 때만 허용합니다. 목록 노출 필터, 사용자 신원, 저장 권한은 호스트가 구성합니다. 목록에서 발견했다는 사실이 실행 권한을 주지 않습니다.
 
@@ -52,7 +52,7 @@ runtime.dispose();
 
 `requestExecutor(plan, {signal})`을 주입하지 않으면 native fetch 기반 공개 HTTP를 사용합니다. secret이나 Login이 필요한 계획은 신뢰하는 서버에서 `createHttpExecutor({authorize,resolveSecret,caller})`로 실행합니다. 브라우저에 secret resolver를 넣지 않습니다. 주소 권한·헤더·파라미터·응답 파싱·timeout은 매 요청에 적용합니다. 서비스의 실제 권한·저장소 구현은 패키지에 포함하지 않습니다.
 
-URL adapter는 `read`, `subscribe`, `writeOwned(patch,{mode,isCurrent})`를 구현합니다. 비동기 준비 이후 **실제 URL 반영 직전**에 `isCurrent()`를 확인해야 합니다. `mergeOwnedUrl`은 정확히 소유한 키만 변경하고 다른 query 문자열의 원래 인코딩을 보존합니다. View 편의 연결은 `mount/replace`의 `url:{adapter,bindings:[{state,key?,history?}],limits?}`로 사용하며 Store의 직접 `connectUrl`과 동시에 연결할 수 없습니다. cleanup 실패는 새 화면 적용을 완료하고 오류를 기록합니다.
+URL adapter는 `read`, `subscribe`, `writeOwned(patch,{mode,isCurrent})`를 구현합니다. 비동기 준비 이후 **실제 URL 반영 직전**에 `isCurrent()`를 확인해야 합니다. `mergeOwnedUrl`은 정확히 소유한 키만 변경하고 다른 query 문자열의 원래 인코딩을 보존합니다. View 편의 연결은 `mount/replace`의 `url:{adapter,bindings:[{state,key?,history?}],limits?}`로 사용하며 Store의 직접 `connectUrl`과 동시에 연결할 수 없습니다. cleanup 실패는 새 화면 적용을 완료하고 오류를 기록합니다. 새 초기값이 늦게 준비돼도 남은 옛 URL로 덮지 않으며, 초기값 준비 중 명시한 State 쓰기는 준비 완료 후 URL에 반영합니다.
 
 ## CEL 지원 및 제한
 
@@ -73,3 +73,5 @@ npm run test:package
 ```
 
 Node 22.21.1·24.1.0 및 Playwright 1.62.1 Chromium으로 검증합니다. Svelte 렌더러, Dart/Flutter, 선택 차트는 후속 패키지 범위입니다. HTTP 실서비스 정책, 다른 브라우저 및 운영 성능은 이 검사로 보장하지 않습니다.
+
+빌드는 필수 타입 선언을 포함한 8개 산출물을 모두 준비한 뒤 `dist`를 교체하며 이전 빌드의 불필요한 파일을 남기지 않습니다. `npm run check`는 `skip`·`todo`를 통과로 집계하지 않고 실패 처리하며, 인수 대조에는 실제 실행 보고서가 필요합니다.

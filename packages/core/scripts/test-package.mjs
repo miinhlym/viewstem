@@ -1,4 +1,4 @@
-import { mkdtemp,writeFile,readFile,rm } from 'node:fs/promises';
+import { mkdtemp,writeFile,rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -9,7 +9,7 @@ const directory=await mkdtemp(join(tmpdir(),'viewstem-package-consumer-'));
 const execute=(command,args,cwd=directory)=>execFileSync(command,args,{cwd,encoding:'utf8',stdio:['ignore','pipe','pipe']});
 try {
  const [packed]=JSON.parse(execute('npm',['pack',pkg,'--pack-destination',directory,'--ignore-scripts','--json'],root));
- assert.ok(packed.files.some(file=>file.path==='dist/index.d.ts'));assert.ok(packed.files.some(file=>file.path==='dist/http.js'));assert.ok(packed.files.some(file=>file.path==='dist/cel-support.json'));assert.ok(packed.files.some(file=>file.path==='README.md'));assert.ok(packed.files.every(file=>!file.path.startsWith('test/')&&!file.path.startsWith('experiments/')));
+ assert.deepEqual(packed.files.map(file=>file.path).sort(),['README.md','package.json',...['cel-support.json','http.d.ts','http.js','http.js.map','index.d.ts','index.js','index.js.map','THIRD-PARTY-NOTICES.txt'].map(name=>`dist/${name}`)].sort());
  await writeFile(join(directory,'package.json'),JSON.stringify({private:true,type:'module'}));
  execute('npm',['install',join(directory,packed.filename),'--ignore-scripts','--no-audit','--no-fund']);
  await writeFile(join(directory,'consumer.mjs'),`import assert from 'node:assert/strict';
@@ -21,14 +21,16 @@ registry.registerAction({kind:'Action',id:'answer',spec:{output:{schema:{type:'b
 const runtime=createRuntime({registry}),{view,initial}=await runtime.mount({view:{render:{id:'leaf',componentRef:'Leaf'}}});await initial;
 assert.equal(await runtime.invokeAction({owner:view,actionRef:'answer'}),false);
 assert.equal(compileCel('x+1',{inputs:{x:{type:'integer'}}})({x:2}),3);
-const store=createStateStore(),scope=store.createScope(),cell=scope.registerState('n',{schema:{type:'integer'},initial:1});cell.write(2);assert.equal(cell.read(),2);
+const store=createStateStore(),scope=store.createScope(),cell=scope.registerState('n',{schema:{type:'integer'},initial:1});assert.equal(store.transaction(()=>{cell.write(2);return cell.read();}),2);
 assert.equal(typeof createHttpExecutor(),'function');assert.ok(support);store.dispose();runtime.dispose();console.log('isolated package runtime passed');
 `);
  execute(process.execPath,['consumer.mjs']);
- await writeFile(join(directory,'consumer.ts'),`import {createRegistry,createRuntime,createStateStore} from '@viewstem/core';
+ await writeFile(join(directory,'consumer.ts'),`import {createRegistry,createRuntime,createStateStore,type View} from '@viewstem/core';
 import {createHttpExecutor} from '@viewstem/core/http';
 const registry=createRegistry();const store=createStateStore();
 const cell=store.createScope().registerState('n',{schema:{type:'integer'} as const,initial:1});cell.write(2);
+const answer:number=store.transaction(()=>42);
+declare const view:View;const node=view.snapshot().roots[0];if(node)await view.emit(node,'click',{});
 // @ts-expect-error schema-inferred integer rejects strings
 cell.write('wrong');
 const runtime=createRuntime({registry,stateStore:store,requestExecutor:createHttpExecutor()});runtime.dispose();

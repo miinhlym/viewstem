@@ -4,6 +4,7 @@ const root=new URL('../../../',import.meta.url),read=async path=>JSON.parse(awai
 const coverage=await read('docs/handoff/core-acceptance-coverage.json'),seen=new Set(),reports=[];
 for(const path of process.argv.slice(2))reports.push(await read(path));
 const problems=[];
+if(!reports.length)problems.push('at least one executed test report is required');
 for(const row of coverage.records){
  if(seen.has(row.id))problems.push(`duplicate ${row.id}`);seen.add(row.id);
  if(row.status==='deferred-optional-chart'){if(!row.id.startsWith('X'))problems.push(`invalid deferred ${row.id}`);continue;}
@@ -17,5 +18,8 @@ for(const row of coverage.records){
  }
 }
 if(seen.size!==224||coverage.records.filter(row=>row.status==='verified-core').length!==216)problems.push('unexpected inventory');
-for(const report of reports)if(report.failed)problems.push(`${report.nodeVersion} failed tests ${report.failed}`);
+for(const report of reports){
+ if(report.failed)problems.push(`${report.nodeVersion} failed tests ${report.failed}`);
+ if(report.skipped||report.todo)problems.push(`${report.nodeVersion} unexecuted tests: skipped=${report.skipped??0}, todo=${report.todo??0}`);
+}
 if(problems.length){console.error(JSON.stringify(problems,null,2));process.exitCode=1;}else console.log(JSON.stringify({core:216,optionalCharts:8,verifiedReports:reports.map(report=>({node:report.nodeVersion,passed:report.passed}))}));

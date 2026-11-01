@@ -8,5 +8,5 @@ const result=spawnSync(process.execPath,['--test','--test-reporter=./packages/co
 if(result.error)throw result.error;
 if(result.stderr)process.stderr.write(result.stderr);
 await writeFile(new URL('results/current.json',directory),result.stdout);
-const report=JSON.parse(result.stdout);console.log(JSON.stringify({node:report.nodeVersion,passed:report.passed,failed:report.failed,failures:report.failures}));
-process.exitCode=result.status??1;
+const report=JSON.parse(result.stdout);console.log(JSON.stringify({node:report.nodeVersion,passed:report.passed,failed:report.failed,skipped:report.skipped,todo:report.todo,failures:report.failures}));
+process.exitCode=result.status||report.failed||report.skipped||report.todo?1:result.status??1;
