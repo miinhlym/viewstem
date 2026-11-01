@@ -7,6 +7,7 @@
 | 하려는 일 | 시작점 |
 |---|---|
 | 패키지를 사용하거나 호스트에 연결하기 | [패키지 사용법](../packages/core/README.md), [호스트 연결 계약](spec/07-host-integration.md) |
+| JSON을 편집하며 화면과 실행 상태 확인하기 | [core playground 사용법](../playground/README.md), [구현·검증 인계](handoff/playground-implementation-2026-11-02.md) |
 | 리소스와 실행 규칙 이해하기 | [전체 계약](VIEWSTEM-SPEC.md) → 아래 주제별 명세 |
 | 기존 core를 수정하고 검증하기 | [현재 작업 시작 절차](handoff/implementation-start.md#새-채팅에서-시작할-때) |
 | 지원 범위와 제한 확인하기 | [구현 인수인계](handoff/core-implementation-2026-11-02.md), [CEL 지원 범위](handoff/core-cel-support.md) |
@@ -46,6 +47,7 @@
 | 인수 ID별 기대 동작 | [인수 검증 행렬](handoff/acceptance-matrix.md) | 계약 변경 시 기대값·근거 갱신 |
 | 기대값과 실제 제품 테스트의 연결 | [제품 인수 대응표](handoff/core-acceptance-coverage.json) | [build-coverage.mjs](../packages/core/scripts/build-coverage.mjs)가 원래 목록과 제품 테스트 매핑을 조합; 생성물을 별도 수기 목록으로 관리하지 않음 |
 | 실제 실행 환경·결과·해시 | [제품 검증 결과](handoff/core-verification-results.json) | 실행 보고서와 검증 증거로 갱신; `test:report`가 이 요약 JSON까지 자동 갱신하지는 않음 |
+| 바닐라 playground의 브라우저 흐름·화면 검증 | [playground 검증 결과](handoff/playground-verification-results.json), [기능별 점검표](handoff/playground-audit-2026-11-02.md) | `test:playground` 실행과 화면 확인 후 갱신; core 인수 항목과 별도 추적 |
 | 구현 전 독립 실험의 이력 | [검증 진행표](handoff/verification-ledger.md), [원래 인수 목록](../experiments/verification/coverage.json) | 원래 실험·실패 증거 보존; 제품 통과 증거와 구분 |
 
 ## 배경과 이력

@@ -8,7 +8,7 @@
 
 | 범위 | 남은 작업과 완료 기준 | 기준 계약·근거 |
 |---|---|---|
-| Svelte 제품 렌더러 | core projection·수명·이벤트를 실제 제품 어댑터에 연결하고 초기 반영·제거·반복을 검증. 테스트 전용 DOM 어댑터와 구분 | [호스트 연결](../spec/07-host-integration.md), [화면 계약](../spec/05-component-view.md) |
+| Svelte 제품 렌더러 | core projection·수명·이벤트를 실제 제품 어댑터에 연결하고 초기 반영·제거·반복을 검증. [바닐라 playground](../../playground/README.md)의 도구용 DOM 어댑터와 구분 | [호스트 연결](../spec/07-host-integration.md), [화면 계약](../spec/05-component-view.md) |
 | Dart core·Flutter | 별도 실행기를 같은 의미로 구현하고 교차 적합성 검증. 기존 Dart CEL 후보의 불일치는 해결된 것으로 취급하지 않음 | [제품·언어 경계](implementation-start.md#2-제품과-의존성-경계), [후보 검증 기록](verification-ledger.md) |
 | 선택 차트 패키지 | 엔진별 실제 지원표·공개 입력·렌더링을 제품 패키지로 검증. 독립 실험 통과를 제품 완료로 옮기지 않음 | [차트 계약](../spec/11-optional-charts.md), 제품 인수 대응표의 X 항목 |
 | 실제 서비스 연결 | 서비스가 resolver·권한·secret 저장소·router를 구현하고 해당 환경에서 검증. core에 도메인 의존성을 추가하지 않음 | [HTTP·인증](../spec/01-datasource-auth.md), [호스트 권한](../spec/07-host-integration.md) |

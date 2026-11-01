@@ -4,6 +4,8 @@ A framework-independent runtime for declarative UIs.
 
 JS/TS core의 [패키지 사용법](packages/core/README.md), [구현 범위와 제한](docs/handoff/core-implementation-2026-11-02.md), [실제 검증 결과](docs/handoff/core-verification-results.json)를 확인하세요. 로컬 구현·검증과 공개 발행 상태는 구별합니다.
 
+JSON을 편집하며 실제 core 동작을 확인하려면 `npm ci --ignore-scripts` 후 `npm run playground`를 실행하세요. [바닐라 플레이그라운드](playground/README.md)에서 화면 미리보기와 State·Query·Action을 확인할 수 있습니다.
+
 - [문서 지도와 읽는 순서](docs/README.md)
 - [현재 설계 명세](docs/VIEWSTEM-SPEC.md)
 - [수정·검증을 이어갈 시작 지점](docs/handoff/implementation-start.md#새-채팅에서-시작할-때)

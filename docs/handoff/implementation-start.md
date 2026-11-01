@@ -43,6 +43,7 @@ npm run test:package
 - 인수 테스트 연결이 바뀌면 제품 매핑을 수정한 뒤 `node packages/core/scripts/build-coverage.mjs`로 대응표를 재생성하고 실행 보고서와 대조한다. 원래 [실험 목록](../../experiments/verification/coverage.json)은 덮어쓰지 않는다.
 - CEL 패치·카탈로그 변경은 [지원 범위](core-cel-support.md)와 [고정 소스 재현 절차](../../packages/core/vendor/README.md)를 함께 검증한다.
 - 브라우저 동작 변경은 `test:browser`, 공개 타입·배포 구성·패키지 README 변경은 `test:package`로 소비자를 확인한다. 문서 경로만 바뀌면 링크·앵커·배포 경계와 `git diff --check`를 확인하며 무관한 전체 제품 검사를 반복하지 않는다.
+- `playground/` 변경은 `npm run test:playground`와 실제 화면 확인을 추가한다. 사용법·분할 화면·도구 범위는 [playground README](../../playground/README.md), 실행 증거는 [별도 결과](playground-verification-results.json)를 따른다.
 - 결과 요약 JSON은 위 명령으로 자동 갱신되지 않는다. 새 실행 증거·해시를 반영하고, 재사용한 검사와 다시 실행한 검사를 구분한다. [날짜별 구현 보고](core-implementation-2026-11-02.md)는 그 시점의 기록으로 유지한다.
 
 <a id="2-제품과-의존성-경계"></a>

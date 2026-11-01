@@ -1,0 +1,768 @@
+{
+  "date": "2026-11-02",
+  "baselineCommit": "f5a856401d99cffc14ae32ed6df5b73ee3350127",
+  "scope": "Vanilla JS playground consuming the actual @viewstem/core public API; JSON editor, native DOM preview, View-level State/Query/Action inspectors, Snapshot/Log, HTTP fixture and lifecycle. Core implementation and experiments unchanged.",
+  "platform": {
+    "system": "Darwin",
+    "release": "24.6.0",
+    "architecture": "arm64",
+    "chromium": "151.0.7922.34"
+  },
+  "commands": {
+    "run": "npm run playground",
+    "browser": "npm run test:playground",
+    "reports": "node --test --test-reporter=tap --test-reporter-destination=playground/test/results/<node>.tap --test-reporter=./packages/core/scripts/test-reporter.mjs --test-reporter-destination=playground/test/results/<node>.json playground/test/*.test.mjs",
+    "core": "npm run check",
+    "syntax": "node --check on playground app, components, layout, samples and server modules",
+    "whitespace": "git diff --check",
+    "reportSetup": "mkdir -p playground/test/results"
+  },
+  "browser": {
+    "results": [
+      {
+        "nodeVersion": "v22.21.1",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "tests": [
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "numeric keyboard entry preserves decimals and exponents; blank editing restores the committed value on blur"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "pending inputs remain disabled until their State becomes ready, and disabled buttons emit no Action"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "a Derived calculation error is inspectable and recovers when its input becomes valid"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "Action failure preserves completed State writes and a successful retry clears its active error"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "double-clicking a running Action produces one HTTP execution and recovers after it completes"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "Query executeWhen blocks refresh, then opening the gate recovers both data and the error indicator"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "polling resumes, pauses without blocking manual refresh, and stops issuing requests after disposal"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "rapid search edits converge to the last input without publishing stale Query results"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "keyed repeat reorders preserve focused IME editing and local State; removal creates a fresh lifetime"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "named slots retain their order and duplicate repeat keys are rejected before replacing the running view"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "invalid JSON envelopes, duplicate built-ins and oversized UTF-8 drafts preserve the active view"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "a slow file import never overwrites a newer editor change or a later imported file"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "storage denial and oversized file rejection leave the editor and runtime usable"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "preview node and diagnostic limits remain recoverable and never report a rendering failure as ready"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "narrow and landscape viewports expose controls without page overflow, and logs stay bounded"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "malformed HTTP request targets return 400 without terminating the playground server"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Korean pasted text survives URL encoding and filters the actual HTTP results"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Korean IME composition survives a pending Query response and commits exactly once"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Korean IME cancellation, blur commit and later typing keep State and input synchronized"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "an external State reset permits re-entering the same Korean text after IME commit"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "JSON starts a real HTTP Query; editing input updates State, Action, results and preserves focus"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Action inspector observes asynchronous running and successful false without treating it as missing"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Query errors preserve last success, expose stale and diagnostics, and recover after input change"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "State and CEL Derived render through JSON; when removes and recreates the visual node"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "JSON Component composition, authored slots and repeat render once without duplicate children"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "invalid JSON, invalid references and invalid schemas preserve the last live preview"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "initial Query failure remains inspectable and the run indicator recovers with the Query"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "rerunning a JSON document creates a fresh runtime instead of retaining edited State"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "stop cancels pending HTTP and rejects late publications; a later run starts cleanly"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "rapid executions and replacement while an Action runs never publish the old generation"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "draft reload restores exact edits without automatically executing their requests"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "import preserves the running view until execution; export retains the exact editable draft"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "registered View references and explicit inputs use the same public core API"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "literal HTML stays text and inspector preserves null and false"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "keyboard execution, formatting, accessible tabs and component reference help work"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "mobile switches between full-height editor, preview and inspector without page overflow"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "workspace fills the viewport; splitters resize by pointer and keyboard with bounded pane sizes"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Snapshot and Log use exclusive inspectable tabs and log clearing does not alter runtime state"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Action failure exposes the actual core error in the inspector"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "playground server serves only its assets and mock endpoint, without a filesystem or proxy route"
+          }
+        ],
+        "failures": [],
+        "skippedTests": [],
+        "todoTests": [],
+        "reportSha256": "7930890b3944b6ad5953d0221396709680fd653af355067e2334d9fd06f932e0",
+        "localReport": "playground/test/results/node22.json"
+      },
+      {
+        "nodeVersion": "v24.1.0",
+        "passed": 40,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "tests": [
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "numeric keyboard entry preserves decimals and exponents; blank editing restores the committed value on blur"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "pending inputs remain disabled until their State becomes ready, and disabled buttons emit no Action"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "a Derived calculation error is inspectable and recovers when its input becomes valid"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "Action failure preserves completed State writes and a successful retry clears its active error"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "double-clicking a running Action produces one HTTP execution and recovers after it completes"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "Query executeWhen blocks refresh, then opening the gate recovers both data and the error indicator"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "polling resumes, pauses without blocking manual refresh, and stops issuing requests after disposal"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "rapid search edits converge to the last input without publishing stale Query results"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "keyed repeat reorders preserve focused IME editing and local State; removal creates a fresh lifetime"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "named slots retain their order and duplicate repeat keys are rejected before replacing the running view"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "invalid JSON envelopes, duplicate built-ins and oversized UTF-8 drafts preserve the active view"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "a slow file import never overwrites a newer editor change or a later imported file"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "storage denial and oversized file rejection leave the editor and runtime usable"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "preview node and diagnostic limits remain recoverable and never report a rendering failure as ready"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "narrow and landscape viewports expose controls without page overflow, and logs stay bounded"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "malformed HTTP request targets return 400 without terminating the playground server"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Korean pasted text survives URL encoding and filters the actual HTTP results"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Korean IME composition survives a pending Query response and commits exactly once"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Korean IME cancellation, blur commit and later typing keep State and input synchronized"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "an external State reset permits re-entering the same Korean text after IME commit"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "JSON starts a real HTTP Query; editing input updates State, Action, results and preserves focus"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Action inspector observes asynchronous running and successful false without treating it as missing"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Query errors preserve last success, expose stale and diagnostics, and recover after input change"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "State and CEL Derived render through JSON; when removes and recreates the visual node"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "JSON Component composition, authored slots and repeat render once without duplicate children"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "invalid JSON, invalid references and invalid schemas preserve the last live preview"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "initial Query failure remains inspectable and the run indicator recovers with the Query"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "rerunning a JSON document creates a fresh runtime instead of retaining edited State"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "stop cancels pending HTTP and rejects late publications; a later run starts cleanly"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "rapid executions and replacement while an Action runs never publish the old generation"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "draft reload restores exact edits without automatically executing their requests"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "import preserves the running view until execution; export retains the exact editable draft"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "registered View references and explicit inputs use the same public core API"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "literal HTML stays text and inspector preserves null and false"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "keyboard execution, formatting, accessible tabs and component reference help work"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "mobile switches between full-height editor, preview and inspector without page overflow"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "workspace fills the viewport; splitters resize by pointer and keyboard with bounded pane sizes"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Snapshot and Log use exclusive inspectable tabs and log clearing does not alter runtime state"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Action failure exposes the actual core error in the inspector"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "playground server serves only its assets and mock endpoint, without a filesystem or proxy route"
+          }
+        ],
+        "failures": [],
+        "skippedTests": [],
+        "todoTests": [],
+        "reportSha256": "46650cfcd17122975407f15d004b563e1edd849d5d3310fe7c839c1c8b1358b9",
+        "localReport": "playground/test/results/node24.json"
+      }
+    ],
+    "uncaughtPageErrors": 0,
+    "remoteCIExecuted": false
+  },
+  "visual": {
+    "inspected": [
+      "Desktop 1512x982: compact toolbar, full-height JSON editor, preview/inspector split, no page overflow",
+      "Mobile 390x844: exclusive JSON/preview/inspector panes with reachable controls and no page overflow"
+    ],
+    "automatedAdditionalViewport": "800x650: splitter minimum widths and horizontal overflow",
+    "interactions": [
+      "Mouse drag, arrow keys, Home/End and double-click splitter reset",
+      "Arrow/Home/End inspector tabs, exclusive Snapshot/Log panels",
+      "Mobile execution reveals preview; invalid JSON reveals error while preserving last preview",
+      "Shift+Tab leaves the JSON editor"
+    ],
+    "reference": "https://www.typescriptlang.org/play/",
+    "screenshots": {
+      "playground/test/results/desktop.png": "7b3e24dcbb07b88da299647e25fc2ff9846f4ecf94a796749dd5670182ac956a",
+      "playground/test/results/mobile-editor.png": "acf8706563f6b2d1707ce6ee5304ca3e7c5d169037ca8dd565667f61405d4c9b",
+      "playground/test/results/mobile-preview.png": "72c951752fe5372482c9a7a76e1f9b6345ce72b44da456f0c91cfddf77b9faf9",
+      "playground/test/results/mobile-inspector.png": "e5cc118a913c95def42a0f7c5f6da6d43bca72eb665bbc7e48a210a7f4d4b351"
+    }
+  },
+  "coreIntegration": {
+    "command": "npm run check",
+    "node": "v22.21.1",
+    "passed": 1060,
+    "failed": 0,
+    "skipped": 0,
+    "todo": 0,
+    "build": "passed",
+    "strictTypes": "passed",
+    "acceptance": {
+      "verifiedCore": 216,
+      "optionalChartsDeferred": 8
+    },
+    "localReport": "packages/core/test/results/current.json",
+    "reportSha256": "689d3e6d064479e7b80c1ff2bb9cfc237b7eb4686636006220f11d94b160259e",
+    "baseline": "docs/handoff/core-verification-results.json",
+    "unchangedRecordedSources": 128,
+    "changedRecordedSources": [
+      "package.json"
+    ],
+    "reason": "Root package.json only adds playground and test:playground scripts; lockfile and all recorded core sources unchanged.",
+    "unchangedBuildArtifacts": 8,
+    "reused": "Existing core Node 24, core Chromium and isolated tarball verification; source/artifact matches confirmed. Historical evidence is preserved, not overwritten."
+  },
+  "sourceSha256": {
+    "playground/README.md": "1ab5526f8851c524deb7fad94aabb2d3e22d16c2e60a82e4e88a8e1e037d882c",
+    "playground/app.mjs": "ad0053b0a65e05e5f824ac1af24231f01b01eedc657cb37497c29d94d2580cc2",
+    "playground/components.mjs": "8dcad90ca39914e33b25c3a22d1c30821c2cf1bd3d9891cd8ffcfb3fca80a5d8",
+    "playground/index.html": "8ac3e92ae9f10440bdc7df5cff531a1d6553e98801f5064d2586e19c116107f8",
+    "playground/layout.mjs": "de2e0b1919d334554fc6dbac454a421faf9550f37a27a5831c68cdaf9f63d913",
+    "playground/samples.mjs": "11b32c6afb971d7582ecbaa3e4ea2c12e0c66d0ce29e76a3997d3cfc2dc298ef",
+    "playground/server.mjs": "93f18b7376e323c73a90d704504b7aa8e40a10a4ad7d81bfac1f8cad1078b562",
+    "playground/style.css": "3322de723a84c6d4adc9d6f1b507d4e5259f9adc1e1ce1a0c51699295250e27a",
+    "playground/test/playground.test.mjs": "25174ac1aa2d1c3b1a4a974850fdffd31522173fa6bfb9c9a1ebf09bfdbb7744",
+    "package.json": "93a71367adc4ee4a576e6f637c13e8d49612bc8a0fff212b741426c004edbed0",
+    "package-lock.json": "15c84c14d4f420bf412291d720ae3cdb457b0a880ca4d01eed6652041bd9f607",
+    ".github/workflows/core.yml": "1ef32d2f76aea20ff8115671fb1a5c6c055412918f9e4231488b55a9dda3588a",
+    ".gitignore": "889dc9a8e55baa2f5698f2f7efe33734d9a6e3fe068e66138fc4c97091d24be0",
+    "playground/test/edge-cases.test.mjs": "744626035d26b6086c749bde57b3e6464cb7e89aabe35244f073537574235c5c"
+  },
+  "documentationSha256": {
+    "README.md": "eac1778babb05a656a9c56037889f9569f3a89bb0b2d84e827b0e0c8df8fe8b9",
+    "docs/README.md": "3ae7d3996702d7299a560572214f06798e4c292fca36eea20c188b045aa72acc",
+    "docs/VIEWSTEM-SPEC.md": "61dce4570cbde32c0e0c57c64f09ae94c3e70318e23254a0099a364805449adf",
+    "docs/handoff/implementation-start.md": "f12b3a6864cbb4c818ac2d07201277a66cc553a098fdc015d3b977f3f6d7f445",
+    "docs/handoff/open-contracts.md": "7c53c98f378b7959ab577896917eb097684aa65d58452503bbbd0777d424079d",
+    "docs/history/decision-register.md": "654a33f3a0c55ff0a3703431ee4157c6471c24e417bdbd7f68d349e077f80c57",
+    "docs/history/evidence-index.md": "fc30fc3f660e6a97e8184f96a07ca418427d0257340f818a5bbab7dbf94bbf5f",
+    "docs/handoff/playground-implementation-2026-11-02.md": "390ce7eadd39e59e456dea163efd6912189a7f9816da7e06dd2c12be39b4345d",
+    "docs/handoff/playground-audit-2026-11-02.md": "c87e489091341432974cc7138ea460a83b39a7c94ab95c4599ac20d638f2436b"
+  },
+  "remainingKnownFailures": [],
+  "limitations": [
+    "Inspectors expose View-level State/Derived, Query and observed event Action IDs, not all internal Component execution cells.",
+    "Preview supports nine playground-owned components plus declarative compositions; no Grid/chart UI or general renderer SDK.",
+    "Native textarea editor: no syntax highlighting, completion or source hot reload; Shift+Tab exits indentation capture.",
+    "Draft limit 1MB UTF-8; displayed values capped at 40000 characters/depth 20; preview capped at 3000 nodes. Truncated snapshots are diagnostics, not complete JSON exports.",
+    "Chromium only; other browsers, real mobile input methods/touch and large document performance not verified.",
+    "External APIs use browser CORS; no proxy, secret resolver or hosted deployment."
+  ],
+  "publication": "Local split commits requested and prepared; no push, remote CI execution or package publication.",
+  "imeFollowup": {
+    "date": "2026-11-02",
+    "report": "User observed broken Korean input in the Query/Action example concept search.",
+    "cause": "Snapshot rendering assigned the last committed State value to an input during active IME composition. Chromium cancelled composition without compositionend, leaving the input handler stuck in composing mode.",
+    "before": {
+      "componentSha256": "beec5a674469a2d7f99e9321ce7305493cb98ab6e211729c25f31a3170208316",
+      "priorVerificationSha256": "91ec05b2e943c32c1f39004cbdd66193c4bfcb48ceb188d10b215108620a3bf2",
+      "observed": {
+        "paste": {
+          "value": "입력",
+          "results": [
+            "Query",
+            "Component"
+          ],
+          "state": "\"입력\""
+        },
+        "composingValue": "입력",
+        "valueAfterPendingQueryResponse": "입",
+        "subsequentRequestSearches": [
+          "",
+          "입력",
+          "",
+          "입"
+        ],
+        "uncaughtErrors": []
+      },
+      "regression": {
+        "nodeVersion": "v22.21.1",
+        "passed": 1,
+        "failed": 2,
+        "skipped": 0,
+        "todo": 0,
+        "tests": [
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Korean pasted text survives URL encoding and filters the actual HTTP results"
+          }
+        ],
+        "failures": [
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Korean IME composition survives a pending Query response and commits exactly once",
+            "message": "a Query snapshot must not overwrite the composing syllable\n\n'입' !== '입력'\n"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Korean IME cancellation, blur commit and later typing keep State and input synchronized",
+            "message": "cancelling unchanged composition must not invoke an Action\n\n1 !== 0\n"
+          }
+        ],
+        "skippedTests": [],
+        "todoTests": []
+      },
+      "localEvidenceDirectory": "playground/test/results/ime-before/"
+    },
+    "changes": [
+      "Rendering and event handling share composition state; snapshot refreshes do not assign value during active composition.",
+      "Commit emits once, ignoring a duplicate final input event; cancellation with no change does not invoke an Action.",
+      "External value assignments invalidate duplicate suppression, permitting the same text after a State reset."
+    ],
+    "verification": {
+      "method": "Chromium CDP Input.imeSetComposition and Input.insertText drive native browser composition. A separate synthetic trailing input checks the alternate final-event ordering.",
+      "reference": "https://raw.githubusercontent.com/ChromeDevTools/devtools-protocol/master/pdl/domains/Input.pdl",
+      "targeted": {
+        "nodeVersion": "v22.21.1",
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "tests": [
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Korean pasted text survives URL encoding and filters the actual HTTP results"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Korean IME composition survives a pending Query response and commits exactly once"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "Korean IME cancellation, blur commit and later typing keep State and input synchronized"
+          },
+          {
+            "file": "playground/test/playground.test.mjs",
+            "name": "an external State reset permits re-entering the same Korean text after IME commit"
+          }
+        ],
+        "failures": [],
+        "skippedTests": [],
+        "todoTests": []
+      },
+      "fullSuites": [
+        {
+          "nodeVersion": "v22.21.1",
+          "passed": 24,
+          "failed": 0
+        },
+        {
+          "nodeVersion": "v24.1.0",
+          "passed": 24,
+          "failed": 0
+        }
+      ],
+      "additionalResetRegression": "An intermediate duplicate-suppression implementation rejected re-entry of the same text after an external State reset; reproduced and fixed by clearing suppression on value assignment.",
+      "coreEvidence": "Reused unchanged core evidence: all 128 recorded sources other than the previously changed root manifest, and all eight build artifacts still match."
+    },
+    "limitation": "Browser IME machinery verified; not a physical macOS keyboard or real mobile IME certification."
+  },
+  "auditFollowup": {
+    "date": "2026-11-02",
+    "inventory": "docs/handoff/playground-audit-2026-11-02.md",
+    "scope": "All currently documented playground feature areas: three examples, nine adapters, JSON registration/edit/import/export/drafts, State/Derived, Query/Action, composition/lifetimes, inspectors/logs, layouts/keyboard and loopback server. Not an exhaustive audit of all core APIs or environments.",
+    "method": "Real Chromium pages edit JSON and operate preview controls against the actual public core package and native HTTP. CDP drives IME. File.text completion is deliberately gated for deterministic stale-import races; malformed request crash was isolated in a child process.",
+    "before": {
+      "priorVerificationSha256": "eb90772803ae52b1d24087ac14c6b59978c1fab3011ebbdc8b58269da31c2edd",
+      "sourceSha256": {
+        "playground/app.mjs": "49dc0b0af5d8194b9b9195c907d8eb246dd62e2cb3a8b50145e1eeae2800bb72",
+        "playground/components.mjs": "fd124a120dc3ff2a83143ee94c7f402bf33ed3d37b73ece3600e20b689a7e9ff",
+        "playground/layout.mjs": "de2e0b1919d334554fc6dbac454a421faf9550f37a27a5831c68cdaf9f63d913",
+        "playground/server.mjs": "91b97aceb48305317f462fbfa141f9ef05d0e13bdfe8c2d339dae5203a37e833"
+      },
+      "initialEdgeSuite": {
+        "nodeVersion": "v22.21.1",
+        "passed": 7,
+        "failed": 7,
+        "skipped": 0,
+        "todo": 0,
+        "tests": [
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "double-clicking a running Action produces one HTTP execution and recovers after it completes"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "polling resumes, pauses without blocking manual refresh, and stops issuing requests after disposal"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "rapid search edits converge to the last input without publishing stale Query results"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "named slots retain their order and duplicate repeat keys are rejected before replacing the running view"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "invalid JSON envelopes, duplicate built-ins and oversized UTF-8 drafts preserve the active view"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "storage denial and oversized file rejection leave the editor and runtime usable"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "narrow and landscape viewports expose controls without page overflow, and logs stay bounded"
+          }
+        ],
+        "failures": [
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "numeric keyboard entry preserves decimals and exponents; blank editing restores the committed value on blur",
+            "message": "Expected values to be strictly equal:\n\n'' !== '1000'\n"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "pending inputs remain disabled until their State becomes ready, and disabled buttons emit no Action",
+            "message": "Expected values to be strictly equal:\n\nfalse !== true\n"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "Action failure preserves completed State writes and a successful retry clears its active error",
+            "message": "Expected values to be strictly equal:\n\ntrue !== false\n"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "Query executeWhen blocks refresh, then opening the gate recovers both data and the error indicator",
+            "message": "Expected values to be strictly equal:\n\ntrue !== false\n"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "keyed repeat reorders preserve focused IME editing and local State; removal creates a fresh lifetime",
+            "message": "Expected values to be strictly equal:\n\nfalse !== true\n"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "a slow file import never overwrites a newer editor change or a later imported file",
+            "message": "Expected values to be strictly equal:\n+ actual - expected\n\n+ '{\"view\":{\"render\":{\"id\":\"text\",\"componentRef\":\"Text\",\"inputs\":{\"text\":\"늦은 파일\"}}}}'\n- '새 편집 내용'\n"
+          },
+          {
+            "file": "playground/test/edge-cases.test.mjs",
+            "name": "preview node and diagnostic limits remain recoverable and never report a rendering failure as ready",
+            "message": "Expected values to be strictly equal:\n\n'ready' !== 'error'\n"
+          }
+        ],
+        "skippedTests": [],
+        "todoTests": []
+      },
+      "correctedTestExpectation": {
+        "name": "pending inputs remain disabled until their State becomes ready, and disabled buttons emit no Action",
+        "reason": "An optional Value input can remain missing; this is not a pending dependency. The corrected fixture uses a Derived with a missing required Variable input, and passed on the unchanged implementation.",
+        "localReport": "playground/test/results/audit-before/pending-corrected.tap",
+        "sha256": "9a1fc6fadc1356c0cfd8cef25d454bd7ba9d1f076f51f6414fb3ae5359a135f8"
+      },
+      "malformedRequest": {
+        "response": {
+          "error": "ECONNRESET"
+        },
+        "exit": {
+          "code": 1,
+          "signal": null
+        },
+        "stderr": "node:internal/url:827\n      href = bindingUrl.parse(input, base, true);\n                        ^\n\nTypeError: Invalid URL\n    at new URL (node:internal/url:827:25)\n    at Server.<anonymous> (file://<repository>/playground/server.mjs:20:17)\n    at Server.emit (node:events:519:28)\n    at parserOnIncoming (node:_http_server:1186:12)\n    at HTTPParser.parserOnHeadersComplete (node:_http_common:122:17) {\n  code: 'ERR_INVALID_URL',\n  input: '//[',\n  base: 'http://localhost'\n}\n\nNode.js v22.21.1\n"
+      }
+    },
+    "fixedFindings": [
+      {
+        "id": "PG-A01",
+        "area": "NumberInput",
+        "before": "Blank input remained visually blank after blur while State retained its value.",
+        "after": "Preserve intermediate numeric editing and same-value numeric notation; synchronize to the current State on blur. Negative fractions and exponent input verified."
+      },
+      {
+        "id": "PG-A02",
+        "area": "Error recovery",
+        "before": "Action retry and Query gate recovery succeeded while their previous error banner persisted.",
+        "after": "Track errors by event connection or Query; clear on corresponding recovery, retain failures in Log, and do not clear due to unrelated success."
+      },
+      {
+        "id": "PG-A03",
+        "area": "Keyed DOM repeat",
+        "before": "Reordering retained input DOM with insertBefore dropped focus and interrupted IME.",
+        "after": "Reorder siblings around the retained focused subtree, preserving focus, native composition and Component-local State; removal/re-add starts fresh."
+      },
+      {
+        "id": "PG-A04",
+        "area": "Import lifecycle",
+        "before": "A delayed file read overwrote a newer editor change.",
+        "after": "Draft revision and import ordering prevent stale file results or errors from replacing newer work."
+      },
+      {
+        "id": "PG-A05",
+        "area": "Run status",
+        "before": "A 3000-node display-limit error banner coexisted with ready status.",
+        "after": "An active display error takes precedence in run status and clears after successful rendering."
+      },
+      {
+        "id": "PG-A06",
+        "area": "Loopback server",
+        "before": "Request target //[ raised an uncaught Invalid URL exception and terminated the server with code 1.",
+        "after": "Return HTTP 400 and continue serving subsequent requests."
+      }
+    ],
+    "verification": {
+      "fullSuites": [
+        {
+          "nodeVersion": "v22.21.1",
+          "passed": 40,
+          "failed": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        {
+          "nodeVersion": "v24.1.0",
+          "passed": 40,
+          "failed": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      ],
+      "testFiles": [
+        "playground/test/playground.test.mjs",
+        "playground/test/edge-cases.test.mjs"
+      ],
+      "uncaughtPageErrors": 0,
+      "screenshots": {
+        "playground/test/results/audit/action-recovered.png": "07e282365c5c85d090c191f922a683d5354e9d2a54e982e11fc450697fc9c954",
+        "playground/test/results/audit/numbers.png": "10cb06e03cf5d6086634f793f6a837b8c43318ef70949e903e5319ffac59e0df",
+        "playground/test/results/audit/repeat-lifetimes.png": "301528c302328337922474e1045a39b93db68454b72c6deef891fd5e121d6fa3",
+        "playground/test/results/audit/viewport-320.png": "27483fdceb6eeaa5bc42ed009d4b11acc430e9e9c948a066e71a85dea17679da",
+        "playground/test/results/audit/viewport-844.png": "b9506cb40e94cb7f5d80486d66dec62bbecdf53a3736faab3a0da5a8954e3656"
+      },
+      "visualInspected": [
+        "1280x800 Action recovery and repeated Component input lifecycle",
+        "320x568 compact controls and pane switching",
+        "844x390 landscape panes and internal scrolling"
+      ],
+      "reusedCore": {
+        "sourceFilesMatched": 128,
+        "buildArtifactsMatched": 8,
+        "record": "docs/handoff/core-verification-results.json",
+        "scope": "Unchanged core build, Node, strict types, acceptance, Chromium adapters and isolated package results from previous verified runs."
+      },
+      "syntax": "passed",
+      "whitespace": "passed",
+      "remoteCIExecuted": false
+    },
+    "unresolvedReproducedFailures": [],
+    "limitations": [
+      "Chromium only; no other browser engines or physical mobile/OS input methods certified.",
+      "No sustained load or large-document performance guarantee.",
+      "Local HTTP fixtures only; external service CORS, authentication and authorization remain environment-specific.",
+      "No general renderer SDK, Grid/chart UI, Svelte or Dart/Flutter support added."
+    ]
+  },
+  "splitCommitPreparation": {
+    "date": "2026-11-02",
+    "implementationCommit": "491a2e88a5e643197ef23753c4194bcb539cd06a",
+    "testsCommit": "bb30accdafbe824fa9db08260dd32d9d64da8362",
+    "documentationCommit": "This record is included in the separate playground documentation commit.",
+    "verification": "All recorded playground source and documentation hashes and both 40-test reports matched before committing. Existing core evidence remains applicable; no source or test changes made during split-commit preparation.",
+    "excluded": "Ignored local test outputs, screenshots, before-fix working copies, build outputs and dependency caches remain local.",
+    "publication": "Local commits only; no push or npm publication."
+  }
+}

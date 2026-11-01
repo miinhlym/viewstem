@@ -104,6 +104,7 @@
 
 | D92 | 구현 착수 인계와 문서·실험 커밋 | U35 이전 선택 대기 표기를 최신 계약으로 정리하고 검증 기준선을 로컬 커밋. 새 채팅은 저장소 문서·실험을 읽고 JS/TS core 구현 요청에 따라 진행. [시작 절차](../handoff/implementation-start.md#새-채팅에서-시작할-때) | U36: 새 채팅 준비·문서 및 실험 커밋 요청 |
 | D93 | JS/TS core 구현·실제 패키지 검증 | U37에서 기존 구현 보류 해제. 단일 StateStore에 Registry·Query·Action·headless View 연결, 실제 패키지 인수 216개, 타입·고정 CEL 빌드·브라우저·tarball 검증. SDK·패키지 구조·추가 CEL 수정 패치는 기술 위임에 따른 구체화이며 기존 실험 보존. Svelte/Dart/차트·공개 발행은 후속. [제품 인계](../handoff/core-implementation-2026-11-02.md) | U37: 실제 구현과 검증 요청 |
+| D94 | 바닐라 core playground | JSON 편집·실행, 화면 미리보기, State·Query·Action 관찰을 제공하는 로컬 개발 도구. 실제 공개 core를 사용하고 DOM·HTTP fixture는 playground가 소유. 새 실행의 초기화·잘못된 구성의 기존 화면 보존·분할 화면은 요청을 구현하는 기술 구체화다. Svelte renderer·선택 차트·공개 배포는 후속. [구현 인계](../handoff/playground-implementation-2026-11-02.md) | U38: 바닐라 playground 구현과 작업 공간 중심 UI 요청 |
 
 ## B. 대체·기각된 방향
 
