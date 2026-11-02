@@ -14,6 +14,7 @@
     "packages/*"
   ],
   "scripts": {
+    "test:ci": "node --test .github/scripts/*.test.mjs",
     "build": "npm run build -w @viewstem/core",
     "test": "npm run test -w @viewstem/core",
     "typecheck": "npm run typecheck -w @viewstem/core",
