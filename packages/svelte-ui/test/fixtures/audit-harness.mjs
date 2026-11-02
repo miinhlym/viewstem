@@ -34,7 +34,17 @@ export async function createAuditHarness() {
         window.diagnostics = []; window.events = []; window.unhandled = [];
         window.addEventListener('unhandledrejection', e => unhandled.push(String(e.reason?.code ?? e.reason)));
         window.renderer = API.createRenderer({ onError: entry => diagnostics.push(entry) });
-        API.registerComponents(renderer, API.shadcn);
+        // Behavior cases register the complete families used by their authored View.
+        // Full-catalog registration is still exercised by catalog/gallery and tarball tests.
+        const references = new Set();
+        const visit = value => {
+          if (!value || typeof value !== 'object') return;
+          if (typeof value.componentRef === 'string') references.add(value.componentRef);
+          for (const child of Object.values(value)) visit(child);
+        };
+        visit(view);
+        const sets = API.shadcn.filter(set => set.components.some(entry => references.has(entry.contract.id)));
+        API.registerComponents(renderer, sets);
         renderer.registry.registerAction({ kind: 'Action', id: 'audit-record', spec: { ports: { name: { kind: 'Value', schema: { type: 'string' } }, payload: { kind: 'Value', schema: true } } } }, ({ inputs }) => { events.push({ name: inputs.name, payload: inputs.payload }); });
         window.mounted = await renderer.mount({ target: document.querySelector('#app'), view });
         await mounted.initialComplete;
