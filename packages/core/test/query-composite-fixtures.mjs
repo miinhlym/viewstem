@@ -38,10 +38,10 @@ export function setup(options = {}) {
       requests.push(row); return completion.promise;
     },
   });
-  const host = { slots: new Map(), snapshot: (name = 'search') => host.slots.get(name)?.query.snapshot(), mount(name, settings = {}) {
+  const host = { slots: new Map(), getSnapshot: (name = 'search') => host.slots.get(name)?.query.getSnapshot(), mount(name, settings = {}) {
     host.slots.get(name)?.query.dispose();
     const query = engine.runtime.createUsage(options.root ?? 'root', { inputs: { a: 1, b: 1 }, clock, ...settings,
-      onChange: state => trace.push({ kind: 'snapshot', reason: state.status === 'success' ? 'run-success' : state.status, state }),
+      onChange: state => trace.push({ kind: 'getSnapshot', reason: state.status === 'success' ? 'run-success' : state.status, state }),
     });
     host.slots.set(name, { query }); return query;
   } };

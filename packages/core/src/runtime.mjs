@@ -63,7 +63,7 @@ export class Runtime {
     if(queued.length)this.registry.registerResources(queued);
     this.registry.validateDefinition('View',spec);return structuredClone(spec);
   }
-  async mount(target) {
+  async createView(target) {
     if(!this.alive)fail('CANCELLED');
     const view=new View(this);this.views.add(view);
     try{return {view,...await view.replace(target)};}catch(caught){view.dispose();throw safeError(caught);}
@@ -74,7 +74,7 @@ export class Runtime {
     try{return owner.runtime.actions.invoke(owner.root.actionOwner,actionRef,inputs,action);}catch(caught){return Promise.reject(safeError(caught));}
   }
   listResources(kind) { return this.registry.list(kind); }
-  describeResource(kind,id) { return this.registry.export(kind,id); }
+  exportResource(kind,id) { return this.registry.exportResource(kind,id); }
   dispose(){if(!this.alive)return;this.alive=false;for(const view of [...this.views])view.dispose();if(this.ownsStore)this.stateStore.dispose();}
 }
 
@@ -92,13 +92,13 @@ export class View {
       }
       if(root==='states') {
         const handle=owner.states.get(name);if(!handle)fail('REFERENCE_NOT_FOUND');
-        value=target?handle:readSnapshot(handle.snapshot());
+        value=target?handle:readSnapshot(handle.getSnapshot());
       } else if(root==='ports') {
         if(!own(owner.spec.ports??{},name))fail('REFERENCE_NOT_FOUND');
         value=owner.ports[name];
-        if(!target){const kind=owner.spec.ports[name].kind;if(kind==='State')value=value?readSnapshot(value.snapshot()):undefined;else if(kind==='Query')value=value?.snapshot();}
+        if(!target){const kind=owner.spec.ports[name].kind;if(kind==='State')value=value?readSnapshot(value.getSnapshot()):undefined;else if(kind==='Query')value=value?.getSnapshot();}
       } else if(root==='queries') {
-        const item=owner.queries.get(name);if(!item)fail('REFERENCE_NOT_FOUND');value=target?item.handle:item.usage?.snapshot()??{status:'waiting',data:undefined,error:null,dataInputs:undefined,stale:false,waitingReason:'INPUT_NOT_READY'};
+        const item=owner.queries.get(name);if(!item)fail('REFERENCE_NOT_FOUND');value=target?item.handle:item.usage?.getSnapshot()??{status:'waiting',data:undefined,error:null,dataInputs:undefined,stale:false,waitingReason:'INPUT_NOT_READY'};
       } else if(root==='actions') {
         let connection=[...(this.planConnections??this.connections).values()].find(item=>item.owner.id===owner.id&&item.handler.id===name);
         if(!connection&&this.planning){
@@ -106,7 +106,7 @@ export class View {
           const declared=this.actionDeclarations(owner.spec).get(name);
           if(previous&&equal(previous.handler,declared))connection=previous;
         }
-        if(connection)value=connection.connection.snapshot();
+        if(connection)value=connection.connection.getSnapshot();
         else if(this.planning&&this.actionNames(owner.spec).has(name))value=idle;
         else fail('REFERENCE_NOT_FOUND');
       } else if(root==='repeat') {if(!own(extra.repeat??{},name))fail('REFERENCE_NOT_FOUND');value=extra.repeat[name];}
@@ -142,7 +142,7 @@ export class View {
     for(const [name,use] of Object.entries(spec.queries??{})) {
       const old=previous?.queries.get(name),identity=use.queryRef?`Query:${use.queryRef}`:tuple(use.query);
       const item=old?.identity===identity?{...old,use,owner}: {use,owner,identity,usage:null,handle:null};
-      if(!item.handle)item.handle=createQueryHandle({snapshot:()=>item.usage?.snapshot()??{status:'waiting',data:undefined,error:null,dataInputs:undefined,stale:false,waitingReason:'INPUT_NOT_READY'},refresh:signal=>item.usage?item.usage.refresh(signal):Promise.reject(error('INPUT_NOT_READY')),retry:signal=>item.usage?item.usage.retry(signal):Promise.reject(error('INVALID_RETRY_STATE'))});
+      if(!item.handle)item.handle=createQueryHandle({getSnapshot:()=>item.usage?.getSnapshot()??{status:'waiting',data:undefined,error:null,dataInputs:undefined,stale:false,waitingReason:'INPUT_NOT_READY'},refresh:signal=>item.usage?item.usage.refresh(signal):Promise.reject(error('INPUT_NOT_READY')),retry:signal=>item.usage?item.usage.retry(signal):Promise.reject(error('INVALID_RETRY_STATE'))});
       // Preserve the object referenced by the handle; owner/use are assigned after commit.
       owner.queries.set(name,old?.identity===identity?old:item);
     }
@@ -251,7 +251,7 @@ export class View {
             if(!unchanged){for(const stop of owner.reactions)stop();owner.reactions=[];changed.push(owner);}
           }
           // Remove every changed target first; exchanging two legal targets is atomic.
-          for(const owner of changed)for(const definition of owner.reactionDefinitions)owner.reactions.push(store.reaction(owner.scope,definition));
+          for(const owner of changed)for(const definition of owner.reactionDefinitions)owner.reactions.push(store.registerReaction(owner.scope,definition));
         };
         reconcileReactions(oldOwners);
         if(settleWrites) {
@@ -308,10 +308,10 @@ export class View {
   schedule(){if(this.queued||!this.alive)return;this.queued=true;queueMicrotask(()=>{this.queued=false;this.refresh();});}
   project() {
     if(!this.alive)return;
-    const application=this.application,snapshot=this.snapshot();for(const listener of this.listeners){if(!this.alive||application!==this.application)return;try{listener(snapshot);}catch(caught){this.diagnostics.push(safeError(caught));}}
+    const application=this.application,snapshot=this.getSnapshot();for(const listener of this.listeners){if(!this.alive||application!==this.application)return;try{listener(snapshot);}catch(caught){this.diagnostics.push(safeError(caught));}}
     if(!this.alive||application!==this.application)return;
-    if(this.initial && !this.queued && [...this.owners.values()].every(owner=>[...owner.queries.values()].every(item=>item.usage?.snapshot().status!=='running'))) {
-      const queryErrors=[];for(const owner of this.owners.values())for(const [query,item] of owner.queries)if(item.usage?.snapshot().status==='error')queryErrors.push({instanceId:owner.id,query,error:item.usage.snapshot().error});
+    if(this.initial && !this.queued && [...this.owners.values()].every(owner=>[...owner.queries.values()].every(item=>item.usage?.getSnapshot().status!=='running'))) {
+      const queryErrors=[];for(const owner of this.owners.values())for(const [query,item] of owner.queries)if(item.usage?.getSnapshot().status==='error')queryErrors.push({instanceId:owner.id,query,error:item.usage.getSnapshot().error});
       this.initial.resolve({generation:this.generation,queryErrors});
     }
   }
@@ -333,7 +333,7 @@ export class View {
       }
       this.spec=spec;this.inputs=inputs;this.generation++;this.initial?.reject(error('CANCELLED'));this.initial=deferred();this.configureQueries();check();this.project();check();}
     catch(caught){if(application===this.application)this.runtime=previousExecution;this.planConnections=null;throw safeError(caught);}finally{this.planning=false;}
-    this.schedule();return {initial:this.initial.promise};
+    this.schedule();return {initialComplete:this.initial.promise};
   }
   async update(spec,{inputs=this.inputs,states}={}) {
     const next=structuredClone(spec);this.runtime.registry.validateDefinition('View',next);
@@ -369,17 +369,18 @@ export class View {
   exportDefinition(){return structuredClone(this.spec);}
   getState(name,instanceId){const owner=instanceId?this.owners.get(instanceId):this.root;return owner?.states.get(name)??fail('REFERENCE_NOT_FOUND');}
   getQuery(name,instanceId){const owner=instanceId?this.owners.get(instanceId):this.root;return owner?.queries.get(name)?.handle??fail('REFERENCE_NOT_FOUND');}
-  snapshot() {
+  getSnapshot() {
     const serialize=instance=>Object.freeze({id:instance.id,instanceId:instance.owner?.id,address:instance.address,generation:instance.generation,componentRef:instance.source?.componentRef,status:instance.status,error:instance.error??null,inputs:instance.inputs,children:Object.freeze(instance.children.map(serialize)),slots:Object.freeze(Object.fromEntries(Object.entries(instance.slots??{}).map(([name,nodes])=>[name,Object.freeze(nodes.map(serialize))])))});
     const states=Object.create(null),queries=Object.create(null),actions=Object.create(null);
-    for(const [name,handle] of this.root?.states??[])states[name]=handle.snapshot();
-    for(const [name,item] of this.root?.queries??[])queries[name]=item.handle.snapshot();
-    for(const entry of this.connections.values())if(entry.owner.id===this.root?.id&&entry.handler.id)actions[entry.handler.id]=entry.connection.snapshot();
+    for(const [name,handle] of this.root?.states??[])states[name]=handle.getSnapshot();
+    for(const [name,item] of this.root?.queries??[])queries[name]=item.handle.getSnapshot();
+    for(const entry of this.connections.values())if(entry.owner.id===this.root?.id&&entry.handler.id)actions[entry.handler.id]=entry.connection.getSnapshot();
     return Object.freeze({generation:this.generation,lifetime:this.root?.id,roots:Object.freeze((this.roots??[]).map(serialize)),states:Object.freeze(states),queries:Object.freeze(queries),actions:Object.freeze(actions),errors:Object.freeze([...this.diagnostics])});
   }
-  subscribe(listener){this.listeners.add(listener);listener(this.snapshot());return()=>this.listeners.delete(listener);}
+  subscribe(listener){this.listeners.add(listener);listener(this.getSnapshot());return()=>this.listeners.delete(listener);}
   emit(target,event,payload) {
     try {
+      if(!this.alive)fail('CANCELLED');
       const instance=typeof target==='string'?this.instances.get(target)??[...this.instances.values()].find(item=>item.owner?.id===target):this.instances.get(target.address);
       if(!instance || (typeof target!=='string' && target.generation!==instance.generation))fail('CANCELLED');
       const contract=instance.spec.events?.[event];if(!contract)fail('REFERENCE_NOT_FOUND');let data;try{data=protect(this.runtime.registry.validator(contract).accept(payload));}catch(caught){throw safeError(caught,'TYPE_MISMATCH');}

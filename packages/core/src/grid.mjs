@@ -6,7 +6,7 @@ const lastRow = box => {
   return box.row + (box.rowSpan - 1);
 };
 const lastColumn = box => box.column + (box.columnSpan - 1);
-export function gridLayout(declarations, expanded, layout = {}) {
+export function computeGridLayout(declarations, expanded, layout = {}) {
   const declared = new Map(declarations.map(node => [node.id, node]));
   const plans = new Map();
   for (const key of Object.keys(layout)) if (!declared.has(key)) fail('INVALID_DEFINITION', {message:'GRID_UNKNOWN_ID'});

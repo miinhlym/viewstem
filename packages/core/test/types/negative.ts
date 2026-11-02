@@ -1,15 +1,15 @@
 import { createRegistry, createRuntime } from '@viewstem/core';
-import type { ActionCall, ActionObservation, ActionSpec, ComponentNode, InitialReport, NativeAction, NativeActionDefinition, NativeContext, QueryHandle, QuerySnapshot, QueryUse, StateDeclaration, StateHandle, StateStore, TypeContract, ValueSnapshot, ViewHandle } from '@viewstem/core';
+import type { ActionCall, ActionSnapshot, ActionSpec, ComponentNode, InitialReport, ActionHandler, CodeActionDefinition, ActionContext, QueryHandle, QuerySnapshot, QueryUse, StateDeclaration, StateHandle, StateStore, TypeContract, ValueSnapshot, View } from '@viewstem/core';
 
 declare const state: StateHandle<number>;
 declare const query: QueryHandle<readonly { id: string }[]>;
-declare const view: ViewHandle;
+declare const view: View;
 declare const querySnapshot: QuerySnapshot<readonly { id: string }[]>;
-declare const actionObservation: ActionObservation<number>;
+declare const actionObservation: ActionSnapshot<number>;
 declare const initial: InitialReport;
 declare const snapshot: ValueSnapshot<number>;
 type Inputs = { form: { title: string; tags: string[]; metadata: Map<string, { label: string }>; selected: Set<string> }; target: StateHandle<number>; list: QueryHandle<readonly string[]> };
-declare const context: NativeContext<Inputs>;
+declare const context: ActionContext<Inputs>;
 const registry = createRegistry();
 const runtime = createRuntime({ registry });
 
@@ -22,7 +22,7 @@ const explicitUndefined: TypeContract = { schema: undefined };
 // @ts-expect-error RESOURCE_NESTED_SCHEMA_XOR - resource registration checks nested port contracts.
 registry.registerResources([{ kind: 'View', id: 'both', spec: { ports: { value: { kind: 'Value', schema: { type: 'number' }, typeRef: 'number' } }, render: { id: 'text', componentRef: 'Text' } } }]);
 // @ts-expect-error COMPONENT_EVENT_SCHEMA_XOR - code Component events keep type contract XOR.
-registry.registerComponent({ kind: 'Component', id: 'event', spec: { events: { click: { schema: { type: 'object' }, typeRef: 'event' } } } });
+registry.registerComponentContract({ kind: 'Component', id: 'event', spec: { events: { click: { schema: { type: 'object' }, typeRef: 'event' } } } });
 // @ts-expect-error STATE_INITIAL_TYPE - the declared host value type controls initial.
 const initialWrong: StateDeclaration<number> = { schema: { type: 'number' }, initial: 'wrong' };
 // @ts-expect-error STATE_WRITE_TYPE - write uses the State value type.
@@ -58,7 +58,7 @@ context.inputs.form.metadata.get('x')!.label = 'changed';
 // @ts-expect-error NATIVE_INPUT_SET_READONLY - Value Set cannot be mutated.
 context.inputs.form.selected.add('x');
 // @ts-expect-error NATIVE_NO_RUNTIME - a bound child call does not grant the runtime.
-context.runtime.mount({ viewRef: 'x' });
+context.runtime.createView({ viewRef: 'x' });
 // @ts-expect-error NATIVE_NO_STORE - Store is not implicitly granted.
 context.stateStore.createScope();
 // @ts-expect-error NATIVE_NO_EVENT - event data must be explicit inputs.
@@ -74,13 +74,13 @@ registry.registerAction<{}, boolean>({ kind: 'Action', id: 'wrong-result', spec:
 // @ts-expect-error NATIVE_TYPED_UNDEFINED - typed output cannot be omitted.
 registry.registerAction<{}, boolean>({ kind: 'Action', id: 'missing-result', spec: { output: { schema: { type: 'boolean' } } } }, () => undefined);
 // @ts-expect-error NATIVE_NULL_NOT_DECLARED - null requires a nullable result type.
-const nonNullable: NativeAction<{}, string> = () => null;
+const nonNullable: ActionHandler<{}, string> = () => null;
 // @ts-expect-error NATIVE_TYPED_OUTPUT_REQUIRED - typed definition needs output contract.
-const noTypedOutput: NativeActionDefinition<{}, boolean> = { kind: 'Action', id: 'missing', spec: {} };
+const noTypedOutput: CodeActionDefinition<{}, boolean> = { kind: 'Action', id: 'missing', spec: {} };
 // @ts-expect-error NATIVE_VOID_OUTPUT_FORBIDDEN - a void definition has no output.
-const voidWithOutput: NativeActionDefinition<{}> = { kind: 'Action', id: 'void', spec: { output: { schema: { type: 'number' } } } };
+const voidWithOutput: CodeActionDefinition<{}> = { kind: 'Action', id: 'void', spec: { output: { schema: { type: 'number' } } } };
 // @ts-expect-error NATIVE_OUTPUT_NO_VALUE - native implementation returns the value.
-const nativeWithValue: NativeActionDefinition<{}, number> = { kind: 'Action', id: 'native', spec: { output: { schema: { type: 'number' }, value: 1 } } };
+const nativeWithValue: CodeActionDefinition<{}, number> = { kind: 'Action', id: 'native', spec: { output: { schema: { type: 'number' }, value: 1 } } };
 // @ts-expect-error DECLARATIVE_OUTPUT_NEEDS_VALUE - declarative output evaluates explicit value.
 const declarativeMissingValue: ActionSpec = { steps: [], output: { schema: { type: 'number' } } };
 // @ts-expect-error ACTION_CALL_BOTH - ref and inline are mutually exclusive.
@@ -96,9 +96,9 @@ const bothComponent: ComponentNode = { id: 'node', componentRef: 'Text', compone
 // @ts-expect-error COMPONENT_CALL_NEITHER - a node requires a Component target.
 const neitherComponent: ComponentNode = { id: 'node' };
 // @ts-expect-error MOUNT_CALL_BOTH - View ref and inline View cannot coexist.
-await runtime.mount({ viewRef: 'v', view: { render: { id: 'label', componentRef: 'Text' } } });
+await runtime.createView({ viewRef: 'v', view: { render: { id: 'label', componentRef: 'Text' } } });
 // @ts-expect-error MOUNT_CALL_NEITHER - a View target is required.
-await runtime.mount({ inputs: {} });
+await runtime.createView({ inputs: {} });
 // @ts-expect-error INVOKE_CALL_BOTH - explicit Action invocation keeps target XOR.
 await runtime.invokeAction({ actionRef: 'a', action: { steps: [] }, owner: view });
 // @ts-expect-error INVOKE_OWNER_REQUIRED - lifetime owner is explicit.

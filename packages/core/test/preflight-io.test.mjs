@@ -1,13 +1,17 @@
+import { createHttpExecutor } from '@viewstem/core/http';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 // Exercise the public entry points directly from source; the build owner updates dist.
-import { createRuntime, createRegistry, createStateStore, createHttpExecutor } from '../src/index.mjs';
+import { createRuntime, createRegistry } from '../src/index.mjs';
+// Pending-initialization probes below target the internal Store; the View flows
+// above them continue to exercise the public Runtime and its URL integration.
+import { createStateStore } from '../src/state.mjs';
 import { memoryUrl, link, tick } from './fixtures/state/url-adapter.mjs';
 
 const integer = { type: 'integer' };
 function runtimeFixture(t) {
   const endpoint = memoryUrl(link({ owned: 8 })), registry = createRegistry();
-  registry.registerComponent({ kind: 'Component', id: 'Text', spec: { ports: { value: { kind: 'Value', schema: true } } } });
+  registry.registerComponentContract({ kind: 'Component', id: 'Text', spec: { ports: { value: { kind: 'Value', schema: true } } } });
   const runtime = createRuntime({ registry }); t.after(() => runtime.dispose());
   const render = { id: 'text', componentRef: 'Text', inputs: { value: 'ready' } };
   const pending = { ports: { seed: { kind: 'Value', schema: integer } }, states: {
@@ -18,30 +22,30 @@ function runtimeFixture(t) {
 
 test('U33 pending replacement initial survives failed old URL cleanup', async t => {
   const f = runtimeFixture(t);
-  const { view, initial } = await f.runtime.mount({ view: { states: {
+  const { view, initialComplete: initial } = await f.runtime.createView({ view: { states: {
     value: { kind: 'State', schema: integer, initial: 1 },
   }, render: f.render }, url: f.url }); await initial;
-  f.failNext(); const replacement = await view.replace({ view: f.pending, url: f.url }); await replacement.initial;
-  assert.equal(view.getState('value').snapshot().status, 'pending');
-  const update = await view.update(f.pending, { inputs: { seed: 3 } }); await update.initial; await tick();
+  f.failNext(); const replacement = await view.replace({ view: f.pending, url: f.url }); await replacement.initialComplete;
+  assert.equal(view.getState('value').getSnapshot().status, 'pending');
+  const update = await view.update(f.pending, { inputs: { seed: 3 } }); await update.initialComplete; await tick();
   assert.equal(view.getState('value').read(), 3);
   assert.equal(new URL(f.read()).searchParams.get('owned'), '8');
-  assert.ok(view.snapshot().errors.some(error => error.kind === 'replace-cleanup' && error.code === 'HTTP_ERROR'));
+  assert.ok(view.getSnapshot().errors.some(error => error.kind === 'replace-cleanup' && error.code === 'HTTP_ERROR'));
   assert.equal(f.attempts.length, 1);
   f.navigate(link({ owned: 6 })); assert.equal(view.getState('value').read(), 6);
 });
 
 test('pending View initialization restores URL without writing it back', async t => {
-  const f = runtimeFixture(t), { view, initial } = await f.runtime.mount({ view: f.pending, url: f.url }); await initial;
-  const update = await view.update(f.pending, { inputs: { seed: 3 } }); await update.initial; await tick();
+  const f = runtimeFixture(t), { view, initialComplete: initial } = await f.runtime.createView({ view: f.pending, url: f.url }); await initial;
+  const update = await view.update(f.pending, { inputs: { seed: 3 } }); await update.initialComplete; await tick();
   assert.equal(view.getState('value').read(), 8); assert.equal(f.attempts.length, 0);
 });
 
 test('pending View baseline preserves explicit State write and sends it to URL', async t => {
-  const f = runtimeFixture(t), { view, initial } = await f.runtime.mount({ view: f.pending, url: f.url }); await initial;
+  const f = runtimeFixture(t), { view, initialComplete: initial } = await f.runtime.createView({ view: f.pending, url: f.url }); await initial;
   view.getState('value').write(9);
   assert.equal(f.attempts.length, 0);
-  const update = await view.update(f.pending, { inputs: { seed: 3 } }); await update.initial; await tick();
+  const update = await view.update(f.pending, { inputs: { seed: 3 } }); await update.initialComplete; await tick();
   assert.equal(view.getState('value').read(), 9);
   assert.equal(new URL(f.read()).searchParams.get('owned'), '9');
   assert.deepEqual(f.attempts.map(job => job.patch), [{ owned: '9' }]);
@@ -69,7 +73,7 @@ for (const history of ['replace', 'push']) test(`pending explicit writes accumul
   const target = scope.registerState('value', { schema: integer, pendingInitial: new Promise(resolve => { settle = resolve; }) });
   const other = scope.registerState('other', { schema: integer, initial: 1 });
   const reaction = scope.registerState('reaction', { schema: integer, initial: 7 });
-  store.reaction(scope, { watch: [target], target: reaction, value: 0 });
+  store.registerReaction(scope, { watch: [target], target: reaction, value: 0 });
   const connection = store.connectUrl({ adapter: f.adapter, bindings: [{ target, key: 'owned' }, { target: other, key: 'other', history }] });
   target.write(9); other.write(4); target.write(10); assert.equal(f.attempts.length, 0);
   reaction.write(7); settle(3); await tick(); await connection.ready;
@@ -84,7 +88,7 @@ test('pending pure initialization and URL restore never write URL or run reactio
   let settle;
   const target = scope.registerState('value', { schema: integer, pendingInitial: new Promise(resolve => { settle = resolve; }) });
   const reaction = scope.registerState('reaction', { schema: integer, initial: 7 });
-  store.reaction(scope, { watch: [target], target: reaction, value: 0 });
+  store.registerReaction(scope, { watch: [target], target: reaction, value: 0 });
   const connection = store.connectUrl({ adapter: f.adapter, bindings: [{ target, key: 'owned' }] });
   settle(3); await tick(); await connection.ready;
   assert.equal(target.read(), 8); assert.equal(reaction.read(), 7); assert.equal(f.attempts.length, 0);

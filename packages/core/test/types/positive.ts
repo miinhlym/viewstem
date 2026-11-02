@@ -1,5 +1,5 @@
 import { createRegistry, createRuntime, createStateStore } from '@viewstem/core';
-import type { ActionSpec, Clock, ComponentNode, NativeAction, NativeActionDefinition, QueryHandle, StateHandle, TypeContract } from '@viewstem/core';
+import type { ActionSpec, Clock, ComponentNode, ActionHandler, CodeActionDefinition, QueryHandle, StateHandle, TypeContract } from '@viewstem/core';
 
 const registry = createRegistry();
 const store = createStateStore();
@@ -7,7 +7,7 @@ const scope = store.createScope();
 const count = scope.registerState<number>('count', { schema: { type: 'number' }, initial: 0 });
 const nullable = scope.registerState<string | null>('name', { schema: { type: ['string', 'null'] }, initial: null });
 count.write(3); count.reset(); nullable.write(null);
-const snapshot = count.snapshot();
+const snapshot = count.getSnapshot();
 if (snapshot.status === 'ready') { const actual: number = snapshot.value; void actual; }
 if (snapshot.status === 'error') { const message: string = snapshot.error.message; void message; }
 const missingPossible: number | undefined = count.read(); void missingPossible;
@@ -18,7 +18,7 @@ const unsubscribe = store.subscribe([count.address, nullable.address], observati
 }); unsubscribe();
 
 declare const query: QueryHandle<readonly { id: string }[]>;
-const querySnapshot = query.snapshot();
+const querySnapshot = query.getSnapshot();
 if (querySnapshot.data) { const id: string | undefined = querySnapshot.data[0]?.id; void id; }
 await query.refresh(); await query.retry();
 
@@ -28,8 +28,8 @@ const ports = {
   target: { kind: 'State', required: true, schema: { type: 'number' } },
   list: { kind: 'Query', required: true },
 } as const;
-const typedDefinition: NativeActionDefinition<Inputs, boolean> = { kind: 'Action', id: 'confirm', spec: { ports, output: { schema: { type: 'boolean' } } } };
-const confirm: NativeAction<Inputs, boolean> = async ({ inputs, signal }) => {
+const typedDefinition: CodeActionDefinition<Inputs, boolean> = { kind: 'Action', id: 'confirm', spec: { ports, output: { schema: { type: 'boolean' } } } };
+const confirm: ActionHandler<Inputs, boolean> = async ({ inputs, signal }) => {
   if (signal.aborted) throw Error('cancelled');
   const title: string = inputs.form.title;
   for (const entry of inputs.form.metadata.values()) { const label: string = entry.label; void label; }
@@ -49,7 +49,7 @@ registry.registerAction<Inputs>({ kind: 'Action', id: 'child-calls', spec: { por
 const viaRef: TypeContract = { typeRef: 'string-type' }; const viaSchema: TypeContract = { schema: { type: 'string' } }; void viaRef; void viaSchema;
 const action: ActionSpec = { steps: [{ kind: 'SetState', target: { '@path': '/ports/count' }, value: 2 }, { kind: 'Assert', condition: true }], output: { schema: { type: 'number' }, value: 2 } };
 const inlineRoot: ComponentNode = { id: 'inline', component: { render: { id: 'label', componentRef: 'Text', inputs: { text: 'hello' } } } };
-registry.registerComponent({ kind: 'Component', id: 'Text', spec: {
+registry.registerComponentContract({ kind: 'Component', id: 'Text', spec: {
   ports: { text: { kind: 'Value', schema: { type: 'string' } } },
   events: { clicked: { schema: { type: 'object' } } },
 } });
@@ -61,11 +61,11 @@ const runtime = createRuntime({ registry, stateStore: store, requestExecutor: as
   if (kind !== 'Type') throw Error('This fixture resolver only serves Type definitions');
   return { kind, id, spec: { schema: { type: 'string' } } };
 } });
-const { view, initial } = await runtime.mount({ view: { render: inlineRoot } });
+const { view, initialComplete: initial } = await runtime.createView({ view: { render: inlineRoot } });
 const first = await initial; const generation: number = first.generation; void generation;
 for (const error of first.queryErrors) { const code: string = error.error.code; void code; }
-await (await view.update(view.exportDefinition())).initial;
-await (await view.replace({ viewRef: 'another-view', inputs: { title: 'example' } })).initial;
+await (await view.update(view.exportDefinition())).initialComplete;
+await (await view.replace({ viewRef: 'another-view', inputs: { title: 'example' } })).initialComplete;
 const unknownResult = await runtime.invokeAction({ actionRef: 'confirm', owner: view, inputs: { target: count, list: query } });
 if (typeof unknownResult === 'boolean') { const result: boolean = unknownResult; void result; }
 await runtime.invokeAction({ action, owner: view, inputs: { count } });

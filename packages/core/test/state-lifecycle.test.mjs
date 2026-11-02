@@ -10,12 +10,12 @@ const nullable = schema => ({ anyOf: [schema, { type: 'null' }] });
 const fixture = () => { const store = new StateStore(); return { store, scope: store.createScope() }; };
 const defer = () => { let resolve, reject; const promise = new Promise((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; };
 const tick = async () => { await Promise.resolve(); await Promise.resolve(); };
-function rejectedWrite(cell, value) { const before = cell.snapshot(); assert.throws(() => cell.write(value)); assert.equal(cell.snapshot(), before); }
+function rejectedWrite(cell, value) { const before = cell.getSnapshot(); assert.throws(() => cell.write(value)); assert.equal(cell.getSnapshot(), before); }
 const plain = value => JSON.parse(JSON.stringify(value));
 
 await test('V31-V35/missing-null-falsy-reference', () => {
   const { scope } = fixture(), cell = scope.registerState('value', { schema: true });
-  assert.equal(cell.read(), undefined); assert.deepEqual(cell.snapshot(), { status: 'missing' });
+  assert.equal(cell.read(), undefined); assert.deepEqual(cell.getSnapshot(), { status: 'missing' });
   rejectedWrite(cell, cell.read());
   assert.throws(() => scope.getState('absent'), { code: 'REFERENCE_NOT_FOUND' });
   for (const value of ['device-1', null, 0, false, '']) { cell.write(value); assert.equal(cell.read(), value); }
@@ -25,7 +25,7 @@ await test('V13-V18/object-normalization-and-atomic-failure', () => {
   const { scope } = fixture(), cell = scope.registerState('value', { schema: { type: 'object' }, initial: {} });
   const source = { name: undefined, age: 20, profile: { name: undefined } }; cell.write(source);
   assert.deepEqual(plain(cell.read()), { age: 20, profile: {} }); assert.ok(Object.hasOwn(source, 'name')); assert.equal(Object.isFrozen(source), false);
-  cell.write({}); const snapshot = cell.snapshot(); cell.write({ name: undefined }); assert.equal(cell.snapshot(), snapshot);
+  cell.write({}); const snapshot = cell.getSnapshot(); cell.write({ name: undefined }); assert.equal(cell.getSnapshot(), snapshot);
   const required = scope.registerState('required', { schema: { properties: { name: { type: 'string' } }, required: ['name'] }, initial: { name: 'old' } });
   rejectedWrite(required, { name: undefined }); rejectedWrite(required, { name: null });
   const optional = scope.registerState('optional', { schema: { properties: { name: nullable({ type: 'string' }) } } });
@@ -110,7 +110,7 @@ await test('V58-V59/cycles-and-shared-graph', () => {
 await test('V60-V62/equality-coercion-default-extra', () => {
   const { store, scope } = fixture(), cell = scope.registerState('value', { schema: true, initial: 0.3 });
   let notices = 0; store.subscribe(cell.address, () => notices++); cell.write(0.30000000000000004); assert.equal(notices, 2);
-  cell.write({ a: 1, b: 2 }); const snapshot = cell.snapshot(); cell.write({ b: 2, a: 1 }); assert.equal(cell.snapshot(), snapshot);
+  cell.write({ a: 1, b: 2 }); const snapshot = cell.getSnapshot(); cell.write({ b: 2, a: 1 }); assert.equal(cell.getSnapshot(), snapshot);
   rejectedWrite(scope.registerState('number', { schema: number, initial: 1 }), '42'); rejectedWrite(scope.registerState('boolean', { schema: { type: 'boolean' }, initial: false }), 'false');
   const strict = scope.registerState('strict', { schema: { type: 'object', properties: { n: { ...integer, default: 1 } }, required: ['n'], additionalProperties: false }, initial: { n: 0 } });
   rejectedWrite(strict, {}); rejectedWrite(strict, { n: 1, extra: true });
@@ -118,12 +118,12 @@ await test('V60-V62/equality-coercion-default-extra', () => {
 });
 await test('V05-V07/content-and-native-membership', () => {
   const { scope } = fixture(), cell = scope.registerState('value', { schema: true, initial: new Set([{ x: 1 }, { x: 1 }]) });
-  const saved = cell.snapshot(), items = [...cell.read()]; assert.ok(cell.read().has(items[0])); assert.equal(cell.read().has({ x: 1 }), false);
-  cell.write(new Set([items[1], items[0]])); assert.equal(cell.snapshot(), saved);
-  cell.write(new Set([{ x: 1 }, { x: 1 }])); assert.notEqual(cell.snapshot(), saved);
-  cell.write(new Map([[1, { a: 1 }], ['1', { b: 2 }]])); const mapSnapshot = cell.snapshot(); cell.write(new Map([['1', { b: 2 }], [1, { a: 1 }]])); assert.equal(cell.snapshot(), mapSnapshot);
+  const saved = cell.getSnapshot(), items = [...cell.read()]; assert.ok(cell.read().has(items[0])); assert.equal(cell.read().has({ x: 1 }), false);
+  cell.write(new Set([items[1], items[0]])); assert.equal(cell.getSnapshot(), saved);
+  cell.write(new Set([{ x: 1 }, { x: 1 }])); assert.notEqual(cell.getSnapshot(), saved);
+  cell.write(new Map([[1, { a: 1 }], ['1', { b: 2 }]])); const mapSnapshot = cell.getSnapshot(); cell.write(new Map([['1', { b: 2 }], [1, { a: 1 }]])); assert.equal(cell.getSnapshot(), mapSnapshot);
   for (const key of [true, null, {}, undefined]) rejectedWrite(cell, new Map([[key, 1]]));
-  cell.write([1, 2]); const arraySnapshot = cell.snapshot(); cell.write([2, 1]); assert.notEqual(cell.snapshot(), arraySnapshot);
+  cell.write([1, 2]); const arraySnapshot = cell.getSnapshot(); cell.write([2, 1]); assert.notEqual(cell.getSnapshot(), arraySnapshot);
 });
 await test('V08-V09/S06/protected-stable-snapshots', () => {
   const { store, scope } = fixture(), source = { list: [{ x: 1 }], set: new Set([{ x: 1 }]), map: new Map([[1, { x: 1 }]]) };
@@ -140,7 +140,7 @@ await test('S01-S05/atomic-scoped-observation-and-generations', () => {
   const { store, scope } = fixture(), a = scope.registerState('a', { schema: true, initial: null }), b = scope.registerState('b', { schema: integer, initial: 0 });
   const all = [], pair = [], single = []; store.subscribe(null, value => all.push(value)); store.subscribe([a.address, b.address], value => pair.push(value)); const unsubscribe = store.subscribe(a.address, value => single.push(value));
   assert.equal(single.length, 1); assert.deepEqual(single[0].changes, []); assert.equal(single[0].values[keyOf(a.address)], null);
-  store.batch([[a, 1], [b, 2]]); assert.equal(pair.length, 2); assert.equal(pair[1].changes.length, 2); assert.equal(pair[1].values[keyOf(b.address)], 2); assert.equal(single.length, 2);
+  store.writeBatch([[a, 1], [b, 2]]); assert.equal(pair.length, 2); assert.equal(pair[1].changes.length, 2); assert.equal(pair[1].values[keyOf(b.address)], 2); assert.equal(single.length, 2);
   b.write(3); assert.equal(single.length, 2); assert.equal(pair.at(-1).values[keyOf(a.address)], 1);
   scope.removeState('a'); assert.equal(Object.hasOwn(pair.at(-1).values, keyOf(a.address)), false); assert.equal(pair.at(-1).changes[0].kind, 'removed');
   const newA = scope.registerState('a', { schema: true, initial: 1 }); assert.equal(pair.at(-1).changes[0].kind, 'added'); assert.throws(() => a.write(9), { code: 'CANCELLED' });
@@ -156,7 +156,7 @@ await test('S03/reentrant-writes-next-batch', () => {
 });
 await test('C08-C09/initial-write-race-reset-baseline', async () => {
   const { scope } = fixture(), deferred = defer(), cell = scope.registerState('value', { schema: integer, pendingInitial: deferred.promise });
-  assert.equal(cell.snapshot().status, 'pending'); assert.throws(() => cell.read(), { code: 'VALUE_PENDING' });
+  assert.equal(cell.getSnapshot().status, 'pending'); assert.throws(() => cell.read(), { code: 'VALUE_PENDING' });
   cell.write(9); assert.equal(cell.read(), 9); assert.throws(() => cell.reset(), { code: 'VALUE_PENDING' }); assert.equal(cell.read(), 9);
   deferred.resolve(3); await tick(); assert.equal(cell.read(), 9); cell.reset(); assert.equal(cell.read(), 3); cell.write(4); cell.reset(); assert.equal(cell.read(), 3);
   const other = defer(), replaced = scope.registerState('old', { schema: integer, pendingInitial: other.promise }); scope.replaceState('old', { schema: integer, initial: 7 });
@@ -165,24 +165,24 @@ await test('C08-C09/initial-write-race-reset-baseline', async () => {
 await test('K08/initial-error-and-snapshot-status', async () => {
   const { scope } = fixture(), deferred = defer(), cell = scope.registerState('value', { schema: integer, pendingInitial: deferred.promise });
   deferred.reject(Object.assign(new Error('internal'), { code: 'TYPE_MISMATCH' })); await tick();
-  assert.equal(cell.snapshot().status, 'error'); assert.equal(Object.hasOwn(cell.snapshot(), 'value'), false); assert.throws(() => cell.read());
+  assert.equal(cell.getSnapshot().status, 'error'); assert.equal(Object.hasOwn(cell.getSnapshot(), 'value'), false); assert.throws(() => cell.read());
 });
 await test('C11-C13/reaction-explicit-priority-and-atomic-derived', () => {
   const { store, scope } = fixture(), org = scope.registerState('org', { schema: integer, initial: 1 }), selection = scope.registerState('selection', { schema: integer, initial: 7 });
   const derived = scope.registerState('total', { schema: integer, dependencies: [org, selection], derived: (a, b) => a + b });
-  store.reaction(scope, { watch: [org], target: selection, value: 0 });
-  assert.throws(() => store.reaction(store.createScope(), { watch: [org], target: selection, value: 1 }), { code: 'INVALID_DEFINITION' });
+  store.registerReaction(scope, { watch: [org], target: selection, value: 0 });
+  assert.throws(() => store.registerReaction(store.createScope(), { watch: [org], target: selection, value: 1 }), { code: 'INVALID_DEFINITION' });
   const observed = []; store.subscribe(null, payload => observed.push(payload));
-  store.batch([[org, 2], [selection, 7]]); assert.equal(selection.read(), 7); assert.equal(derived.read(), 9); assert.equal(observed.length, 2);
+  store.writeBatch([[org, 2], [selection, 7]]); assert.equal(selection.read(), 7); assert.equal(derived.read(), 9); assert.equal(observed.length, 2);
   org.write(3); assert.equal(selection.read(), 0); assert.equal(derived.read(), 3); assert.equal(observed.length, 3);
-  store.batch([[org, 4], [selection, 8]], { origin: 'url' }); assert.equal(selection.read(), 8); assert.equal(derived.read(), 12);
+  store.writeBatch([[org, 4], [selection, 8]], { origin: 'url' }); assert.equal(selection.read(), 8); assert.equal(derived.read(), 12);
   org.write(4); assert.equal(selection.read(), 8);
 });
 await test('C10/derived-failure-and-cycle', () => {
   const { store, scope } = fixture(), source = scope.registerState('source', { schema: integer, initial: 1 }), unrelated = scope.registerState('other', { schema: integer, initial: 7 });
   const derived = scope.registerState('derived', { schema: integer, dependencies: [source], derived: value => { if (!value) throw Error('bad'); return 10 / value; } });
-  source.write(0); assert.equal(source.read(), 0); assert.equal(derived.snapshot().status, 'error'); assert.equal(unrelated.read(), 7); assert.throws(() => derived.write(1), { code: 'TYPE_MISMATCH' });
-  assert.throws(() => store.reaction(scope, { watch: [derived], target: source, value: 1 }), { code: 'INVALID_DEFINITION' });
+  source.write(0); assert.equal(source.read(), 0); assert.equal(derived.getSnapshot().status, 'error'); assert.equal(unrelated.read(), 7); assert.throws(() => derived.write(1), { code: 'TYPE_MISMATCH' });
+  assert.throws(() => store.registerReaction(scope, { watch: [derived], target: source, value: 1 }), { code: 'INVALID_DEFINITION' });
   source.write(2); assert.equal(derived.read(), 5);
 });
 await test('C06-C07-C15/scope-ownership-and-shared-handles', () => {
@@ -193,23 +193,23 @@ await test('C06-C07-C15/scope-ownership-and-shared-handles', () => {
 });
 await test('atomic/reject-whole-batch-and-replacement', () => {
   const { store, scope } = fixture(), a = scope.registerState('a', { schema: integer, initial: 1 }), b = scope.registerState('b', { schema: integer, initial: 2 });
-  const aBefore = a.snapshot(), bBefore = b.snapshot(); assert.throws(() => store.batch([[a, 3], [b, 'bad']])); assert.equal(a.snapshot(), aBefore); assert.equal(b.snapshot(), bBefore);
+  const aBefore = a.getSnapshot(), bBefore = b.getSnapshot(); assert.throws(() => store.writeBatch([[a, 3], [b, 'bad']])); assert.equal(a.getSnapshot(), aBefore); assert.equal(b.getSnapshot(), bBefore);
   assert.throws(() => scope.replaceState('a', { schema: integer, initial: 'bad' })); assert.equal(scope.getState('a'), a); assert.equal(a.read(), 1);
 });
 await test('lifecycle/removed-dependency-cannot-retain-stale-success', () => {
   const { store, scope } = fixture(), other = store.createScope(), source = scope.registerState('source', { schema: integer, initial: 1 });
   const derived = other.registerState('derived', { schema: integer, dependencies: [source], derived: x => x * 2 }), observed = [];
   store.subscribe(null, value => observed.push(value)); scope.removeState('source');
-  assert.equal(derived.snapshot().status, 'error'); assert.equal(derived.snapshot().error.code, 'CANCELLED');
+  assert.equal(derived.getSnapshot().status, 'error'); assert.equal(derived.getSnapshot().error.code, 'CANCELLED');
   assert.equal(observed.length, 2); assert.equal(observed[1].changes.length, 2);
-  scope.registerState('source', { schema: integer, initial: 3 }); assert.equal(derived.snapshot().status, 'error');
+  scope.registerState('source', { schema: integer, initial: 3 }); assert.equal(derived.getSnapshot().status, 'error');
 });
 await test('lifecycle/replaced-and-disposed-dependency-invalidates-atomically', () => {
   for (const action of ['replace', 'dispose']) {
     const { store, scope } = fixture(), other = store.createScope(), source = scope.registerState('source', { schema: integer, initial: 1 });
     const derived = other.registerState('derived', { schema: integer, dependencies: [source], derived: x => x + 1 });
     if (action === 'replace') scope.replaceState('source', { schema: integer, initial: 2 }); else scope.dispose();
-    assert.equal(derived.snapshot().status, 'error'); assert.equal(derived.snapshot().error.code, 'CANCELLED');
+    assert.equal(derived.getSnapshot().status, 'error'); assert.equal(derived.getSnapshot().error.code, 'CANCELLED');
     assert.throws(() => source.read(), { code: 'CANCELLED' });
   }
 });
@@ -219,8 +219,8 @@ await test('errors/hostile-initial-error-does-not-stay-pending', async () => {
   for (const error of [getter, revoked.proxy, Object.create({ code: 'TYPE_MISMATCH' }), { code: 'private-secret' }, null, false, 0, 'secret']) {
     const { scope } = fixture(), deferred = defer(), cell = scope.registerState('value', { schema: true, pendingInitial: deferred.promise });
     deferred.reject(error); await tick();
-    assert.equal(cell.snapshot().status, 'error'); assert.equal(cell.snapshot().error.code, 'INTERNAL_ERROR');
-    assert.equal(JSON.stringify(cell.snapshot()).includes('secret'), false);
+    assert.equal(cell.getSnapshot().status, 'error'); assert.equal(cell.getSnapshot().error.code, 'INTERNAL_ERROR');
+    assert.equal(JSON.stringify(cell.getSnapshot()).includes('secret'), false);
   }
   assert.equal(getters, 0);
 });
@@ -230,7 +230,7 @@ await test('errors/observer-failure-cannot-prevent-other-observers', () => {
   store.subscribe(source.address, value => { if (value.changes.length) throw hostile; });
   store.subscribe(source.address, value => seen.push(value.values[keyOf(source.address)]));
   source.write(1); source.write(2); assert.deepEqual(seen, [0, 1, 2]); assert.equal(getters, 0);
-  assert.ok(store.diagnostics().every(error => error.code === 'INTERNAL_ERROR'));
+  assert.ok(store.getDiagnostics().every(error => error.code === 'INTERNAL_ERROR'));
 });
 await test('observation/initial-listener-isolation-and-reentrancy', () => {
   const { store, scope } = fixture(), source = scope.registerState('value', { schema: integer, initial: 0 }), seen = [];

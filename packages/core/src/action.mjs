@@ -37,7 +37,7 @@ export class ActionEngine {
       if (!state.alive) return; state.alive = false;
       for (const connection of [...state.connections]) connection.dispose();
       for (const call of state.calls) call.abort();
-    }, snapshot(id) { const item = state.ids.get(id); if (!item) die('REFERENCE_NOT_FOUND'); return item.snapshot(); } });
+    }, getSnapshot(id) { const item = state.ids.get(id); if (!item) die('REFERENCE_NOT_FOUND'); return item.getSnapshot(); } });
     probe.#owners.set(owner, state); return owner;
   }
   connect(owner, { id, actionRef, spec, inputs = {} }) {
@@ -49,7 +49,7 @@ export class ActionEngine {
     if (!definition) die('REFERENCE_NOT_FOUND');
     if (spec !== undefined) definition = this.definition(undefined,spec);
     let alive = true, snapshot = idle(), active = null;
-    const connection = Object.freeze({ snapshot: () => snapshot,
+    const connection = Object.freeze({ getSnapshot: () => snapshot,
       invoke: supplied => {
         if (!alive || !state.alive) return Promise.reject(failure('CANCELLED'));
         if (active) return Promise.resolve(undefined); // Ignore, without queue or join.
@@ -126,7 +126,7 @@ export class ActionEngine {
           // Reconnected child handles retain every ancestor guard, and the
           // innermost caller's cancellation must also reach its Query ticket.
           const requestSignal = childSignal => childSignal && childSignal !== signal ? AbortSignal.any([signal, childSignal]) : signal;
-          bounded[name] = boundedQuery(createQueryHandle({ snapshot: () => value.snapshot(),
+          bounded[name] = boundedQuery(createQueryHandle({ getSnapshot: () => value.getSnapshot(),
             refresh: childSignal => value.refresh(requestSignal(childSignal)), retry: childSignal => value.retry(requestSignal(childSignal)) }), check);
         }
         else bounded[name] = value;
@@ -145,10 +145,10 @@ export class ActionEngine {
         resolve(keys) {
           const [root,name] = keys;
           if (root === 'ports') {
-            if(keys.length===1)return {value:Object.fromEntries(Object.entries(bounded).map(([key,value])=>[key,definition.ports[key].kind==='State'?value?.read():definition.ports[key].kind==='Query'?value?.snapshot():value])),offset:1};
+            if(keys.length===1)return {value:Object.fromEntries(Object.entries(bounded).map(([key,value])=>[key,definition.ports[key].kind==='State'?value?.read():definition.ports[key].kind==='Query'?value?.getSnapshot():value])),offset:1};
             if (!own(definition.ports ?? {},name)) die('REFERENCE_NOT_FOUND');
             const value=bounded[name],kind=definition.ports[name].kind;
-            return {value:kind === 'State' ? value?.read() : kind === 'Query' ? value?.snapshot() : value,offset:2};
+            return {value:kind === 'State' ? value?.read() : kind === 'Query' ? value?.getSnapshot() : value,offset:2};
           }
           if(root === 'steps') { if(keys.length===1)return {value:steps,offset:1};if(!own(steps,name))die('REFERENCE_NOT_FOUND');return {value:steps[name],offset:2}; }
           die('REFERENCE_NOT_FOUND');

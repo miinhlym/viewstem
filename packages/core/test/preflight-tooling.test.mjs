@@ -79,8 +79,12 @@ test('preflight build requires declarations, preserves prior output on failure, 
   const complete = run([join(core, 'scripts/build.mjs')], directory);
   assert.equal(complete.status, 0, complete.stderr);
   assert.deepEqual((await readdir(join(core, 'dist'))).sort(), [
-    'THIRD-PARTY-NOTICES.txt', 'cel-support.json', 'http.d.ts', 'http.js', 'http.js.map',
+    'THIRD-PARTY-NOTICES.txt', 'cel-support.json', 'cel.d.ts', 'cel.js', 'cel.js.map', 'chunks', 'http.d.ts', 'http.js', 'http.js.map',
     'index.d.ts', 'index.js', 'index.js.map',
   ]);
+  const chunks = await readdir(join(core, 'dist/chunks'));
+  assert.ok(chunks.length > 0);
+  assert.ok(chunks.every(name => /^chunk-[A-Z0-9]+\.js(?:\.map)?$/.test(name)));
+  for (const name of chunks.filter(name => name.endsWith('.js'))) assert.ok(chunks.includes(`${name}.map`));
   assert.equal((await readdir(core)).some(name => name.startsWith('.core-build-')), false);
 });

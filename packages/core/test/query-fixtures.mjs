@@ -96,7 +96,7 @@ export class ProbeHost {
     if (query.active) query.active.request = this.transport.requests.at(-1);
     this.slots.set(name, { owner, query }); this.pollers.set(name, query); return query;
   }
-  snapshot(name = 'search') { return this.slots.get(name)?.query.snapshot(); }
+  getSnapshot(name = 'search') { return this.slots.get(name)?.query.getSnapshot(); }
 }
 export const PollingHost = ProbeHost;
 export const MAX_NATIVE_TIMER_MS = 2_147_483_647;

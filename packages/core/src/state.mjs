@@ -168,8 +168,8 @@ export class StateStore {
     const store = this;
     cell.handle = Object.freeze({ address, generation: cell.generation,
       read() { store.#current(cell); const snapshot = store.#readingStage?.get(cell) ?? cell.state; if (snapshot.status === 'pending') fail('VALUE_PENDING'); if (snapshot.status === 'error') throw snapshot.error; return snapshot.status === 'ready' ? snapshot.value : undefined; },
-      snapshot() { store.#current(cell); return store.#readingStage?.get(cell) ?? cell.state; },
-      write(value) { store.batch([[cell.handle, value]]); },
+      getSnapshot() { store.#current(cell); return store.#readingStage?.get(cell) ?? cell.state; },
+      write(value) { store.writeBatch([[cell.handle, value]]); },
       reset() {
         store.#current(cell); if (cell.derived) fail('READ_ONLY');
         if (cell.baseline.status === 'pending') fail('VALUE_PENDING');
@@ -213,7 +213,7 @@ export class StateStore {
     });
   }
 
-  batch(changes, { origin = 'explicit' } = {}) {
+  writeBatch(changes, { origin = 'explicit' } = {}) {
     const prepared = new Map();
     for (const [handle, value] of changes) {
       const cell = this.#cellFor(handle);
@@ -230,10 +230,10 @@ export class StateStore {
   stageBatch(changes) {
     const before=new Map([...this.#cells.values()].map(cell=>[cell,cell.state]));
     const explicit=new Set(changes.map(([handle])=>this.#cellFor(handle)));
-    this.batch(changes,{origin:'stage'});
+    this.writeBatch(changes,{origin:'stage'});
     return ()=>this.#commit(new Map(),explicit,'explicit',before);
   }
-  reaction(owner, { watch, target, value }) {
+  registerReaction(owner, { watch, target, value }) {
     if (!Array.isArray(watch) || watch.length === 0) fail('INVALID_DEFINITION');
     const cell = this.#cellFor(target), watched = watch.map(handle => this.#cellFor(handle));
     if (cell.derived) fail('READ_ONLY');
@@ -333,7 +333,7 @@ export class StateStore {
     if (!wasNotifying) this.#perform(() => {});
     return () => this.#subscribers.delete(subscriber);
   }
-  diagnostics() { return [...this.#diagnostics]; }
+  getDiagnostics() { return [...this.#diagnostics]; }
 }
 
 export const createStateStore = () => new StateStore();

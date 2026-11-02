@@ -72,7 +72,7 @@ export function connectStateUrl(store,{adapter,bindings,limits:custom={},restore
     const all=parts(adapter.read()),owned=all.filter(part=>keys.has(part.key));
     const tooLarge=bytes(owned.map(part=>part.raw).join('&'))>limits.maxOwnedBytes;
     const entries=prepared.map(binding=>{
-      if(firstRestore&&(dirty.has(binding.key)||initialPending.has(binding.target)&&store.hasWritten(binding.target)))return [binding.target,binding.target.snapshot()];
+      if(firstRestore&&(dirty.has(binding.key)||initialPending.has(binding.target)&&store.hasWritten(binding.target)))return [binding.target,binding.target.getSnapshot()];
       const found=owned.filter(part=>part.key===binding.key);let snapshot=binding.baseline;
       if(snapshot.status==='pending')snapshot={status:'missing'};
       if(found.length)try{
@@ -127,7 +127,7 @@ export function connectStateUrl(store,{adapter,bindings,limits:custom={},restore
     writeDirty();
   });
   if(initialized){if(restore)applyRestore();else{firstRestore=false;readyResolve();}writeDirty();}
-  const connection=Object.freeze({ready,isReady:()=>initialized,restore:restoreNow,diagnostics:()=>[...diagnostics],
+  const connection=Object.freeze({ready,isReady:()=>initialized,restore:restoreNow,getDiagnostics:()=>[...diagnostics],
     async removeOwned(selected=prepared.map(b=>b.target)){
       const selectedKeys=prepared.filter(b=>selected.includes(b.target)).map(b=>b.key);const current=++revision;
       dirty.clear();try{return await adapter.writeOwned(Object.fromEntries(selectedKeys.map(key=>[key,null])),{mode:'replace',isCurrent:()=>alive&&revision===current});}catch(caught){if(alive&&revision===current)report(caught,'replace-cleanup');return {applied:false};}

@@ -17,6 +17,10 @@
       "types": "./dist/http.d.ts",
       "import": "./dist/http.js"
     },
+    "./cel": {
+      "types": "./dist/cel.d.ts",
+      "import": "./dist/cel.js"
+    },
     "./cel-support.json": "./dist/cel-support.json"
   },
   "files": [

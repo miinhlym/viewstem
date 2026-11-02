@@ -101,14 +101,14 @@ async function run() {
   const source = editor.value; let session;
   try {
     const document = parseDocument(source), registry = createRegistry();
-    for (const component of components) registry.registerComponent(component);
+    for (const component of components) registry.registerComponentContract(component);
     registry.registerResources(document.resources ?? []);
     session = { runtime: createRuntime({ registry }), registry }; pending.add(session);
     status('구성 확인 중', 'running');
     const target = Object.hasOwn(document, 'view') ? { view: document.view } : { viewRef: document.viewRef };
-    const mounted = await session.runtime.mount({ ...target, inputs: document.inputs ?? {} });
+    const mounted = await session.runtime.createView({ ...target, inputs: document.inputs ?? {} });
     // Attach a rejection handler even if a newer run cancels this mount.
-    const settled = mounted.initial.then(value => ({ value }), error => ({ error }));
+    const settled = mounted.initialComplete.then(value => ({ value }), error => ({ error }));
     pending.delete(session);
     if (current !== revision) { release(session); return; }
     if (active) release(active);

@@ -7,7 +7,7 @@ const set=value=>({kind:'SetState',target:p('/ports/cell'),value});
 const assertStep=(condition,message)=>({kind:'Assert',condition,...(message===undefined?{}:{message})});
 const wait=()=>{let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return{promise,resolve,reject};};
 const flush=async()=>{for(let n=0;n<30;n++)await Promise.resolve();};
-async function fixture(register,options={}){const registry=createRegistry();registry.registerComponent({kind:'Component',id:'Empty',spec:{}});register(registry);const runtime=createRuntime({registry,...options});const {view}=await runtime.mount({view:{render:{id:'root',componentRef:'Empty'}}});return{registry,runtime,view,invoke:(actionRef,inputs)=>runtime.invokeAction({owner:view,actionRef,inputs})};}
+async function fixture(register,options={}){const registry=createRegistry();registry.registerComponentContract({kind:'Component',id:'Empty',spec:{}});register(registry);const runtime=createRuntime({registry,...options});const {view}=await runtime.createView({view:{render:{id:'root',componentRef:'Empty'}}});return{registry,runtime,view,invoke:(actionRef,inputs)=>runtime.invokeAction({owner:view,actionRef,inputs})};}
 const native=(registry,id,spec,run)=>registry.registerAction({kind:'Action',id,spec},run);
 const decl=(registry,id,spec)=>registry.registerResources([{kind:'Action',id,spec}]);
 test('A01 A08 A23 A24: completed State and external effects survive subsequent failure',async()=>{

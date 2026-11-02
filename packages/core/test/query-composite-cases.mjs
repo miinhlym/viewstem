@@ -5,7 +5,7 @@ import { PollingHost } from './query-fixtures.mjs';
 
 export const cases = [];
 const add = (id, run, options = {}) => cases.push({ id, run, options });
-const state = f => f.host.snapshot();
+const state = f => f.host.getSnapshot();
 const pairs = f => f.requests.map(r => [r.request.path, r.inputs.value]);
 const completed = f => f.trace.filter(r => r.reason === 'run-success');
 async function initial(f) { await flush(); await f.reply(2, ['right-1']); await f.reply(1, ['left-1']); }
@@ -67,7 +67,7 @@ add('C08-owner-replacement-and-old-response', async f => {
   const next = f.host.mount('search', { inputs: { a: 2, b: 1 } }); await flush();
   // Replacement must execute both sources; no cache carries to the new usage.
   assert.equal(f.requests.length, 5); await f.reply(3, ['old-owner']);
-  assert.equal(next.snapshot().data, undefined);
+  assert.equal(next.getSnapshot().data, undefined);
   await f.reply(5, ['new-right']); await f.reply(4, ['new-left']);
   assert.deepEqual(state(f).data, { left: ['new-left'], right: ['new-right'] });
 });
@@ -80,8 +80,8 @@ add('C09-first-source-failure-is-not-empty-success', async f => {
 add('C10-independent-owner-not-blocked', async f => {
   await flush(); const other = f.host.mount('other', { inputs: { a: 9, b: 9 } }); await flush();
   await f.reply(3, ['other-left']); await f.reply(4, ['other-right']);
-  assert.equal(other.snapshot().status, 'success'); assert.equal(state(f).status, 'running');
-  await f.reply(1, null, 'HTTP_ERROR'); assert.equal(other.snapshot().status, 'success');
+  assert.equal(other.getSnapshot().status, 'success'); assert.equal(state(f).status, 'running');
+  await f.reply(1, null, 'HTTP_ERROR'); assert.equal(other.getSnapshot().status, 'success');
 });
 add('C11-refresh-follows-latest-input-and-forces-fresh-children', async f => {
   await initial(f); f.query.configure({ inputs: { a: 2, b: 1 } }); await flush();

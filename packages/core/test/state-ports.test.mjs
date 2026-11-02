@@ -122,7 +122,7 @@ await test('K04/number-cell-current-integer-does-not-pass-integer-contract', () 
 });
 await test('K04/common-Type-missing-cell-connects-before-readiness', () => {
   const { store, scope } = fixture(), cell = scope.registerState('source', { schema: integer }), ports = compile({ input: { kind: 'State', typeRef: 'Int', required: true } }, { store, types: { Int: integer } });
-  const connected = ports.prepare({ input: cell }); assert.equal(connected.status, 'ready'); assert.equal(connected.ports.input.snapshot().status, 'missing');
+  const connected = ports.prepare({ input: cell }); assert.equal(connected.status, 'ready'); assert.equal(connected.ports.input.getSnapshot().status, 'missing');
   const reader = compile({ input: value(integer, { required: true }) });
   assert.equal(reader.prepare({ input: stateValue(connected.ports.input) }, { mode: 'automatic' }).status, 'waiting');
   connected.ports.input.write(3); assert.equal(reader.prepare({ input: stateValue(cell) }).ports.input, 3);
@@ -162,10 +162,10 @@ await test('K04/readonly-derived-values-and-query-results-are-not-state-targets'
 await test('K04/followup-write-revalidates-value-permissions-and-generation', () => {
   const { store, scope } = fixture(), schema = { ...integer, minimum: 0 }, source = scope.registerState('source', { schema, initial: 1 });
   const ports = compile({ input: state(schema) }, { store }), linked = ports.prepare({ input: source }).ports.input;
-  const before = source.snapshot(); code(() => linked.write(-1), 'TYPE_MISMATCH'); code(() => linked.write('2'), 'TYPE_MISMATCH'); assert.equal(source.snapshot(), before);
+  const before = source.getSnapshot(); code(() => linked.write(-1), 'TYPE_MISMATCH'); code(() => linked.write('2'), 'TYPE_MISMATCH'); assert.equal(source.getSnapshot(), before);
   linked.write(3); linked.reset(); assert.equal(source.read(), 1);
   scope.replaceState('source', { schema, initial: 9 }); code(() => linked.write(2), 'CANCELLED'); code(() => linked.reset(), 'CANCELLED'); assert.equal(scope.getState('source').read(), 9);
-  const checks = [], target = { address: { scopeId: 'private', name: 'target' }, generation: 1, snapshot: () => ({ status: 'ready', value: 1 }), read: () => 1, write: () => checks.push('write'), reset: () => checks.push('reset') };
+  const checks = [], target = { address: { scopeId: 'private', name: 'target' }, generation: 1, getSnapshot: () => ({ status: 'ready', value: 1 }), read: () => 1, write: () => checks.push('write'), reset: () => checks.push('reset') };
   let writable = true, currentSchema = integer; const checkingStore = { contract: () => ({ schema: currentSchema, writable }) };
   const port = compile({ input: state() }, { store: checkingStore }).prepare({ input: target }).ports.input;
   writable = false; code(() => port.write(1), 'TYPE_CONTRACT_MISMATCH'); writable = true; currentSchema = number; code(() => port.write(1), 'TYPE_CONTRACT_MISMATCH'); assert.deepEqual(checks, []);
@@ -195,7 +195,7 @@ await test('integration/nested-State-ports-reconnect-without-bypassing-ancestor-
   grandchild.write(4); assert.equal(cell.read(), 4); assert.deepEqual(calls, ['child:write', 'write']);
   code(() => grandchild.write('bad'), 'TYPE_MISMATCH'); assert.equal(cell.read(), 4);
   grandchild.reset(); assert.equal(cell.read(), 1); alive = false;
-  for (const operation of [() => grandchild.write(8), () => grandchild.reset(), () => grandchild.read(), () => grandchild.snapshot()]) code(operation, 'CANCELLED');
+  for (const operation of [() => grandchild.write(8), () => grandchild.reset(), () => grandchild.read(), () => grandchild.getSnapshot()]) code(operation, 'CANCELLED');
   assert.equal(cell.read(), 1); cell.write(9); assert.equal(cell.read(), 9);
 });
 await test('integration/nested-State-handles-retain-store-and-generation-boundaries', () => {
@@ -210,16 +210,16 @@ await test('integration/nested-State-handles-retain-store-and-generation-boundar
 });
 await test('integration/Query-delegate-branding-identity-and-nested-cancellation', async () => {
   const calls = [], snapshot = { status: 'success', data: 1 }, signal = new AbortController().signal;
-  const delegate = { snapshot() { assert.equal(this, delegate); calls.push('snapshot'); return snapshot; }, async refresh(arg) { assert.equal(this, delegate); calls.push(['refresh', arg]); return 2; }, async retry(arg) { calls.push(['retry', arg]); return 3; } };
+  const delegate = { getSnapshot() { assert.equal(this, delegate); calls.push("getSnapshot"); return snapshot; }, async refresh(arg) { assert.equal(this, delegate); calls.push(['refresh', arg]); return 2; }, async retry(arg) { calls.push(['retry', arg]); return 3; } };
   const query = queryFixture(delegate), ports = compile({ input: { kind: 'Query' } }); let alive = true;
   const guarded = boundedQuery(query, () => { if (!alive) throw { code: 'CANCELLED' }; });
   const child = boundedQuery(ports.prepare({ input: guarded }).ports.input, () => {});
-  assert.equal(child.identity, query.identity); assert.equal(child.snapshot(), snapshot);
+  assert.deepEqual(Reflect.ownKeys(child).sort(), ['getSnapshot', 'refresh', 'retry']); assert.equal(child.getSnapshot(), snapshot);
   assert.equal(await child.refresh(signal), 2); assert.equal(await child.retry(signal), 3);
-  assert.deepEqual(calls, ['snapshot', ['refresh', signal], ['retry', signal]]);
+  assert.deepEqual(calls, ["getSnapshot", ['refresh', signal], ['retry', signal]]);
   code(() => ports.prepare({ input: delegate }), 'TYPE_CONTRACT_MISMATCH'); code(() => boundedQuery(delegate, () => {}), 'TYPE_CONTRACT_MISMATCH');
   code(() => ports.prepare({ input: { ...child } }), 'TYPE_CONTRACT_MISMATCH');
-  alive = false; for (const method of ['snapshot', 'refresh', 'retry']) code(() => child[method](), 'CANCELLED');
+  alive = false; for (const method of ["getSnapshot", 'refresh', 'retry']) code(() => child[method](), 'CANCELLED');
   assert.equal(calls.length, 3); assert.equal(await query.refresh(), 2);
 });
 await test('A22/preparation-errors-identify-exact-structural-type-and-expression-input', () => {

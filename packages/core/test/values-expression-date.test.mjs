@@ -83,8 +83,8 @@ test('K31/K35 declared-date constraints run after normalization and ordinary str
 test('K32 same instant has stable snapshot; service collection codec preserves strings and numeric keys', () => {
   const store = createStateStore(), scope = store.createScope();
   for (const [kind, initial, equivalent] of [['date', '2026-10-29', '2026-10-29'], ['time', '09:30', '09:30:00.000'], ['datetime', '2026-10-29T09:30:00+09:00', '2026-10-29T00:30:00.000Z']]) {
-    const value = scope.registerState(kind, { schema: { 'x-viewstem-type': kind }, initial }), before = value.snapshot(); let count = 0;
-    store.subscribe(value.address, () => count++); value.write(equivalent); assert.equal(value.snapshot(), before); assert.equal(count, 1);
+    const value = scope.registerState(kind, { schema: { 'x-viewstem-type': kind }, initial }), before = value.getSnapshot(); let count = 0;
+    store.subscribe(value.address, () => count++); value.write(equivalent); assert.equal(value.getSnapshot(), before); assert.equal(count, 1);
   }
   assert.deepEqual(encodeBoundary({ set: new Set(['2026-10-29']), map: new Map([[1.5, '09:30:00.000']]) }), { set: ['2026-10-29'], map: [[1.5, '09:30:00.000']] });
 });

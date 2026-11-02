@@ -25,7 +25,7 @@ export function display(value) {
     stack.add(v);
     let result;
     if (typeof v.read === 'function' && typeof v.write === 'function') result = { $type: 'StateHandle', address: v.address };
-    else if (typeof v.refresh === 'function' && typeof v.snapshot === 'function') result = { $type: 'QueryHandle' };
+    else if (typeof v.refresh === 'function' && typeof v.getSnapshot === 'function') result = { $type: 'QueryHandle' };
     else if (v instanceof Set) result = { $type: 'Set', values: [...v].map(x => convert(x, depth + 1)) };
     else if (v instanceof Map) result = { $type: 'Map', entries: [...v].map(pair => pair.map(x => convert(x, depth + 1))) };
     else if (Array.isArray(v)) result = v.map(x => convert(x, depth + 1));

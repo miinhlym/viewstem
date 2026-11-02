@@ -51,23 +51,23 @@ function setup(t, settings = {}, edit = () => {}) {
 // These are the observable production equivalents of the T2 C01–C09 fixtures.
 test('C01 independent sources publish only a complete success', async t => {
   const f = setup(t); await flush(); assert.equal(f.requests.length, 2);
-  await f.reply(2, ['right']); assert.equal(f.query.snapshot().data, undefined);
-  await f.reply(1, ['left']); const state = f.query.snapshot();
+  await f.reply(2, ['right']); assert.equal(f.query.getSnapshot().data, undefined);
+  await f.reply(1, ['left']); const state = f.query.getSnapshot();
   assert.deepEqual(plain(state.data), { left: ['left'], right: ['right'] }); assert.equal(state.status, 'success');
   assert.deepEqual(plain(state.dataInputs), { a: 1, b: 1 }); assert.equal(await f.query.initialSettled, state);
 });
 test('C02 only unchanged child inputs reuse; previous data stays stale until all complete', async t => {
-  const f = setup(t); await f.initial(); const previous = f.query.snapshot();
+  const f = setup(t); await f.initial(); const previous = f.query.getSnapshot();
   f.query.update({ inputs: { a: 2, b: 1 } }); await flush();
   assert.equal(f.requests.length, 3); assert.equal(f.requests[2].plan.request.path, '/left');
-  assert.equal(f.query.snapshot().stale, true); assert.equal(f.query.snapshot().data, previous.data);
-  await f.reply(3, ['new']); assert.deepEqual(plain(f.query.snapshot().data), { left: ['new'], right: ['right'] });
+  assert.equal(f.query.getSnapshot().stale, true); assert.equal(f.query.getSnapshot().data, previous.data);
+  await f.reply(3, ['new']); assert.deepEqual(plain(f.query.getSnapshot().data), { left: ['new'], right: ['right'] });
   assert.deepEqual(plain(previous.data), { left: ['left'], right: ['right'] });
 });
 test('C04 nested errors preserve actual declaration locations and last complete pair', async t => {
   const f = setup(t); await f.initial(); f.query.update({ inputs: { a: 2, b: 2 } }); await flush();
   await f.reply(3, ['partial']); await f.reply(4, null, 'HTTP_ERROR');
-  const state = f.query.snapshot(); assert.equal(state.status, 'error'); assert.equal(state.error.location, '/spec/sources/right');
+  const state = f.query.getSnapshot(); assert.equal(state.status, 'error'); assert.equal(state.error.location, '/spec/sources/right');
   assert.equal(state.error.cause.location, '/spec/sources/main'); assert.equal(state.error.cause.resource.id, 'right');
   assert.deepEqual(plain(state.data), { left: ['left'], right: ['right'] }); assert.equal(state.stale, true);
   assert.equal(JSON.stringify(state.error).includes('private'), false);
@@ -84,7 +84,7 @@ test('C06 obsolete completion cannot publish or seed a child cache', async t => 
   const f = setup(t); await f.initial(); f.query.update({ inputs: { a: 2, b: 1 } }); await flush();
   f.query.update({ inputs: { a: 3, b: 1 } }); await f.reply(3, ['obsolete']);
   assert.equal(f.requests.length, 4); assert.equal(f.requests[3].plan.inputs.value, 3);
-  await f.reply(4, ['current']); assert.deepEqual(plain(f.query.snapshot().data), { left: ['current'], right: ['right'] });
+  await f.reply(4, ['current']); assert.deepEqual(plain(f.query.getSnapshot().data), { left: ['current'], right: ['right'] });
 });
 test('C07 partial failures do not commit cache entries', async t => {
   const f = setup(t); await f.initial(); f.query.update({ inputs: { a: 2, b: 2 } }); await flush();
@@ -94,8 +94,8 @@ test('C07 partial failures do not commit cache entries', async t => {
 });
 test('C09 first failure is error with missing data and aborts siblings', async t => {
   const f = setup(t); await flush(); await f.reply(1, null, 'HTTP_ERROR');
-  const state = f.query.snapshot(); assert.equal(state.status, 'error'); assert.equal(state.data, undefined); assert.equal(state.stale, false);
-  assert.equal(f.requests[1].signal.aborted, true); await f.reply(2, ['late']); assert.equal(f.query.snapshot(), state);
+  const state = f.query.getSnapshot(); assert.equal(state.status, 'error'); assert.equal(state.data, undefined); assert.equal(state.stale, false);
+  assert.equal(f.requests[1].signal.aborted, true); await f.reply(2, ['late']); assert.equal(f.query.getSnapshot(), state);
 });
 test('fresh waiter follows latest input after its fresh execution started', async t => {
   const f = setup(t); await f.initial(); let settled = false;
@@ -103,7 +103,7 @@ test('fresh waiter follows latest input after its fresh execution started', asyn
   f.query.update({ inputs: { a: 9, b: 1 } }); await f.reply(3, []); await f.reply(4, []);
   assert.equal(settled, false); assert.equal(f.requests.length, 6);
   await f.reply(5, ['new']); await f.reply(6, ['right-fresh']); await waiter;
-  assert.equal(f.query.snapshot().dataInputs.a, 9);
+  assert.equal(f.query.getSnapshot().dataInputs.a, 9);
 });
 test('waiter-specific cancellation preserves remaining callers and shared execution', async t => {
   const f = setup(t); await flush(); const controller = new AbortController();
@@ -116,18 +116,18 @@ test('gate closure rejects waiters; disposal blocks late publication and cleans 
   const f = setup(t, { intervalMs: 10 }); await flush();
   const pending = assert.rejects(f.query.refresh(), e => e.code === 'EXECUTION_BLOCKED');
   f.query.update({ executeWhen: false }); await pending;
-  await f.reply(1, []); await f.reply(2, []); assert.equal(f.query.snapshot().status, 'waiting');
-  f.query.update({ executeWhen: true }); await flush(); const state = f.query.snapshot(); f.query.dispose();
-  await f.reply(3, []); await f.reply(4, []); assert.equal(f.query.snapshot(), state); assert.equal(f.clock.tasks.size, 0);
+  await f.reply(1, []); await f.reply(2, []); assert.equal(f.query.getSnapshot().status, 'waiting');
+  f.query.update({ executeWhen: true }); await flush(); const state = f.query.getSnapshot(); f.query.dispose();
+  await f.reply(3, []); await f.reply(4, []); assert.equal(f.query.getSnapshot(), state); assert.equal(f.clock.tasks.size, 0);
 });
 for (const value of [null, false, 0, '', []]) test(`last successful ${JSON.stringify(value)} survives failure; retry bypasses refresh false`, async t => {
   const f = setup(t, { refresh: false }, q => { q.root.spec.transform.input = ref('/sources/left'); }); await flush();
   await f.reply(1, value); await f.reply(2, []);
   await assert.rejects(f.query.refresh(), e => e.code === 'QUERY_REFRESH_DISABLED');
   f.query.update({ inputs: { a: 2, b: 1 } }); await flush(); await f.reply(3, null, 'HTTP_ERROR');
-  assert.deepEqual(plain(f.query.snapshot().data), value); assert.equal(f.query.snapshot().stale, true);
+  assert.deepEqual(plain(f.query.getSnapshot().data), value); assert.equal(f.query.getSnapshot().stale, true);
   const retry = f.query.retry(); await flush(); assert.equal(f.requests.length, 5);
-  await f.reply(4, value); await f.reply(5, []); await retry; assert.equal(f.query.snapshot().stale, false);
+  await f.reply(4, value); await f.reply(5, []); await retry; assert.equal(f.query.getSnapshot().stale, false);
 });
 test('polling anchors at whole completion and resumes with one immediate fresh request', async t => {
   const f = setup(t, { intervalMs: 100, autoRefreshWhen: false }); await f.initial(); await f.clock.advance(1000);
@@ -164,16 +164,16 @@ test('direct independent execution never uses a usage cache', async () => {
 test('missing/pending prepared inputs wait then become executable', async t => {
   let snapshot = { status: 'pending' };
   const f = setup(t, { inputs: { a: expression(() => snapshot), b: 1 } }); await flush(); assert.equal(f.requests.length, 0);
-  assert.equal(f.query.snapshot().waitingReason, 'INPUT_NOT_READY'); snapshot = { status: 'ready', value: 2 };
+  assert.equal(f.query.getSnapshot().waitingReason, 'INPUT_NOT_READY'); snapshot = { status: 'ready', value: 2 };
   f.query.update({}); await flush(); assert.equal(f.requests.length, 2); await f.reply(1, []); await f.reply(2, []);
 });
 test('dependency errors surface as errors and pending dependencies keep incomplete inputs waiting', async t => {
   const f = setup(t, { inputs: {}, ready: false, inputError: { code: 'TYPE_MISMATCH', message: 'unsafe' } });
-  assert.equal(f.query.snapshot().status, 'error'); assert.equal(f.query.snapshot().error.code, 'TYPE_MISMATCH');
+  assert.equal(f.query.getSnapshot().status, 'error'); assert.equal(f.query.getSnapshot().error.code, 'TYPE_MISMATCH');
   await assert.rejects(f.query.refresh(), error => error.code === 'TYPE_MISMATCH'); assert.equal(f.requests.length, 0);
-  f.query.update({ inputError: { code: 'VALUE_PENDING' }, ready: false }); assert.equal(f.query.snapshot().status, 'waiting');
+  f.query.update({ inputError: { code: 'VALUE_PENDING' }, ready: false }); assert.equal(f.query.getSnapshot().status, 'waiting');
   f.query.update({ inputError: undefined, ready: true, inputs: { a: 1, b: 1 } }); await flush();
-  assert.equal(f.requests.length, 2); await f.reply(1, []); await f.reply(2, []); assert.equal(f.query.snapshot().status, 'success');
+  assert.equal(f.requests.length, 2); await f.reply(1, []); await f.reply(2, []); assert.equal(f.query.getSnapshot().status, 'success');
 });
 test('updating a static interval replaces its timer and refresh re-enable restores polling', async t => {
   const f = setup(t, { intervalMs: 100 }); await f.initial(); await f.clock.advance(50);

@@ -101,7 +101,7 @@ export class Registry {
       : typeof filter === 'function' ? filter(definition) : Object.entries(object(filter)).every(([field, value]) => definition[field] === value));
     return [...this.#definitions.values()].filter(matches).map(definition => copy(definition));
   }
-  export(kind, id) { return copy(this.get(kind, id)); }
+  exportResource(kind, id) { return copy(this.get(kind, id)); }
   fork() { const next = new Registry(); next.#definitions = new Map(this.#definitions); next.#implementations = new Map(this.#implementations); next.#code = new Set(this.#code); next.#functions = this.#functions; return next; }
   types() { return Object.fromEntries([...this.#definitions.values()].filter(value => value.kind === 'Type').map(value => [value.id, value.spec.schema])); }
   implementation(kind, id) { return this.#implementations.get(key(kind, id)); }
@@ -115,26 +115,30 @@ export class Registry {
   registerResources(resources) { return this.#register(resources); }
   registerAction(definition, implementation) {
     if (definition?.kind !== 'Action' || typeof implementation !== 'function') invalid();
-    return this.#register([definition], ['Action', definition.id, implementation]);
+    return this.#register([definition], 'Action', implementation);
   }
-  registerComponent(contract) {
-    if (contract?.kind !== 'Component') invalid();
-    return this.#register([contract], ['Component', contract.id]);
+  registerComponentContract(contract) {
+    return this.registerComponentContracts([contract]);
   }
-  #register(resources, code) {
+  registerComponentContracts(contracts) {
+    return this.#register(contracts, 'Component');
+  }
+  #register(resources, codeKind, implementation) {
     if (!Array.isArray(resources)) invalid();
+    const definitions = Array.from(resources, copy);
     const candidate = this.fork();
-    for (const resource of resources) {
-      const definition = copy(resource);
+    for (const definition of definitions) {
       fields(definition, ['kind', 'id', 'name', 'spec']);
       if (!kinds.has(definition.kind) || !own(definition, 'spec')) invalid();
+      if (codeKind !== undefined && definition.kind !== codeKind) invalid();
       name(definition.id); object(definition.spec);
       if (own(definition, 'name') && typeof definition.name !== 'string') invalid();
       const address = key(definition.kind, definition.id);
       if (candidate.#definitions.has(address)) invalid();
       candidate.#definitions.set(address, freeze(definition));
+      if (codeKind !== undefined) candidate.#code.add(address);
+      if (implementation !== undefined) candidate.#implementations.set(address, implementation);
     }
-    if (code) { const address = key(code[0], code[1]); candidate.#code.add(address); if (code[2]) candidate.#implementations.set(address, code[2]); }
     try { candidate.#validateAll(); } catch (error) { throw safeError(error, 'INVALID_DEFINITION'); }
     this.#definitions = candidate.#definitions; this.#code = candidate.#code; this.#implementations = candidate.#implementations;
     return this;

@@ -1,4 +1,6 @@
-import { createRegistry, createStateStore, createRuntime, compileSchema, compileCel, evaluateSnapshot, createQueryEngine, createHttpExecutor, mergeOwnedUrl } from '@viewstem/core';
+import { compileCel } from '@viewstem/core/cel';
+import { createHttpExecutor } from '@viewstem/core/http';
+import { createRegistry, createStateStore, createRuntime, mergeOwnedUrl } from '@viewstem/core';
 import type { QuerySpec, QuerySource, ComponentNode, Step, DatasourceSpec, AnyResource, QueryHandle } from '@viewstem/core';
 import { createHttpExecutor as fromHttp } from '@viewstem/core/http';
 
@@ -42,7 +44,7 @@ registry.registerAction({ kind: 'Action', id: 'void-return-async', spec: {} } as
 // @ts-expect-error default is forbidden on required Value ports.
 registry.registerAction({ kind: 'Action', id: 'required-default', spec: { ports: { x: { kind: 'Value', required: true, default: 1, schema: { type: 'number' } } } } } as const, () => undefined);
 // @ts-expect-error schema declarations do not belong on Query ports.
-registry.registerComponent({ kind: 'Component', id: 'query-schema', spec: { ports: { q: { kind: 'Query', schema: true } } } });
+registry.registerComponentContract({ kind: 'Component', id: 'query-schema', spec: { ports: { q: { kind: 'Query', schema: true } } } });
 // @ts-expect-error declarative registration requires steps.
 registry.registerResources([{ kind: 'Action', id: 'native-as-json', spec: {} }]);
 // @ts-expect-error Query sources have one target family.
@@ -70,25 +72,22 @@ const stateResource: AnyResource = { kind: 'State', id: 'x', spec: {} };
 
 const store = createStateStore(), scope = store.createScope();
 const count = scope.registerState<number>('count', { schema: { type: 'number' }, initial: 0 });
-store.batch([[count, 1]]);
-store.reaction(scope, { watch: [count], target: count, value: 0 });
+store.writeBatch([[count, 1]]);
+store.registerReaction(scope, { watch: [count], target: count, value: 0 });
+// @ts-expect-error capability inspection belongs to the engine.
 store.contract(count);
 store.connectUrl({ adapter: { read: () => 'https://example.test', subscribe: () => () => {}, writeOwned: async (_patch, context) => ({ applied: context.isCurrent() }) }, bindings: [{ target: count }] });
 // @ts-expect-error standalone Store has no registry for resolving Type resources.
 scope.registerState<string>('unsupported-host-ref', { typeRef: 'string' });
 const runtime = createRuntime({ registry, stateStore: store });
-const mounted = await runtime.mount({ view: { render: { id: 'text', componentRef: 'Text' } } });
+const mounted = await runtime.createView({ view: { render: { id: 'text', componentRef: 'Text' } } });
 const state = mounted.view.getState('count'); const unknown: unknown = state.read(); void unknown;
 const query: QueryHandle = mounted.view.getQuery('data'); await query.refresh();
 mounted.view.subscribe(snapshot => { const generation: number = snapshot.generation; void generation; });
 await mounted.view.emit({ address: 'address', generation: 1 }, 'change', null);
 await mounted.view.update(mounted.view.exportDefinition(), { states: { count: 2 } });
-const codec = compileSchema<number>({ type: 'number' }); const accepted: number = codec.accept(1); void accepted;
 const cel = compileCel('size(items)', { inputs: { items: { type: 'array' } } }); const computed: unknown = cel({ items: [] }); void computed;
-const snapshot = evaluateSnapshot({ '@path': '/ports/a' }, { ports: { a: 1 } }); if (snapshot.status === 'ready') { const evaluated: unknown = snapshot.value; void evaluated; }
 const requestExecutor = createHttpExecutor({ authorize: () => true }); fromHttp({ transport: fetch });
-const engine = createQueryEngine({ registry, requestExecutor });
-const usage = engine.createUsage('query', { inputs: {}, intervalMs: 100 }); await usage.initialSettled; usage.update({ executeWhen: false }); usage.dispose();
 const href: string = mergeOwnedUrl('https://example.test?a=1', { a: null }); void href;
 const stopClock = scope.connectClock(count, { now: () => 123, subscribe: listener => { listener(124); return () => {}; } }); stopClock();
 // @ts-expect-error clocks supply numeric State cells.
@@ -100,14 +99,11 @@ pureRegistry.updateResource({ kind: 'Variable', id: 'double', spec: { expression
 pureRegistry.functions.push({ name: 'x', inputs: [], output: true, run: () => 1 });
 createRegistry({ functions: [{ name: 'annotated', inputs: [{ type: 'number' }], output: { type: 'number' }, run: (number: number) => number * 2 }] });
 createHttpExecutor({ authorize: ({ destination }) => { const href: string = destination; return href.startsWith('https:'); }, resolveSecret: (_ref, { destination, signal }) => { const href: string = destination; void href; void signal; return 'server-only'; } });
-const { gridLayout, normalizeDate, localInstant, encodeBoundary, joinRows } = await import('@viewstem/core');
-const placements = gridLayout([{ id: 'x' }], [{ id: 'x', address: 'address' }], { x: { columnSpan: 6 } });
+const { computeGridLayout } = await import('@viewstem/core');
+const placements = computeGridLayout([{ id: 'x' }], [{ id: 'x', address: 'address' }], { x: { columnSpan: 6 } });
 const column: number | undefined = placements.get('address')?.column; void column;
 // @ts-expect-error fixed grid placement requires both row and column.
-gridLayout([{ id: 'x' }], [{ id: 'x', address: 'address' }], { x: { row: 1 } });
-const day: string = normalizeDate('2026-11-02', 'date'); const instant: string = localInstant(day, '12:00', 'Asia/Seoul'); void instant;
-const encoded: unknown = encodeBoundary(new Set([1])); void encoded;
-joinRows([{ id: 1 }], [{ id: 1 }], { kind: 'Join', right: [], on: [{ left: 'id', right: 'id' }] });
+computeGridLayout([{ id: 'x' }], [{ id: 'x', address: 'address' }], { x: { row: 1 } });
 createRuntime({ registry, authorize: context => {
   if (context.operation === 'update') { const owner = context.owner; const spec = context.definition; void owner.exportDefinition(); void spec.render.id; }
   return false;

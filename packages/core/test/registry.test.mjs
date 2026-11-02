@@ -8,7 +8,7 @@ const state = (extra = {}) => ({ kind: 'State', schema: { type: 'string' }, ...e
 const query = (sources = {}, input = []) => ({ sources, transform: { input } });
 const bad = (run, code = 'INVALID_DEFINITION') => assert.throws(run, error => error.code === code);
 const text = () => resource('Component', 'Text', { ports: { text: value(true) }, events: { change: { schema: true } } });
-function ui() { const registry = createRegistry(); registry.registerComponent(text()); registry.registerComponent(resource('Component', 'Box', { slots: { body: {} } })); return registry; }
+function ui() { const registry = createRegistry(); registry.registerComponentContract(text()); registry.registerComponentContract(resource('Component', 'Box', { slots: { body: {} } })); return registry; }
 const node = (id = 'text', extra = {}) => ({ id, componentRef: 'Text', ...extra });
 const view = render => ({ render });
 
@@ -22,7 +22,7 @@ test('registration is atomic; kind/id is the exact identity and definitions are 
   assert.equal(registry.list('Variable').length, 1);
   bad(() => registry.registerResources([resource('Type', 'new', { schema: true }), resource('Type', 'same', { schema: true })]));
   bad(() => registry.get('Type', 'new'), 'REFERENCE_NOT_FOUND');
-  const exported = registry.export('Type', 'same'); exported.spec.schema.type = 'number';
+  const exported = registry.exportResource('Type', 'same'); exported.spec.schema.type = 'number';
   assert.equal(registry.get('Type', 'same').spec.schema.type, 'string');
   const fork = registry.fork(); fork.registerResources([resource('Type', 'local', { schema: false })]);
   bad(() => registry.get('Type', 'local'), 'REFERENCE_NOT_FOUND');
@@ -133,7 +133,7 @@ test('State, Derived and reaction dependencies reject cycles and unknown roots',
 
 test('capability inputs require real writable cells and compatible contracts', () => {
   const registry = ui();
-  registry.registerComponent(resource('Component', 'Editor', { ports: { selection: state({ required: true }) } }));
+  registry.registerComponentContract(resource('Component', 'Editor', { ports: { selection: state({ required: true }) } }));
   bad(() => registry.validateDefinition('View', { states: { a: { kind: 'State', schema: { type: 'number' }, initial: 1 } }, render: { id: 'editor', componentRef: 'Editor', inputs: { selection: { '@path': '/states/a' } } } }), 'TYPE_CONTRACT_MISMATCH');
   bad(() => registry.validateDefinition('View', { render: { id: 'editor', componentRef: 'Editor', inputs: { selection: 'constant' } } }));
   registry.validateDefinition('View', { states: { a: state() }, render: { id: 'editor', componentRef: 'Editor', inputs: { selection: { '@path': '/states/a' } } } });

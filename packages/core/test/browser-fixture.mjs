@@ -3,10 +3,10 @@ import { createRegistry,createRuntime,createStateStore,mergeOwnedUrl } from '@vi
 const p=path=>({'@path':path}),integer={type:'integer'},port=(kind,schema=integer)=>({kind,schema,required:true});
 export async function startBrowserFixture() {
  const registry=createRegistry();
- registry.registerComponent({kind:'Component',id:'Row',spec:{slots:{default:{}}}});
- registry.registerComponent({kind:'Component',id:'Input',spec:{ports:{value:port('Value')},events:{change:{schema:integer}}}});
- registry.registerComponent({kind:'Component',id:'Text',spec:{ports:{text:port('Value',{type:'string'})}}});
- registry.registerComponent({kind:'Component',id:'Button',spec:{events:{click:{schema:{type:'object'}}}}});
+ registry.registerComponentContract({kind:'Component',id:'Row',spec:{slots:{default:{}}}});
+ registry.registerComponentContract({kind:'Component',id:'Input',spec:{ports:{value:port('Value')},events:{change:{schema:integer}}}});
+ registry.registerComponentContract({kind:'Component',id:'Text',spec:{ports:{text:port('Value',{type:'string'})}}});
+ registry.registerComponentContract({kind:'Component',id:'Button',spec:{events:{click:{schema:{type:'object'}}}}});
  registry.registerResources([
   {kind:'Variable',id:'double',spec:{ports:{n:port('Value')},expression:'n * 2'}},
   {kind:'Action',id:'set',spec:{ports:{cell:port('State'),value:port('Value')},steps:[{kind:'SetState',target:p('/ports/cell'),value:p('/ports/value')}]}},
@@ -22,7 +22,7 @@ export async function startBrowserFixture() {
   {id:'result',componentRef:'Text',inputs:{text:p('/queries/result/data/label')}},
   {id:'confirm',componentRef:'Button',on:{click:{id:'confirmed',actionRef:'confirm'}}}
  ]}}};
- const mounted=await runtime.mount({view:spec,url:{adapter,bindings:[{state:'count',history:'push'}]}}),{view}=mounted;
+ const mounted=await runtime.createView({view:spec,url:{adapter,bindings:[{state:'count',history:'push'}]}}),{view}=mounted;
  const paint=snapshot=>{
   const children=snapshot.roots[0]?.children??[];
   document.querySelector('#count').value=children.find(node=>node.id==='input')?.inputs.value??'';
@@ -30,8 +30,8 @@ export async function startBrowserFixture() {
   document.querySelector('#double').textContent=snapshot.states.twice?.value??'pending';
  };
  view.subscribe(paint);
- document.querySelector('#count').addEventListener('input',event=>{calls++;const target=view.snapshot().roots[0].children.find(node=>node.id==='input');view.emit(target,'change',Number(event.target.value)).catch(error=>window.errors.push(error));});
- document.querySelector('#confirm').addEventListener('click',()=>{view.emit(view.snapshot().roots[0].children.find(node=>node.id==='confirm'),'click',{}).catch(error=>window.errors.push(error));});
+ document.querySelector('#count').addEventListener('input',event=>{calls++;const target=view.getSnapshot().roots[0].children.find(node=>node.id==='input');view.emit(target,'change',Number(event.target.value)).catch(error=>window.errors.push(error));});
+ document.querySelector('#confirm').addEventListener('click',()=>{view.emit(view.getSnapshot().roots[0].children.find(node=>node.id==='confirm'),'click',{}).catch(error=>window.errors.push(error));});
  window.errors=[];
- return {runtime,view,store,shared,writes,initial:mounted.initial,get calls(){return calls;},async replace(){const next=structuredClone(spec);next.states.count.initial=7;const result=await view.replace({view:next,url:{adapter,bindings:[{state:'count',history:'push'}]}});await result.initial;},dispose(){runtime.dispose();store.dispose();}};
+ return {runtime,view,store,shared,writes,initialComplete:mounted.initialComplete,get calls(){return calls;},async replace(){const next=structuredClone(spec);next.states.count.initial=7;const result=await view.replace({view:next,url:{adapter,bindings:[{state:'count',history:'push'}]}});await result.initialComplete;},dispose(){runtime.dispose();store.dispose();}};
 }

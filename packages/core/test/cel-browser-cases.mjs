@@ -1,4 +1,5 @@
-import { compileCel, createStateStore } from '@viewstem/core';
+import { compileCel } from '@viewstem/core/cel';
+import { createStateStore } from '@viewstem/core';
 const protect=value=>{const store=createStateStore(),scope=store.createScope();const result=scope.registerState('value',{schema:true,initial:value}).read();store.dispose();return result;};
 const integer = { type: 'integer' }, number = { type: 'number' }, string = { type: 'string' };
 const run = (source, inputs = {}, bindings = {}, output, extra = {}) => compileCel(source, { inputs, output, ...extra })(bindings);

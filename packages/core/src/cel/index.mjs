@@ -192,4 +192,4 @@ export function compileCel(expression, { inputs = {}, output, functions = [], li
   };
 }
 export function evaluateCel(expression, bindings, options = {}) { return compileCel(expression, options)(bindings); }
-export { defaultLimits as celLimits };
+export { defaultLimits as defaultCelLimits };

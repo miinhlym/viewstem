@@ -71,7 +71,7 @@ JSON으로 선언형 Component를 추가하고 이 컴포넌트들을 조합할 
 
 ## 관찰 범위
 
-- State 패널: `view.snapshot().states`의 **View 최상위 State·Derived**. missing/pending/error와 실제 null/false를 구분한다.
+- State 패널: `view.getSnapshot().states`의 **View 최상위 State·Derived**. missing/pending/error와 실제 null/false를 구분한다.
 - Query 패널: View 최상위 Query의 상태·data·dataInputs·error·stale·waitingReason. 새로고침·오류 재시도는 실제 Query 핸들을 호출한다.
 - Action 패널: View가 소유한 이벤트 연결의 관찰 ID. 예를 들어 `on.click: { "id": "saved", "actionRef": "save" }`에 지정한 ID가 대상이다. 모든 등록 Action의 전역 실행 목록은 아니다.
 - Snapshot 탭: Component 입력·상태·하위 노드·이름별 slot·화면 진단. Component 내부 셀·Query·Action을 모두 열거하는 debugger는 이번 범위에 없다.

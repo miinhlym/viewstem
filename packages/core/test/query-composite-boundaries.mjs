@@ -6,18 +6,18 @@ import { PollingHost } from './query-fixtures.mjs';
 const add = (id, run, options = {}) => cases.push({ id, run, options });
 add('C31-first-failure-aborts-siblings-and-ignores-late-rejection', async f => {
   await flush(); await f.reply(1, null, 'HTTP_ERROR');
-  assert.equal(f.query.snapshot().error.location, '/spec/sources/left');
+  assert.equal(f.query.getSnapshot().error.location, '/spec/sources/left');
   assert.equal(f.requests[1].signal.aborted, true);
-  const failed = f.query.snapshot(); await f.reply(2, null, 'TIMEOUT');
-  assert.strictEqual(f.query.snapshot(), failed);
+  const failed = f.query.getSnapshot(); await f.reply(2, null, 'TIMEOUT');
+  assert.strictEqual(f.query.getSnapshot(), failed);
 });
 add('C32-timeout-resume-does-not-accept-late-partial-success', async f => {
   await flush(); f.query.configure({ autoRefreshWhen: true });
   await f.reply(1, ['partial']); await f.clock.advance(50);
-  assert.equal(f.requests.length, 4); assert.equal(f.query.snapshot().data, undefined);
-  await f.reply(2, ['obsolete']); assert.equal(f.query.snapshot().data, undefined);
+  assert.equal(f.requests.length, 4); assert.equal(f.query.getSnapshot().data, undefined);
+  await f.reply(2, ['obsolete']); assert.equal(f.query.getSnapshot().data, undefined);
   assert.equal(f.query.pending, null); await f.reply(3, ['fresh-left']); await f.reply(4, ['fresh-right']);
-  assert.deepEqual(f.query.snapshot().data, { left: ['fresh-left'], right: ['fresh-right'] });
+  assert.deepEqual(f.query.getSnapshot().data, { left: ['fresh-left'], right: ['fresh-right'] });
   await f.clock.advance(99); assert.equal(f.requests.length, 4);
   await f.clock.advance(1); assert.equal(f.requests.length, 6);
 }, { Host: PollingHost, query: { intervalMs: 100, timeoutMs: 50, autoRefreshWhen: false } });
@@ -27,14 +27,14 @@ add('C33-cancelled-fresh-waiter-does-not-cancel-composite', async f => {
   caller.abort(); await flush(); assert.equal(waiter.code, 'CANCELLED');
   assert.equal(f.requests[2].signal.aborted, false); assert.equal(f.requests[3].signal.aborted, false);
   await f.reply(3, ['new-left']); await f.reply(4, ['new-right']);
-  assert.deepEqual(f.query.snapshot().data, { left: ['new-left'], right: ['new-right'] });
+  assert.deepEqual(f.query.getSnapshot().data, { left: ['new-left'], right: ['new-right'] });
 });
 add('C34-deep-child-reuse-and-fresh-propagation', async f => {
   await flush(); await f.reply(1, ['left']); await f.reply(2, ['right']);
   f.query.configure({ inputs: { a: 2, b: 1 } }); await flush();
   assert.equal(f.requests.length, 3); assert.equal(f.requests[2].request.path, '/left');
   await f.reply(3, ['next-left']);
-  assert.deepEqual(f.query.snapshot().data, { left: ['next-left'], right: ['right'] });
+  assert.deepEqual(f.query.getSnapshot().data, { left: ['next-left'], right: ['right'] });
   const fresh = observe(f.query.refresh()); await flush(); assert.equal(f.requests.length, 5);
   await f.reply(4, ['fresh-left']); await f.reply(5, ['fresh-right']); assert.equal(fresh.status, 'fulfilled');
 }, { queries: (() => {
@@ -45,10 +45,10 @@ add('C34-deep-child-reuse-and-fresh-propagation', async f => {
 add('C35-response-expression-shaped-data-is-not-evaluated', async f => {
   await flush(); const data = { '@path': '/ports/private', '@call': 'unexpected', nested: { '@@value': 1 } };
   await f.reply(1, data); await f.reply(2, ['right']);
-  assert.deepEqual(f.query.snapshot().data.left, data);
+  assert.deepEqual(f.query.getSnapshot().data.left, data);
 });
 add('C36-special-source-names-remain-own-data', async f => {
-  await flush(); await f.reply(1, ['safe']); assert.deepEqual(f.query.snapshot().data, ['safe']);
+  await flush(); await f.reply(1, ['safe']); assert.deepEqual(f.query.getSnapshot().data, ['safe']);
 }, { queries: JSON.parse(JSON.stringify({ root: { sources: Object.fromEntries([['__proto__', {
   query: leaf('/special'), inputs: { value: 1 },
 }]]), transform: { input: ref('/sources/__proto__') } } })) });

@@ -25,7 +25,7 @@ export function setup(options = {}, mutation = {}) {
 }
 const count = f => f.transport.requests.length;
 const ticks = f => f.trace.filter(r => r.kind === 'poll-tick');
-const snapshot = f => f.host.snapshot();
+const snapshot = f => f.host.getSnapshot();
 const schedule = f => f.trace.filter(r => r.kind === 'poll-scheduled').at(-1);
 
 add('P01-completion-not-start-anchors-next-interval', async f => {

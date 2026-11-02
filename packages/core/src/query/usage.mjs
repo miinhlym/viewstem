@@ -44,7 +44,7 @@ export class QueryUsage {
     this.inputs = prepared.ports;
     this.ready = this.settings.ready && prepared.status === 'ready';
   }
-  snapshot() { return this.state; }
+  getSnapshot() { return this.state; }
   publish(patch) {
     if (!this.alive) return;
     this.state = Object.freeze({ ...this.state, ...patch });

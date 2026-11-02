@@ -14,7 +14,7 @@ export function setup(options = {}, mutation = {}) {
 const input = term => ({ term });
 const cases = [];
 const add = (id, contracts, run, options = {}) => cases.push({ id, contracts, run, options });
-const state = s => s.host.snapshot();
+const state = s => s.host.getSnapshot();
 const request = s => s.transport.requests.at(-1);
 const terms = s => s.transport.requests.map(item => item.inputs.term);
 const replies = s => s.trace.filter(item => item.kind === 'accept');
@@ -331,7 +331,7 @@ add('R26-independent-owners', ['K16', 'K29'], async s => {
   await reply(s, 2, 'other-initial');
   await reply(s, 3, 'other-fresh');
   assert.equal(otherFresh.status, 'fulfilled');
-  assert.equal(s.host.snapshot('other').data, 'other-fresh');
+  assert.equal(s.host.getSnapshot('other').data, 'other-fresh');
   other.dispose();
 });
 

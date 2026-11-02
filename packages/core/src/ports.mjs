@@ -65,7 +65,7 @@ export function expression(readSnapshot) {
   if (typeof readSnapshot !== 'function') fail('INVALID_DEFINITION');
   const token = Object.freeze({}); expressions.set(token, readSnapshot); return token;
 }
-export const stateValue = handle => expression(() => handle.snapshot());
+export const stateValue = handle => expression(() => handle.getSnapshot());
 // Only contract inspection unwraps a State. Operations always use the immediate
 // parent so nested calls cannot bypass an ancestor's validation/cancellation.
 export function stateRoot(handle, store) {
@@ -79,16 +79,16 @@ export function stateRoot(handle, store) {
 }
 export function boundedState(baseHandle, guard) {
   if (!record(baseHandle) || typeof guard !== 'function'
-    || ['read', 'snapshot', 'write', 'reset'].some(method => typeof baseHandle[method] !== 'function')) fail('TYPE_CONTRACT_MISMATCH');
+    || ['read', "getSnapshot", 'write', 'reset'].some(method => typeof baseHandle[method] !== 'function')) fail('TYPE_CONTRACT_MISMATCH');
   const wrapper = { address: baseHandle.address, generation: baseHandle.generation };
-  for (const method of ['read', 'snapshot', 'write', 'reset']) wrapper[method] = (...args) => { guard(method); return baseHandle[method](...args); };
+  for (const method of ['read', "getSnapshot", 'write', 'reset']) wrapper[method] = (...args) => { guard(method); return baseHandle[method](...args); };
   stateWrappers.set(wrapper, { base: baseHandle }); return Object.freeze(wrapper);
 }
 export function createQueryHandle(delegate = {}) {
   if (!record(delegate)) fail('INVALID_DEFINITION');
-  for (const method of ['snapshot', 'refresh', 'retry']) if (own(delegate, method) && typeof delegate[method] !== 'function') fail('INVALID_DEFINITION');
-  const handle = { identity: Symbol('query-instance') };
-  for (const method of ['snapshot', 'refresh', 'retry']) handle[method] = (...args) => {
+  for (const method of ["getSnapshot", 'refresh', 'retry']) if (own(delegate, method) && typeof delegate[method] !== 'function') fail('INVALID_DEFINITION');
+  const handle = {};
+  for (const method of ["getSnapshot", 'refresh', 'retry']) handle[method] = (...args) => {
     if (typeof delegate[method] !== 'function') fail('INVALID_DEFINITION');
     return delegate[method](...args);
   };
@@ -96,8 +96,8 @@ export function createQueryHandle(delegate = {}) {
 }
 export function boundedQuery(baseHandle, guard) {
   if (!queries.has(baseHandle) || typeof guard !== 'function') fail('TYPE_CONTRACT_MISMATCH');
-  const wrapper = { identity: baseHandle.identity };
-  for (const method of ['snapshot', 'refresh', 'retry']) wrapper[method] = (...args) => { guard(method); return baseHandle[method](...args); };
+  const wrapper = {};
+  for (const method of ["getSnapshot", 'refresh', 'retry']) wrapper[method] = (...args) => { guard(method); return baseHandle[method](...args); };
   queries.add(wrapper); return Object.freeze(wrapper);
 }
 
@@ -129,7 +129,7 @@ export function compilePorts({ resourceKind, ports = {}, types = {}, store }) {
     catch (error) { throw safeError(error, 'TYPE_MISMATCH'); }
   }
   function connectState(port, handle) {
-    if (!record(handle) || !record(handle.address) || typeof handle.write !== 'function' || typeof handle.snapshot !== 'function') fail('TYPE_CONTRACT_MISMATCH');
+    if (!record(handle) || !record(handle.address) || typeof handle.write !== 'function' || typeof handle.getSnapshot !== 'function') fail('TYPE_CONTRACT_MISMATCH');
     const verify = () => {
       const contract = store?.contract(stateRoot(handle, store)) ?? fail('TYPE_CONTRACT_MISMATCH');
       if (!contract.writable) fail('TYPE_CONTRACT_MISMATCH');
@@ -137,7 +137,7 @@ export function compilePorts({ resourceKind, ports = {}, types = {}, store }) {
     };
     verify();
     const wrapper = Object.freeze({ address: handle.address, generation: handle.generation,
-      read: () => handle.read(), snapshot: () => handle.snapshot(),
+      read: () => handle.read(), getSnapshot: () => handle.getSnapshot(),
       write(value) { verify(); handle.write(accept(port.validator, value)); },
       reset() { verify(); handle.reset(); },
     });

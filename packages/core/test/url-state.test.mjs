@@ -16,11 +16,11 @@ test('L01/K19 fixed pre-URL baseline, invalid diagnostics and missing stay disti
   const connection = f.store.connectUrl({ adapter: f.adapter, bindings: [{ target: a }, { target: b }] });
   assert.equal(a.read(), 5); assert.equal(b.read(), undefined); assert.equal(f.attempts.length, 0);
   for (const [x, y] of [[7, 'first'], [9, 'second']]) {
-    f.store.batch([[a, x], [b, y]]); await tick();
-    f.navigate(link({ 'p.a': 'wrong' })); assert.equal(a.read(), 1); assert.equal(b.snapshot().status, 'missing');
+    f.store.writeBatch([[a, x], [b, y]]); await tick();
+    f.navigate(link({ 'p.a': 'wrong' })); assert.equal(a.read(), 1); assert.equal(b.getSnapshot().status, 'missing');
   }
-  assert.equal(connection.diagnostics().length, 2);
-  assert.ok(connection.diagnostics().every(error => error.kind === 'restore' && error.key === 'p.a'));
+  assert.equal(connection.getDiagnostics().length, 2);
+  assert.ok(connection.getDiagnostics().every(error => error.kind === 'restore' && error.key === 'p.a'));
   connection.dispose();
 });
 test('L03/L04 scalar/array/Set and nullable round trips preserve exact values', async () => {
@@ -43,7 +43,7 @@ test('L03 unsupported collection profiles reject before installing observers', (
 test('L04 duplicate owned key and malformed JSON restore baseline with diagnostics', () => {
   for (const search of ['p.value=1&p.value=2', 'p.value=not-json', 'p.value=%22wrong%22']) {
     const f = fixture(`https://example.test/view?${search}`), cell = f.scope.registerState('value', { schema: integer, initial: 7 }), connection = bind(f, cell);
-    assert.equal(cell.read(), 7); assert.equal(connection.diagnostics().length, 1); assert.equal(f.attempts.length, 0); connection.dispose();
+    assert.equal(cell.read(), 7); assert.equal(connection.getDiagnostics().length, 1); assert.equal(f.attempts.length, 0); connection.dispose();
   }
 });
 test('L05 exact owned merge preserves raw external query bytes, path/hash and other stores', async () => {
@@ -64,28 +64,28 @@ test('L05/K19 duplicate owned keys/targets and derived binding reject configurat
 test('L06/K19 oversized encoded output keeps State and writes no partial patch', async () => {
   const f = fixture('https://example.test/view?external=keep'), a = f.scope.registerState('a', { schema: string, initial: '' }), b = f.scope.registerState('b', { schema: string, initial: '' });
   const connection = f.store.connectUrl({ adapter: f.adapter, bindings: [{ target: a }, { target: b }], limits: { maxValueBytes: 12 } });
-  f.store.batch([[a, 'ok'], [b, '😀'.repeat(10)]]); await tick(); assert.equal(a.read(), 'ok'); assert.equal(b.read(), '😀'.repeat(10)); assert.equal(f.attempts.length, 0); assert.equal(new URL(f.read()).search, '?external=keep');
-  assert.equal(connection.diagnostics()[0].code, 'LIMIT_EXCEEDED'); connection.dispose();
+  f.store.writeBatch([[a, 'ok'], [b, '😀'.repeat(10)]]); await tick(); assert.equal(a.read(), 'ok'); assert.equal(b.read(), '😀'.repeat(10)); assert.equal(f.attempts.length, 0); assert.equal(new URL(f.read()).search, '?external=keep');
+  assert.equal(connection.getDiagnostics()[0].code, 'LIMIT_EXCEEDED'); connection.dispose();
 });
 test('L06/K19 input limits use baseline; external URL bytes are excluded from owned budget', () => {
   const huge = 'x'.repeat(10000), f = fixture(`${link({ 'p.value': [1, 2, 3] })}&outside=${huge}`), cell = f.scope.registerState('value', { schema: array(integer), initial: [7] });
   const connection = bind(f, cell, { limits: { maxItems: 2, maxOwnedBytes: 100 } });
-  assert.deepEqual([...cell.read()], [7]); assert.equal(connection.diagnostics()[0].code, 'LIMIT_EXCEEDED'); connection.dispose();
+  assert.deepEqual([...cell.read()], [7]); assert.equal(connection.getDiagnostics()[0].code, 'LIMIT_EXCEEDED'); connection.dispose();
   const other = fixture(`${link({ 'p.value': [1] })}&outside=${huge}`), target = other.scope.registerState('value', { schema: array(integer), initial: [7] }), connected = bind(other, target, { limits: { maxOwnedBytes: 100 } });
-  assert.deepEqual([...target.read()], [1]); assert.equal(connected.diagnostics().length, 0); connected.dispose();
+  assert.deepEqual([...target.read()], [1]); assert.equal(connected.getDiagnostics().length, 0); connected.dispose();
 });
 test('L06 output list and registration limits reject without truncation', async () => {
   const f = fixture(), cell = f.scope.registerState('value', { schema: set(integer), initial: new Set() });
   const connection = bind(f, cell, { limits: { maxItems: 2 } }); cell.write(new Set([1, 2, 3])); await tick();
-  assert.equal(cell.read().size, 3); assert.equal(f.attempts.length, 0); assert.equal(connection.diagnostics()[0].code, 'LIMIT_EXCEEDED'); connection.dispose();
+  assert.equal(cell.read().size, 3); assert.equal(f.attempts.length, 0); assert.equal(connection.getDiagnostics()[0].code, 'LIMIT_EXCEEDED'); connection.dispose();
   for (const limits of [{ maxKeys: 0 }, { unknown: 2 }, { maxValueBytes: 1.5 }]) assert.throws(() => bind(f, cell, { limits }), { code: 'INVALID_DEFINITION' });
   const b = f.scope.registerState('b', { schema: integer }); assert.throws(() => f.store.connectUrl({ adapter: f.adapter, bindings: [{ target: cell }, { target: b }], limits: { maxKeys: 1 } }), { code: 'LIMIT_EXCEEDED' });
 });
 test('L06/L07 write and cleanup failure are synchronization errors; subsequent State writes still work', async () => {
   const f = fixture(), cell = f.scope.registerState('value', { schema: integer, initial: 1 }), connection = bind(f, cell);
-  f.failNext(); cell.write(2); await tick(); assert.equal(cell.read(), 2); assert.equal(connection.diagnostics()[0].kind, 'write');
+  f.failNext(); cell.write(2); await tick(); assert.equal(cell.read(), 2); assert.equal(connection.getDiagnostics()[0].kind, 'write');
   cell.write(3); await tick(); assert.equal(valueAt(f), 3);
-  f.failNext(); await connection.removeOwned(); assert.equal(valueAt(f), 3); assert.equal(connection.diagnostics().at(-1).kind, 'replace-cleanup');
+  f.failNext(); await connection.removeOwned(); assert.equal(valueAt(f), 3); assert.equal(connection.getDiagnostics().at(-1).kind, 'replace-cleanup');
   cell.write(4); await tick(); assert.equal(valueAt(f), 4); connection.dispose();
 });
 test('L07/L10 disposing connection preserves URL and shared service binding survives consumer scope disposal', async () => {
@@ -100,12 +100,12 @@ test('L07 replacement cleanup removes selected exact keys and retains external/p
 });
 test('L08/K18 atomic push+replace batch writes once; same values and restore do not repush', async () => {
   const f = fixture(), org = f.scope.registerState('org', { schema: integer, initial: 1 }), selection = f.scope.registerState('selection', { schema: integer, initial: 7 });
-  f.store.reaction(f.scope, { watch: [org], target: selection, value: 0 });
+  f.store.registerReaction(f.scope, { watch: [org], target: selection, value: 0 });
   const connection = f.store.connectUrl({ adapter: f.adapter, bindings: [{ target: org, history: 'replace' }, { target: selection, history: 'push' }] });
-  f.store.batch([[org, 2], [selection, 7]]); await tick(); assert.equal(f.commits.length, 1); assert.equal(f.commits[0].mode, 'replace'); assert.equal(selection.read(), 7);
+  f.store.writeBatch([[org, 2], [selection, 7]]); await tick(); assert.equal(f.commits.length, 1); assert.equal(f.commits[0].mode, 'replace'); assert.equal(selection.read(), 7);
   org.write(3); await tick(); assert.equal(f.commits.length, 2); assert.equal(f.commits[1].mode, 'push'); assert.equal(selection.read(), 0);
   f.navigate(link({ 'p.org': 4, 'p.selection': 9 })); await tick(); assert.equal(selection.read(), 9); assert.equal(f.commits.length, 2);
-  f.store.batch([[org, 4], [selection, 9]]); await tick(); assert.equal(f.commits.length, 2); connection.dispose();
+  f.store.writeBatch([[org, 4], [selection, 9]]); await tick(); assert.equal(f.commits.length, 2); connection.dispose();
 });
 test('L09/K20 delayed newest write carries unapplied keys and invalidates old commit', async () => {
   const f = fixture(undefined, { delayed: true }), a = f.scope.registerState('a', { schema: integer, initial: 0 }), b = f.scope.registerState('b', { schema: integer, initial: 0 });
@@ -163,8 +163,8 @@ test('L02/K08 failed initial remains error baseline when URL key is absent', asy
   const f = fixture(); let reject;
   const cell = f.scope.registerState('value', { schema: integer, pendingInitial: new Promise((_, fail) => { reject = fail; }) }), connection = bind(f, cell);
   reject({ code: 'HTTP_ERROR' }); await tick();
-  assert.equal(cell.snapshot().status, 'error'); assert.throws(() => cell.read(), { code: 'HTTP_ERROR' });
-  f.navigate('https://example.test/view'); assert.equal(cell.snapshot().status, 'error'); assert.equal(f.commits.length, 0); connection.dispose();
+  assert.equal(cell.getSnapshot().status, 'error'); assert.throws(() => cell.read(), { code: 'HTTP_ERROR' });
+  f.navigate('https://example.test/view'); assert.equal(cell.getSnapshot().status, 'error'); assert.equal(f.commits.length, 0); connection.dispose();
 });
 test('C08/L02 explicit write during pending baseline survives settlement and releases URL readiness', async () => {
   const f = fixture(); let resolve;

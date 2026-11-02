@@ -16,19 +16,19 @@ function deferred() { let resolve, reject; const promise = new Promise((yes, no)
 const flush = async () => { for (let i = 0; i < 30; i++) await Promise.resolve(); };
 function registry(functions = []) {
   const registry = createRegistry({ functions });
-  registry.registerComponent(resource('Component', 'Empty', {}));
-  registry.registerComponent(resource('Component', 'Button', { events: { click: { schema: true } } }));
-  registry.registerComponent(resource('Component', 'Row', { slots: { default: {} } }));
+  registry.registerComponentContract(resource('Component', 'Empty', {}));
+  registry.registerComponentContract(resource('Component', 'Button', { events: { click: { schema: true } } }));
+  registry.registerComponentContract(resource('Component', 'Row', { slots: { default: {} } }));
   return registry;
 }
 async function mount(t, registry, spec = { render: { id: 'empty', componentRef: 'Empty' } }, options = {}, inputs) {
   const runtime = createRuntime({ registry, ...options }); t.after(() => runtime.dispose());
-  const { view, initial } = await runtime.mount({ view: spec, ...(inputs ? { inputs } : {}) }); await initial;
+  const { view, initialComplete: initial } = await runtime.createView({ view: spec, ...(inputs ? { inputs } : {}) }); await initial;
   return { registry, runtime, view, invoke: (actionRef, inputs = {}) => runtime.invokeAction({ owner: view, actionRef, inputs }) };
 }
 const buttonView = (actionRef, inputs = {}, extra = {}) => ({ ...extra, render: { id: 'button', componentRef: 'Button', on: { click: { id: 'observed', actionRef, inputs } } } });
-const emit = (view, event = null) => view.emit(view.snapshot().roots[0], 'click', event);
-const snapshot = view => view.snapshot().actions.observed;
+const emit = (view, event = null) => view.emit(view.getSnapshot().roots[0], 'click', event);
+const snapshot = view => view.getSnapshot().actions.observed;
 
 test('A17 false If without else continues; missing then is rejected without execution', async t => {
   const r = registry(), trace = [];
@@ -116,11 +116,18 @@ test('A25 actual target preparation rejects unconnected/Derived/Query/data/forge
   const r = registry(); let after = 0;
   native(r, 'after', {}, () => { after++; }); declarative(r, 'write', { ports: { cell: state(integer, false), next: value() }, steps: [set(path('/ports/next')), step('after')] });
   r.registerResources([resource('Variable', 'calculated', { expression: '1' }), resource('Query', 'q', { sources: {}, transform: { input: { x: 1 } } })]);
-  const store = createStateStore(), scope = store.createScope(), cell = scope.registerState('cell', { schema: integer, initial: 1 }), derived = scope.registerState('derived', { schema: integer, dependencies: [cell], derived: value => value + 1 });
-  const f = await mount(t, r, { queries: { data: { queryRef: 'q' } }, render: { id: 'empty', componentRef: 'Empty' } }, { stateStore: store });
-  const query = f.view.getQuery('data'), readonly = { address: cell.address, generation: cell.generation, read: () => cell.read(), snapshot: () => cell.snapshot() };
-  for (const target of [undefined, null, 1, cell.read(), derived, query, query.snapshot().data, f.runtime.variable('calculated'), readonly, { ...cell }]) {
-    const before = cell.snapshot(); await assert.rejects(f.invoke('write', { ...(target === undefined ? {} : { cell: target }), next: 3 })); assert.equal(cell.snapshot(), before); assert.equal(after, 0);
+  const store = createStateStore(), scope = store.createScope(), cell = scope.registerState('cell', { schema: integer, initial: 1 });
+  const f = await mount(t, r, {
+    ports: { cell: state(integer) },
+    states: {
+      derived: { kind: 'Derived', schema: integer, variable: { ports: { n: value(integer) }, expression: 'n + 1' }, inputs: { n: path('/ports/cell') } },
+      calculated: { kind: 'Derived', schema: integer, variableRef: 'calculated' },
+    }, queries: { data: { queryRef: 'q' } }, render: { id: 'empty', componentRef: 'Empty' },
+  }, { stateStore: store }, { cell });
+  const derived = f.view.getState('derived');
+  const query = f.view.getQuery('data'), readonly = { address: cell.address, generation: cell.generation, read: () => cell.read(), getSnapshot: () => cell.getSnapshot() };
+  for (const target of [undefined, null, 1, cell.read(), derived, query, query.getSnapshot().data, f.view.getState('calculated').read(), readonly, { ...cell }]) {
+    const before = cell.getSnapshot(); await assert.rejects(f.invoke('write', { ...(target === undefined ? {} : { cell: target }), next: 3 })); assert.equal(cell.getSnapshot(), before); assert.equal(after, 0);
   }
   await assert.rejects(f.invoke('write', { cell, next: 'bad' }), { code: 'TYPE_MISMATCH' }); assert.equal(cell.read(), 1); assert.equal(after, 0);
   scope.replaceState('cell', { schema: integer, initial: 9 }); await assert.rejects(f.invoke('write', { cell, next: 3 }), { code: 'CANCELLED' }); assert.equal(scope.getState('cell').read(), 9); scope.dispose();
@@ -131,7 +138,7 @@ test('A02 Value snapshot and State target identity survive form mutation and por
   const store = createStateStore(), scope = store.createScope(), one = scope.registerState('one', { schema: integer, initial: 0 }), two = scope.registerState('two', { schema: integer, initial: 0 });
   const spec = buttonView('capture', { form: path('/ports/form'), cell: path('/ports/cell') }, { ports: { form: value(object), cell: state(integer) } }), form = { n: 1 };
   const f = await mount(t, r, spec, { stateStore: store }, { form, cell: one }); const running = emit(f.view); form.n = 9;
-  await (await f.view.update(spec, { inputs: { form: { n: 7 }, cell: two } })).initial;
+  await (await f.view.update(spec, { inputs: { form: { n: 7 }, cell: two } })).initialComplete;
   assert.equal(held.form.n, 1); assert.deepEqual(held.cell.address, one.address); assert.throws(() => { held.form.n = 99; }); gate.resolve(); assert.equal(await running, 1); assert.equal(one.read(), 1); assert.equal(two.read(), 0); scope.dispose();
 });
 test('A11/A13/A15 active event connection ignores duplicate while independent shared-State call survives its removal', async t => {
@@ -143,10 +150,10 @@ test('A11/A13/A15 active event connection ignores duplicate while independent sh
   const store = createStateStore(), scope = store.createScope(), shared = scope.registerState('shared', { schema: integer, initial: 0 }), spec = buttonView('work', { cell: path('/ports/cell'), tag: 'event' }, { ports: { cell: state(integer) } });
   const f = await mount(t, r, spec, { stateStore: store }, { cell: shared }); const event = emit(f.view), cancelled = assert.rejects(event, { code: 'CANCELLED' });
   const external = f.invoke('work', { cell: shared, tag: 'external' }); await emit(f.view); assert.equal(calls, 2);
-  await (await f.view.update({ ...spec, render: { id: 'button', componentRef: 'Button' } })).initial; await cancelled;
+  await (await f.view.update({ ...spec, render: { id: 'button', componentRef: 'Button' } })).initialComplete; await cancelled;
   assert.equal(contexts.get('external').signal.aborted, false); assert.throws(() => contexts.get('event').inputs.cell.write(99), { code: 'CANCELLED' });
   externalGate.resolve(); assert.equal(await external, 'external');
-  await (await f.view.update(spec)).initial; assert.equal(snapshot(f.view).status, 'idle');
+  await (await f.view.update(spec)).initialComplete; assert.equal(snapshot(f.view).status, 'idle');
   eventGate.resolve(); await flush(); assert.equal(snapshot(f.view).status, 'idle'); assert.equal(snapshot(f.view).data, null); assert.equal(shared.read(), 3);
   assert.equal(await emit(f.view), 'event'); assert.equal(snapshot(f.view).status, 'success'); shared.write(4); assert.equal(shared.read(), 4); scope.dispose();
 });
@@ -199,24 +206,25 @@ test('K21 item-local when skips hidden inputs/Queries; hidden duplicate keys sti
   r.registerResources([resource('Component', 'Consumer', { ports: { text: value(string) }, queries: { q: { query: { sources: { main: { datasource: { kind: 'Http', baseUrl: 'https://example.test' }, request: { method: 'GET', path: 'items' } } }, transform: { input: path('/sources/main') } } } }, render: { id: 'inside', componentRef: 'Empty' } })]);
   const node = { id: 'consumer', componentRef: 'Consumer', repeat: { items: [{ id: 'one', show: true, text: 'valid' }, { id: 'two', show: false }], as: 'item', key: path('/repeat/item/id') }, when: path('/repeat/item/show'), inputs: { text: path('/repeat/item/text') } };
   const spec = { render: { id: 'row', componentRef: 'Row', slots: { default: [node] } } }, f = await mount(t, r, spec, { requestExecutor: async () => { requests++; return { status: 200, headers: {}, body: null }; } });
-  assert.equal(f.view.snapshot().roots[0].children.length, 1); assert.equal(requests, 1);
+  assert.equal(f.view.getSnapshot().roots[0].children.length, 1); assert.equal(requests, 1);
   const invalid = structuredClone(spec); invalid.render.slots.default[0].repeat.items[1].id = 'one';
-  await assert.rejects(f.runtime.mount({ view: invalid }), { code: 'INVALID_DEFINITION' }); assert.equal(requests, 1);
+  await assert.rejects(f.runtime.createView({ view: invalid }), { code: 'INVALID_DEFINITION' }); assert.equal(requests, 1);
   const repeated = alias => ({ id: alias, componentRef: 'Row', repeat: { items: [], as: alias, key: 'x' }, slots: { default: [] } });
   const nested = repeated('same'); nested.slots.default.push({ ...repeated('same'), id: 'nested' });
-  assert.throws(() => r.validateDefinition('View', { render: { id: 'root', componentRef: 'Row', slots: { default: [nested] } } }), { code: 'INVALID_DEFINITION' });
-  r.validateDefinition('View', { render: { id: 'root', componentRef: 'Row', slots: { default: [{ ...repeated('same'), id: 'first' }, { ...repeated('same'), id: 'second' }] } } });
+  await assert.rejects(f.runtime.createView({ view: { render: { id: 'root', componentRef: 'Row', slots: { default: [nested] } } } }), { code: 'INVALID_DEFINITION' });
+  const siblings = await f.runtime.createView({ view: { render: { id: 'root', componentRef: 'Row', slots: { default: [{ ...repeated('same'), id: 'first' }, { ...repeated('same'), id: 'second' }] } } } });
+  await siblings.initialComplete;
 });
 test('A21 same observation id in two Component instances has independently visible running/success states', async t => {
   const r = registry(), gates = { one: deferred(), two: deferred() };
-  r.registerComponent(resource('Component', 'Status', { ports: { value: value(string) } }));
+  r.registerComponentContract(resource('Component', 'Status', { ports: { value: value(string) } }));
   native(r, 'wait', { ports: { tag: value(string) }, output: { schema: string } }, async ({ inputs }) => { await gates[inputs.tag].promise; return inputs.tag; });
   r.registerResources([resource('Component', 'Caller', { ports: { tag: value(string) }, render: { id: 'row', componentRef: 'Row', slots: { default: [
     { id: 'status', componentRef: 'Status', inputs: { value: path('/actions/local/status') } },
     { id: 'inner', componentRef: 'Button', on: { click: { id: 'local', actionRef: 'wait', inputs: { tag: path('/ports/tag') } } } },
   ] } } })]);
   const spec = { render: { id: 'root', componentRef: 'Row', slots: { default: [{ id: 'one', componentRef: 'Caller', inputs: { tag: 'one' } }, { id: 'two', componentRef: 'Caller', inputs: { tag: 'two' } }] } } }, f = await mount(t, r, spec);
-  const named = id => { const all = []; const walk = node => { if (node.id === id) all.push(node); node.children.forEach(walk); }; f.view.snapshot().roots.forEach(walk); return all; };
+  const named = id => { const all = []; const walk = node => { if (node.id === id) all.push(node); node.children.forEach(walk); }; f.view.getSnapshot().roots.forEach(walk); return all; };
   const statuses = () => named('status').map(node => node.inputs.value); assert.deepEqual(statuses(), ['idle', 'idle']);
   const one = f.view.emit(named('inner')[0], 'click', null); assert.deepEqual(statuses(), ['running', 'idle']);
   const two = f.view.emit(named('inner')[1], 'click', null); assert.deepEqual(statuses(), ['running', 'running']);

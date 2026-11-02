@@ -34,31 +34,31 @@ test('H01 real HTTP composite query, input reuse, failure retention and polling 
     onChange: state => { for (const waiter of stateWaiters) if (waiter.predicate(state)) waiter.resolve(state); },
   });
   const wait = count => received.length >= count ? Promise.resolve() : bounded(new Promise(resolve => waiters.push({ count, resolve })));
-  const state = predicate => predicate(query.snapshot()) ? Promise.resolve(query.snapshot()) : bounded(new Promise(resolve => stateWaiters.push({ predicate, resolve })));
+  const state = predicate => predicate(query.getSnapshot()) ? Promise.resolve(query.getSnapshot()) : bounded(new Promise(resolve => stateWaiters.push({ predicate, resolve })));
   const reply = (path, start, value, status = 200) => {
     const { res } = received.find((row, index) => index >= start && row.path === path);
     res.writeHead(status, { 'content-type': 'application/json' }); res.end(JSON.stringify(value));
   };
   try {
     await wait(2); reply('/left', 0, ['left-1']); await clock.advance(1000);
-    assert.equal(received.length, 2); assert.equal(query.snapshot().data, undefined);
+    assert.equal(received.length, 2); assert.equal(query.getSnapshot().data, undefined);
     reply('/right', 0, ['right-1']); await query.initialSettled;
-    check.deepEqual(query.snapshot().data, { left: ['left-1'], right: ['right-1'] });
+    check.deepEqual(query.getSnapshot().data, { left: ['left-1'], right: ['right-1'] });
     query.update({ inputs: { a: 2, b: 1 } }); await wait(3);
     assert.equal(received[2].path, '/left'); reply('/left', 2, ['left-2']); await state(s => s.status === 'success');
-    check.deepEqual(query.snapshot().data, { left: ['left-2'], right: ['right-1'] });
+    check.deepEqual(query.getSnapshot().data, { left: ['left-2'], right: ['right-1'] });
     await clock.advance(19); assert.equal(received.length, 3); await clock.advance(1); await wait(5);
     reply('/left', 3, ['partial']); reply('/right', 3, {}, 503); await state(s => s.status === 'error');
-    assert.equal(query.snapshot().error.location, '/spec/sources/right'); assert.equal(query.snapshot().error.cause.location, '/spec/sources/main');
-    check.deepEqual(query.snapshot().data, { left: ['left-2'], right: ['right-1'] }); assert.equal(query.snapshot().stale, true);
+    assert.equal(query.getSnapshot().error.location, '/spec/sources/right'); assert.equal(query.getSnapshot().error.cause.location, '/spec/sources/main');
+    check.deepEqual(query.getSnapshot().data, { left: ['left-2'], right: ['right-1'] }); assert.equal(query.getSnapshot().stale, true);
     await clock.advance(20); await wait(7); reply('/left', 5, ['fresh-left']); reply('/right', 5, ['fresh-right']); await state(s => s.status === 'success');
     query.update({ autoRefreshWhen: false }); await clock.advance(100); assert.equal(received.length, 7);
     query.update({ autoRefreshWhen: true }); await wait(9); assert.equal(query.pending, null);
     reply('/left', 7, ['resumed-left']); reply('/right', 7, ['resumed-right']); await state(s => s.status === 'success');
-    check.deepEqual(query.snapshot().data, { left: ['resumed-left'], right: ['resumed-right'] });
+    check.deepEqual(query.getSnapshot().data, { left: ['resumed-left'], right: ['resumed-right'] });
     await clock.advance(19); assert.equal(received.length, 9); await clock.advance(1); await wait(11);
     reply('/left', 9, ['polled-left']); reply('/right', 9, ['polled-right']); await state(s => s.status === 'success');
-    assert.equal(query.snapshot().stale, false); query.dispose(); assert.equal(clock.tasks.size, 0);
+    assert.equal(query.getSnapshot().stale, false); query.dispose(); assert.equal(clock.tasks.size, 0);
   } finally {
     query.dispose(); for (const row of received) row.res.destroy(); server.closeAllConnections();
     await new Promise(resolve => server.close(resolve));

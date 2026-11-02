@@ -8,7 +8,7 @@ void result;
 store.transaction(async () => 42);
 
 declare const view: View;
-const node = view.snapshot().roots[0];
+const node = view.getSnapshot().roots[0];
 if (node) await view.emit(node, 'click', {});
 // @ts-expect-error fabricated targets still require a generation.
 view.emit({ address: 'address' }, 'click', {});
