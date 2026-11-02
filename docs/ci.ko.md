@@ -29,7 +29,7 @@
 ## 로컬 검사와 shard 관리
 
 `npm run check:svelte-ui` 등 기존 명령은 계속 전체 로컬 검증을 실행합니다.
-CI의 브라우저 분산을 재현하려면 다음을 실행합니다.
+Svelte UI shard 실행과 보고서 병합을 재현하려면 다음을 실행합니다.
 
 ```sh
 npm run build:svelte-ui

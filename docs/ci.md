@@ -30,7 +30,7 @@ requires revisiting the installation command.
 ## Local checks and shard maintenance
 
 Existing commands such as `npm run check:svelte-ui` still run the complete local
-suite. To reproduce the CI browser distribution after building the packages:
+suite. To reproduce the Svelte UI shards and merge their reports:
 
 ```sh
 npm run build:svelte-ui

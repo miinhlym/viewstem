@@ -1,0 +1,377 @@
+{
+  "mode": "optimization",
+  "decision": "PASS",
+  "canonicalOwner": [
+    ".github/workflows/core.yml",
+    "packages/svelte-ui/scripts/browser-plan.json",
+    "packages/svelte-ui/scripts/test-reports.mjs"
+  ],
+  "recordedAtUtc": "2026-11-03T10:22:00Z",
+  "summary": {
+    "adoption": "Keep four balanced browser shards, separate Node compatibility, referenced-family fixture registration and headless-shell installation.",
+    "target": "The measured final configuration passes the required 300-second target; the optional 180-second stretch target is not met.",
+    "correctness": "All required jobs passed; all 117 UI names and all 66 family contracts are preserved.",
+    "cause": "Combined configuration observations; individual remote speedup effects are not isolated.",
+    "limits": "Small sample, shared hosted runners and uncontrolled npm cache state; no p95 or guaranteed future runtime claim."
+  },
+  "comparisonBasis": {
+    "scenario": "main push through successful CI complete, including setup, builds, tests, package consumers and report aggregation",
+    "environment": {
+      "runner": "GitHub-hosted ubuntu-latest",
+      "compatibilityNode": [
+        "22.21.1",
+        "24.1.0"
+      ],
+      "browserNode": "24.1.0",
+      "browser": "Playwright default Chromium headless shell",
+      "cache": "setup-node npm cache; cold/warm state not independently controlled"
+    },
+    "workload": {
+      "uiTests": 117,
+      "uiFamilies": 66,
+      "requiredUiCases": 68,
+      "uiTestNameSha256": "2895661070fe8e564cb4be727689193e5fbf7b6cda82edf2f81cc4467491e65f",
+      "nameDigestEncoding": "SHA-256 of sorted UTF-8 test names joined by LF with a final LF",
+      "nodeCompatibility": "both supported Node versions; browser behavior runs once in the candidate",
+      "productSourceChanged": false,
+      "dependenciesChanged": false
+    },
+    "variables": [
+      "referenced-family fixture registration",
+      "job separation and balanced shards",
+      "removal of repeated browser behavior runs across Node versions",
+      "headless-shell-only browser installation"
+    ],
+    "metrics": {
+      "workflowSeconds": "workflow createdAt to completed-run updatedAt observed immediately after completion",
+      "logicalCriticalPathSeconds": "max parallel prerequisite job durations plus CI complete duration, using GitHub job timestamps",
+      "runnerSeconds": "sum of all job execution durations",
+      "coordinationAndAllocationRemainderSeconds": "workflowSeconds minus logicalCriticalPathSeconds; not a direct measure of pure runner queue time"
+    },
+    "sampling": "One existing successful baseline, one three-shard trial, one final four-shard trial; final documentation push repeats the same executable sources separately. No observed optimization trial was excluded.",
+    "localProxy": "Three fresh Button contexts per configuration diagnosed registration cost; local full-suite timing is not a remote CI score."
+  },
+  "gates": [
+    {
+      "name": "optimization-necessity",
+      "decision": "PASS",
+      "evidence": "Baseline critical path 885s exceeds user target 300s."
+    },
+    {
+      "name": "required-runtime",
+      "budgetSeconds": 300,
+      "decision": "PASS",
+      "observedCriticalPathSeconds": 201,
+      "observedWorkflowSeconds": 208
+    },
+    {
+      "name": "stretch-runtime",
+      "budgetSeconds": 180,
+      "required": false,
+      "decision": "FAIL",
+      "observedCriticalPathSeconds": 201,
+      "observedWorkflowSeconds": 208
+    },
+    {
+      "name": "preserved-ui-acceptance",
+      "decision": "PASS",
+      "tests": 117,
+      "families": 66,
+      "requiredCases": 68,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "missing": []
+    },
+    {
+      "name": "node-compatibility",
+      "decision": "PASS",
+      "nodeVersions": [
+        "22.21.1",
+        "24.1.0"
+      ],
+      "coreTestsPerVersion": 1080,
+      "ciToolingTestsPerVersion": 6,
+      "installedTarballConsumersPerVersion": 3,
+      "acceptanceMapping": {
+        "core": 216,
+        "optionalCharts": 8
+      }
+    },
+    {
+      "name": "browser-integration",
+      "decision": "PASS",
+      "celCasesPerAdapter": 25,
+      "celAdapters": 2,
+      "coreTests": 7,
+      "svelteRendererTests": 30,
+      "playgroundTests": 41
+    },
+    {
+      "name": "report-integrity",
+      "decision": "PASS",
+      "coverage": "Missing/duplicate/stale/mixed-source/failed/cancelled/skipped/todo reports and unassigned browser files are rejected, including external catalog acceptance input changes."
+    },
+    {
+      "name": "product-contract",
+      "decision": "PASS",
+      "evidence": "No changes under packages/core/src, packages/svelte/src or packages/svelte-ui/src; dependencies and public API unchanged."
+    }
+  ],
+  "runs": [
+    {
+      "configuration": "baseline",
+      "runId": 41610602026,
+      "url": "https://github.com/miinhlym/viewstem/actions/runs/41610602026",
+      "revision": "4aa473b7efced7c035ff6518c694ddc1be81fafd",
+      "createdAt": "2026-11-03T09:23:16Z",
+      "completedRecordAt": "2026-11-03T09:38:05Z",
+      "conclusion": "success",
+      "workflowSeconds": 889,
+      "logicalCriticalPathSeconds": 885,
+      "runnerSeconds": 1565,
+      "coordinationAndAllocationRemainderSeconds": 4,
+      "jobs": [
+        {
+          "name": "core (22.21.1)",
+          "conclusion": "success",
+          "startedAt": "2026-11-03T09:23:19Z",
+          "completedAt": "2026-11-03T09:38:04Z",
+          "seconds": 885
+        },
+        {
+          "name": "core (24.1.0)",
+          "conclusion": "success",
+          "startedAt": "2026-11-03T09:23:19Z",
+          "completedAt": "2026-11-03T09:34:39Z",
+          "seconds": 680
+        }
+      ]
+    },
+    {
+      "configuration": "three-shards",
+      "runId": 41616443238,
+      "url": "https://github.com/miinhlym/viewstem/actions/runs/41616443238",
+      "revision": "5d0540117dbe20dec0128219a65eab1b5807b2ea",
+      "createdAt": "2026-11-03T10:06:18Z",
+      "completedRecordAt": "2026-11-03T10:10:21Z",
+      "conclusion": "success",
+      "workflowSeconds": 243,
+      "logicalCriticalPathSeconds": 219,
+      "runnerSeconds": 889,
+      "coordinationAndAllocationRemainderSeconds": 24,
+      "jobs": [
+        {
+          "name": "UI browser (2/3)",
+          "conclusion": "success",
+          "startedAt": "2026-11-03T10:06:21Z",
+          "completedAt": "2026-11-03T10:09:21Z",
+          "seconds": 180
+        },
+        {
+          "name": "Node compatibility (24.1.0)",
+          "conclusion": "success",
+          "startedAt": "2026-11-03T10:06:31Z",
+          "completedAt": "2026-11-03T10:09:36Z",
+          "seconds": 185
+        },
+        {
+          "name": "UI browser (3/3)",
+          "conclusion": "success",
+          "startedAt": "2026-11-03T10:06:21Z",
+          "completedAt": "2026-11-03T10:09:48Z",
+          "seconds": 207
+        },
+        {
+          "name": "UI browser (1/3)",
+          "conclusion": "success",
+          "startedAt": "2026-11-03T10:06:41Z",
+          "completedAt": "2026-11-03T10:10:05Z",
+          "seconds": 204
+        },
+        {
+          "name": "Node compatibility (22.21.1)",
+          "conclusion": "success",
+          "startedAt": "2026-11-03T10:06:22Z",
+          "completedAt": "2026-11-03T10:08:03Z",
+          "seconds": 101
+        },
+        {
+          "name": "CI complete",
+          "conclusion": "success",
+          "startedAt": "2026-11-03T10:10:08Z",
+          "completedAt": "2026-11-03T10:10:20Z",
+          "seconds": 12
+        }
+      ],
+      "uiReport": {
+        "sourceHash": "fc92f14386df72f57f6f9fba2dbc342d8f431be75358470289d1e80fd751a404",
+        "node": "v24.1.0",
+        "platform": "linux",
+        "arch": "x64",
+        "counts": {
+          "tests": 117,
+          "passed": 117,
+          "failed": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "audit": {
+          "families": 66,
+          "passedFamilies": 66,
+          "requiredCases": 68,
+          "missing": []
+        },
+        "testNameSha256": "2895661070fe8e564cb4be727689193e5fbf7b6cda82edf2f81cc4467491e65f",
+        "timing": {
+          "shardDurationMs": [
+            {
+              "index": 1,
+              "durationMs": 153147.035216
+            },
+            {
+              "index": 2,
+              "durationMs": 129926.54672
+            },
+            {
+              "index": 3,
+              "durationMs": 164793.995338
+            }
+          ]
+        }
+      }
+    },
+    {
+      "configuration": "four-shards-headless-only",
+      "runId": 41617437850,
+      "url": "https://github.com/miinhlym/viewstem/actions/runs/41617437850",
+      "revision": "70ac51e621b7f8c436019f6f20f0e9176f8845bc",
+      "createdAt": "2026-11-03T10:13:22Z",
+      "completedRecordAt": "2026-11-03T10:16:50Z",
+      "conclusion": "success",
+      "workflowSeconds": 208,
+      "logicalCriticalPathSeconds": 201,
+      "runnerSeconds": 811,
+      "coordinationAndAllocationRemainderSeconds": 7,
+      "jobs": [
+        {
+          "name": "Node compatibility (24.1.0)",
+          "conclusion": "success",
+          "startedAt": "2026-11-03T10:13:25Z",
+          "completedAt": "2026-11-03T10:14:36Z",
+          "seconds": 71
+        },
+        {
+          "name": "Node compatibility (22.21.1)",
+          "conclusion": "success",
+          "startedAt": "2026-11-03T10:13:25Z",
+          "completedAt": "2026-11-03T10:14:51Z",
+          "seconds": 86
+        },
+        {
+          "name": "UI browser (1/4)",
+          "conclusion": "success",
+          "startedAt": "2026-11-03T10:13:25Z",
+          "completedAt": "2026-11-03T10:16:11Z",
+          "seconds": 166
+        },
+        {
+          "name": "UI browser (4/4)",
+          "conclusion": "success",
+          "startedAt": "2026-11-03T10:13:25Z",
+          "completedAt": "2026-11-03T10:15:23Z",
+          "seconds": 118
+        },
+        {
+          "name": "UI browser (3/4)",
+          "conclusion": "success",
+          "startedAt": "2026-11-03T10:13:25Z",
+          "completedAt": "2026-11-03T10:16:14Z",
+          "seconds": 169
+        },
+        {
+          "name": "UI browser (2/4)",
+          "conclusion": "success",
+          "startedAt": "2026-11-03T10:13:25Z",
+          "completedAt": "2026-11-03T10:16:33Z",
+          "seconds": 188
+        },
+        {
+          "name": "CI complete",
+          "conclusion": "success",
+          "startedAt": "2026-11-03T10:16:36Z",
+          "completedAt": "2026-11-03T10:16:49Z",
+          "seconds": 13
+        }
+      ],
+      "uiReport": {
+        "sourceHash": "0e97e179ff8a2d2d02cf6bd9380cc45ddc36e09f7716b865f5c832d5ecccb9cf",
+        "node": "v24.1.0",
+        "platform": "linux",
+        "arch": "x64",
+        "counts": {
+          "tests": 117,
+          "passed": 117,
+          "failed": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "audit": {
+          "families": 66,
+          "passedFamilies": 66,
+          "requiredCases": 68,
+          "missing": []
+        },
+        "testNameSha256": "2895661070fe8e564cb4be727689193e5fbf7b6cda82edf2f81cc4467491e65f",
+        "timing": {
+          "shardDurationMs": [
+            {
+              "index": 1,
+              "durationMs": 121752.560091
+            },
+            {
+              "index": 2,
+              "durationMs": 126164.466791
+            },
+            {
+              "index": 3,
+              "durationMs": 119228.729953
+            },
+            {
+              "index": 4,
+              "durationMs": 43235.005938
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "skipped": [
+    {
+      "name": "combination-matrix",
+      "reason": "No separate remote run for each optimization axis; adopted combined changes preserve all required checks. No isolated remote speedup claim."
+    },
+    {
+      "name": "stable-tail-estimate",
+      "reason": "Insufficient independent samples for p95; future hosted runner variability remains."
+    },
+    {
+      "name": "product-runtime-benchmark",
+      "reason": "Only CI/test harness changed; no-new-claim for runtime performance."
+    }
+  ],
+  "evidence": {
+    "publicHandoff": "docs/handoff/ci-optimization-2026-11-03.md",
+    "localRawDirectory": ".git/ci-evidence/optimization/",
+    "remoteArtifacts": [
+      "ui-shard-*",
+      "ui-browser-results"
+    ],
+    "artifactRetentionDays": 14,
+    "previousPreOptimizationFailure": "https://github.com/miinhlym/viewstem/actions/runs/41607958955",
+    "cleanup": "No raw evidence or existing local data removed."
+  }
+}

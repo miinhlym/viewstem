@@ -40,9 +40,10 @@ Node 버전·의존성·공개 API·제품 구현은 변경하지 않는다. Nod
 | [Vite](https://github.com/vitejs/vite/blob/54431638c3a9fc6b38dbce8041051a3feca3c6e4/.github/workflows/ci.yml) | 호환성 matrix와 최종 gate 분리. README·라이선스도 실제 tarball에 들어가므로 문서 변경 전체 skip은 도입하지 않는다. |
 | [Zod](https://github.com/colinhacks/zod/blob/15e25673bae8d407d52494fdb0e8741b7f1a1b0d/.github/workflows/test.yml) | 호환성 축별 검사 분리. TypeScript 버전 확대는 이번 범위에 넣지 않는다. |
 | [Playwright CI](https://playwright.dev/docs/ci#workers) | 작업 내 제한된 동시성과 작업 간 분산, 결과 artifact 보존. 현재 native Node test runner를 유지한다. |
+| [Chromium headless shell](https://playwright.dev/docs/browsers#chromium-headless-shell) | 기본 headless 실행에 필요한 브라우저만 설치한다. headed/channel 사용 여부를 먼저 확인했다. |
 | [Svelte testing](https://svelte.dev/docs/svelte/testing) | 실제 컴포넌트/통합 검사와 소형 로직 검사의 구분. 실제 Chromium 검증을 DOM 모형으로 대체하지 않는다. |
 
-## 측정과 정확성 계획
+## 측정과 정확성 결과
 
 기존 성공 CI를 baseline으로 유지한다. 로컬 진단은 같은 audit harness·빌드·Button
 fixture에서 새 context 3회로 등록·스크립트 주입·mount 시간을 분리했다. 전체 묶음
@@ -51,7 +52,7 @@ fixture에서 새 context 3회로 등록·스크립트 주입·mount 시간을 �
 
 완료 기준은 기존 테스트 이름 집합 보존, 전체 브라우저 인수 통과, 누락·중복·실패·
 서로 다른 소스의 보고서를 거부하는 회귀 검사, 두 Node의 tarball 소비자 통과다.
-원격에서는 같은 실행 소스의 완료 기록을 반복 확보하고 각 job 및 전체 경로의
+원격에서는 같은 실행 소스의 완료 기록을 반복 확인하고 각 job 및 전체 경로의
 실행 시간·러너 합계를 비교한다. 실패 실행과 불리한 측정은 제외하지 않고 기록한다.
 
 원본 로컬 자료는 `.git/ci-evidence/optimization/`에 두며, 원격 결과는 Actions
@@ -62,8 +63,35 @@ fixture에서 새 context 3회로 등록·스크립트 주입·mount 시간을 �
 전체 러너 시간 합은 889초였다. UI 117개·family 66개와 양쪽 Node 호환성 검사가 통과했다.
 
 추가 목표를 위해 이 실행의 파일별 시간과 core/renderer/playground 57초를 함께
-균형 배치해 4-shard로 조정했다. headless-only 설치와 함께 적용한 구성의 전체 시간은
-다음 실행으로 확인하며, 두 조정 각각의 독립 개선 비율을 주장하지 않는다.
+균형 배치해 4-shard로 조정했다. headless-only 설치와 함께 적용한
+[CI 41617437850](https://github.com/miinhlym/viewstem/actions/runs/41617437850)는
+리비전 `70ac51e`에서 **전체 208초(3분 28초)**에 성공했다. 두 조정 각각의 독립 개선
+비율을 주장하지 않는다.
+
+| 측정 | 기준 | 3-shard 구성 | 최종 4-shard 구성 |
+|---|---:|---:|---:|
+| workflow 생성부터 완료 기록까지 | 889초 | 243초 | 208초 |
+| 작업 의존 경로의 실행 시간 | 885초 | 219초 | 201초 |
+| 전체 job 실행 시간 합계 | 1,565초 | 889초 | 811초 |
+| workflow 조정·배정 등 나머지 시간 | 4초 | 24초 | 7초 |
+
+의존 경로는 병렬 선행 작업 중 최댓값에 최종 gate 시간을 더한다. 마지막 구성은
+`max(71,86,166,118,169,188)+13=201초`다. 나머지 시간은 workflow 전체 시간과의
+차이이며 순수 러너 대기 시간만을 측정한 값은 아니다. 실제 대기를 포함해도
+**5분 목표 PASS**, **3분 추가 목표 미달**이다. 전체 러너 시간도 기준 대비 약 48% 줄었다.
+소수의 실행 결과이므로 p95나 모든 실행의 5분 이내 완료를 보장하지 않는다.
+npm cache·러너 부하를 고정하지 않았으며 각각의 변경에 대한 인과 효과는 분리하지 않았다.
+
+최종 구성에서 두 Node 각각 core 1,080개, CI 도구 회귀 6개, 세 tarball 설치 소비자가
+통과했다. core 인수 대응은 core 216개·선택 차트 8개 구분을 유지한다. 브라우저에서는
+CEL 두 어댑터 각각 25개, core 7개, Svelte renderer 30개, playground 41개가 통과했다.
+UI 117개 이름 집합은 변경 전과 정확히 같고, 66/66 family·필수 사례 68개가 검증됐다.
+제품 `src`·의존성·공개 API 변경은 없다.
+
+실행별 리비전·소스 해시·작업 시간·판정·생략한 비교는
+[기계 판독 결과](ci-optimization-results.json)에 기록한다. 이 문서의 수치는 `70ac51e`
+실행 시점의 스냅샷이다. 최종 문서 커밋에서도 동일 실행 소스의 CI를 재확인하되,
+실행마다 결과 문서를 다시 커밋하는 순환은 만들지 않는다.
 
 독립 리뷰에서 카탈로그 인수 입력인 `docs/handoff/shadcn-component-inventory.json`이
 로컬 결과 해시에서 빠진 것을 수정했다. 같은 HEAD에서 이 입력만 바꿔도 과거 결과가
@@ -72,5 +100,6 @@ fixture에서 새 context 3회로 등록·스크립트 주입·mount 시간을 �
 로컬 전체 실행은 Node 24.1.0에서 117/117 통과, 실패·cancel·skip·todo 0,
 66/66 family 인수를 확인했다. 변경 전 보고서와 테스트 이름 집합이 정확히 일치한다.
 소요 시간은 327.006초였으며 macOS 개발 환경 값으로 원격 CI 목표와 직접 비교하지 않는다.
-보고서 gate 회귀 5개는 Node 22.21.1·24.1.0 모두 통과했고 `actionlint`,
+보고서 gate 회귀는 처음 5개에서 인수 입력 해시 검사까지 6개로 늘렸으며
+Node 22.21.1·24.1.0 모두 통과했다. `actionlint`,
 변경 diff 공백 검사, CI 안내의 로컬 링크와 영문·한국어 코드 블록 대조도 통과했다.
