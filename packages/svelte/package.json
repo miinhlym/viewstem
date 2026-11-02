@@ -1,0 +1,36 @@
+{
+  "name": "@viewstem/svelte",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Explicit Svelte renderer adapters for Viewstem core",
+  "engines": {
+    "node": ">=22"
+  },
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "dependencies": {
+    "@viewstem/core": "0.1.0"
+  },
+  "peerDependencies": {
+    "svelte": "^5.57.3"
+  },
+  "scripts": {
+    "build": "svelte-package -i src/lib -o dist",
+    "typecheck": "svelte-check --tsconfig ./tsconfig.json --fail-on-warnings && svelte-check --tsconfig ./example/tsconfig.json --fail-on-warnings",
+    "test": "node scripts/run-tests.mjs"
+  }
+}

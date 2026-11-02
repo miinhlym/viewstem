@@ -15,12 +15,20 @@
     "check:coverage": "node packages/core/scripts/check-coverage.mjs packages/core/test/results/current.json",
     "test:report": "node packages/core/scripts/run-tests.mjs",
     "playground": "npm run build && node playground/server.mjs",
-    "test:playground": "npm run build && node --test playground/test/*.test.mjs"
+    "test:playground": "npm run build && node --test playground/test/*.test.mjs",
+    "build:svelte": "npm run build && npm run build -w @viewstem/svelte",
+    "check:svelte": "npm run build:svelte && npm run typecheck -w @viewstem/svelte && npm run test -w @viewstem/svelte && npm run test:svelte:package",
+    "test:svelte": "npm run build:svelte && npm run test -w @viewstem/svelte",
+    "test:svelte:package": "node packages/svelte/scripts/test-package.mjs",
+    "example:svelte": "npm run build:svelte && node packages/svelte/example/server.mjs"
   },
   "devDependencies": {
     "@marcbachmann/cel-js": "8.0.0",
+    "@sveltejs/package": "2.5.8",
     "esbuild": "0.25.12",
     "playwright": "1.62.1",
+    "svelte": "5.57.3",
+    "svelte-check": "4.7.8",
     "typescript": "5.9.3"
   },
   "engines": {
