@@ -29,11 +29,12 @@ try {
   const ui = packages.at(-1);
   const paths = new Set(ui.files.map(({ path }) => path));
   for (const path of [
+    'LICENSE', 'README.md', 'dist/shadcn/vendor/sonner-runtime/LICENSE',
     'dist/index.js', 'dist/index.d.ts', 'dist/shadcn/index.js', 'dist/shadcn/index.d.ts',
     'dist/shadcn/styles.css', 'dist/shadcn/support.json', 'upstream/NOTICE.txt',
   ]) assert.ok(paths.has(path), `missing packed file ${path}`);
   for (const path of paths) {
-    assert.ok(path.startsWith('dist/') || ['README.md', 'package.json', 'upstream/NOTICE.txt'].includes(path), path);
+    assert.ok(path.startsWith('dist/') || ['LICENSE', 'README.md', 'package.json', 'upstream/NOTICE.txt'].includes(path), path);
     assert.doesNotMatch(path, /(?:^|\/)(?:\.type-cache|src|test|example|scripts|node_modules)\/|(?:^|\/)catalog\.json$/);
   }
 
@@ -47,7 +48,11 @@ try {
     const installed = lock.packages[`node_modules/${name}`];
     assert.equal(installed.integrity, integrity);
     assert.equal(basename(installed.resolved), filename);
+    assert.equal((await json(`node_modules/${name}/package.json`)).license, 'MIT');
+    assert.equal(await readFile(join(directory, `node_modules/${name}/LICENSE`), 'utf8'), await readFile(join(root, 'LICENSE'), 'utf8'));
   }
+  assert.equal(await readFile(join(directory, 'node_modules/@viewstem/svelte-ui/upstream/NOTICE.txt'), 'utf8'), await readFile(join(root, 'packages/svelte-ui/upstream/NOTICE.txt'), 'utf8'));
+  assert.equal(await readFile(join(directory, 'node_modules/@viewstem/svelte-ui/dist/shadcn/vendor/sonner-runtime/LICENSE'), 'utf8'), await readFile(join(root, 'packages/svelte-ui/src/lib/shadcn/vendor/sonner-runtime/LICENSE'), 'utf8'));
   const installedUI = await json('node_modules/@viewstem/svelte-ui/package.json');
   const familyEntries = Object.entries(installedUI.exports).filter(([name, entry]) => name.startsWith('./shadcn/') && entry.types);
   assert.equal(familyEntries.length, 66);
@@ -197,6 +202,7 @@ try {
     chromium: browser.version(),
     svelte: svelteVersion,
     tarball: { integrity: ui.integrity, bytes: ui.size, unpackedBytes: ui.unpackedSize, files: paths.size },
+    license: 'MIT; installed text in all three packages and upstream UI notices verified',
     familyExports: familyEntries.length,
     selected: { js: size(asset(selected, '.js')), css: size(asset(selected, '.css')), modules: selectedPaths.length },
     full: {

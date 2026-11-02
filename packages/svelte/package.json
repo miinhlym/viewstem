@@ -1,5 +1,14 @@
 {
   "name": "@viewstem/svelte",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miinhlym/viewstem.git",
+    "directory": "packages/svelte"
+  },
+  "bugs": {
+    "url": "https://github.com/miinhlym/viewstem/issues"
+  },
   "version": "0.1.0",
   "type": "module",
   "description": "Explicit Svelte renderer adapters for Viewstem core",
@@ -17,7 +26,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "sideEffects": [
     "**/*.css"

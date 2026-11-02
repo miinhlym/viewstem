@@ -1,5 +1,14 @@
 {
   "name": "@viewstem/svelte-ui",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miinhlym/viewstem.git",
+    "directory": "packages/svelte-ui"
+  },
+  "bugs": {
+    "url": "https://github.com/miinhlym/viewstem/issues"
+  },
   "version": "0.1.0",
   "type": "module",
   "description": "Explicit Viewstem component sets for Svelte UI libraries",
@@ -354,7 +363,8 @@
   },
   "files": [
     "dist",
-    "upstream/NOTICE.txt"
+    "upstream/NOTICE.txt",
+    "LICENSE"
   ],
   "sideEffects": [
     "**/*.css"

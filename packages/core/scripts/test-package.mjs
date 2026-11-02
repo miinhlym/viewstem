@@ -12,9 +12,13 @@ try {
  const paths=packed.files.map(file=>file.path),chunks=paths.filter(path=>path.startsWith('dist/chunks/'));
  assert.ok(chunks.length>0);assert.ok(chunks.every(path=>/^dist\/chunks\/chunk-[A-Z0-9]+\.js(?:\.map)?$/.test(path)));
  for(const path of chunks.filter(path=>path.endsWith('.js')))assert.ok(chunks.includes(`${path}.map`));
- assert.deepEqual(paths.filter(path=>!chunks.includes(path)).sort(),['README.md','package.json',...['cel-support.json','cel.d.ts','cel.js','cel.js.map','http.d.ts','http.js','http.js.map','index.d.ts','index.js','index.js.map','THIRD-PARTY-NOTICES.txt'].map(name=>`dist/${name}`)].sort());
+ assert.deepEqual(paths.filter(path=>!chunks.includes(path)).sort(),['LICENSE','README.md','package.json',...['cel-support.json','cel.d.ts','cel.js','cel.js.map','http.d.ts','http.js','http.js.map','index.d.ts','index.js','index.js.map','THIRD-PARTY-NOTICES.txt'].map(name=>`dist/${name}`)].sort());
  await writeFile(join(directory,'package.json'),JSON.stringify({private:true,type:'module'}));
  execute('npm',['install',join(directory,packed.filename),'--ignore-scripts','--no-audit','--no-fund']);
+ const installed=join(directory,'node_modules/@viewstem/core');
+ assert.equal(JSON.parse(await readFile(join(installed,'package.json'),'utf8')).license,'MIT');
+ assert.equal(await readFile(join(installed,'LICENSE'),'utf8'),await readFile(join(root,'LICENSE'),'utf8'));
+ assert.ok((await readFile(join(installed,'dist/THIRD-PARTY-NOTICES.txt'),'utf8')).includes(await readFile(join(pkg,'vendor/cel-js/LICENSE'),'utf8')));
  await writeFile(join(directory,'consumer.mjs'),`import assert from 'node:assert/strict';
 import {createRegistry,createRuntime,createStateStore} from '@viewstem/core';
 import {createHttpExecutor} from '@viewstem/core/http';
@@ -46,5 +50,5 @@ cell.write('wrong');
 const runtime=createRuntime({registry,stateStore:store,requestExecutor:createHttpExecutor()});runtime.dispose();
 `);
  execute(process.execPath,[join(root,'node_modules/typescript/bin/tsc'),'--strict','--exactOptionalPropertyTypes','--noUncheckedIndexedAccess','--noEmit','--target','ES2022','--module','NodeNext','--moduleResolution','NodeNext','--lib','ES2022,DOM','consumer.ts','public-api.ts']);
- console.log(JSON.stringify({nodeVersion:process.version,package:packed.name,version:packed.version,files:packed.files.map(file=>file.path),integrity:packed.integrity,bytes:packed.size,unpackedBytes:packed.unpackedSize,runtime:'passed',publicBoundaryTests:7,types:'passed'},null,2));
+ console.log(JSON.stringify({nodeVersion:process.version,package:packed.name,version:packed.version,files:packed.files.map(file=>file.path),integrity:packed.integrity,bytes:packed.size,unpackedBytes:packed.unpackedSize,license:'MIT; installed text and vendored CEL notice verified',runtime:'passed',publicBoundaryTests:7,types:'passed'},null,2));
 }finally{await rm(directory,{recursive:true,force:true});}

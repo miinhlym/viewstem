@@ -17,8 +17,8 @@ try {
   const pack = name => JSON.parse(execute('npm', ['pack', join(root, 'packages', name), '--pack-destination', directory, '--ignore-scripts', '--json'], root))[0];
   const core = pack('core'), svelte = pack('svelte');
   const paths = svelte.files.map(file => file.path);
-  for (const path of ['dist/index.js', 'dist/index.d.ts', 'dist/ViewstemView.svelte', 'dist/ViewstemView.svelte.d.ts', 'dist/renderer.js', 'dist/types.d.ts']) assert.ok(paths.includes(path), path);
-  assert.ok(paths.every(path => ['README.md', 'package.json'].includes(path) || path.startsWith('dist/')));
+  for (const path of ['LICENSE', 'README.md', 'dist/index.js', 'dist/index.d.ts', 'dist/ViewstemView.svelte', 'dist/ViewstemView.svelte.d.ts', 'dist/renderer.js', 'dist/types.d.ts']) assert.ok(paths.includes(path), path);
+  assert.ok(paths.every(path => ['LICENSE', 'README.md', 'package.json'].includes(path) || path.startsWith('dist/')));
   assert.ok(paths.every(path => !/(?:^|\/)(?:test|example|node_modules)\//.test(path)));
   // The override resolves unpublished core locally. It is not a consumer dependency.
   await writeFile(join(directory, 'package.json'), JSON.stringify({ private: true, type: 'module', overrides: { '@viewstem/core': `file:${join(directory, core.filename)}` } }));
@@ -26,6 +26,8 @@ try {
   const consumerManifest = JSON.parse(await readFile(join(directory, 'package.json'), 'utf8'));
   assert.deepEqual(Object.keys(consumerManifest.dependencies).sort(), ['@viewstem/svelte', 'svelte']);
   const installedManifest = JSON.parse(await readFile(join(directory, 'node_modules/@viewstem/svelte/package.json'), 'utf8'));
+  assert.equal(installedManifest.license, 'MIT');
+  assert.equal(await readFile(join(directory, 'node_modules/@viewstem/svelte/LICENSE'), 'utf8'), await readFile(join(root, 'LICENSE'), 'utf8'));
   assert.equal(installedManifest.dependencies['@viewstem/core'], '0.1.0');
   await writeFile(join(directory, 'consumer.ts'), `import { createRenderer, ViewstemView, type ComponentAdapter, type MountedView, type ComponentAdapterProps, type ComponentContract, type ViewSpec, type Runtime, type RequestExecutor } from '@viewstem/svelte';
 import type { Component, Snippet } from 'svelte';
@@ -132,7 +134,7 @@ window.disposeConsumer=()=>renderer.dispose();
   await page.evaluate(() => window.disposeConsumer());
   assert.equal(await page.locator('main button').count(), 0);
   assert.deepEqual(errors, []);
-  const report = { nodeVersion: process.version, svelteVersion: '5.57.3', files: paths, integrity: svelte.integrity, bytes: svelte.size, unpackedBytes: svelte.unpackedSize, consumerDependencies: Object.keys(consumerManifest.dependencies).sort(), coreResolution: 'transitive dependency; local tarball override for unpublished core', imports: '@viewstem/svelte only (runtime and shared types)', types: 'passed', browser: 'passed', errors };
+  const report = { nodeVersion: process.version, svelteVersion: '5.57.3', files: paths, integrity: svelte.integrity, bytes: svelte.size, unpackedBytes: svelte.unpackedSize, license: 'MIT; installed text verified', consumerDependencies: Object.keys(consumerManifest.dependencies).sort(), coreResolution: 'transitive dependency; local tarball override for unpublished core', imports: '@viewstem/svelte only (runtime and shared types)', types: 'passed', browser: 'passed', errors };
   const results = resolve(root, process.env.VIEWSTEM_SVELTE_RESULTS_DIR ?? 'packages/svelte/test/results');
   await mkdir(results, { recursive: true });
   await writeFile(join(results, `package-node${process.versions.node.split('.')[0]}.json`), JSON.stringify(report, null, 2) + '\n');

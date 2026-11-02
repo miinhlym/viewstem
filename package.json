@@ -1,5 +1,13 @@
 {
   "name": "viewstem-workspace",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miinhlym/viewstem.git"
+  },
+  "bugs": {
+    "url": "https://github.com/miinhlym/viewstem/issues"
+  },
   "private": true,
   "type": "module",
   "workspaces": [
