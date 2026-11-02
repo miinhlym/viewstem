@@ -364,6 +364,7 @@
   "files": [
     "dist",
     "upstream/NOTICE.txt",
+    "README.ko.md",
     "LICENSE"
   ],
   "sideEffects": [

@@ -29,12 +29,12 @@ try {
   const ui = packages.at(-1);
   const paths = new Set(ui.files.map(({ path }) => path));
   for (const path of [
-    'LICENSE', 'README.md', 'dist/shadcn/vendor/sonner-runtime/LICENSE',
+    'LICENSE', 'README.md', 'README.ko.md', 'dist/shadcn/vendor/sonner-runtime/LICENSE',
     'dist/index.js', 'dist/index.d.ts', 'dist/shadcn/index.js', 'dist/shadcn/index.d.ts',
     'dist/shadcn/styles.css', 'dist/shadcn/support.json', 'upstream/NOTICE.txt',
   ]) assert.ok(paths.has(path), `missing packed file ${path}`);
   for (const path of paths) {
-    assert.ok(path.startsWith('dist/') || ['LICENSE', 'README.md', 'package.json', 'upstream/NOTICE.txt'].includes(path), path);
+    assert.ok(path.startsWith('dist/') || ['LICENSE', 'README.md', 'README.ko.md', 'package.json', 'upstream/NOTICE.txt'].includes(path), path);
     assert.doesNotMatch(path, /(?:^|\/)(?:\.type-cache|src|test|example|scripts|node_modules)\/|(?:^|\/)catalog\.json$/);
   }
 

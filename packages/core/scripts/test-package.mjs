@@ -12,7 +12,7 @@ try {
  const paths=packed.files.map(file=>file.path),chunks=paths.filter(path=>path.startsWith('dist/chunks/'));
  assert.ok(chunks.length>0);assert.ok(chunks.every(path=>/^dist\/chunks\/chunk-[A-Z0-9]+\.js(?:\.map)?$/.test(path)));
  for(const path of chunks.filter(path=>path.endsWith('.js')))assert.ok(chunks.includes(`${path}.map`));
- assert.deepEqual(paths.filter(path=>!chunks.includes(path)).sort(),['LICENSE','README.md','package.json',...['cel-support.json','cel.d.ts','cel.js','cel.js.map','http.d.ts','http.js','http.js.map','index.d.ts','index.js','index.js.map','THIRD-PARTY-NOTICES.txt'].map(name=>`dist/${name}`)].sort());
+ assert.deepEqual(paths.filter(path=>!chunks.includes(path)).sort(),['LICENSE','README.md','README.ko.md','package.json',...['cel-support.json','cel.d.ts','cel.js','cel.js.map','http.d.ts','http.js','http.js.map','index.d.ts','index.js','index.js.map','THIRD-PARTY-NOTICES.txt'].map(name=>`dist/${name}`)].sort());
  await writeFile(join(directory,'package.json'),JSON.stringify({private:true,type:'module'}));
  execute('npm',['install',join(directory,packed.filename),'--ignore-scripts','--no-audit','--no-fund']);
  const installed=join(directory,'node_modules/@viewstem/core');

@@ -17,8 +17,8 @@ try {
   const pack = name => JSON.parse(execute('npm', ['pack', join(root, 'packages', name), '--pack-destination', directory, '--ignore-scripts', '--json'], root))[0];
   const core = pack('core'), svelte = pack('svelte');
   const paths = svelte.files.map(file => file.path);
-  for (const path of ['LICENSE', 'README.md', 'dist/index.js', 'dist/index.d.ts', 'dist/ViewstemView.svelte', 'dist/ViewstemView.svelte.d.ts', 'dist/renderer.js', 'dist/types.d.ts']) assert.ok(paths.includes(path), path);
-  assert.ok(paths.every(path => ['LICENSE', 'README.md', 'package.json'].includes(path) || path.startsWith('dist/')));
+  for (const path of ['LICENSE', 'README.md', 'README.ko.md', 'dist/index.js', 'dist/index.d.ts', 'dist/ViewstemView.svelte', 'dist/ViewstemView.svelte.d.ts', 'dist/renderer.js', 'dist/types.d.ts']) assert.ok(paths.includes(path), path);
+  assert.ok(paths.every(path => ['LICENSE', 'README.md', 'README.ko.md', 'package.json'].includes(path) || path.startsWith('dist/')));
   assert.ok(paths.every(path => !/(?:^|\/)(?:test|example|node_modules)\//.test(path)));
   // The override resolves unpublished core locally. It is not a consumer dependency.
   await writeFile(join(directory, 'package.json'), JSON.stringify({ private: true, type: 'module', overrides: { '@viewstem/core': `file:${join(directory, core.filename)}` } }));
