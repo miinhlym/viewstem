@@ -131,7 +131,7 @@ export class View {
   }
   makeOwner(spec,ports,id,previous,created) {
     const store=this.runtime.stateStore,registry=this.runtime.registry;
-    const owner={id,spec,ports,scope:previous?.scope??store.createScope(),actionOwner:previous?.actionOwner??this.runtime.actions.owner(),states:new Map(previous?.states),queries:new Map(),reactions:previous?.reactions??[],slots:previous?.slots??{},instance:null};
+    const owner={id,spec,ports,scope:previous?.scope??store.createScope(),actionOwner:previous?.actionOwner??this.runtime.actions.owner(),states:new Map(previous?.states),computations:new Map(),queries:new Map(),reactions:previous?.reactions??[],slots:previous?.slots??{},instance:null};
     if(!previous)created.push(owner);
     for(const [name,declaration] of Object.entries(spec.states??{})) {
       const schema=registry.schema(declaration),existing=owner.states.get(name);
@@ -149,15 +149,34 @@ export class View {
     for(const name of validateInitials(spec,this.runtime.registry.functions)) {
       const declaration=spec.states[name],handle=owner.states.get(name),context=this.context(owner);
       if(declaration.kind==='Derived') {
-        const dependencies=pathsIn(declaration.inputs??{},this.runtime.registry.functions).flatMap(keys=>keys[0]==='states'?[owner.states.get(keys[1])]:keys[0]==='ports'&&spec.ports?.[keys[1]]?.kind==='State'?[ports[keys[1]]]:[]).filter(Boolean);
-        store.computed(handle,dependencies.map(handle=>stateRoot(handle,store)),()=>{
+        const paths=pathsIn(declaration.inputs??{},this.runtime.registry.functions);
+        const portNames=new Set(paths.filter(keys=>keys[0]==='ports').flatMap(keys=>keys.length===1?Object.keys(spec.ports??{}):[keys[1]]));
+        const dependencies=[...paths.filter(keys=>keys[0]==='states').map(keys=>owner.states.get(keys[1])),
+          ...[...portNames].filter(name=>spec.ports?.[name]?.kind==='State').map(name=>ports[name])].filter(Boolean).map(handle=>stateRoot(handle,store));
+        const variable=declaration.variable??registry.get('Variable',declaration.variableRef).spec;
+        const values=[...portNames].map(name=>{
+          try{
+            // Track capability validity, not State data already propagated by
+            // the Store. A new wrapper may guard the same cell with a new owner.
+            if(spec.ports?.[name]?.kind==='State'){ports[name]?.getSnapshot();return [name,true];}
+            return [name,spec.ports?.[name]?.kind==='Query'?ports[name]?.getSnapshot():ports[name]];
+          }
+          catch(caught){return [name,{status:'error',error:safeError(caught)}];}
+        });
+        const prior=previous?.computations?.get(name);
+        // Reuse only the explicit State/port connections tracked here. Other
+        // context roots must keep their existing conservative refresh behavior.
+        const tracked=paths.every(keys=>keys[0]==='ports'||keys[0]==='states'&&keys.length>1);
+        const unchanged=tracked&&prior&&equal(prior.declaration,declaration)&&equal(prior.variable,variable)&&equal(prior.values,values)
+          &&dependencies.length===prior.dependencies.length&&dependencies.every((handle,index)=>handle===prior.dependencies[index]);
+        owner.computations.set(name,{declaration,variable,values,dependencies});
+        store.computed(handle,dependencies,()=>{
           try {
-            const variable=declaration.variable??registry.get('Variable',declaration.variableRef).spec;
             const inputs=this.prepareInputs(variable,declaration.inputs??{},context,'automatic',false,'Variable');
             if(inputs.status==='waiting')return {status:'pending'};
             return {status:'ready',value:this.runtime.variable(variable,inputs.ports)};
           }catch(caught){return {status:'error',error:safeError(caught)};}
-        });
+        },{recompute:!unchanged});
       } else if(own(declaration,'initial')) {
         let snapshot=evaluateSnapshot(declaration.initial,context,{roots:['states','ports','queries']});
         if(snapshot.status==='missing')snapshot={status:'pending'};

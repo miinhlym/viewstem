@@ -83,11 +83,13 @@ export class StateStore {
     for(const listener of this.#baselineListeners)listener();
   }
 
-  computed(handle, dependencies, compute) {
+  computed(handle, dependencies, compute, { recompute = true } = {}) {
     const cell = this.#cellFor(handle), previous = {...cell};
     cell.derived = true; cell.computeSnapshot = compute;
     cell.dependencies = dependencies.map(handle => this.#cellFor(handle));
-    try { this.#order(); this.recompute(); } catch (caught) { Object.assign(cell,previous); throw caught; }
+    // Rebinding an unchanged runtime owner keeps its latest context without
+    // re-evaluating an otherwise unchanged dependency graph.
+    try { this.#order(); if(recompute)this.recompute(); } catch (caught) { Object.assign(cell,previous); throw caught; }
   }
   recompute() { this.#structuralCommit([]); }
   baseline(handle) { return this.#cellFor(handle).baseline; }
