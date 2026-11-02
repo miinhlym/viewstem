@@ -171,6 +171,28 @@ test('gallery Action, Korean input, Query and rejected JSON use the live View', 
   await page.locator('#preview tbody').getByText('4월', { exact: true }).waitFor();
 });
 
+test('gallery preserves live State through persisted page transitions and cleans up on final exit', async t => {
+  const page = await openPage(t);
+  await page.goto((await galleryApp()).url + '/?example=profile'); await ready(page);
+  const name = page.getByLabel('이름', { exact: true });
+  await name.fill('캐시 전');
+  await name.evaluate(element => { window.retainedName = element; });
+  for (const value of ['복귀 후', '다시 복귀']) {
+    await page.evaluate(async () => {
+      window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true }));
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
+    });
+    assert.equal(await name.count(), 1);
+    assert.equal(await name.evaluate(element => element === window.retainedName), true);
+    await name.fill(value);
+    await page.getByRole('button', { name: '설정 적용', exact: true }).click();
+    await page.getByText(value + ' · seoyun@example.com', { exact: true }).waitFor();
+  }
+  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: false })));
+  await page.waitForFunction(() => document.querySelector('#preview').textContent === '');
+});
+
 test('Command gallery searches Korean labels while preserving stable values', async t => {
   const page = await openPage(t);
   await page.goto((await galleryApp()).url + '/?family=command');

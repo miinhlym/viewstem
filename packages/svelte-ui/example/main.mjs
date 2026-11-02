@@ -195,11 +195,13 @@ theme.addEventListener('click', () => {
   const dark = document.documentElement.classList.toggle('dark');
   theme.setAttribute('aria-pressed', String(dark));
 });
-window.addEventListener('pagehide', () => {
+window.addEventListener('pagehide', event => {
+  // A cached page resumes with its DOM and module state; keep its execution alive.
+  if (event.persisted) return;
   revision++;
   unsubscribe?.();
   void renderer.dispose().catch(() => {});
-}, { once: true });
+});
 
 const params = new URL(location.href).searchParams;
 kind.value = scenarioBySlug.has(params.get('example')) ? 'screens' : 'components';
