@@ -69,7 +69,7 @@ npm run test:package
 개인 core ──X──> 회사 도메인/업무 API/비밀정보 저장소
 ```
 
-- 개인 모노레포에서 core와 Svelte 패키지를 분리한다. `@viewstem/core`, `@viewstem/svelte`는 명명 기준이지 npm scope 확보·배포 완료 사실이 아니다. 라이선스·배포 설정은 별도다. [E04, E41]
+- 개인 모노레포에서 core와 Svelte 패키지를 분리한다. `@viewstem/core`, `@viewstem/svelte`는 명명 기준이지 npm scope 확보·배포 완료 사실이 아니다. 자체 코드의 [MIT 라이선스](../../LICENSE)와 [기여 정책](../../CONTRIBUTING.md)은 2026-11-03 사용자 선택으로 확정했으며 외부 코드 고지는 유지한다. npm 권한·발행은 별도다. [E04, E41, D101]
 - core는 DOM·Svelte 없이 검증, 상태, 값 평가, 의존성, Query/Action 실행, 수명, 변경을 담당한다. Button·Grid·차트·Toast·업무 리소스를 자동 등록하지 않는다.
 - 코드형 Component/Action은 서비스가 공개 계약과 구현을 명시 등록한다. 선택 UI 패키지로 일반 컴포넌트를 제공할 수 있다. 핵심 라이브러리에 구체 UI를 넣지 않는 것이 UI 지원 금지는 아니다.
 - 회사 확장은 업무 리소스·업무 API·장비 로직을 소유한다. 회사 도메인 예제를 core의 필수 필드나 기본 데이터 모델로 승격하지 않는다.
