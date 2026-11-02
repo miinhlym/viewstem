@@ -65,6 +65,8 @@ const renderer = createRenderer({ requestExecutor, resourceResolver });
 
 공개 `ViewstemView`에 `{renderer, view}`를 전달합니다. `view`는 앱이 `runtime.createView`로 만든 core View입니다. 예제의 [App.svelte](../../packages/svelte/example/App.svelte)와 어댑터가 이 연결을 보여줍니다. 이 링크는 같은 revision의 소스 저장소용이며 tarball 안에 예제를 포함하지 않습니다.
 
+다른 Runtime의 View도 빌릴 수 있습니다. 이때 View가 사용하는 모든 코드 Component의 동일한 공개 계약과 Svelte 구현을 renderer에 명시 등록해야 하며, 참조하는 Component ID의 코드형·선언형 구분이 renderer Registry와 충돌하지 않아야 합니다. 다른 Registry의 계약을 자동 복사하거나 호환성을 전체 대조하지 않습니다. 같은 Registry를 공유한 Runtime을 주입하면 이 등록 기준을 함께 유지할 수 있습니다.
+
 `ViewstemView`를 직접 호스팅하는 앱은 Svelte root의 오류 변환 정책을 설정합니다.
 
 ```ts

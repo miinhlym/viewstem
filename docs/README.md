@@ -29,6 +29,8 @@
 
 U44에서 변경한 Registry·Svelte 일괄 등록 및 폐기 후 emit 계약의 재검증, 현재 core·Svelte·playground 회귀 결과와 해시는 [U44 실행 기록](handoff/svelte-ui-shadcn-verification-results.json)에 있다. 이전 단계의 검증 파일을 덮어쓰지 않는다.
 
+분리 커밋 이후 Svelte UI 전체의 검토와 수명·사용자 함수·갤러리 복원 수정은 [branch preflight 인계](handoff/svelte-ui-preflight-2026-11-03.md), 해당 수정 후 실제 패키지 검사는 [preflight 실행 결과](handoff/svelte-ui-preflight-verification-results.json)를 따른다.
+
 ## 현재 명세
 
 각 행은 해당 질문의 기준 문서다. 예제는 계약 이해를 돕고, 실행 결과를 대신하지 않는다. 실제 JS/TS 시그니처는 [공개 타입](../packages/core/src/index.d.ts)과 [HTTP 타입](../packages/core/src/http.d.ts), [CEL 타입](../packages/core/src/cel.d.ts)을 따른다.
@@ -62,6 +64,7 @@ U44에서 변경한 Registry·Svelte 일괄 등록 및 폐기 후 emit 계약의
 | Svelte 렌더러·공개 타입·tarball 소비자 | [Svelte 검증 결과](handoff/svelte-verification-results.json), [구현 범위](handoff/svelte-implementation-2026-11-02.md) | `check:svelte`와 실제 예제 확인 후 갱신; core 인수 수와 별도 추적 |
 | Svelte UI 카탈로그·동작·소스/CSS·번들 | [U44 실행 기록](handoff/svelte-ui-shadcn-verification-results.json), [지원 범위](../packages/svelte-ui/README.md) | `check:svelte-ui`; 전체 카탈로그와 JSON/native 전용 부품을 구분 |
 | shadcn 66개별 입력·이벤트·State·중첩·키보드 | [동작 검증표](handoff/svelte-ui-audit-matrix.md), [감사 인계](handoff/svelte-ui-audit-2026-11-03.md), [실행 결과](handoff/svelte-ui-audit-verification-results.json) | 공개 패키지 브라우저 검사와 미실행 사례 검사; 기존 U44 mount/참조 수와 구분 |
+| Svelte UI 전체 branch preflight와 후속 수정 | [검토·수정 인계](handoff/svelte-ui-preflight-2026-11-03.md), [실행 결과](handoff/svelte-ui-preflight-verification-results.json) | 비교 기준·기존 증거 재사용·수정 후 회귀·미커밋 인계 상태 구분 |
 | 구현 전 독립 실험의 이력 | [검증 진행표](handoff/verification-ledger.md), [원래 인수 목록](../experiments/verification/coverage.json) | 원래 실험·실패 증거 보존; 제품 통과 증거와 구분 |
 
 ## 배경과 이력

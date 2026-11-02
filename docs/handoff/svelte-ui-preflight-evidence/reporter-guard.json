@@ -1,0 +1,49 @@
+{
+  "node": "v22.21.1",
+  "workingDirectory": "repository root",
+  "command": "node --input-type=module (script on stdin)",
+  "scope": "Real Node runner and audit-reporter failure detection; synthetic test outcomes, not UI behavior. Exit forwarding in run-tests.mjs was code-reviewed.",
+  "script": "import assert from 'node:assert/strict';\nimport { mkdtempSync, writeFileSync, rmSync } from 'node:fs';\nimport { tmpdir } from 'node:os';\nimport { join, resolve } from 'node:path';\nimport { spawnSync } from 'node:child_process';\nconst dir = mkdtempSync(join(tmpdir(), 'viewstem-review-reporter-'));\nconst fixturePaths = ['controls', 'overlays', 'display'].map(group => resolve(`packages/svelte-ui/test/fixtures/audit-${group}.json`));\nconst reporter = resolve('packages/svelte-ui/scripts/audit-reporter.mjs');\ntry {\n  const fixture = join(dir, 'cases.test.mjs');\n  writeFileSync(fixture, `import test from 'node:test';\nimport {readFileSync} from 'node:fs';\nconst names=${JSON.stringify(fixturePaths)}.flatMap(path=>JSON.parse(readFileSync(path))).flatMap(row=>row.testNames);\nfor (const [i,name] of names.entries()) {\n  if(i===0 && process.env.REVIEW_AUDIT_SCENARIO==='missing') continue;\n  test(name,{skip:i===0&&process.env.REVIEW_AUDIT_SCENARIO==='skip'},()=>{\n    if(i===0&&process.env.REVIEW_AUDIT_SCENARIO==='fail') throw new Error('intentional review failure');\n  });\n}\nif(process.env.REVIEW_AUDIT_SCENARIO==='extra-fail') test('review/non-required failure',()=>{throw new Error('intentional extra failure');});\n`);\n  const results = [];\n  for (const scenario of ['pass', 'missing', 'skip', 'fail', 'extra-fail']) {\n    const r = spawnSync(process.execPath, ['--test', `--test-reporter=${reporter}`, fixture], {encoding:'utf8', env:{...process.env, REVIEW_AUDIT_SCENARIO:scenario}});\n    if (r.error) throw r.error;\n    assert.equal(r.status, scenario === 'pass' ? 0 : 1, `${scenario}: ${r.stderr}`);\n    let report; try {report=JSON.parse(r.stdout);} catch {}\n    if(scenario==='pass'||scenario==='extra-fail') assert.equal(report.audit.missing.length,0);\n    results.push({scenario,exitStatus:r.status,reportFamilies:report?.audit.passedFamilies,reportMissing:report?.audit.missing.length,failedOutcomes:report?.outcomes.filter(t=>t.status==='failed').length,missingRejected:r.stderr.includes('Unverified shadcn family behavior cases')});\n  }\n  console.log(JSON.stringify({node:process.version,results},null,2));\n} finally {rmSync(dir,{recursive:true,force:true});}\n",
+  "observedResults": [
+    {
+      "scenario": "pass",
+      "exitStatus": 0,
+      "reportFamilies": 66,
+      "reportMissing": 0,
+      "failedOutcomes": 0,
+      "missingRejected": false
+    },
+    {
+      "scenario": "missing",
+      "exitStatus": 1,
+      "reportFamilies": 65,
+      "reportMissing": 1,
+      "failedOutcomes": 0,
+      "missingRejected": true
+    },
+    {
+      "scenario": "skip",
+      "exitStatus": 1,
+      "reportFamilies": 65,
+      "reportMissing": 1,
+      "failedOutcomes": 0,
+      "missingRejected": true
+    },
+    {
+      "scenario": "fail",
+      "exitStatus": 1,
+      "reportFamilies": 65,
+      "reportMissing": 1,
+      "failedOutcomes": 1,
+      "missingRejected": true
+    },
+    {
+      "scenario": "extra-fail",
+      "exitStatus": 1,
+      "reportFamilies": 66,
+      "reportMissing": 0,
+      "failedOutcomes": 1,
+      "missingRejected": false
+    }
+  ]
+}

@@ -10,6 +10,8 @@
 
 U45의 Svelte UI 동작 감사는 [66개별 검증표](svelte-ui-audit-matrix.md), [수정·검증 인계](svelte-ui-audit-2026-11-03.md), [실행 결과](svelte-ui-audit-verification-results.json)에서 관리한다. 아래 독립 실험 수와 합산하지 않는다.
 
+분리 커밋 이후 전체 branch preflight에서 발견한 수명·사용자 함수·갤러리 복원 문제와 수정 후 검사는 [preflight 인계](svelte-ui-preflight-2026-11-03.md), [별도 실행 결과](svelte-ui-preflight-verification-results.json)에 보존한다. U45의 당시 실행 결과는 유지한다.
+
 ## U34–U35 독립 실험 기록
 
 이하 완료 기준·검사 수·잔여는 **U36 인계까지의 과거 기록**이다. 당시 core 미구현·보류 표기를 현재 상태로 적용하지 않는다. 날짜별 T1–T4 결과와 실패 archive는 원래 증거로 유지한다.

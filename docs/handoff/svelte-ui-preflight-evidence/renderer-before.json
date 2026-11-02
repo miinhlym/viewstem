@@ -1,0 +1,76 @@
+{
+  "reviewedHead": "35b6ff9bf00d0856ab9d1e5ee7ec8a24365cc35e",
+  "base": "e6451e5",
+  "date": "2026-11-03",
+  "node": "22.21.1",
+  "svelte": "5.57.3",
+  "browserFixture": "packages/svelte/test/browser-harness.mjs (existing dist consumer, no build or project writes)",
+  "browserCommand": "node /tmp/viewstem-preflight-renderer-35b6ff9/browser-repro.mjs",
+  "coreCommand": "node /tmp/viewstem-preflight-renderer-35b6ff9/core-repro.mjs",
+  "executionNote": "Equivalent stdin scripts were executed successfully before saving these reusable copies. Initial URL reproduction used unsupported schema:true and was corrected to schema:{type:number}; only the corrected execution is evidence below.",
+  "teardown": {
+    "stopped": {
+      "message": "unsubscribe failure"
+    },
+    "state": null,
+    "afterDispose": "1    local 0 write refresh event none",
+    "second": {
+      "code": "INVALID_DEFINITION",
+      "message": "This target already has a renderer attachment."
+    },
+    "renderer": null,
+    "afterRenderer": ""
+  },
+  "foreign": {
+    "result": null,
+    "text": "",
+    "root": "Probe"
+  },
+  "browserErrors": [],
+  "reactions": [
+    {
+      "kind": "disposed",
+      "targetAfterOwnerDisposal": 1
+    },
+    {
+      "kind": "foreign",
+      "targetAfterOwnerDisposal": 1
+    }
+  ],
+  "functions": {
+    "rendererPattern": {
+      "code": "INVALID_DEFINITION",
+      "message": "INVALID_DEFINITION"
+    },
+    "controlRegistered": "double"
+  },
+  "reentrantAbort": {
+    "aborted": true,
+    "samePromise": false,
+    "action": "CANCELLED",
+    "dom": "",
+    "destroyed": 1,
+    "errors": [],
+    "messages": []
+  },
+  "officialSvelteAutofixer": {
+    "ViewstemView": "no issues/suggestions",
+    "ConnectedView": "no issues/suggestions",
+    "NodeList": "no issues/suggestions",
+    "RenderNode": "no issues; generic effect state-assignment suggestions judged intentional boundary reset lifecycle"
+  },
+  "existingEvidenceReused": "Root confirmed same environment and src/hash coverage for core 1074, Svelte 27, UI 116; no full suite rerun in this review.",
+  "reproductionSources": {
+    "core-repro.mjs": "import {createStateStore,createRegistry,createRuntime} from '/Users/minholim/dev/minh/viewstem/packages/core/src/api.mjs';\nconst reactions=[];\nfor(const kind of ['disposed','foreign']) {\n  const store=createStateStore(),cells=store.createScope(),other=createStateStore();\n  const owner=kind==='foreign'?other.createScope():store.createScope();\n  const watched=cells.registerState('watched',{schema:{type:'number'},initial:0});\n  const target=cells.registerState('target',{schema:{type:'number'},initial:9});\n  if(kind==='disposed')owner.dispose();\n  let error;\n  try{store.registerReaction(owner,{watch:[watched],target,value:1});}catch(e){error=e.code;}\n  if(kind==='foreign')owner.dispose();\n  watched.write(1);reactions.push({kind,error,targetAfterOwnerDisposal:target.read()});\n  store.dispose();other.dispose();\n}\nconst integer={type:'integer'};\nconst functions=[{name:'doubleForRenderer',inputs:[integer],output:integer,run:n=>n*2}];\nconst resource={kind:'Variable',id:'double',spec:{ports:{n:{kind:'Value',schema:integer,required:true}},expression:'doubleForRenderer(n)'}};\nconst registry=createRegistry(),runtime=createRuntime({registry,functions});\nlet rendererPattern;\ntry{registry.registerResources([resource]);rendererPattern={success:true};}catch(e){rendererPattern={code:e.code,message:e.message};}\nconst configured=createRegistry({functions});configured.registerResources([resource]);runtime.dispose();\nconsole.log(JSON.stringify({reactions,functions:{rendererPattern,controlRegistered:configured.get('Variable','double').id}},null,2));\n",
+    "browser-repro.mjs": "import { startBrowserHarness } from '/Users/minholim/dev/minh/viewstem/packages/svelte/test/browser-harness.mjs';\nconst harness=await startBrowserHarness();\ntry {\n  const {page,errors}=await harness.page();\n  const teardown=await page.evaluate(async()=>{\n    const F=Fixture,e=F.environment();\n    const adapter={read:()=>location.href,subscribe:()=>()=>{throw new Error('unsubscribe failure');},writeOwned(){}};\n    const mounted=await e.renderer.mount({target:e.target,view:{states:{count:F.state(1,{type:'number'})},render:F.probe('node',F.p('/states/count'))},url:{adapter,bindings:[{state:'count'}]}});await mounted.initialComplete;\n    const stopped=await F.errorOf(()=>mounted.dispose());\n    const state=await F.errorOf(()=>mounted.view.getState('count').write(9));\n    const afterDispose=e.target.textContent;\n    const second=await F.errorOf(()=>e.renderer.mount({target:e.target,view:{render:F.probe('next','next')}}));\n    const renderer=await F.errorOf(()=>e.renderer.dispose());\n    const afterRenderer=e.target.textContent;\n    await F.errorOf(()=>e.runtime.dispose());\n    return {stopped,state,afterDispose,second,renderer,afterRenderer};\n  });\n  const foreign=await page.evaluate(async()=>{\n    const F=Fixture,origin=F.environment(),renderer=F.createRenderer(),target=F.target('foreign');\n    const created=await origin.runtime.createView({view:{render:F.probe('borrowed','should render')}});await created.initialComplete;\n    const attachment=renderer.attach(created.view,target);\n    const result=await F.errorOf(()=>attachment.whenRendered());\n    const out={result,text:target.textContent,root:created.view.getSnapshot().roots[0].componentRef};\n    await attachment.dispose();await renderer.dispose();await origin.renderer.dispose();origin.runtime.dispose();return out;\n  });\n  console.log(JSON.stringify({teardown,foreign,errors},null,2));\n} finally {await harness.close();}\n"
+  },
+  "finalDisposition": {
+    "foreign": "Not classified as a product defect: no code Component contract/implementation was registered on the receiving renderer. Existing registration preconditions clarified in README.",
+    "reentrantAbort": "Execution cancellation is synchronous; observed promise identity alone was not classified as a defect.",
+    "fixed": [
+      "URL cleanup exception retaining State/DOM target",
+      "foreign or disposed reaction owner",
+      "custom function mismatch in automatic Registry"
+    ]
+  }
+}
