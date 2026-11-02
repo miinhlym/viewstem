@@ -1,0 +1,49 @@
+name: Bug report
+description: Report a reproducible problem. English and Korean are welcome.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For security vulnerabilities, use [private reporting](https://github.com/miinhlym/viewstem/security/advisories/new) or email miinhlym@gmail.com instead.
+        Remove credentials and private data from examples and logs.
+        [한국어 제보 안내](https://github.com/miinhlym/viewstem/blob/main/SUPPORT.ko.md)
+  - type: input
+    id: affected
+    attributes:
+      label: Package version or source commit
+      description: Include the affected package, playground, or example.
+      placeholder: "@viewstem/core at commit …"
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node.js, browser, Svelte, and relevant package versions.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: |
+        Use the reproduction path that fits your report:
+        - Playground or gallery: identify the screen/example, include the JSON used to run it, and list the steps that trigger the problem.
+        - Consumer app or core script: include minimal runnable JSON/code, the necessary resource/component registrations, and runtime/renderer setup.
+        If the reproduction makes external Query requests, provide mock responses or a local fixture so it can run without private services or credentials.
+        An inline example or a public reproduction repository is welcome; a hosted reproduction URL is not required.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include relevant errors or screenshots, with sensitive data removed.
+    validations:
+      required: true

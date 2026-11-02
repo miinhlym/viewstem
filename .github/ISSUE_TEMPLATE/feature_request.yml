@@ -1,0 +1,28 @@
+name: Feature proposal
+description: Discuss a use case before a substantial change. English and Korean are welcome.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Discuss substantial features and public API changes before implementing them.
+        A proposal does not imply an implementation or delivery commitment.
+        [한국어 기여 안내](https://github.com/miinhlym/viewstem/blob/main/CONTRIBUTING.ko.md)
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What are you trying to achieve, and what prevents it today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Include an example API or JSON configuration if useful.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and compatibility
+      description: Existing approaches, affected packages, or changes to existing behavior.

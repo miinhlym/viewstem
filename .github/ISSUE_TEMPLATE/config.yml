@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability privately
+    url: https://github.com/miinhlym/viewstem/security/advisories/new
+    about: Do not post exploit details publicly. If unavailable, email miinhlym@gmail.com.
