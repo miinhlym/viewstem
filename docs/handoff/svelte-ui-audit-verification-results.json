@@ -1,0 +1,413 @@
+{
+  "date": "2026-11-03",
+  "verifiedAt": "2026-11-03T05:59:34.742Z",
+  "baselineCommit": "e6451e5917476a2f63c83844634db2b92e2f1f8c",
+  "scope": "U45: full inventory of 66 shadcn component families; behavior audit, seven reproduced defects including example configuration, regressions and documentation. Existing unpublished worktree retained.",
+  "platform": {
+    "system": "Darwin",
+    "release": "24.6.0",
+    "architecture": "arm64",
+    "chromium": "151.0.7922.34"
+  },
+  "versions": {
+    "svelte": "5.57.3",
+    "bits-ui": "2.20.0",
+    "@tanstack/svelte-table": "9.0.0",
+    "layerchart": "2.0.0",
+    "playwright": "1.62.1"
+  },
+  "upstream": {
+    "catalog": {
+      "checkedAt": "2026-11-03T05:41:59.481Z",
+      "url": "https://www.shadcn-svelte.com/docs/components",
+      "status": 200,
+      "count": 66,
+      "slugs": [
+        "accordion",
+        "alert",
+        "alert-dialog",
+        "aspect-ratio",
+        "attachment",
+        "avatar",
+        "badge",
+        "breadcrumb",
+        "bubble",
+        "button",
+        "button-group",
+        "calendar",
+        "card",
+        "carousel",
+        "chart",
+        "checkbox",
+        "code-block",
+        "collapsible",
+        "combobox",
+        "command",
+        "context-menu",
+        "data-table",
+        "date-picker",
+        "dialog",
+        "drawer",
+        "dropdown-menu",
+        "empty",
+        "field",
+        "hover-card",
+        "input",
+        "input-group",
+        "input-otp",
+        "item",
+        "kbd",
+        "label",
+        "marker",
+        "menubar",
+        "message",
+        "message-scroller",
+        "native-select",
+        "navigation-menu",
+        "pagination",
+        "popover",
+        "progress",
+        "questionnaire",
+        "radio-group",
+        "range-calendar",
+        "resizable",
+        "scroll-area",
+        "select",
+        "separator",
+        "sheet",
+        "sidebar",
+        "skeleton",
+        "slider",
+        "sonner",
+        "spinner",
+        "switch",
+        "table",
+        "tabs",
+        "textarea",
+        "toggle",
+        "toggle-group",
+        "tooltip",
+        "trace",
+        "typography"
+      ]
+    },
+    "comparison": {
+      "checkedAt": "2026-11-03T05:43:19.693Z",
+      "status": 200,
+      "pinned": "fe4b0ad3b8b30c6745346db008c3307b5afeabb1",
+      "latest": "688cff9494c8f38fb80dd28dd8c11b590af251a6",
+      "ahead": 2,
+      "commits": [
+        {
+          "sha": "633fbd1456ebc0793d7b107b7e1ac2a719b4e8ca",
+          "message": "feat: add Typeset (#2800)\n\nCo-authored-by: Aidan Bleser <117548273+ieedan@users.noreply.github.com>"
+        },
+        {
+          "sha": "688cff9494c8f38fb80dd28dd8c11b590af251a6",
+          "message": "docs: add message scroller card to homepage (#2957)"
+        }
+      ],
+      "changedPinnedFiles": []
+    }
+  },
+  "coverage": {
+    "families": 66,
+    "nativeParts": 386,
+    "jsonAdapters": 351,
+    "recipes": 6,
+    "nativeContextParts": 35,
+    "behaviorCases": 68,
+    "sharedCases": 2,
+    "addedGalleryCase": 1,
+    "newTests": 71,
+    "finalUniqueTests": 116,
+    "allFamilyAxesAccountedFor": true,
+    "completePropCombinationCoverage": false,
+    "matrix": "docs/handoff/svelte-ui-audit-matrix.json"
+  },
+  "runs": [
+    {
+      "node": "v22.21.1",
+      "command": "npm test -w @viewstem/svelte-ui",
+      "passed": 115,
+      "failed": 0,
+      "families": {
+        "families": 66,
+        "passedFamilies": 66,
+        "requiredCases": 68,
+        "missing": []
+      },
+      "result": "docs/handoff/svelte-ui-audit-evidence/node22-full.json",
+      "note": "115 cases passed on final production package. The later keyword-only example change was rechecked with the complete 7-case catalog file; unique union is 116."
+    },
+    {
+      "node": "v22.21.1",
+      "command": "node --test packages/svelte-ui/test/catalog.browser.mjs",
+      "passed": 7,
+      "failed": 0,
+      "result": "docs/handoff/svelte-ui-audit-evidence/node22-catalog.xml"
+    },
+    {
+      "node": "v24.1.0",
+      "command": "node packages/svelte-ui/scripts/run-tests.mjs",
+      "passed": 116,
+      "failed": 0,
+      "families": {
+        "families": 66,
+        "passedFamilies": 66,
+        "requiredCases": 68,
+        "missing": []
+      },
+      "result": "docs/handoff/svelte-ui-audit-evidence/node24-full.json"
+    }
+  ],
+  "checks": {
+    "builds": [
+      "v22.21.1 passed",
+      "v24.1.0 passed"
+    ],
+    "typecheck": [
+      "v22.21.1: 0 errors, 0 warnings",
+      "v24.1.0: 0 errors, 0 warnings"
+    ],
+    "generated": [
+      "v22.21.1: source/Sonner/catalog/CSS/matrix matched",
+      "v24.1.0: source/Sonner/catalog/CSS/matrix matched"
+    ],
+    "buildComparison": {
+      "node22Files": 1115,
+      "node24Files": 1115,
+      "changed": [],
+      "missing": []
+    },
+    "isolatedConsumers": [
+      {
+        "node": "v22.21.1",
+        "chromium": "151.0.7922.34",
+        "svelte": "5.57.3",
+        "tarball": {
+          "integrity": "sha512-pGxb9bR9PamGM7sr8TUWQlHAJQyxXpqSkR38r1gbTHS5Vmk7uaDeFkSaIE1TE7NNoza66ixEuaEs1R8BctJmEw==",
+          "bytes": 290254,
+          "unpackedBytes": 5385704,
+          "files": 1118
+        },
+        "familyExports": 66,
+        "selected": {
+          "js": {
+            "bytes": 826951,
+            "gzipBytes": 258813
+          },
+          "css": {
+            "bytes": 292012,
+            "gzipBytes": 31183
+          },
+          "modules": 249
+        },
+        "full": {
+          "js": {
+            "bytes": 4014946,
+            "gzipBytes": 754311
+          },
+          "modules": 2944,
+          "engines": [
+            "LayerChart",
+            "TanStack Table",
+            "Sonner"
+          ]
+        },
+        "excludedFromButton": [
+          "LayerChart",
+          "TanStack Table",
+          "Sonner",
+          "Shiki"
+        ],
+        "typecheck": "passed (strict consumer with skipLibCheck)",
+        "esmBrowser": "passed"
+      },
+      {
+        "node": "v24.1.0",
+        "chromium": "151.0.7922.34",
+        "svelte": "5.57.3",
+        "tarball": {
+          "integrity": "sha512-pGxb9bR9PamGM7sr8TUWQlHAJQyxXpqSkR38r1gbTHS5Vmk7uaDeFkSaIE1TE7NNoza66ixEuaEs1R8BctJmEw==",
+          "bytes": 290254,
+          "unpackedBytes": 5385704,
+          "files": 1118
+        },
+        "familyExports": 66,
+        "selected": {
+          "js": {
+            "bytes": 826951,
+            "gzipBytes": 258813
+          },
+          "css": {
+            "bytes": 292012,
+            "gzipBytes": 31183
+          },
+          "modules": 249
+        },
+        "full": {
+          "js": {
+            "bytes": 4014941,
+            "gzipBytes": 754313
+          },
+          "modules": 2944,
+          "engines": [
+            "LayerChart",
+            "TanStack Table",
+            "Sonner"
+          ]
+        },
+        "excludedFromButton": [
+          "LayerChart",
+          "TanStack Table",
+          "Sonner",
+          "Shiki"
+        ],
+        "typecheck": "passed (strict consumer with skipLibCheck)",
+        "esmBrowser": "passed"
+      }
+    ],
+    "svelteAutofixer": {
+      "files": [
+        "Bridge.svelte",
+        "DataTable.svelte",
+        "avatar.svelte",
+        "avatar-image.svelte",
+        "carousel.svelte",
+        "button.svelte"
+      ],
+      "issues": 0,
+      "suggestionsDisposition": "Algorithm-local Sets are not reactive state. Avatar/Bridge effects deliberately synchronize an external component boundary. Existing native bind:this contracts retained."
+    }
+  },
+  "fixes": [
+    "per-property native props preserve portal DOM, focus, uncontrolled drafts and completion callbacks",
+    "Avatar reloads changed src after automatic loading, retains explicit loaded bypass",
+    "dynamic-element Badge receives CSS scope",
+    "Carousel orientation/options and reInit state remain reactive",
+    "DataTable clamps displayed page after data changes without writing host State",
+    "disabled Button anchor suppresses activation and propagation",
+    "Command example supplies Korean keywords while preserving stable selection IDs"
+  ],
+  "reusedEvidence": {
+    "record": "docs/handoff/svelte-ui-shadcn-verification-results.json",
+    "basis": "core and Svelte renderer source hashes exactly match U44; their 33 dist files match the saved U44 fingerprints. UI tests run their actual public runtime again. Core-only suites were not rerun.",
+    "matched": [
+      "core",
+      "svelte"
+    ],
+    "builds": {
+      "core": {
+        "files": 17,
+        "changed": []
+      },
+      "svelte": {
+        "files": 16,
+        "changed": []
+      }
+    }
+  },
+  "sourceTrees": {
+    "core": {
+      "roots": [
+        "packages/core/src"
+      ],
+      "files": 30,
+      "bytes": 244932,
+      "sha256": "9fc1c3b990b4031648d71f2654e163bc5ba7ad68a5cc1f3bc0b77aa48f683c5f"
+    },
+    "svelte": {
+      "roots": [
+        "packages/svelte/src"
+      ],
+      "files": 8,
+      "bytes": 23471,
+      "sha256": "6c3292bccb1eb46917552a7120c4f585e773f9311f9b0b8ea1edd3b05542659c"
+    },
+    "ui": {
+      "roots": [
+        "packages/svelte-ui/src"
+      ],
+      "files": 568,
+      "bytes": 4824286,
+      "sha256": "bdde33c6135ae16e4450f5c550877db8c1c23fac80b5ddaafa590e170f790ec7"
+    },
+    "uiTests": {
+      "roots": [
+        "packages/svelte-ui/test"
+      ],
+      "files": 18,
+      "bytes": 266498,
+      "sha256": "37e0f5be4983308b4756e65ef20d92453e31f05772a0d5fb6cc5c557052c987d"
+    },
+    "uiScripts": {
+      "roots": [
+        "packages/svelte-ui/scripts"
+      ],
+      "files": 10,
+      "bytes": 65865,
+      "sha256": "a9e9960d5a6d1832f0a64f87681cbea1391c1de35d458d33c4b8933ac9fe68bd"
+    },
+    "examples": {
+      "roots": [
+        "packages/svelte-ui/example"
+      ],
+      "files": 8,
+      "bytes": 52614,
+      "sha256": "2153b62b9990b0ff287c4fb73baa68a36446bf7da627a0b650e4cf026d3ef840"
+    }
+  },
+  "artifacts": {
+    "packages/svelte-ui/package.json": {
+      "bytes": 15253,
+      "sha256": "cc70ddb4847348c960e40b9f58279402a1071e540845aff10ea0fe91c0576bf7"
+    },
+    "packages/svelte-ui/README.md": {
+      "bytes": 11766,
+      "sha256": "c96e0d85bbf259d9285ccf37a178129f034ce66451eadef833e131c3db67eb8a"
+    },
+    "packages/svelte-ui/upstream/source.json": {
+      "bytes": 9756,
+      "sha256": "55ff9fd23cf8cd7848195afebad4214d7808e53de60a1a077cd06a7256110ace"
+    },
+    "packages/svelte-ui/upstream/source.json.gz": {
+      "bytes": 68439,
+      "sha256": "c7d0223f45602e5a612883be037485c2cbb2c39ed501a20c33beb083d6f3e069"
+    },
+    "packages/svelte-ui/upstream/NOTICE.txt": {
+      "bytes": 4220,
+      "sha256": "3655c6290e5fb5b5eaed838b0fea447cd3cea3ed1cf52828ea76f059cd1a9e00"
+    },
+    "packages/svelte-ui/src/lib/shadcn/support.json": {
+      "bytes": 2287077,
+      "sha256": "37cb7a89ab0686036bdaacc8b68e35e256f90dde00fedd7e0646de2e610d983a"
+    },
+    "packages/svelte-ui/src/lib/shadcn/styles.css": {
+      "bytes": 326478,
+      "sha256": "c302e09e47a007f735a861c74ac29a7ba3edffa43b2eca853b89f9c4ff412f60"
+    },
+    "docs/handoff/svelte-ui-audit-matrix.json": {
+      "bytes": 190191,
+      "sha256": "9db6cc32ccede53900bc0a4eaee815d20e0719de2a2e0abadc19ddcd65b7aa38"
+    }
+  },
+  "hashMethod": "Tree SHA-256 over sorted repository-relative path + NUL + file SHA-256 + LF; byte counts are source bytes. Tarball integrity comes from npm pack, not source hashes.",
+  "preFixEvidence": "docs/handoff/svelte-ui-audit-evidence/README.md",
+  "manualBrowser": {
+    "url": "http://127.0.0.1:4175/?family=command",
+    "observations": [
+      "IAB Korean label search initially returned no results; keywords added and the actual gallery browser regression passed",
+      "Final gallery server restarted with fixed package and final examples"
+    ],
+    "finalIabRecheck": "Not completed: reload raced the server startup; IAB then blocked access to its data-URL connection-error page. Final behavior is verified by the actual gallery Chromium suite, not claimed as a second manual pass."
+  },
+  "limitations": [
+    "Chromium on macOS arm64; no Firefox/WebKit or actual mobile touch/screen reader certification",
+    "Support manifest inventories every prop/event/slot; behavior cases cover documented scenarios, not every inherited HTML attribute or Cartesian product of options",
+    "35 native-context parts retain native composition coverage, not JSON adapter coverage",
+    "NativeSelect multiple DOM change transports its first selected string; use Select multiple valueChange for JSON arrays",
+    "Per-family untested options explicitly listed in matrix; no new component family or upstream version upgrade",
+    "No commit, push, or publication in this task"
+  ]
+}

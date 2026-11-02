@@ -789,5 +789,10 @@
       "verification": "All recorded product source and build hashes still match. Existing Node 22/24, strict type, coverage, Chromium and isolated tarball results reused; staged whitespace and documentation structure rechecked.",
       "publication": "Local commits only; no push or npm publication."
     }
+  },
+  "publicApiFollowup": {
+    "record": "docs/handoff/public-api-verification-results.json",
+    "scope": "U41 public API refactor and current-source regression rerun",
+    "historicalEvidence": "Earlier results and hashes in this file remain evidence for their recorded source snapshot; do not apply them to the refactored package."
   }
 }

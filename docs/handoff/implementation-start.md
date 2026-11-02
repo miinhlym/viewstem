@@ -1,5 +1,7 @@
 <a id="구현-인수인계-어디서-시작할-것인가"></a>
 
+현재 공개 API 이름과 변경 후 검증은 [U42 네이밍 적용](public-api-naming-2026-11-02.md), [검증 기록](public-api-naming-verification-results.json)을 따른다. U41 및 이전 기록의 API 이름·해시는 당시 증거로 보존한다.
+
 # core 작업 인수인계
 
 이 문서는 기존 JS/TS core를 수정·검증할 때의 시작점이다. 구현 전 착수 계획은 뒤의 역사 기록으로 보존한다. 신규 기능 승인서나 공개 발행 기록은 아니다.
@@ -7,6 +9,10 @@
 ## 현재 구현 인계
 
 [U37 구현 범위와 제한](core-implementation-2026-11-02.md), [제품 인수 대응표](core-acceptance-coverage.json), [실행 결과](core-verification-results.json)를 함께 확인한다. 독립 실험의 완료와 실제 패키지의 완료를 구분하며, 현재 결과를 과거의 ‘core 구현 보류’로 되돌리지 않는다.
+
+Svelte 작업은 [U39 렌더러 인계](svelte-implementation-2026-11-02.md), [패키지 사용법](../../packages/svelte/README.md), [별도 검증 결과](svelte-verification-results.json)를 확인한다. 기존 core를 소비하는 렌더러이며 기본 Component 자동 등록이나 별도 상태 엔진을 추가하지 않는다.
+
+Svelte UI 작업은 [U44 인계](svelte-ui-shadcn-implementation-2026-11-03.md), [UI 사용법](../../packages/svelte-ui/README.md), [검증 결과](svelte-ui-shadcn-verification-results.json)를 확인한다. `npm run check:svelte-ui`는 고정 vendor·타입·카탈로그·브라우저·tarball 소비자를 검증한다.
 
 ## 새 채팅에서 시작할 때
 
@@ -24,7 +30,9 @@ Q1–Q3과 U35는 종료된 결정이다. 코드 Action 문맥 `invokeAction`은
 
 실제 패키지의 초기 구현은 `adbad43`에 있으며 이후 검토 수정과 실행 범위는 [구현 인수인계](core-implementation-2026-11-02.md)에 기록한다. 이 문서의 예시나 과거 계획을 실행 완료 증거로 사용하지 않는다. 로컬 커밋·원격 반영·npm 발행은 각각 별개다.
 
-현재 계약의 설명은 명세가, 정확한 JS/TS 시그니처는 [index.d.ts](../../packages/core/src/index.d.ts)와 [http.d.ts](../../packages/core/src/http.d.ts)가 소유한다. 세부 판단은 [위임 기준](open-contracts.md#세부-판단의-위임과-논의-기준)을 따른다.
+현재 계약의 설명은 명세가, 정확한 JS/TS 시그니처는 [index.d.ts](../../packages/core/src/index.d.ts)와 [http.d.ts](../../packages/core/src/http.d.ts), [cel.d.ts](../../packages/core/src/cel.d.ts)가 소유한다. 세부 판단은 [위임 기준](open-contracts.md#세부-판단의-위임과-논의-기준)을 따른다.
+
+현재 공개 API 정리와 최신 재실행은 [U41 인계](public-api-refactor-2026-11-02.md)와 [검증 기록](public-api-verification-results.json)을 따른다. 이전 시점의 결과·해시를 현재 소스의 증거로 재사용하지 않는다.
 
 ## 수정 후 검증
 
@@ -44,6 +52,7 @@ npm run test:package
 - CEL 패치·카탈로그 변경은 [지원 범위](core-cel-support.md)와 [고정 소스 재현 절차](../../packages/core/vendor/README.md)를 함께 검증한다.
 - 브라우저 동작 변경은 `test:browser`, 공개 타입·배포 구성·패키지 README 변경은 `test:package`로 소비자를 확인한다. 문서 경로만 바뀌면 링크·앵커·배포 경계와 `git diff --check`를 확인하며 무관한 전체 제품 검사를 반복하지 않는다.
 - `playground/` 변경은 `npm run test:playground`와 실제 화면 확인을 추가한다. 사용법·분할 화면·도구 범위는 [playground README](../../playground/README.md), 실행 증거는 [별도 결과](playground-verification-results.json)를 따른다.
+- `packages/svelte/` 변경은 `npm run check:svelte`로 빌드·strict 타입·실제 Chromium·tarball 소비자를 검사한다. `npm run example:svelte`는 명시 등록한 네 어댑터를 사용하는 실제 Svelte 앱이다. CI는 Node 22/24 각각 같은 검사를 실행한다.
 - 결과 요약 JSON은 위 명령으로 자동 갱신되지 않는다. 새 실행 증거·해시를 반영하고, 재사용한 검사와 다시 실행한 검사를 구분한다. [날짜별 구현 보고](core-implementation-2026-11-02.md)는 그 시점의 기록으로 유지한다.
 
 <a id="2-제품과-의존성-경계"></a>
@@ -121,4 +130,4 @@ U13에서 O01–O16을 모두 검토했다. [현재 처리 현황](open-contract
 
 ### U34–U35 검증 완료 위치
 
-[전체 진행표](verification-ledger.md)와 [224개 인수 항목 증거](../../experiments/verification/coverage.json)가 U36까지의 독립 실험 최종 상태다. T3의 State/Action/UI/application 모형·TypeScript 계약과 T4의 제한 차트 프로필도 실행했다. JS CEL 패치·native 값 어댑터와 Dart VM 값 교차 실험을 구별하며, 기존 Dart CEL 후보의 7개 불일치를 해결한 것으로 보고하지 않는다. 코드 Action 하위 호출은 U35에서 부모 취소·재귀를 상속하고 외부 호출은 독립 유지하기로 확정했으며, 문맥 호출·실제 Query ticket·UI 연결 수명 회귀를 실행했다. 이 문단은 U36까지의 실험 인계다. 현재 core 패키지 결과는 문서 맨 위의 U37 제품 인계를 따르며 Svelte renderer는 후속이다.
+[전체 진행표](verification-ledger.md)와 [224개 인수 항목 증거](../../experiments/verification/coverage.json)가 U36까지의 독립 실험 최종 상태다. T3의 State/Action/UI/application 모형·TypeScript 계약과 T4의 제한 차트 프로필도 실행했다. JS CEL 패치·native 값 어댑터와 Dart VM 값 교차 실험을 구별하며, 기존 Dart CEL 후보의 7개 불일치를 해결한 것으로 보고하지 않는다. 코드 Action 하위 호출은 U35에서 부모 취소·재귀를 상속하고 외부 호출은 독립 유지하기로 확정했으며, 문맥 호출·실제 Query ticket·UI 연결 수명 회귀를 실행했다. 이 문단은 U36까지의 실험 인계다. 현재 core 패키지는 문서 맨 위의 U37 제품 인계, Svelte renderer는 U39 인계를 따른다.

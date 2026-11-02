@@ -224,3 +224,18 @@ URL의 부재 인용 `Sentinel_c3f93ce9e94c81919d176599664b79e3`도 회수 R05�
 - **U37 · 실제 JS/TS core 구현 요청:** 2026-11-02 사용자는 기준 커밋 `10a326b`에서 “이번 요청으로 기존 core 구현 보류를 해제한다”라고 명시하고 계획에 머무르지 않는 실제 구현·검증을 요청했다. 공통 타입→값/State/수명→Query→Action→화면 실행, 하나의 통합 런타임, 기존 실험 보존, 검증된 CEL 고정 패치·공개 지원 목록·재현 빌드가 범위다. D93과 [제품 인계](../handoff/core-implementation-2026-11-02.md)에 구현·검증·후속 범위를 기록한다. Svelte·Dart/Flutter·선택 차트 및 원격 공개는 완료로 확대하지 않는다.
 
 - **U38 · 바닐라 core playground와 화면 밀도:** 2026-11-02 사용자는 Svelte 패키지 없이 JSON 구성의 동작을 확인할 방법을 논의한 뒤 바닐라 playground 구현을 요청했다. JSON 직접 편집·실행, 화면 미리보기와 State·Query·Action 상태 확인이 범위다. 구현 중에는 불필요한 여백·설명·장식을 줄여 화면을 최대한 사용하는 실제 편집 도구로 바꾸도록 요청했다. D94와 [구현·검증 인계](../handoff/playground-implementation-2026-11-02.md)에 실제 공개 패키지 연결과 브라우저 흐름을 기록한다. 독립 상태 엔진이나 core의 DOM 의존성을 허용한 요청이 아니며, Svelte·Dart/Flutter·선택 차트 및 원격 배포 완료로 확대하지 않는다.
+
+- **U39 · Svelte 렌더러 구현:** 2026-11-02 사용자는 “`@viewstem/svelte` 구현부터 해. 여기선 기본 등록하는 건 없고 렌더러만 구현하는건가?”라고 요청했다. 기존 core/호스트 계약에 따라 자동 UI 등록 없이 명시 등록과 Svelte 렌더링을 구현한다. 공개 API·수명·오류 연결의 기술 구체화와 실제 검증은 D95 및 [Svelte 인계](../handoff/svelte-implementation-2026-11-02.md)에 남긴다. 기본 UI 패키지·SSR·Dart/Flutter·차트·공개 발행 요청으로 확대하지 않는다.
+
+- **U40 · Svelte 단일 import와 API 이름:** 2026-11-02 사용자는 `@viewstem/svelte`에 대해 “core없이 이것만 import해서 사용하는 것부터 수정해.”라고 요청하고 이어 “svelte라는 단어도 필요없지 않나?”라고 덧붙였다. 패키지 이름이 프레임워크를 식별하므로 생성 함수를 `createRenderer()`로 정리하고, 기본 Registry·Runtime 생성과 소유권 처리를 포함한다. core 내부 dependency·공통 타입 재노출·기존 공개 이름 정리는 D96의 기술 구체화다. [구현·검증](../handoff/svelte-implementation-2026-11-02.md#u40-단일-패키지-진입점)에 남기며, 논의 중인 UI kit의 패키지 구조·기본 UI 구현까지 확정한 요청으로 확대하지 않는다.
+
+
+- **U41 · 공개 API 경계 정리:** 2026-11-02 사용자는 내부 구현용을 숨기고 실제 사용자에게 필요한 API만 공개할 수 있는지 검토를 요청한 뒤 “리팩토링해.”라고 지시했다. D97의 진입점 분리·반환 객체 캡슐화·명시 타입 export와 기존 소비자 검증을 구현한다. [변경 안내](../handoff/public-api-refactor-2026-11-02.md)에 호환성 변경과 실제 검증을 기록하며, 새 UI 기능·배포 승인으로 확대하지 않는다.
+
+- **U42 · 공개 네이밍 권고 적용:** 2026-11-02 사용자는 “권고한 네이밍으로 수정해. 공개 타입과 예제, 플레이그라운드, 테스트, 문서까지 같이 맞추고 검증해줘.”라고 요청했다. D98은 [검토 보고서](../handoff/public-api-naming-review-2026-11-02.md)의 P1/P2 이름 변경과 중복 ViewHandle 제거를 채택한다. [적용 인계](../handoff/public-api-naming-2026-11-02.md)에 호환성·실제 검증·이전 증거 보존을 기록한다. JSON DSL·제품 지원 범위 변경이나 원격 공개 요청으로 확대하지 않는다.
+
+- **U43 · Svelte UI와 shadcn 전체 지원 계획:** 2026-11-02 사용자는 “이제 svelte ui 패키지 계획해서 shadcn 컴포넌트 전부부터 지원해보자”라고 요청했다. D99는 UI 없는 기존 renderer와 별도의 UI 제공 범위를 계획하고 공식 shadcn-svelte 카탈로그의 전체 항목을 조사한다. [계획과 지원 목표](../handoff/svelte-ui-shadcn-plan-2026-11-02.md)는 구현 전 제안이며, 특정 SDK 서명 확정·제품 구현 완료·외부 배포를 의미하지 않는다.
+
+- **U44 · Svelte UI 계획 구현 승인:** 2026-11-03 사용자는 “계획대로 구현해. shadcn 전체 컴포넌트 지원하고 예제, 테스트, 문서까지 같이 맞추고 검증해줘.”라고 요청했다. D100은 별도 UI 패키지의 실제 구현과 원자적 등록 경계를 기록한다. [구현 인계](../handoff/svelte-ui-shadcn-implementation-2026-11-03.md), [실행 검증](../handoff/svelte-ui-shadcn-verification-results.json), 공개 support manifest에서 66개 카탈로그·386개 native 부품과 JSON/native 전용 지원을 구분한다. npm 발행과 커밋 승인은 포함하지 않는다.
+
+- **U45 · shadcn 66개별 동작 감사:** 2026-11-03 사용자는 66개별 검증표와 입력·이벤트·State 전환·중첩·키보드 실제 테스트, 발견 문제 수정과 회귀·검증 문서를 요청했다. [감사 인계](../handoff/svelte-ui-audit-2026-11-03.md)와 [행렬](../handoff/svelte-ui-audit-matrix.md)은 U44의 mount/참조 확인에서 동작 근거를 확장한다. DataTable은 유효 페이지로 표시를 보정하며 호스트 State를 자동 변경하지 않는다. 공개 API 추가·지원 브라우저 확대·커밋·발행은 포함하지 않는다.

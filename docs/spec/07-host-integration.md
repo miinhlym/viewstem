@@ -1,35 +1,36 @@
 # 호스트 등록 · 렌더러 연결
 
-U37 구현: 실제 JS/TS API는 [core README](../../packages/core/README.md)와 [공개 타입](../../packages/core/src/index.d.ts)에 구체화했다. `NodeSnapshot`은 이름별 `slots`와 평탄한 `children`을 함께 제공한다. 기존 화면은 주입한 정의를 유지하고 `replace`/새 mount에서 새 Registry 정의를 주입한다. 아래 의사 코드와 실제 패키지 시그니처를 구별하며 최소 계약·권한·초기 완료 의미는 그대로 따른다.
+U41 API 정리: JS/TS 루트는 세 팩토리와 URL/Grid 유틸리티만 공개하며 HTTP·CEL 직접 실행기는 subpath로 제공한다. Registry·Store·Runtime·View는 타입과 공개 핸들로 사용하고 내부 엔진·검증기·생성자는 노출하지 않는다. `authorize`의 update owner는 공개 View, invoke owner는 메서드 없는 수명 식별 객체다. 코드 Action의 구현 함수는 권한 콜백에 노출하지 않는다. [변경 안내와 검증](../handoff/public-api-refactor-2026-11-02.md)을 따른다.
+
+U37 구현: 실제 JS/TS API는 [core README](../../packages/core/README.md)와 [공개 타입](../../packages/core/src/index.d.ts)에 구체화했다. `NodeSnapshot`은 이름별 `slots`와 평탄한 `children`을 함께 제공한다. 기존 화면은 주입한 정의를 유지하고 `replace`/새 createView에서 새 Registry 정의를 주입한다. 아래 예제·SDK 표와 공개 선언은 같은 이름을 사용하며 최소 계약·권한·초기 완료 의미는 그대로 따른다.
+
+U39–U40 구현: [Svelte README](../../packages/svelte/README.md)의 `createRenderer()`, `registerComponent(id, implementation)`, `ViewstemView`가 실제 클라이언트 API다. U40에서 core 직접 import 없이 시작하도록 빈 Registry·Runtime을 내부 생성하고, 공개 함수·타입에서 중복 Svelte 명칭을 제거했다. `renderer.registry`에 코드 Component 계약을 등록하고 같은 ID의 Svelte 구현을 연결한다. 기본 UI·Action·테마는 자동 등록하지 않는다. `renderer.dispose()`는 내부 생성 Runtime과 그 View를 정리하며 `createRenderer({runtime})`의 주입 Runtime·외부 Store는 보존한다. `attach`/`ViewstemView` 자체는 View를 빌린다. DOM 반영을 포함하는 initialComplete과 렌더 실패·root 오류 정책은 패키지 사용법을 따른다.
 
 
 기준일: 2026-10-28 · Viewstem v1 설계 계약
 
 [명세 시작점](../VIEWSTEM-SPEC.md) · 이 문서는 최종 명세의 주제별 상세다. **확정**과 **구체화 필요/구현 제안/이전 승인 이관**을 구분해 읽는다. JSON은 계약 설명이며 실행 검증 완료를 뜻하지 않는다.
 
-**구현 제안:** 아래 JS는 책임 연결을 설명하는 의사 코드다. 함수명·시그니처·인자·반환 핸들은 확정 SDK가 아니다. 실제 코드 등록 확장은 Component와 Action이며, core가 전체 View/StateStore/runtime 권한을 native Action에 자동 주입하지 않는다.
-
 ## 10.8 서비스 연결과 에이전트의 같은 경로
 
+아래는 현재 JS/TS API의 연결 예다. 계약·컴포넌트·리소스·DOM 대상·저장 서비스는 호스트가 제공한다.
+
 ```js
-// 구현 제안용 의사 코드: 함수명과 인자는 최종 SDK 계약이 아니다.
-const registry = createRegistry();
-const renderer = createSvelteRenderer({ registry });
+import { createRenderer } from '@viewstem/svelte';
 
-// 공개 계약과 실제 렌더러 구현은 별개로 등록한다.
-renderer.registerComponent(buttonContract, ButtonAdapter);
-registry.registerAction(confirmContract, confirmImplementation);
-for (const resource of resources) registry.registerResource(resource);
+const renderer = createRenderer();
+renderer.registry.registerComponentContract(buttonContract);
+renderer.registerComponent(buttonContract.id, ButtonAdapter);
+renderer.registry.registerAction(confirmContract, confirmImplementation);
+renderer.registry.registerResources(resources);
 
-const view = renderer.mount({ viewRef: "editor-view", target: element });
-
-// 서비스·UI·에이전트는 같은 공개 변경/호출 기반을 사용한다.
-// 실제 함수명·주소·호출자 권한 인자는 구현 시 구체화한다.
-const definition = view.exportDefinition();
+const mounted = await renderer.mount({ viewRef: 'editor-view', target: element });
+await mounted.initialComplete;
+const definition = mounted.view.exportDefinition();
 await serviceApi.saveDefinition(definition);
 ```
 
-위 예시 전체를 최종 시그니처로 취급하지 않는다. 현재 최소 SDK 표면은 아래 U13을 따른다. 예시는 임의 액션 호출을 허가하지 않는다. 공개 대상·입력·호출자 권한을 검사하고 실제 서버 쓰기는 서버가 다시 검증해야 한다. export/save도 서비스가 선택한 명시적 저장 흐름이다.
+공개 대상·입력·호출자 권한을 검사하고 실제 서버 쓰기는 서버가 다시 검증한다. export/save는 서비스가 선택한 명시적 저장 흐름이다.
 
 **등록 식별은 확정:** 위 함수명과 무관하게 같은 등록 집합은 `(kind, id)`로 정의를 구별한다. Query와 Component가 같은 ID인 것은 허용한다. 코드형·선언형 Component끼리 또는 코드형·선언형 Action끼리 같은 ID이면 해당 종류 안의 중복 오류다. `xxxRef`는 기대 종류만 찾으며 다른 종류나 구현 방식으로 fallback하지 않는다. [등록 계약](../VIEWSTEM-SPEC.md#41-정의와-인스턴스)의 예시와 U01을 따른다.
 
@@ -37,24 +38,24 @@ await serviceApi.saveDefinition(definition);
 
 ## 최소 SDK와 적용 완료
 
-**확정(U13):** 다음 이름·결과 의미를 JS/TS core의 최소 표면으로 선택한다. 타입 선언 파일·제네릭 추론·렌더러별 감싸기 함수는 구현 시 이 계약에 맞춰 검증한다. 아래 표는 SDK 구현 완료 기록이 아니다.
+**확정(U13, U42):** U13의 실행 계약에 U42 공개 이름을 적용한다. 실제 타입은 패키지 선언을 따르며 실행 검증은 [U42 검증 기록](../handoff/public-api-naming-verification-results.json)에서 추적한다.
 
 | 표면 | 계약 |
 |---|---|
 | createRegistry() | 등록 집합 생성. registerResources(resources)는 묶음 전체 구조·참조·순환 검증 후 원자 등록 |
 | registry.registerAction(definition, implementation) | 코드형 Action의 공개 정의와 실행 함수 등록. 같은 종류 ID 중복 거절 |
-| registry.registerComponent(contract) | 코드 Component 공개 계약 등록. 실제 렌더러 구현은 같은 ID에 별도 연결 |
+| registry.registerComponentContract(contract) | 코드 Component 공개 계약 등록. 실제 렌더러 구현은 같은 ID에 별도 연결 |
 | createStateStore() | 서비스가 소유할 core Store 생성. createScope()로 격리된 소유 범위 생성 |
 | createRuntime(options) | registry 필수, stateStore·requestExecutor·resourceResolver 선택. Store 생략 시 core가 생성·소유하며 주입 Store의 수명은 서비스가 유지. 실제 필요한 의존성이 없을 때만 오류 |
-| runtime.mount({viewRef 또는 view, inputs}) | 구조 준비·검증·commit 후 Promise로 `{view, initial}` 반환. initial은 최초 처리 보고의 별도 Promise |
+| runtime.createView({viewRef 또는 view, inputs}) | 구조 준비·검증·commit 후 Promise로 `{view, initialComplete}` 반환. initialComplete은 최초 처리 보고의 별도 Promise |
 | view.update(viewSpec) | 다음 전체 View spec을 원자 reconcile. 같은 owner·노드 ID·대상 정의의 상태 유지. 실패 시 기존 정의·상태 유지 |
-| view.replace({viewRef 또는 view, inputs}) | 새 수명으로 전체 교체. 준비 실패 시 기존 View 유지. 성공 시 이전 내부 수명 정리·새 initial Promise 반환 |
+| view.replace({viewRef 또는 view, inputs}) | 새 수명으로 전체 교체. 준비 실패 시 기존 View 유지. 성공 시 이전 내부 수명 정리·새 initialComplete Promise 반환 |
 | view.exportDefinition() | 현재 View spec을 반환. 독립 리소스로 저장할 kind/id/name 외피는 서비스가 부여. 자동 저장·runtime snapshot export 아님 |
 | view.dispose() | 소유 실행·내부 상태·구독 정리. 서비스 Store의 외부 소유 셀은 유지. 반복 호출은 안전한 no-op |
 | runtime.invokeAction({actionRef 또는 action, inputs, owner}) | 독립 명시 호출. owner 수명·공개 대상·권한·입력 검증 후 실행하고 실제 결과/void 또는 공통 오류 반환 |
 | context.invokeAction({actionRef 또는 action, inputs}) | 코드 Action의 부모에 연결된 하위 호출. 부모 owner·스택·취소를 상속하며 변경 불가. 명시 입력·대상·권한·출력 검증 후 결과/오류 Promise 반환 [U35] |
 
-update/replace는 `{initial}`을 반환하며 각 initial은 그 적용 세대에 고정된다. 보고는 `{generation, queryErrors}`다. 실행 가능한 최초 Query의 개별 오류는 queryErrors에 모으고 initial 자체를 전체 적용 실패로 reject하지 않는다. 외부 입력 대기는 완료를 막지 않는다. commit 뒤 폐기·다음 세대 교체로 완료할 수 없게 되면 해당 initial은 CANCELLED다. core는 최초 projection 전달까지, 렌더러 연결은 해당 projection 반영 확인까지 포함해 자신의 initial을 완료한다. 렌더러가 없는 core 경로는 DOM을 기다리지 않는다.
+update/replace는 `{initialComplete}`을 반환하며 각 initialComplete은 그 적용 세대에 고정된다. 보고는 `{generation, queryErrors}`다. 실행 가능한 최초 Query의 개별 오류는 queryErrors에 모으고 initialComplete 자체를 전체 적용 실패로 reject하지 않는다. 외부 입력 대기는 완료를 막지 않는다. commit 뒤 폐기·다음 세대 교체로 완료할 수 없게 되면 해당 initialComplete은 CANCELLED다. core는 최초 projection 전달까지, 렌더러 연결은 해당 projection 반영 확인까지 포함해 자신의 initialComplete을 완료한다. 렌더러가 없는 core 경로는 DOM을 기다리지 않는다.
 
 update는 유지할 State의 계약과 기존 연결을 새 정의로 재검증하고, 불일치를 조용한 초기화로 숨기지 않는다. 구조 준비와 실제 외부 요청 실행은 구분한다. 구조 준비를 위한 정의 resolver 조회와 달리, 데이터 Query·코드 Action은 구조 검증 전에 선행 실행하지 않는다. native 실행 context는 `{inputs, signal, invokeAction}`이며 State/Query inputs에는 아래 호출 한정 핸들을 넣는다. 전체 runtime·Store는 자동 주입하지 않는다. untrusted 에이전트 입력으로 owner나 권한을 위조할 수 없도록 서비스 연결층이 공개 대상과 호출자 권한을 먼저 확인한다.
 
@@ -64,9 +65,9 @@ U35의 하위 호출은 부모가 끝난 뒤 사용할 수 없고, 대기하지 
 
 State의 논리 주소는 `{scopeId, name}`이고 실제 셀 핸들은 생성 세대에 고정한다. scopeId는 core가 발급하며 local name에 `/` 등을 이어 붙여 정체성을 추측하지 않는다. 이름으로 다시 조회한 새 셀과 폐기된 옛 핸들은 다르다.
 
-- Scope는 registerState(name, declaration), getState(name), removeState(name), dispose()를 제공한다. 중복 등록·미등록 조회/제거는 오류다. 셀 교체는 명시 replaceState(name, declaration)로 수행한다.
-- StateHandle은 read(), snapshot(), write(value)를 제공한다. read/snapshot은 [값 준비 상태](10-value-contracts.md#값-준비-상태의-읽기)를 따르며 쓰기는 전체 값 교체다. reset()은 최초 확정 초기 snapshot을 복원한다. snapshot이 missing이면 missing으로 복원하며 undefined 쓰기로 구현하지 않는다.
-- QueryHandle은 snapshot(), refresh(), retry()를 제공한다. 호출에 묶인 핸들의 쓰기·갱신·재시도는 호출 취소 후 거절하지만 원래 공유 대상이나 다른 호출의 핸들을 폐기하지 않는다.
+- StateScope는 registerState(name, declaration), getState(name), removeState(name), dispose()를 제공한다. 중복 등록·미등록 조회/제거는 오류다. 셀 교체는 명시 replaceState(name, declaration)로 수행한다.
+- StateHandle은 read(), getSnapshot(), write(value)를 제공한다. read/getSnapshot은 [값 준비 상태](10-value-contracts.md#값-준비-상태의-읽기)를 따르며 쓰기는 전체 값 교체다. reset()은 최초 확정 초기 snapshot을 복원한다. snapshot이 missing이면 missing으로 복원하며 undefined 쓰기로 구현하지 않는다.
+- QueryHandle은 getSnapshot(), refresh(), retry()를 제공한다. 호출에 묶인 핸들의 쓰기·갱신·재시도는 호출 취소 후 거절하지만 원래 공유 대상이나 다른 호출의 핸들을 폐기하지 않는다.
 - Store.subscribe(selector, listener)는 전체·한 주소·주소 배열을 받으며 구독 해제 함수를 반환한다. 정확한 관찰 payload와 URL/reaction 연결은 [Store 상세](09-preserved-contracts.md#store-주소관찰reaction의-현행-매핑)를 따른다.
 
 시간 공급 인터페이스는 `Clock.now(): epoch milliseconds`와 `Clock.subscribe(listener): unsubscribe`로 둔다. now는 유한한 안전 정수이며 listener는 같은 종류의 시각을 받는다. 서비스가 이 공급자를 명시적인 State/Value 입력에 연결하고 변화 시 그 입력을 갱신한다. 구독은 만든 owner가 해제하며 초기값/reset을 매 tick마다 다시 실행하지 않는다. core가 숨은 현재 시각이나 기본 tick 주기를 CEL에 넣지 않는다. 업무 시간대는 [U14의 명시 Value 입력](10-value-contracts.md#명시-업무-시간대와-달력-연산)으로 별도 연결한다. Clock의 epoch milliseconds는 날짜 데이터의 공개 문자열 표현과 별개이며 명시 변환 없이 날짜 State에 저장하지 않는다. [U13, U14]
@@ -84,3 +85,13 @@ code는 INVALID_DEFINITION, REFERENCE_NOT_FOUND, TYPE_MISMATCH, TYPE_CONTRACT_MI
 **U34 독립 State 실험:** 오류 정제 중 다시 발생하는 예외와 `null`·`false` 등의 reject 값도 실패로 처리한다. 알 수 없는 State/관찰 콜백 예외는 고정 INTERNAL_ERROR로 격리하며 다른 관찰자 통지를 막지 않는다. 폐기된 의존 셀의 결과를 현재 성공값으로 유지하지 않고 세대에 묶인 CANCELLED로 전파한다. [실행 범위와 회귀](../../experiments/t3-state/README.md)는 실제 core SDK 구현과 구별한다.
 
 이 오류 표면과 값 snapshot은 서로 다른 계약이다. Action 관찰의 error와 Query 관찰의 error에는 같은 오류를 넣되 각 리소스의 status/data 의미는 유지한다. 네트워크·취소·동시 교체에서의 실제 적합성은 구현 후 검증해야 한다.
+
+U42에서 Registry/Runtime의 정의 추출 이름을 `exportResource`로 통일했다. View의 `exportDefinition`은 ViewSpec을 반환하므로 유지한다. Store는 `writeBatch`, `registerReaction`, `getDiagnostics`, URL 연결은 `getDiagnostics`를 제공한다. Svelte `whenRendered()`는 현재 projection의 DOM 반영을 기다리며 Query 완료·paint를 보장하지 않는다. State JSON의 `initial`은 완료 Promise인 `initialComplete`와 다른 필드다. [전체 이름 이행표](../handoff/public-api-naming-2026-11-02.md)를 따른다.
+
+## Svelte UI 묶음 등록 · U44
+
+`@viewstem/svelte-ui`의 `registerComponents(renderer, sets)`는 `ComponentSet[]`을 받는다. 전체 shadcn은 `/shadcn`의 `shadcn`, 선택 사용은 `/shadcn/button` 등의 family 묶음을 전달한다. 등록은 import의 부작용이 아니며 실패한 묶음의 일부 계약·구현을 남기지 않는다. 이를 위해 core Registry에 `registerComponentContracts(contracts[])`, Svelte Renderer에 `registerComponents({contract, component}[])`와 `ComponentRegistration` 타입을 추가했다. 단일 등록과 같은 중복·유효성·수명 검사를 적용한다.
+
+UI 입력은 core의 Value, 변경은 기존 `on` → Action → State 경로를 사용한다. native callback 스택에서 즉시 core projection을 발행하면 Svelte effect 초기화와 재진입할 수 있어, UI 패키지의 native 이벤트는 한 microtask 뒤 core `emit`으로 연결한다. DOM submit의 `preventDefault`는 동기적으로 적용한다. core의 직접 `View.emit`과 Action 실행 계약을 비동기 큐로 바꾸는 것은 아니다. View 폐기 뒤 남은 renderer emit은 동기 예외 대신 CANCELLED Promise로 거절한다.
+
+`child` 합성은 실제 DOM props/attachment를 하나의 UI 부품에 연결하며, 일반 슬롯에 scoped 값을 추가하지 않는다. Calendar/RangeCalendar 내부 34개 부품과 Chart.Tooltip은 공개 native namespace로 조합한다. 정확한 지원 입력·이벤트·슬롯과 한계는 [UI 사용법](../../packages/svelte-ui/README.md), 실행 결과는 [U44 기록](../handoff/svelte-ui-shadcn-verification-results.json)을 따른다.

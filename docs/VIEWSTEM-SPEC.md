@@ -1,6 +1,8 @@
 # Viewstem 최종 설계 명세
 
-최초 통합: **2026-10-28** · 현재 인계: **2026-11-02, U38** · 구현 담당자를 위한 현재 계약
+현재 공개 API 이름과 변경 후 검증은 [U42 네이밍 적용](handoff/public-api-naming-2026-11-02.md), [검증 기록](handoff/public-api-naming-verification-results.json)을 따른다. U41 및 이전 기록의 API 이름·해시는 당시 증거로 보존한다.
+
+최초 통합: **2026-10-28** · 현재 인계: **2026-11-02, U41** · 구현 담당자를 위한 현재 계약
 
 설계 복원·명확화의 배경은 [결정 등록부](history/decision-register.md)와 [원문→계약 대응표](handoff/source-contract-matrix.md)에 있다. 현재 구현·검증 결과는 [제품 인수인계](handoff/core-implementation-2026-11-02.md), 실제 잔여는 [후속 작업](handoff/open-contracts.md#실제-남은-작업)을 따른다. 이 명세는 언어 독립 계약을 소유하며 진행 수치를 복제하지 않는다.
 
@@ -25,7 +27,7 @@ Viewstem은 **재사용 리소스로 UI·상태·데이터·동작을 선언하�
 | [10 값 상세](spec/10-value-contracts.md) | State의 missing 읽기·undefined·숫자 범위·표현·정규화·미지원 값/순환 거절, literal/escape, 시간 의존 계산, 타입별 비교, 격리·읽기 snapshot, 날짜 경계 |
 | [11 선택 차트](spec/11-optional-charts.md) | core 기본 제공과 구별하는 차트 계약·엔진 범위·독립 실험과 제품 구현의 구분 |
 
-`[E01]` 등의 근거 표기는 결정 근거 식별자다. E01–E42는 원 통합 명세의 색인이고 E43–E69은 보관 원문 직접 대조와 방 기록 회수로 보완한 근거다. 회수 요약과 원문 전문은 [색인](history/evidence-index.md)에서 구별한다. U01–U38은 이관 후 프로젝트 대화에서 확정한 명확화·값 계약·실행 실험·CEL 패치 진행 전제·검증 진행·도구 구현의 근거다. 해당 대화를 읽어야만 이 명세를 해석할 수 있도록 작성하지 않는다.
+`[E01]` 등의 근거 표기는 결정 근거 식별자다. E01–E42는 원 통합 명세의 색인이고 E43–E69은 보관 원문 직접 대조와 방 기록 회수로 보완한 근거다. 회수 요약과 원문 전문은 [색인](history/evidence-index.md)에서 구별한다. U01–U41은 이관 후 프로젝트 대화에서 확정한 명확화·값 계약·실행 실험·CEL 패치 진행 전제·검증 진행·도구 구현의 근거다. 해당 대화를 읽어야만 이 명세를 해석할 수 있도록 작성하지 않는다.
 
 JS/TS의 실제 API는 [패키지 사용법](../packages/core/README.md)과 [공개 타입](../packages/core/src/index.d.ts), 실행 가능한 CEL 프로필은 [지원 문서](handoff/core-cel-support.md)를 따른다. U28–U36의 독립 실험·누락 보완·실패 전후 증거는 [검증 진행표](handoff/verification-ledger.md)에 보존한다. 그 시점의 미구현 표기는 현재 진행 상태가 아니다.
 
@@ -80,6 +82,8 @@ JSON 예시는 확정된 구조의 의미를 설명한다. 외부 코드형 Comp
 - 바닐라 DOM 컴포넌트를 먼저 만들고 Svelte가 이를 감싸야 한다는 결정은 아니다. 화면 구현은 각 렌더러가 맡는다.
 
 - U38의 [바닐라 core playground](../playground/README.md)는 JSON을 편집·실행하고 화면과 State·Query·Action을 확인하는 개발 도구다. 공개 core API를 소비하며 DOM 컴포넌트는 도구 안에 둔다. 이 도구의 DOM 어댑터를 Svelte의 필수 기반으로 정하거나 core에 DOM 책임을 추가하지 않는다.
+- U39–U40의 [Svelte 클라이언트 렌더러](../packages/svelte/README.md)는 공개 core projection·수명·이벤트에 Svelte 구현을 연결한다. `@viewstem/svelte`의 `createRenderer()`만으로 시작하며 기본 UI·Action·테마 자동 등록 없이 호스트가 Component 계약과 구현을 각각 등록한다. 실제 패키지 검증과 지원 한계는 [인계](handoff/svelte-implementation-2026-11-02.md)를 따른다.
+- U44의 [Svelte UI 패키지](../packages/svelte-ui/README.md)는 별도의 명시적 ComponentSet으로 shadcn 카탈로그를 제공한다. 묶음 등록은 계약과 구현을 원자적으로 등록하며, core의 JSON DSL·State 엔진에 UI 의존성을 추가하지 않는다. 351개 JSON 원본 부품·6개 조합과 35개 native 문맥 전용 부품의 경계는 [U44 인계](handoff/svelte-ui-shadcn-implementation-2026-11-03.md)를 따른다. scoped slot 값 전달이나 ECharts/Canvas 계약을 확장하지 않는다.
 
 - Rust/WASM 통합 코어는 검토했지만 현재 채택 경로는 아니다.
 

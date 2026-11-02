@@ -1,0 +1,85 @@
+{
+  "date": "2026-11-02",
+  "verifiedAtUtc": "2026-11-02T10:48:31.526465+00:00",
+  "scope": "Design/inventory verification only. No UI package implementation or acceptance tests completed.",
+  "upstreamCommit": "fe4b0ad3b8b30c6745346db008c3307b5afeabb1",
+  "inventorySha256": "58781ba7930897858ef1e1c274cb0afb276365e9ab0fcb37657ae14b6dc6ccc4",
+  "counts": {
+    "catalogItemCount": 66,
+    "directSourceCatalogItems": 62,
+    "recipeItems": 3,
+    "typographyItems": 1,
+    "directSourceFamilyUniqueComponentExports": 386,
+    "publicComponentCountRule": "Count distinct exported Svelte component bindings in each family barrel once. For a given binding, exports such as Root and Root as Accordion are one component. Keep runtimeExportNames/aliases available for exact import surface; exclude typeExports and helperRuntimeExports. Catalog-item count is a separate 66-family/page count.",
+    "directSourceComponentExportCountExcludes": "Alternate barrel aliases for the same binding; type-only exports; runtime helpers such as *Variants and useSidebar; registry family/page counts are separate.",
+    "sourceUiDirectoryCountIncludingNonCatalogForm": 63,
+    "nonCatalogUiDirectories": [
+      "form"
+    ]
+  },
+  "phaseGroups": {
+    "C context·내용": 7,
+    "D overlay": 4,
+    "A 표시·텍스트": 19,
+    "I 추가 표시·대화": 8,
+    "G 날짜": 3,
+    "F 레이아웃·이동": 4,
+    "H 조합·서비스": 4,
+    "B 입력·선택": 11,
+    "E 메뉴": 6
+  },
+  "barrelFilesHashVerified": 62,
+  "localComponentSourcePathsVerified": 385,
+  "externalComponentPassthroughs": [
+    {
+      "family": "resizable",
+      "binding": "Pane",
+      "source": "paneforge"
+    }
+  ],
+  "productImplemented": 0,
+  "productVerified": 0,
+  "svelteSnippetContextFeasibility": {
+    "nodeVersion": "v22.21.1",
+    "browser": "151.0.7922.34",
+    "svelte": "5.57.3",
+    "scope": "isolated snippet/context feasibility only, not Viewstem UI package acceptance",
+    "value": "provided",
+    "errors": []
+  },
+  "feasibilitySourceSha256": "68a93f8374aaecc91aa52721d7841b25015d6f45f8c86d323cfa26d3368f3e57",
+  "feasibilitySourceLocation": "/tmp/viewstem-ui-context-spike/run.mjs (temporary local investigation; not product test evidence)",
+  "svelteAutofixer": {
+    "components": 4,
+    "issues": 0,
+    "suggestions": 0
+  },
+  "existingU42SourceInventory": {
+    "files": 353,
+    "changed": [],
+    "fullProductTestsRerun": false,
+    "reason": "No product source, dependency, build configuration, or package/example source changed"
+  },
+  "documentation": {
+    "localPathTargetsChecked": 232,
+    "missing": [],
+    "sha256": {
+      "docs/handoff/svelte-ui-shadcn-plan-2026-11-02.md": "7904da1ddfbb42b53418eb5c99d094d40a4a7d64bcf2e5cd253b44e0726735c9",
+      "docs/README.md": "74f6c6e652ac74db021e9a8c3ffbda862e59bb29319a219c0300b4cf8867b179",
+      "docs/handoff/open-contracts.md": "c25801e38b7fd5d0c6213503631c73b9bb50d68b08a32170e55306b50e4165b2",
+      "docs/history/decision-register.md": "5beb49f5ba950d04a863f7236e6c66944fb0f424a33fd930fd7a3b2be56fd47c",
+      "docs/history/evidence-index.md": "5d2dacc4112aded02c3b817c95a6938d8983bf8078504b2e36b90451556edf20"
+    },
+    "limitations": "Only local path existence checked; remote URLs and Markdown anchors not crawled"
+  },
+  "notYetVerified": [
+    "actual Bits UI contexts, triggers and portals",
+    "pinned style/icon transformation and emitted CSS",
+    "Data Table row/snippet integration",
+    "Chart rendering and toast actions",
+    "component prop/event/slot compatibility",
+    "registration conflict/rollback semantics",
+    "UI package build/types/tarball/bundle size",
+    "all 66 families and 386 parts as actual Viewstem components"
+  ]
+}

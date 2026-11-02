@@ -1,0 +1,906 @@
+{
+  "date": "2026-11-02",
+  "baselineCommit": "e6451e5917476a2f63c83844634db2b92e2f1f8c",
+  "worktree": "Implementation and verification on the current worktree; not committed or published by this request",
+  "scope": "Actual @viewstem/svelte client renderer with createRenderer() owning a default core Runtime/Registry, optional injected Runtime, single-package imports and shared types. No implicit UI, Action or theme registration and no duplicate runtime engine.",
+  "platform": {
+    "system": "Darwin",
+    "release": "24.6.0",
+    "architecture": "arm64",
+    "chromium": "151.0.7922.34"
+  },
+  "versions": {
+    "node": [
+      "v22.21.1",
+      "v24.1.0"
+    ],
+    "svelte": "5.57.3",
+    "svelte-check": "4.7.8",
+    "@sveltejs/package": "2.5.8",
+    "typescript": "5.9.3",
+    "esbuild": "0.25.12",
+    "playwright": "1.62.1"
+  },
+  "commands": {
+    "install": {
+      "command": "npm ci --ignore-scripts",
+      "result": "passed"
+    },
+    "svelte": {
+      "command": "npm run check:svelte",
+      "node": [
+        "22.21.1",
+        "24.1.0"
+      ],
+      "result": "passed",
+      "sequence": [
+        "core build",
+        "Svelte package build",
+        "svelte-check src and strict consumer types",
+        "svelte-check example",
+        "24 real Chromium acceptance tests",
+        "isolated @viewstem/svelte consumer with transitive local core tarball, NodeNext types, real Chromium consumer"
+      ]
+    },
+    "core": {
+      "command": "npm run check && npm run test:package",
+      "node": "22.21.1",
+      "result": "passed",
+      "executionStage": "Executed for U39; reused for U40 after checking all core source and build artifact hashes"
+    },
+    "example": {
+      "command": "IAB UI verification of restarted localhost:4174 example via cua_repl; U39 route and responsive evidence reused for unchanged server/styles/adapters",
+      "result": "passed"
+    },
+    "whitespace": {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  },
+  "browser": {
+    "transport": "Real Chromium and loopback HTTP serving the built public consumer bundle. Query race/retry cases use a controlled RequestExecutor; this suite does not revalidate production HTTP/auth transports.",
+    "results": [
+      {
+        "nodeVersion": "v22.21.1",
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "tests": [
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "default renderers own independent runtimes and expose their empty registries"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "owned runtime disposal cancels direct View Query and Action execution with reentrant abort cleanup"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "owned runtime preserves supplied Store and independently owned Views attached to its renderer"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "owned runtime disposal waits for a delayed resolver then releases the target without mounting"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "runtime injection rejects conflicting creation options without changing the injected runtime"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "consumer has no implicit adapters or resources; adapter registration is explicit and validated"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "missing adapter is isolated, initial rejects, and text remains escaped"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "required Value input waiting and type errors recover without replacing sibling DOM"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "State and Query handles cross explicit ports and stay usable from adapter interactions"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "named and empty forwarded slots preserve order and author scope; host context reaches adapters"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "event forwarding validates payload and preserves native false output"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "repeat keys preserve Svelte and core state on reorder, and removal creates a new lifetime"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "when removal cancels async Action and stale adapter callback; recreation is independent"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "Query initial waits for DOM commit while ready siblings render progressively; errors and retry recover"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "multiple pending placeholders without addresses remain separate and recover in authored order"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "invalid updates/replacements preserve DOM, State and generation; valid replace starts fresh lifetime"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "attachments and Svelte host borrow Views; renderer owns mounted Views and never injected runtime or Store"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "host adapter render failures are sanitized, isolated, and recover on valid updates"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "replacement cancels pending initial and prevents late Query results from reaching current DOM"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "renderer disposal awaits delayed mount cleanup and preserves injected runtime usability"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "direct Svelte host uses explicit root transformError for malicious adapter exceptions and recovery"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "components explicitly registered after mount are available on replacement"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "saved emit checks current input readiness synchronously before Svelte has flushed"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "reentrant renderer disposal from adapter initialization cancels mount and removes its DOM"
+          }
+        ],
+        "failures": [],
+        "skippedTests": [],
+        "todoTests": [],
+        "rawReport": "packages/svelte/test/results/node22.json",
+        "rawReportSha256": "8555ffbae64c2cee9bbae84700980bdb27cde2180157674d9a30e1f5e48d9cbc",
+        "testIdentitySha256": "b188dd4a855dc132bc58e99d2b1503f4d08885622c32ad742dba12ec74f9b8fd"
+      },
+      {
+        "nodeVersion": "v24.1.0",
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0,
+        "tests": [
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "default renderers own independent runtimes and expose their empty registries"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "owned runtime disposal cancels direct View Query and Action execution with reentrant abort cleanup"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "owned runtime preserves supplied Store and independently owned Views attached to its renderer"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "owned runtime disposal waits for a delayed resolver then releases the target without mounting"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "runtime injection rejects conflicting creation options without changing the injected runtime"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "consumer has no implicit adapters or resources; adapter registration is explicit and validated"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "missing adapter is isolated, initial rejects, and text remains escaped"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "required Value input waiting and type errors recover without replacing sibling DOM"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "State and Query handles cross explicit ports and stay usable from adapter interactions"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "named and empty forwarded slots preserve order and author scope; host context reaches adapters"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "event forwarding validates payload and preserves native false output"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "repeat keys preserve Svelte and core state on reorder, and removal creates a new lifetime"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "when removal cancels async Action and stale adapter callback; recreation is independent"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "Query initial waits for DOM commit while ready siblings render progressively; errors and retry recover"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "multiple pending placeholders without addresses remain separate and recover in authored order"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "invalid updates/replacements preserve DOM, State and generation; valid replace starts fresh lifetime"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "attachments and Svelte host borrow Views; renderer owns mounted Views and never injected runtime or Store"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "host adapter render failures are sanitized, isolated, and recover on valid updates"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "replacement cancels pending initial and prevents late Query results from reaching current DOM"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "renderer disposal awaits delayed mount cleanup and preserves injected runtime usability"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "direct Svelte host uses explicit root transformError for malicious adapter exceptions and recovery"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "components explicitly registered after mount are available on replacement"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "saved emit checks current input readiness synchronously before Svelte has flushed"
+          },
+          {
+            "file": "packages/svelte/test/browser.test.mjs",
+            "name": "reentrant renderer disposal from adapter initialization cancels mount and removes its DOM"
+          }
+        ],
+        "failures": [],
+        "skippedTests": [],
+        "todoTests": [],
+        "rawReport": "packages/svelte/test/results/node24.json",
+        "rawReportSha256": "f9d0d6e9330eb07a2354c53c54f30885cff2e03523854322ded3f4d75ad24539",
+        "testIdentitySha256": "b188dd4a855dc132bc58e99d2b1503f4d08885622c32ad742dba12ec74f9b8fd"
+      }
+    ],
+    "unhandledRejections": "0; asserted for every test",
+    "pageAndConsoleErrors": "0; asserted for every test"
+  },
+  "testIdentityHashAlgorithm": "SHA-256 of UTF-8 compact JSON array of [repository-relative file, exact test name], sorted lexicographically, Unicode preserved",
+  "package": {
+    "results": [
+      {
+        "nodeVersion": "v22.21.1",
+        "svelteVersion": "5.57.3",
+        "files": [
+          "README.md",
+          "dist/ConnectedView.svelte",
+          "dist/ConnectedView.svelte.d.ts",
+          "dist/connection.d.ts",
+          "dist/connection.js",
+          "dist/index.d.ts",
+          "dist/index.js",
+          "dist/NodeList.svelte",
+          "dist/NodeList.svelte.d.ts",
+          "dist/renderer.d.ts",
+          "dist/renderer.js",
+          "dist/RenderNode.svelte",
+          "dist/RenderNode.svelte.d.ts",
+          "dist/types.d.ts",
+          "dist/types.js",
+          "dist/ViewstemView.svelte",
+          "dist/ViewstemView.svelte.d.ts",
+          "package.json"
+        ],
+        "integrity": "sha512-gQokfrk7h1RBHu2FrbdJ4k3SkueSKeGgW/OiJ3Y0w/7as6im4yrW/xLI20oVc00jN82v04AQ4cfITihgW+CyJA==",
+        "bytes": 11596,
+        "unpackedBytes": 34712,
+        "consumerDependencies": [
+          "@viewstem/svelte",
+          "svelte"
+        ],
+        "coreResolution": "transitive dependency; local tarball override for unpublished core",
+        "imports": "@viewstem/svelte only (runtime and shared types)",
+        "types": "passed",
+        "browser": "passed",
+        "errors": [],
+        "rawReport": "packages/svelte/test/results/package-node22.json",
+        "rawReportSha256": "56101641cff028f27daf4ac5ef29da8153b4e75162e5f64a033b945241a23b45"
+      },
+      {
+        "nodeVersion": "v24.1.0",
+        "svelteVersion": "5.57.3",
+        "files": [
+          "README.md",
+          "dist/ConnectedView.svelte",
+          "dist/ConnectedView.svelte.d.ts",
+          "dist/connection.d.ts",
+          "dist/connection.js",
+          "dist/index.d.ts",
+          "dist/index.js",
+          "dist/NodeList.svelte",
+          "dist/NodeList.svelte.d.ts",
+          "dist/renderer.d.ts",
+          "dist/renderer.js",
+          "dist/RenderNode.svelte",
+          "dist/RenderNode.svelte.d.ts",
+          "dist/types.d.ts",
+          "dist/types.js",
+          "dist/ViewstemView.svelte",
+          "dist/ViewstemView.svelte.d.ts",
+          "package.json"
+        ],
+        "integrity": "sha512-gQokfrk7h1RBHu2FrbdJ4k3SkueSKeGgW/OiJ3Y0w/7as6im4yrW/xLI20oVc00jN82v04AQ4cfITihgW+CyJA==",
+        "bytes": 11596,
+        "unpackedBytes": 34712,
+        "consumerDependencies": [
+          "@viewstem/svelte",
+          "svelte"
+        ],
+        "coreResolution": "transitive dependency; local tarball override for unpublished core",
+        "imports": "@viewstem/svelte only (runtime and shared types)",
+        "types": "passed",
+        "browser": "passed",
+        "errors": [],
+        "rawReport": "packages/svelte/test/results/package-node24.json",
+        "rawReportSha256": "412d33aeb624b13aef635b2018441407b43b1937d88c54f74e584ecf444825b3"
+      }
+    ],
+    "node22And24TarballByteIdentity": "Same SHA-512 integrity, size and file list after each full build",
+    "types": "Strict NodeNext consumer, explicit Component export, positive and @ts-expect-error negative contracts; library/fixture/example svelte-check have zero errors and warnings",
+    "runtime": "Installed @viewstem/svelte tarball with transitive core (local tarball override because unpublished), consumer manifest has only @viewstem/svelte and svelte. createRenderer() and common types require no direct core import. Explicit Button initial 0 → click → core Action/State → DOM 2; renderer.dispose removes DOM; no browser errors.",
+    "filesBoundary": "Only dist, README.md and package.json; no tests, example or node_modules",
+    "generatedFiles": "dist and the svelte-package .svelte-kit staging directory are ignored; no generated JS/declarations or local results are tracked."
+  },
+  "example": {
+    "nodeVersion": "v22.21.1",
+    "chromium": "151.0.7922.34",
+    "checks": [
+      "initial JSON renders greeting",
+      "Korean string input → inline Action → State → CEL Derived → Svelte Label",
+      "empty value renders alternate greeting",
+      "reset event restores input and greeting",
+      "390px viewport has no horizontal overflow",
+      "no page or console errors"
+    ],
+    "routes": [
+      {
+        "path": "/",
+        "method": "GET",
+        "status": 200
+      },
+      {
+        "path": "/app.js",
+        "method": "HEAD",
+        "status": 200
+      },
+      {
+        "path": "/package.json",
+        "method": "GET",
+        "status": 404
+      },
+      {
+        "path": "/",
+        "method": "POST",
+        "status": 405
+      }
+    ],
+    "errors": [],
+    "screenshots": [
+      "packages/svelte/test/results/example-desktop.png",
+      "packages/svelte/test/results/example-narrow.png"
+    ],
+    "limitations": [
+      "Programmatic fill is not physical Korean IME verification",
+      "Narrow desktop Chromium is not a real mobile device"
+    ],
+    "visualInspection": "Inspected 1280x800 and 390x844 screenshots: label/input/greeting/reset visible, no overlap, clipping or horizontal overflow.",
+    "executionStage": "U39 original screenshot/route/responsive checks; preserved here as prior evidence. Current single-import example interaction rerun is in singleImportFollowup.example."
+  },
+  "officialSvelteReview": {
+    "result": "All library, test fixture, type fixture and example Svelte components checked with official Svelte autofixer; no issues. Final changed ConnectedView/RenderNode and isolated consumer Button rechecked.",
+    "retainedSuggestions": {
+      "file": "packages/svelte/src/lib/RenderNode.svelte",
+      "reason": "The effect resets a failed Svelte boundary only when a new core projection arrives. Clearing renderError and calling reset are deliberate imperative lifecycle operations, not derived data; replacing them with $derived would perform side effects during derived evaluation."
+    },
+    "followup": {
+      "tool": "official Svelte MCP svelte_autofixer",
+      "version": "5.57.3",
+      "issues": [],
+      "suggestions": [],
+      "otherComponents": "Unchanged since U39; review evidence reused",
+      "files": [
+        "packages/svelte/example/App.svelte",
+        "packages/svelte/test/types/TypedHost.svelte"
+      ]
+    }
+  },
+  "independentReview": {
+    "scope": [
+      "public package surface and NodeNext resolution",
+      "registration snapshots and replace",
+      "renderer-owned vs borrowed lifecycle",
+      "current readiness at event time",
+      "host render error boundary"
+    ],
+    "remainingKnownFindings": [],
+    "corrections": [
+      {
+        "problem": "NodeNext falls back to Svelte wildcard declaration and loses ViewstemView exports",
+        "fix": "Explicit public Component<ViewstemViewProps, {settled}> annotation",
+        "verification": "Isolated installed-tarball strict NodeNext consumer"
+      },
+      {
+        "problem": "Component registered after mount renders blank on replace due to frozen code IDs/adapters",
+        "fix": "Refresh injected renderer maps only at a new core View lifetime",
+        "test": "components explicitly registered after mount are available on replacement"
+      },
+      {
+        "problem": "Svelte inspects host-thrown Proxy before boundary handler, exposing a raw throw",
+        "fix": "Official root transformError hook with identity-only sanitizer; direct-host integration documented and tested",
+        "tests": [
+          "host adapter render failures are sanitized, isolated, and recover on valid updates",
+          "direct Svelte host uses explicit root transformError for malicious adapter exceptions and recovery"
+        ]
+      },
+      {
+        "problem": "A retained ready callback can run Action after core readiness changed but before Svelte flush",
+        "fix": "Check current core address/generation/status on emit",
+        "test": "saved emit checks current input readiness synchronously before Svelte has flushed"
+      },
+      {
+        "problem": "Renderer disposal during adapter initialization reads null projection and can attach late DOM",
+        "fix": "Null-safe projection and post-mount liveness/cleanup guard",
+        "test": "reentrant renderer disposal from adapter initialization cancels mount and removes its DOM"
+      }
+    ],
+    "executionStage": "Independent review of U39. U40 changes reviewed by the main agent and verified with the new ownership regressions; no new independent review claimed."
+  },
+  "coreRegression": {
+    "rerun": {
+      "nodeVersion": "v22.21.1",
+      "passed": 1060,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0,
+      "rawReport": "packages/core/test/results/current.json",
+      "rawReportSha256": "689d3e6d064479e7b80c1ff2bb9cfc237b7eb4686636006220f11d94b160259e",
+      "acceptance": {
+        "core": 216,
+        "verifiedCore": 216,
+        "optionalChartsDeferred": 8
+      },
+      "strictTypes": "passed",
+      "package": {
+        "nodeVersion": "v22.21.1",
+        "package": "@viewstem/core",
+        "version": "0.1.0",
+        "files": [
+          "README.md",
+          "dist/cel-support.json",
+          "dist/http.d.ts",
+          "dist/http.js",
+          "dist/http.js.map",
+          "dist/index.d.ts",
+          "dist/index.js",
+          "dist/index.js.map",
+          "dist/THIRD-PARTY-NOTICES.txt",
+          "package.json"
+        ],
+        "integrity": "sha512-EQhoWLrpoqSNUTCi9430jCtTCP7jjuhNpkMkQNZBYIm5TvwFIP3GFKxEtokbah+cCsT3E3L/l9kHL/Jgt34H7Q==",
+        "bytes": 273539,
+        "unpackedBytes": 1193493,
+        "runtime": "passed",
+        "types": "passed"
+      }
+    },
+    "reused": {
+      "record": "docs/handoff/core-verification-results.json",
+      "evidence": [
+        "Node 24 core regression",
+        "core CEL/HTTP/URL Chromium checks"
+      ],
+      "matchingSourceEntries": 127,
+      "matchingBuildArtifacts": 8,
+      "differentSourceInventoryEntries": [
+        "package-lock.json",
+        "package.json"
+      ],
+      "reason": "All core recorded source/test/build inputs match except root workspace manifest and lockfile additions. Core code, runtime dependencies and all eight dist artifacts are unchanged. Existing installed dependency versions/integrities match; Node 22 full core and changed README tarball consumption rerun."
+    }
+  },
+  "playgroundReuse": {
+    "record": "docs/handoff/playground-verification-results.json",
+    "node": [
+      "22.21.1",
+      "24.1.0"
+    ],
+    "passedEach": 41,
+    "matchingSourceEntries": 10,
+    "differentConfigurationEntries": [
+      "package.json",
+      "package-lock.json",
+      ".github/workflows/core.yml",
+      ".gitignore"
+    ],
+    "reason": "All playground sources and tests match; root config changes only add Svelte scripts/dependencies/CI step/ignored reports. Existing lockfile dependency versions/integrities and core build bytes are unchanged. Prior playground browser evidence reused, not reported as reexecuted."
+  },
+  "dependencyChanges": {
+    "added": [
+      "svelte@5.57.3",
+      "svelte-check@4.7.8",
+      "@sveltejs/package@2.5.8",
+      "@viewstem/svelte workspace"
+    ],
+    "existingLockEntriesCompared": 41,
+    "existingDependencyVersionOrIntegrityChanges": [],
+    "toolingChoice": "@sveltejs/package 3.0.2 install was rejected by its TypeScript 6 peer requirement. 2.5.8 preserves existing TypeScript 5.9.3 without forced peer bypass.",
+    "singleImport": "@viewstem/core@0.1.0 moved from Svelte peerDependencies to dependencies; svelte remains a peer. Root lockfile updated and npm ci --ignore-scripts passed. No existing dependency version/integrity changes."
+  },
+  "ci": {
+    "file": ".github/workflows/core.yml",
+    "nodeMatrix": [
+      "22.21.1",
+      "24.1.0"
+    ],
+    "newStep": "npm run check:svelte",
+    "prerequisites": "npm ci --ignore-scripts and Playwright Chromium installation already precede it",
+    "remoteExecution": "not run; local matching commands passed"
+  },
+  "sourceSha256": {
+    "packages/svelte/README.md": "69625d58b6f3a982baefc9ea7b607af2512d4e57fd6b1ac6924069c2cb980f4b",
+    "packages/svelte/example/App.svelte": "f6cee19df960f2319623b2533c936f53091868f846e83fd64a1943251578c6dc",
+    "packages/svelte/example/README.md": "93e7fdf4cc3039f292ed85b2c6b045a1f954eb1a7568795505f936197a51cd98",
+    "packages/svelte/example/adapters/Button.svelte": "ec02e83b4a7c9b90683d18202eb32a91769f64d8192f2eb8b5a23c77aa10a685",
+    "packages/svelte/example/adapters/Input.svelte": "9547868d2b0bdbc12c8bc9dd1175dbd0142311cf02f051c2a03735f45abf1c05",
+    "packages/svelte/example/adapters/Label.svelte": "cb2cba14e4eea228816f9ae2718a673572bb490007533361aca0db324ac69952",
+    "packages/svelte/example/adapters/Stack.svelte": "caaa261f46dbcc8a97deef54c6e177495db5ad589c124dde36c1b1a377c228f0",
+    "packages/svelte/example/definition.ts": "5b52914f45b4f96421e2048ff6bbf9db55a960f95530ea27aed12053064eb247",
+    "packages/svelte/example/index.html": "3da24079d4beeb44b4e709a6a15b4366e4ef84c487cfe4d137182acbd72634c2",
+    "packages/svelte/example/main.mjs": "a37894c361ec6f5343d427ac23cdceaa4d3b6977c3e054a0bfd254adf4774a0a",
+    "packages/svelte/example/server.mjs": "bb6f802fd4399dcbc54f3349442533212172ec7baac4e3ac4bcfbb1ae12cc8bc",
+    "packages/svelte/example/tsconfig.json": "36ec00b96cd10761c4b2b87014449f8571a770117b8b48ce6880fdd21302235a",
+    "packages/svelte/package.json": "b97313f60cc90c3dd0646f6945a8332c6ffde19aa2e117f51c326e5a8b94f458",
+    "packages/svelte/scripts/run-tests.mjs": "ae35d3eedff0eb155af5bb973b01d22a763a4908d65d3fd70be8c2e44ab7ee93",
+    "packages/svelte/scripts/test-package.mjs": "13a26dc2b77784497583403e48b042774f47a04ec658054acf7a33a0a2a3bac8",
+    "packages/svelte/src/lib/ConnectedView.svelte": "2f753641d1156aa821345da8fec9b5e581b9155f2ebf24083192ba8297b9cb7b",
+    "packages/svelte/src/lib/NodeList.svelte": "f76c5b749bf3aa4f508ef13b770e4a4b19653acee0fcb4b9a2af615a3e576cec",
+    "packages/svelte/src/lib/RenderNode.svelte": "1deba2bc324fa7f70c34b768d7a68744a67751e30e61a05579c46ffacbe88345",
+    "packages/svelte/src/lib/ViewstemView.svelte": "68c97a05524dc2c0611422e283347f1d5539f87cd73e41b26d9cd729d13b0612",
+    "packages/svelte/src/lib/connection.ts": "a5455bafd4e06db0629e0778b68baabc470f9e36da542915f840045782224c4b",
+    "packages/svelte/src/lib/index.ts": "d5ed75ceb5cecc43005bb1b96c9c22204c9619371805f8e31d08dc33f1881463",
+    "packages/svelte/src/lib/renderer.ts": "ae1a05b0501a4f5ab9b8f793b5eb6c9f67f65418cffa4a467ab6a137d7b07cfc",
+    "packages/svelte/src/lib/types.ts": "b68465f00721525e9bd3ff108ffa4a4b7079445bd6b3fd09b27cf72123a8f325",
+    "packages/svelte/test/browser-fixture.mjs": "266c801ed7088ebf5805eac1dd76a67c62ca1fe94f2e5acb148343c3a0c16697",
+    "packages/svelte/test/browser-harness.mjs": "6b77feb99554ebb909a71892276e97a41d4ac9ed67c17a0bb35cb093e40eebbb",
+    "packages/svelte/test/browser.test.mjs": "fdf4ad9f7d11e54470cace4d9c1b2a68523031fad4b24979437629238ba434de",
+    "packages/svelte/test/fixtures/Crash.svelte": "15d4dbf5c33b6690d0dff80a65334a2d1f751048149acf1cd8fba8228abbade2",
+    "packages/svelte/test/fixtures/Host.svelte": "a745ebc464922ea043ed691d8d0d71f7d544701776123c99c67def2d9540b1c2",
+    "packages/svelte/test/fixtures/Layout.svelte": "ab8d37ed6fd847dbd5a6d22cbfd51f95d8d36cfd92c6a97845e88a5ea702d534",
+    "packages/svelte/test/fixtures/Probe.svelte": "64068702ca4774c8f9cd8358e362529382a84820a8eb19050a8426f1dc9719ab",
+    "packages/svelte/test/fixtures/Reentrant.svelte": "680ae093dbb178f74b3d330ce493dfa7cc8443f4c607709235e182a784c56a32",
+    "packages/svelte/test/fixtures/observations.mjs": "13a636f47318b7a3f181cbd83ad97db0e5bf59ec290f00c0c11c9f66611b2cd0",
+    "packages/svelte/test/types/TypedAdapter.svelte": "dba271324a208936bbf33b5d3eee09aba33bcb3839dc06b090f41892f702c42a",
+    "packages/svelte/test/types/TypedHost.svelte": "571a721764eff327169f65fcc0bee69a22d3fbb1d18d7bb5c9dbe54eb3cc2cb1",
+    "packages/svelte/test/types/consumer.ts": "085f750b5d48c47a8e05592434df50c577b1132b782846c105133ab7ad471a23",
+    "packages/svelte/tsconfig.json": "d93409c29ffd22ff649dbfece1571fa316c7fa45dd6fae646f0193311b6bf73b",
+    "package.json": "4bbb8078eb8a2f310ed20d3348c96c0144f1242b1cc3c7743c858531009d5286",
+    "package-lock.json": "47db3594259a11cc121ddcddc23eaa0af0549fc381868e81757dd789231207e6",
+    ".github/workflows/core.yml": "1ed09a016eae8ef996ab6a05e94f04cc1c9682f7b097d745a973b9d482108d25",
+    ".gitignore": "9e9fe2c004022c40b9c4a583eac651f79f6573c74aa237933a018549d76147b1"
+  },
+  "artifactSha256": {
+    "packages/svelte/dist/ConnectedView.svelte": "2f753641d1156aa821345da8fec9b5e581b9155f2ebf24083192ba8297b9cb7b",
+    "packages/svelte/dist/ConnectedView.svelte.d.ts": "9eb7f17ede6ad2c850d8a023ab2c779a79b8860ba3e6c8f2725d419dde4d6cea",
+    "packages/svelte/dist/NodeList.svelte": "f76c5b749bf3aa4f508ef13b770e4a4b19653acee0fcb4b9a2af615a3e576cec",
+    "packages/svelte/dist/NodeList.svelte.d.ts": "4d054feb0521b264e2d0db253cfe5fbb1d384152e61d6fba1041d82a80b88296",
+    "packages/svelte/dist/RenderNode.svelte": "1deba2bc324fa7f70c34b768d7a68744a67751e30e61a05579c46ffacbe88345",
+    "packages/svelte/dist/RenderNode.svelte.d.ts": "737a669559cc025578e9acc6ffd8f2aa31fa3e7f90e838ea8dbddfaf7731cdef",
+    "packages/svelte/dist/ViewstemView.svelte": "68c97a05524dc2c0611422e283347f1d5539f87cd73e41b26d9cd729d13b0612",
+    "packages/svelte/dist/ViewstemView.svelte.d.ts": "5aa920c4928532be9bda2221d15e8b85c94492f523fe7dbc77e833ab80006ead",
+    "packages/svelte/dist/connection.d.ts": "90f9ce52f50c1142a654495d8aa67b629ec56675d8bf6bd5bec69eb968f6e8f1",
+    "packages/svelte/dist/connection.js": "199c8ea73676bb86c83e1aa61b9b05af669dd5277468684ca612964febcc68b6",
+    "packages/svelte/dist/index.d.ts": "03e827d74bead8b2181795ce050c870683408ca8a8b7b6ad983b695a5ec71cb4",
+    "packages/svelte/dist/index.js": "d247499641defd1bab1bdc03574ea6b0a1b17e745b7adafea60c4803fa2c0a78",
+    "packages/svelte/dist/renderer.d.ts": "c7edcd2fc894f03d4729870e50119797b65240f3cdcc0dee6a7e19cf64011892",
+    "packages/svelte/dist/renderer.js": "64d39305e8732116a844edfc9ba61ae1bd20cbfa09e0f31249e8dc46d60e7fac",
+    "packages/svelte/dist/types.d.ts": "e68e5e0a9ad5d3e429270f892dfaa8ec286462c4dc8a25486646d81682538d7a",
+    "packages/svelte/dist/types.js": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
+  },
+  "limitations": [
+    "Svelte 5 client rendering only; Svelte 4 and SSR/hydration runtime transfer are outside this implementation scope",
+    "No default UI components, Grid/charts, themes, design system or company-specific contracts",
+    "Chromium only; programmatic Korean fill is not physical IME/mobile verification; no operating-load performance claim",
+    "Adapter code controls native control accessibility, composition handling and presentation of incomplete inputs",
+    "Direct ViewstemView hosts must configure the Svelte root error policy; the exported transformError is shown and tested. Arbitrary host component code is not sandboxed",
+    "Host-owned async resourceResolver abort/timeout is not renderer-owned; dispose awaits late mount cleanup",
+    "No push, remote CI, npm publication, license or scope ownership resolution"
+  ],
+  "publication": "Local implementation and verification only",
+  "documentation": {
+    "result": "All relative Markdown file destinations in changed/new documentation resolve; historical record links preserved",
+    "filesChecked": 12,
+    "destinationsChecked": 340,
+    "sha256": {
+      "README.md": "06432fddaadcc94ac4611a855742207b438b9aab528fc4142bb23584a6edb42f",
+      "docs/README.md": "457a951b1f7952002d9573dc9329ec9446bb45a46748524b57e84c51fda2a38c",
+      "docs/VIEWSTEM-SPEC.md": "fd9eea34d2abe5d5565c6496d0b34ebeb29337622888c936f50316dda29c7b75",
+      "docs/handoff/implementation-start.md": "a62ccf2a2a92b4e135f4b6b403b7fa073ea24bdaa9255599418dac9faed7ae61",
+      "docs/handoff/open-contracts.md": "5d856f6b1deaa61217f556a515288a574943e7bc06735fc1a6b897bccbd67f11",
+      "docs/history/decision-register.md": "ebc4f901e3faa96e83dba0ce0f38c810e46accac1c2dc076fbfe7cf0cef11735",
+      "docs/history/evidence-index.md": "b1c28609307f22dcc11e5b64b800c1ba3d76a85e497fddc76b3cbceecf46cb35",
+      "docs/spec/07-host-integration.md": "831175cd3694a330693b7e266126c6794fad76125d9ccc3397e686dd10cd1883",
+      "packages/core/README.md": "5aa09418e4f424243cb6f8f90af27f81e50c4adb3b1a9dd65788faea0a4c24e7",
+      "docs/handoff/svelte-implementation-2026-11-02.md": "1c1304c76305ab4ca743c49f2d3f58e07c6b7476f26fe6a2c9415409ffd637ec",
+      "packages/svelte/README.md": "69625d58b6f3a982baefc9ea7b607af2512d4e57fd6b1ac6924069c2cb980f4b",
+      "packages/svelte/example/README.md": "93e7fdf4cc3039f292ed85b2c6b045a1f954eb1a7568795505f936197a51cd98"
+    }
+  },
+  "singleImportFollowup": {
+    "decision": "U40 / D96",
+    "api": [
+      "createRenderer",
+      "Renderer",
+      "RendererOptions",
+      "Adapter",
+      "transformError",
+      "renderer.registry",
+      "type-only core contract exports"
+    ],
+    "ownership": "Default Runtime is owned; injected Runtime is borrowed; supplied StateStore and foreign Views survive disposal. Owned Runtime cancels Query/Action including direct runtime.mount Views. Pending renderer.mount cleanup is awaited.",
+    "newTests": [
+      "default renderers own independent runtimes and expose their empty registries",
+      "owned runtime disposal cancels direct View Query and Action execution with reentrant abort cleanup",
+      "owned runtime preserves supplied Store and independently owned Views attached to its renderer",
+      "owned runtime disposal waits for a delayed resolver then releases the target without mounting",
+      "runtime injection rejects conflicting creation options without changing the injected runtime"
+    ],
+    "previousVerification": {
+      "stage": "U39 before single-import bootstrap and API rename",
+      "record": "packages/svelte/test/results/before-bootstrap/verification-results.json",
+      "recordSha256": "37ea816be48c173ea1a8389cd8f4c6918a6e9523d6f41f42781c43fe38a6674b",
+      "browser": [
+        {
+          "nodeVersion": "v22.21.1",
+          "passed": 19,
+          "failed": 0,
+          "skipped": 0,
+          "todo": 0,
+          "testIdentitySha256": "0f8be678cf9ad62f62fe78c968544b6fb824963379699424dd630c3f4102b18a"
+        },
+        {
+          "nodeVersion": "v24.1.0",
+          "passed": 19,
+          "failed": 0,
+          "skipped": 0,
+          "todo": 0,
+          "testIdentitySha256": "0f8be678cf9ad62f62fe78c968544b6fb824963379699424dd630c3f4102b18a"
+        }
+      ],
+      "package": [
+        {
+          "nodeVersion": "v22.21.1",
+          "svelteVersion": "5.57.3",
+          "files": [
+            "README.md",
+            "dist/ConnectedView.svelte",
+            "dist/ConnectedView.svelte.d.ts",
+            "dist/connection.d.ts",
+            "dist/connection.js",
+            "dist/index.d.ts",
+            "dist/index.js",
+            "dist/NodeList.svelte",
+            "dist/NodeList.svelte.d.ts",
+            "dist/renderer.d.ts",
+            "dist/renderer.js",
+            "dist/RenderNode.svelte",
+            "dist/RenderNode.svelte.d.ts",
+            "dist/types.d.ts",
+            "dist/types.js",
+            "dist/ViewstemView.svelte",
+            "dist/ViewstemView.svelte.d.ts",
+            "package.json"
+          ],
+          "integrity": "sha512-Vh13lTwwIeCGroQNq5K8UyFPbzDCR2XaUk1nJmO3+dRO0z3s9eOBbYwOloBIEMIeAQMgowaoxrsxnV+lE4bdPA==",
+          "bytes": 10617,
+          "unpackedBytes": 31715,
+          "types": "passed",
+          "browser": "passed",
+          "errors": [],
+          "rawReport": "packages/svelte/test/results/before-bootstrap/package-node22.json",
+          "rawReportSha256": "052bf416ce2ff1cc036464035a3b827c71871673de1ec0636720c9cc36d8a950"
+        },
+        {
+          "nodeVersion": "v24.1.0",
+          "svelteVersion": "5.57.3",
+          "files": [
+            "README.md",
+            "dist/ConnectedView.svelte",
+            "dist/ConnectedView.svelte.d.ts",
+            "dist/connection.d.ts",
+            "dist/connection.js",
+            "dist/index.d.ts",
+            "dist/index.js",
+            "dist/NodeList.svelte",
+            "dist/NodeList.svelte.d.ts",
+            "dist/renderer.d.ts",
+            "dist/renderer.js",
+            "dist/RenderNode.svelte",
+            "dist/RenderNode.svelte.d.ts",
+            "dist/types.d.ts",
+            "dist/types.js",
+            "dist/ViewstemView.svelte",
+            "dist/ViewstemView.svelte.d.ts",
+            "package.json"
+          ],
+          "integrity": "sha512-Vh13lTwwIeCGroQNq5K8UyFPbzDCR2XaUk1nJmO3+dRO0z3s9eOBbYwOloBIEMIeAQMgowaoxrsxnV+lE4bdPA==",
+          "bytes": 10617,
+          "unpackedBytes": 31715,
+          "types": "passed",
+          "browser": "passed",
+          "errors": [],
+          "rawReport": "packages/svelte/test/results/before-bootstrap/package-node24.json",
+          "rawReportSha256": "bec00cc1f58de29dbd8385d35fa4de5b474c7fc4c2d90068f750934104894faa"
+        }
+      ],
+      "sourceSha256": {
+        "packages/svelte/README.md": "c86416ce7f57fc55c8258eae2956187691752d8ecd995da70b1e6ebaed523642",
+        "packages/svelte/example/App.svelte": "535e1fe83d663d2ba3b9503a134cb6cd32d69e82a101f0ce19a120297ef16c18",
+        "packages/svelte/example/README.md": "a3c8ca903045d9626a2ad7604c84fd0add519157c1b5159c21ee9e1edb8bd983",
+        "packages/svelte/example/adapters/Button.svelte": "ec02e83b4a7c9b90683d18202eb32a91769f64d8192f2eb8b5a23c77aa10a685",
+        "packages/svelte/example/adapters/Input.svelte": "9547868d2b0bdbc12c8bc9dd1175dbd0142311cf02f051c2a03735f45abf1c05",
+        "packages/svelte/example/adapters/Label.svelte": "cb2cba14e4eea228816f9ae2718a673572bb490007533361aca0db324ac69952",
+        "packages/svelte/example/adapters/Stack.svelte": "caaa261f46dbcc8a97deef54c6e177495db5ad589c124dde36c1b1a377c228f0",
+        "packages/svelte/example/definition.ts": "965ad2ce0aa017cd67f594ff4152d4e1d16628e9204f12424c04210bae04d082",
+        "packages/svelte/example/index.html": "3da24079d4beeb44b4e709a6a15b4366e4ef84c487cfe4d137182acbd72634c2",
+        "packages/svelte/example/main.mjs": "fbda774702ee4ed5aa0f4ad40a9d3a44ee504a21f188a676c60954d1021a0272",
+        "packages/svelte/example/server.mjs": "bb6f802fd4399dcbc54f3349442533212172ec7baac4e3ac4bcfbb1ae12cc8bc",
+        "packages/svelte/example/tsconfig.json": "36ec00b96cd10761c4b2b87014449f8571a770117b8b48ce6880fdd21302235a",
+        "packages/svelte/package.json": "3fb13e5003504fb53c8ec87a20823c3de38b45fd757cc7fb158fb0c58b9825f6",
+        "packages/svelte/scripts/run-tests.mjs": "ae35d3eedff0eb155af5bb973b01d22a763a4908d65d3fd70be8c2e44ab7ee93",
+        "packages/svelte/scripts/test-package.mjs": "410d2485b237d86ce46b6f2ff2aa860f0c4296a8f53fc2be782f0f10765f31e3",
+        "packages/svelte/src/lib/ConnectedView.svelte": "2f753641d1156aa821345da8fec9b5e581b9155f2ebf24083192ba8297b9cb7b",
+        "packages/svelte/src/lib/NodeList.svelte": "f76c5b749bf3aa4f508ef13b770e4a4b19653acee0fcb4b9a2af615a3e576cec",
+        "packages/svelte/src/lib/RenderNode.svelte": "1deba2bc324fa7f70c34b768d7a68744a67751e30e61a05579c46ffacbe88345",
+        "packages/svelte/src/lib/ViewstemView.svelte": "68c97a05524dc2c0611422e283347f1d5539f87cd73e41b26d9cd729d13b0612",
+        "packages/svelte/src/lib/connection.ts": "7684f8864446903e23d6d6968edb7cf38254632d956d47261f016cc991e7970b",
+        "packages/svelte/src/lib/index.ts": "3c8fdc482eb65e2d23c19ebe5ed9fe9c85649b2a3323008596f11d17d66e1fb9",
+        "packages/svelte/src/lib/renderer.ts": "d32209026ee830f65d17369d1155f1d9c0fef5b101dbb3c2445c25f6b659b787",
+        "packages/svelte/src/lib/types.ts": "d15a16cd31235883328f9533d0888653c4b7b39b6d08450d2dab81573eee4db3",
+        "packages/svelte/test/browser-fixture.mjs": "a91db025c033acf766ebdf6cbcec74beb86253e88e6a4e4bd03b86825045df7e",
+        "packages/svelte/test/browser-harness.mjs": "6b77feb99554ebb909a71892276e97a41d4ac9ed67c17a0bb35cb093e40eebbb",
+        "packages/svelte/test/browser.test.mjs": "dd40f3b0b2578b5b7bad22a05cdeea9217c6babc8f47d09faee9ed1ac66381fb",
+        "packages/svelte/test/fixtures/Crash.svelte": "15d4dbf5c33b6690d0dff80a65334a2d1f751048149acf1cd8fba8228abbade2",
+        "packages/svelte/test/fixtures/Host.svelte": "a745ebc464922ea043ed691d8d0d71f7d544701776123c99c67def2d9540b1c2",
+        "packages/svelte/test/fixtures/Layout.svelte": "ab8d37ed6fd847dbd5a6d22cbfd51f95d8d36cfd92c6a97845e88a5ea702d534",
+        "packages/svelte/test/fixtures/Probe.svelte": "64068702ca4774c8f9cd8358e362529382a84820a8eb19050a8426f1dc9719ab",
+        "packages/svelte/test/fixtures/Reentrant.svelte": "680ae093dbb178f74b3d330ce493dfa7cc8443f4c607709235e182a784c56a32",
+        "packages/svelte/test/fixtures/observations.mjs": "13a636f47318b7a3f181cbd83ad97db0e5bf59ec290f00c0c11c9f66611b2cd0",
+        "packages/svelte/test/types/TypedAdapter.svelte": "dba271324a208936bbf33b5d3eee09aba33bcb3839dc06b090f41892f702c42a",
+        "packages/svelte/test/types/TypedHost.svelte": "eec056a9e4ec807e84603c7df7d0ed8ffa260a83139606296a2260e768e2ec08",
+        "packages/svelte/test/types/consumer.ts": "f576d5a2b95ea1730b701289b5df1f4446952f3ed7339af18d58786a4043adc0",
+        "packages/svelte/tsconfig.json": "d93409c29ffd22ff649dbfece1571fa316c7fa45dd6fae646f0193311b6bf73b",
+        "package.json": "4bbb8078eb8a2f310ed20d3348c96c0144f1242b1cc3c7743c858531009d5286",
+        "package-lock.json": "82ba999adaf2f359303bd2ea181bc6e5e1ce4a1e83dc570a5f43f09408a8b61b",
+        ".github/workflows/core.yml": "1ed09a016eae8ef996ab6a05e94f04cc1c9682f7b097d745a973b9d482108d25",
+        ".gitignore": "9e9fe2c004022c40b9c4a583eac651f79f6573c74aa237933a018549d76147b1"
+      },
+      "artifactSha256": {
+        "packages/svelte/dist/ConnectedView.svelte": "2f753641d1156aa821345da8fec9b5e581b9155f2ebf24083192ba8297b9cb7b",
+        "packages/svelte/dist/ConnectedView.svelte.d.ts": "9eb7f17ede6ad2c850d8a023ab2c779a79b8860ba3e6c8f2725d419dde4d6cea",
+        "packages/svelte/dist/NodeList.svelte": "f76c5b749bf3aa4f508ef13b770e4a4b19653acee0fcb4b9a2af615a3e576cec",
+        "packages/svelte/dist/NodeList.svelte.d.ts": "4d054feb0521b264e2d0db253cfe5fbb1d384152e61d6fba1041d82a80b88296",
+        "packages/svelte/dist/RenderNode.svelte": "1deba2bc324fa7f70c34b768d7a68744a67751e30e61a05579c46ffacbe88345",
+        "packages/svelte/dist/RenderNode.svelte.d.ts": "737a669559cc025578e9acc6ffd8f2aa31fa3e7f90e838ea8dbddfaf7731cdef",
+        "packages/svelte/dist/ViewstemView.svelte": "68c97a05524dc2c0611422e283347f1d5539f87cd73e41b26d9cd729d13b0612",
+        "packages/svelte/dist/ViewstemView.svelte.d.ts": "5aa920c4928532be9bda2221d15e8b85c94492f523fe7dbc77e833ab80006ead",
+        "packages/svelte/dist/connection.d.ts": "18fa33f63b4376ca258e0f5754cb4f94496ab7a2a125d57d97047737c51067f9",
+        "packages/svelte/dist/connection.js": "0dba23b53ec660d2432239010a7d2e8978f520dd80066e8e4cd04a5dfc9a05f9",
+        "packages/svelte/dist/index.d.ts": "fcf953a9cb03554c68c991cd6221b185cdf2df951f5f1d0a7ef8956156fdfd5c",
+        "packages/svelte/dist/index.js": "ea2fccdf9e802d0eb97077a4206c99436f56a871a269862e799f1ecc1c3c842e",
+        "packages/svelte/dist/renderer.d.ts": "afe2a71196b31951349c68335646aeacfd8804fa48dcb7699c353c25b752567d",
+        "packages/svelte/dist/renderer.js": "abdb891c865c09531c8b245d936b01f89ac28daec20c70ca3b35a18aba66e2c8",
+        "packages/svelte/dist/types.d.ts": "298df10aafad2d2a43a6089f0175bcff6fd8c5a3defee11dad396f5720545292",
+        "packages/svelte/dist/types.js": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
+      },
+      "rawReports": "Original node22/node24/package/example reports and screenshots preserved under packages/svelte/test/results/before-bootstrap (ignored local evidence). Summary and original hashes retained here."
+    },
+    "firstRun": {
+      "nodeVersion": "v22.21.1",
+      "passed": 23,
+      "failed": 1,
+      "skipped": 0,
+      "todo": 0,
+      "failures": [
+        {
+          "file": "packages/svelte/test/browser.test.mjs",
+          "name": "default renderers own independent runtimes and expose their empty registries",
+          "message": "Expected values to be strictly equal:\n+ actual - expected\n\n+ 'REFERENCE_NOT_FOUND'\n- 'CANCELLED'\n"
+        }
+      ],
+      "rawReport": "packages/svelte/test/results/before-bootstrap/bootstrap-first-run-node22.json",
+      "rawReportSha256": "4a9bb5b35ba7db524081aba5fc119aacb227ffa978d1dbc8d787ae1da9a274c8",
+      "resolution": "Test expectation corrected: disposed State scope lookup is REFERENCE_NOT_FOUND, not CANCELLED. Runtime mount and pending Query/Action cancellation remain CANCELLED. No core change."
+    },
+    "coreEvidenceReuse": {
+      "sourceMatches": 127,
+      "artifactMatches": 8,
+      "differentRootConfiguration": [
+        "package.json",
+        "package-lock.json"
+      ],
+      "existingDependencyChanges": [],
+      "coreRuntimeSourceChanges": []
+    },
+    "example": {
+      "url": "http://127.0.0.1:4174/",
+      "driver": "cua_repl in-app browser",
+      "checks": [
+        "Initial input Svelte and greeting visible",
+        "Set input to 한글 테스트 → 안녕하세요, 한글 테스트!",
+        "Empty input → 이름을 입력하세요.",
+        "Click 초기화 → input Svelte and greeting restored",
+        "Screenshot inspected; no missing controls, overlap or visible error"
+      ],
+      "screenshot": "packages/svelte/test/results/example-bootstrap.png",
+      "screenshotSha256": "82a395d706eb008daa46369b599b6acb0c3e8b2feae76a8cb119dc9a55e9727b",
+      "limitations": [
+        "Programmatic setValue does not verify physical Korean IME",
+        "Previous responsive and HTTP route checks reused; styles, server and adapter implementations are unchanged"
+      ]
+    },
+    "install": {
+      "command": "npm ci --ignore-scripts --no-audit --no-fund",
+      "result": "passed",
+      "log": "packages/svelte/test/results/install-bootstrap.log",
+      "sha256": "f311cdabd2e3a11ffc54a6833216b003b51234b85c1edc5f2687fcba8de80346"
+    },
+    "checkLogs": {
+      "node22": {
+        "path": "packages/svelte/test/results/check-node22.log",
+        "sha256": "07aeaded515e6a5023707fe2a600adb058985b78f5828b51904e91c6a90bef08"
+      },
+      "node24": {
+        "path": "packages/svelte/test/results/check-node24.log",
+        "sha256": "00d610cf07a01176202b02300d48d3fc35ea8e60bf79a95e24cad938e9bdab8c"
+      }
+    },
+    "finalTypeFixtureCheck": {
+      "node22": {
+        "path": "packages/svelte/test/results/types-bootstrap-node22.log",
+        "sha256": "98feed1fbfdcff9eed85228bc5169555e0eeee682849a2489c4ff7a0d39fdaf1",
+        "result": "passed; final TypedHost imports NodeSnapshot and PublicError from @viewstem/svelte"
+      },
+      "node24": {
+        "path": "packages/svelte/test/results/types-bootstrap-node24.log",
+        "sha256": "98feed1fbfdcff9eed85228bc5169555e0eeee682849a2489c4ff7a0d39fdaf1",
+        "result": "passed; final TypedHost imports NodeSnapshot and PublicError from @viewstem/svelte"
+      }
+    }
+  },
+  "publicApiFollowup": {
+    "record": "docs/handoff/public-api-verification-results.json",
+    "scope": "U41 public API refactor and current-source regression rerun",
+    "historicalEvidence": "Earlier results and hashes in this file remain evidence for their recorded source snapshot; do not apply them to the refactored package."
+  }
+}

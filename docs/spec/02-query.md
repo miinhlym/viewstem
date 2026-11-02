@@ -240,7 +240,7 @@ U31의 [재개 정책 검증](../handoff/t2-polling-resume-2026-10-30.md)은 즉
 
 재시도나 입력 변경으로 waiting/running이 되어도 보존한 쌍을 지우지 않는다. 입력 변경 또는 직전 실패로 stale이 된 결과는 다음 유효한 전체 성공까지 stale을 유지한다. 같은 입력의 정상 갱신 중에는 직전 성공 결과의 stale:false를 유지하며 running이 갱신 중임을 알린다. 새 실행이 실제로 시작하면 이전 error는 null로 지우고, 다음 성공에서 data·dataInputs를 원자 교체하며 stale:false·error:null로 만든다. 새 실패에서는 보존한 쌍을 유지하고 새 error를 기록한다.
 
-현재 입력 B로 실패했는데 보존 data의 dataInputs가 A이면 화면은 이를 A의 이전 결과로 표시해야 한다. 실패하거나 stale인 data를 표시하는 서비스·렌더러는 오류/이전 결과 표시를 함께 제공하며 현재 조건의 최신 성공값으로 표시하지 않는다. dataInputs는 실제 Value 입력만 담고 Store 핸들·secret·Login 응답을 포함하지 않는다. 관찰 경로는 data와 같은 위치의 `dataInputs`·`stale`이고 QueryHandle.snapshot()에서도 동일하다.
+현재 입력 B로 실패했는데 보존 data의 dataInputs가 A이면 화면은 이를 A의 이전 결과로 표시해야 한다. 실패하거나 stale인 data를 표시하는 서비스·렌더러는 오류/이전 결과 표시를 함께 제공하며 현재 조건의 최신 성공값으로 표시하지 않는다. dataInputs는 실제 Value 입력만 담고 Store 핸들·secret·Login 응답을 포함하지 않는다. 관찰 경로는 data와 같은 위치의 `dataInputs`·`stale`이고 QueryHandle.getSnapshot()에서도 동일하다.
 
 보존 data는 실패를 성공으로 바꾸지 않는다. RefreshQuery/refresh/retry를 기다리는 호출은 해당 fresh 실행의 오류를 받고 후속 Action 단계는 중단된다. 명시 Action Query 호출에는 이 대체 결과를 반환하지 않는다. 실패한 실행의 일부 source 결과를 마지막 성공 snapshot에 승격하거나 이전 결과와 섞어 새 성공으로 발표하지 않는다. 입력 불변의 유효 결과 재사용은 아래 E69 범위로 유지한다.
 

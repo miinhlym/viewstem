@@ -6,6 +6,10 @@
 
 제품 증거는 [구현 범위·제한·검토 기록](core-implementation-2026-11-02.md), [인수 항목과 제품 테스트 연결](core-acceptance-coverage.json), [실제 실행 결과](core-verification-results.json)로 나눈다. 이 진행표는 현재 제품 검사 수를 복제하지 않는다. branch-preflight의 발견·수정 전 증거·커밋 상태도 구현 인수인계에서 확인한다.
 
+## U45 Svelte UI 동작 감사 · 2026-11-03
+
+U45의 Svelte UI 동작 감사는 [66개별 검증표](svelte-ui-audit-matrix.md), [수정·검증 인계](svelte-ui-audit-2026-11-03.md), [실행 결과](svelte-ui-audit-verification-results.json)에서 관리한다. 아래 독립 실험 수와 합산하지 않는다.
+
 ## U34–U35 독립 실험 기록
 
 이하 완료 기준·검사 수·잔여는 **U36 인계까지의 과거 기록**이다. 당시 core 미구현·보류 표기를 현재 상태로 적용하지 않는다. 날짜별 T1–T4 결과와 실패 archive는 원래 증거로 유지한다.

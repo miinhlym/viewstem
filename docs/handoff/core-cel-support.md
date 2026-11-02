@@ -5,6 +5,8 @@
 ## 공개 진입점
 
 ```js
+import { compileCel } from '@viewstem/core/cel';
+
 const evaluate = compileCel('size(items) + 1', {
   inputs: { items: { type: 'array', items: { type: 'integer' } } },
   output: { type: 'integer' },
@@ -20,7 +22,7 @@ evaluate({ items: [1, 2] }); // 3 (동기)
 
 ## 값과 스키마
 
-공통 `compileSchema`의 전체 v1 수용 프로필을 사용한다. boolean schema, 로컬 `$ref`/`$defs`, `allOf`/`anyOf`/`oneOf`, `not`, 조건부 schema, union type, 객체 추가 속성, tuple의 `prefixItems`를 실험의 `SCHEMA_OUTSIDE_TYPED_FIXTURE`로 거절하지 않는다. 스키마 admission과 별개로 CEL에서 가능한 실제 연산은 인코딩 타입에 따른다.
+내부 공통 스키마 검증기의 전체 v1 수용 프로필을 사용한다. boolean schema, 로컬 `$ref`/`$defs`, `allOf`/`anyOf`/`oneOf`, `not`, 조건부 schema, union type, 객체 추가 속성, tuple의 `prefixItems`를 실험의 `SCHEMA_OUTSIDE_TYPED_FIXTURE`로 거절하지 않는다. 스키마 admission과 별개로 CEL에서 가능한 실제 연산은 인코딩 타입에 따른다.
 
 - numeric 위치가 모든 가능한 분기에서 integer로 제한되면 JS 안전 정수↔CEL int(BigInt)로 연결한다. `number`는 double이며 값이 우연히 정수여도 int로 바꾸지 않는다. 스키마가 숫자 종류를 결정하지 못하는 `true`, 무타입 schema, integer/number 혼합 분기는 입력 JS number를 double로 인코딩한다. 출력의 명시 integer는 CEL double을, 명시 number는 CEL int를 거절한다. 종류를 정하지 않은 출력은 CEL int를 JS 안전 정수로 복원하며 범위 밖 결과를 거절한다.
 - 객체는 일반 CEL map이므로 `obj.field`/`obj["field"]`를 사용한다. 배열은 표준 list다. CEL map literal은 string key만 가진 공개 객체로 복원하며, native Map을 literal로 암묵 생성하지 않는다.
@@ -51,7 +53,7 @@ timestamp/duration은 내부 CEL 중간값을 계산하는 기능이며 Viewstem
 
 ## 제한과 재현성
 
-기본 `celLimits`: expressionChars=65536, inputNodes=20000, outputNodes=20000, valueBytes=262144, depth=64. 모두 양의 안전 정수이며 알 수 없는 limit은 거절한다. 기본 `cost=100000`, AST node 한도 10000이다. 이 값은 초기 구현 기본값이며 임의 서비스의 보안 상한 또는 실행시간 보장이 아니다.
+기본 `defaultCelLimits`: expressionChars=65536, inputNodes=20000, outputNodes=20000, valueBytes=262144, depth=64. 모두 양의 안전 정수이며 알 수 없는 limit은 거절한다. 기본 `cost=100000`, AST node 한도 10000이다. 이 값은 초기 구현 기본값이며 임의 서비스의 보안 상한 또는 실행시간 보장이 아니다.
 
 입력/출력의 실제 native payload까지 node·UTF-8 byte·depth·cycle을 검사한다. 평가별 비용 예산은 AST 진입·엔진 함수/연산자 인자·비교를 차감하며 native 함수/동등성은 숨겨진 payload graph도 차감한다. cost와 host 결과 크기 초과는 CEL 오류 단락으로 숨겨지지 않는다. 입력과 출력의 각 제한은 별도다. 신뢰된 호스트 콜백 내부의 임의 루프나 단일 JS/Temporal 작업 시간을 선점하지 않는다.
 

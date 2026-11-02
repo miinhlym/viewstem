@@ -911,5 +911,10 @@
       "excluded": "Ignored local reports, screenshots, before-fix source copies and handoff fingerprints remain local.",
       "publication": "Local commits only; no push, remote CI execution or package publication."
     }
+  },
+  "publicApiFollowup": {
+    "record": "docs/handoff/public-api-verification-results.json",
+    "scope": "U41 public API refactor and current-source regression rerun",
+    "historicalEvidence": "Earlier results and hashes in this file remain evidence for their recorded source snapshot; do not apply them to the refactored package."
   }
 }

@@ -1,0 +1,199 @@
+{
+  "date": "2026-11-03",
+  "verifiedAt": "2026-11-03T03:38:46.591Z",
+  "scope": "Kind-based navigation and editing of a single ViewSpec in the existing Svelte UI gallery. No runtime, public API, dependency or package build changes.",
+  "platform": {
+    "system": "Darwin",
+    "release": "24.6.0",
+    "architecture": "arm64",
+    "chromium": "151.0.7922.34"
+  },
+  "runs": [
+    {
+      "node": "v22.21.1",
+      "command": "npm test -w @viewstem/svelte-ui",
+      "passed": 44,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0,
+      "tests": [
+        "IME draft survives unrelated projection and commits once; update, replace and disposal preserve lifetimes",
+        "when, repeat and State writes update existing inputs; replaced callbacks cannot mutate the new lifetime",
+        "child slot preserves native trigger events, focus return and portal theme without a host CSS reset",
+        "invalid union mode and executable URL become renderer diagnostics; corrected input recovers",
+        "native Calendar date values round trip and external null clears the selection",
+        "missing inputs defer native mount and invalid inputs disable the retained control until recovery",
+        "catalog fixtures account for each upstream family and public component binding",
+        "all 66 JSON examples render their expected UI through installed package exports",
+        "gallery Action, Korean input, Query and rejected JSON use the live View",
+        "modal child triggers, menu portals and selection use native controls",
+        "host namespace exposes calendar and chart parts inside their native scoped contexts",
+        "gallery panels use the viewport and keep the inspector scrollable on desktop and narrow screens",
+        "Accordion, Collapsible and Tabs change both Core State and visible content",
+        "Checkbox, Switch, Radio and Slider forward user input to Core State",
+        "Toggle, Toggle Group, Input OTP and Native Select keep controlled values",
+        "Carousel navigation moves the native Embla track",
+        "Resizable drag and Sidebar toggling change the layout",
+        "Navigation Menu and Questionnaire expose their next action through native controls",
+        "Code Block copies content, Message Scroller returns to the end and Trace expands",
+        "every section of all 71 examples round trips without changing the ViewSpec",
+        "nested declarations are indexed by scope, literal data is ignored, and escaped keys cannot pollute prototypes",
+        "State and Action edits retain other kinds and run as one ViewSpec",
+        "Query and Component sections retain their input bindings and alter the actual preview",
+        "invalid JSON blocks section changes without losing the draft or the running preview",
+        "section navigation supports keyboard, URL reload, and narrow screens",
+        "command IME commits the final Korean value once (immediate final input)",
+        "command IME commits the final Korean value once (delayed final input)",
+        "otp IME commits the final Korean value once (immediate final input)",
+        "otp IME commits the final Korean value once (delayed final input)",
+        "OTP IME respects the native maximum length rule",
+        "OTP IME respects the native numeric pattern rule",
+        "OTP IME respects the native completion after composition rule",
+        "Combobox search and choice commit through a Viewstem Action",
+        "DatePicker returns date-only single values and complete ranges",
+        "DataTable controls round-trip pagination, sorting, filter and row selection",
+        "Chart produces SVG marks for every recipe kind and Typography preserves semantics",
+        "Notifications isolate duplicate logical IDs and remove disposed toaster instances",
+        "five full-screen examples are serializable, addressable and switch back to the 66 component samples",
+        "profile validation, tabs and settings persist through Actions and restore resets the example",
+        "customer filters, Query results and modal additions share the same State",
+        "booking requires a name and captures the selected room, date and time before cancellation",
+        "dashboard periods refresh Query metrics and chart geometry without remounting the gallery",
+        "pricing uses plan, billing period and keyboard-adjusted seats, preserving a saved quote snapshot",
+        "screen examples fit narrow layouts and retain functional controls in dark mode"
+      ]
+    },
+    {
+      "node": "v24.1.0",
+      "command": "node --test --test-concurrency=1 packages/svelte-ui/test/catalog.browser.mjs packages/svelte-ui/test/scenarios.browser.mjs packages/svelte-ui/test/definition-sections.browser.mjs",
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    {
+      "node": "v22.21.1",
+      "command": "node --test packages/svelte-ui/test/definition-sections.browser.mjs",
+      "stage": "Final regression test source after strengthening the authoring-data preservation assertion.",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0,
+      "tests": [
+        "every section of all 71 examples round trips without changing the ViewSpec",
+        "nested declarations are indexed by scope, literal data is ignored, and escaped keys cannot pollute prototypes",
+        "State and Action edits retain other kinds and run as one ViewSpec",
+        "Query and Component sections retain their input bindings and alter the actual preview",
+        "invalid JSON blocks section changes without losing the draft or the running preview",
+        "section navigation supports keyboard, URL reload, and narrow screens"
+      ]
+    }
+  ],
+  "coverage": {
+    "roundTrip": "Every indexed section in all 66 component examples and 5 screen examples retains the full ViewSpec and does not mutate the fixture.",
+    "nesting": [
+      "inline Component State/Derived/Query/render",
+      "slots and event Action bindings",
+      "Action/Query/Variable calls inside If",
+      "Query Datasource sources",
+      "literal data excluded",
+      "JSON Pointer escaping and inherited-property rejection"
+    ],
+    "browser": [
+      "State and Action edits applied together to real preview",
+      "Query inputs retained and data table updated",
+      "Component edit and full JSON synchronization",
+      "invalid JSON preserves editor selection, text and running preview",
+      "restore retains selected kind when available",
+      "keyboard tabs, URL reload and 390x844 layout"
+    ],
+    "existing": "Full Node 22 UI suite, including 66-family catalog, input/IME, overlays, chart/calendar and five screen interactions; affected gallery suites repeated on Node 24."
+  },
+  "manual": {
+    "browser": "IAB",
+    "url": "http://127.0.0.1:4175/?example=profile&section=State",
+    "observed": [
+      "Kind tabs and counts",
+      "Individual State selector and source JSON path",
+      "Full-height editor alongside running profile preview and inspector"
+    ]
+  },
+  "packageEvidenceReuse": {
+    "record": "svelte-ui-shadcn-verification-results.json",
+    "reason": "Package source and built bytes match the previously verified U44 runtime. Existing type, tarball and reproduction evidence retained; gallery compilation and browser behavior rechecked.",
+    "sourceTrees": {
+      "core": {
+        "files": 30,
+        "sha256": "9fc1c3b990b4031648d71f2654e163bc5ba7ad68a5cc1f3bc0b77aa48f683c5f",
+        "unchangedFromU44": true
+      },
+      "svelte": {
+        "files": 8,
+        "sha256": "6c3292bccb1eb46917552a7120c4f585e773f9311f9b0b8ea1edd3b05542659c",
+        "unchangedFromU44": true
+      },
+      "svelte-ui": {
+        "files": 567,
+        "sha256": "d85307069d65411381b096db49764cc1c94cc90cae86d85ceffe393c9d824f05",
+        "unchangedFromU44": true
+      }
+    },
+    "builds": {
+      "core": {
+        "files": 17,
+        "unchangedFromU44": true
+      },
+      "svelte": {
+        "files": 16,
+        "unchangedFromU44": true
+      },
+      "svelte-ui": {
+        "files": 1113,
+        "unchangedFromU44": true
+      }
+    }
+  },
+  "changedFiles": [
+    {
+      "path": "packages/svelte-ui/example/definition-sections.mjs",
+      "bytes": 6061,
+      "sha256": "8b78a222d6f866dd8dde72545ec0a3db581577403a67b60a0194d7f32b761c31"
+    },
+    {
+      "path": "packages/svelte-ui/example/main.mjs",
+      "bytes": 9012,
+      "sha256": "21756a772828ed0d79420328eba84f0a1781ff5de35c8da5f2f6bbff1abc3b03"
+    },
+    {
+      "path": "packages/svelte-ui/example/index.html",
+      "bytes": 2271,
+      "sha256": "625901bc45d829f90214e1b3e9b487b9b480e1764c5d12c54a0b9abf1f107923"
+    },
+    {
+      "path": "packages/svelte-ui/example/gallery.css",
+      "bytes": 4675,
+      "sha256": "064db4d6acfdcbce3a2e51d02420479e310b62a8dabe0252678a72a609ae7d1d"
+    },
+    {
+      "path": "packages/svelte-ui/example/README.md",
+      "bytes": 4704,
+      "sha256": "885c62b15b664a2e2fb02a894d57f3732d81a710af043f8e1fa528a1b7f503d1"
+    },
+    {
+      "path": "packages/svelte-ui/test/definition-sections.browser.mjs",
+      "bytes": 8752,
+      "sha256": "6f590cc6ed4be399f88c0ad3067a12eabbac6ed92fbc8db56fb2b0f8156e362f"
+    },
+    {
+      "path": "docs/handoff/svelte-ui-kind-editor-2026-11-03.md",
+      "bytes": 2817,
+      "sha256": "25853a7a19e2fac004a7c2db24a139ca102599feea74e213dc4227651192b009"
+    }
+  ],
+  "limitations": [
+    "This editor projects inline ViewSpec objects; registered external resource implementations are not expanded.",
+    "Use the whole-document tab for adding/removing/renaming entries and editing top-level ports, reactions and queryDefaults.",
+    "URL persists the kind only. Sample change, restore and reload reset the draft.",
+    "Section navigation validates JSON syntax; existing runtime validation runs on Apply."
+  ]
+}
