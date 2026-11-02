@@ -11,7 +11,7 @@ export function createRenderer({ runtime: injectedRuntime, onError, ...runtimeOp
   if (injectedRuntime !== undefined && Object.keys(runtimeOptions).length) throw failure('INVALID_DEFINITION', 'Runtime injection and Runtime creation options are mutually exclusive.');
   const ownsRuntime = injectedRuntime === undefined;
   const runtime = injectedRuntime === undefined
-    ? createRuntime({ ...runtimeOptions, registry: runtimeOptions.registry === undefined ? createRegistry() : runtimeOptions.registry })
+    ? createRuntime({ ...runtimeOptions, registry: runtimeOptions.registry === undefined ? createRegistry({ functions: runtimeOptions.functions }) : runtimeOptions.registry })
     : injectedRuntime;
   const state: RendererState = { alive: true, adapters: new Map(), connections: new Set(), onError };
   const attachments = new Set<RenderAttachment>();

@@ -37,6 +37,8 @@ await renderer.dispose();
 
 생성 옵션으로 `registry`, `stateStore`, `requestExecutor`, `resourceResolver`, `authorize`, `functions`, `requestTimeoutMs`, `clock`과 렌더 오류 관찰자 `onError`를 전달할 수 있습니다. 기존 Runtime을 공유할 때는 `createRenderer({ runtime, onError })`를 사용합니다. `runtime`과 Runtime 생성 옵션을 함께 주면 `INVALID_DEFINITION`이며 타입 검사도 거절합니다.
 
+Registry를 생략하면 `functions`를 자동 Registry의 정의 검증과 Runtime 실행에 함께 사용합니다. Registry를 직접 전달할 때는 해당 Registry도 같은 함수 계약으로 구성합니다.
+
 ```ts
 const renderer = createRenderer({ requestExecutor, resourceResolver });
 // 또는 기존 Runtime을 빌림: const renderer = createRenderer({ runtime });

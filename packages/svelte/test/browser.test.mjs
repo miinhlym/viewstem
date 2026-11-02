@@ -78,6 +78,28 @@ test('default renderers own independent runtimes and expose their empty registri
   assert.equal(result.dom, '');
 }));
 
+test('renderer functions configure registration and actual CEL execution together', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture, number = { type: 'number' };
+    const renderer = F.createRenderer({ functions: [{ name: 'twice', inputs: [number], output: number, run: value => value * 2 }] });
+    window.e = { renderer, runtime: renderer.runtime, target: F.target() };
+    renderer.registry.registerComponentContract(F.resource('Component', 'Probe', { ports: { value: F.port() } }));
+    renderer.registerComponent('Probe', F.Probe);
+    renderer.registry.registerResources([F.resource('Variable', 'double', {
+      ports: { value: F.port(number) }, expression: 'twice(value)',
+    })]);
+    const mounted = await renderer.mount({ target: e.target, view: {
+      states: { source: F.state(3, number), doubled: { kind: 'Derived', schema: number, variableRef: 'double', inputs: { value: F.p('/states/source') } } },
+      render: F.probe('answer', F.p('/states/doubled')),
+    } });
+    await mounted.initialComplete;
+    const initial = e.target.querySelector('[data-value]').textContent;
+    mounted.view.getState('source').write(5); await mounted.whenRendered();
+    return { initial, updated: e.target.querySelector('[data-value]').textContent };
+  });
+  assert.deepEqual(result, { initial: '6', updated: '10' });
+}));
+
 test('owned runtime disposal cancels direct View Query and Action execution with reentrant abort cleanup', t => browserTest(t, async page => {
   await page.evaluate(async () => {
     const F = Fixture;
