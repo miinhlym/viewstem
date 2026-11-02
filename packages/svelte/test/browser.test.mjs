@@ -100,6 +100,53 @@ test('renderer functions configure registration and actual CEL execution togethe
   assert.deepEqual(result, { initial: '6', updated: '10' });
 }));
 
+test('throwing URL teardown releases owned State, DOM and the renderer target', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture; window.e = F.environment();
+    let stops = 0;
+    const adapter = { read: () => location.href, subscribe: () => () => { stops++; throw Error('private host failure'); }, writeOwned() {} };
+    const mounted = await e.renderer.mount({ target: e.target, view: {
+      states: { count: F.state(1, { type: 'number' }) }, render: F.probe('value', F.p('/states/count')),
+    }, url: { adapter, bindings: [{ state: 'count' }] } });
+    await mounted.initialComplete;
+    const cell = mounted.view.getState('count');
+    await mounted.dispose();
+    const empty = e.target.textContent;
+    const stale = await F.errorOf(() => cell.write(9));
+    const next = await e.renderer.mount({ target: e.target, view: { render: F.probe('next', 'reused') }, url: { adapter, bindings: [] } });
+    await next.initialComplete;
+    const text = e.target.querySelector('[data-value]').textContent;
+    await next.dispose();
+    return { stops, empty, stale: stale.code, text };
+  });
+  assert.deepEqual(result, { stops: 2, empty: '', stale: 'REFERENCE_NOT_FOUND', text: 'reused' });
+}));
+
+test('attachment cleanup releases its DOM target even when an injected View disposer rejects', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture; window.e = F.environment();
+    const renderer = F.createRenderer({ runtime: {
+      ...e.runtime,
+      async createView(target) {
+        const created = await e.runtime.createView(target);
+        return { ...created, view: { ...created.view, dispose() { created.view.dispose(); throw Error('host teardown failed'); } } };
+      },
+    } });
+    renderer.registerComponent('Probe', F.Probe);
+    const mounted = await renderer.mount({ target: e.target, view: { render: F.probe('first', 'first') } });
+    await mounted.initialComplete;
+    const first = mounted.dispose(), repeated = mounted.dispose();
+    const failed = await F.errorOf(() => first);
+    const empty = e.target.textContent;
+    const next = await e.renderer.mount({ target: e.target, view: { render: F.probe('next', 'reused') } });
+    await next.initialComplete;
+    const text = e.target.querySelector('[data-value]').textContent;
+    await next.dispose(); await renderer.dispose();
+    return { same: first === repeated, failed: failed.message, empty, text };
+  });
+  assert.deepEqual(result, { same: true, failed: 'host teardown failed', empty: '', text: 'reused' });
+}));
+
 test('owned runtime disposal cancels direct View Query and Action execution with reentrant abort cleanup', t => browserTest(t, async page => {
   await page.evaluate(async () => {
     const F = Fixture;

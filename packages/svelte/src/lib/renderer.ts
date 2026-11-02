@@ -44,10 +44,20 @@ export function createRenderer({ runtime: injectedRuntime, onError, ...runtimeOp
       async whenRendered() { if (disposed) throw cancelled(); await instance.whenRendered(); if (disposed) throw cancelled(); },
       dispose() {
         if (stopped) return stopped;
+        let resolve!: () => void, reject!: (error: unknown) => void;
+        stopped = new Promise<void>((yes, no) => { resolve = yes; reject = no; });
         disposed = true;
         attachments.delete(attachment);
-        if (owned) view.dispose();
-        stopped = unmount(instance).finally(() => release(target, token));
+        const cleanup: Promise<void>[] = [];
+        // Publish the promise before host teardown can reenter. Execution stops
+        // synchronously, and a failing host cleanup must not retain the DOM claim.
+        try { if (owned) view.dispose(); } catch (error) { cleanup.push(Promise.reject(error)); }
+        try { cleanup.push(unmount(instance)); } catch (error) { cleanup.push(Promise.reject(error)); }
+        void Promise.allSettled(cleanup).then(results => {
+          release(target, token);
+          const failed = results.find(result => result.status === 'rejected');
+          if (failed?.status === 'rejected') reject(failed.reason); else resolve();
+        });
         return stopped;
       },
     };
@@ -117,7 +127,10 @@ export function createRenderer({ runtime: injectedRuntime, onError, ...runtimeOp
           async replace(next) { check(); const result = await view!.replace(next); return { initialComplete: finish(result.initialComplete) }; },
         };
         return handle;
-      } catch (error) { view?.dispose(); release(target, token); throw error; }
+      } catch (error) {
+        try { view?.dispose(); } finally { release(target, token); }
+        throw error;
+      }
       finally { pending.delete(completion); complete(); }
     },
     dispose() {
