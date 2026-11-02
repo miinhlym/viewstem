@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Viewstem · shadcn 갤러리</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/shadcn.css">
+    <link rel="stylesheet" href="/gallery.css">
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <header class="toolbar">
+      <h1>Viewstem / shadcn</h1>
+      <div class="controls">
+        <select id="example-kind" aria-label="예제 종류"><option value="screens">화면 예제</option><option value="components">컴포넌트</option></select>
+        <label for="family">컴포넌트</label>
+        <select id="family"></select>
+        <button id="theme" type="button" aria-pressed="false">어두운 테마</button>
+      </div>
+    </header>
+    <main>
+      <section class="editor-panel" aria-labelledby="definition-title">
+        <div class="section-title">
+          <h2 id="definition-title">ViewSpec JSON</h2>
+          <div class="controls"><button id="invalid" type="button">오류 예제</button><button id="restore" type="button">예제 복원</button><button id="apply" type="button">적용</button></div>
+        </div>
+        <div id="definition-sections" role="tablist" aria-label="JSON 종류"></div>
+        <div id="definition-pane" role="tabpanel" aria-labelledby="section-all">
+          <div id="section-detail" hidden>
+            <select id="section-item" aria-label="JSON 항목"></select>
+            <code id="section-path"></code>
+          </div>
+          <p id="editor-error" role="alert"></p>
+          <textarea id="definition" spellcheck="false" aria-label="전체 ViewSpec JSON"></textarea>
+        </div>
+      </section>
+      <section class="preview-panel" aria-labelledby="preview-title">
+        <div class="section-title"><h2 id="preview-title">미리보기</h2><p id="status" role="status"></p></div>
+        <p id="diagnostics" role="alert"></p>
+        <div id="preview" data-viewstem-shadcn=""></div>
+        <details open>
+          <summary>State · Query · Action</summary>
+          <pre id="inspector" tabindex="0" aria-label="실행 상태"></pre>
+        </details>
+      </section>
+    </main>
+  </body>
+</html>
