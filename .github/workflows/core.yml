@@ -42,27 +42,21 @@ jobs:
           npm run typecheck -w @viewstem/svelte
           npm run typecheck -w @viewstem/svelte-ui
           npm run check:generated -w @viewstem/svelte-ui
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps --only-shell chromium
       - name: Installed tarball consumers on each Node version
         run: |
           npm run test:package
           npm run test:svelte:package
           npm run test:svelte-ui:package
-      - name: Core, renderer and playground browser tests
-        if: matrix.node == '24.1.0'
-        run: |
-          npm run test:browser
-          npm run test -w @viewstem/svelte
-          node --test playground/test/*.test.mjs
 
   ui:
-    name: UI browser (${{ matrix.shard }}/3)
+    name: UI browser (${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3]
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
@@ -71,15 +65,21 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm run build:svelte-ui
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps --only-shell chromium
       - name: Run assigned browser files
-        run: npm run test -w @viewstem/svelte-ui -- --shard=${{ matrix.shard }}/3
+        run: npm run test -w @viewstem/svelte-ui -- --shard=${{ matrix.shard }}/4
+      - name: Core, renderer and playground browser tests
+        if: matrix.shard == 4
+        run: |
+          npm run test:browser
+          npm run test -w @viewstem/svelte
+          node --test playground/test/*.test.mjs
       - name: Preserve shard evidence even on failure
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: ui-shard-${{ matrix.shard }}
-          path: packages/svelte-ui/test/results/shard-${{ matrix.shard }}-of-3.json
+          path: packages/svelte-ui/test/results/shard-${{ matrix.shard }}-of-4.json
           if-no-files-found: error
           retention-days: 14
 

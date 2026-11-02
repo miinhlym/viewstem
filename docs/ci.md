@@ -12,8 +12,8 @@ compatibility job and every browser shard, including their merged audit.
 | Job | Environment | Checks |
 |---|---|---|
 | Node compatibility | Node 22.21.1 and 24.1.0, Ubuntu | Build all three packages, core tests/types/acceptance mapping, CI tooling regressions, Svelte/UI types, reproducible generated sources, all three installed tarball consumers |
-| Browser integration | Inside the Node 24.1.0 compatibility job | Core browser behavior, Svelte renderer, vanilla playground |
-| UI browser | Node 24.1.0, Chromium, three Ubuntu jobs | Every Svelte UI browser file, with a fresh context/page per case and sequential files inside each shard |
+| Browser integration | Inside UI shard 4 on Node 24.1.0 | Core browser behavior, Svelte renderer, vanilla playground |
+| UI browser | Node 24.1.0, Chromium, four Ubuntu jobs | Every Svelte UI browser file, with a fresh context/page per case and sequential files inside each shard |
 | CI complete | Node 24.1.0, Ubuntu | All prerequisite jobs succeeded; all shards have matching source/revision/environment; no missing files, duplicate cases, failures, skips or todos; all 66 family contracts verified |
 
 Browser behavior runs once across the shards. Node-specific build and package
@@ -22,6 +22,10 @@ not the package API or supported component behavior. Tests still consume built
 public package exports. The catalog, gallery and tarball checks register the
 full component collection; individual behavior cases register the complete
 families referenced by their View.
+
+CI installs Chromium with `--only-shell`: all current browser checks already use
+Playwright's default headless shell. A future headed test or explicit `channel`
+requires revisiting the installation command.
 
 ## Local checks and shard maintenance
 
@@ -32,9 +36,10 @@ suite. To reproduce the CI browser distribution after building the packages:
 npm run build:svelte-ui
 npx playwright install chromium
 npm run test:ci
-npm run test -w @viewstem/svelte-ui -- --shard=1/3
-npm run test -w @viewstem/svelte-ui -- --shard=2/3
-npm run test -w @viewstem/svelte-ui -- --shard=3/3
+npm run test -w @viewstem/svelte-ui -- --shard=1/4
+npm run test -w @viewstem/svelte-ui -- --shard=2/4
+npm run test -w @viewstem/svelte-ui -- --shard=3/4
+npm run test -w @viewstem/svelte-ui -- --shard=4/4
 node packages/svelte-ui/scripts/merge-test-reports.mjs packages/svelte-ui/test/results
 ```
 

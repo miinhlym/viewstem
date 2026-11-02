@@ -38,7 +38,7 @@ test('changing the external catalog acceptance inventory invalidates reports eve
 });
 
 test('browser plan assigns every actual file once; new, missing and duplicate files cannot be silently skipped', async () => {
-  assert.equal((await readPlan()).shards.length, 3);
+  assert.equal((await readPlan()).shards.length, 4);
   assert.throws(() => validatePlan(plan, ['a.browser.mjs', 'b.browser.mjs', 'new.browser.mjs']));
   assert.throws(() => validatePlan(plan, ['a.browser.mjs']));
   assert.throws(() => validatePlan({ shards: [['a.browser.mjs'], ['a.browser.mjs']] }, ['a.browser.mjs']));

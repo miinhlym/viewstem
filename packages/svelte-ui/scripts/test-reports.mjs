@@ -26,7 +26,7 @@ export async function readPlan() {
 export function scopeFor(plan, shard) {
   if (shard === undefined) return { index: null, total: plan.shards.length, files: plan.shards.flat().sort() };
   const match = /^([1-9]\d*)\/([1-9]\d*)$/.exec(shard);
-  assert.ok(match, 'Use --shard=N/M, for example --shard=1/3');
+  assert.ok(match, `Use --shard=N/M, for example --shard=1/${plan.shards.length}`);
   const index = Number(match[1]), total = Number(match[2]);
   assert.equal(total, plan.shards.length, 'Shard total must match browser-plan.json');
   assert.ok(index <= total, 'Shard index is out of range');

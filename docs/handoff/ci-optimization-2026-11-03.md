@@ -17,11 +17,12 @@ UI 테스트 통과 뒤 패키지 검사 경로 assertion이 실패한 증거로
 ## 채택한 구성
 
 - Node 22.21.1·24.1.0에서 core 테스트·타입·인수 연결, 세 패키지 빌드·타입·생성 재현·tarball 설치를 유지한다.
-- core·Svelte renderer·playground 브라우저 검증은 대표 Node 24에서 실행한다.
-- UI 11개 브라우저 파일을 측정 시간에 따라 3개 작업으로 배정한다. 각 작업 안에서는 기존처럼 순차 실행한다.
+- core·Svelte renderer·playground 브라우저 검증은 대표 Node 24의 UI shard 4에서 실행한다.
+- UI 11개 브라우저 파일을 측정 시간에 따라 4개 작업으로 배정한다. 각 작업 안에서는 기존처럼 순차 실행한다.
 - 전체 117개 테스트와 66개 family 기대값은 유지한다. 개별 동작 테스트에서는 View에서 참조하는 family 전체를 등록하며, full catalog·갤러리·tarball의 전체 묶음 등록 검사는 유지한다.
 - reporter는 부분 결과와 전체 결과를 구별한다. 최종 gate가 모든 파일의 실행·중복·실패·skip·todo·소스 해시·리비전·환경 일치 및 전체 family 인수를 검증한다.
 - `main` push·PR·수동 실행만 받고 같은 PR/브랜치의 과거 실행은 취소한다. action은 확인한 v6 커밋 SHA로 고정한다.
+- 모든 기존 브라우저 launch가 기본 headless 모드이므로 설치에 `--only-shell`을 사용해 실행에 쓰지 않는 headed Chromium 다운로드를 생략한다. 실행하는 브라우저 종류는 바꾸지 않는다.
 - 기존 로컬 전체 검증 명령은 유지한다. 새 사용법·필수 check 이름은 [CI 안내](../ci.ko.md)에 둔다.
 
 Node 버전·의존성·공개 API·제품 구현은 변경하지 않는다. Node 26 추가 등 지원 정책
@@ -55,7 +56,18 @@ fixture에서 새 context 3회로 등록·스크립트 주입·mount 시간을 �
 
 원본 로컬 자료는 `.git/ci-evidence/optimization/`에 두며, 원격 결과는 Actions
 실행 링크와 `ui-shard-*`, `ui-browser-results` artifact로 보존한다.
-현재 원격 변경 후 결과는 실행 대기 중이며, 목표 달성으로 판정하지 않는다.
+첫 변경 후 [CI 41616443238](https://github.com/miinhlym/viewstem/actions/runs/41616443238)는
+리비전 `5d05401`에서 **전체 243초**에 성공했다. 3-shard 구성으로 기본 목표를 충족했으며,
+실행 경로에서 러너 배정 차이를 제외한 계산은 `max(101,185,180,207,204)+12=219초`,
+전체 러너 시간 합은 889초였다. UI 117개·family 66개와 양쪽 Node 호환성 검사가 통과했다.
+
+추가 목표를 위해 이 실행의 파일별 시간과 core/renderer/playground 57초를 함께
+균형 배치해 4-shard로 조정했다. headless-only 설치와 함께 적용한 구성의 전체 시간은
+다음 실행으로 확인하며, 두 조정 각각의 독립 개선 비율을 주장하지 않는다.
+
+독립 리뷰에서 카탈로그 인수 입력인 `docs/handoff/shadcn-component-inventory.json`이
+로컬 결과 해시에서 빠진 것을 수정했다. 같은 HEAD에서 이 입력만 바꿔도 과거 결과가
+거절되는 회귀를 추가했으며, 관련 6개 검사가 Node 22·24에서 통과했다.
 
 로컬 전체 실행은 Node 24.1.0에서 117/117 통과, 실패·cancel·skip·todo 0,
 66/66 family 인수를 확인했다. 변경 전 보고서와 테스트 이름 집합이 정확히 일치한다.
