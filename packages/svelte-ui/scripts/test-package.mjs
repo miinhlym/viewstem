@@ -1,16 +1,17 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { build } from 'esbuild';
 import { chromium } from 'playwright';
 
 const root = fileURLToPath(new URL('../../../', import.meta.url));
-const directory = await mkdtemp(join(tmpdir(), 'viewstem-svelte-ui-consumer-'));
+// Canonical paths exercise npm's file:filename lock entries on macOS as well as Linux.
+const directory = await realpath(await mkdtemp(join(tmpdir(), 'viewstem-svelte-ui-consumer-')));
 const run = (command, args, cwd = directory) => execFileSync(command, args, {
   cwd,
   encoding: 'utf8',
@@ -47,7 +48,8 @@ try {
   for (const { name, integrity, filename } of packages) {
     const installed = lock.packages[`node_modules/${name}`];
     assert.equal(installed.integrity, integrity);
-    assert.equal(basename(installed.resolved), filename);
+    const source = new URL(installed.resolved, pathToFileURL(join(directory, 'package-lock.json')));
+    assert.equal(await realpath(fileURLToPath(source)), await realpath(join(directory, filename)));
     assert.equal((await json(`node_modules/${name}/package.json`)).license, 'MIT');
     assert.equal(await readFile(join(directory, `node_modules/${name}/LICENSE`), 'utf8'), await readFile(join(root, 'LICENSE'), 'utf8'));
   }
@@ -202,6 +204,7 @@ try {
     chromium: browser.version(),
     svelte: svelteVersion,
     tarball: { integrity: ui.integrity, bytes: ui.size, unpackedBytes: ui.unpackedSize, files: paths.size },
+    installedSources: Object.fromEntries(packages.map(({ name }) => [name, lock.packages[`node_modules/${name}`].resolved])),
     license: 'MIT; installed text in all three packages and upstream UI notices verified',
     familyExports: familyEntries.length,
     selected: { js: size(asset(selected, '.js')), css: size(asset(selected, '.css')), modules: selectedPaths.length },
