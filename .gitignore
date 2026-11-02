@@ -9,3 +9,6 @@
 
 /packages/svelte/test/results/
 /packages/svelte/.svelte-kit/
+
+packages/svelte-ui/.type-cache/
+/packages/svelte-ui/test/results/
