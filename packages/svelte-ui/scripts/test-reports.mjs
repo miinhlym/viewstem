@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readFile, readdir } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const root = fileURLToPath(new URL('../../../', import.meta.url));
@@ -32,16 +33,17 @@ export function scopeFor(plan, shard) {
   return { index, total, files: [...plan.shards[index - 1]].sort() };
 }
 
-export async function sourceIdentity() {
+export async function sourceIdentity(directory = root) {
   // Include untracked source files for local runs, but never ignored dist/results.
   const files = execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--',
-    'packages/core', 'packages/svelte', 'packages/svelte-ui', 'package.json', 'package-lock.json', '.github'],
-  { cwd: root, encoding: 'utf8' }).split('\0').filter(Boolean).sort();
+    'packages/core', 'packages/svelte', 'packages/svelte-ui', 'package.json', 'package-lock.json', '.github',
+    'docs/handoff/shadcn-component-inventory.json'],
+  { cwd: directory, encoding: 'utf8' }).split('\0').filter(Boolean).sort();
   const hash = createHash('sha256');
-  for (const file of files) hash.update(file).update('\0').update(await readFile(new URL(file, new URL('../../../', import.meta.url)))).update('\0');
+  for (const file of files) hash.update(file).update('\0').update(await readFile(resolve(directory, file))).update('\0');
   return {
     sourceHash: hash.digest('hex'),
-    revision: process.env.GITHUB_SHA ?? execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(),
+    revision: process.env.GITHUB_SHA ?? execFileSync('git', ['rev-parse', 'HEAD'], { cwd: directory, encoding: 'utf8' }).trim(),
   };
 }
 

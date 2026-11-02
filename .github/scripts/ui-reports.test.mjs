@@ -2,7 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { mergeReports, readPlan, scopeFor, validatePlan, validateReport } from '../../packages/svelte-ui/scripts/test-reports.mjs';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { mergeReports, readPlan, scopeFor, sourceIdentity, validatePlan, validateReport } from '../../packages/svelte-ui/scripts/test-reports.mjs';
 
 const plan = { shards: [['a.browser.mjs'], ['b.browser.mjs']] };
 const identity = { sourceHash: 'same-source', revision: 'same-revision' };
@@ -15,6 +18,24 @@ function report(index, name) {
   };
 }
 const reports = () => [report(1, 'alpha'), report(2, 'beta')];
+
+test('changing the external catalog acceptance inventory invalidates reports even at the same Git revision', async t => {
+  const directory = await mkdtemp(join(tmpdir(), 'viewstem-ci-identity-'));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const git = args => execFileSync('git', args, { cwd: directory, stdio: 'pipe' });
+  git(['init', '--quiet']);
+  await mkdir(join(directory, 'docs/handoff'), { recursive: true });
+  const inventory = join(directory, 'docs/handoff/shadcn-component-inventory.json');
+  await writeFile(inventory, '{"families":66}\n');
+  git(['add', '.']);
+  git(['-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', '-c', 'commit.gpgsign=false', 'commit', '--quiet', '-m', 'test: catalog identity fixture']);
+  const before = await sourceIdentity(directory);
+  await writeFile(inventory, '{"families":67}\n');
+  const after = await sourceIdentity(directory);
+  assert.equal(before.revision, after.revision);
+  assert.notEqual(before.sourceHash, after.sourceHash);
+  assert.throws(() => validateReport({ ...report(1, 'alpha'), ...before }, scopeFor(plan, '1/2'), after));
+});
 
 test('browser plan assigns every actual file once; new, missing and duplicate files cannot be silently skipped', async () => {
   assert.equal((await readPlan()).shards.length, 3);
