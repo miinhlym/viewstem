@@ -173,3 +173,19 @@ test('C08/L02 explicit write during pending baseline survives settlement and rel
   assert.equal(connection.isReady(), true); assert.equal(cell.read(), 9);
   cell.reset(); assert.equal(cell.read(), 3); connection.dispose();
 });
+
+test('disposing a pending URL connection resolves ready even if adapter cleanup fails', { timeout: 1000 }, async () => {
+  const f = fixture(link({ 'p.value': 4 }));
+  let resolve;
+  const target = f.scope.registerState('value', { schema: integer, pendingInitial: new Promise(done => { resolve = done; }) });
+  const connection = bind(f, target, {
+    adapter: { ...f.adapter, subscribe: () => () => { throw new Error('host cleanup failed'); } }
+  });
+  assert.equal(connection.isReady(), false);
+  connection.dispose();
+  await connection.ready;
+  resolve(3);
+  await tick();
+  assert.equal(target.read(), 3);
+  assert.equal(connection.isReady(), false);
+});

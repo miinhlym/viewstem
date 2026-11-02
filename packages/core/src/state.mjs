@@ -123,7 +123,12 @@ export class StateStore {
         update(clock.now());let active=true;
         const stop=clock.subscribe(value=>{if(active&&lifetime.alive)update(value);});
         if(typeof stop!=='function')fail('INVALID_DEFINITION');
-        const unsubscribe=()=>{if(!active)return;active=false;clockSubscriptions.delete(unsubscribe);stop();};
+        const unsubscribe = () => {
+          if (!active) return;
+          active = false;
+          clockSubscriptions.delete(unsubscribe);
+          try { stop(); } catch (caught) { store.#diagnostics.push(safeError(caught)); }
+        };
         clockSubscriptions.add(unsubscribe);return unsubscribe;
       },
       registerState(name, declaration) { current(); return store.#register(scopeId, name, declaration); },

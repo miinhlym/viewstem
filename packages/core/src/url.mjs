@@ -103,9 +103,7 @@ export function connectStateUrl(store,{adapter,bindings,limits:custom={},restore
     if(!alive)return;++revision;dirty.clear();restorePending=true;
     if(!initialized)initialize();else{applyRestore();writeDirty();}
   };
-  const stopUrl=adapter.subscribe(restoreNow);
-  const stopBaseline=store.observeBaseline(initialize);
-  const stopStore=store.subscribe(prepared.map(b=>b.target.address),payload=>{
+  const observeStore=payload=>{
     if(!alive||!payload.changes.length)return;
     if(!restoring)++revision;
     const changed=new Set(payload.changes.map(change=>JSON.stringify([change.target.scopeId,change.target.name])));
@@ -125,14 +123,38 @@ export function connectStateUrl(store,{adapter,bindings,limits:custom={},restore
       dirty.set(binding.key,{value:value===undefined?null:JSON.stringify(value instanceof Set?[...value]:value),count,history:dirty.get(binding.key)?.history==='push'?'push':binding.history});
     }
     writeDirty();
-  });
-  if(initialized){if(restore)applyRestore();else{firstRestore=false;readyResolve();}writeDirty();}
+  };
+  let stopUrl, stopBaseline, stopStore;
+  const cleanup = () => {
+    if (!alive) return;
+    alive = false;
+    ++revision;
+    dirty.clear();
+    stopStore?.();
+    try { stopUrl?.(); } catch (caught) { report(safeError(caught), 'cleanup'); }
+    stopBaseline?.();
+    for (const key of keys) if (claims.get(key) === token) claims.delete(key);
+    readyResolve();
+  };
+  try {
+    stopUrl = adapter.subscribe(restoreNow);
+    stopBaseline = store.observeBaseline(initialize);
+    stopStore = store.subscribe(prepared.map(binding => binding.target.address), observeStore);
+    if(initialized){if(restore)applyRestore();else{firstRestore=false;readyResolve();}writeDirty();}
+  } catch (caught) {
+    cleanup();
+    throw caught;
+  }
   const connection=Object.freeze({ready,isReady:()=>initialized,restore:restoreNow,getDiagnostics:()=>[...diagnostics],
     async removeOwned(selected=prepared.map(b=>b.target)){
       const selectedKeys=prepared.filter(b=>selected.includes(b.target)).map(b=>b.key);const current=++revision;
       dirty.clear();try{return await adapter.writeOwned(Object.fromEntries(selectedKeys.map(key=>[key,null])),{mode:'replace',isCurrent:()=>alive&&revision===current});}catch(caught){if(alive&&revision===current)report(caught,'replace-cleanup');return {applied:false};}
     },
-    dispose(){if(!alive)return;alive=false;++revision;dirty.clear();stopStore();stopUrl();stopBaseline();for(const key of keys)if(claims.get(key)===token)claims.delete(key);readyResolve();onDispose();}
+    dispose() {
+      if (!alive) return;
+      cleanup();
+      onDispose();
+    }
   });
   connectionTokens.set(connection,token);return connection;
 }
