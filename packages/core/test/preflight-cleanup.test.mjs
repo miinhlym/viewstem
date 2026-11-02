@@ -80,6 +80,27 @@ test('failed transaction rolls back newly created scopes despite host cleanup er
   assert.equal(store.getDiagnostics()[0].code, 'INTERNAL_ERROR');
 });
 
+test('reaction registration rejects foreign and cancelled owners without changing the graph', () => {
+  const store = createStateStore(), owner = store.createScope(), other = store.createScope();
+  const foreign = createStateStore().createScope(), cancelled = store.createScope();
+  cancelled.dispose();
+  const watch = other.registerState('watch', { schema, initial: 1 });
+  const target = other.registerState('target', { schema, initial: 0 });
+  const reaction = { watch: [watch], target, value: 7 };
+
+  assert.throws(() => store.registerReaction(foreign, reaction), { code: 'INVALID_DEFINITION' });
+  assert.throws(() => store.registerReaction(cancelled, reaction), { code: 'CANCELLED' });
+  watch.write(2);
+  assert.equal(target.read(), 0);
+  store.registerReaction(owner, reaction);
+  watch.write(3);
+  assert.equal(target.read(), 7);
+  owner.dispose();
+  target.write(0);
+  watch.write(4);
+  assert.equal(target.read(), 0);
+});
+
 test('URL startup failures release claims and installed subscriptions', () => {
   const store = createStateStore(), scope = store.createScope();
   const target = scope.registerState('value', { schema, initial: 1 });

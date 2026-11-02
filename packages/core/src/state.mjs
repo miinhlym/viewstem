@@ -241,6 +241,9 @@ export class StateStore {
     return ()=>this.#commit(new Map(),explicit,'explicit',before);
   }
   registerReaction(owner, { watch, target, value }) {
+    const lifetime = this.#scopeLifetimes.get(owner);
+    if (!lifetime) fail('INVALID_DEFINITION');
+    if (!lifetime.alive) fail('CANCELLED');
     if (!Array.isArray(watch) || watch.length === 0) fail('INVALID_DEFINITION');
     const cell = this.#cellFor(target), watched = watch.map(handle => this.#cellFor(handle));
     if (cell.derived) fail('READ_ONLY');
