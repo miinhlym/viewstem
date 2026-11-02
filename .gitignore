@@ -12,3 +12,4 @@
 
 packages/svelte-ui/.type-cache/
 /packages/svelte-ui/test/results/
+/packages/svelte-ui/.svelte-kit/
