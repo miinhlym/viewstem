@@ -15,6 +15,7 @@
 | 오픈소스 기여·이용 조건·문의 확인 | [MIT 라이선스](../LICENSE), [기여 안내](../CONTRIBUTING.ko.md), [지원](../SUPPORT.ko.md), [보안 제보](../SECURITY.ko.md), [행동강령](../CODE_OF_CONDUCT.ko.md) |
 | 패키지를 사용하거나 호스트에 연결하기 | [패키지 사용법](../packages/core/README.ko.md), [호스트 연결 계약](spec/07-host-integration.md) |
 | JSON을 편집하며 화면과 실행 상태 확인하기 | [core playground 사용법](../playground/README.ko.md), [구현·검증 인계](handoff/playground-implementation-2026-11-02.md) |
+| CI 검사·브라우저 분산·시간 목표 확인 | [CI 안내](ci.ko.md), [최적화 증거](handoff/ci-optimization-2026-11-03.md) |
 | Svelte 앱에 렌더러 연결하기 | [Svelte 패키지 사용법](../packages/svelte/README.ko.md), [실행 예제](../packages/svelte/example/README.ko.md), [구현 인계](handoff/svelte-implementation-2026-11-02.md) |
 | Svelte shadcn UI를 등록하고 전체 예제 실행 | [UI 사용법](../packages/svelte-ui/README.ko.md), [U44 구현·검증 인계](handoff/svelte-ui-shadcn-implementation-2026-11-03.md), [66개 카탈로그·386개 부품 목록](handoff/shadcn-component-inventory.json) |
 | 여러 컴포넌트를 결합한 화면 만들기 | [화면 예제 5개](../packages/svelte-ui/example/README.ko.md), [예제 구현·검증](handoff/svelte-ui-examples-2026-11-03.md), [종류별 JSON 편집](handoff/svelte-ui-kind-editor-2026-11-03.md), [폼 State 구성](handoff/svelte-ui-form-state-2026-11-03.md) |

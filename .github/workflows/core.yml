@@ -1,22 +1,116 @@
 name: core
-on: [push, pull_request]
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  core:
+  compatibility:
+    name: Node compatibility (${{ matrix.node }})
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
+      fail-fast: false
       matrix:
         node: ['22.21.1', '24.1.0']
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
-          node-version: '${{ matrix.node }}'
+          node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci --ignore-scripts
-      - run: npm run check
-      - run: npm run test:package
+      - name: Build all packages once
+        run: npm run build:svelte-ui
+      - name: Core tests, types and acceptance coverage
+        run: |
+          npm run test:report
+          npm run typecheck
+          npm run check:coverage
+          npm run test:ci
+      - name: Svelte types and reproducible generated sources
+        run: |
+          npm run typecheck -w @viewstem/svelte
+          npm run typecheck -w @viewstem/svelte-ui
+          npm run check:generated -w @viewstem/svelte-ui
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:browser
-      - run: npm run test:playground
-      - run: npm run check:svelte
-      - run: npm run check:svelte-ui
+      - name: Installed tarball consumers on each Node version
+        run: |
+          npm run test:package
+          npm run test:svelte:package
+          npm run test:svelte-ui:package
+      - name: Core, renderer and playground browser tests
+        if: matrix.node == '24.1.0'
+        run: |
+          npm run test:browser
+          npm run test -w @viewstem/svelte
+          node --test playground/test/*.test.mjs
+
+  ui:
+    name: UI browser (${{ matrix.shard }}/3)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.1.0'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run build:svelte-ui
+      - run: npx playwright install --with-deps chromium
+      - name: Run assigned browser files
+        run: npm run test -w @viewstem/svelte-ui -- --shard=${{ matrix.shard }}/3
+      - name: Preserve shard evidence even on failure
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: ui-shard-${{ matrix.shard }}
+          path: packages/svelte-ui/test/results/shard-${{ matrix.shard }}-of-3.json
+          if-no-files-found: error
+          retention-days: 14
+
+  complete:
+    name: CI complete
+    if: ${{ !cancelled() }}
+    needs: [compatibility, ui]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.1.0'
+      - name: Require every prerequisite job to pass
+        env:
+          COMPATIBILITY_RESULT: ${{ needs.compatibility.result }}
+          UI_RESULT: ${{ needs.ui.result }}
+        run: |
+          test "$COMPATIBILITY_RESULT" = success
+          test "$UI_RESULT" = success
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          pattern: ui-shard-*
+          path: packages/svelte-ui/test/results/shards
+          merge-multiple: true
+      - name: Require all browser files and all 66 family contracts
+        run: node packages/svelte-ui/scripts/merge-test-reports.mjs packages/svelte-ui/test/results/shards
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: ui-browser-results
+          path: packages/svelte-ui/test/results/current.json
+          if-no-files-found: error
+          retention-days: 14

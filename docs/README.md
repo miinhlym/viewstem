@@ -15,6 +15,7 @@ Use this map to find the reference for your task. The language-independent contr
 | Task | Start here |
 |---|---|
 | Contribute, check license terms, or get help | [MIT license](../LICENSE), [contributing](../CONTRIBUTING.md), [support](../SUPPORT.md), [security reporting](../SECURITY.md), [code of conduct](../CODE_OF_CONDUCT.md) |
+| Understand CI checks, browser shards, and the time budget | [CI guide](ci.md), [optimization evidence](handoff/ci-optimization-2026-11-03.md) (Korean) |
 | Use a package or integrate it with a host | [Core package guide](../packages/core/README.md), [host integration contract](spec/07-host-integration.md) |
 | Edit JSON and inspect the view and its execution state | [Core playground guide](../playground/README.md), [implementation and verification handoff](handoff/playground-implementation-2026-11-02.md) |
 | Connect the renderer to a Svelte app | [Svelte package guide](../packages/svelte/README.md), [runnable example](../packages/svelte/example/README.md), [implementation handoff](handoff/svelte-implementation-2026-11-02.md) |

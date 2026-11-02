@@ -84,8 +84,10 @@ their original form.
 
 ## Verification
 
-Run checks that cover the changed behavior. The full CI runs on each configured
-Node version; the commands below identify the relevant local gates.
+Run checks that cover the changed behavior. CI checks Node compatibility on both
+configured versions and runs the full browser suite on one representative version.
+See the [CI guide](docs/ci.md) for jobs, shard reports and the time budget. The
+commands below identify the relevant local gates.
 
 | Change | Checks |
 |---|---|
