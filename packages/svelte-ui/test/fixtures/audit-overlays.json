@@ -1,0 +1,571 @@
+[
+  {
+    "family": "alert-dialog",
+    "testNames": [
+      "audit/alert-dialog: controlled modal and keyboard dismissal"
+    ],
+    "inputs": [
+      "Root.open bound to host State",
+      "Disabled body button",
+      "Trigger custom child",
+      "Content accessible title/description",
+      "Action variant=destructive"
+    ],
+    "events": [
+      "openChange writes boolean State",
+      "openChangeComplete true/false payload",
+      "Confirm Action click"
+    ],
+    "stateTransitions": [
+      "Trigger opens, Escape closes, host writes true, explicit dismissal closes"
+    ],
+    "nesting": [
+      "Trigger child avoids nested button",
+      "Portalled content with header/footer"
+    ],
+    "keyboard": [
+      "Enter trigger, Escape dismissal and trigger focus restoration",
+      "Space/Enter explicit action",
+      "Tab wraps and skips disabled button"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Outside interaction policies and visual animation"
+    ]
+  },
+  {
+    "family": "dialog",
+    "testNames": [
+      "audit/dialog: controlled modal and keyboard dismissal"
+    ],
+    "inputs": [
+      "Root.open bound to host State",
+      "Disabled body button",
+      "Trigger custom child",
+      "Content accessible title/description",
+      "Content.showCloseButton=false"
+    ],
+    "events": [
+      "openChange writes boolean State",
+      "openChangeComplete true/false payload"
+    ],
+    "stateTransitions": [
+      "Trigger opens, Escape closes, host writes true, explicit dismissal closes"
+    ],
+    "nesting": [
+      "Trigger child avoids nested button",
+      "Portalled content with header/footer"
+    ],
+    "keyboard": [
+      "Enter trigger, Escape dismissal and trigger focus restoration",
+      "Space/Enter explicit action",
+      "Tab wraps and skips disabled button"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Outside interaction policies and visual animation"
+    ]
+  },
+  {
+    "family": "drawer",
+    "testNames": [
+      "audit/drawer: controlled modal and keyboard dismissal"
+    ],
+    "inputs": [
+      "Root.open bound to host State",
+      "Disabled body button",
+      "Trigger custom child",
+      "Content accessible title/description",
+      "Drawer direction=bottom and autoFocus"
+    ],
+    "events": [
+      "openChange writes boolean State",
+      "openChangeComplete true/false payload"
+    ],
+    "stateTransitions": [
+      "Trigger opens, Escape closes, host writes true, explicit dismissal closes",
+      "Closing nested Drawer leaves outer open"
+    ],
+    "nesting": [
+      "Trigger child avoids nested button",
+      "Portalled content with header/footer",
+      "Drawer.NestedRoot has independent controlled open state"
+    ],
+    "keyboard": [
+      "Enter trigger, Escape dismissal and trigger focus restoration",
+      "Space/Enter explicit action"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Drag/snap points and touch interactions",
+      "Outer Tab wrap outside the nested drawer scenario"
+    ]
+  },
+  {
+    "family": "sheet",
+    "testNames": [
+      "audit/sheet: controlled modal and keyboard dismissal"
+    ],
+    "inputs": [
+      "Root.open bound to host State",
+      "Disabled body button",
+      "Trigger custom child",
+      "Content accessible title/description",
+      "Content.showCloseButton=false",
+      "Content.side=left"
+    ],
+    "events": [
+      "openChange writes boolean State",
+      "openChangeComplete true/false payload"
+    ],
+    "stateTransitions": [
+      "Trigger opens, Escape closes, host writes true, explicit dismissal closes"
+    ],
+    "nesting": [
+      "Trigger child avoids nested button",
+      "Portalled content with header/footer"
+    ],
+    "keyboard": [
+      "Enter trigger, Escape dismissal and trigger focus restoration",
+      "Space/Enter explicit action",
+      "Tab wraps and skips disabled button"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Outside interaction policies and visual animation"
+    ]
+  },
+  {
+    "family": "popover",
+    "testNames": [
+      "audit/popover: nested overlay consumes Escape and restores focus"
+    ],
+    "inputs": [
+      "Controlled root open",
+      "Content side and alignment"
+    ],
+    "events": [
+      "openChange writes boolean State",
+      "Child openChangeComplete true/false and parent false payload"
+    ],
+    "stateTransitions": [
+      "Host reopens parent, Close dismisses; closing child preserves parent",
+      "Immediate host child reversal settles closed and leaves parent open"
+    ],
+    "nesting": [
+      "Popover inside portalled Popover content"
+    ],
+    "keyboard": [
+      "Space/Enter open; successive Escape closes child then parent and restores focus; Enter on Close"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Collision geometry and pointer dismissal"
+    ]
+  },
+  {
+    "family": "hover-card",
+    "testNames": [
+      "audit/hover-card: hover, disabled, and focus lifecycle"
+    ],
+    "inputs": [
+      "Root.open/disabled",
+      "Content.side=bottom",
+      "Trigger.href and root openDelay/closeDelay=0"
+    ],
+    "events": [
+      "openChange writes boolean State",
+      "openChangeComplete true/false payload"
+    ],
+    "stateTransitions": [
+      "Disabled hover stays closed; host enables; hover/leave round trip; focus/Escape round trip"
+    ],
+    "nesting": [
+      "Portalled content with nested Typography"
+    ],
+    "keyboard": [
+      "Tab focuses trigger and opens; Escape closes while retaining focus"
+    ],
+    "notApplicable": [
+      "Information preview has no selected value"
+    ],
+    "limitations": [
+      "Timing thresholds, pointer transit over content and touch"
+    ]
+  },
+  {
+    "family": "tooltip",
+    "testNames": [
+      "audit/tooltip: hover, disabled, and focus lifecycle"
+    ],
+    "inputs": [
+      "Root.open/disabled",
+      "Content.side=bottom",
+      "Provider.delayDuration=0"
+    ],
+    "events": [
+      "openChange writes boolean State",
+      "openChangeComplete true/false payload"
+    ],
+    "stateTransitions": [
+      "Disabled hover stays closed; host enables; hover/leave round trip; focus/Escape round trip"
+    ],
+    "nesting": [
+      "Portalled content with nested Typography",
+      "Provider \u2192 Root \u2192 Trigger/Content"
+    ],
+    "keyboard": [
+      "Tab focuses trigger and opens; Escape closes while retaining focus"
+    ],
+    "notApplicable": [
+      "Information preview has no selected value"
+    ],
+    "limitations": [
+      "Timing thresholds, pointer transit over content and touch"
+    ]
+  },
+  {
+    "family": "dropdown-menu",
+    "testNames": [
+      "audit/dropdown-menu: disabled items, radio State, and keyboard submenu"
+    ],
+    "inputs": [
+      "Content.loop",
+      "Disabled item",
+      "RadioGroup value",
+      "Sub.open and SubTrigger.textValue",
+      "Root.open",
+      "RadioItem.closeOnSelect=false and true"
+    ],
+    "events": [
+      "RadioGroup.valueChange",
+      "Sub.openChange and openChangeComplete true/false",
+      "Item.select for CSV only",
+      "Root.openChange/openChangeComplete"
+    ],
+    "stateTransitions": [
+      "Host writes radio selection; one keyboard choice changes State while menu stays open, then a second choice commits selection and closes"
+    ],
+    "nesting": [
+      "Group, RadioGroup and Sub with independent submenu content under portalled menu"
+    ],
+    "keyboard": [
+      "ArrowDown skips disabled item; e typeahead; ArrowRight/ArrowLeft enters/leaves submenu; Enter selects; Escape closes",
+      "Enter opens and focus returns to trigger",
+      "Enter keeps radio focus when closeOnSelect=false",
+      "Host radio selection keeps the focused menu item mounted"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Checkbox state, directional variants, pointer travel and positioning"
+    ]
+  },
+  {
+    "family": "context-menu",
+    "testNames": [
+      "audit/context-menu: disabled items, radio State, and keyboard submenu"
+    ],
+    "inputs": [
+      "Content.loop",
+      "Disabled item",
+      "RadioGroup value",
+      "Sub.open and SubTrigger.textValue",
+      "Root.open",
+      "RadioItem.closeOnSelect=false and true"
+    ],
+    "events": [
+      "RadioGroup.valueChange",
+      "Sub.openChange and openChangeComplete true/false",
+      "Item.select for CSV only",
+      "Root.openChange/openChangeComplete"
+    ],
+    "stateTransitions": [
+      "Host writes radio selection; one keyboard choice changes State while menu stays open, then a second choice commits selection and closes"
+    ],
+    "nesting": [
+      "Group, RadioGroup and Sub with independent submenu content under portalled menu"
+    ],
+    "keyboard": [
+      "ArrowDown skips disabled item; e typeahead; ArrowRight/ArrowLeft enters/leaves submenu; Enter selects; Escape closes",
+      "Enter keeps radio focus when closeOnSelect=false",
+      "Host radio selection keeps the focused menu item mounted"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Checkbox state, directional variants, pointer travel and positioning",
+      "Keyboard context trigger gesture and focus restoration after pointer opening"
+    ]
+  },
+  {
+    "family": "menubar",
+    "testNames": [
+      "audit/menubar: disabled items, radio State, and keyboard submenu"
+    ],
+    "inputs": [
+      "Content.loop",
+      "Disabled item",
+      "RadioGroup value",
+      "Sub.open and SubTrigger.textValue",
+      "Root.value/loop and Menu.value",
+      "RadioItem.closeOnSelect=false and true"
+    ],
+    "events": [
+      "RadioGroup.valueChange",
+      "Sub.openChange and openChangeComplete true/false",
+      "Item.select for CSV only",
+      "Root.valueChange and Menu.openChange"
+    ],
+    "stateTransitions": [
+      "Host writes radio selection; one keyboard choice changes State while menu stays open, then a second choice commits selection and closes"
+    ],
+    "nesting": [
+      "Group, RadioGroup and Sub with independent submenu content under portalled menu"
+    ],
+    "keyboard": [
+      "ArrowDown skips disabled item; e typeahead; ArrowRight/ArrowLeft enters/leaves submenu; Enter selects; Escape closes",
+      "ArrowRight switches menubar trigger focus",
+      "Enter keeps radio focus when closeOnSelect=false",
+      "Host radio selection keeps the focused menu item mounted"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Checkbox state, directional variants, pointer travel and positioning"
+    ]
+  },
+  {
+    "family": "navigation-menu",
+    "testNames": [
+      "audit/navigation-menu: controlled panels and keyboard links"
+    ],
+    "inputs": [
+      "Root.value and viewport=false",
+      "Item.value/openOnHover",
+      "Trigger.disabled",
+      "Link.href and active"
+    ],
+    "events": [
+      "Root.valueChange",
+      "Link.click"
+    ],
+    "stateTransitions": [
+      "Host selects API and Docs; Enter opens Docs and Escape clears value"
+    ],
+    "nesting": [
+      "List \u2192 Item \u2192 Trigger/Content \u2192 Link"
+    ],
+    "keyboard": [
+      "Left/Right skips disabled trigger; Enter opens, Down enters content, Escape restores focus, Enter activates link"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Viewport=true, delayed hover and RTL"
+    ]
+  },
+  {
+    "family": "sidebar",
+    "testNames": [
+      "audit/sidebar: desktop collapse, subnavigation, and keyboard shortcut"
+    ],
+    "inputs": [
+      "Provider.open",
+      "Root.collapsible=icon",
+      "MenuButton.isActive",
+      "MenuSubButton.href"
+    ],
+    "events": [
+      "Provider.openChange",
+      "MenuSubButton.click"
+    ],
+    "stateTransitions": [
+      "Toggle/shortcut round trip and host collapses; nested link visibility follows open"
+    ],
+    "nesting": [
+      "Provider contains sidebar tree and trigger inside Inset; nested menu link"
+    ],
+    "keyboard": [
+      "Space on trigger; Ctrl+B shortcut; Enter activates nested link"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Mobile viewport, drawer, and rail"
+    ]
+  },
+  {
+    "family": "command",
+    "testNames": [
+      "audit/command: filtering, disabled selection, and dialog State"
+    ],
+    "inputs": [
+      "Dialog.open/value/title/description/label/loop",
+      "Input aria-label",
+      "Item.value/keywords/disabled"
+    ],
+    "events": [
+      "valueChange writes highlighted command",
+      "Item.select",
+      "Dialog.openChange/openChangeComplete"
+    ],
+    "stateTransitions": [
+      "Host opens palette; Down highlights Save; keyword and empty results; Escape closes",
+      "Unrelated summary State write preserves input DOM identity, focus, and draft"
+    ],
+    "nesting": [
+      "Dialog \u2192 Command.Input/List \u2192 Group \u2192 Item"
+    ],
+    "keyboard": [
+      "ArrowDown skips disabled; Enter selects; Escape closes"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Columns, link item, and Vim bindings"
+    ]
+  },
+  {
+    "family": "button",
+    "testNames": [
+      "audit/button: native keyboard activation and disabled host control"
+    ],
+    "inputs": [
+      "variant=outline",
+      "size=sm",
+      "type=button",
+      "State-bound disabled",
+      "href and text fallback",
+      "Disabled href variant removes href, uses aria-disabled and tabindex=-1"
+    ],
+    "events": [
+      "click and keyDown including key payload",
+      "Link click",
+      "Physical click on disabled href variant leaves direct and ancestor Action State unchanged"
+    ],
+    "stateTransitions": [
+      "Host enables previously disabled button"
+    ],
+    "nesting": [
+      "Typography default child takes precedence over fallback text"
+    ],
+    "keyboard": [
+      "Tab skips disabled button; Enter/Space on button; Enter on link"
+    ],
+    "notApplicable": [
+      "No component-managed selected/open state"
+    ],
+    "limitations": [
+      "Form submission"
+    ]
+  },
+  {
+    "family": "button-group",
+    "testNames": [
+      "audit/button-group: orientation and nested button tab order"
+    ],
+    "inputs": [
+      "Root.orientation and aria-label",
+      "Separator.orientation/decorative",
+      "Child Button.disabled"
+    ],
+    "events": [
+      "Child Button.click"
+    ],
+    "stateTransitions": [
+      "Host changes outer orientation"
+    ],
+    "nesting": [
+      "Nested horizontal group inside outer group with text/separator"
+    ],
+    "keyboard": [
+      "Tab skips disabled child and preserves native order; Space activates child"
+    ],
+    "notApplicable": [
+      "Group does not implement composite roving focus or selection"
+    ],
+    "limitations": [
+      "Visual borders and mixed input/button layout"
+    ]
+  },
+  {
+    "family": "breadcrumb",
+    "testNames": [
+      "audit/breadcrumb: current page, link activation, and hidden separators"
+    ],
+    "inputs": [
+      "Root.aria-label",
+      "Link.href",
+      "State-bound Page text"
+    ],
+    "events": [
+      "Link.click"
+    ],
+    "stateTransitions": [
+      "Host updates current page caption"
+    ],
+    "nesting": [
+      "List/Item with current page, link, separators and ellipsis"
+    ],
+    "keyboard": [
+      "Tab reaches only navigable link; Enter activates and updates URL hash"
+    ],
+    "notApplicable": [
+      "Navigation reflects host-provided current item"
+    ],
+    "limitations": [
+      "Ellipsis menus and link custom child"
+    ]
+  },
+  {
+    "family": "pagination",
+    "testNames": [
+      "audit/pagination: page State and disabled boundaries"
+    ],
+    "inputs": [
+      "Root.count/perPage/page",
+      "Link.page and isActive",
+      "Previous/Next"
+    ],
+    "events": [
+      "pageChange writes numeric State"
+    ],
+    "stateTransitions": [
+      "Page 1 \u2192 2 \u2192 3 via controls; host resets page 1 and updates active flag"
+    ],
+    "nesting": [
+      "Content \u2192 Item \u2192 Previous/Link/Next"
+    ],
+    "keyboard": [
+      "Tab skips disabled Previous; Enter selects numbered page; Space activates Next"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Loop, dynamic page lists and vertical orientation"
+    ]
+  },
+  {
+    "family": "sonner",
+    "testNames": [
+      "audit/sonner: raw toaster stays separate from State notifications"
+    ],
+    "inputs": [
+      "Sonner.position, closeButton, containerAriaLabel",
+      "Notifications.position, closeButton and notifications array"
+    ],
+    "events": [
+      "Notifications.dismiss payload includes logical id/reason; host removal emits none",
+      "Native toast() and toast.dismiss()"
+    ],
+    "stateTransitions": [
+      "Host removes a toast; keyboard dismissal; dispose/remount reconstructs current items; host toast survives recipe disposal"
+    ],
+    "nesting": [
+      "Raw and recipe toasters are siblings with isolated display"
+    ],
+    "keyboard": [
+      "Enter on Close toast"
+    ],
+    "notApplicable": [
+      "Raw Sonner display is driven by host toast API"
+    ],
+    "limitations": [
+      "Auto-dismiss timing, swipe and focus shortcut"
+    ]
+  }
+]

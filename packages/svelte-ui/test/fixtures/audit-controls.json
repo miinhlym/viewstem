@@ -1,0 +1,644 @@
+[
+  {
+    "family": "accordion",
+    "testNames": [
+      "audit/accordion: single and multiple panels honor keyboard and external selection"
+    ],
+    "inputs": [
+      "type",
+      "value",
+      "Accordion.Item.value",
+      "Accordion.Item.disabled"
+    ],
+    "events": [
+      "valueChange"
+    ],
+    "stateTransitions": [
+      "section settings → billing → external settings",
+      "multi [one] → [one,two] → external []"
+    ],
+    "nesting": [
+      "Root → Item → Trigger/Content"
+    ],
+    "keyboard": [
+      "ArrowDown moves trigger focus",
+      "Enter/Space toggles"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Horizontal navigation and forceMount"
+    ]
+  },
+  {
+    "family": "collapsible",
+    "testNames": [
+      "audit/collapsible: keyboard opens and external close hides nested action"
+    ],
+    "inputs": [
+      "open",
+      "disabled"
+    ],
+    "events": [
+      "openChange"
+    ],
+    "stateTransitions": [
+      "open false → true → external false",
+      "external disabled blocks opening"
+    ],
+    "nesting": [
+      "Content → Button"
+    ],
+    "keyboard": [
+      "Space opens",
+      "Enter on disabled trigger leaves open false"
+    ],
+    "notApplicable": [],
+    "limitations": []
+  },
+  {
+    "family": "tabs",
+    "testNames": [
+      "audit/tabs: arrows skip disabled triggers and State selects the matching panel"
+    ],
+    "inputs": [
+      "value",
+      "Tabs.Trigger.value",
+      "Tabs.Trigger.disabled",
+      "Tabs.Content.value"
+    ],
+    "events": [
+      "valueChange"
+    ],
+    "stateTransitions": [
+      "summary → activity → summary → external activity"
+    ],
+    "nesting": [
+      "Root → List → Trigger; sibling matching Content"
+    ],
+    "keyboard": [
+      "ArrowRight selects next enabled tab and wraps"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Manual activation and vertical orientation"
+    ]
+  },
+  {
+    "family": "checkbox",
+    "testNames": [
+      "audit/checkbox: Space emits boolean and controlled disabled blocks changes"
+    ],
+    "inputs": [
+      "checked",
+      "disabled",
+      "indeterminate"
+    ],
+    "events": [
+      "checkedChange",
+      "indeterminateChange"
+    ],
+    "stateTransitions": [
+      "mixed → checked → external unchecked",
+      "external disabled blocks change"
+    ],
+    "nesting": [
+      "Field.Group → Checkbox and linked Label"
+    ],
+    "keyboard": [
+      "Space checks and clears mixed state"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Readonly and native form submission"
+    ]
+  },
+  {
+    "family": "switch",
+    "testNames": [
+      "audit/switch: Space emits boolean and controlled disabled blocks changes"
+    ],
+    "inputs": [
+      "checked",
+      "disabled"
+    ],
+    "events": [
+      "checkedChange"
+    ],
+    "stateTransitions": [
+      "false → true → external false",
+      "external disabled blocks change"
+    ],
+    "nesting": [
+      "Field.Group → Switch and linked Label"
+    ],
+    "keyboard": [
+      "Space toggles"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Native form submission"
+    ]
+  },
+  {
+    "family": "radio-group",
+    "testNames": [
+      "audit/radio-group: keyboard selection skips disabled item and follows State"
+    ],
+    "inputs": [
+      "value",
+      "RadioGroup.Item.value",
+      "RadioGroup.Item.disabled"
+    ],
+    "events": [
+      "valueChange"
+    ],
+    "stateTransitions": [
+      "seoul → busan → seoul → external busan"
+    ],
+    "nesting": [
+      "Root → Item and linked Label"
+    ],
+    "keyboard": [
+      "ArrowRight selects next enabled radio and wraps"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Vertical orientation"
+    ]
+  },
+  {
+    "family": "slider",
+    "testNames": [
+      "audit/slider: numeric and range thumbs emit stepped values within limits"
+    ],
+    "inputs": [
+      "type",
+      "min",
+      "max",
+      "step",
+      "value",
+      "disabled"
+    ],
+    "events": [
+      "valueChange",
+      "valueCommit"
+    ],
+    "stateTransitions": [
+      "35 → 40 → 100 → external 15",
+      "[20,80] → [30,80] → external [10,90]"
+    ],
+    "nesting": [],
+    "keyboard": [
+      "ArrowRight applies step and clamps maximum",
+      "End jumps to maximum"
+    ],
+    "notApplicable": [
+      "Slider renders thumbs from value"
+    ],
+    "limitations": [
+      "Pointer interaction"
+    ]
+  },
+  {
+    "family": "toggle",
+    "testNames": [
+      "audit/toggle: Space emits boolean and controlled disabled blocks changes"
+    ],
+    "inputs": [
+      "pressed",
+      "disabled"
+    ],
+    "events": [
+      "pressedChange"
+    ],
+    "stateTransitions": [
+      "false → true → external false",
+      "external disabled blocks change"
+    ],
+    "nesting": [
+      "Field.Group → Toggle"
+    ],
+    "keyboard": [
+      "Space toggles"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Visual variants"
+    ]
+  },
+  {
+    "family": "toggle-group",
+    "testNames": [
+      "audit/toggle-group: single replacement and multiple selection use distinct payloads"
+    ],
+    "inputs": [
+      "type",
+      "value",
+      "ToggleGroup.Item.value",
+      "ToggleGroup.Item.disabled"
+    ],
+    "events": [
+      "valueChange"
+    ],
+    "stateTransitions": [
+      "list → grid → external list",
+      "[bold] → [bold,italic] → external []"
+    ],
+    "nesting": [
+      "Root → Items"
+    ],
+    "keyboard": [
+      "Enter selects single item",
+      "ArrowRight moves focus, Space selects multiple item"
+    ],
+    "notApplicable": [],
+    "limitations": []
+  },
+  {
+    "family": "input",
+    "testNames": [
+      "audit/input: DOM input updates State and readonly preserves external text"
+    ],
+    "inputs": [
+      "type",
+      "value",
+      "readonly",
+      "maxlength"
+    ],
+    "events": [
+      "input",
+      "keyDown"
+    ],
+    "stateTransitions": [
+      "Initial → End → external external",
+      "readonly blocks typing"
+    ],
+    "nesting": [
+      "Field.Group → Label and Input"
+    ],
+    "keyboard": [
+      "End and x while readonly; x reaches Core as keyDown"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "IME separately covered by ime-domain suite"
+    ]
+  },
+  {
+    "family": "input-otp",
+    "testNames": [
+      "audit/input-otp: digits update derived slots and respect length and readonly"
+    ],
+    "inputs": [
+      "value",
+      "maxlength",
+      "pattern",
+      "readonly",
+      "InputOtp.Slot.cell"
+    ],
+    "events": [
+      "valueChange",
+      "complete"
+    ],
+    "stateTransitions": [
+      "empty → 123456 → external 82",
+      "derived slots follow value"
+    ],
+    "nesting": [
+      "Root → Group → Slot with separator"
+    ],
+    "keyboard": [
+      "Digit typing enforces maxlength and rejects letters",
+      "readonly blocks Backspace"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Clipboard paste"
+    ]
+  },
+  {
+    "family": "textarea",
+    "testNames": [
+      "audit/textarea: DOM input updates State and readonly preserves external text"
+    ],
+    "inputs": [
+      "value",
+      "readonly",
+      "maxlength",
+      "rows"
+    ],
+    "events": [
+      "input",
+      "keyDown"
+    ],
+    "stateTransitions": [
+      "Initial multiline → edited multiline → external external",
+      "readonly blocks typing"
+    ],
+    "nesting": [
+      "Field.Group → Label and Textarea"
+    ],
+    "keyboard": [
+      "End and x while readonly; x reaches Core as keyDown"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "IME separately covered by ime-domain suite"
+    ]
+  },
+  {
+    "family": "native-select",
+    "testNames": [
+      "audit/native-select: native change payload and external value preserve option grouping"
+    ],
+    "inputs": [
+      "value",
+      "multiple",
+      "NativeSelect.OptGroup.label",
+      "NativeSelect.Option.value",
+      "NativeSelect.Option.disabled"
+    ],
+    "events": [
+      "change",
+      "keyDown"
+    ],
+    "stateTransitions": [
+      "seoul → busan → external seoul",
+      "multiple [a,c] → user selection [b,c] persists through separate callback State update with first selected string b → external [a,b]"
+    ],
+    "nesting": [
+      "Root → OptGroup → Option, linked Label"
+    ],
+    "keyboard": [
+      "Escape dispatches keyDown without changing selection"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Headless browser cannot exercise OS-native dropdown keyboard selection",
+      "Multiple change payload is the first selected DOM string"
+    ]
+  },
+  {
+    "family": "select",
+    "testNames": [
+      "audit/select: portal options support keyboard selection and controlled open and value",
+      "audit/select: multiple choices emit arrays and external clear restores placeholder"
+    ],
+    "inputs": [
+      "type",
+      "value",
+      "open",
+      "items",
+      "Select.Item.disabled",
+      "Select.Item.value"
+    ],
+    "events": [
+      "openChange",
+      "valueChange"
+    ],
+    "stateTransitions": [
+      "closed → open → busan/closed → external seoul/open → closed",
+      "[seoul] → [seoul,busan] → [busan] → external []"
+    ],
+    "nesting": [
+      "Root → Trigger/Value and Portal → Content → Group → Item"
+    ],
+    "keyboard": [
+      "Enter opens and selects",
+      "ArrowDown moves highlight",
+      "Escape closes"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "openChangeComplete"
+    ]
+  },
+  {
+    "family": "combobox",
+    "testNames": [
+      "audit/combobox: search, keyboard choice, and external reset update the trigger"
+    ],
+    "inputs": [
+      "options",
+      "value",
+      "disabled",
+      "placeholder",
+      "searchPlaceholder"
+    ],
+    "events": [
+      "valueChange"
+    ],
+    "stateTransitions": [
+      "apple → pear → external empty/placeholder",
+      "external disabled blocks trigger"
+    ],
+    "nesting": [
+      "Internal trigger/search/listbox composition"
+    ],
+    "keyboard": [
+      "Enter opens",
+      "ArrowDown and Enter choose filtered option"
+    ],
+    "notApplicable": [
+      "Composite does not expose arbitrary option slots"
+    ],
+    "limitations": [
+      "IME during filtering"
+    ]
+  },
+  {
+    "family": "calendar",
+    "testNames": [
+      "audit/calendar: date codec, keyboard day navigation, limits and null reset",
+      "audit/calendar: multiple dates round-trip as ISO arrays"
+    ],
+    "inputs": [
+      "type",
+      "value",
+      "placeholder",
+      "minValue",
+      "maxValue",
+      "readonly",
+      "maxDays"
+    ],
+    "events": [
+      "valueChange"
+    ],
+    "stateTransitions": [
+      "2026-11-02 → 2026-11-03 → user deselect null → external 2026-11-05 → external null",
+      "readonly blocks selection",
+      "multiple [02] → [02,05] → third day resets to [06] → external []"
+    ],
+    "nesting": [
+      "Internal calendar grid and day composition"
+    ],
+    "keyboard": [
+      "ArrowRight moves one day",
+      "Enter selects"
+    ],
+    "notApplicable": [
+      "Calendar parts require native scoped snippets"
+    ],
+    "limitations": [
+      "Month/year navigation"
+    ]
+  },
+  {
+    "family": "range-calendar",
+    "testNames": [
+      "audit/range-calendar: completed ISO range and external clear update the grid"
+    ],
+    "inputs": [
+      "value",
+      "placeholder",
+      "minValue",
+      "maxValue"
+    ],
+    "events": [
+      "valueChange"
+    ],
+    "stateTransitions": [
+      "external partial range → completed ISO range → external empty range"
+    ],
+    "nesting": [
+      "Internal range calendar grid"
+    ],
+    "keyboard": [
+      "ArrowRight moves one day",
+      "Enter completes selection"
+    ],
+    "notApplicable": [
+      "RangeCalendar parts require native scoped snippets"
+    ],
+    "limitations": [
+      "startValueChange/endValueChange and multiple months"
+    ]
+  },
+  {
+    "family": "date-picker",
+    "testNames": [
+      "audit/date-picker: single and range popup honor ISO changes and disabled state"
+    ],
+    "inputs": [
+      "value",
+      "range",
+      "locale",
+      "min",
+      "max",
+      "placeholder",
+      "disabled"
+    ],
+    "events": [
+      "valueChange",
+      "rangeChange"
+    ],
+    "stateTransitions": [
+      "single 2026-11-04 → 2026-11-05 → external null",
+      "partial range → complete range → external empty range"
+    ],
+    "nesting": [
+      "Popup composes calendar/range calendar"
+    ],
+    "keyboard": [
+      "Enter opens",
+      "ArrowRight then Enter selects date"
+    ],
+    "notApplicable": [
+      "Composite owns calendar slots"
+    ],
+    "limitations": [
+      "Non-English format"
+    ]
+  },
+  {
+    "family": "carousel",
+    "testNames": [
+      "audit/carousel: arrows and nested controls navigate to bounded slide positions"
+    ],
+    "inputs": [
+      "orientation"
+    ],
+    "events": [
+      "keyDown",
+      "click"
+    ],
+    "stateTransitions": [
+      "start → middle → final → first",
+      "external horizontal → vertical reorients track and next moves on Y axis"
+    ],
+    "nesting": [
+      "Root → Content → Item → Card; Previous/Next"
+    ],
+    "keyboard": [
+      "ArrowRight advances",
+      "Enter activates navigation buttons"
+    ],
+    "notApplicable": [
+      "Embla position and opts have no JSON State input"
+    ],
+    "limitations": [
+      "Loop and swipe"
+    ]
+  },
+  {
+    "family": "resizable",
+    "testNames": [
+      "audit/resizable: keyboard emits layout proportions and clamps minimum pane size"
+    ],
+    "inputs": [
+      "direction",
+      "Resizable.Pane.defaultSize",
+      "Resizable.Pane.minSize"
+    ],
+    "events": [
+      "layoutChange"
+    ],
+    "stateTransitions": [
+      "[45,55] → first pane grows → first pane returns within configured minimum"
+    ],
+    "nesting": [
+      "PaneGroup → Pane and Handle"
+    ],
+    "keyboard": [
+      "ArrowRight expands first pane",
+      "Home moves toward minimum"
+    ],
+    "notApplicable": [
+      "Layout is internally controlled"
+    ],
+    "limitations": [
+      "Drag separately covered by controls suite"
+    ]
+  },
+  {
+    "family": "questionnaire",
+    "testNames": [
+      "audit/questionnaire: required validation, controlled steps and keyboard submit"
+    ],
+    "inputs": [
+      "item",
+      "items",
+      "Questionnaire.Item.required",
+      "Questionnaire.Choice.value"
+    ],
+    "events": [
+      "itemChange",
+      "submit"
+    ],
+    "stateTransitions": [
+      "required format blocks next",
+      "format → detail → external format with preserved answer → detail → submit"
+    ],
+    "nesting": [
+      "Root → Item → Choices/Choice and Actions → Next/Submit"
+    ],
+    "keyboard": [
+      "Space selects answer",
+      "Enter advances/submits"
+    ],
+    "notApplicable": [],
+    "limitations": [
+      "Skip/previous, reset, custom shortcuts and free-text input"
+    ]
+  }
+]
