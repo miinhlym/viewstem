@@ -6,6 +6,8 @@ The [core workflow](../.github/workflows/core.yml) runs on pushes to `main`, pul
 requests, and manual dispatch. A newer run cancels an older run for the same PR
 or branch. Required checks should use **CI complete**, which depends on every
 compatibility job and every browser shard, including their merged audit.
+Pushes to other branches without a pull request do not run CI automatically;
+use a pull request or manual dispatch to check them.
 
 ## Checks and environments
 
@@ -53,6 +55,9 @@ Each run replaces its own `shard-N-of-M.json`. The merger rejects incomplete,
 duplicate, failed, skipped, or mixed-source reports. Re-run every shard after
 changing source, fixtures, dependency locks or CI configuration. Reports are
 diagnostic artifacts, never cached substitutes for executing tests.
+Source identity includes unstaged additions, edits and deletions; staging is not
+required. Native test suites are recorded separately from individual cases, and
+suite teardown failures or missing suite results also fail validation.
 
 CI uploads individual shard reports and a merged `ui-browser-results` artifact
 for 14 days. A partial shard is not a complete family audit. Full local runs and

@@ -103,3 +103,75 @@ UI 117개 이름 집합은 변경 전과 정확히 같고, 66/66 family·필수 
 보고서 gate 회귀는 처음 5개에서 인수 입력 해시 검사까지 6개로 늘렸으며
 Node 22.21.1·24.1.0 모두 통과했다. `actionlint`,
 변경 diff 공백 검사, CI 안내의 로컬 링크와 영문·한국어 코드 블록 대조도 통과했다.
+
+## Branch preflight — 2026-11-04
+
+검토 시작 시 `main`·`origin/main`·확인한 원격 tip은 모두
+`b1d82953ee418def825499e8090c999249cb2d94`였고 작업 트리는 깨끗했다.
+이미 반영된 이번 작업 전체가 요청 범위이므로 upstream과의 빈 diff 대신 개편 직전
+`4aa473b7efced7c035ff6518c694ddc1be81fafd`부터의 6개 커밋·18개 파일을 비교했다.
+workflow·package script 2개, 테스트 실행/보고/fixture 7개, 문서 9개를 모두 검토했다.
+생성된 dist·type cache·실행 보고서는 소스 diff에서 제외하고 실행 증거로 사용했다.
+
+### 검증 범위 대조
+
+기존 npm 검증 명령을 실제 하위 명령까지 펼쳐 새 workflow와 대조했다.
+26종 명령에 누락은 없으며, Chromium 설치의 `--only-shell` 변경은 모든 실제 launch가
+기본 headless 모드인 것을 확인했다. matrix·반복 횟수와 테스트 항목 수는 구별한다.
+
+| 경계 | 개편 전 | 개편 후·검토 결과 |
+|---|---|---|
+| core 테스트·타입·인수 연결 | Node 22·24 | 두 버전 유지; core 216개·선택 차트 8개 구분 유지 |
+| 세 패키지 빌드·타입·tarball | Node 22·24, 중복 빌드 포함 | 두 버전 유지; 각 job에서 한 번 빌드하고 실제 설치 소비자 검사 |
+| UI 생성 재현 | vendor·sonner·type cache·catalog·components·CSS·audit matrix | 명령과 순서 모두 유지; 생성 소스는 검사하고 임시 catalog만 재생성 |
+| core/CEL·renderer·playground 브라우저 | Node 22·24에서 같은 Chromium 검사 | 대표 Node 24 한 번으로 축소; 개별 검사 명령·본문 유지 |
+| UI 동작 검사 | 117개·11개 파일, 두 Node에서 각각 실행 | 117개·11개 파일을 Node 24의 4개 shard에 정확히 한 번 배정; 이름·본문 삭제 없음 |
+| 개별 동작의 등록 환경 | 매번 전체 컴포넌트 등록 | 사용 family만 등록; 모든 66개 갤러리와 357개 JSON Component 전체 등록 tarball 검사는 유지 |
+| 자동 실행 trigger | 모든 branch/tag push와 PR | `main` push·PR·수동 실행; PR 없는 다른 branch/tag push 자동 실행은 제외 |
+| 보고서·CI 도구 | 전체 실행 reporter | shard/전체 구분·통합 gate·새 파일 누락·실패·중복·서로 다른 소스 거부 회귀 추가 |
+
+따라서 **테스트 항목 누락은 없지만 실행 환경·등록 조합·trigger는 의도적으로 좁아졌다.**
+Node 22에서 전체 브라우저 suite를 다시 실행한 것으로 보고하지 않는다. full-catalog
+검사는 유지되지만 개별 동작마다 무관한 family가 함께 등록되는 조합까지 반복하지 않는다.
+카탈로그 검사는 upstream 386개 export 중 JSON fixture 351개와 raw 조합 나머지에 대한
+대응을 유지하며, 이것을 386개 모두 독립 JSON Component라는 의미로 확대하지 않는다.
+
+### 확인한 결함과 수정
+
+1. **Stage 전 소스 삭제의 false failure:** `git ls-files --cached`에 남은 삭제 파일을
+   읽다가 `ENOENT`로 테스트 시작이 막혔다. 현재 작업 트리에서 없어진 파일만 해시에서
+   제외하며, 다른 읽기 오류는 계속 실패한다. 삭제 전 보고서 거부와 stage 전후 동일
+   해시를 임시 Git 저장소로 검증했다.
+2. **정상 native suite의 false failure:** `describe` 완료 이벤트까지 개별 테스트에
+   포함해 실제 테스트 수와 어긋났다. suite 결과를 별도로 보존·검증·병합한다.
+   단순히 suite를 버리면 정리 hook 실패를 놓칠 수 있어, suite 개수·누락·실패도 검사한다.
+   정상 중첩 그룹과 실패·skip·todo·AbortSignal 취소·suite 정리 실패를 실제 Node
+   subprocess로 검증했다. Node 22는 미리 취소된 테스트를 failed, Node 24는 cancelled로
+   집계하므로 양쪽 모두 비정상 종료·보고서 거부를 확인한다.
+
+회귀 개발 중 parent `NODE_TEST_CONTEXT`의 상속과 미완료 Promise에 의존한 취소 fixture가
+각각 nested runner 생략·Node 24 timeout을 일으켰다. 독립 runner 환경과 명시적 AbortSignal로
+fixture를 수정했으며, 이 중간 실패도 원본에 보존했다. 제품 결함이나 성공 증거로 바꾸지 않는다.
+
+### 재검증과 재사용
+
+- Node 22.21.1·24.1.0의 CI 도구 회귀는 **각 14/14 통과**했다. 보고서 입력을 꾸민 검사와
+  실제 native runner 검사를 함께 사용했다.
+- UI reporter가 바뀌어 Node 24에서 `npm run build:svelte-ui` 후
+  `npm run test -w @viewstem/svelte-ui`를 실행했다. **117/117, 66/66 family·필수 사례 68개
+  통과**, 실패·취소·skip·todo 0이며 이전 테스트 이름 집합과 정확히 일치했다.
+  현재 작업 트리의 소스 해시·scope·suite 개수로 보고서를 다시 검증했다. 로컬 소요 시간
+  223.011초는 CI 성능 수치로 사용하지 않는다. 중간 실행은 reporter 수정 확정 전에
+  시작해 의도적으로 중단했으며 통과로 계산하지 않는다.
+- `actionlint`, 변경 JS 문법, diff 공백, CI 안내 링크·영문/한국어 코드 블록이 통과했다.
+- 변경 없는 core·Svelte·playground 본문, 타입·생성 재현·tarball 검증은
+  [동일 HEAD 성공 CI 41618717896](https://github.com/miinhlym/viewstem/actions/runs/41618717896)의
+  증거를 재사용한다. 이 실행은 전체 207초, 의존 경로 201초였다. 새 reporter 회귀는 로컬
+  재검증이며 이전 원격 CI가 현재 미커밋 수정을 실행한 것처럼 보고하지 않는다.
+
+현재 작업은 preflight 범위에서만 수정하며 commit·push·새 원격 실행은 하지 않는다.
+실제 GitHub workflow 취소/부분 재실행의 provider 동작은 새로 재현하지 않았고,
+원격 status는 다음 반영 후 확인할 gate다. 테스트 내부 취소 실패 전파와 구별한다.
+원본·명령 대조·회귀 로그와 worktree 인계 fingerprint는
+`.git/ci-evidence/preflight-2026-11-04/`에 보존한다. Dirty 인계 증거는 immutable ready
+판정으로 재사용할 수 없으며, 다음 lifecycle에서 commit 후 다시 계산해야 한다.

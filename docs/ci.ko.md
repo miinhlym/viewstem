@@ -6,6 +6,8 @@
 동작합니다. 같은 PR이나 브랜치의 새 실행은 이전 실행을 취소합니다.
 필수 검사는 모든 호환성 작업과 브라우저 shard 및 통합 인수 검증에 의존하는
 **CI complete**를 사용합니다.
+PR이 없는 다른 브랜치의 push는 CI를 자동 실행하지 않습니다. 해당 브랜치는
+PR이나 수동 실행으로 확인합니다.
 
 ## 검사와 환경
 
@@ -52,6 +54,8 @@ node packages/svelte-ui/scripts/merge-test-reports.mjs packages/svelte-ui/test/r
 결과와 서로 다른 소스의 결과를 거절합니다. 소스·fixture·의존성 잠금·CI 설정을
 바꾸면 모든 shard를 다시 실행합니다. 결과는 진단 자료이며 테스트 실행을 대신하는
 캐시가 아닙니다.
+소스 해시는 stage하지 않은 추가·수정·삭제도 반영합니다. Native 테스트 그룹은
+개별 사례와 따로 기록하며, 그룹 정리 단계의 실패나 그룹 결과 누락도 실패 처리합니다.
 
 CI는 개별 shard 보고서와 통합 `ui-browser-results` artifact를 14일 보존합니다.
 일부 shard의 성공은 전체 family 인수 통과가 아닙니다. 전체 로컬 실행과 성공한

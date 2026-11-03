@@ -96,6 +96,7 @@ commands below identify the relevant local gates.
 | Svelte renderer or its example | `npm run check:svelte` |
 | Svelte UI adapters, generated sources, styles, or gallery | `npm run check:svelte-ui` |
 | Vanilla playground | `npm run test:playground` |
+| CI configuration or browser reporting | `npm run test:ci`; validate workflow syntax and run the affected browser checks described in the [CI guide](docs/ci.md) |
 | Package metadata or license files only | Build the affected package and run its existing package consumer check: `test:package`, `test:svelte:package`, or `test:svelte-ui:package` |
 | Community documentation or templates only | Check links, examples, JSON/YAML syntax where applicable, and `git diff --check` |
 
