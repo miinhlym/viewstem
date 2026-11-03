@@ -79,6 +79,9 @@ export function validateReport(report, scope, identity) {
   assert.equal(report.summary?.success, true, 'Browser runner did not finish successfully');
   const counts = report.summary.counts;
   for (const key of ['failed', 'cancelled', 'skipped', 'todo']) assert.equal(counts[key], 0, `Browser ${key} cases`);
+  assert.ok(Array.isArray(report.suites), 'Missing browser suite outcomes');
+  assert.equal(counts.suites, report.suites.length, 'Runner/report suite counts disagree');
+  for (const suite of report.suites) assert.equal(suite.status, 'passed', `Unverified browser suite: ${suite.name}`);
   assert.ok(report.outcomes.length > 0, 'Empty browser report');
   assert.equal(counts.tests, report.outcomes.length, 'Runner/report test counts disagree');
   assert.equal(counts.passed, report.outcomes.length, 'Not all browser cases passed');
@@ -104,13 +107,14 @@ export function mergeReports(reports, plan, identity, rows) {
     for (const key of ['node', 'platform', 'arch']) assert.equal(report[key], reports[0][key], `Mixed browser ${key}`);
   }
   const outcomes = reports.flatMap(report => report.outcomes);
+  const suites = reports.flatMap(report => report.suites);
   const merged = {
     format: 2, ...identity, recordedAtUtc: new Date().toISOString(),
     node: reports[0].node, platform: reports[0].platform, arch: reports[0].arch,
     scope: scopeFor(plan),
-    summary: { success: true, counts: { tests: outcomes.length, passed: outcomes.length, failed: 0, cancelled: 0, skipped: 0, todo: 0 } },
+    summary: { success: true, counts: { tests: outcomes.length, suites: suites.length, passed: outcomes.length, failed: 0, cancelled: 0, skipped: 0, todo: 0 } },
     timing: { shardDurationMs: reports.map(report => ({ index: report.scope.index, durationMs: report.summary.duration_ms })) },
-    audit: auditSummary(outcomes, rows), outcomes,
+    audit: auditSummary(outcomes, rows), outcomes, suites,
   };
   validateReport(merged, scopeFor(plan), identity);
   assert.deepEqual(merged.audit.missing, [], 'Unverified shadcn family behavior cases');

@@ -13,8 +13,9 @@ const rows = [{ family: 'a', testNames: ['alpha'] }, { family: 'b', testNames: [
 function report(index, name) {
   return {
     format: 2, ...identity, scope: scopeFor(plan, `${index}/2`), node: 'v24.1.0', platform: 'linux', arch: 'x64',
-    summary: { success: true, duration_ms: 100, counts: { tests: 1, passed: 1, failed: 0, cancelled: 0, skipped: 0, todo: 0 } },
+    summary: { success: true, duration_ms: 100, counts: { tests: 1, suites: 0, passed: 1, failed: 0, cancelled: 0, skipped: 0, todo: 0 } },
     outcomes: [{ file: plan.shards[index - 1][0], name, status: 'passed', durationMs: 80 }],
+    suites: [],
   };
 }
 const reports = () => [report(1, 'alpha'), report(2, 'beta')];
@@ -72,10 +73,15 @@ test('shard arguments reject wrong totals, zero, out-of-range and malformed indi
 });
 
 test('merge accounts for all files and family cases independent of shard arrival order', () => {
-  const merged = mergeReports(reports().reverse(), plan, identity, rows);
+  const input = reports().reverse();
+  input[0].suites = [{ name: 'group', status: 'passed' }];
+  input[0].summary.counts.suites = 1;
+  const merged = mergeReports(input, plan, identity, rows);
   assert.equal(merged.summary.counts.passed, 2);
   assert.deepEqual(merged.audit, { families: 2, passedFamilies: 2, requiredCases: 2, missing: [] });
   assert.deepEqual(merged.scope.files, ['a.browser.mjs', 'b.browser.mjs']);
+  assert.deepEqual(merged.suites, input[0].suites);
+  assert.equal(merged.summary.counts.suites, 1);
 });
 
 test('missing, duplicate, stale, foreign or incomplete reports cannot produce a green merge', () => {
@@ -87,6 +93,10 @@ test('missing, duplicate, stale, foreign or incomplete reports cannot produce a 
     r => { r.summary.success = false; }, r => { r.summary.counts.tests = 2; },
     r => { r.outcomes = []; }, r => { r.outcomes[0].file = 'a.browser.mjs'; },
     r => { r.outcomes[0].name = 'alpha'; }, r => { r.outcomes[0].name = 'unrelated'; },
+    r => { r.suites = [{ name: 'group', status: 'failed' }]; r.summary.counts.suites = 1; },
+    r => { r.suites = [{ name: 'group', status: 'skipped' }]; r.summary.counts.suites = 1; },
+    r => { r.suites = [{ name: 'group', status: 'todo' }]; r.summary.counts.suites = 1; },
+    r => { delete r.suites; }, r => { r.summary.counts.suites = 1; },
   ];
   for (const mutate of mutations) {
     const input = reports(); mutate(input[1]);
