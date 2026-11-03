@@ -37,6 +37,26 @@ test('changing the external catalog acceptance inventory invalidates reports eve
   assert.throws(() => validateReport({ ...report(1, 'alpha'), ...before }, scopeFor(plan, '1/2'), after));
 });
 
+test('unstaged source deletion invalidates old reports without requiring git add', async t => {
+  const directory = await mkdtemp(join(tmpdir(), 'viewstem-ci-delete-'));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const git = args => execFileSync('git', args, { cwd: directory, stdio: 'pipe' });
+  git(['init', '--quiet']);
+  await mkdir(join(directory, 'packages/core/src'), { recursive: true });
+  const source = join(directory, 'packages/core/src/removed.mjs');
+  await writeFile(source, 'export const value = 1;\n');
+  git(['add', '.']);
+  git(['-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', '-c', 'commit.gpgsign=false', 'commit', '--quiet', '-m', 'test: deletion identity fixture']);
+  const before = await sourceIdentity(directory);
+  await rm(source);
+  const deleted = await sourceIdentity(directory);
+  assert.equal(deleted.revision, before.revision);
+  assert.notEqual(deleted.sourceHash, before.sourceHash);
+  assert.throws(() => validateReport({ ...report(1, 'alpha'), ...before }, scopeFor(plan, '1/2'), deleted));
+  git(['add', '-u']);
+  assert.deepEqual(await sourceIdentity(directory), deleted, 'staging does not change the tested worktree');
+});
+
 test('browser plan assigns every actual file once; new, missing and duplicate files cannot be silently skipped', async () => {
   assert.equal((await readPlan()).shards.length, 4);
   assert.throws(() => validatePlan(plan, ['a.browser.mjs', 'b.browser.mjs', 'new.browser.mjs']));

@@ -40,7 +40,16 @@ export async function sourceIdentity(directory = root) {
     'docs/handoff/shadcn-component-inventory.json'],
   { cwd: directory, encoding: 'utf8' }).split('\0').filter(Boolean).sort();
   const hash = createHash('sha256');
-  for (const file of files) hash.update(file).update('\0').update(await readFile(resolve(directory, file))).update('\0');
+  for (const file of files) {
+    let content;
+    try { content = await readFile(resolve(directory, file)); }
+    catch (error) {
+      // git ls-files still lists unstaged deletions; hash the current worktree.
+      if (error.code === 'ENOENT') continue;
+      throw error;
+    }
+    hash.update(file).update('\0').update(content).update('\0');
+  }
   return {
     sourceHash: hash.digest('hex'),
     revision: process.env.GITHUB_SHA ?? execFileSync('git', ['rev-parse', 'HEAD'], { cwd: directory, encoding: 'utf8' }).trim(),
