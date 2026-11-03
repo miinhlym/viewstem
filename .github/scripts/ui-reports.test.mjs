@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { mergeReports, readPlan, scopeFor, sourceIdentity, validatePlan, validateReport } from '../../packages/svelte-ui/scripts/test-reports.mjs';
@@ -65,6 +65,49 @@ test('browser plan assigns every actual file once; new, missing and duplicate fi
   assert.throws(() => validatePlan({ shards: [['a.browser.mjs'], ['a.browser.mjs']] }, ['a.browser.mjs']));
   assert.throws(() => validatePlan({ shards: [[]] }, []));
 });
+
+const nativeCases = [
+  { name: 'flat pass', body: "test('case', () => {});", passes: true },
+  { name: 'nested suites', body: "describe('outer', () => describe('inner', () => it('case', () => {})));", passes: true, suites: 2 },
+  { name: 'assertion failure', body: "test('case', () => { throw Error('fixture failure'); });" },
+  { name: 'skip', body: "test.skip('case', () => {});", count: 'skipped' },
+  { name: 'todo', body: "test.todo('case', () => {});", count: 'todo' },
+  { name: 'cancelled test', body: "test('case', { signal: AbortSignal.abort() }, () => {});", aborted: true },
+  { name: 'suite teardown failure', body: "describe('group', () => { after(() => { throw Error('teardown failure'); }); it('case', () => {}); });" },
+];
+for (const fixture of nativeCases) {
+  test(`native browser reporter preserves ${fixture.name}`, async t => {
+    const directory = await mkdtemp(join(tmpdir(), 'viewstem-ci-reporter-'));
+    t.after(() => rm(directory, { recursive: true, force: true }));
+    const name = 'fixture.browser.mjs';
+    await writeFile(join(directory, name), `import { test, describe, it, after } from 'node:test';\n${fixture.body}\n`);
+    const output = join(directory, 'report.json');
+    const scope = { index: 1, total: 1, files: [name] };
+    const reporter = fileURLToPath(new URL('../../packages/svelte-ui/scripts/audit-reporter.mjs', import.meta.url));
+    const env = { ...process.env, VIEWSTEM_UI_REPORT: JSON.stringify({ ...identity, scope }) };
+    // Start an independent runner, not a worker in this parent test process.
+    delete env.NODE_TEST_CONTEXT;
+    const result = spawnSync(process.execPath, [
+      '--test', `--test-reporter=${reporter}`, `--test-reporter-destination=${output}`, join(directory, name),
+    ], { encoding: 'utf8', timeout: 10_000, env });
+    assert.ifError(result.error);
+    assert.equal(result.signal, null);
+    const actual = JSON.parse(await readFile(output, 'utf8'));
+    if (fixture.passes) {
+      assert.equal(result.status, 0, result.stderr);
+      assert.deepEqual(actual.outcomes.map(test => test.name), ['case']);
+      assert.equal(actual.summary.counts.tests, 1);
+      assert.equal(actual.suites.length, fixture.suites ?? 0);
+      validateReport(actual, scope, identity);
+    } else {
+      assert.equal(result.status, 1, 'failed or incomplete runs cannot pass');
+      if (fixture.count) assert.equal(actual.summary.counts[fixture.count], 1);
+      // Node 22 classifies pre-aborted tests as failed; Node 24 as cancelled.
+      if (fixture.aborted) assert.equal(actual.summary.counts.failed + actual.summary.counts.cancelled, 1);
+      assert.throws(() => validateReport(actual, scope, identity));
+    }
+  });
+}
 
 test('shard arguments reject wrong totals, zero, out-of-range and malformed indices before execution', () => {
   for (const value of ['0/2', '3/2', '1/3', '1', '1/2junk', '-1/2']) assert.throws(() => scopeFor(plan, value));
