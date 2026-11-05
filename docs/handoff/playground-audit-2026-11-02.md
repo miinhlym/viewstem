@@ -1,10 +1,12 @@
 # Playground 실행·경계 점검
 
+> 이 문서는 제거 전 리비전의 기록이다. 임시 앱은 U46에서 제거했으며 [현재 제거·검증 범위](temporary-tools-removal-2026-11-04.md)를 따른다. 아래 소스 링크는 당시 리비전으로 고정한다.
+
 사용자의 여러 구성 직접 실행·예외·기획 적합성 점검 요청에 따라, 기본 예제 3종과 별도 JSON 구성을 실제 Chromium에서 실행했다. 대상은 현재 playground의 공개 기능 전체이며, core 전체 인수 검증과 별개다. 본 기록의 범위 밖 모든 입력·브라우저에 결함이 없다는 보장은 아니다.
 
 ## 실행 방법과 범위
 
-[기본 시나리오](../../playground/test/playground.test.mjs)와 [추가 경계 시나리오](../../playground/test/edge-cases.test.mjs)는 편집기에 JSON을 넣고 실행 버튼·미리보기 입력·Query 도구·탭을 조작한다. 실제 공개 패키지, DOM, loopback HTTP를 사용하며 내부 State를 직접 변조해 결과를 만드는 검사는 아니다. Node 22/24의 정확한 버전·통과 수·test name·소스 해시는 [검증 결과](playground-verification-results.json)의 `browser`와 `auditFollowup`에서 관리한다.
+[기본 시나리오](https://github.com/miinhlym/viewstem/blob/b1d82953ee418def825499e8090c999249cb2d94/playground/test/playground.test.mjs)와 [추가 경계 시나리오](https://github.com/miinhlym/viewstem/blob/b1d82953ee418def825499e8090c999249cb2d94/playground/test/edge-cases.test.mjs)는 편집기에 JSON을 넣고 실행 버튼·미리보기 입력·Query 도구·탭을 조작한다. 실제 공개 패키지, DOM, loopback HTTP를 사용하며 내부 State를 직접 변조해 결과를 만드는 검사는 아니다. Node 22/24의 정확한 버전·통과 수·test name·소스 해시는 [검증 결과](playground-verification-results.json)의 `browser`와 `auditFollowup`에서 관리한다.
 
 | 점검 대상 | 직접 실행한 입력과 관찰 기준 | 결과 |
 |---|---|---|

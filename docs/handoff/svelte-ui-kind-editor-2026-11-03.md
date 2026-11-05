@@ -1,5 +1,7 @@
 # Svelte UI 갤러리 종류별 JSON 편집
 
+> 역사 기록: U46에서 이 갤러리와 종류별 편집기를 제거했다. 현재 범위는 [제거 인계](temporary-tools-removal-2026-11-04.md)를 따른다. 아래 소스 링크는 당시 공개 리비전에 고정한다.
+
 하나의 큰 JSON으로 표시하던 갤러리에 종류별 탐색·편집을 추가했다. 원본 ViewSpec 형식과 패키지 공개 계약은 유지한다. 구현 범위는 갤러리의 HTML·CSS·바닐라 JavaScript와 회귀 테스트이며, core·Svelte·UI 패키지 런타임은 수정하지 않았다. 이전 U44 및 화면 예제 검증 기록은 당시 증거로 보존한다.
 
 ## 동작
@@ -14,6 +16,6 @@
 
 ## 검증
 
-[definition-sections.browser.mjs](../../packages/svelte-ui/test/definition-sections.browser.mjs)는 71개 예제의 모든 분리 항목을 다시 합쳐 원본과 동일한지 검사한다. 중첩 정의와 일반 데이터 구분, JSON Pointer escaping과 원형 오염 방지, State·Action·Query·Component 수정의 실제 렌더링, 잘못된 JSON에서 편집본 보존, 키보드·URL 복원·390px 화면도 검사한다.
+[definition-sections.browser.mjs](https://github.com/miinhlym/viewstem/blob/b1d82953ee418def825499e8090c999249cb2d94/packages/svelte-ui/test/definition-sections.browser.mjs)는 71개 예제의 모든 분리 항목을 다시 합쳐 원본과 동일한지 검사한다. 중첩 정의와 일반 데이터 구분, JSON Pointer escaping과 원형 오염 방지, State·Action·Query·Component 수정의 실제 렌더링, 잘못된 JSON에서 편집본 보존, 키보드·URL 복원·390px 화면도 검사한다.
 
 갤러리는 실제 패키지 dist를 사용해 컴파일한다. 기존 UI 회귀 전체와 Node 24의 영향 범위 재검증 결과, 소스 해시 및 기존 패키지 검증 재사용 근거는 [실행 기록](svelte-ui-kind-editor-verification-results.json)에 둔다.

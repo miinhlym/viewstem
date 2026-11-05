@@ -1,0 +1,802 @@
+{
+  "mode": "local-temporary-tools-removal",
+  "decision": "U46 / D103",
+  "recordedAtUtc": "2026-11-04T01:47:30.310526+00:00",
+  "baseRevision": "517503d72db30ed3363b7fd61285f480870fce79",
+  "sourceHash": "113ca9fa95ec85cb87e5f1b6d8046c8f952e0bb90974d2a92e931c3a67c5237e",
+  "sourceHashScope": "Current worktree package sources/tests/guides/manifests, root package.json and package-lock.json, .github, and shadcn inventory; includes unstaged deletions and untracked fixtures; see scripts/test-reports.mjs",
+  "removed": {
+    "directories": [
+      "playground/",
+      "packages/svelte-ui/example/"
+    ],
+    "npmScripts": [
+      "playground",
+      "test:playground",
+      "example:svelte-ui"
+    ],
+    "workflowStep": "Playground invocation inside browser shard 4",
+    "galleryOnlyTestFile": "packages/svelte-ui/test/definition-sections.browser.mjs"
+  },
+  "retained": {
+    "packages": [
+      "@viewstem/core",
+      "@viewstem/svelte",
+      "@viewstem/svelte-ui"
+    ],
+    "minimalSvelteExample": "packages/svelte/example/",
+    "publicSourcesAndDependencyLockUnchanged": true,
+    "pureCompositionFixtures": [
+      "packages/svelte-ui/test/fixtures/scenarios.mjs",
+      "packages/svelte-ui/test/fixtures/scenario-state.mjs"
+    ]
+  },
+  "coverage": {
+    "playground": {
+      "basis": "517503d72db30ed3363b7fd61285f480870fce79:playground/test/*.test.mjs; static source inspection only; not an equivalent E2E replacement",
+      "classification_note": "Package-contract mappings establish only the named aspects, not equivalent end-to-end tests. All tests also exercise the retired app or its vanilla adapter. Empty mappings classify primary behavior as retired; Korean IME, numeric entry, app error/inspector, server and shell belong to removed implementation.",
+      "counts": {
+        "package_contract_partial": 23,
+        "retired_shell_or_vanilla_adapter": 18
+      },
+      "uncertainty": "No evidence that removed tests uniquely exercise a product-only contract; combined real HTTP + DOM + Korean IME, focus/selection and duplicate action retry sequences are not proven equivalent by package tests. No product Svelte UI IME equivalence is asserted.",
+      "tests": [
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "Korean pasted text survives URL encoding and filters the actual HTTP results",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "Korean IME composition survives a pending Query response and commits exactly once",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "Korean IME cancellation, blur commit and later typing keep State and input synchronized",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "an external State reset permits re-entering the same Korean text after IME commit",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "JSON starts a real HTTP Query; editing input updates State, Action, results and preserves focus",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/core/test/runtime-query.test.mjs",
+              "test": "N02 unknown reference without resolver fails clearly; default public native HTTP works without a supplied executor"
+            },
+            {
+              "file": "packages/svelte/test/browser.test.mjs",
+              "test": "State and Query handles cross explicit ports and stay usable from adapter interactions"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "Action inspector observes asynchronous running and successful false without treating it as missing",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/core/test/action.test.mjs",
+              "test": "A04 A05 A06 A07 A18: false/null/void raw results and lexical branch scope"
+            },
+            {
+              "file": "packages/core/test/runtime-ui-review.test.mjs",
+              "test": "A14 action observations exist before earlier sibling inputs and remain current while running"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "Query errors preserve last success, expose stale and diagnostics, and recover after input change",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/core/test/runtime-query.test.mjs",
+              "test": "K25/K27 current Query status keeps prior data/dataInputs stale on failure and replaces the pair after retry"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "State and CEL Derived render through JSON; when removes and recreates the visual node",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/svelte/test/browser.test.mjs",
+              "test": "renderer functions configure registration and actual CEL execution together"
+            },
+            {
+              "file": "packages/svelte/test/browser.test.mjs",
+              "test": "when removal cancels async Action and stale adapter callback; recreation is independent"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "JSON Component composition, authored slots and repeat render once without duplicate children",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/svelte/test/browser.test.mjs",
+              "test": "named and empty forwarded slots preserve order and author scope; host context reaches adapters"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "invalid JSON, invalid references and invalid schemas preserve the last live preview",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/svelte/test/browser.test.mjs",
+              "test": "invalid updates/replacements preserve DOM, State and generation; valid replace starts fresh lifetime"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "initial Query failure remains inspectable and the run indicator recovers with the Query",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/svelte/test/browser.test.mjs",
+              "test": "Query initial waits for DOM commit while ready siblings render progressively; errors and retry recover"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "rerunning a JSON document creates a fresh runtime instead of retaining edited State",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/svelte/test/browser.test.mjs",
+              "test": "invalid updates/replacements preserve DOM, State and generation; valid replace starts fresh lifetime"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "stop cancels pending HTTP and rejects late publications; a later run starts cleanly",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/svelte/test/browser.test.mjs",
+              "test": "replacement cancels pending initial and prevents late Query results from reaching current DOM"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "rapid executions and replacement while an Action runs never publish the old generation",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/svelte/test/browser.test.mjs",
+              "test": "owned runtime disposal cancels direct View Query and Action execution with reentrant abort cleanup"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "draft reload restores exact edits without automatically executing their requests",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "import preserves the running view until execution; export retains the exact editable draft",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "registered View references and explicit inputs use the same public core API",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/core/test/runtime-management.test.mjs",
+              "test": "N02 referenced definitions resolve recursively in their expected kind and invalid resolution keeps current View"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "literal HTML stays text and inspector preserves null and false",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/svelte/test/browser.test.mjs",
+              "test": "missing adapter is isolated, initial rejects, and text remains escaped"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "keyboard execution, formatting, accessible tabs and component reference help work",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "mobile switches between full-height editor, preview and inspector without page overflow",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "workspace fills the viewport; splitters resize by pointer and keyboard with bounded pane sizes",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "Snapshot and Log use exclusive inspectable tabs and log clearing does not alter runtime state",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "Action failure exposes the actual core error in the inspector",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+              "test": "K28 real fresh RefreshQuery failure rejects the Action while retaining data and suppressing its remaining stages/output"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/playground.test.mjs",
+          "name": "playground server serves only its assets and mock endpoint, without a filesystem or proxy route",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "numeric keyboard entry preserves decimals and exponents; blank editing restores the committed value on blur",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "pending inputs remain disabled until their State becomes ready, and disabled buttons emit no Action",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/svelte/test/browser.test.mjs",
+              "test": "required Value input waiting and type errors recover without replacing sibling DOM"
+            },
+            {
+              "file": "packages/svelte/test/browser.test.mjs",
+              "test": "saved emit checks current input readiness synchronously before Svelte has flushed"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "a Derived calculation error is inspectable and recovers when its input becomes valid",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/core/test/state-lifecycle.test.mjs",
+              "test": "C10/derived-failure-and-cycle"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "Action failure preserves completed State writes and a successful retry clears its active error",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/core/test/action.test.mjs",
+              "test": "A01 A08 A23 A24: completed State and external effects survive subsequent failure"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "double-clicking a running Action produces one HTTP execution and recovers after it completes",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/core/test/action-acceptance.test.mjs",
+              "test": "A11/A13/A15 active event connection ignores duplicate while independent shared-State call survives its removal"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "Query executeWhen blocks refresh, then opening the gate recovers both data and the error indicator",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/core/test/query-acceptance-gaps.test.mjs",
+              "test": "K14 retry never bypasses a closed gate or trusted server authorization even with refresh disabled"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "polling resumes, pauses without blocking manual refresh, and stops issuing requests after disposal",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/core/test/query.test.mjs",
+              "test": "polling anchors at whole completion and resumes with one immediate fresh request"
+            },
+            {
+              "file": "packages/core/test/query.test.mjs",
+              "test": "pause removes only periodic pending intent while preserving input/manual work"
+            },
+            {
+              "file": "packages/core/test/query.test.mjs",
+              "test": "gate closure rejects waiters; disposal blocks late publication and cleans polling"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "rapid search edits converge to the last input without publishing stale Query results",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/core/test/runtime.test.mjs",
+              "test": "Q01/K18 query input changes publish current data only, view initial settles"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "keyed repeat reorders preserve focused IME editing and local State; removal creates a fresh lifetime",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/svelte/test/browser.test.mjs",
+              "test": "repeat keys preserve Svelte and core state on reorder, and removal creates a new lifetime"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "named slots retain their order and duplicate repeat keys are rejected before replacing the running view",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/svelte/test/browser.test.mjs",
+              "test": "named and empty forwarded slots preserve order and author scope; host context reaches adapters"
+            },
+            {
+              "file": "packages/core/test/runtime-query.test.mjs",
+              "test": "N05/K23 dynamic duplicate-key update rolls back staged State writes before retaining the old screen and pending initial"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "unresolved when and repeat nodes remain distinct across slots and resolve independently",
+          "classification": "package_contract_partial",
+          "related_tests": [
+            {
+              "file": "packages/svelte/test/browser.test.mjs",
+              "test": "multiple pending placeholders without addresses remain separate and recover in authored order"
+            }
+          ]
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "invalid JSON envelopes, duplicate built-ins and oversized UTF-8 drafts preserve the active view",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "a slow file import never overwrites a newer editor change or a later imported file",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "storage denial and oversized file rejection leave the editor and runtime usable",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "preview node and diagnostic limits remain recoverable and never report a rendering failure as ready",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "narrow and landscape viewports expose controls without page overflow, and logs stay bounded",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        },
+        {
+          "source": "playground/test/edge-cases.test.mjs",
+          "name": "malformed HTTP request targets return 400 without terminating the playground server",
+          "classification": "retired_shell_or_vanilla_adapter",
+          "related_tests": []
+        }
+      ]
+    },
+    "svelteUI": {
+      "beforeTests": 117,
+      "afterTests": 108,
+      "beforeFiles": 11,
+      "afterFiles": 10,
+      "shards": 4,
+      "retired": [
+        {
+          "name": "every section of all 71 examples round trips without changing the ViewSpec",
+          "reason": "Removed kind editor and draft serialization."
+        },
+        {
+          "name": "nested declarations are indexed by scope, literal data is ignored, and escaped keys cannot pollute prototypes",
+          "reason": "Removed kind editor's section index and path replacement."
+        },
+        {
+          "name": "State and Action edits retain other kinds and run as one ViewSpec",
+          "reason": "Removed kind editor editing and merging. Runtime State and Action integration remains in the composition and recipe tests."
+        },
+        {
+          "name": "Query and Component sections retain their input bindings and alter the actual preview",
+          "reason": "Removed kind editor editing and merging. Query-backed rendering remains in the catalog and composition tests."
+        },
+        {
+          "name": "invalid JSON blocks section changes without losing the draft or the running preview",
+          "reason": "Removed editor draft parsing and section switching. Runtime replacement rejection remains in catalog.browser.mjs."
+        },
+        {
+          "name": "section navigation supports keyboard, URL reload, and narrow screens",
+          "reason": "Removed editor navigation, URL parameters, and layout."
+        },
+        {
+          "name": "gallery preserves live State through persisted page transitions and cleans up on final exit",
+          "reason": "Removed host pagehide/pageshow handling. Renderer/attachment disposal coverage remains in bridge and audit tests."
+        },
+        {
+          "name": "gallery panels use the viewport and keep the inspector scrollable on desktop and narrow screens",
+          "reason": "Removed inspector and editor/preview layout."
+        },
+        {
+          "name": "screen examples fit narrow layouts and retain functional controls in dark mode",
+          "reason": "Removed screen picker, editor/preview viewport layout and gallery theme toggle. Native portal theme continues to be checked in bridge.browser.mjs."
+        }
+      ],
+      "renamedAndMigrated": [
+        {
+          "before": "gallery Action, Korean input, Query and rejected JSON use the live View",
+          "after": "Action, Korean input, Query and rejected replacement use the live View"
+        },
+        {
+          "before": "Command gallery searches Korean labels while preserving stable values",
+          "after": "Command searches Korean labels while preserving stable values"
+        },
+        {
+          "before": "five full-screen examples are serializable, addressable and switch back to the 66 component samples",
+          "after": "five composition fixtures render from serializable ViewSpecs"
+        },
+        {
+          "before": "profile validation, tabs and settings persist through Actions and restore resets the example",
+          "after": "profile validation, tabs and settings persist through Actions"
+        },
+        {
+          "before": "dashboard periods refresh Query metrics and chart geometry without remounting the gallery",
+          "after": "dashboard periods refresh Query metrics and chart geometry in the same View"
+        }
+      ],
+      "requiredAuditSourcesAndCaseNamesUnchanged": true,
+      "audit": {
+        "families": 66,
+        "passedFamilies": 66,
+        "requiredCases": 68,
+        "missing": []
+      },
+      "migration": "Direct mounting, replacement and State/Query/Action snapshots through built package exports. No gallery shell/editor/server copied into a test app."
+    }
+  },
+  "verification": {
+    "checkSvelteUI": {
+      "command": "npm run check:svelte-ui",
+      "node": "v24.1.0",
+      "exitCode": 0,
+      "builds": [
+        "@viewstem/core",
+        "@viewstem/svelte",
+        "@viewstem/svelte-ui"
+      ],
+      "typecheck": "passed; zero errors and warnings",
+      "generatedSources": "passed; pinned source, generated components, styles and audit matrix",
+      "browser": {
+        "sourceHash": "113ca9fa95ec85cb87e5f1b6d8046c8f952e0bb90974d2a92e931c3a67c5237e",
+        "revision": "517503d72db30ed3363b7fd61285f480870fce79",
+        "node": "v24.1.0",
+        "platform": "darwin",
+        "arch": "arm64",
+        "recordedAtUtc": "2026-11-04T01:45:37.409Z",
+        "scope": {
+          "index": null,
+          "total": 4,
+          "files": [
+            "audit-controls.browser.mjs",
+            "audit-display.browser.mjs",
+            "audit-overlays.browser.mjs",
+            "audit-shared.browser.mjs",
+            "bridge.browser.mjs",
+            "catalog.browser.mjs",
+            "controls.browser.mjs",
+            "ime-domain.browser.mjs",
+            "recipes.browser.mjs",
+            "scenarios.browser.mjs"
+          ]
+        },
+        "summary": {
+          "success": true,
+          "counts": {
+            "tests": 108,
+            "failed": 0,
+            "passed": 108,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0,
+            "topLevel": 108,
+            "suites": 0
+          },
+          "duration_ms": 209463.154875
+        },
+        "audit": {
+          "families": 66,
+          "passedFamilies": 66,
+          "requiredCases": 68,
+          "missing": []
+        }
+      },
+      "installedConsumer": {
+        "node": "v24.1.0",
+        "chromium": "151.0.7922.34",
+        "svelte": "5.57.3",
+        "tarball": {
+          "integrity": "sha512-uqZv4vKX6MnnJkR8OwnhCCpy4UdTGnnE+3zw1iIYgEifj/+Or/7sIJDdMcekvmn2Rztzo2nycIRFd1Z7kf6YuQ==",
+          "bytes": 293675,
+          "unpackedBytes": 5398257,
+          "files": 1120
+        },
+        "installedSources": {
+          "@viewstem/core": "file:viewstem-core-0.1.0.tgz",
+          "@viewstem/svelte": "file:viewstem-svelte-0.1.0.tgz",
+          "@viewstem/svelte-ui": "file:viewstem-svelte-ui-0.1.0.tgz"
+        },
+        "license": "MIT; installed text in all three packages and upstream UI notices verified",
+        "familyExports": 66,
+        "selected": {
+          "js": {
+            "bytes": 827450,
+            "gzipBytes": 258989
+          },
+          "css": {
+            "bytes": 292012,
+            "gzipBytes": 31183
+          },
+          "modules": 249
+        },
+        "full": {
+          "js": {
+            "bytes": 4015409,
+            "gzipBytes": 754433
+          },
+          "modules": 2944,
+          "engines": [
+            "LayerChart",
+            "TanStack Table",
+            "Sonner"
+          ]
+        },
+        "excludedFromButton": [
+          "LayerChart",
+          "TanStack Table",
+          "Sonner",
+          "Shiki"
+        ],
+        "typecheck": "passed (strict consumer with skipLibCheck)",
+        "esmBrowser": "passed"
+      }
+    },
+    "svelteInstalledConsumer": {
+      "command": "npm run test:svelte:package",
+      "node": "v24.1.0",
+      "exitCode": 0,
+      "result": {
+        "nodeVersion": "v24.1.0",
+        "svelteVersion": "5.57.3",
+        "files": [
+          "LICENSE",
+          "README.ko.md",
+          "README.md",
+          "dist/ConnectedView.svelte",
+          "dist/ConnectedView.svelte.d.ts",
+          "dist/connection.d.ts",
+          "dist/connection.js",
+          "dist/index.d.ts",
+          "dist/index.js",
+          "dist/NodeList.svelte",
+          "dist/NodeList.svelte.d.ts",
+          "dist/renderer.d.ts",
+          "dist/renderer.js",
+          "dist/RenderNode.svelte",
+          "dist/RenderNode.svelte.d.ts",
+          "dist/types.d.ts",
+          "dist/types.js",
+          "dist/ViewstemView.svelte",
+          "dist/ViewstemView.svelte.d.ts",
+          "package.json"
+        ],
+        "integrity": "sha512-H64zW1sU7FkGCarD/mNVt9nm6buY8Xzdl44e7fPgr7s7TAXRIfZbxGBzzrPDlmPyZyUO6qxXZ4SPKYP3tCFThQ==",
+        "bytes": 17897,
+        "unpackedBytes": 55843,
+        "license": "MIT; installed text verified",
+        "consumerDependencies": [
+          "@viewstem/svelte",
+          "svelte"
+        ],
+        "coreResolution": "transitive dependency; local tarball override for unpublished core",
+        "imports": "@viewstem/svelte only (runtime and shared types)",
+        "types": "passed",
+        "browser": "passed",
+        "errors": []
+      }
+    },
+    "ciTools": [
+      {
+        "command": "npm run test:ci",
+        "node": "v22.21.1",
+        "exitCode": 0,
+        "tests": 14,
+        "passed": 14,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      {
+        "command": "npm run test:ci",
+        "node": "v24.1.0",
+        "exitCode": 0,
+        "tests": 14,
+        "passed": 14,
+        "failed": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    ],
+    "focusedMigration": {
+      "tests": 38,
+      "passed": 38,
+      "failed": 0,
+      "log": ".git/ci-evidence/remove-demos-2026-11-04/svelte-ui-migrated-browser.txt"
+    },
+    "workflowSyntax": {
+      "command": "actionlint .github/workflows/core.yml",
+      "exitCode": 0
+    },
+    "javascriptSyntax": {
+      "command": "node --check on each changed or added .mjs file",
+      "files": 11,
+      "exitCode": 0
+    },
+    "yamlSyntax": {
+      "parser": "Ruby YAML",
+      "files": [
+        ".github/workflows/core.yml",
+        ".github/ISSUE_TEMPLATE/bug_report.yml"
+      ],
+      "result": "passed"
+    },
+    "sourceIdentity": "Final report validated against the current worktree and complete 10-file browser plan; all 66 families and 68 required names passed",
+    "documents": {
+      "checkedFiles": 22,
+      "missingLocalLinkPaths": [],
+      "languagePairs": [
+        {
+          "files": [
+            "CONTRIBUTING.md",
+            "CONTRIBUTING.ko.md"
+          ],
+          "matchingCodeExceptTranslatedComments": true
+        },
+        {
+          "files": [
+            "README.md",
+            "README.ko.md"
+          ],
+          "matchingCodeExceptTranslatedComments": true
+        },
+        {
+          "files": [
+            "docs/README.md",
+            "docs/README.ko.md"
+          ],
+          "matchingCodeExceptTranslatedComments": true
+        },
+        {
+          "files": [
+            "docs/ci.md",
+            "docs/ci.ko.md"
+          ],
+          "matchingCodeExceptTranslatedComments": true
+        },
+        {
+          "files": [
+            "packages/svelte-ui/README.md",
+            "packages/svelte-ui/README.ko.md"
+          ],
+          "matchingCodeExceptTranslatedComments": true
+        },
+        {
+          "files": [
+            "packages/svelte/README.md",
+            "packages/svelte/README.ko.md"
+          ],
+          "matchingCodeExceptTranslatedComments": true
+        }
+      ],
+      "scope": "Changed Markdown local path existence and paired executable snippets; anchors and external URLs are not network-checked"
+    }
+  },
+  "preservation": {
+    "historicalReports": "Unchanged; valid only for their original revision and scope",
+    "historicalSourceLinksRevision": "b1d82953ee418def825499e8090c999249cb2d94",
+    "untrackedFilesInRemovedDirectories": 0,
+    "ignoredPlaygroundFiles": {
+      "count": 49,
+      "oldPath": "playground/test/results",
+      "archivePath": ".git/ci-evidence/remove-demos-2026-11-04/playground-results-original",
+      "allSha256Matched": true,
+      "manifestSha256": "969ec94bb4667774001dbfb4e4ea48c63879c2c23dc15406f5de7ffc50082a83"
+    }
+  },
+  "localEvidence": [
+    {
+      "path": ".git/ci-evidence/remove-demos-2026-11-04/check-svelte-ui.log",
+      "sha256": "77ad052d86af17f1e157af799e74003c32539f2e7f1dabd85b40ed51c7bf6361"
+    },
+    {
+      "path": ".git/ci-evidence/remove-demos-2026-11-04/test-ci-node22.log",
+      "sha256": "9c4dcdd92b78895e568d64c4b58fe6bfe901493f6f6a5e1cf8d76b845635d064"
+    },
+    {
+      "path": ".git/ci-evidence/remove-demos-2026-11-04/test-ci-node24.log",
+      "sha256": "c7bbd883151ca56c6875ff0dda4ff27c2cbf1efdeff7d205deb1c40eb68be8b9"
+    },
+    {
+      "path": ".git/ci-evidence/remove-demos-2026-11-04/test-svelte-package.log",
+      "sha256": "19a9f9fc5942bfd449cce1fe1f5612a5db1363e4d2ef34474b0d7740844b5854"
+    },
+    {
+      "path": ".git/ci-evidence/remove-demos-2026-11-04/svelte-ui-migrated-browser.txt",
+      "sha256": "a89b4c0f3c754088dee083ff90c3ac35d5f603136fd37002f8970d36b4871cc4"
+    }
+  ],
+  "notRun": [
+    "Remote GitHub Actions and new CI timing measurements",
+    "Full core and Svelte runtime suites: unchanged source and tests; not counted as new passes",
+    "Removed playground and gallery-only flows"
+  ],
+  "limits": [
+    "The 41 retired playground cases have partial static product-contract mappings, not equivalent retained end-to-end coverage.",
+    "This change removes temporary tools; it does not expand the supported browser or public package contract."
+  ]
+}

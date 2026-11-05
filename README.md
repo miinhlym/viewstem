@@ -17,30 +17,6 @@ The packages have been built and tested locally. A package version or local
 verification result does not establish publication on npm. See each package's
 README for its public API, supported behavior, and limitations.
 
-## Try it locally
-
-From a clone of this repository:
-
-```sh
-npm ci --ignore-scripts
-npm run playground
-```
-
-The [vanilla playground](playground/README.md) lets you edit JSON, preview the
-rendered view, and inspect State, Query, and Action execution. To try Svelte, run
-one of these commands in a separate terminal:
-
-```sh
-npm run example:svelte
-npm run example:svelte-ui
-```
-
-The [Svelte example](packages/svelte/example/README.md) demonstrates custom
-component registration. The [shadcn gallery](packages/svelte-ui/example/README.md)
-includes 66 component families and five composed screen examples, with JSON
-editing and runtime inspection. Its README distinguishes JSON adapters from
-parts that require native Svelte composition.
-
 ## Documentation
 
 - [Documentation guide](docs/README.md): usage, contracts, and verification records.

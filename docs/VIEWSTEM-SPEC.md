@@ -81,7 +81,7 @@ JSON 예시는 확정된 구조의 의미를 설명한다. 외부 코드형 Comp
 
 - 바닐라 DOM 컴포넌트를 먼저 만들고 Svelte가 이를 감싸야 한다는 결정은 아니다. 화면 구현은 각 렌더러가 맡는다.
 
-- U38의 [바닐라 core playground](../playground/README.md)는 JSON을 편집·실행하고 화면과 State·Query·Action을 확인하는 개발 도구다. 공개 core API를 소비하며 DOM 컴포넌트는 도구 안에 둔다. 이 도구의 DOM 어댑터를 Svelte의 필수 기반으로 정하거나 core에 DOM 책임을 추가하지 않는다.
+- U46·D103에서 임시 바닐라 playground와 shadcn 갤러리를 제거했다. 패키지 사용은 각 공개 README를 따르며, UI 검증은 패키지를 직접 마운트하는 내부 fixture로 수행한다. 도구 제거는 core·renderer·UI 패키지의 공개 계약이나 지원 목록을 변경하지 않는다. [제거와 검증 범위](handoff/temporary-tools-removal-2026-11-04.md)를 따른다.
 - U39–U40의 [Svelte 클라이언트 렌더러](../packages/svelte/README.md)는 공개 core projection·수명·이벤트에 Svelte 구현을 연결한다. `@viewstem/svelte`의 `createRenderer()`만으로 시작하며 기본 UI·Action·테마 자동 등록 없이 호스트가 Component 계약과 구현을 각각 등록한다. 실제 패키지 검증과 지원 한계는 [인계](handoff/svelte-implementation-2026-11-02.md)를 따른다.
 - U44의 [Svelte UI 패키지](../packages/svelte-ui/README.md)는 별도의 명시적 ComponentSet으로 shadcn 카탈로그를 제공한다. 묶음 등록은 계약과 구현을 원자적으로 등록하며, core의 JSON DSL·State 엔진에 UI 의존성을 추가하지 않는다. 351개 JSON 원본 부품·6개 조합과 35개 native 문맥 전용 부품의 경계는 [U44 인계](handoff/svelte-ui-shadcn-implementation-2026-11-03.md)를 따른다. scoped slot 값 전달이나 ECharts/Canvas 계약을 확장하지 않는다.
 

@@ -124,7 +124,6 @@ Node 22/24, Svelte 5.57.3, 브라우저 클라이언트와 TypeScript Bundler �
 원본 shadcn commit은 `fe4b0ad3b8b30c6745346db008c3307b5afeabb1`이고 CLI 기준은 1.7.2입니다. [NOTICE](upstream/NOTICE.txt), 고정 원본 archive/hash, vendor 변환 스크립트, Sonner의 고정 runtime/license와 lockfile을 함께 보존합니다. npm 발행은 별도 작업입니다.
 
 ```sh
-npm run example:svelte-ui       # JSON 편집·실제 화면·State/Query/Action, 기본 :4175
 npm run check:svelte-ui         # 빌드·타입·재생성 일치·브라우저·격리 tarball
 npm run generate -w @viewstem/svelte-ui # 고정 원본·설치된 고정 dependency에서 재생성
 npm run audit:matrix -w @viewstem/svelte-ui # 66개 동작 검증표 재생성

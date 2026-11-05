@@ -32,18 +32,9 @@ npm ci --ignore-scripts
 npx playwright install chromium
 ```
 
-[CI 행렬](.github/workflows/core.yml)에 있는 Node.js 버전을 사용하세요.
-명령의 기준은 [workspace scripts](package.json)입니다. 예제는 로컬에서 실행합니다.
-
-```sh
-npm run playground
-npm run example:svelte
-npm run example:svelte-ui
-```
-
-각 명령은 별도의 개발 서버를 시작합니다. 포트와 옵션은 해당
-[플레이그라운드](playground/README.ko.md), [Svelte 예제](packages/svelte/example/README.ko.md),
-[UI 갤러리](packages/svelte-ui/example/README.ko.md) 안내에서 확인하세요.
+[CI 행렬](.github/workflows/core.yml)의 Node.js 버전을 사용하세요.
+[workspace 스크립트](package.json)와 [검증 표](#검증)에서 변경에 필요한 패키지 검사를
+확인할 수 있습니다.
 
 ## 프로젝트 계약을 지키며 작업하기
 
@@ -65,7 +56,7 @@ npm run example:svelte-ui
 
 ## 문서 언어
 
-루트·패키지·플레이그라운드·예제 README, 문서 안내, 커뮤니티 정책은 기본 파일을
+루트·패키지·예제 README, 문서 안내, 커뮤니티 정책은 기본 파일을
 영문으로 작성하고 같은 디렉터리의 `*.ko.md`에 한국어 문서를 제공합니다.
 각 문서 상단에서 다른 언어로 전환할 수 있어야 합니다. 예제·명령·지원 제한을
 포함해 두 언어를 같은 변경에서 함께 갱신하세요. 번역이 있으면 현재 문서의
@@ -87,8 +78,7 @@ npm run example:svelte-ui
 | core 동작 또는 계약 | `npm run check`; 브라우저 동작이면 `npm run test:browser` 추가 |
 | core 패키지 구성·타입 선언·패키지 README | `npm run build` 후 `npm run test:package` |
 | Svelte 렌더러 또는 해당 예제 | `npm run check:svelte` |
-| Svelte UI 어댑터·생성 소스·스타일·갤러리 | `npm run check:svelte-ui` |
-| 바닐라 플레이그라운드 | `npm run test:playground` |
+| Svelte UI 어댑터·생성 소스·스타일·브라우저 fixture | `npm run check:svelte-ui` |
 | CI 설정 또는 브라우저 보고서 | `npm run test:ci`; workflow 문법을 확인하고 [CI 안내](docs/ci.ko.md)의 영향받는 브라우저 검증 실행 |
 | 패키지 메타데이터나 라이선스 파일만 변경 | 해당 패키지를 빌드하고 기존 소비자 검사인 `test:package`, `test:svelte:package`, `test:svelte-ui:package` 실행 |
 | 커뮤니티 문서나 템플릿만 변경 | 링크·예제·해당 JSON/YAML 문법과 `git diff --check` 확인 |

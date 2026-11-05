@@ -11,7 +11,7 @@ body:
     id: affected
     attributes:
       label: Package version or source commit
-      description: Include the affected package, playground, or example.
+      description: Include the affected package and its version or source commit.
       placeholder: "@viewstem/core at commit …"
     validations:
       required: true
@@ -27,9 +27,7 @@ body:
     attributes:
       label: Reproduction
       description: |
-        Use the reproduction path that fits your report:
-        - Playground or gallery: identify the screen/example, include the JSON used to run it, and list the steps that trigger the problem.
-        - Consumer app or core script: include minimal runnable JSON/code, the necessary resource/component registrations, and runtime/renderer setup.
+        Include minimal runnable JSON/code, the necessary resource/component registrations, runtime/renderer setup, and the steps that trigger the problem in your consumer app or core script.
         If the reproduction makes external Query requests, provide mock responses or a local fixture so it can run without private services or credentials.
         An inline example or a public reproduction repository is welcome; a hosted reproduction URL is not required.
     validations:

@@ -1,6 +1,8 @@
 # 바닐라 core playground 구현 인계
 
-U38·D94의 JSON 편집·실행·화면 미리보기·State/Query/Action 관찰을 `playground/`에 구현했다. 실행 방법과 정확한 사용 범위는 [playground README](../../playground/README.md), 실행 환경·테스트 이름·해시는 [검증 결과](playground-verification-results.json)가 소유한다. 이 도구는 실제 `@viewstem/core` 공개 진입점을 소비한다.
+> 이 문서는 제거 전 리비전의 기록이다. 임시 앱은 U46에서 제거했으며 [현재 제거·검증 범위](temporary-tools-removal-2026-11-04.md)를 따른다. 아래 소스 링크는 당시 리비전으로 고정한다.
+
+U38·D94의 JSON 편집·실행·화면 미리보기·State/Query/Action 관찰을 `playground/`에 구현했다. 실행 방법과 정확한 사용 범위는 [playground README](https://github.com/miinhlym/viewstem/blob/b1d82953ee418def825499e8090c999249cb2d94/playground/README.md), 실행 환경·테스트 이름·해시는 [검증 결과](playground-verification-results.json)가 소유한다. 이 도구는 실제 `@viewstem/core` 공개 진입점을 소비한다.
 
 ## 범위와 완료 기준
 

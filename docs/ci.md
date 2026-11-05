@@ -14,14 +14,14 @@ use a pull request or manual dispatch to check them.
 | Job | Environment | Checks |
 |---|---|---|
 | Node compatibility | Node 22.21.1 and 24.1.0, Ubuntu | Build all three packages, core tests/types/acceptance mapping, CI tooling regressions, Svelte/UI types, reproducible generated sources, all three installed tarball consumers |
-| Browser integration | Inside UI shard 4 on Node 24.1.0 | Core browser behavior, Svelte renderer, vanilla playground |
+| Browser integration | Inside UI shard 4 on Node 24.1.0 | Core browser behavior and Svelte renderer |
 | UI browser | Node 24.1.0, Chromium, four Ubuntu jobs | Every Svelte UI browser file, with a fresh context/page per case and sequential files inside each shard |
 | CI complete | Node 24.1.0, Ubuntu | All prerequisite jobs succeeded; all shards have matching source/revision/environment; no missing files, duplicate cases, failures, skips or todos; all 66 family contracts verified |
 
 Browser behavior runs once across the shards. Node-specific build and package
 installation checks run on both Node versions. This changes test scheduling,
 not the package API or supported component behavior. Tests still consume built
-public package exports. The catalog, gallery and tarball checks register the
+public package exports. The catalog and tarball checks register the
 full component collection; individual behavior cases register the complete
 families referenced by their View.
 

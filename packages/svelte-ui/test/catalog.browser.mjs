@@ -5,20 +5,18 @@ import test, { after, before } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { chromium } from 'playwright';
-import { startExample, svelteConsumerPlugin } from '../example/server.mjs';
-import { fixtureComponentIds, rawCompositionComponentIds, samples } from './fixtures/samples.mjs';
+import { createAuditHarness, read, replace, waitState } from './fixtures/audit-harness.mjs';
+import { svelteConsumerPlugin } from './fixtures/svelte-consumer-plugin.mjs';
+import { fixtureComponentIds, rawCompositionComponentIds, sampleBySlug, samples } from './fixtures/samples.mjs';
 
 const inventory = JSON.parse(await readFile(new URL('../../../docs/handoff/shadcn-component-inventory.json', import.meta.url)));
 const styles = fileURLToPath(import.meta.resolve('@viewstem/svelte-ui/shadcn/styles.css'));
-let gallery, browser;
-before(async () => {
-  browser = await chromium.launch({ headless: true });
-});
-after(async () => {
-  await browser?.close();
-  await gallery?.then(app => app.close(), () => {});
-});
-const galleryApp = () => gallery ??= startExample({ port: 0 });
+let harness;
+before(async () => { harness = await createAuditHarness({ fullCatalog: true }); });
+after(async () => { await harness?.close(); });
+
+const setup = (t, slug) => harness.setup(t, sampleBySlug.get(slug).view);
+const select = (page, slug) => replace(page, sampleBySlug.get(slug).view);
 
 const witnesses = {
   'alert-dialog': 'button',
@@ -50,7 +48,8 @@ const witnesses = {
   typography: 'h1',
 };
 
-async function openPage(t) {
+async function openRawPage(t) {
+  const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
   page.setDefaultTimeout(4000);
   page.setDefaultNavigationTimeout(30_000);
@@ -60,35 +59,16 @@ async function openPage(t) {
     window.unhandled = [];
     window.addEventListener('unhandledrejection', event => window.unhandled.push(String(event.reason?.code ?? event.reason)));
   };
-  await page.addInitScript(trackUnhandled);
   await page.evaluate(trackUnhandled);
   t.after(async () => {
     try {
       assert.deepEqual(errors, [], 'no browser errors');
       assert.deepEqual(await page.evaluate(() => window.unhandled), [], 'no unhandled rejections');
     } finally {
-      await page.close();
+      await browser.close();
     }
   });
   return page;
-}
-
-const status = page => page.locator('#status');
-const ready = page => page.getByText('초기 표시 완료', { exact: true }).waitFor({ timeout: 15_000 });
-async function select(page, slug) {
-  await page.locator('#family').selectOption(slug);
-  await page.waitForFunction(() => {
-    const value = document.querySelector('#status').textContent;
-    return value === '초기 표시 완료' || value === '적용 실패' || document.querySelector('#diagnostics').textContent.length > 0;
-  }, undefined, { timeout: 4000 });
-  assert.equal(await page.locator('#diagnostics').textContent(), '', slug);
-  assert.equal(await status(page).textContent(), '초기 표시 완료', slug);
-}
-async function hasState(page, name, expected) {
-  await page.waitForFunction(({ name, expected }) => {
-    const value = JSON.parse(document.querySelector('#inspector').textContent).states[name]?.value;
-    return JSON.stringify(value) === JSON.stringify(expected);
-  }, { name, expected });
 }
 
 test('catalog fixtures account for each upstream family and public component binding', async () => {
@@ -115,95 +95,73 @@ test('catalog fixtures account for each upstream family and public component bin
 });
 
 test('all 66 JSON examples render their expected UI through installed package exports', { timeout: 180_000 }, async t => {
-  const page = await openPage(t);
-  await page.goto((await galleryApp()).url);
-  await ready(page);
-  assert.equal(await page.locator('#family option').count(), 66);
+  const page = await setup(t, samples[0].slug);
   const failures = [];
   for (const { slug } of samples) {
     try {
       await select(page, slug);
       const witness = witnesses[slug] ?? '[data-slot="' + slug + '"]';
-      await page.locator('#preview').locator(witness).first().waitFor({ state: 'attached' });
+      await page.locator('#app').locator(witness).first().waitFor({ state: 'attached' });
     } catch (error) {
-      failures.push({ slug, status: await status(page).textContent(), diagnostic: await page.locator('#diagnostics').textContent(), error: error.message.split('\n')[0] });
+      failures.push({ slug, error: error.message.split('\n')[0] });
     }
   }
   assert.deepEqual(failures, []);
 });
 
-test('gallery Action, Korean input, Query and rejected JSON use the live View', async t => {
-  const page = await openPage(t);
-  await page.goto((await galleryApp()).url);
-  await ready(page);
+test('Action, Korean input, Query and rejected replacement use the live View', async t => {
+  const page = await setup(t, 'button');
   await page.getByRole('button', { name: '저장', exact: true }).click();
-  await hasState(page, 'saved', true);
+  await waitState(page, 'saved', true);
   await page.getByText('저장 여부: true', { exact: true }).waitFor();
-  await page.getByRole('button', { name: '오류 예제' }).click();
-  await page.getByText('적용 실패', { exact: true }).waitFor();
-  assert.match(await page.locator('#diagnostics').textContent(), /INVALID_DEFINITION/);
-  await hasState(page, 'saved', true);
-  await page.getByRole('button', { name: '예제 복원' }).click();
-  await ready(page);
-  await hasState(page, 'saved', false);
+  const invalid = structuredClone(sampleBySlug.get('button').view);
+  invalid.render.inputs = { ...invalid.render.inputs, unsupportedInput: true };
+  const code = await page.evaluate(async view => {
+    try {
+      await (await mounted.replace({ view })).initialComplete;
+    } catch (error) {
+      return error.code;
+    }
+  }, invalid);
+  assert.equal(code, 'INVALID_DEFINITION');
+  assert.equal(await read(page, 'saved'), true);
+  await page.getByText('저장 여부: true', { exact: true }).waitFor();
+  await select(page, 'button');
+  assert.equal(await read(page, 'saved'), false);
   await select(page, 'input');
   const input = page.getByRole('textbox', { name: '이름' });
   await input.fill('하늘');
-  await hasState(page, 'name', '하늘');
+  await waitState(page, 'name', '하늘');
   const intermediate = await input.evaluate(async element => {
     element.dispatchEvent(new CompositionEvent('compositionstart', { bubbles: true }));
     element.value = 'ㅎ';
     element.dispatchEvent(new InputEvent('input', { bubbles: true, data: 'ㅎ', isComposing: true }));
     await new Promise(requestAnimationFrame);
-    return JSON.parse(document.querySelector('#inspector').textContent).states.name.value;
+    return mounted.view.getState('name').read();
   });
   assert.equal(intermediate, '하늘');
   await input.evaluate(element => {
     element.value = '한글';
     element.dispatchEvent(new CompositionEvent('compositionend', { bubbles: true, data: '한글' }));
   });
-  await hasState(page, 'name', '한글');
+  await waitState(page, 'name', '한글');
   await select(page, 'data-table');
-  await page.waitForFunction(() => JSON.parse(document.querySelector('#inspector').textContent).queries.metrics?.status === 'success');
-  assert.equal(await page.locator('#preview table tbody tr').count(), 2);
+  await page.waitForFunction(() => mounted.view.getSnapshot().queries.metrics?.status === 'success');
+  assert.equal(await page.locator('#app table tbody tr').count(), 2);
   await page.getByRole('searchbox', { name: 'Filter rows' }).fill('4월');
-  await hasState(page, 'filter', '4월');
-  await page.locator('#preview tbody').getByText('4월', { exact: true }).waitFor();
+  await waitState(page, 'filter', '4월');
+  await page.locator('#app tbody').getByText('4월', { exact: true }).waitFor();
 });
 
-test('gallery preserves live State through persisted page transitions and cleans up on final exit', async t => {
-  const page = await openPage(t);
-  await page.goto((await galleryApp()).url + '/?example=profile'); await ready(page);
-  const name = page.getByLabel('이름', { exact: true });
-  await name.fill('캐시 전');
-  await name.evaluate(element => { window.retainedName = element; });
-  for (const value of ['복귀 후', '다시 복귀']) {
-    await page.evaluate(async () => {
-      window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: true }));
-      await new Promise(resolve => requestAnimationFrame(resolve));
-      window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
-    });
-    assert.equal(await name.count(), 1);
-    assert.equal(await name.evaluate(element => element === window.retainedName), true);
-    await name.fill(value);
-    await page.getByRole('button', { name: '설정 적용', exact: true }).click();
-    await page.getByText(value + ' · seoyun@example.com', { exact: true }).waitFor();
-  }
-  await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pagehide', { persisted: false })));
-  await page.waitForFunction(() => document.querySelector('#preview').textContent === '');
-});
-
-test('Command gallery searches Korean labels while preserving stable values', async t => {
-  const page = await openPage(t);
-  await page.goto((await galleryApp()).url + '/?family=command');
-  await ready(page);
+test('Command searches Korean labels while preserving stable values', async t => {
+  const page = await setup(t, 'command');
   const input = page.getByPlaceholder('명령 검색', { exact: true });
-  const preview = page.locator('#preview');
+  const preview = page.locator('#app');
   for (const [query, label, value] of [['환경', '환경 설정', 'settings'], ['보고서', '보고서 열기', 'open'], ['도움', '도움말', 'help']]) {
     await input.fill(query);
     await preview.getByRole('option', { name: new RegExp(label) }).waitFor();
     assert.equal(await preview.getByRole('option').count(), 1);
-    await hasState(page, 'selected', value);
+    await waitState(page, 'selected', value);
     assert.equal(await input.inputValue(), query);
     assert.equal(await input.evaluate(element => element === document.activeElement), true);
   }
@@ -214,9 +172,7 @@ test('Command gallery searches Korean labels while preserving stable values', as
 });
 
 test('modal child triggers, menu portals and selection use native controls', { timeout: 45_000 }, async t => {
-  const page = await openPage(t);
-  await page.goto((await galleryApp()).url);
-  await ready(page);
+  const page = await setup(t, 'button');
   for (const [slug, title, role] of [
     ['dialog', '보고서 공유', 'dialog'],
     ['alert-dialog', '보고서 삭제', 'alertdialog'],
@@ -224,15 +180,15 @@ test('modal child triggers, menu portals and selection use native controls', { t
     ['drawer', '필터 설정', 'dialog'],
   ]) {
     await select(page, slug);
-    const trigger = page.locator('#preview').getByRole('button', { name: title, exact: true });
+    const trigger = page.locator('#app').getByRole('button', { name: title, exact: true });
     await trigger.click();
     const overlay = page.getByRole(role, { name: title });
     await overlay.waitFor();
-    await hasState(page, 'open', true);
-    assert.equal(await page.locator('#preview button button').count(), 0);
+    await waitState(page, 'open', true);
+    assert.equal(await page.locator('#app button button').count(), 0);
     await overlay.getByRole('button', { name: '닫기', exact: true }).click();
     await overlay.waitFor({ state: 'hidden' });
-    await hasState(page, 'open', false);
+    await waitState(page, 'open', false);
     await page.waitForFunction(() => {
       const style = document.body.style;
       return style.pointerEvents !== 'none' && style.overflow !== 'hidden';
@@ -244,16 +200,16 @@ test('modal child triggers, menu portals and selection use native controls', { t
     ['menubar', '파일', 'left'],
   ]) {
     await select(page, slug);
-    await page.locator('#preview').getByText(label, { exact: true }).click({ button });
+    await page.locator('#app').getByText(label, { exact: true }).click({ button });
     await page.getByRole('menuitem', { name: /사본 만들기/ }).click();
-    await hasState(page, 'selection', '사본 만들기');
+    await waitState(page, 'selection', '사본 만들기');
   }
   await select(page, 'select');
-  await page.locator('#preview').getByRole('combobox').click();
+  await page.locator('#app').getByRole('combobox').click();
   await page.getByRole('option', { name: '부산' }).click();
-  await hasState(page, 'site', 'busan');
+  await waitState(page, 'site', 'busan');
   await select(page, 'tooltip');
-  const tooltipTrigger = page.locator('#preview').getByRole('button', { name: '저장 단축키' });
+  const tooltipTrigger = page.locator('#app').getByRole('button', { name: '저장 단축키' });
   await tooltipTrigger.hover();
   const tooltip = page.locator('[data-slot=tooltip-content]').filter({ hasText: '⌘S로 변경 사항을 저장합니다.' });
   await tooltip.waitFor();
@@ -269,7 +225,7 @@ test('host namespace exposes calendar and chart parts inside their native scoped
     bundle: true, write: false, format: 'iife', platform: 'browser',
     conditions: ['svelte', 'browser'], plugins: [svelteConsumerPlugin],
   });
-  const page = await openPage(t);
+  const page = await openRawPage(t);
   await page.setContent('<main></main>');
   await page.addStyleTag({ path: styles });
   await page.addScriptTag({ content: bundle.outputFiles[0].text });
@@ -287,27 +243,4 @@ test('host namespace exposes calendar and chart parts inside their native scoped
   const tooltip = page.locator('[data-raw-tooltip]');
   await tooltip.waitFor();
   assert.match(await tooltip.textContent(), /처리량/);
-});
-
-test('gallery panels use the viewport and keep the inspector scrollable on desktop and narrow screens', async t => {
-  const page = await openPage(t);
-  await page.setViewportSize({ width: 1280, height: 800 });
-  await page.goto((await galleryApp()).url);
-  await ready(page);
-  const desktop = await page.evaluate(() => ({
-    height: innerHeight, page: document.documentElement.scrollHeight,
-    editor: document.querySelector('#definition').getBoundingClientRect().height,
-    inspector: document.querySelector('#inspector').getBoundingClientRect().height,
-    panel: document.querySelector('details').getBoundingClientRect().height,
-  }));
-  assert.ok(desktop.page <= desktop.height + 1, JSON.stringify(desktop));
-  assert.ok(desktop.editor > desktop.height * .75);
-  assert.ok(desktop.inspector < desktop.panel);
-  await page.setViewportSize({ width: 390, height: 844 });
-  const narrow = await page.evaluate(() => ({ width: innerWidth, page: document.documentElement.scrollWidth,
-    editor: document.querySelector('#definition').getBoundingClientRect().height,
-    preview: document.querySelector('#preview').getBoundingClientRect().height,
-  }));
-  assert.ok(narrow.page <= narrow.width, JSON.stringify(narrow));
-  assert.ok(narrow.editor > 200 && narrow.preview > 200);
 });

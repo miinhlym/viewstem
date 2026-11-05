@@ -14,14 +14,14 @@ PR이나 수동 실행으로 확인합니다.
 | 작업 | 환경 | 검사 |
 |---|---|---|
 | Node compatibility | Node 22.21.1·24.1.0, Ubuntu | 세 패키지 빌드, core 테스트·타입·인수 대응, CI 도구 회귀, Svelte/UI 타입, 생성 소스 재현, 세 tarball 설치 소비자 |
-| Browser integration | Node 24.1.0 UI shard 4 안에서 실행 | core 브라우저 동작, Svelte renderer, 바닐라 playground |
+| Browser integration | Node 24.1.0 UI shard 4 안에서 실행 | core 브라우저 동작, Svelte renderer |
 | UI browser | Node 24.1.0, Chromium, Ubuntu 작업 4개 | 모든 UI 브라우저 파일; 사례별 독립 context/page와 shard 안의 파일 순차 실행 |
 | CI complete | Node 24.1.0, Ubuntu | 선행 작업 전체 성공; shard의 소스·리비전·환경 일치; 누락 파일·중복 사례·실패·skip·todo 없음; 66개 family 계약 전체 검증 |
 
 브라우저 동작은 shard 전체에서 한 번씩 실행하며, Node별 빌드·패키지 설치는
 두 버전에서 검사합니다. 테스트 배치를 변경하며 공개 API나 컴포넌트 지원 동작은
 바뀌지 않습니다. 테스트는 빌드한 공개 패키지 export를 사용합니다.
-카탈로그·갤러리·tarball 검사는 전체 컴포넌트를 등록하고, 개별 동작 검사는 View에서
+카탈로그·tarball 검사는 전체 컴포넌트를 등록하고, 개별 동작 검사는 View에서
 참조하는 컴포넌트의 family 전체를 등록합니다.
 
 현재 브라우저 검사는 모두 Playwright의 기본 headless shell을 사용하므로 CI는

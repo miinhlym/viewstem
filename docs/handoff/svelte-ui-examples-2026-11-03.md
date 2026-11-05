@@ -1,6 +1,8 @@
 # Svelte UI 화면 예제 추가
 
-사용자의 “여러 예제 만들어” 요청에 따라 기존 66개 컴포넌트 샘플과 별도로 실사용 화면 5개를 추가했다. 구현은 [scenarios.mjs](../../packages/svelte-ui/example/scenarios.mjs), 사용법은 [갤러리 README](../../packages/svelte-ui/example/README.md)를 따른다. 기존 U44 패키지 구현·검증 기록은 당시 증거로 보존한다.
+> 이 문서는 제거 전 리비전의 기록이다. 임시 앱은 U46에서 제거했으며 [현재 제거·검증 범위](temporary-tools-removal-2026-11-04.md)를 따른다. 아래 소스 링크는 당시 리비전으로 고정한다.
+
+사용자의 “여러 예제 만들어” 요청에 따라 기존 66개 컴포넌트 샘플과 별도로 실사용 화면 5개를 추가했다. 구현은 [scenarios.mjs](https://github.com/miinhlym/viewstem/blob/b1d82953ee418def825499e8090c999249cb2d94/packages/svelte-ui/example/scenarios.mjs), 사용법은 [갤러리 README](https://github.com/miinhlym/viewstem/blob/b1d82953ee418def825499e8090c999249cb2d94/packages/svelte-ui/example/README.md)를 따른다. 기존 U44 패키지 구현·검증 기록은 당시 증거로 보존한다.
 
 ## 실행 범위
 

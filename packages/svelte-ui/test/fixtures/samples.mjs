@@ -1,5 +1,4 @@
-// The catalog examples are plain ViewSpec JSON. Helpers only reduce authoring
-// repetition here; the gallery displays and executes the serialized definitions.
+// The catalog fixtures are plain ViewSpec data mounted by the browser tests.
 const string = { type: 'string' };
 const number = { type: 'number' };
 const boolean = { type: 'boolean' };

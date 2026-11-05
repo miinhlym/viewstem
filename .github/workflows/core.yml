@@ -68,12 +68,11 @@ jobs:
       - run: npx playwright install --with-deps --only-shell chromium
       - name: Run assigned browser files
         run: npm run test -w @viewstem/svelte-ui -- --shard=${{ matrix.shard }}/4
-      - name: Core, renderer and playground browser tests
+      - name: Core and renderer browser tests
         if: matrix.shard == 4
         run: |
           npm run test:browser
           npm run test -w @viewstem/svelte
-          node --test playground/test/*.test.mjs
       - name: Preserve shard evidence even on failure
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6

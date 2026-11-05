@@ -3,7 +3,7 @@ import test, { after, before } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { chromium } from 'playwright';
-import { svelteConsumerPlugin } from '../example/server.mjs';
+import { svelteConsumerPlugin } from './fixtures/svelte-consumer-plugin.mjs';
 
 let browser;
 let javascript;

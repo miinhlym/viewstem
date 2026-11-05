@@ -118,4 +118,4 @@ npm run example:svelte
 
 ## 선택 UI 묶음
 
-shadcn-svelte는 별도 [@viewstem/svelte-ui](../svelte-ui/README.ko.md)에서 전체 또는 family 단위로 명시 등록합니다. renderer 자체에는 기본 UI를 넣지 않습니다. `npm run example:svelte-ui`로 전체 갤러리를 실행합니다. U44 등록·callback 수명 회귀의 최신 증거는 [UI 검증 기록](../../docs/handoff/svelte-ui-shadcn-verification-results.json)을 따릅니다.
+shadcn-svelte는 별도 [@viewstem/svelte-ui](../svelte-ui/README.ko.md)에서 전체 또는 family 단위로 명시 등록합니다. renderer 자체에는 기본 UI를 넣지 않습니다. U44 등록·callback 수명 회귀의 최신 증거는 [UI 검증 기록](../../docs/handoff/svelte-ui-shadcn-verification-results.json)을 따릅니다.

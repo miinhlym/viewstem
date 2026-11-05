@@ -23,8 +23,6 @@
     "test:package": "node packages/core/scripts/test-package.mjs",
     "check:coverage": "node packages/core/scripts/check-coverage.mjs packages/core/test/results/current.json",
     "test:report": "node packages/core/scripts/run-tests.mjs",
-    "playground": "npm run build && node playground/server.mjs",
-    "test:playground": "npm run build && node --test playground/test/*.test.mjs",
     "build:svelte": "npm run build && npm run build -w @viewstem/svelte",
     "check:svelte": "npm run build:svelte && npm run typecheck -w @viewstem/svelte && npm run test -w @viewstem/svelte && npm run test:svelte:package",
     "test:svelte": "npm run build:svelte && npm run test -w @viewstem/svelte",
@@ -33,8 +31,7 @@
     "build:svelte-ui": "npm run build:svelte && npm run build -w @viewstem/svelte-ui",
     "check:svelte-ui": "npm run build:svelte-ui && npm run typecheck -w @viewstem/svelte-ui && npm run check:generated -w @viewstem/svelte-ui && npm run test -w @viewstem/svelte-ui && npm run test:svelte-ui:package",
     "test:svelte-ui": "npm run build:svelte-ui && npm run test -w @viewstem/svelte-ui",
-    "test:svelte-ui:package": "node packages/svelte-ui/scripts/test-package.mjs",
-    "example:svelte-ui": "npm run build:svelte-ui && node packages/svelte-ui/example/server.mjs"
+    "test:svelte-ui:package": "node packages/svelte-ui/scripts/test-package.mjs"
   },
   "devDependencies": {
     "@marcbachmann/cel-js": "8.0.0",

@@ -1,18 +1,10 @@
 import assert from 'node:assert/strict';
 import test, { after, before } from 'node:test';
-import { chromium } from 'playwright';
-import { startExample } from '../example/server.mjs';
+import { createAuditHarness } from './fixtures/audit-harness.mjs';
 
-let app;
-let browser;
-before(async () => {
-  app = await startExample({ port: 0 });
-  browser = await chromium.launch({ headless: true });
-});
-after(async () => {
-  try { await browser?.close(); }
-  finally { await app?.close(); }
-});
+let harness;
+before(async () => { harness = await createAuditHarness({ checkConsoleErrors: true }); });
+after(async () => { await harness?.close(); });
 
 const path = value => ({ '@path': value });
 const read = name => path('/states/' + name);
@@ -31,33 +23,11 @@ const set = (id, event, name, next = path('/event/value')) => ({
 });
 const button = (id, text, name, next) => component(id, 'Button', { text }, { on: set(id + '-click', 'click', name, next) });
 
-async function render(t, view) {
-  const page = await browser.newPage();
-  page.setDefaultTimeout(5000);
-  const errors = [];
-  page.on('pageerror', error => errors.push(error.message));
-  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
-  t.after(async () => {
-    try {
-      assert.deepEqual(errors, [], 'browser errors');
-      assert.equal(await page.locator('#diagnostics').textContent(), '', 'renderer diagnostics');
-      const inspector = JSON.parse(await page.locator('#inspector').textContent() || '{}');
-      assert.deepEqual(inspector.errors, [], 'Viewstem diagnostics');
-    } finally { await page.close(); }
-  });
-  await page.goto(app.url);
-  const editor = page.locator('#definition');
-  await editor.fill(JSON.stringify(view));
-  await page.locator('#apply').click();
-  await page.waitForFunction(() => ['초기 표시 완료', '적용 실패'].includes(document.querySelector('#status').textContent));
-  assert.equal(await page.locator('#diagnostics').textContent(), '');
-  assert.equal(await page.locator('#status').textContent(), '초기 표시 완료');
-  return page;
-}
+const render = (t, view) => harness.setup(t, view);
 
 async function expectState(page, name, value, action) {
   await page.waitForFunction(({ name, value, action }) => {
-    const snapshot = JSON.parse(document.querySelector('#inspector').textContent || '{}');
+    const snapshot = mounted.view.getSnapshot();
     return snapshot.states?.[name]?.status === 'ready' &&
       JSON.stringify(snapshot.states[name].value) === JSON.stringify(value) &&
       (!action || snapshot.actions?.[action]?.status === 'success');
@@ -130,7 +100,7 @@ test('DataTable controls round-trip pagination, sorting, filter and row selectio
       ...set('page-size', 'pageSizeChange', 'size'),
     } }),
   });
-  const preview = page.locator('#preview');
+  const preview = page.locator('#app');
   await preview.getByRole('button', { name: 'Next', exact: true }).click();
   await expectState(page, 'index', 1, 'page-index');
   await preview.getByRole('cell', { name: 'Banana' }).waitFor();

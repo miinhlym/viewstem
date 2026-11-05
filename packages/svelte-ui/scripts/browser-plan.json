@@ -1,7 +1,7 @@
 {
   "shards": [
     ["audit-display.browser.mjs", "recipes.browser.mjs", "audit-shared.browser.mjs", "ime-domain.browser.mjs"],
-    ["audit-overlays.browser.mjs", "definition-sections.browser.mjs", "controls.browser.mjs", "bridge.browser.mjs"],
+    ["audit-overlays.browser.mjs", "controls.browser.mjs", "bridge.browser.mjs"],
     ["catalog.browser.mjs", "scenarios.browser.mjs"],
     ["audit-controls.browser.mjs"]
   ]

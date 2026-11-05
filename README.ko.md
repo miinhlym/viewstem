@@ -17,29 +17,6 @@
 npm 공개 발행을 뜻하지는 않습니다. 공개 API, 지원 동작, 제한은 각 패키지의
 README에서 확인하세요.
 
-## 로컬에서 실행하기
-
-저장소를 clone한 뒤 루트에서 실행합니다.
-
-```sh
-npm ci --ignore-scripts
-npm run playground
-```
-
-[바닐라 플레이그라운드](playground/README.ko.md)에서 JSON을 편집하고 화면을
-미리 보며 State·Query·Action 실행을 확인할 수 있습니다. Svelte를 확인하려면
-별도 터미널에서 다음 명령 중 하나를 실행하세요.
-
-```sh
-npm run example:svelte
-npm run example:svelte-ui
-```
-
-[Svelte 예제](packages/svelte/example/README.ko.md)는 사용자 컴포넌트 등록을
-보여줍니다. [shadcn 갤러리](packages/svelte-ui/example/README.ko.md)는 66개
-컴포넌트군과 화면 조합 예제 5개를 제공하며 JSON 편집과 런타임 관찰을 지원합니다.
-JSON 어댑터와 native Svelte 조합이 필요한 부품의 차이는 해당 README에서 확인하세요.
-
 ## 문서
 
 - [문서 안내](docs/README.ko.md): 사용법, 계약, 검증 기록.

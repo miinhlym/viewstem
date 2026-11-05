@@ -37,18 +37,8 @@ npx playwright install chromium
 ```
 
 Use a Node.js version from the [CI matrix](.github/workflows/core.yml). The
-[workspace scripts](package.json) are the command reference. Examples run locally:
-
-```sh
-npm run playground
-npm run example:svelte
-npm run example:svelte-ui
-```
-
-These start separate development servers. See the relevant
-[playground](playground/README.md), [Svelte](packages/svelte/example/README.md), or
-[UI gallery](packages/svelte-ui/example/README.md) instructions for their ports
-and options.
+[workspace scripts](package.json) and [verification table](#verification) describe
+the package checks relevant to your change.
 
 ## Working with the project contracts
 
@@ -70,7 +60,7 @@ explains how contracts, acceptance mappings, and verification evidence are maint
 
 ## Documentation languages
 
-The root, package, playground, and example READMEs, documentation guide, and
+The root, package, and example READMEs, documentation guide, and
 community policies use English in the default file and Korean in a sibling
 `*.ko.md` file. Each pair links to the other language at the top. Keep both
 versions aligned in the same change, including examples, commands, and support
@@ -94,8 +84,7 @@ commands below identify the relevant local gates.
 | Core behavior or contracts | `npm run check`; add `npm run test:browser` for browser behavior |
 | Core package contents, declarations, or package README | `npm run build` then `npm run test:package` |
 | Svelte renderer or its example | `npm run check:svelte` |
-| Svelte UI adapters, generated sources, styles, or gallery | `npm run check:svelte-ui` |
-| Vanilla playground | `npm run test:playground` |
+| Svelte UI adapters, generated sources, styles, or browser fixtures | `npm run check:svelte-ui` |
 | CI configuration or browser reporting | `npm run test:ci`; validate workflow syntax and run the affected browser checks described in the [CI guide](docs/ci.md) |
 | Package metadata or license files only | Build the affected package and run its existing package consumer check: `test:package`, `test:svelte:package`, or `test:svelte-ui:package` |
 | Community documentation or templates only | Check links, examples, JSON/YAML syntax where applicable, and `git diff --check` |

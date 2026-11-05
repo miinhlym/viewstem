@@ -3,11 +3,11 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { chromium } from 'playwright';
-import { svelteConsumerPlugin } from '../../example/server.mjs';
+import { svelteConsumerPlugin } from './svelte-consumer-plugin.mjs';
 
 // Exercise the published package entry points, real Core State/Action dispatch,
 // and native browser controls. This is intentionally not a second UI runtime.
-export async function createAuditHarness() {
+export async function createAuditHarness({ fullCatalog = false, checkConsoleErrors = false } = {}) {
   const bundle = await build({ stdin: { contents: `
     export { createRenderer } from '@viewstem/svelte';
     export { registerComponents } from '@viewstem/svelte-ui';
@@ -26,42 +26,57 @@ export async function createAuditHarness() {
       page.setDefaultTimeout(8000);
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
+      if (checkConsoleErrors) {
+        page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+      }
+      t.after(async () => {
+        try {
+          const evidence = await page.evaluate(async () => {
+            const viewErrors = window.mounted?.view.getSnapshot().errors ?? [];
+            await window.renderer?.dispose();
+            return {
+              diagnostics: window.diagnostics?.filter(e => e.error?.code !== 'CANCELLED'),
+              unhandled: window.unhandled,
+              viewErrors,
+            };
+          });
+          assert.deepEqual(errors, [], 'uncaught browser errors');
+          assert.deepEqual(evidence, { diagnostics: [], unhandled: [], viewErrors: [] }, 'renderer diagnostics and unhandled rejections');
+        } finally { await context.close(); }
+      });
       await page.route('http://localhost/**', route => route.fulfill({ contentType: 'text/html', body: '<!doctype html><html><body><button id="host">Host</button><div id="app" style="padding:24px;max-width:1000px"></div><button id="after">After</button></body></html>' }));
       await page.goto('http://localhost/');
       await page.addScriptTag({ content: javascript });
       await page.addStyleTag({ content: css });
-      await page.evaluate(async view => {
+      const report = await page.evaluate(async ({ view, fullCatalog }) => {
         window.diagnostics = []; window.events = []; window.unhandled = [];
         window.addEventListener('unhandledrejection', e => unhandled.push(String(e.reason?.code ?? e.reason)));
         window.renderer = API.createRenderer({ onError: entry => diagnostics.push(entry) });
         // Behavior cases register the complete families used by their authored View.
-        // Full-catalog registration is still exercised by catalog/gallery and tarball tests.
+        // The catalog consumer registers every family to replace Views in one host.
         const references = new Set();
         const visit = value => {
           if (!value || typeof value !== 'object') return;
           if (typeof value.componentRef === 'string') references.add(value.componentRef);
           for (const child of Object.values(value)) visit(child);
         };
-        visit(view);
-        const sets = API.shadcn.filter(set => set.components.some(entry => references.has(entry.contract.id)));
+        if (!fullCatalog) visit(view);
+        const sets = fullCatalog ? API.shadcn : API.shadcn.filter(set => set.components.some(entry => references.has(entry.contract.id)));
         API.registerComponents(renderer, sets);
         renderer.registry.registerAction({ kind: 'Action', id: 'audit-record', spec: { ports: { name: { kind: 'Value', schema: { type: 'string' } }, payload: { kind: 'Value', schema: true } } } }, ({ inputs }) => { events.push({ name: inputs.name, payload: inputs.payload }); });
         window.mounted = await renderer.mount({ target: document.querySelector('#app'), view });
-        await mounted.initialComplete;
-      }, view);
-      t.after(async () => {
-        try {
-          const evidence = await page.evaluate(async () => {
-            await renderer.dispose();
-            return { diagnostics: diagnostics.filter(e => e.error?.code !== 'CANCELLED'), unhandled };
-          });
-          assert.deepEqual(errors, [], 'uncaught browser errors');
-          assert.deepEqual(evidence, { diagnostics: [], unhandled: [] }, 'renderer diagnostics and unhandled rejections');
-        } finally { await context.close(); }
-      });
+        return mounted.initialComplete;
+      }, { view, fullCatalog });
+      assert.deepEqual(report.queryErrors, [], 'initial Query errors');
       return page;
     },
   };
+}
+
+export const snapshot = page => page.evaluate(() => mounted.view.getSnapshot());
+export async function replace(page, view) {
+  const report = await page.evaluate(async view => (await mounted.replace({ view })).initialComplete, view);
+  assert.deepEqual(report.queryErrors, [], 'initial Query errors');
 }
 
 export const path = value => ({ '@path': value });

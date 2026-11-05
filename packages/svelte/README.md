@@ -118,4 +118,4 @@ The supported scope is the Svelte 5 client-side renderer. This verification excl
 
 ## Optional UI package
 
-Register shadcn-svelte components explicitly, either all at once or by family, through the separate [@viewstem/svelte-ui](../svelte-ui/README.md) package. The renderer ships without default UI components. Run `npm run example:svelte-ui` to open the full gallery. The [UI verification record](../../docs/handoff/svelte-ui-shadcn-verification-results.json) contains the latest U44 regression evidence for registration and callback lifetimes.
+Register shadcn-svelte components explicitly, either all at once or by family, through the separate [@viewstem/svelte-ui](../svelte-ui/README.md) package. The renderer ships without default UI components. The [UI verification record](../../docs/handoff/svelte-ui-shadcn-verification-results.json) contains the latest U44 regression evidence for registration and callback lifetimes.

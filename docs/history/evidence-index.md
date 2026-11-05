@@ -239,3 +239,5 @@ URL의 부재 인용 `Sentinel_c3f93ce9e94c81919d176599664b79e3`도 회수 R05�
 - **U44 · Svelte UI 계획 구현 승인:** 2026-11-03 사용자는 “계획대로 구현해. shadcn 전체 컴포넌트 지원하고 예제, 테스트, 문서까지 같이 맞추고 검증해줘.”라고 요청했다. D100은 별도 UI 패키지의 실제 구현과 원자적 등록 경계를 기록한다. [구현 인계](../handoff/svelte-ui-shadcn-implementation-2026-11-03.md), [실행 검증](../handoff/svelte-ui-shadcn-verification-results.json), 공개 support manifest에서 66개 카탈로그·386개 native 부품과 JSON/native 전용 지원을 구분한다. npm 발행과 커밋 승인은 포함하지 않는다.
 
 - **U45 · shadcn 66개별 동작 감사:** 2026-11-03 사용자는 66개별 검증표와 입력·이벤트·State 전환·중첩·키보드 실제 테스트, 발견 문제 수정과 회귀·검증 문서를 요청했다. [감사 인계](../handoff/svelte-ui-audit-2026-11-03.md)와 [행렬](../handoff/svelte-ui-audit-matrix.md)은 U44의 mount/참조 확인에서 동작 근거를 확장한다. DataTable은 유효 페이지로 표시를 보정하며 호스트 State를 자동 변경하지 않는다. 공개 API 추가·지원 브라우저 확대·커밋·발행은 포함하지 않는다.
+
+- **U46 · 임시 확인용 앱 제거:** 2026-11-04 사용자는 “플레이그라운드랑 shadcn 갤러리 제거해. 저건 임시로 보려고 만든거지, 사용자들보고 직접 그렇게 해서 확인해보라고 한 게 아니야.”라고 요청했다. D103에 따라 실행 앱과 사용 안내를 제거하고 제품 패키지의 검증은 내부 fixture로 분리한다. [제거·검증 기록](../handoff/temporary-tools-removal-2026-11-04.md)은 폐기한 도구 검사와 유지한 제품 검사를 구분한다. 공개 패키지 지원 축소나 과거 증거 삭제를 뜻하지 않는다.

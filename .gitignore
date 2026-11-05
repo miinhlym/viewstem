@@ -5,7 +5,6 @@
 /packages/*/node_modules/
 /packages/core/test/results/
 
-/playground/test/results/
 
 /packages/svelte/test/results/
 /packages/svelte/.svelte-kit/
