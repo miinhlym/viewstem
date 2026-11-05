@@ -13,10 +13,10 @@
 - Codex CLI: [2026-11-05 비교 결과](viewstem-skills-extended-2026-11-05.md)의 실제 검증 범위를 사용한다. 기준선 33/33, B2 32/33, B3 관련 과제 12/12와 비대상 본문 읽기 0/6은 당시 결과다.
 - Codex의 desktop 전용·계정 업로드·클라우드별 발견 경로: 별도 실행 증거가 없으므로 검증 완료로 확대하지 않는다.
 - Claude Code: 현재 지원·실행 검증 범위에서 제외한다. 설치 안내와 22개 준비 fixture는 미검증 참고 자료로 남기고 추가 로그인·설치·모델 실행을 요구하지 않는다.
-- 스킬 본문과 Codex 발견 metadata는 B3 그대로다. 이번 변경은 두 integration 안내의 지원 상태 문구다. 이전 4파일 archive와 현재 폴더 전체가 같은 hash라고 주장하지 않으며, 발행 전 현재 파일 manifest와 archive를 새로 고정한다.
+- 지원 범위 변경 당시 스킬 본문과 Codex 발견 metadata는 B3 그대로였으며, 두 integration 안내의 지원 상태 문구만 변경했다. 같은 날 후속 런타임 수정에 따라 현재 본문의 구독 안내도 갱신했다. 이 본문으로 Codex 모델 비교를 다시 실행하지는 않았다. 이전 4파일 archive와 현재 폴더 전체가 같은 hash라고 주장하지 않으며, 발행 전 현재 파일 manifest와 archive를 새로 고정한다.
 
 ## 남은 배포 조건
 
-Claude Code 미실행은 배포 차단 조건에서 제거한다. 다만 [View 구독 후 투영 불일치](view-subscription-projection-2026-11-05.md)의 제품 수정·관련 회귀 검증과 정확한 패키지 조합·immutable 공개 ref 확보는 여전히 남아 있다. 따라서 이 범위 변경만으로 공식 배포 준비 완료를 선언하지 않는다.
+Claude Code 미실행은 배포 차단 조건에서 제거한다. [View 구독 후 투영 불일치](view-subscription-projection-2026-11-05.md)는 같은 날 후속 작업에서 [제품 수정·회귀·원본 앱 재검증](view-subscription-projection-fix-2026-11-06.md)을 완료했다. 정확한 패키지 조합과 immutable 공개 ref 확보, 현재 스킬 파일의 배포 manifest 고정은 여전히 남아 있다. 따라서 지원 범위 변경과 런타임 수정만으로 공식 배포 준비 완료를 선언하지 않는다.
 
 2026-11-05 평가 JSON, 실험 계획과 EGM snapshot은 당시 조건·결과를 보존한다. 과거의 두 호스트 배포 판단과 현재 범위가 다를 때에는 [현재 명세 §8.5](../VIEWSTEM-SPEC.md#85-외부-앱-개발용-공통-스킬)와 이 문서를 따른다.

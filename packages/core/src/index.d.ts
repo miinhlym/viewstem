@@ -174,7 +174,9 @@ export interface View {
   update(spec: ViewSpec, options?: { readonly inputs?: Readonly<Record<string, unknown>>; readonly states?: Readonly<Record<string, unknown>> }): Promise<ApplicationResult>;
   replace(target: ViewTarget): Promise<ApplicationResult>; exportDefinition(): ViewSpec;
   getState(name: string, instanceId?: string): StateHandle<unknown>; getQuery(name: string, instanceId?: string): QueryHandle<unknown>;
-  getSnapshot(): ViewSnapshot; subscribe(listener: (snapshot: ViewSnapshot) => void): () => void;
+  getSnapshot(): ViewSnapshot;
+  /** State writes during an active projection queue a follow-up; the delivered snapshot stays unchanged. */
+  subscribe(listener: (snapshot: ViewSnapshot) => void): () => void;
   emit(target: string | NodeSnapshot | { readonly address: string; readonly generation: number }, event: string, payload: unknown): Promise<unknown>;
   dispose(): void;
 }

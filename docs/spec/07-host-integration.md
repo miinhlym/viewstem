@@ -57,6 +57,8 @@ await serviceApi.saveDefinition(definition);
 
 update/replace는 `{initialComplete}`을 반환하며 각 initialComplete은 그 적용 세대에 고정된다. 보고는 `{generation, queryErrors}`다. 실행 가능한 최초 Query의 개별 오류는 queryErrors에 모으고 initialComplete 자체를 전체 적용 실패로 reject하지 않는다. 외부 입력 대기는 완료를 막지 않는다. commit 뒤 폐기·다음 세대 교체로 완료할 수 없게 되면 해당 initialComplete은 CANCELLED다. core는 최초 projection 전달까지, 렌더러 연결은 해당 projection 반영 확인까지 포함해 자신의 initialComplete을 완료한다. 렌더러가 없는 core 경로는 DOM을 기다리지 않는다.
 
+View가 투영을 계산·발행하는 중 구독자가 State를 변경하면 재계산 요청을 버리지 않고 기존 microtask 큐에 합친다. 현재 전달 중인 snapshot은 유지하며, 통지를 마친 뒤 후속 투영에서 변경된 입력을 발행한다. 예약된 투영이 남아 있으면 해당 적용의 초기 완료를 먼저 확정하지 않는다. View 폐기 뒤에는 예약 작업이 발행하지 않으며, 교체 뒤에는 현재 정의와 수명으로 계산한다. 일반적인 State 쓰기나 core 이벤트 전체를 별도 비동기 실행 엔진으로 바꾸는 것은 아니다. [D131 구현·회귀 검증](../handoff/view-subscription-projection-fix-2026-11-06.md)을 따른다.
+
 update는 유지할 State의 계약과 기존 연결을 새 정의로 재검증하고, 불일치를 조용한 초기화로 숨기지 않는다. 구조 준비와 실제 외부 요청 실행은 구분한다. 구조 준비를 위한 정의 resolver 조회와 달리, 데이터 Query·코드 Action은 구조 검증 전에 선행 실행하지 않는다. native 실행 context는 `{inputs, signal, invokeAction}`이며 State/Query inputs에는 아래 호출 한정 핸들을 넣는다. 전체 runtime·Store는 자동 주입하지 않는다. untrusted 에이전트 입력으로 owner나 권한을 위조할 수 없도록 서비스 연결층이 공개 대상과 호출자 권한을 먼저 확인한다.
 
 U35의 하위 호출은 부모가 끝난 뒤 사용할 수 없고, 대기하지 않은 자손도 부모 종료 시 취소한다. 별도 UI 관찰 id를 받지 않으며 입력·결과의 의미와 신뢰 코드 경계는 [Action 하위 호출 계약](04-action.md#재귀확장-실행의-경계)을 따른다. JS/TS 문맥의 함수명은 `invokeAction`으로 구체화했으며 다른 언어에서도 같은 수명·오류 의미를 유지한다.

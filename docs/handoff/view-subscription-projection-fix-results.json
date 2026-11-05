@@ -1,0 +1,335 @@
+{
+  "date": "2026-11-06",
+  "status": "runtime-fixed-and-original-consumer-revalidated",
+  "scope": "View projection invalidation lost during subscriber State writes; no publication or new Codex model evaluation",
+  "sourceManifest": [
+    {
+      "path": "packages/core/src/runtime.mjs",
+      "sha256": "13a46b73881aaef64cc92bb7dd5e0cd005785a47126aa909da08eac227e5d98b"
+    },
+    {
+      "path": "packages/core/src/index.d.ts",
+      "sha256": "e319138716ac44e92cbbd054e5c9d1013940f73f3ef58d737ec03a38e2a51d45"
+    },
+    {
+      "path": "packages/core/test/runtime-subscription-projection.test.mjs",
+      "sha256": "2b0bc32ee8de6eca5e7252542a602bc136a41caf2a9c35f0bef94e73802ba2d6"
+    },
+    {
+      "path": "packages/core/README.md",
+      "sha256": "72471b8fdf84fbe878bb2ddba35883547c007cc1142690eba505f9ac475be13d"
+    },
+    {
+      "path": "packages/core/README.ko.md",
+      "sha256": "5e042b673f1122cf140dcb834ac2ea30af230221843d5f001f9769055533fa81"
+    },
+    {
+      "path": "skills/viewstem/SKILL.md",
+      "sha256": "cc89e642c85852ac640fce1dc28f16fbeb294dfee78c05b5707e630716e670e0"
+    },
+    {
+      "path": "skills/tests/extended-browser.mjs",
+      "sha256": "91975660b4577d60fd390e03d61419fffcb77cfe3004e29acf62334aa4001181"
+    }
+  ],
+  "baselineRuntimeSha256": "4c5eb6e81ceef015c1f94489b5c0f9fececd7da088e6b66dfbef32b559e197ad",
+  "regression": {
+    "command": "node --test packages/core/test/runtime-subscription-projection.test.mjs",
+    "before": {
+      "passed": 2,
+      "failed": 2,
+      "tap": "TAP version 13\n# Subtest: View subscriber State writes publish Query results before initial completion\nnot ok 1 - View subscriber State writes publish Query results before initial completion\n  ---\n  duration_ms: 98.004833\n  type: 'test'\n  location: '<repository>/packages/core/test/runtime-subscription-projection.test.mjs:19:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    + actual - expected\n    \n    + ''\n    - 'Loaded: Initial'\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 'Loaded: Initial'\n  actual: ''\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (file://<repository>/packages/core/test/runtime-subscription-projection.test.mjs:41:10)\n    async Test.run (node:internal/test_runner/test:1054:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)\n  ...\n# Subtest: View subscriber writes coalesce without recursive delivery or endless equal-value notifications\nnot ok 2 - View subscriber writes coalesce without recursive delivery or endless equal-value notifications\n  ---\n  duration_ms: 5.901166\n  type: 'test'\n  location: '<repository>/packages/core/test/runtime-subscription-projection.test.mjs:46:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly deep-equal:\n    + actual - expected\n    \n      [\n        'idle',\n        'start',\n    -   'final'\n      ]\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected:\n    0: 'idle'\n    1: 'start'\n    2: 'final'\n  actual:\n    0: 'idle'\n    1: 'start'\n  operator: 'deepStrictEqual'\n  stack: |-\n    TestContext.<anonymous> (file://<repository>/packages/core/test/runtime-subscription-projection.test.mjs:69:10)\n    async Test.run (node:internal/test_runner/test:1054:7)\n    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)\n  ...\n# Subtest: Disposal inside a View subscriber cancels queued projection work\nok 3 - Disposal inside a View subscriber cancels queued projection work\n  ---\n  duration_ms: 3.025209\n  type: 'test'\n  ...\n# Subtest: Queued subscriber writes cannot restore an old projection after View replacement\nok 4 - Queued subscriber writes cannot restore an old projection after View replacement\n  ---\n  duration_ms: 12.788917\n  type: 'test'\n  ...\n1..4\n# tests 4\n# suites 0\n# pass 2\n# fail 2\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 302.556667\n"
+    },
+    "after": {
+      "passed": 4,
+      "failed": 0,
+      "tap": "TAP version 13\n# Subtest: View subscriber State writes publish Query results before initial completion\nok 1 - View subscriber State writes publish Query results before initial completion\n  ---\n  duration_ms: 50.143333\n  type: 'test'\n  ...\n# Subtest: View subscriber writes coalesce without recursive delivery or endless equal-value notifications\nok 2 - View subscriber writes coalesce without recursive delivery or endless equal-value notifications\n  ---\n  duration_ms: 5.273833\n  type: 'test'\n  ...\n# Subtest: Disposal inside a View subscriber cancels queued projection work\nok 3 - Disposal inside a View subscriber cancels queued projection work\n  ---\n  duration_ms: 2.150125\n  type: 'test'\n  ...\n# Subtest: Queued subscriber writes cannot restore an old projection after View replacement\nok 4 - Queued subscriber writes cannot restore an old projection after View replacement\n  ---\n  duration_ms: 2.231792\n  type: 'test'\n  ...\n1..4\n# tests 4\n# suites 0\n# pass 4\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 238.683416\n"
+    }
+  },
+  "fullCoreReports": {
+    "node22": {
+      "nodeVersion": "v22.21.1",
+      "passed": 1084,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0,
+      "failures": [],
+      "skippedTests": [],
+      "todoTests": []
+    },
+    "node24": {
+      "nodeVersion": "v24.19.0",
+      "passed": 1084,
+      "failed": 0,
+      "skipped": 0,
+      "todo": 0,
+      "failures": [],
+      "skippedTests": [],
+      "todoTests": []
+    }
+  },
+  "validationLogs": {
+    "core-check.log": "\n> check\n> npm run build && npm run test:report && npm run typecheck && npm run check:coverage\n\n\n> build\n> npm run build -w @viewstem/core\n\n\n> @viewstem/core@0.1.0 build\n> node scripts/build.mjs\n\n\n> test:report\n> node packages/core/scripts/run-tests.mjs\n\n{\"node\":\"v22.21.1\",\"passed\":1084,\"failed\":0,\"skipped\":0,\"todo\":0,\"failures\":[]}\n\n> typecheck\n> npm run typecheck -w @viewstem/core\n\n\n> @viewstem/core@0.1.0 typecheck\n> tsc -p test/types/tsconfig.json\n\n\n> check:coverage\n> node packages/core/scripts/check-coverage.mjs packages/core/test/results/current.json\n\n{\"core\":216,\"optionalCharts\":8,\"verifiedReports\":[{\"node\":\"v22.21.1\",\"passed\":1084}]}\n",
+    "core-node24.log": "\n> test:report\n> node packages/core/scripts/run-tests.mjs\n\n{\"node\":\"v24.19.0\",\"passed\":1084,\"failed\":0,\"skipped\":0,\"todo\":0,\"failures\":[]}\n\n> typecheck\n> npm run typecheck -w @viewstem/core\n\n\n> @viewstem/core@0.1.0 typecheck\n> tsc -p test/types/tsconfig.json\n\n\n> check:coverage\n> node packages/core/scripts/check-coverage.mjs packages/core/test/results/current.json\n\n{\"core\":216,\"optionalCharts\":8,\"verifiedReports\":[{\"node\":\"v24.19.0\",\"passed\":1084}]}\n",
+    "core-browser.log": "\n> test:browser\n> node packages/core/test/cel-browser.mjs && node packages/core/test/browser.mjs\n\n{\n  \"nodeVersion\": \"v22.21.1\",\n  \"browser\": \"151.0.7922.34\",\n  \"node\": {\n    \"total\": 25,\n    \"passed\": 25\n  },\n  \"chromium\": {\n    \"total\": 25,\n    \"passed\": 25\n  },\n  \"pageErrors\": [],\n  \"failed\": []\n}\n{\n  \"nodeVersion\": \"v22.21.1\",\n  \"chromium\": \"151.0.7922.34\",\n  \"checks\": [\n    \"URL restore precedes actual first HTTP request and Derived CEL\",\n    \"native input event → Action → shared StateStore → UI/HTTP\",\n    \"History push owns exact key and preserves raw service bytes and hash\",\n    \"actual popstate restores baseline without pushing again\",\n    \"native boolean false is observable success\",\n    \"replacement removes old URL key, uses new initial, preserves service State\",\n    \"no runtime or browser errors\"\n  ],\n  \"passed\": 7,\n  \"pageErrors\": [],\n  \"requests\": [\n    \"3\",\n    \"4\",\n    \"3\",\n    \"7\"\n  ]\n}\n",
+    "core-package.log": "\n> test:package\n> node packages/core/scripts/test-package.mjs\n\n{\n  \"nodeVersion\": \"v22.21.1\",\n  \"package\": \"@viewstem/core\",\n  \"version\": \"0.1.0\",\n  \"files\": [\n    \"LICENSE\",\n    \"README.ko.md\",\n    \"README.md\",\n    \"dist/cel-support.json\",\n    \"dist/cel.d.ts\",\n    \"dist/cel.js\",\n    \"dist/cel.js.map\",\n    \"dist/chunks/chunk-3IB6CG6N.js\",\n    \"dist/chunks/chunk-3IB6CG6N.js.map\",\n    \"dist/chunks/chunk-HIWAPDU3.js\",\n    \"dist/chunks/chunk-HIWAPDU3.js.map\",\n    \"dist/chunks/chunk-TYIHBABB.js\",\n    \"dist/chunks/chunk-TYIHBABB.js.map\",\n    \"dist/http.d.ts\",\n    \"dist/http.js\",\n    \"dist/http.js.map\",\n    \"dist/index.d.ts\",\n    \"dist/index.js\",\n    \"dist/index.js.map\",\n    \"dist/THIRD-PARTY-NOTICES.txt\",\n    \"package.json\"\n  ],\n  \"integrity\": \"sha512-BFf5g/pdwiE1cpvMAimvysogH8xfj+lqTOs/0fmJjh5rx6V1YUEXLZB7HbmAy5ohHf4m2nLhs5/FG2rEkQ0mLQ==\",\n  \"bytes\": 255720,\n  \"unpackedBytes\": 1100287,\n  \"license\": \"MIT; installed text and vendored CEL notice verified\",\n  \"runtime\": \"passed\",\n  \"publicBoundaryTests\": 7,\n  \"types\": \"passed\"\n}\n",
+    "core-package-node24.log": "\n> test:package\n> node packages/core/scripts/test-package.mjs\n\n{\n  \"nodeVersion\": \"v24.19.0\",\n  \"package\": \"@viewstem/core\",\n  \"version\": \"0.1.0\",\n  \"files\": [\n    \"LICENSE\",\n    \"README.ko.md\",\n    \"README.md\",\n    \"dist/cel-support.json\",\n    \"dist/cel.d.ts\",\n    \"dist/cel.js\",\n    \"dist/cel.js.map\",\n    \"dist/chunks/chunk-3IB6CG6N.js\",\n    \"dist/chunks/chunk-3IB6CG6N.js.map\",\n    \"dist/chunks/chunk-HIWAPDU3.js\",\n    \"dist/chunks/chunk-HIWAPDU3.js.map\",\n    \"dist/chunks/chunk-TYIHBABB.js\",\n    \"dist/chunks/chunk-TYIHBABB.js.map\",\n    \"dist/http.d.ts\",\n    \"dist/http.js\",\n    \"dist/http.js.map\",\n    \"dist/index.d.ts\",\n    \"dist/index.js\",\n    \"dist/index.js.map\",\n    \"dist/THIRD-PARTY-NOTICES.txt\",\n    \"package.json\"\n  ],\n  \"integrity\": \"sha512-Y9CO8+Zf1yObdbVVvPYTaNZ6oxmtz7yuCxYCWBp1P07Fv6/hDSUIx/aa/JDm4NAKOrFgPwB8qSgiKkv6Q8Kh8w==\",\n  \"bytes\": 254314,\n  \"unpackedBytes\": 1100287,\n  \"license\": \"MIT; installed text and vendored CEL notice verified\",\n  \"runtime\": \"passed\",\n  \"publicBoundaryTests\": 7,\n  \"types\": \"passed\"\n}\n",
+    "svelte-check.log": "\n> check:svelte\n> npm run build:svelte && npm run typecheck -w @viewstem/svelte && npm run test -w @viewstem/svelte && npm run test:svelte:package\n\n\n> build:svelte\n> npm run build && npm run build -w @viewstem/svelte\n\n\n> build\n> npm run build -w @viewstem/core\n\n\n> @viewstem/core@0.1.0 build\n> node scripts/build.mjs\n\n\n> @viewstem/svelte@0.1.0 build\n> svelte-package -i src/lib -o dist\n\nsrc/lib -> dist\n\n> @viewstem/svelte@0.1.0 typecheck\n> svelte-check --tsconfig ./tsconfig.json --fail-on-warnings && svelte-check --tsconfig ./example/tsconfig.json --fail-on-warnings\n\nLoading svelte-check in workspace: <repository>/packages/svelte\nGetting Svelte diagnostics...\n\nsvelte-check found 0 errors and 0 warnings\nLoading svelte-check in workspace: <repository>/packages/svelte\nGetting Svelte diagnostics...\n\nsvelte-check found 0 errors and 0 warnings\n\n> @viewstem/svelte@0.1.0 test\n> node scripts/run-tests.mjs\n\n{\"node\":\"v22.21.1\",\"passed\":30,\"failed\":0,\"skipped\":0,\"todo\":0,\"failures\":[]}\n\n> test:svelte:package\n> node packages/svelte/scripts/test-package.mjs\n\n{\n  \"nodeVersion\": \"v22.21.1\",\n  \"svelteVersion\": \"5.57.3\",\n  \"files\": [\n    \"LICENSE\",\n    \"README.ko.md\",\n    \"README.md\",\n    \"dist/ConnectedView.svelte\",\n    \"dist/ConnectedView.svelte.d.ts\",\n    \"dist/connection.d.ts\",\n    \"dist/connection.js\",\n    \"dist/index.d.ts\",\n    \"dist/index.js\",\n    \"dist/NodeList.svelte\",\n    \"dist/NodeList.svelte.d.ts\",\n    \"dist/renderer.d.ts\",\n    \"dist/renderer.js\",\n    \"dist/RenderNode.svelte\",\n    \"dist/RenderNode.svelte.d.ts\",\n    \"dist/types.d.ts\",\n    \"dist/types.js\",\n    \"dist/ViewstemView.svelte\",\n    \"dist/ViewstemView.svelte.d.ts\",\n    \"package.json\"\n  ],\n  \"integrity\": \"sha512-H64zW1sU7FkGCarD/mNVt9nm6buY8Xzdl44e7fPgr7s7TAXRIfZbxGBzzrPDlmPyZyUO6qxXZ4SPKYP3tCFThQ==\",\n  \"bytes\": 17897,\n  \"unpackedBytes\": 55843,\n  \"license\": \"MIT; installed text verified\",\n  \"consumerDependencies\": [\n    \"@viewstem/svelte\",\n    \"svelte\"\n  ],\n  \"coreResolution\": \"transitive dependency; local tarball override for unpublished core\",\n  \"imports\": \"@viewstem/svelte only (runtime and shared types)\",\n  \"types\": \"passed\",\n  \"browser\": \"passed\",\n  \"errors\": []\n}\n",
+    "consumer-install.log": "\nchanged 1 package in 449ms\n"
+  },
+  "originalPackages": [
+    {
+      "name": "@viewstem/core",
+      "version": "0.1.0",
+      "filename": "viewstem-core-0.1.0.tgz",
+      "integrity": "sha512-G6gD1NddIZMn8RHTEb3dbLrYc9Rc5xPezPSi9sTa0MOA/58F0xceUNVV3Od7Y95T48cQcqIbMCLM2KWoNy3I6Q==",
+      "sha256": "a84956007a20dec39028ace483a8faa727fc7b0b842095cd97e4a966c057fefb",
+      "size": 255148
+    },
+    {
+      "name": "@viewstem/svelte",
+      "version": "0.1.0",
+      "filename": "viewstem-svelte-0.1.0.tgz",
+      "integrity": "sha512-H64zW1sU7FkGCarD/mNVt9nm6buY8Xzdl44e7fPgr7s7TAXRIfZbxGBzzrPDlmPyZyUO6qxXZ4SPKYP3tCFThQ==",
+      "sha256": "6c6c4f659e7c1d63c5cdecf170f2c3a3b01bedb28d5fac6b9600c536d36f401b",
+      "size": 17897
+    },
+    {
+      "name": "@viewstem/svelte-ui",
+      "version": "0.1.0",
+      "filename": "viewstem-svelte-ui-0.1.0.tgz",
+      "integrity": "sha512-Krx8OmpCEpdAVL72fvJE7WgyRvANDtN1vVmWhKOKokePw4PQoj1cxYS/OegSmPeua1oK7Unq4sWiz1Qwuxlr5w==",
+      "sha256": "93339445d8a7a3b9096808e3009b1359089f16c630559b7538e4b1eed0cb460f",
+      "size": 293680
+    }
+  ],
+  "fixedConsumerCore": {
+    "name": "@viewstem/core",
+    "version": "0.1.0",
+    "filename": "viewstem-core-0.1.0.tgz",
+    "integrity": "sha512-BFf5g/pdwiE1cpvMAimvysogH8xfj+lqTOs/0fmJjh5rx6V1YUEXLZB7HbmAy5ohHf4m2nLhs5/FG2rEkQ0mLQ==",
+    "size": 255720,
+    "unpackedSize": 1100287,
+    "sha256": "fc69062fa1187bb796a19f79eba391cb1b3808a7fa23fd7d27daebee833d4dc2"
+  },
+  "fixedArchiveManifest": [
+    {
+      "path": "LICENSE",
+      "sha256": "8c899ea7e6e7aba365702c3c15f7a85b75423f9705baf75f7e15037090fa71e6"
+    },
+    {
+      "path": "dist/cel.js",
+      "sha256": "12f1e19707c77b01253fb74b52d296d246bc3110e71be053240c8ab914edb09a"
+    },
+    {
+      "path": "dist/chunks/chunk-3IB6CG6N.js",
+      "sha256": "8ed3f43a5c40956daee7ee5a356a5b72d144d641d1961bd2934bb0edc1b6448a"
+    },
+    {
+      "path": "dist/chunks/chunk-HIWAPDU3.js",
+      "sha256": "24bef2929e1465973c7d9ea78a84181f2498f3c69979c39f56ff9cdf74972fac"
+    },
+    {
+      "path": "dist/chunks/chunk-TYIHBABB.js",
+      "sha256": "861735def1526e063bba2f104730192ce3d20f6074451ab8c633c302d5a8e9d9"
+    },
+    {
+      "path": "dist/http.js",
+      "sha256": "36c92b001a05609bd0a9cc3ae6ad971156ce833476baa9a379ab9a08fadf355e"
+    },
+    {
+      "path": "dist/index.js",
+      "sha256": "544b3740f1305d85ae5e2a36e9eb1025edd90e1c035926b37b28686d07a47e76"
+    },
+    {
+      "path": "dist/cel-support.json",
+      "sha256": "44a3bf64ce1ec773a67026db104de2f9529ddd1588ebbdd1f985ae8e21bdbc7d"
+    },
+    {
+      "path": "package.json",
+      "sha256": "0534759255d898db81071d4eabd03cf54b46f99cdd2d520036bb6096bbb156a0"
+    },
+    {
+      "path": "dist/cel.js.map",
+      "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+    },
+    {
+      "path": "dist/chunks/chunk-3IB6CG6N.js.map",
+      "sha256": "9d8740a6da28a532e2bbb89457c40112351b922310fade7255951361105fba6a"
+    },
+    {
+      "path": "dist/chunks/chunk-HIWAPDU3.js.map",
+      "sha256": "5d9dac02b1582dd672efd338510fd9a4449509d744cc83d3c6e58165c412792c"
+    },
+    {
+      "path": "dist/chunks/chunk-TYIHBABB.js.map",
+      "sha256": "0292ecb67a9072d7297d33029568a081da622373a855bc4d06c925820768d5b4"
+    },
+    {
+      "path": "dist/http.js.map",
+      "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+    },
+    {
+      "path": "dist/index.js.map",
+      "sha256": "5a6809d00055a4cfd0b7fbb21aa660e90e99cc6437d8344658873167d55e9be4"
+    },
+    {
+      "path": "README.ko.md",
+      "sha256": "5e042b673f1122cf140dcb834ac2ea30af230221843d5f001f9769055533fa81"
+    },
+    {
+      "path": "README.md",
+      "sha256": "72471b8fdf84fbe878bb2ddba35883547c007cc1142690eba505f9ac475be13d"
+    },
+    {
+      "path": "dist/cel.d.ts",
+      "sha256": "f9a6847637235948611c0f4fcbc680594780b6b9e60ad14a53caf117cbecb7cd"
+    },
+    {
+      "path": "dist/http.d.ts",
+      "sha256": "6b3e1dfee0b20f669c0f6cadedd1a7ce835d6c32ccf77b975fc037c069353c80"
+    },
+    {
+      "path": "dist/index.d.ts",
+      "sha256": "e319138716ac44e92cbbd054e5c9d1013940f73f3ef58d737ec03a38e2a51d45"
+    },
+    {
+      "path": "dist/THIRD-PARTY-NOTICES.txt",
+      "sha256": "251e67ccbf506c58d0ae3a687605aa8557582f0b36914e4d0f43d99b34f1180c"
+    }
+  ],
+  "fixedArchiveMatchesCurrentPackageFiles": true,
+  "consumerComparison": {
+    "node": "v22.21.1",
+    "originalRun": "codex-form-refresh-B2-r3",
+    "originalSourceManifest": [
+      {
+        "path": "src/app.ts",
+        "sha256": "3011401cdfb4369c86c0eed0fb52365d76c73419ac688d6e701c1eb5a8e15158"
+      }
+    ],
+    "archive": "<task-temp>/tarballs/viewstem-core-0.1.0.tgz",
+    "archiveSha256": "fc69062fa1187bb796a19f79eba391cb1b3808a7fa23fd7d27daebee833d4dc2",
+    "nonCoreDependencyFilesCompared": 19060,
+    "nonCoreDependenciesUnchanged": true,
+    "originalAppSourceUnchanged": true,
+    "fixtureUnchanged": true,
+    "outcomes": [
+      {
+        "name": "before",
+        "project": "<task-temp>/consumer-before",
+        "exitCode": 1,
+        "verification": {
+          "ok": false,
+          "typecheck": {
+            "ok": true,
+            "output": "Loading svelte-check in workspace: <task-temp>/consumer-before\nGetting Svelte diagnostics...\n\n<task-temp>/consumer-before/tsconfig.json:1:1\nWarn: No svelte input files were found in config file '<task-temp>/consumer-before/tsconfig.json'. Did you forget to add svelte files to the 'include' in your tsconfig.json? Specified 'include' paths were '[\"src/**/*\"]' and 'exclude' paths were 'undefined' (svelte)\n\n\n====================================\nsvelte-check found 0 errors and 1 warning in 1 file\n"
+          },
+          "build": {
+            "ok": true,
+            "rendererIncluded": true,
+            "errors": []
+          },
+          "runtime": {
+            "ok": true,
+            "ready": true,
+            "error": ""
+          },
+          "assertions": [
+            {
+              "name": "load and successful save refresh",
+              "ok": false,
+              "evidence": "locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('Loaded: Initial').first() to be visible\u001b[22m\n"
+            },
+            {
+              "name": "failed save does not refresh",
+              "ok": false,
+              "evidence": "locator.waitFor: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('Loaded: Ada').first() to be visible\u001b[22m\n"
+            },
+            {
+              "name": "dispose removes owned UI",
+              "ok": true,
+              "evidence": {
+                "remaining": 0
+              }
+            }
+          ],
+          "pageErrors": []
+        }
+      },
+      {
+        "name": "after",
+        "project": "<task-temp>/consumer-after",
+        "exitCode": 0,
+        "verification": {
+          "ok": true,
+          "typecheck": {
+            "ok": true,
+            "output": "Loading svelte-check in workspace: <task-temp>/consumer-after\nGetting Svelte diagnostics...\n\n<task-temp>/consumer-after/tsconfig.json:1:1\nWarn: No svelte input files were found in config file '<task-temp>/consumer-after/tsconfig.json'. Did you forget to add svelte files to the 'include' in your tsconfig.json? Specified 'include' paths were '[\"src/**/*\"]' and 'exclude' paths were 'undefined' (svelte)\n\n\n====================================\nsvelte-check found 0 errors and 1 warning in 1 file\n"
+          },
+          "build": {
+            "ok": true,
+            "rendererIncluded": true,
+            "errors": []
+          },
+          "runtime": {
+            "ok": true,
+            "ready": true,
+            "error": ""
+          },
+          "assertions": [
+            {
+              "name": "load and successful save refresh",
+              "ok": true,
+              "evidence": {
+                "calls": [
+                  "load",
+                  "save:Ada",
+                  "load"
+                ]
+              }
+            },
+            {
+              "name": "failed save does not refresh",
+              "ok": true,
+              "evidence": {
+                "calls": [
+                  "load",
+                  "save:Ada",
+                  "load",
+                  "save:Reject"
+                ]
+              }
+            },
+            {
+              "name": "dispose removes owned UI",
+              "ok": true,
+              "evidence": {
+                "remaining": 0
+              }
+            }
+          ],
+          "pageErrors": []
+        }
+      }
+    ]
+  },
+  "independentReview": {
+    "role": "reviewer",
+    "scope": "queue coalescing, initial completion, disposal, replacement and equal writes",
+    "actionableFindings": 0,
+    "testsPassed": 15,
+    "testFiles": [
+      "runtime-subscription-projection.test.mjs",
+      "runtime-derived-dependencies.test.mjs",
+      "runtime-review-regression.test.mjs"
+    ]
+  },
+  "limits": [
+    "The original app was unchanged; this is runtime/package revalidation, not another model generation or a replacement for the original failed B2 result.",
+    "TS-only consumer reports the same No svelte input files warning before and after; there are zero type errors.",
+    "The post-fix skill wording has not undergone a new Codex model comparison.",
+    "Claude Code is excluded from current support and validation.",
+    "Development version 0.1.0 identifies multiple artifacts; use the archive hashes. No artifact was published."
+  ]
+}

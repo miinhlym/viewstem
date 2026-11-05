@@ -407,7 +407,7 @@ agent-kit과 SDK 어댑터는 이를 모델/SDK에 연결하는 구성 제안이
 
 최소 공통 스킬과 Codex의 첫 View·폼·native UI 초기 비교를 완료했다. 최종 후보는 4파일 구성을 유지하며 추가 참조·조회 도구는 도입하지 않았다. 실제 통과 범위와 Claude Code의 준비·미실행 경계는 [초기 구현 인계](handoff/viewstem-skills-initial-2026-11-05.md)에 기록한다.
 
-후속 Codex 확장 비교·비활성화 검사·B3 보완과 배포 판단은 [확장 검증 인계](handoff/viewstem-skills-extended-2026-11-05.md)를 따른다. 개발 산출물에서 재현된 [View 구독 후 투영 불일치](handoff/view-subscription-projection-2026-11-05.md)는 미해결이며 스킬의 회피 지침을 라이브러리 계약 변경이나 제품 수정 완료로 해석하지 않는다.
+후속 Codex 확장 비교·비활성화 검사·B3 보완과 배포 판단은 [확장 검증 인계](handoff/viewstem-skills-extended-2026-11-05.md)를 따른다. 개발 산출물에서 재현된 [View 구독 후 투영 불일치](handoff/view-subscription-projection-2026-11-05.md)는 후속 [제품 수정·회귀·원본 앱 재검증](handoff/view-subscription-projection-fix-2026-11-06.md)에서 해결했다. 과거 스킬 비교의 실패 기록과 수정된 패키지의 검증 결과는 구별한다.
 
 이는 실행 중인 화면의 원격 조작 프로토콜이나 새 agent-kit API, 공개 발행 승인을 뜻하지 않는다.
 

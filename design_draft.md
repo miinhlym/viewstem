@@ -2,7 +2,7 @@
 
 - 작성자: miinhlym · 작성 지원: Codex
 - 날짜: 2026-11-05 · 지원 범위 갱신: 2026-11-06
-- 상태: **최종 EGM F1–F7 반영과 Codex 확장 비교 완료. 공통 본문은 B3를 유지하고 D129에 따라 지원·검증 대상은 Codex로 한정한다. Claude Code는 첫 배포 필수 조건에서 제외한다. 재현된 런타임 제한과 공개 ref 조건 때문에 공식 첫 배포는 보류한다.**
+- 상태: **최종 EGM F1–F7 반영과 Codex 확장 비교 완료. 공통 본문은 B3를 바탕으로 수정된 투영 계약을 반영하며 D129에 따라 지원·검증 대상은 Codex로 한정한다. Claude Code는 첫 배포 필수 조건에서 제외한다. 투영 불일치는 제품 수정·회귀·원본 앱 재검증을 완료했다. 공개 ref와 현재 배포물 고정 조건 때문에 공식 첫 배포는 보류한다.**
 - 대상: 외부 프로젝트에서 Viewstem을 사용해 앱을 만드는 코딩 에이전트. 사용자가 이 대상을 확인하고 독립 검토 및 설계 구체화를 요청했다.
 - 선행 자료: [조사·작업 가설](concepts_brief.md), [Goldfish 통합 보고서](docs/designs/viewstem-skills-review-2026-11-05/goldfish_review_report.md), [읽기 전용 조사 증거](docs/designs/viewstem-skills-inspection-2026-11-05.json).
 
@@ -24,7 +24,7 @@
 
 초기 실험 후 채택한 B2도 같은 4개 파일이다. README 우선·필요한 이름만 조회하도록 본문을 보완해 과도한 출력이 줄었고, 이번에는 references와 helper를 추가하지 않았다. [실행 결과](docs/handoff/viewstem-skills-initial-2026-11-05.md)는 이 최소 범위와 후속 후보를 구분한다.
 
-후속 확장 비교의 B3도 4파일을 유지한다. 압축 JSON의 재귀 텍스트 검색을 피하는 지침과, 평가한 개발 산출물에서 재현된 View 구독 후 투영 불일치를 피하는 선언형 Query 표시 권고를 추가했다. 이는 새 라이브러리 계약이나 제품 수정이 아니다. [확장 결과·배포 판단](docs/handoff/viewstem-skills-extended-2026-11-05.md)에 원래 실패와 보완 후 결과를 분리한다.
+후속 확장 비교의 B3도 4파일을 유지한다. 압축 JSON의 재귀 텍스트 검색을 피하는 지침과, 당시 개발 산출물에서 재현된 View 구독 후 투영 불일치를 피하는 선언형 Query 표시 권고를 추가했다. [확장 결과·배포 판단](docs/handoff/viewstem-skills-extended-2026-11-05.md)에 원래 실패와 보완 후 결과를 분리한다. 이후 제품 수정에 맞춰 현재 본문은 후속 snapshot 확인과 이전 개발 산출물의 계약 확인을 안내한다. 이 문구 변경 뒤 Codex 모델 비교를 새로 수행한 것은 아니며, B3 평가 당시 snapshot과 hash는 보존한다.
 
 ```text
 skills/viewstem/
@@ -282,4 +282,4 @@ Goldfish는 `fork_turns:none`으로 부모 대화를 전달받지 않았다. 공
 
 초기 구현·비교는 [인계 기록](docs/handoff/viewstem-skills-initial-2026-11-05.md)과 [측정·생성 코드](skills/tests/behavior-results.json)에 남겼다. Codex 3개 과제 × A/B/B2의 9회가 기능 검증을 통과했고 최종 B2는 3회 모두 실제로 읽혔다. A도 모두 통과했으므로 성공률 개선은 입증되지 않았다. 큰 지원 사전 출력은 본문 보완으로 줄었으며 추가 자료·도구는 생략했다. Claude Code는 같은 A/B2 입력과 설치 폴더·호출 초안을 준비했으며 모델·실제 CLI 설정 고정과 실행은 미수행이다.
 
-후속으로 [확장 실행 계약](docs/designs/viewstem-skills-extended-2026-11-05.md)에 따라 11개 과제 × A/B2 × 3회의 66개 비교를 마쳤다(유효한 초기 4회 재사용). A는 33/33, B2는 32/33이고 비활성화 과제의 불필요한 본문 읽기는 0/6이었다. B3는 관련 4개 과제 12/12 재평가를 통과했다. 기존 실패는 [런타임 투영 불일치](docs/handoff/view-subscription-projection-2026-11-05.md)로 남아 있으며 API 오용이나 수정 완료로 간주하지 않는다. Claude Code는 최종 후보의 22개 입력만 준비했다. 이후 D129의 현재 지원 범위와 남은 첫 배포 조건은 [2026-11-06 인계](docs/handoff/viewstem-skills-scope-2026-11-06.md)가 소유한다. 기존 평가 수치와 EGM snapshot은 당시 조건의 증거로 유지한다.
+후속으로 [확장 실행 계약](docs/designs/viewstem-skills-extended-2026-11-05.md)에 따라 11개 과제 × A/B2 × 3회의 66개 비교를 마쳤다(유효한 초기 4회 재사용). A는 33/33, B2는 32/33이고 비활성화 과제의 불필요한 본문 읽기는 0/6이었다. B3는 관련 4개 과제 12/12 재평가를 통과했다. 기존 실패는 [당시 런타임 투영 불일치](docs/handoff/view-subscription-projection-2026-11-05.md)의 증거로 보존한다. 이후 [제품 수정·회귀·원본 앱 재검증](docs/handoff/view-subscription-projection-fix-2026-11-06.md)을 완료했으며, 이 후속 결과를 원래 B2 평가의 통과로 소급하지 않는다. Claude Code는 최종 후보의 22개 입력만 준비했다. 이후 D129의 현재 지원 범위와 남은 첫 배포 조건은 [2026-11-06 인계](docs/handoff/viewstem-skills-scope-2026-11-06.md)가 소유한다. 기존 평가 수치와 EGM snapshot은 당시 조건의 증거로 유지한다.

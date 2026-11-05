@@ -52,11 +52,11 @@ user's requested scope and response language.
 - Pass a writable State handle explicitly through a State port when an Action
   needs to write it. Value inputs and node snapshots are read-only. Bind UI
   values back to State so changes are visible on the next projection.
-- Bind Query display values declaratively instead of mirroring them into State
-  from a `View.subscribe` callback. In the evaluated development artifacts,
-  synchronous subscriber writes can leave node inputs and DOM stale even when
-  State and Query snapshots are correct. This is a reproduced runtime limit,
-  not a general prohibition on subscriber writes.
+- Prefer declarative Query display bindings when no independent State is needed.
+  If a subscriber writes State during an active View projection, its current
+  callback snapshot remains unchanged; inspect a subsequent projection and the
+  rendered result. Check the installed package's subscription contract when
+  working with older development artifacts.
 - Core initial completion can resolve with `queryErrors`. Renderer completion,
   DOM updates, and browser paint are different observations. Check the relevant
   error channel and the actual rendered result rather than treating resolution

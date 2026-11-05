@@ -320,7 +320,11 @@ export class View {
     }
   }
   refresh() {
-    if(!this.alive||!this.root||this.planning)return;
+    if(!this.alive||!this.root)return;
+    // A subscriber can commit State while project() is publishing this plan.
+    // Preserve that invalidation without recursively rebuilding or delivering
+    // a newer snapshot to listeners still receiving the current one.
+    if(this.planning){this.schedule();return;}
     this.planning=true;
     try{this.build(this.spec,this.inputs);this.configureQueries();this.project();}catch(caught){this.planConnections=null;this.diagnostics.push(safeError(caught));this.project();}finally{this.planning=false;}
   }
