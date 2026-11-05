@@ -79,6 +79,7 @@ npx playwright install chromium
 | core 패키지 구성·타입 선언·패키지 README | `npm run build` 후 `npm run test:package` |
 | Svelte 렌더러 또는 해당 예제 | `npm run check:svelte` |
 | Svelte UI 어댑터·생성 소스·스타일·브라우저 fixture | `npm run check:svelte-ui` |
+| 사이트 UI·콘텐츠·탐색·예제 | [사이트 유지보수 안내](apps/docs/README.ko.md#변경-영역에-맞는-검증-선택)에서 수정 위치와 관련 검증 확인 |
 | CI 설정 또는 브라우저 보고서 | `npm run test:ci`; workflow 문법을 확인하고 [CI 안내](docs/ci.ko.md)의 영향받는 브라우저 검증 실행 |
 | 패키지 메타데이터나 라이선스 파일만 변경 | 해당 패키지를 빌드하고 기존 소비자 검사인 `test:package`, `test:svelte:package`, `test:svelte-ui:package` 실행 |
 | 커뮤니티 문서나 템플릿만 변경 | 링크·예제·해당 JSON/YAML 문법과 `git diff --check` 확인 |

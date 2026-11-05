@@ -85,6 +85,7 @@ commands below identify the relevant local gates.
 | Core package contents, declarations, or package README | `npm run build` then `npm run test:package` |
 | Svelte renderer or its example | `npm run check:svelte` |
 | Svelte UI adapters, generated sources, styles, or browser fixtures | `npm run check:svelte-ui` |
+| Website UI, content, navigation, or examples | Follow the [website maintenance guide](apps/docs/README.md#choose-checks-by-the-changed-boundary) for source owners and targeted checks |
 | CI configuration or browser reporting | `npm run test:ci`; validate workflow syntax and run the affected browser checks described in the [CI guide](docs/ci.md) |
 | Package metadata or license files only | Build the affected package and run its existing package consumer check: `test:package`, `test:svelte:package`, or `test:svelte-ui:package` |
 | Community documentation or templates only | Check links, examples, JSON/YAML syntax where applicable, and `git diff --check` |
