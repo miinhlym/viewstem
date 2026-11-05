@@ -1,0 +1,35 @@
+{
+  "checked_at": "2026-11-05T08:10:13.308753+00:00",
+  "target_unchanged": true,
+  "snapshot_matches": true,
+  "reviewers_completed": 9,
+  "report_files_checked": [
+    "README.md",
+    "comprehension_report.md",
+    "consolidated_review_report.md",
+    "critic_report.md",
+    "goldfish_context.md",
+    "implementation_readiness_report.md",
+    "intermediate_zoom_out_report.md",
+    "research_report.md",
+    "review_input_snapshot.md",
+    "stage7_design.md",
+    "stage7_structural.md",
+    "stage7_style.md",
+    "stage9_codebase.md",
+    "stage9_readiness.md",
+    "stage9_style.md",
+    "zoom_out_report.md"
+  ],
+  "local_links_checked": 52,
+  "source_snapshot_hashes_checked": 17,
+  "code_baseline_changes": [],
+  "errors": [],
+  "actual_product_tests_run": false,
+  "actual_skill_or_host_evals_run": false,
+  "notes": [
+    "Review-only evidence; no implementation, installation, or product test claims",
+    "Original snapshot links resolve against repository root",
+    "Third-party research snapshots are data and are not linted as authored project documentation"
+  ]
+}

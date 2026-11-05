@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "scope": "Initial direction-finding experiment; one run per scenario and arm, not a release benchmark",
+  "scenarios": [
+    {
+      "id": "first-view",
+      "language": "en",
+      "prompt": "Add my first Viewstem screen to this existing Svelte consumer app. Implement src/app.ts mountApp(target, services) using the Viewstem renderer and provided UI so it shows a button labelled Start. Include the needed UI styling. Return a dispose function that cleans up resources this screen owns. Use the installed packages and run the app's available checks.",
+      "assessment": ["public renderer and explicitly registered provided UI", "visible Start button with package CSS", "owned screen disposed", "no invented API or private source imports"]
+    },
+    {
+      "id": "form",
+      "language": "ko",
+      "prompt": "이 Svelte 소비 앱에 Viewstem 폼을 만들어줘. src/app.ts의 mountApp(target, services) 계약은 유지하고, Name이라는 접근성 이름의 입력과 Save 버튼을 보여줘. 입력값을 Viewstem State에 연결하고 Action으로 services.save(name)을 호출해. 저장이 끝나면 화면에 Saved: 입력값을 표시해줘. dispose로 이 화면이 소유한 자원을 정리하고 제공된 앱 검사 명령으로 확인해줘.",
+      "assessment": ["input event updates declared Viewstem State", "Action calls supplied save service with current input", "Saved: Ada visible after real input and click", "dispose removes owned UI"]
+    },
+    {
+      "id": "native",
+      "language": "en",
+      "prompt": "I want to show a calendar in this Svelte consumer app and was planning to register shadcn.Calendar.Day directly as a JSON component. Check the installed Viewstem support contract. If that part needs native context, use the family's public native Svelte exports to show a working calendar instead, and explain that boundary. Keep src/app.ts mountApp(target, services), return cleanup, and run the available checks. The existing packages are enough; don't add dependencies.",
+      "assessment": ["correct native-context boundary explanation", "public native calendar composition rather than fictional JSON Calendar.Day registration", "calendar day grid visible", "Svelte host unmount cleanup"]
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "mode": "BRAINSTORM",
+  "fork_turns": "none",
+  "supplied_standards": [],
+  "maximum_concurrent_reviewers": 2,
+  "failures": [],
+  "reviewers": [
+    {
+      "reviewer": "egm-design",
+      "persona": "design_critic.md",
+      "agent_id": "/root/goldfish_synthesis/design_brainstormer",
+      "status": "completed",
+      "completion_evidence": "native FINAL_ANSWER received",
+      "report": "design_critic.md",
+      "counts": {
+        "blocker": 0,
+        "major": 1,
+        "nit": 0
+      },
+      "report_sha256": "0007bfd873633323320daf36416bfe87ffad487725b9160cc4d60002fb835fe2"
+    },
+    {
+      "reviewer": "egm-codebase-details",
+      "persona": "codebase_details.md",
+      "agent_id": "/root/goldfish_synthesis/details_brainstormer",
+      "status": "completed",
+      "completion_evidence": "native FINAL_ANSWER received",
+      "report": "codebase_details.md",
+      "counts": {
+        "blocker": 0,
+        "major": 0,
+        "nit": 2
+      },
+      "report_sha256": "8b9b4f27857bf86c14ae8f709e57d11baea9a151e4726fcacf8304dc63e55790"
+    },
+    {
+      "reviewer": "egm-zoom-out",
+      "persona": "zoom_out.md",
+      "agent_id": "/root/goldfish_synthesis/zoomout_brainstormer",
+      "status": "completed",
+      "completion_evidence": "native FINAL_ANSWER received",
+      "report": "zoom_out.md",
+      "counts": {
+        "blocker": 0,
+        "major": 1,
+        "nit": 1
+      },
+      "report_sha256": "f1b0f8d8a70a45d3a702c4852dc5f03ff195bf966d31c3fe2440e2a5b1cf4cb3"
+    },
+    {
+      "reviewer": "egm-comprehension",
+      "persona": "comprehension.md",
+      "agent_id": "/root/goldfish_synthesis/comprehension_brainstormer",
+      "status": "completed",
+      "completion_evidence": "native FINAL_ANSWER received",
+      "report": "comprehension.md",
+      "counts": {
+        "blocker": 0,
+        "major": 1,
+        "nit": 2
+      },
+      "report_sha256": "0dcb4932f1864b189f2dfec5a529c6205433bea47a95ec60c2ff42b1a4da433a"
+    },
+    {
+      "reviewer": "egm-implementation-readiness",
+      "persona": "implementation_readiness.md",
+      "status": "completed",
+      "agent_id": "/root/goldfish_synthesis/readiness_brainstormer",
+      "completion_evidence": "native FINAL_ANSWER received",
+      "report": "implementation_readiness.md",
+      "counts": {
+        "blocker": 0,
+        "major": 0,
+        "nit": 0
+      },
+      "report_sha256": "c7ca6d95f07d15af7308c4f4154a805c3114cf7c9c4cb992beb4bc8dc44c8642"
+    },
+    {
+      "reviewer": "egm-structural",
+      "persona": "structural.md",
+      "status": "completed",
+      "agent_id": "/root/goldfish_synthesis/structural_brainstormer",
+      "completion_evidence": "native FINAL_ANSWER received",
+      "report": "structural.md",
+      "counts": {
+        "blocker": 0,
+        "major": 0,
+        "nit": 2
+      },
+      "report_sha256": "88f9a07586e5d655c36021c0b1d678813cd9c7694ea91081a22c57cdaa678070"
+    }
+  ],
+  "raw_counts": {
+    "blocker": 0,
+    "major": 3,
+    "nit": 7
+  },
+  "completion": "all six reviewers returned native FINAL_ANSWER; no failures and no retries",
+  "deduplicated_counts": {
+    "blocker": 0,
+    "major": 2,
+    "nit": 5
+  },
+  "input_sha256": "ca43013796584231a0e12d6f0ed246c353bea137dbd902c87db574b50f4eef4e",
+  "review_target": "review_input_snapshot.md",
+  "root_target_updated_after_all_reviews": true,
+  "limitations": "No incomplete mandatory review. Supplemental reads were scoped; no implementation, consumer install, host discovery, behavior evaluation, builds, or publication performed."
+}

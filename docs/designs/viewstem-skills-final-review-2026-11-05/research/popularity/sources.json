@@ -1,0 +1,42 @@
+[
+  {
+    "name": "anthropics",
+    "url": "https://www.skills.sh/anthropics/skills",
+    "path": "docs/designs/viewstem-skills-final-review-2026-11-05/research/popularity/anthropics.html",
+    "sha256": "c17e75b88659ff29f0fed83aa436423add442cc116c8598354142065c90e9bd8",
+    "bytes": 71817,
+    "retrieved_at": "2026-11-05T07:44:03.480343+00:00"
+  },
+  {
+    "name": "vercel",
+    "url": "https://www.skills.sh/vercel-labs/agent-skills",
+    "path": "docs/designs/viewstem-skills-final-review-2026-11-05/research/popularity/vercel.html",
+    "sha256": "06317f28e3e6899b5f49608b0bf08016d55e610cfe0e1291e70daf0239dec0f6",
+    "bytes": 71352,
+    "retrieved_at": "2026-11-05T07:44:03.577472+00:00"
+  },
+  {
+    "name": "supabase",
+    "url": "https://www.skills.sh/supabase/agent-skills",
+    "path": "docs/designs/viewstem-skills-final-review-2026-11-05/research/popularity/supabase.html",
+    "sha256": "d78683384887f89c6ecbc8ffb1bbb8fd5effcb03e28e790c5af9fcf02b999218",
+    "bytes": 50276,
+    "retrieved_at": "2026-11-05T07:44:03.880829+00:00"
+  },
+  {
+    "name": "expo",
+    "url": "https://www.skills.sh/expo/skills",
+    "path": "docs/designs/viewstem-skills-final-review-2026-11-05/research/popularity/expo.html",
+    "sha256": "544dc6946cfca4eaf6182db3d505f4294cee3a8be9338495989d2f030c60ee31",
+    "bytes": 100320,
+    "retrieved_at": "2026-11-05T07:44:04.191162+00:00"
+  },
+  {
+    "name": "metrics-definition",
+    "url": "https://www.skills.sh/docs",
+    "path": "docs/designs/viewstem-skills-final-review-2026-11-05/research/popularity/metrics-definition.html",
+    "sha256": "200aa871ee8ca88c4d80cbe16f54df92687108de0e0671cbf52d4e26087c8904",
+    "bytes": 43811,
+    "retrieved_at": "2026-11-05T07:44:04.326615+00:00"
+  }
+]

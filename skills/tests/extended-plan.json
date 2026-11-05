@@ -1,0 +1,103 @@
+{
+  "date": "2026-11-05",
+  "workspace": "/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-extended-6ry4o01p",
+  "baseline": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/baseline",
+  "status": "registered_before_extended_model_runs",
+  "host": "codex-cli 0.160.0",
+  "model": "gpt-6.1-terra",
+  "effort": "high",
+  "maxSecondsPerRun": 360,
+  "maxCommandCallsPerRun": 50,
+  "concurrency": 2,
+  "arms": [
+    "A",
+    "B2"
+  ],
+  "rounds": 3,
+  "categories": 10,
+  "cases": [
+    "first-view",
+    "form-refresh",
+    "core-only",
+    "repeat",
+    "native",
+    "completion",
+    "renderer-error",
+    "late-response",
+    "version-unsupported",
+    "svelte-decoy",
+    "other-decoy"
+  ],
+  "plannedComparisons": 66,
+  "reusedInitialComparisons": 4,
+  "newComparisons": 62,
+  "reuse": [
+    {
+      "id": "codex-first-view-A",
+      "scenario": "first-view",
+      "arm": "A",
+      "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-A",
+      "promptSha256": "2329d9c2e51a397e4f0b9fe8f8802931790415172c6ba5673dc0508fe3115086",
+      "traceSha256": "7997cc806c0556c07bbcc997f11b7ec4c855c8b701a47fa8940e58bd2ed4bd56"
+    },
+    {
+      "id": "codex-first-view-B2",
+      "scenario": "first-view",
+      "arm": "B2",
+      "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-B2",
+      "promptSha256": "2329d9c2e51a397e4f0b9fe8f8802931790415172c6ba5673dc0508fe3115086",
+      "traceSha256": "ad49aa71551b3a6e58ce5a6765cd3364387a6190d1309ae773b3859ce4b99985"
+    },
+    {
+      "id": "codex-native-A",
+      "scenario": "native",
+      "arm": "A",
+      "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-native-A",
+      "promptSha256": "75220da7b6a6fd6d94c8ab54c714581422f641cda17d0b5c954fa443428927d6",
+      "traceSha256": "1c3679f2ea5103eb9fe3ce9eaa9b418c89da7cd57835c5f80478c237cba13b70"
+    },
+    {
+      "id": "codex-native-B2",
+      "scenario": "native",
+      "arm": "B2",
+      "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-native-B2",
+      "promptSha256": "75220da7b6a6fd6d94c8ab54c714581422f641cda17d0b5c954fa443428927d6",
+      "traceSha256": "0c62611bd89855bfa98ce67726c8cc4b262be6baf2d50114d1ba0f226e4da1b0"
+    }
+  ],
+  "evaluation": [
+    "functional correctness",
+    "actual SKILL body reads",
+    "unrequested Viewstem edits/advice in decoys",
+    "public API and ownership semantics",
+    "scope integrity",
+    "native token usage and commands, no causal speed claim"
+  ],
+  "stopAndRepair": "Preserve original failures. Fix evaluator defects separately from skill defects; regrade unchanged artifacts when only grader changes. Re-evaluate relevant cases with a new candidate identifier after skill changes.",
+  "claudeCode": "preparation_only_no_execution",
+  "releaseGate": "Local Codex evidence is separate from dual-host and cloud support. No publication in this task.",
+  "globalConcurrencyLimit": 3,
+  "executionGroups": {
+    "initialRepeat": 2,
+    "other": 1,
+    "browserAfterInitialRepeat": 2
+  },
+  "concurrencyNote": "Separate groups use up to three total model sessions; timing is observational, not a causal comparison.",
+  "refinement": {
+    "candidate": "B3",
+    "reason": "B2 form-refresh r1 used recursive rg over minified UI support JSON and returned 1048607 output bytes in one command",
+    "change": "Exclude minified support JSON from recursive search and prefer declarative Query display bindings to avoid the reproduced development-runtime projection inconsistency. No helper/reference added.",
+    "affectedScenarios": [
+      "form-refresh",
+      "native",
+      "version-unsupported",
+      "late-response"
+    ],
+    "additionalCandidateRuns": 12,
+    "baseline": "Reuse unchanged A inputs and outputs for each affected scenario",
+    "discoveryMetadataChanged": false,
+    "unaffectedEvidence": "Retain B2 full suite and label B3 targeted re-evaluation separately; do not claim a fresh full B3 suite",
+    "additionalReason": "B2 form-refresh r3 reproduced State/Query success with stale View projection after synchronous View.subscribe State write; direct declarative Query binding passes",
+    "additionalCoverageReason": "The subscription/projection guidance also affects Query display during View replacement; add late-response B3 before release judgment."
+  }
+}

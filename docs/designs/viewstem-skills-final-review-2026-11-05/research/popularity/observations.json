@@ -1,0 +1,12 @@
+{
+  "observed_date": "2026-11-05",
+  "method": "web open rendered public skills.sh pages; cached page values may differ from raw direct HTTP snapshots",
+  "metric": "anonymous skills CLI install counters, not unique people, active users, or demonstrated effectiveness",
+  "observations": [
+    {"url":"https://www.skills.sh/anthropics/skills","repo_total":"3.7M","skill":"skill-creator","skill_installs":"424.3K"},
+    {"url":"https://www.skills.sh/vercel-labs/agent-skills","repo_total":"3.2M","skill":"vercel-react-best-practices","skill_installs":"871.9K"},
+    {"url":"https://www.skills.sh/supabase/agent-skills","repo_total":"827.8K","skill":"supabase-postgres-best-practices","skill_installs":"472.1K"},
+    {"url":"https://www.skills.sh/expo/skills","repo_total":"1.1M","skill":"expo-skill-eval","skill_installs":"23.8K"}
+  ],
+  "definition_url":"https://www.skills.sh/docs"
+}

@@ -1,0 +1,79 @@
+[
+  {
+    "name": "anthropic-skill-creator",
+    "repo": "anthropics/skills",
+    "commit": "ca45fc496a3436251f191354091d557da31c15b5",
+    "url": "https://github.com/anthropics/skills/blob/ca45fc496a3436251f191354091d557da31c15b5/skills/skill-creator/SKILL.md",
+    "source_path": "skills/skill-creator/SKILL.md",
+    "error": false,
+    "snapshot": "/Users/minholim/dev/minh/viewstem/docs/designs/viewstem-skills-final-review-2026-11-05/research/oss/anthropic-skill-creator.md",
+    "retrieved_at": "2026-11-05",
+    "sha256": "d6d01c462951f68a151338b14c287bb47bafe81f3b9280a78b421cee14e66eee"
+  },
+  {
+    "name": "vercel-react",
+    "repo": "vercel-labs/agent-skills",
+    "commit": "1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62",
+    "url": "https://github.com/vercel-labs/agent-skills/blob/1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62/skills/react-best-practices/SKILL.md",
+    "source_path": "skills/react-best-practices/SKILL.md",
+    "error": false,
+    "snapshot": "/Users/minholim/dev/minh/viewstem/docs/designs/viewstem-skills-final-review-2026-11-05/research/oss/vercel-react.md",
+    "retrieved_at": "2026-11-05",
+    "sha256": "84df228cc3bb284357aa8d26758442f878024272d1526e12b58e3b98ffa11afa"
+  },
+  {
+    "name": "supabase-postgres",
+    "repo": "supabase/agent-skills",
+    "commit": "c9be0e931b7930f7d02126d04774d904c381e7d7",
+    "url": "https://github.com/supabase/agent-skills/blob/c9be0e931b7930f7d02126d04774d904c381e7d7/skills/supabase-postgres-best-practices/SKILL.md",
+    "source_path": "skills/supabase-postgres-best-practices/SKILL.md",
+    "error": false,
+    "snapshot": "/Users/minholim/dev/minh/viewstem/docs/designs/viewstem-skills-final-review-2026-11-05/research/oss/supabase-postgres.md",
+    "retrieved_at": "2026-11-05",
+    "sha256": "c4402177625222f84138802bf5ffa3bc43d557cb38f70e4d3c5215a5fb3e434c"
+  },
+  {
+    "name": "expo-eval",
+    "repo": "expo/skills",
+    "commit": "a9e5bd3fa00b4e61f632e43f85da73aee1942582",
+    "url": "https://github.com/expo/skills/blob/a9e5bd3fa00b4e61f632e43f85da73aee1942582/.claude/skills/expo-skill-eval/SKILL.md",
+    "source_path": ".claude/skills/expo-skill-eval/SKILL.md",
+    "error": false,
+    "snapshot": "/Users/minholim/dev/minh/viewstem/docs/designs/viewstem-skills-final-review-2026-11-05/research/oss/expo-eval.md",
+    "retrieved_at": "2026-11-05",
+    "sha256": "921efa9c6083394f2a80db49d2f3e7f26a353838ab55225ab61ce920ead69429"
+  },
+  {
+    "name": "expo-readme",
+    "repo": "expo/skills",
+    "commit": "a9e5bd3fa00b4e61f632e43f85da73aee1942582",
+    "url": "https://github.com/expo/skills/blob/a9e5bd3fa00b4e61f632e43f85da73aee1942582/plugins/expo/skills/README.md",
+    "source_path": "plugins/expo/skills/README.md",
+    "error": false,
+    "snapshot": "/Users/minholim/dev/minh/viewstem/docs/designs/viewstem-skills-final-review-2026-11-05/research/oss/expo-readme.md",
+    "retrieved_at": "2026-11-05",
+    "sha256": "114dbb953f0e00830df5ee2ec50ffdd25741ed971e2a80ecfd129e9662bfcd71"
+  },
+  {
+    "name": "supabase-contributing",
+    "repo": "supabase/agent-skills",
+    "commit": "c9be0e931b7930f7d02126d04774d904c381e7d7",
+    "url": "https://github.com/supabase/agent-skills/blob/c9be0e931b7930f7d02126d04774d904c381e7d7/CONTRIBUTING.md",
+    "source_path": "CONTRIBUTING.md",
+    "error": false,
+    "snapshot": "/Users/minholim/dev/minh/viewstem/docs/designs/viewstem-skills-final-review-2026-11-05/research/oss/supabase-contributing.md",
+    "retrieved_at": "2026-11-05",
+    "sha256": "30a1bbea3a02ab85f4175af590048950c974fed6eaec7c148f766f9510cbb046"
+  },
+  {
+    "name": "vercel-react-readme",
+    "repo": "vercel-labs/agent-skills",
+    "commit": "1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62",
+    "url": "https://github.com/vercel-labs/agent-skills/blob/1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62/skills/react-best-practices/README.md",
+    "source_path": "skills/react-best-practices/README.md",
+    "error": false,
+    "snapshot": "/Users/minholim/dev/minh/viewstem/docs/designs/viewstem-skills-final-review-2026-11-05/research/oss/vercel-react-readme.md",
+    "retrieved_at": "2026-11-05",
+    "sha256": "e1b2aafc5b55167b042aebf29fa42a05e4fb3c8f1598e44ad3767dab7ca15247"
+  }
+]

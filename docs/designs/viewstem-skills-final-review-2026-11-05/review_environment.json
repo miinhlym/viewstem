@@ -1,0 +1,80 @@
+{
+  "git_head": "517503d72db30ed3363b7fd61285f480870fce79",
+  "files": [
+    {
+      "path": "/Users/minholim/dev/minh/viewstem/AGENTS.md",
+      "sha256": "61a1e9836a8b14af280dde6fd5597b3e5f8cfda29d47deb98e5ec00a1ca2ccc9"
+    },
+    {
+      "path": "/Users/minholim/dev/minh/viewstem/design_draft.md",
+      "sha256": "93d6a46b61ed990fb2385b3e6565950d90033bdeeb72015406f2f8a1820b6967"
+    },
+    {
+      "path": "/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/skills/egm-review/SKILL.md",
+      "sha256": "a172962167d174ae49d86833876d6a8508b77135c8e979b18e24d9dc04a67c1c"
+    },
+    {
+      "path": "/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/docs/codex.md",
+      "sha256": "95ec5e0776615230d97538168e3e88c2a9d77d180ef4b6ae312838d88ea65cba"
+    },
+    {
+      "path": "/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/agents/codebase_details.md",
+      "sha256": "d80db07e449b57b3b3776d1401cca72a54b6b65a0ab218b86f9064ee4b8167bc"
+    },
+    {
+      "path": "/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/agents/synthesizer.md",
+      "sha256": "402e661fa44684ce51246575d169f65003981846f318cf13cf124c8895b4ccab"
+    },
+    {
+      "path": "/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/agents/design_critic.md",
+      "sha256": "cee6294735ce2bd4fea19245852b6eb07cbe8ede7e72a4bfc829f586e4a39d0f"
+    },
+    {
+      "path": "/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/agents/style.md",
+      "sha256": "9330780622baaef8dc683ea78efb3ff8e4583e3dde7ab6092b84df50e8c9ea58"
+    },
+    {
+      "path": "/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/agents/structural.md",
+      "sha256": "f0d4fe6faee4e388366b7d653fe353a9b09f45ca1bf5dae29280e351cda7da87"
+    },
+    {
+      "path": "/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/agents/implementation_readiness.md",
+      "sha256": "1f6aa61cfe7cb86dc94943ab3b3fd339e5baba533937198fd10edb06dfa64e8f"
+    },
+    {
+      "path": "/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/agents/bootstrap_orchestrator.md",
+      "sha256": "5c2fa484754f8d582669500d16d5728fe95daff8bd964f8e7f09142c6a666bfc"
+    },
+    {
+      "path": "/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/agents/zoom_out.md",
+      "sha256": "adc9d7b7db4c304866e61d5e5e446502231abe188ce64656939305e07ae7995f"
+    },
+    {
+      "path": "/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/agents/comprehension.md",
+      "sha256": "974f4972f717dc7b102a9b1407b3a625749149f2ae905727241e919f43cc3fa5"
+    },
+    {
+      "path": "/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/resources/document_standards/re-implementation-standard.md",
+      "sha256": "421aacbf5e9a0d4c5b794edfa4cac333f8cc67bc4cf0e3717efcad4f827e6e46"
+    },
+    {
+      "path": "/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/resources/document_standards/zoom-out-standard.md",
+      "sha256": "0a01013bd363a8d744f8372b65495892360d7339e4e35c767003ae38f48e6799"
+    },
+    {
+      "path": "/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/resources/document_standards/heilmeier-standard.md",
+      "sha256": "a23bc354a5651bd00d817409a72ebcb7536c249e2038c13255ce89f49f138174"
+    },
+    {
+      "path": "/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/resources/document_standards/feature-spec-standard.md",
+      "sha256": "8e9821e7bfd7c074dd1cec7ba02e3ea09a3fd32e35b91a1463a37c1ee3b9d6a4"
+    },
+    {
+      "path": "/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/resources/document_standards/implementation-readiness-standard.md",
+      "sha256": "49ef3a44228a14c774ec606477293be6467b232a9e4af9e031a3cad64ed87642"
+    }
+  ],
+  "isolation": "fresh conversation via fork_turns:none; filesystem and host instructions shared/unverified",
+  "mode": "uninterrupted",
+  "target_unchanged": true
+}

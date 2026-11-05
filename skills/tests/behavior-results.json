@@ -1,0 +1,1568 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-05",
+  "status": "codex_initial_completed_claude_preparation_completed",
+  "workspace": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz",
+  "host": {
+    "codex": "codex-cli 0.160.0",
+    "model": "gpt-6.1-terra",
+    "effort": "high",
+    "node": "v22.21.1",
+    "maxSecondsPerRun": 360,
+    "maxCommandsPerRun": 50,
+    "approval": "never",
+    "sandbox": "workspace-write",
+    "session": "fresh ephemeral"
+  },
+  "packages": [
+    {
+      "name": "@viewstem/core",
+      "version": "0.1.0",
+      "filename": "viewstem-core-0.1.0.tgz",
+      "integrity": "sha512-G6gD1NddIZMn8RHTEb3dbLrYc9Rc5xPezPSi9sTa0MOA/58F0xceUNVV3Od7Y95T48cQcqIbMCLM2KWoNy3I6Q==",
+      "sha256": "a84956007a20dec39028ace483a8faa727fc7b0b842095cd97e4a966c057fefb",
+      "size": 255148
+    },
+    {
+      "name": "@viewstem/svelte",
+      "version": "0.1.0",
+      "filename": "viewstem-svelte-0.1.0.tgz",
+      "integrity": "sha512-H64zW1sU7FkGCarD/mNVt9nm6buY8Xzdl44e7fPgr7s7TAXRIfZbxGBzzrPDlmPyZyUO6qxXZ4SPKYP3tCFThQ==",
+      "sha256": "6c6c4f659e7c1d63c5cdecf170f2c3a3b01bedb28d5fac6b9600c536d36f401b",
+      "size": 17897
+    },
+    {
+      "name": "@viewstem/svelte-ui",
+      "version": "0.1.0",
+      "filename": "viewstem-svelte-ui-0.1.0.tgz",
+      "integrity": "sha512-Krx8OmpCEpdAVL72fvJE7WgyRvANDtN1vVmWhKOKokePw4PQoj1cxYS/OegSmPeua1oK7Unq4sWiz1Qwuxlr5w==",
+      "sha256": "93339445d8a7a3b9096808e3009b1359089f16c630559b7538e4b1eed0cb460f",
+      "size": 293680
+    }
+  ],
+  "arms": {
+    "A": "installed public packages, no Viewstem skill",
+    "B": "initial thin skill, original standard compatibility frontmatter",
+    "B2": "final thin skill: selective named-member lookup, README-first; Node requirement moved to body for legacy validator compatibility"
+  },
+  "summary": {
+    "A": {
+      "runs": 3,
+      "functionalPasses": 3,
+      "skillReads": 0,
+      "commands": 28,
+      "wallSeconds": 340.181,
+      "commandOutputBytes": 1223850,
+      "inputTokens": 1745580,
+      "cachedInputTokens": 1637376,
+      "outputTokens": 7304
+    },
+    "B": {
+      "runs": 3,
+      "functionalPasses": 3,
+      "skillReads": 3,
+      "commands": 22,
+      "wallSeconds": 185.525,
+      "commandOutputBytes": 688892,
+      "inputTokens": 1345296,
+      "cachedInputTokens": 1201024,
+      "outputTokens": 6090
+    },
+    "B2": {
+      "runs": 3,
+      "functionalPasses": 3,
+      "skillReads": 3,
+      "commands": 25,
+      "wallSeconds": 189.219,
+      "commandOutputBytes": 176955,
+      "inputTokens": 1121552,
+      "cachedInputTokens": 1019264,
+      "outputTokens": 5712
+    }
+  },
+  "runs": [
+    {
+      "id": "codex-first-view-A",
+      "host": "codex",
+      "scenario": "first-view",
+      "arm": "A",
+      "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-A",
+      "promptSha256": "2329d9c2e51a397e4f0b9fe8f8802931790415172c6ba5673dc0508fe3115086",
+      "skillPath": null,
+      "skillManifest": null,
+      "status": "completed",
+      "exitCode": 0,
+      "stopReason": null,
+      "wallSeconds": 64.295,
+      "commandCalls": 5,
+      "completedCommands": 5,
+      "usage": {
+        "input_tokens": 312994,
+        "cached_input_tokens": 280448,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1234,
+        "reasoning_output_tokens": 68
+      },
+      "skillReadObserved": false,
+      "finalResponse": "[src/app.ts]( /private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-A/src/app.ts)에서 Viewstem 렌더러로 **Start** 버튼을 표시하고 UI 스타일을 적용했습니다. 반환된 `dispose`는 화면과 렌더러를 정리하며, 초기화 실패 시에도 렌더러를 정리합니다.\n\n`npm run check`와 `npm run build`는 모두 통과했습니다. 두 명령은 `.svelte` 입력 파일이 없다는 경고 1건을 보고했으며, 런타임 화면 검증은 수행하지 않았습니다.",
+      "traceSha256": "7997cc806c0556c07bbcc997f11b7ec4c855c8b701a47fa8940e58bd2ed4bd56",
+      "checkExitCode": 0,
+      "checkSeconds": 84.826,
+      "verification": {
+        "ok": true,
+        "scenario": "first-view",
+        "typecheck": {
+          "ok": true,
+          "output": "Loading svelte-check in workspace: /private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-A\nGetting Svelte diagnostics...\n\n/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-A/tsconfig.json:1:1\nWarn: No svelte input files were found in config file '/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-A/tsconfig.json'. Did you forget to add svelte files to the 'include' in your tsconfig.json? Specified 'include' paths were '[\"src/**/*\"]' and 'exclude' paths were 'undefined' (svelte)\n\n\n====================================\nsvelte-check found 0 errors and 1 warning in 1 file\n"
+        },
+        "build": {
+          "ok": true,
+          "forbiddenImports": [],
+          "rendererIncluded": true,
+          "calendarImported": false,
+          "errors": []
+        },
+        "runtime": {
+          "ok": true,
+          "ready": true,
+          "error": ""
+        },
+        "pageErrors": [],
+        "assertions": [
+          {
+            "name": "Start button visible",
+            "ok": true,
+            "evidence": "visible"
+          },
+          {
+            "name": "Dispose removes owned UI",
+            "ok": true,
+            "evidence": {
+              "remaining": 0
+            }
+          }
+        ]
+      },
+      "sourceManifest": [
+        {
+          "path": "app.ts",
+          "sha256": "a1bd70b574e8076fa4f61f037a456309121a5b48b9e99e4e71ac4bc47baf122a"
+        }
+      ],
+      "protectedFileChanges": [],
+      "commandOutputBytes": 50607,
+      "failedCommands": 0,
+      "sourceFiles": [
+        {
+          "path": "src/app.ts",
+          "content": "import { createRenderer } from '@viewstem/svelte';\nimport { registerComponents } from '@viewstem/svelte-ui';\nimport { button } from '@viewstem/svelte-ui/shadcn/button';\nimport '@viewstem/svelte-ui/shadcn/styles.css';\n\nexport async function mountApp(\n  target: HTMLElement,\n  services: { save?: (name: string) => Promise<void> } = {},\n): Promise<{ dispose: () => void | Promise<void> }> {\n  const renderer = createRenderer();\n  try {\n    registerComponents(renderer, [button]);\n    const mounted = await renderer.mount({\n      target,\n      view: {\n        render: {\n          id: 'start',\n          componentRef: 'shadcn.Button',\n          inputs: { text: 'Start' },\n        },\n      },\n    });\n    await mounted.initialComplete;\n\n    let disposal: Promise<void> | undefined;\n    return {\n      dispose: () => (disposal ??= (async () => {\n        try {\n          await mounted.dispose();\n        } finally {\n          await renderer.dispose();\n        }\n      })()),\n    };\n  } catch (error) {\n    await renderer.dispose();\n    throw error;\n  }\n}\n",
+          "sha256": "a1bd70b574e8076fa4f61f037a456309121a5b48b9e99e4e71ac4bc47baf122a"
+        }
+      ],
+      "sourceCheckoutReadObserved": false,
+      "packageLockUnchanged": true,
+      "otherSkillReads": [],
+      "manualAssessment": {
+        "publicImportsOnly": true,
+        "declaredStateAndAction": null,
+        "nativeBoundaryCorrect": null,
+        "userInterventions": 0,
+        "finalWrongApisObserved": 0,
+        "uiCssImported": true
+      }
+    },
+    {
+      "id": "codex-first-view-B",
+      "host": "codex",
+      "scenario": "first-view",
+      "arm": "B",
+      "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-B",
+      "promptSha256": "2329d9c2e51a397e4f0b9fe8f8802931790415172c6ba5673dc0508fe3115086",
+      "skillPath": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-B/.agents/skills/viewstem",
+      "skillManifest": [
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "58555067741bb407d2ac9213a90a4a56a25b809e369451df2f9602f598b39799"
+        },
+        {
+          "path": "integrations/claude-code.md",
+          "sha256": "300cdba204d8ab2e84d44eb108a0ad32d63bc0f16011717a309b5bb21d2e4480"
+        },
+        {
+          "path": "integrations/codex.md",
+          "sha256": "af55838d95f787b83d7586531c7f6140df0c02d12909811125597b27b44b3b75"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "1c882e4fec85b95d1072e98094f5f4524677cd5a823f82de2d26a1cfddc93de6"
+        }
+      ],
+      "status": "completed",
+      "exitCode": 0,
+      "stopReason": null,
+      "wallSeconds": 54.23,
+      "commandCalls": 7,
+      "completedCommands": 7,
+      "usage": {
+        "input_tokens": 386574,
+        "cached_input_tokens": 336256,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1665,
+        "reasoning_output_tokens": 118
+      },
+      "skillReadObserved": true,
+      "finalResponse": "[src/app.ts](/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-B/src/app.ts)에 Viewstem 렌더러와 제공 버튼 UI를 연결해 **Start** 버튼을 표시하도록 구현했습니다. UI 스타일을 가져오고, 종료 또는 초기화 실패 시 화면이 소유한 리소스를 정리합니다.\n\n`npm run check`와 `npm run build`가 모두 통과했습니다. Svelte 입력 파일이 없다는 경고 1건이 있었으며, 두 명령은 런타임 화면 검사를 수행하지 않아 실제 브라우저 표시와 종료 동작은 확인하지 못했습니다.",
+      "traceSha256": "f71ba9caa59d0835f5da51cebe96d58b84c8adda972b2552be0b9f663848988c",
+      "checkExitCode": 0,
+      "checkSeconds": 9.757,
+      "verification": {
+        "ok": true,
+        "scenario": "first-view",
+        "typecheck": {
+          "ok": true,
+          "output": "Loading svelte-check in workspace: /private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-B\nGetting Svelte diagnostics...\n\n/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-B/tsconfig.json:1:1\nWarn: No svelte input files were found in config file '/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-B/tsconfig.json'. Did you forget to add svelte files to the 'include' in your tsconfig.json? Specified 'include' paths were '[\"src/**/*\"]' and 'exclude' paths were 'undefined' (svelte)\n\n\n====================================\nsvelte-check found 0 errors and 1 warning in 1 file\n"
+        },
+        "build": {
+          "ok": true,
+          "forbiddenImports": [],
+          "rendererIncluded": true,
+          "calendarImported": false,
+          "errors": []
+        },
+        "runtime": {
+          "ok": true,
+          "ready": true,
+          "error": ""
+        },
+        "pageErrors": [],
+        "assertions": [
+          {
+            "name": "Start button visible",
+            "ok": true,
+            "evidence": "visible"
+          },
+          {
+            "name": "Dispose removes owned UI",
+            "ok": true,
+            "evidence": {
+              "remaining": 0
+            }
+          }
+        ]
+      },
+      "sourceManifest": [
+        {
+          "path": "app.ts",
+          "sha256": "0ae320e8f3c72ed237f052130b769e01a7d207040e46f02724e90137cbceabf7"
+        }
+      ],
+      "protectedFileChanges": [],
+      "commandOutputBytes": 150418,
+      "failedCommands": 1,
+      "sourceFiles": [
+        {
+          "path": "src/app.ts",
+          "content": "import { createRenderer } from '@viewstem/svelte';\nimport { registerComponents } from '@viewstem/svelte-ui';\nimport { button } from '@viewstem/svelte-ui/shadcn/button';\nimport '@viewstem/svelte-ui/shadcn/styles.css';\n\nexport async function mountApp(target: HTMLElement, services: {save?: (name:string)=>Promise<void>} = {}): Promise<{dispose:()=>void|Promise<void>}> {\n  const renderer = createRenderer();\n  try {\n    registerComponents(renderer, [button]);\n    const mounted = await renderer.mount({\n      target,\n      view: {\n        render: {\n          id: 'start',\n          componentRef: 'shadcn.Button',\n          inputs: { text: 'Start', type: 'button' },\n        },\n      },\n    });\n    const report = await mounted.initialComplete;\n    if (report.queryErrors.length) throw report.queryErrors[0].error;\n    return {\n      dispose: async () => {\n        try {\n          await mounted.dispose();\n        } finally {\n          await renderer.dispose();\n        }\n      },\n    };\n  } catch (error) {\n    await renderer.dispose();\n    throw error;\n  }\n}\n",
+          "sha256": "0ae320e8f3c72ed237f052130b769e01a7d207040e46f02724e90137cbceabf7"
+        }
+      ],
+      "sourceCheckoutReadObserved": false,
+      "packageLockUnchanged": true,
+      "otherSkillReads": [],
+      "manualAssessment": {
+        "publicImportsOnly": true,
+        "declaredStateAndAction": null,
+        "nativeBoundaryCorrect": null,
+        "userInterventions": 0,
+        "finalWrongApisObserved": 0,
+        "uiCssImported": true
+      }
+    },
+    {
+      "id": "codex-first-view-B2",
+      "host": "codex",
+      "scenario": "first-view",
+      "arm": "B2",
+      "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-B2",
+      "promptSha256": "2329d9c2e51a397e4f0b9fe8f8802931790415172c6ba5673dc0508fe3115086",
+      "skillPath": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-B2/.agents/skills/viewstem",
+      "skillManifest": [
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "58555067741bb407d2ac9213a90a4a56a25b809e369451df2f9602f598b39799"
+        },
+        {
+          "path": "integrations/claude-code.md",
+          "sha256": "300cdba204d8ab2e84d44eb108a0ad32d63bc0f16011717a309b5bb21d2e4480"
+        },
+        {
+          "path": "integrations/codex.md",
+          "sha256": "af55838d95f787b83d7586531c7f6140df0c02d12909811125597b27b44b3b75"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "821a5ea3e55578d01db547954f68e9204569186fecaadf05d2d9e694c10d6455"
+        }
+      ],
+      "status": "completed",
+      "exitCode": 0,
+      "stopReason": null,
+      "wallSeconds": 51.401,
+      "commandCalls": 8,
+      "completedCommands": 8,
+      "usage": {
+        "input_tokens": 362047,
+        "cached_input_tokens": 333568,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1443,
+        "reasoning_output_tokens": 112
+      },
+      "skillReadObserved": true,
+      "finalResponse": "[src/app.ts](/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-B2/src/app.ts)에 Viewstem renderer와 제공된 Button UI를 등록해 **Start** 버튼을 구현했습니다. UI 스타일을 가져오고, 반환된 `dispose`와 초기화 실패 경로에서 renderer와 소유 리소스를 정리합니다. `mountApp`의 공개 시그니처는 유지했습니다.\n\n`npm run check`와 `npm run build`는 모두 통과했습니다. Svelte 파일이 없다는 경고가 하나 있었으며, 제공된 검사에서는 런타임 시나리오가 실행되지 않아 브라우저의 실제 표시와 정리 동작은 별도로 확인하지 못했습니다.",
+      "traceSha256": "ad49aa71551b3a6e58ce5a6765cd3364387a6190d1309ae773b3859ce4b99985",
+      "checkExitCode": 0,
+      "checkSeconds": 1.461,
+      "verification": {
+        "ok": true,
+        "scenario": "first-view",
+        "typecheck": {
+          "ok": true,
+          "output": "Loading svelte-check in workspace: /private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-B2\nGetting Svelte diagnostics...\n\n/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-B2/tsconfig.json:1:1\nWarn: No svelte input files were found in config file '/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-first-view-B2/tsconfig.json'. Did you forget to add svelte files to the 'include' in your tsconfig.json? Specified 'include' paths were '[\"src/**/*\"]' and 'exclude' paths were 'undefined' (svelte)\n\n\n====================================\nsvelte-check found 0 errors and 1 warning in 1 file\n"
+        },
+        "build": {
+          "ok": true,
+          "forbiddenImports": [],
+          "rendererIncluded": true,
+          "calendarImported": false,
+          "errors": []
+        },
+        "runtime": {
+          "ok": true,
+          "ready": true,
+          "error": ""
+        },
+        "pageErrors": [],
+        "assertions": [
+          {
+            "name": "Start button visible",
+            "ok": true,
+            "evidence": "visible"
+          },
+          {
+            "name": "Dispose removes owned UI",
+            "ok": true,
+            "evidence": {
+              "remaining": 0
+            }
+          }
+        ]
+      },
+      "sourceManifest": [
+        {
+          "path": "app.ts",
+          "sha256": "ad165b484c6f08827ffebb277ae61079169473ad556c750b7dc9a3d0c432dc7e"
+        }
+      ],
+      "protectedFileChanges": [],
+      "commandOutputBytes": 55952,
+      "failedCommands": 2,
+      "sourceFiles": [
+        {
+          "path": "src/app.ts",
+          "content": "import { createRenderer } from '@viewstem/svelte';\nimport { registerComponents } from '@viewstem/svelte-ui';\nimport { button } from '@viewstem/svelte-ui/shadcn/button';\nimport '@viewstem/svelte-ui/shadcn/styles.css';\n\nexport async function mountApp(\n  target: HTMLElement,\n  services: { save?: (name: string) => Promise<void> } = {},\n): Promise<{ dispose: () => void | Promise<void> }> {\n  const renderer = createRenderer();\n\n  try {\n    registerComponents(renderer, [button]);\n    const mounted = await renderer.mount({\n      target,\n      view: {\n        render: { id: 'start', componentRef: 'shadcn.Button', inputs: { text: 'Start' } },\n      },\n    });\n    await mounted.initialComplete;\n    return { dispose: () => renderer.dispose() };\n  } catch (error) {\n    await renderer.dispose();\n    throw error;\n  }\n}\n",
+          "sha256": "ad165b484c6f08827ffebb277ae61079169473ad556c750b7dc9a3d0c432dc7e"
+        }
+      ],
+      "sourceCheckoutReadObserved": false,
+      "packageLockUnchanged": true,
+      "otherSkillReads": [],
+      "manualAssessment": {
+        "publicImportsOnly": true,
+        "declaredStateAndAction": null,
+        "nativeBoundaryCorrect": null,
+        "userInterventions": 0,
+        "finalWrongApisObserved": 0,
+        "uiCssImported": true
+      }
+    },
+    {
+      "id": "codex-form-A",
+      "host": "codex",
+      "scenario": "form",
+      "arm": "A",
+      "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-A",
+      "promptSha256": "0f5b2f65b9d14000b96afe9d18baa77bd562b595006c0536b71b56c53733d3e0",
+      "skillPath": null,
+      "skillManifest": null,
+      "status": "completed",
+      "exitCode": 0,
+      "stopReason": null,
+      "wallSeconds": 175.763,
+      "commandCalls": 12,
+      "completedCommands": 12,
+      "usage": {
+        "input_tokens": 963260,
+        "cached_input_tokens": 916096,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 3854,
+        "reasoning_output_tokens": 404
+      },
+      "skillReadObserved": false,
+      "finalResponse": "[src/app.ts](/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-A/src/app.ts)에 Viewstem 폼을 구현했습니다. `Name` 입력을 State에 연결하고, `Save` 버튼의 Action이 `services.save(name)`을 기다린 뒤 저장된 값을 표시합니다. `dispose`는 화면이 소유한 렌더러와 리소스를 정리합니다.\n\n`npm run check`와 `npm run build`는 모두 통과했습니다. 두 명령 모두 Svelte 파일이 없다는 경고 1개를 출력했으며, 런타임 시나리오는 실행하지 않았습니다. 따라서 실제 브라우저 상호작용은 별도로 검증되지 않았습니다.",
+      "traceSha256": "8e4622c46d35c1c905028bc1fd8d219082e4d8374c34adeedf73e67ee8330720",
+      "checkExitCode": 0,
+      "checkSeconds": 9.501,
+      "verification": {
+        "ok": true,
+        "scenario": "form",
+        "typecheck": {
+          "ok": true,
+          "output": "Loading svelte-check in workspace: /private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-A\nGetting Svelte diagnostics...\n\n/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-A/tsconfig.json:1:1\nWarn: No svelte input files were found in config file '/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-A/tsconfig.json'. Did you forget to add svelte files to the 'include' in your tsconfig.json? Specified 'include' paths were '[\"src/**/*\"]' and 'exclude' paths were 'undefined' (svelte)\n\n\n====================================\nsvelte-check found 0 errors and 1 warning in 1 file\n"
+        },
+        "build": {
+          "ok": true,
+          "forbiddenImports": [],
+          "rendererIncluded": true,
+          "calendarImported": false,
+          "errors": []
+        },
+        "runtime": {
+          "ok": true,
+          "ready": true,
+          "error": ""
+        },
+        "pageErrors": [],
+        "assertions": [
+          {
+            "name": "Save Ada and show status",
+            "ok": true,
+            "evidence": {
+              "calls": [
+                "Ada"
+              ],
+              "status": "Saved: Ada"
+            }
+          },
+          {
+            "name": "Dispose removes owned UI",
+            "ok": true,
+            "evidence": {
+              "remaining": 0
+            }
+          }
+        ]
+      },
+      "sourceManifest": [
+        {
+          "path": "app.ts",
+          "sha256": "8ac12efb99298e50d891975168ff7d1273cddc3cdd2419dcc4aa6a3ed02b8abf"
+        }
+      ],
+      "protectedFileChanges": [],
+      "commandOutputBytes": 1126766,
+      "failedCommands": 2,
+      "sourceFiles": [
+        {
+          "path": "src/app.ts",
+          "content": "import { createRenderer } from '@viewstem/svelte';\nimport { registerComponents } from '@viewstem/svelte-ui';\nimport { input } from '@viewstem/svelte-ui/shadcn/input';\nimport { button } from '@viewstem/svelte-ui/shadcn/button';\nimport { typography } from '@viewstem/svelte-ui/shadcn/typography';\n\nexport async function mountApp(target: HTMLElement, services: {save?: (name:string)=>Promise<void>} = {}): Promise<{dispose:()=>void|Promise<void>}> {\n  const renderer = createRenderer();\n  try {\n    registerComponents(renderer, [input, button, typography]);\n    renderer.registry.registerAction({\n      kind: 'Action', id: 'saveName', spec: { ports: {\n        name: { kind: 'Value', schema: { type: 'string' }, required: true },\n        result: { kind: 'State', schema: { type: 'string' }, required: true },\n        saved: { kind: 'State', schema: { type: 'boolean' }, required: true },\n      } },\n    }, async ({ inputs, signal }) => {\n      await services.save?.(inputs.name);\n      if (!signal.aborted) {\n        inputs.result.write(`Saved: ${inputs.name}`);\n        inputs.saved.write(true);\n      }\n    });\n    const mounted = await renderer.mount({ target, view: {\n      states: {\n        name: { kind: 'State', schema: { type: 'string' }, initial: '' },\n        result: { kind: 'State', schema: { type: 'string' }, initial: '' },\n        saved: { kind: 'State', schema: { type: 'boolean' }, initial: false },\n      },\n      render: { id: 'form', componentRef: 'shadcn.Typography', inputs: { as: 'div' }, slots: { default: [\n        { id: 'name', componentRef: 'shadcn.Input', inputs: { 'aria-label': 'Name', value: { '@path': '/states/name' } }, on: {\n          input: { action: { ports: {\n            target: { kind: 'State', schema: { type: 'string' }, required: true },\n            next: { kind: 'Value', schema: { type: 'string' }, required: true },\n          }, steps: [{ kind: 'SetState', target: { '@path': '/ports/target' }, value: { '@path': '/ports/next' } }] }, inputs: { target: { '@path': '/states/name' }, next: { '@path': '/event/value' } } },\n        } },\n        { id: 'save', componentRef: 'shadcn.Button', inputs: { text: 'Save', type: 'button' }, on: {\n          click: { actionRef: 'saveName', inputs: { name: { '@path': '/states/name' }, result: { '@path': '/states/result' }, saved: { '@path': '/states/saved' } } },\n        } },\n        { id: 'result', componentRef: 'shadcn.Typography', when: { '@path': '/states/saved' }, inputs: { as: 'p', text: { '@path': '/states/result' } } },\n      ] } },\n    } });\n    await mounted.initialComplete;\n    return { dispose: () => renderer.dispose() };\n  } catch (error) {\n    await renderer.dispose();\n    throw error;\n  }\n}\n",
+          "sha256": "8ac12efb99298e50d891975168ff7d1273cddc3cdd2419dcc4aa6a3ed02b8abf"
+        }
+      ],
+      "sourceCheckoutReadObserved": false,
+      "packageLockUnchanged": true,
+      "otherSkillReads": [
+        "svelte-code-writer",
+        "svelte-core-bestpractices"
+      ],
+      "manualAssessment": {
+        "publicImportsOnly": true,
+        "declaredStateAndAction": true,
+        "nativeBoundaryCorrect": null,
+        "userInterventions": 0,
+        "finalWrongApisObserved": 0,
+        "uiCssImported": false
+      }
+    },
+    {
+      "id": "codex-form-B",
+      "host": "codex",
+      "scenario": "form",
+      "arm": "B",
+      "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-B",
+      "promptSha256": "0f5b2f65b9d14000b96afe9d18baa77bd562b595006c0536b71b56c53733d3e0",
+      "skillPath": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-B/.agents/skills/viewstem",
+      "skillManifest": [
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "58555067741bb407d2ac9213a90a4a56a25b809e369451df2f9602f598b39799"
+        },
+        {
+          "path": "integrations/claude-code.md",
+          "sha256": "300cdba204d8ab2e84d44eb108a0ad32d63bc0f16011717a309b5bb21d2e4480"
+        },
+        {
+          "path": "integrations/codex.md",
+          "sha256": "af55838d95f787b83d7586531c7f6140df0c02d12909811125597b27b44b3b75"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "1c882e4fec85b95d1072e98094f5f4524677cd5a823f82de2d26a1cfddc93de6"
+        }
+      ],
+      "status": "completed",
+      "exitCode": 0,
+      "stopReason": null,
+      "wallSeconds": 74.061,
+      "commandCalls": 7,
+      "completedCommands": 7,
+      "usage": {
+        "input_tokens": 517404,
+        "cached_input_tokens": 474368,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2306,
+        "reasoning_output_tokens": 286
+      },
+      "skillReadObserved": true,
+      "finalResponse": "[src/app.ts](/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-B/src/app.ts)에 폼을 구현했습니다. Name 입력을 Viewstem State에 연결하고, Save Action이 `services.save(name)`을 기다린 뒤 저장된 값을 표시합니다. `dispose`는 화면이 생성한 렌더러와 리소스를 정리합니다.\n\n`npm run check`와 `npm run build`는 통과했습니다. 두 명령 모두 Svelte 입력 파일이 없다는 경고 1건을 보고했습니다. 제공된 검사에는 실행 시나리오가 없었고 사용 가능한 브라우저 테스트 도구도 없어, 실제 입력·저장·정리 동작은 별도로 검증하지 못했습니다.",
+      "traceSha256": "89303936e8b6aa331a194652dc6aee0b21ee8069621e31cdcb2703e13c0bd713",
+      "checkExitCode": 0,
+      "checkSeconds": 8.001,
+      "verification": {
+        "ok": true,
+        "scenario": "form",
+        "typecheck": {
+          "ok": true,
+          "output": "Loading svelte-check in workspace: /private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-B\nGetting Svelte diagnostics...\n\n/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-B/tsconfig.json:1:1\nWarn: No svelte input files were found in config file '/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-B/tsconfig.json'. Did you forget to add svelte files to the 'include' in your tsconfig.json? Specified 'include' paths were '[\"src/**/*\"]' and 'exclude' paths were 'undefined' (svelte)\n\n\n====================================\nsvelte-check found 0 errors and 1 warning in 1 file\n"
+        },
+        "build": {
+          "ok": true,
+          "forbiddenImports": [],
+          "rendererIncluded": true,
+          "calendarImported": false,
+          "errors": []
+        },
+        "runtime": {
+          "ok": true,
+          "ready": true,
+          "error": ""
+        },
+        "pageErrors": [],
+        "assertions": [
+          {
+            "name": "Save Ada and show status",
+            "ok": true,
+            "evidence": {
+              "calls": [
+                "Ada"
+              ],
+              "status": "Saved: Ada"
+            }
+          },
+          {
+            "name": "Dispose removes owned UI",
+            "ok": true,
+            "evidence": {
+              "remaining": 0
+            }
+          }
+        ]
+      },
+      "sourceManifest": [
+        {
+          "path": "app.ts",
+          "sha256": "1f0474a7a7cba8a4f27afd7b01a53afa84610e0fb7d8166b5b2a2be349591161"
+        }
+      ],
+      "protectedFileChanges": [],
+      "commandOutputBytes": 163510,
+      "failedCommands": 0,
+      "sourceFiles": [
+        {
+          "path": "src/app.ts",
+          "content": "import { createRenderer } from '@viewstem/svelte';\nimport { registerComponents } from '@viewstem/svelte-ui';\nimport { input } from '@viewstem/svelte-ui/shadcn/input';\nimport { button } from '@viewstem/svelte-ui/shadcn/button';\nimport { typography } from '@viewstem/svelte-ui/shadcn/typography';\nimport '@viewstem/svelte-ui/shadcn/styles.css';\n\nexport async function mountApp(target: HTMLElement, services: {save?: (name:string)=>Promise<void>} = {}): Promise<{dispose:()=>void|Promise<void>}> {\n  const renderer = createRenderer();\n  try {\n    registerComponents(renderer, [input, button, typography]);\n    renderer.registry.registerAction({\n      kind: 'Action', id: 'saveName', spec: { ports: {\n        name: { kind: 'Value', schema: { type: 'string' }, required: true },\n        result: { kind: 'State', schema: { type: 'string' }, required: true },\n      } },\n    }, async ({ inputs, signal }) => {\n      await services.save?.(inputs.name);\n      if (!signal.aborted) inputs.result.write(`Saved: ${inputs.name}`);\n    });\n    const mounted = await renderer.mount({ target, view: {\n      states: {\n        name: { kind: 'State', schema: { type: 'string' }, initial: '' },\n        result: { kind: 'State', schema: { type: 'string' }, initial: '' },\n      },\n      render: { id: 'form', componentRef: 'shadcn.Typography', inputs: { as: 'div' }, slots: { default: [\n        { id: 'name', componentRef: 'shadcn.Input', inputs: { 'aria-label': 'Name', value: { '@path': '/states/name' } }, on: {\n          input: { action: { ports: {\n            target: { kind: 'State', schema: { type: 'string' }, required: true },\n            next: { kind: 'Value', schema: { type: 'string' }, required: true },\n          }, steps: [{ kind: 'SetState', target: { '@path': '/ports/target' }, value: { '@path': '/ports/next' } }] }, inputs: { target: { '@path': '/states/name' }, next: { '@path': '/event/value' } } },\n        } },\n        { id: 'save', componentRef: 'shadcn.Button', inputs: { text: 'Save' }, on: { click: { actionRef: 'saveName', inputs: { name: { '@path': '/states/name' }, result: { '@path': '/states/result' } } } } },\n        { id: 'result', componentRef: 'shadcn.Typography', inputs: { as: 'p', text: { '@path': '/states/result' } } },\n      ] } },\n    } });\n    const report = await mounted.initialComplete;\n    if (report.queryErrors.length) throw new Error('View initialization failed');\n    return { dispose: () => renderer.dispose() };\n  } catch (error) {\n    await renderer.dispose();\n    throw error;\n  }\n}\n",
+          "sha256": "1f0474a7a7cba8a4f27afd7b01a53afa84610e0fb7d8166b5b2a2be349591161"
+        }
+      ],
+      "sourceCheckoutReadObserved": false,
+      "packageLockUnchanged": true,
+      "otherSkillReads": [
+        "svelte-code-writer",
+        "svelte-core-bestpractices"
+      ],
+      "manualAssessment": {
+        "publicImportsOnly": true,
+        "declaredStateAndAction": true,
+        "nativeBoundaryCorrect": null,
+        "userInterventions": 0,
+        "finalWrongApisObserved": 0,
+        "uiCssImported": true
+      }
+    },
+    {
+      "id": "codex-form-B2",
+      "host": "codex",
+      "scenario": "form",
+      "arm": "B2",
+      "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-B2",
+      "promptSha256": "0f5b2f65b9d14000b96afe9d18baa77bd562b595006c0536b71b56c53733d3e0",
+      "skillPath": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-B2/.agents/skills/viewstem",
+      "skillManifest": [
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "58555067741bb407d2ac9213a90a4a56a25b809e369451df2f9602f598b39799"
+        },
+        {
+          "path": "integrations/claude-code.md",
+          "sha256": "300cdba204d8ab2e84d44eb108a0ad32d63bc0f16011717a309b5bb21d2e4480"
+        },
+        {
+          "path": "integrations/codex.md",
+          "sha256": "af55838d95f787b83d7586531c7f6140df0c02d12909811125597b27b44b3b75"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "821a5ea3e55578d01db547954f68e9204569186fecaadf05d2d9e694c10d6455"
+        }
+      ],
+      "status": "completed",
+      "exitCode": 0,
+      "stopReason": null,
+      "wallSeconds": 71.454,
+      "commandCalls": 8,
+      "completedCommands": 8,
+      "usage": {
+        "input_tokens": 424519,
+        "cached_input_tokens": 386176,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2465,
+        "reasoning_output_tokens": 270
+      },
+      "skillReadObserved": true,
+      "finalResponse": "[src/app.ts](/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-B2/src/app.ts)에 Viewstem 폼을 구현했습니다. `Name` 입력을 State에 연결하고, `Save` Action이 `services.save(name)`을 기다린 뒤 `Saved: 입력값`을 표시합니다. `dispose`는 화면이 소유한 렌더러와 View를 정리합니다.\n\n`npm run check`와 `npm run build`는 통과했습니다. Svelte 입력 파일이 없다는 경고 1건이 있었고, 제공된 검사 결과에는 실행 시나리오가 없어 브라우저에서 입력·저장·정리 동작은 확인하지 못했습니다.",
+      "traceSha256": "ac566d71364849ec153c18e5067521d7a35aec799071201c551308ac65f181f5",
+      "checkExitCode": 0,
+      "checkSeconds": 1.928,
+      "verification": {
+        "ok": true,
+        "scenario": "form",
+        "typecheck": {
+          "ok": true,
+          "output": "Loading svelte-check in workspace: /private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-B2\nGetting Svelte diagnostics...\n\n/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-B2/tsconfig.json:1:1\nWarn: No svelte input files were found in config file '/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-form-B2/tsconfig.json'. Did you forget to add svelte files to the 'include' in your tsconfig.json? Specified 'include' paths were '[\"src/**/*\"]' and 'exclude' paths were 'undefined' (svelte)\n\n\n====================================\nsvelte-check found 0 errors and 1 warning in 1 file\n"
+        },
+        "build": {
+          "ok": true,
+          "forbiddenImports": [],
+          "rendererIncluded": true,
+          "calendarImported": false,
+          "errors": []
+        },
+        "runtime": {
+          "ok": true,
+          "ready": true,
+          "error": ""
+        },
+        "pageErrors": [],
+        "assertions": [
+          {
+            "name": "Save Ada and show status",
+            "ok": true,
+            "evidence": {
+              "calls": [
+                "Ada"
+              ],
+              "status": "Saved: Ada"
+            }
+          },
+          {
+            "name": "Dispose removes owned UI",
+            "ok": true,
+            "evidence": {
+              "remaining": 0
+            }
+          }
+        ]
+      },
+      "sourceManifest": [
+        {
+          "path": "app.ts",
+          "sha256": "288bf55dd3cb7d93c8e3b270a042c4a151b293f1545e14352d78548c993c176e"
+        }
+      ],
+      "protectedFileChanges": [],
+      "commandOutputBytes": 66184,
+      "failedCommands": 1,
+      "sourceFiles": [
+        {
+          "path": "src/app.ts",
+          "content": "import { createRenderer } from '@viewstem/svelte';\nimport { registerComponents } from '@viewstem/svelte-ui';\nimport { input } from '@viewstem/svelte-ui/shadcn/input';\nimport { button } from '@viewstem/svelte-ui/shadcn/button';\nimport { card } from '@viewstem/svelte-ui/shadcn/card';\nimport { typography } from '@viewstem/svelte-ui/shadcn/typography';\nimport '@viewstem/svelte-ui/shadcn/styles.css';\n\nexport async function mountApp(target: HTMLElement, services: { save?: (name: string) => Promise<void> } = {}): Promise<{ dispose: () => void | Promise<void> }> {\n  const renderer = createRenderer();\n  try {\n    registerComponents(renderer, [input, button, card, typography]);\n    renderer.registry.registerAction({\n      kind: 'Action', id: 'saveName',\n      spec: { ports: {\n        name: { kind: 'Value', schema: { type: 'string' }, required: true },\n        result: { kind: 'State', schema: { type: 'string' }, required: true },\n      } },\n    }, async ({ inputs, signal }) => {\n      await services.save?.(inputs.name);\n      if (!signal.aborted) inputs.result.write(`Saved: ${inputs.name}`);\n    });\n    const mounted = await renderer.mount({ target, view: {\n      states: {\n        name: { kind: 'State', schema: { type: 'string' }, initial: '' },\n        result: { kind: 'State', schema: { type: 'string' }, initial: '' },\n      },\n      render: { id: 'form', componentRef: 'shadcn.Card.Content', slots: { default: [\n        { id: 'name', componentRef: 'shadcn.Input',\n          inputs: { value: { '@path': '/states/name' }, 'aria-label': 'Name' },\n          on: { input: { action: {\n            ports: {\n              target: { kind: 'State', schema: { type: 'string' }, required: true },\n              next: { kind: 'Value', schema: { type: 'string' }, required: true },\n            },\n            steps: [{ kind: 'SetState', target: { '@path': '/ports/target' }, value: { '@path': '/ports/next' } }],\n          }, inputs: { target: { '@path': '/states/name' }, next: { '@path': '/event/value' } } } },\n        },\n        { id: 'save', componentRef: 'shadcn.Button', inputs: { text: 'Save', type: 'button' },\n          on: { click: { actionRef: 'saveName', inputs: { name: { '@path': '/states/name' }, result: { '@path': '/states/result' } } } },\n        },\n        { id: 'result', componentRef: 'shadcn.Typography', inputs: { text: { '@path': '/states/result' } } },\n      ] } },\n    } });\n    const report = await mounted.initialComplete;\n    if (report.queryErrors.length) throw new Error('View initialization failed');\n    return { dispose: () => renderer.dispose() };\n  } catch (error) {\n    await renderer.dispose();\n    throw error;\n  }\n}\n",
+          "sha256": "288bf55dd3cb7d93c8e3b270a042c4a151b293f1545e14352d78548c993c176e"
+        }
+      ],
+      "sourceCheckoutReadObserved": false,
+      "packageLockUnchanged": true,
+      "otherSkillReads": [],
+      "manualAssessment": {
+        "publicImportsOnly": true,
+        "declaredStateAndAction": true,
+        "nativeBoundaryCorrect": null,
+        "userInterventions": 0,
+        "finalWrongApisObserved": 0,
+        "uiCssImported": true
+      }
+    },
+    {
+      "id": "codex-native-A",
+      "host": "codex",
+      "scenario": "native",
+      "arm": "A",
+      "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-native-A",
+      "promptSha256": "75220da7b6a6fd6d94c8ab54c714581422f641cda17d0b5c954fa443428927d6",
+      "skillPath": null,
+      "skillManifest": null,
+      "status": "completed",
+      "exitCode": 0,
+      "stopReason": null,
+      "wallSeconds": 100.123,
+      "commandCalls": 11,
+      "completedCommands": 11,
+      "usage": {
+        "input_tokens": 469326,
+        "cached_input_tokens": 440832,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2216,
+        "reasoning_output_tokens": 363
+      },
+      "skillReadObserved": false,
+      "finalResponse": "`shadcn.Calendar.Day`는 지원표에서 `native-context`로 분류되어 JSON 컴포넌트로 직접 등록할 수 없습니다. 대신 공개 `@viewstem/svelte-ui/shadcn/calendar` 네이티브 Calendar로 달력을 표시하고, 선택한 날짜를 화면에 표시하도록 구현했습니다.\n\n[src/app.ts](/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-native-A/src/app.ts)는 기존 `mountApp(target, services)` 시그니처와 정리 함수를 유지합니다.\n\n`npm run check`와 `npm run build`가 통과했고 Svelte 진단은 오류와 경고 모두 0건입니다. 제공 검사에서 런타임 시나리오는 실행되지 않아 브라우저 상호작용은 별도로 확인하지 못했습니다. Svelte autofixer도 로컬에서 실행되지 않아 중단했습니다.",
+      "traceSha256": "1c3679f2ea5103eb9fe3ce9eaa9b418c89da7cd57835c5f80478c237cba13b70",
+      "checkExitCode": 0,
+      "checkSeconds": 3.346,
+      "verification": {
+        "ok": true,
+        "scenario": "native",
+        "typecheck": {
+          "ok": true,
+          "output": "Loading svelte-check in workspace: /private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-native-A\nGetting Svelte diagnostics...\n\nsvelte-check found 0 errors and 0 warnings\n"
+        },
+        "build": {
+          "ok": true,
+          "forbiddenImports": [],
+          "rendererIncluded": false,
+          "calendarImported": true,
+          "errors": []
+        },
+        "runtime": {
+          "ok": true,
+          "ready": true,
+          "error": ""
+        },
+        "pageErrors": [],
+        "assertions": [
+          {
+            "name": "Calendar day grid visible",
+            "ok": true,
+            "evidence": {
+              "dayButtons": 35
+            }
+          },
+          {
+            "name": "Dispose removes owned UI",
+            "ok": true,
+            "evidence": {
+              "remaining": 0
+            }
+          }
+        ]
+      },
+      "sourceManifest": [
+        {
+          "path": "app.ts",
+          "sha256": "01820f3a63bb2670b8f27ee429c4b5f1e91a0d71866ecf9becdb83d0b6a42438"
+        },
+        {
+          "path": "CalendarApp.svelte",
+          "sha256": "f1e91305dd51e35b1a3cf179a8756918366a33cd323dacfc0cc658e556e694aa"
+        }
+      ],
+      "protectedFileChanges": [],
+      "commandOutputBytes": 46477,
+      "failedCommands": 4,
+      "sourceFiles": [
+        {
+          "path": "src/CalendarApp.svelte",
+          "content": "<script lang=\"ts\">\n  import { components as Calendar } from '@viewstem/svelte-ui/shadcn/calendar';\n  import '@viewstem/svelte-ui/shadcn/styles.css';\n\n  let selected = $state('');\n</script>\n\n<main>\n  <section aria-labelledby=\"calendar-title\">\n    <h1 id=\"calendar-title\">Calendar</h1>\n    <p>Choose a date.</p>\n    <Calendar.Calendar\n      type=\"single\"\n      calendarLabel=\"Choose a date\"\n      onValueChange={(value) => { selected = value?.toString() ?? ''; }}\n    />\n    <p aria-live=\"polite\">{selected ? `Selected date: ${selected}` : 'No date selected'}</p>\n  </section>\n</main>\n\n<style>\n  main { font-family: system-ui, sans-serif; padding: 2rem; }\n  section { max-width: 24rem; }\n</style>\n",
+          "sha256": "f1e91305dd51e35b1a3cf179a8756918366a33cd323dacfc0cc658e556e694aa"
+        },
+        {
+          "path": "src/app.ts",
+          "content": "import { mount, unmount } from 'svelte';\nimport CalendarApp from './CalendarApp.svelte';\n\nexport async function mountApp(target: HTMLElement, services: {save?: (name:string)=>Promise<void>} = {}): Promise<{dispose:()=>void|Promise<void>}> {\n  void services;\n  const app = mount(CalendarApp, { target });\n  return { dispose: () => unmount(app) };\n}\n",
+          "sha256": "01820f3a63bb2670b8f27ee429c4b5f1e91a0d71866ecf9becdb83d0b6a42438"
+        }
+      ],
+      "sourceCheckoutReadObserved": false,
+      "packageLockUnchanged": true,
+      "otherSkillReads": [
+        "svelte-code-writer",
+        "svelte-core-bestpractices"
+      ],
+      "manualAssessment": {
+        "publicImportsOnly": true,
+        "declaredStateAndAction": null,
+        "nativeBoundaryCorrect": true,
+        "userInterventions": 0,
+        "finalWrongApisObserved": 0,
+        "uiCssImported": true
+      }
+    },
+    {
+      "id": "codex-native-B",
+      "host": "codex",
+      "scenario": "native",
+      "arm": "B",
+      "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-native-B",
+      "promptSha256": "75220da7b6a6fd6d94c8ab54c714581422f641cda17d0b5c954fa443428927d6",
+      "skillPath": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-native-B/.agents/skills/viewstem",
+      "skillManifest": [
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "58555067741bb407d2ac9213a90a4a56a25b809e369451df2f9602f598b39799"
+        },
+        {
+          "path": "integrations/claude-code.md",
+          "sha256": "300cdba204d8ab2e84d44eb108a0ad32d63bc0f16011717a309b5bb21d2e4480"
+        },
+        {
+          "path": "integrations/codex.md",
+          "sha256": "af55838d95f787b83d7586531c7f6140df0c02d12909811125597b27b44b3b75"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "1c882e4fec85b95d1072e98094f5f4524677cd5a823f82de2d26a1cfddc93de6"
+        }
+      ],
+      "status": "completed",
+      "exitCode": 0,
+      "stopReason": null,
+      "wallSeconds": 57.234,
+      "commandCalls": 8,
+      "completedCommands": 7,
+      "usage": {
+        "input_tokens": 441318,
+        "cached_input_tokens": 390400,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2119,
+        "reasoning_output_tokens": 252
+      },
+      "skillReadObserved": true,
+      "finalResponse": "달력을 [Calendar.svelte](/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-native-B/src/Calendar.svelte)에 추가하고, [app.ts](/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-native-B/src/app.ts)에서 기존 `mountApp(target, services)` 시그니처와 정리 함수를 유지했습니다.\n\n설치된 지원 계약에서 `shadcn.Calendar.Day`는 `native-context`이므로 JSON 컴포넌트로 직접 등록할 수 없습니다. 대신 공개 네이티브 `components.Calendar`의 날짜 스니펫 안에 `components.Day`를 배치했습니다.\n\n`npm run check`와 `npm run build`가 통과했고, Svelte 진단은 오류와 경고 모두 0건입니다. 제공된 검사에는 브라우저 실행이 포함되지 않아 실제 날짜 선택과 정리 동작은 별도로 검증하지 못했습니다. Svelte autofixer도 설치되어 있지 않아 실행하지 못했습니다.",
+      "traceSha256": "ff12ef781f2bba4efe549653734f98070a483eb359e74b52d907fef06e762ce6",
+      "checkExitCode": 0,
+      "checkSeconds": 2.951,
+      "verification": {
+        "ok": true,
+        "scenario": "native",
+        "typecheck": {
+          "ok": true,
+          "output": "Loading svelte-check in workspace: /private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-native-B\nGetting Svelte diagnostics...\n\nsvelte-check found 0 errors and 0 warnings\n"
+        },
+        "build": {
+          "ok": true,
+          "forbiddenImports": [],
+          "rendererIncluded": false,
+          "calendarImported": true,
+          "errors": []
+        },
+        "runtime": {
+          "ok": true,
+          "ready": true,
+          "error": ""
+        },
+        "pageErrors": [],
+        "assertions": [
+          {
+            "name": "Calendar day grid visible",
+            "ok": true,
+            "evidence": {
+              "dayButtons": 35
+            }
+          },
+          {
+            "name": "Dispose removes owned UI",
+            "ok": true,
+            "evidence": {
+              "remaining": 0
+            }
+          }
+        ]
+      },
+      "sourceManifest": [
+        {
+          "path": "app.ts",
+          "sha256": "7611e7855d18f8ae7f2147ae7d58a5a8605ec78eefb2a7a014de8a12ebc4ca4c"
+        },
+        {
+          "path": "Calendar.svelte",
+          "sha256": "03f18b6bd0657462f59079b0d94ced0880c5297204bc5f5dc34a1afb7da41b09"
+        }
+      ],
+      "protectedFileChanges": [],
+      "commandOutputBytes": 374964,
+      "failedCommands": 2,
+      "sourceFiles": [
+        {
+          "path": "src/Calendar.svelte",
+          "content": "<script lang=\"ts\">\n  import { components as Calendar } from '@viewstem/svelte-ui/shadcn/calendar';\n  import '@viewstem/svelte-ui/shadcn/styles.css';\n\n  let selected = $state('');\n</script>\n\n<main data-viewstem-shadcn>\n  <h1>Calendar</h1>\n  <Calendar.Calendar type=\"single\" onValueChange={(value) => { selected = value?.toString() ?? ''; }}>\n    {#snippet day()}\n      <Calendar.Day />\n    {/snippet}\n  </Calendar.Calendar>\n  <p aria-live=\"polite\">{selected ? `Selected: ${selected}` : 'Select a date'}</p>\n</main>\n",
+          "sha256": "03f18b6bd0657462f59079b0d94ced0880c5297204bc5f5dc34a1afb7da41b09"
+        },
+        {
+          "path": "src/app.ts",
+          "content": "import { mount, unmount, flushSync } from 'svelte';\nimport Calendar from './Calendar.svelte';\n\nexport async function mountApp(target: HTMLElement, services: {save?: (name:string)=>Promise<void>} = {}): Promise<{dispose:()=>void|Promise<void>}> {\n  void services;\n  const app = mount(Calendar, { target });\n  flushSync();\n  return { dispose: () => unmount(app) };\n}\n",
+          "sha256": "7611e7855d18f8ae7f2147ae7d58a5a8605ec78eefb2a7a014de8a12ebc4ca4c"
+        }
+      ],
+      "sourceCheckoutReadObserved": false,
+      "packageLockUnchanged": true,
+      "otherSkillReads": [
+        "svelte-code-writer",
+        "svelte-core-bestpractices"
+      ],
+      "manualAssessment": {
+        "publicImportsOnly": true,
+        "declaredStateAndAction": null,
+        "nativeBoundaryCorrect": true,
+        "userInterventions": 0,
+        "finalWrongApisObserved": 0,
+        "uiCssImported": true
+      }
+    },
+    {
+      "id": "codex-native-B2",
+      "host": "codex",
+      "scenario": "native",
+      "arm": "B2",
+      "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-native-B2",
+      "promptSha256": "75220da7b6a6fd6d94c8ab54c714581422f641cda17d0b5c954fa443428927d6",
+      "skillPath": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-native-B2/.agents/skills/viewstem",
+      "skillManifest": [
+        {
+          "path": "agents/openai.yaml",
+          "sha256": "58555067741bb407d2ac9213a90a4a56a25b809e369451df2f9602f598b39799"
+        },
+        {
+          "path": "integrations/claude-code.md",
+          "sha256": "300cdba204d8ab2e84d44eb108a0ad32d63bc0f16011717a309b5bb21d2e4480"
+        },
+        {
+          "path": "integrations/codex.md",
+          "sha256": "af55838d95f787b83d7586531c7f6140df0c02d12909811125597b27b44b3b75"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "821a5ea3e55578d01db547954f68e9204569186fecaadf05d2d9e694c10d6455"
+        }
+      ],
+      "status": "completed",
+      "exitCode": 0,
+      "stopReason": null,
+      "wallSeconds": 66.364,
+      "commandCalls": 9,
+      "completedCommands": 8,
+      "usage": {
+        "input_tokens": 334986,
+        "cached_input_tokens": 299520,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1804,
+        "reasoning_output_tokens": 286
+      },
+      "skillReadObserved": true,
+      "finalResponse": "달력을 [CalendarApp.svelte](./src/CalendarApp.svelte)에 추가하고, [app.ts](./src/app.ts)에서 기존 `mountApp(target, services)` 시그니처와 정리 함수를 유지했습니다.\n\n설치된 지원 데이터에서 `shadcn.Calendar.Day`는 `native-context`로 분류되어 JSON 컴포넌트로 직접 등록할 수 없습니다. 대신 공개 Svelte 내보내기인 `Calendar.Calendar`로 완성된 단일 날짜 선택 달력을 표시하도록 구성했습니다. JSON 방식이 필요하다면 `shadcn.Calendar.Root`는 전체 달력을 렌더링하는 지원 계약입니다.\n\n`npm run check`와 `npm run build`는 통과했고, Svelte 진단은 오류와 경고 모두 0건이었습니다. 제공된 검사는 런타임 검증을 실행하지 않았으며, 로컬에서 사용할 브라우저 검사 도구도 없어 날짜 선택·월 이동·정리 동작은 직접 확인하지 못했습니다.",
+      "traceSha256": "0c62611bd89855bfa98ce67726c8cc4b262be6baf2d50114d1ba0f226e4da1b0",
+      "checkExitCode": 0,
+      "checkSeconds": 2.902,
+      "verification": {
+        "ok": true,
+        "scenario": "native",
+        "typecheck": {
+          "ok": true,
+          "output": "Loading svelte-check in workspace: /private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-native-B2\nGetting Svelte diagnostics...\n\nsvelte-check found 0 errors and 0 warnings\n"
+        },
+        "build": {
+          "ok": true,
+          "forbiddenImports": [],
+          "rendererIncluded": false,
+          "calendarImported": true,
+          "errors": []
+        },
+        "runtime": {
+          "ok": true,
+          "ready": true,
+          "error": ""
+        },
+        "pageErrors": [],
+        "assertions": [
+          {
+            "name": "Calendar day grid visible",
+            "ok": true,
+            "evidence": {
+              "dayButtons": 35
+            }
+          },
+          {
+            "name": "Dispose removes owned UI",
+            "ok": true,
+            "evidence": {
+              "remaining": 0
+            }
+          }
+        ]
+      },
+      "sourceManifest": [
+        {
+          "path": "app.ts",
+          "sha256": "120b9d3533ab659d9ba505fec3458916e9b2f608391e6eef1bd59adfefa94cbf"
+        },
+        {
+          "path": "CalendarApp.svelte",
+          "sha256": "0c479e656b1b9b634919d8aea77810a264a571eac5b859aa96b444cf58b06f33"
+        }
+      ],
+      "protectedFileChanges": [],
+      "commandOutputBytes": 54819,
+      "failedCommands": 1,
+      "sourceFiles": [
+        {
+          "path": "src/CalendarApp.svelte",
+          "content": "<script lang=\"ts\">\n  import { components as Calendar } from '@viewstem/svelte-ui/shadcn/calendar';\n</script>\n\n<main data-viewstem-shadcn>\n  <h1>Calendar</h1>\n  <Calendar.Calendar type=\"single\" />\n</main>\n",
+          "sha256": "0c479e656b1b9b634919d8aea77810a264a571eac5b859aa96b444cf58b06f33"
+        },
+        {
+          "path": "src/app.ts",
+          "content": "import { mount, unmount } from 'svelte';\nimport '@viewstem/svelte-ui/shadcn/styles.css';\nimport CalendarApp from './CalendarApp.svelte';\n\nexport async function mountApp(target: HTMLElement, services: {save?: (name:string)=>Promise<void>} = {}): Promise<{dispose:()=>void|Promise<void>}> {\n  const app = mount(CalendarApp, { target });\n  return { dispose: () => unmount(app) };\n}\n",
+          "sha256": "120b9d3533ab659d9ba505fec3458916e9b2f608391e6eef1bd59adfefa94cbf"
+        }
+      ],
+      "sourceCheckoutReadObserved": false,
+      "packageLockUnchanged": true,
+      "otherSkillReads": [
+        "svelte-code-writer",
+        "svelte-core-bestpractices"
+      ],
+      "manualAssessment": {
+        "publicImportsOnly": true,
+        "declaredStateAndAction": null,
+        "nativeBoundaryCorrect": true,
+        "userInterventions": 0,
+        "finalWrongApisObserved": 0,
+        "uiCssImported": true
+      }
+    }
+  ],
+  "claudeCode": {
+    "status": "not_run",
+    "reason": "user_requested_preparation_only",
+    "authenticationUsed": false,
+    "modelInvoked": false,
+    "preparationStatus": "completed",
+    "preparedComparisons": [
+      {
+        "id": "claude-code-first-view-A",
+        "host": "claude-code",
+        "scenario": "first-view",
+        "arm": "A",
+        "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/claude-code-first-view-A",
+        "promptSha256": "2329d9c2e51a397e4f0b9fe8f8802931790415172c6ba5673dc0508fe3115086",
+        "skillPath": null,
+        "skillManifest": null,
+        "status": "not_run",
+        "reason": "user_requested_preparation_only",
+        "invocation": {
+          "command": "claude",
+          "args": [
+            "--print",
+            "--output-format",
+            "stream-json",
+            "--verbose",
+            "--no-session-persistence"
+          ],
+          "cwd": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/claude-code-first-view-A",
+          "prompt": "prompt.txt",
+          "requiresAuthentication": true,
+          "execute": false,
+          "promptDelivery": "stdin",
+          "model": null,
+          "configurationRequired": [
+            "Verify installed CLI flags and version",
+            "Pin model and effective settings for both arms",
+            "Verify baseline discovery paths and apply the same execution budget"
+          ]
+        },
+        "invocationSha256": "125dd8fbeac3e5a36d2546d8802df48bf0546d55a357e9c0fe2ea4eaf28a886f",
+        "initialSourceManifest": [
+          {
+            "path": "app.ts",
+            "sha256": "24db68f925bde14cefa86dfa3ed9c29fcb9475b4e57f7ab1a2f30b5aa4d58e14"
+          }
+        ],
+        "packageLockSha256": "3432ea8b6cd48467b22ca31141fcc1a90406d1888c26ba932b2465f63b84761c"
+      },
+      {
+        "id": "claude-code-first-view-B2",
+        "host": "claude-code",
+        "scenario": "first-view",
+        "arm": "B2",
+        "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/claude-code-first-view-B2",
+        "promptSha256": "2329d9c2e51a397e4f0b9fe8f8802931790415172c6ba5673dc0508fe3115086",
+        "skillPath": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/claude-code-first-view-B2/.claude/skills/viewstem",
+        "skillManifest": [
+          {
+            "path": "agents/openai.yaml",
+            "sha256": "58555067741bb407d2ac9213a90a4a56a25b809e369451df2f9602f598b39799"
+          },
+          {
+            "path": "integrations/claude-code.md",
+            "sha256": "300cdba204d8ab2e84d44eb108a0ad32d63bc0f16011717a309b5bb21d2e4480"
+          },
+          {
+            "path": "integrations/codex.md",
+            "sha256": "af55838d95f787b83d7586531c7f6140df0c02d12909811125597b27b44b3b75"
+          },
+          {
+            "path": "SKILL.md",
+            "sha256": "821a5ea3e55578d01db547954f68e9204569186fecaadf05d2d9e694c10d6455"
+          }
+        ],
+        "status": "not_run",
+        "reason": "user_requested_preparation_only",
+        "invocation": {
+          "command": "claude",
+          "args": [
+            "--print",
+            "--output-format",
+            "stream-json",
+            "--verbose",
+            "--no-session-persistence"
+          ],
+          "cwd": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/claude-code-first-view-B2",
+          "prompt": "prompt.txt",
+          "requiresAuthentication": true,
+          "execute": false,
+          "promptDelivery": "stdin",
+          "model": null,
+          "configurationRequired": [
+            "Verify installed CLI flags and version",
+            "Pin model and effective settings for both arms",
+            "Verify baseline discovery paths and apply the same execution budget"
+          ]
+        },
+        "invocationSha256": "07cd55ac9a8d2142b51146fac71582b87cbf2d11a4b6618d9aad9695eab12eed",
+        "initialSourceManifest": [
+          {
+            "path": "app.ts",
+            "sha256": "24db68f925bde14cefa86dfa3ed9c29fcb9475b4e57f7ab1a2f30b5aa4d58e14"
+          }
+        ],
+        "packageLockSha256": "3432ea8b6cd48467b22ca31141fcc1a90406d1888c26ba932b2465f63b84761c"
+      },
+      {
+        "id": "claude-code-form-A",
+        "host": "claude-code",
+        "scenario": "form",
+        "arm": "A",
+        "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/claude-code-form-A",
+        "promptSha256": "0f5b2f65b9d14000b96afe9d18baa77bd562b595006c0536b71b56c53733d3e0",
+        "skillPath": null,
+        "skillManifest": null,
+        "status": "not_run",
+        "reason": "user_requested_preparation_only",
+        "invocation": {
+          "command": "claude",
+          "args": [
+            "--print",
+            "--output-format",
+            "stream-json",
+            "--verbose",
+            "--no-session-persistence"
+          ],
+          "cwd": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/claude-code-form-A",
+          "prompt": "prompt.txt",
+          "requiresAuthentication": true,
+          "execute": false,
+          "promptDelivery": "stdin",
+          "model": null,
+          "configurationRequired": [
+            "Verify installed CLI flags and version",
+            "Pin model and effective settings for both arms",
+            "Verify baseline discovery paths and apply the same execution budget"
+          ]
+        },
+        "invocationSha256": "ce1770b77882a14be036ac4f7995431aa80a6f34a82fa35c8a744cd68d876af1",
+        "initialSourceManifest": [
+          {
+            "path": "app.ts",
+            "sha256": "24db68f925bde14cefa86dfa3ed9c29fcb9475b4e57f7ab1a2f30b5aa4d58e14"
+          }
+        ],
+        "packageLockSha256": "3432ea8b6cd48467b22ca31141fcc1a90406d1888c26ba932b2465f63b84761c"
+      },
+      {
+        "id": "claude-code-form-B2",
+        "host": "claude-code",
+        "scenario": "form",
+        "arm": "B2",
+        "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/claude-code-form-B2",
+        "promptSha256": "0f5b2f65b9d14000b96afe9d18baa77bd562b595006c0536b71b56c53733d3e0",
+        "skillPath": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/claude-code-form-B2/.claude/skills/viewstem",
+        "skillManifest": [
+          {
+            "path": "agents/openai.yaml",
+            "sha256": "58555067741bb407d2ac9213a90a4a56a25b809e369451df2f9602f598b39799"
+          },
+          {
+            "path": "integrations/claude-code.md",
+            "sha256": "300cdba204d8ab2e84d44eb108a0ad32d63bc0f16011717a309b5bb21d2e4480"
+          },
+          {
+            "path": "integrations/codex.md",
+            "sha256": "af55838d95f787b83d7586531c7f6140df0c02d12909811125597b27b44b3b75"
+          },
+          {
+            "path": "SKILL.md",
+            "sha256": "821a5ea3e55578d01db547954f68e9204569186fecaadf05d2d9e694c10d6455"
+          }
+        ],
+        "status": "not_run",
+        "reason": "user_requested_preparation_only",
+        "invocation": {
+          "command": "claude",
+          "args": [
+            "--print",
+            "--output-format",
+            "stream-json",
+            "--verbose",
+            "--no-session-persistence"
+          ],
+          "cwd": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/claude-code-form-B2",
+          "prompt": "prompt.txt",
+          "requiresAuthentication": true,
+          "execute": false,
+          "promptDelivery": "stdin",
+          "model": null,
+          "configurationRequired": [
+            "Verify installed CLI flags and version",
+            "Pin model and effective settings for both arms",
+            "Verify baseline discovery paths and apply the same execution budget"
+          ]
+        },
+        "invocationSha256": "0903e752e00b1390358b312f69d8481232e4a19672bdf3a0af307818a22b6f55",
+        "initialSourceManifest": [
+          {
+            "path": "app.ts",
+            "sha256": "24db68f925bde14cefa86dfa3ed9c29fcb9475b4e57f7ab1a2f30b5aa4d58e14"
+          }
+        ],
+        "packageLockSha256": "3432ea8b6cd48467b22ca31141fcc1a90406d1888c26ba932b2465f63b84761c"
+      },
+      {
+        "id": "claude-code-native-A",
+        "host": "claude-code",
+        "scenario": "native",
+        "arm": "A",
+        "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/claude-code-native-A",
+        "promptSha256": "75220da7b6a6fd6d94c8ab54c714581422f641cda17d0b5c954fa443428927d6",
+        "skillPath": null,
+        "skillManifest": null,
+        "status": "not_run",
+        "reason": "user_requested_preparation_only",
+        "invocation": {
+          "command": "claude",
+          "args": [
+            "--print",
+            "--output-format",
+            "stream-json",
+            "--verbose",
+            "--no-session-persistence"
+          ],
+          "cwd": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/claude-code-native-A",
+          "prompt": "prompt.txt",
+          "requiresAuthentication": true,
+          "execute": false,
+          "promptDelivery": "stdin",
+          "model": null,
+          "configurationRequired": [
+            "Verify installed CLI flags and version",
+            "Pin model and effective settings for both arms",
+            "Verify baseline discovery paths and apply the same execution budget"
+          ]
+        },
+        "invocationSha256": "58da25f2c2ab1632841791911e97f812415bcbdc753baa459cefbd5e6b31b82a",
+        "initialSourceManifest": [
+          {
+            "path": "app.ts",
+            "sha256": "24db68f925bde14cefa86dfa3ed9c29fcb9475b4e57f7ab1a2f30b5aa4d58e14"
+          }
+        ],
+        "packageLockSha256": "3432ea8b6cd48467b22ca31141fcc1a90406d1888c26ba932b2465f63b84761c"
+      },
+      {
+        "id": "claude-code-native-B2",
+        "host": "claude-code",
+        "scenario": "native",
+        "arm": "B2",
+        "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/claude-code-native-B2",
+        "promptSha256": "75220da7b6a6fd6d94c8ab54c714581422f641cda17d0b5c954fa443428927d6",
+        "skillPath": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/claude-code-native-B2/.claude/skills/viewstem",
+        "skillManifest": [
+          {
+            "path": "agents/openai.yaml",
+            "sha256": "58555067741bb407d2ac9213a90a4a56a25b809e369451df2f9602f598b39799"
+          },
+          {
+            "path": "integrations/claude-code.md",
+            "sha256": "300cdba204d8ab2e84d44eb108a0ad32d63bc0f16011717a309b5bb21d2e4480"
+          },
+          {
+            "path": "integrations/codex.md",
+            "sha256": "af55838d95f787b83d7586531c7f6140df0c02d12909811125597b27b44b3b75"
+          },
+          {
+            "path": "SKILL.md",
+            "sha256": "821a5ea3e55578d01db547954f68e9204569186fecaadf05d2d9e694c10d6455"
+          }
+        ],
+        "status": "not_run",
+        "reason": "user_requested_preparation_only",
+        "invocation": {
+          "command": "claude",
+          "args": [
+            "--print",
+            "--output-format",
+            "stream-json",
+            "--verbose",
+            "--no-session-persistence"
+          ],
+          "cwd": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/claude-code-native-B2",
+          "prompt": "prompt.txt",
+          "requiresAuthentication": true,
+          "execute": false,
+          "promptDelivery": "stdin",
+          "model": null,
+          "configurationRequired": [
+            "Verify installed CLI flags and version",
+            "Pin model and effective settings for both arms",
+            "Verify baseline discovery paths and apply the same execution budget"
+          ]
+        },
+        "invocationSha256": "d441e8602035045f7793c9ddb9e8733e00b3d48c7a3470c3fc4a2dddf156e7bb",
+        "initialSourceManifest": [
+          {
+            "path": "app.ts",
+            "sha256": "24db68f925bde14cefa86dfa3ed9c29fcb9475b4e57f7ab1a2f30b5aa4d58e14"
+          }
+        ],
+        "packageLockSha256": "3432ea8b6cd48467b22ca31141fcc1a90406d1888c26ba932b2465f63b84761c"
+      }
+    ],
+    "modelPinned": false,
+    "runtimeFlagsVerified": false,
+    "executionBudgetEnforced": false,
+    "historicalInitialBFixtures": 3
+  },
+  "decisions": {
+    "finalCandidate": "B2",
+    "additionalWorkflowReferences": "not_added; entry refinement addressed observed excessive lookup",
+    "inspectUi": "not_implemented; no persistent selected-lookup failure after B2"
+  },
+  "infrastructure": {
+    "snapshotCopyRaceBeforeModelStart": 2,
+    "resolution": "scenario-specific immutable skill snapshot paths, retried before any agent run",
+    "validatorInitialIssues": [
+      "PyYAML absent; installed only in temporary virtualenv",
+      "bundled older validator rejected optional standard compatibility field; requirement moved to body in B2"
+    ],
+    "validatorFinal": "passed",
+    "postRunChanges": "Preparation shell quoting and invocation metadata were hardened after model runs; consumer check/build branches and final skill bytes are unchanged. Package-lock protection was added to future runs after existing nine locks were independently checked."
+  },
+  "limitations": [
+    "one run per scenario and arm; no randomized order or statistical performance claim",
+    "cumulative token counters include cached input; output byte counts are not token counts",
+    "same installed personal skill catalog remained available; some Svelte skills were read, so not a clean no-other-skills host test",
+    "fresh conversations and external app CWD are not full filesystem/instruction isolation",
+    "no source checkout read commands observed; protected app files and lockfiles unchanged",
+    "runtime graders cover three happy-path behaviors; not all failure/race/accessibility/negative-trigger scenarios",
+    "baseline form omitted CSS, recorded as manual observation without changing the preregistered functional score",
+    "Claude Code actual invocation, cloud paths, pnpm/PnP, core-only and public release remain unverified"
+  ],
+  "harnessSelfCheck": {
+    "project": "/tmp/viewstem-harness-packed.3SKLfG",
+    "tarballs": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/tarballs",
+    "evidence": {
+      "first": {
+        "path": "/tmp/viewstem-harness-first.json",
+        "sha256": "b3d02fe30e61cd0af269fa06a24491c368dea989dc2dfcd38b47a5e40b878093",
+        "ok": true,
+        "typecheck": true,
+        "build": true,
+        "runtime": true,
+        "assertions": [
+          {
+            "name": "Start button visible",
+            "ok": true,
+            "evidence": "visible"
+          },
+          {
+            "name": "Dispose removes owned UI",
+            "ok": true,
+            "evidence": {
+              "remaining": 0
+            }
+          }
+        ]
+      },
+      "form": {
+        "path": "/tmp/viewstem-harness-form.json",
+        "sha256": "c3f6b03e2e58b5f8c11f1d34e80260d91f6bcb2691f96846122f6328e33817d0",
+        "ok": true,
+        "typecheck": true,
+        "build": true,
+        "runtime": true,
+        "assertions": [
+          {
+            "name": "Save Ada and show status",
+            "ok": true,
+            "evidence": {
+              "calls": [
+                "Ada"
+              ],
+              "status": "Saved: Ada"
+            }
+          },
+          {
+            "name": "Dispose removes owned UI",
+            "ok": true,
+            "evidence": {
+              "remaining": 0
+            }
+          }
+        ]
+      },
+      "native": {
+        "path": "/tmp/viewstem-harness-native.json",
+        "sha256": "81aebf4a6cb5af3025b94716ee53f822b8bcb2c3ec35e8f0b3fb7102031e3ece",
+        "ok": true,
+        "typecheck": true,
+        "build": true,
+        "runtime": true,
+        "assertions": [
+          {
+            "name": "Calendar day grid visible",
+            "ok": true,
+            "evidence": {
+              "dayButtons": 35
+            }
+          },
+          {
+            "name": "Dispose removes owned UI",
+            "ok": true,
+            "evidence": {
+              "remaining": 0
+            }
+          }
+        ]
+      },
+      "form-negative": {
+        "path": "/tmp/viewstem-harness-form-negative.json",
+        "sha256": "d704462e2468c6f2d889472d0859fa84ea9b35ea92ffbef3f8e2d4acef5a95d3",
+        "ok": false,
+        "typecheck": true,
+        "build": true,
+        "runtime": true,
+        "assertions": [
+          {
+            "name": "Save Ada and show status",
+            "ok": false,
+            "evidence": "locator.fill: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('textbox', { name: 'Name', exact: true })\u001b[22m\n"
+          },
+          {
+            "name": "Dispose removes owned UI",
+            "ok": true,
+            "evidence": {
+              "remaining": 0
+            }
+          }
+        ]
+      },
+      "todo": {
+        "path": "/tmp/viewstem-harness-todo.json",
+        "sha256": "3e8bebd3c42fd9a55987e99dde17c16028a7c1303d89b7f378a56a03c144fe8e",
+        "ok": false,
+        "typecheck": true,
+        "build": false,
+        "runtime": null,
+        "assertions": []
+      },
+      "type-negative": {
+        "path": "/tmp/viewstem-harness-type-negative.json",
+        "sha256": "daa51698989a19b45a69f782a69e4cbb823418990ad9776cc82e664934233cab",
+        "ok": false,
+        "typecheck": false,
+        "build": true,
+        "runtime": null,
+        "assertions": []
+      }
+    }
+  },
+  "finalSkillManifest": [
+    {
+      "path": "SKILL.md",
+      "sha256": "821a5ea3e55578d01db547954f68e9204569186fecaadf05d2d9e694c10d6455"
+    },
+    {
+      "path": "agents/openai.yaml",
+      "sha256": "58555067741bb407d2ac9213a90a4a56a25b809e369451df2f9602f598b39799"
+    },
+    {
+      "path": "integrations/claude-code.md",
+      "sha256": "300cdba204d8ab2e84d44eb108a0ad32d63bc0f16011717a309b5bb21d2e4480"
+    },
+    {
+      "path": "integrations/codex.md",
+      "sha256": "af55838d95f787b83d7586531c7f6140df0c02d12909811125597b27b44b3b75"
+    }
+  ],
+  "maintainerToolManifest": [
+    {
+      "path": "skills/tests/consumer.mjs",
+      "sha256": "779a81cd31ac6caa316d0491f3211edfb0eee9d03c7ecffae6f5fb9a650be45b"
+    },
+    {
+      "path": "skills/tests/run-initial.mjs",
+      "sha256": "c30164df9b6847d1448fc3595a508a292a5d045b813dd6443483fb0c452cb87a"
+    },
+    {
+      "path": "skills/tests/scenarios.json",
+      "sha256": "27c5dd4a481f717be31687811b42ea751df324ff31a9fd7f879bd83274b1997b"
+    }
+  ],
+  "artifactVerification": {
+    "codexTraceHashes": 9,
+    "generatedSourceHashes": true,
+    "tarballHashes": 3,
+    "finalCandidateManifestMatchesRuns": 3,
+    "claudeFinalCandidateCopiesMatch": 3,
+    "claudePromptPairsMatchCodex": 6,
+    "baselineAndRunLockfilesMatch": true
+  },
+  "staticVerification": {
+    "nodeSyntax": [
+      "skills/tests/consumer.mjs",
+      "skills/tests/run-initial.mjs"
+    ],
+    "skillCreatorQuickValidate": "passed",
+    "markdownFilesChecked": 6,
+    "localLinksChecked": 36,
+    "localLinkErrors": 0,
+    "finalReviewSnapshotUnchanged": true,
+    "trackedDiffWhitespace": "passed",
+    "finalSkillFileCount": 4
+  }
+}

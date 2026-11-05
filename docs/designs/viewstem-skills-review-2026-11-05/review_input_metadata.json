@@ -1,0 +1,14 @@
+{
+  "target": "concepts_brief.md",
+  "sha256": "ca43013796584231a0e12d6f0ed246c353bea137dbd902c87db574b50f4eef4e",
+  "line_count": 138,
+  "snapshot": "review_input_snapshot.md",
+  "snapshot_note": "Exact original text. Relative links inside this snapshot resolve from the repository root, not this artifact directory.",
+  "mode": "BRAINSTORM",
+  "date": "2026-11-05",
+  "source_revision": "517503d72db30ed3363b7fd61285f480870fce79",
+  "conversation_context": "fork_turns:none; filesystem and AGENTS instructions are not claimed to be isolated",
+  "source_revision_note": "Checkout HEAD only; the reviewed input was the working-tree file identified by sha256, not a claim that all evidence matched HEAD.",
+  "root_target_updated_after_all_reviews": true,
+  "current_root_is_not_review_input": true
+}

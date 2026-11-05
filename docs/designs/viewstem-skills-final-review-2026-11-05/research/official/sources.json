@@ -1,0 +1,52 @@
+[
+  {
+    "name": "agent-skills-specification",
+    "url": "https://agentskills.io/specification.md",
+    "resolved_url": "https://agentskills.io/specification.md",
+    "path": "docs/designs/viewstem-skills-final-review-2026-11-05/research/official/agent-skills-specification.md",
+    "sha256": "bf4137a702014f82a022de532e597c5f92ea86fb53fe29ea27bee3bbc1d19738",
+    "bytes": 7685,
+    "retrieved_at": "2026-11-05T07:40:57.056560+00:00"
+  },
+  {
+    "name": "agent-skills-best-practices",
+    "url": "https://agentskills.io/skill-creation/best-practices.md",
+    "resolved_url": "https://agentskills.io/skill-creation/best-practices.md",
+    "path": "docs/designs/viewstem-skills-final-review-2026-11-05/research/official/agent-skills-best-practices.md",
+    "sha256": "ab9f3b6091a0f24816b52cd7b90a3fdf53e621f47dba13b36694be272b87fb41",
+    "bytes": 15060,
+    "retrieved_at": "2026-11-05T07:40:57.146782+00:00"
+  },
+  {
+    "name": "agent-skills-evaluating",
+    "url": "https://agentskills.io/skill-creation/evaluating-skills.md",
+    "resolved_url": "https://agentskills.io/skill-creation/evaluating-skills.md",
+    "path": "docs/designs/viewstem-skills-final-review-2026-11-05/research/official/agent-skills-evaluating.md",
+    "sha256": "a799805f3a285390c1b6e906b691f56684fa1031b499d177f664f464d99fb684",
+    "bytes": 16973,
+    "retrieved_at": "2026-11-05T07:40:57.249976+00:00"
+  },
+  {
+    "name": "claude-code-skills",
+    "url": "https://code.claude.com/docs/en/skills.md",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "name": "openai-build-skills",
+    "url": "https://learn.chatgpt.com/docs/build-skills.md",
+    "resolved_url": "https://learn.chatgpt.com/docs/build-skills.md",
+    "path": "docs/designs/viewstem-skills-final-review-2026-11-05/research/official/openai-build-skills.md",
+    "sha256": "95b5ef4d0581d9eeeee342ef4718e77ed7574fe9c61ae28e1c2bffa4c6bdb411",
+    "bytes": 11396,
+    "retrieved_at": "2026-11-05T07:40:57.533216+00:00"
+  },
+  {
+    "name": "claude-code-skills-raw",
+    "url": "https://code.claude.com/docs/en/skills",
+    "resolved_url": "https://code.claude.com/docs/en/skills",
+    "path": "docs/designs/viewstem-skills-final-review-2026-11-05/research/official/claude-code-skills.md",
+    "bytes": 119044,
+    "sha256": "977bb9f8d6a004c37e6731afd94bc3ad7bba1e64a2b2d7e7f22df910d4b06287",
+    "retrieved_at": "2026-11-05T07:43:18.027101+00:00"
+  }
+]

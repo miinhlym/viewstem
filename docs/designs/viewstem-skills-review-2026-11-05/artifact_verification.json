@@ -1,0 +1,12 @@
+{
+  "snapshot_sha256_matches": true,
+  "snapshot_lines": 138,
+  "reviewers_completed": 6,
+  "unique_agent_ids": 6,
+  "reports_with_input_hash_and_native_completion_evidence": 6,
+  "local_markdown_links_checked": 100,
+  "link_errors": [],
+  "snapshot_links_resolved_from": "repository root",
+  "product_tests_run": false,
+  "root_target_updated_after_review": true
+}
