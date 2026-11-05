@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { DateFormatter, parseDate, type DateValue } from '@internationalized/date';
+	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import { Button } from '../vendor/button/index.js';
 	import { Calendar } from '../vendor/calendar/index.js';
 	import * as Popover from '../vendor/popover/index.js';
@@ -84,8 +85,18 @@
 <Popover.Root bind:open>
 	<Popover.Trigger>
 		{#snippet child({ props })}
-			<Button {...props} data-viewstem-shadcn="" variant="outline" {disabled}>
-				{label || placeholder}
+			<Button
+				{...props}
+				variant="outline"
+				data-empty={!label}
+				class={[
+					'justify-between text-start font-normal data-[empty=true]:text-muted-foreground',
+					isRange ? 'min-w-[212px]' : 'w-[212px]',
+				]}
+				{disabled}
+			>
+				<span class="truncate">{label || placeholder}</span>
+				<ChevronDownIcon data-icon="inline-end" />
 			</Button>
 		{/snippet}
 	</Popover.Trigger>

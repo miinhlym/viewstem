@@ -83,7 +83,7 @@ All 386 upstream parts have native Svelte exports. The 17 child parts each of Ca
   import { components as Calendar } from '@viewstem/svelte-ui/shadcn/calendar';
   import { parseDate } from '@internationalized/date';
 </script>
-<Calendar.Root type="single" value={parseDate('2026-11-03')} />
+<Calendar.Calendar type="single" value={parseDate('2026-11-03')} />
 ```
 
 See [RawComposition.svelte](test/fixtures/RawComposition.svelte) for native composition with the required context and [samples.mjs](test/fixtures/samples.mjs) for the 66 JSON examples. Use function props, DOM refs, FileList, scoped formatter and cell snippets, and Svelte `bind:` in host code. JSON has no syntax for serializing functions or DOM objects.

@@ -244,3 +244,29 @@ test('host namespace exposes calendar and chart parts inside their native scoped
   await tooltip.waitFor();
   assert.match(await tooltip.textContent(), /처리량/);
 });
+
+// Upstream preflight is part of the component contract, scoped away from host UI.
+test('original preflight resets widget headings, SVG and hidden states without resetting the host', async t => {
+  const page = await openRawPage(t);
+  await page.setContent('<div id="host"><h3>Host heading</h3><svg></svg></div><div id="native" data-viewstem-shadcn style="font-size:14px"><h3>Widget heading</h3><svg></svg><div hidden class="flex">Hidden step</div></div>');
+  const readHost = () => page.locator('#host').evaluate(root => [...root.children].map(el => {
+    const s=getComputedStyle(el);return [s.fontSize,s.fontWeight,s.marginTop,s.display];
+  }));
+  const host = await readHost();
+  await page.addStyleTag({ path: styles });
+  assert.deepEqual(await readHost(), host);
+  assert.deepEqual(await page.locator('#native h3').evaluate(el => {
+    const s=getComputedStyle(el);return [s.fontSize,s.fontWeight,s.marginTop];
+  }), ['14px','400','0px']);
+  assert.equal(await page.locator('#native svg').evaluate(el => getComputedStyle(el).display), 'block');
+  assert.equal(await page.locator('#native [hidden]').isVisible(), false);
+});
+
+test('Marker keeps its original styled root when props are spread', async t => {
+  const page = await setup(t, 'marker');
+  const marker = page.locator('[data-slot="marker"]').first();
+  assert.equal(await marker.getAttribute('data-viewstem-shadcn'), '');
+  assert.deepEqual(await marker.evaluate(el => {
+    const s=getComputedStyle(el);return [s.display,s.fontSize,s.lineHeight];
+  }), ['flex','14px','20px']);
+});

@@ -37,6 +37,7 @@
 	const mergedProps = $derived({
 		class: cn(markerVariants({ variant }), className),
 		"data-slot": "marker",
+		"data-viewstem-shadcn": "",
 		"data-variant": variant,
 		...restProps,
 	});

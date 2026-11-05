@@ -26,10 +26,17 @@ node packages/svelte-ui/scripts/vendor-snapshot.mjs /path/to/pinned/shadcn-svelt
 The registry has already applied Nova utility classes. Generation selects Lucide
 icons, resolves library and hook paths, applies the default menu treatment,
 keeps host typography, and inserts `data-viewstem-shadcn` where widgets own
-styled DOM. Keep changes to this process in the generator. Source attribution and
+styled DOM. Marker carries the attribute through its shared root props; Bits
+PinInput requires the reserved `viewstem-shadcn-root` class on its styled wrapper
+because arbitrary data attributes are forwarded to the input. Neither adds DOM.
+Keep changes to this process in the generator. Source attribution and
 terms are in [NOTICE.txt](NOTICE.txt).
 
 The package stylesheet scans vendor and local UI source, and emits scoped CSS.
+It scopes the complete installed Tailwind preflight instead of reconstructing a
+subset, retaining the host font. Host reset layers must precede Viewstem layers;
+LayerChart base/component layers precede the original shadcn utilities.
+The documentation declares this layer order before Starlight loads.
 Set `--viewstem-*` semantic variables on a host ancestor to customize the
 Neutral theme. Dark mode follows `.dark` or `data-theme="dark"` on a DOM
 ancestor. Set the theme on `html` or `body` to include default body portals.

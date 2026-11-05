@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import { tick } from 'svelte';
 	import { Button } from '../vendor/button/index.js';
 	import * as Command from '../vendor/command/index.js';
@@ -48,18 +49,19 @@
 		{#snippet child({ props })}
 			<Button
 				{...props}
-				data-viewstem-shadcn=""
 				variant="outline"
+				class="w-[200px] justify-between font-normal"
 				role="combobox"
 				aria-label={label}
 				aria-expanded={open}
 				{disabled}
 			>
-				{label}
+				<span class="truncate">{label}</span>
+				<ChevronDownIcon class="text-muted-foreground" data-icon="inline-end" />
 			</Button>
 		{/snippet}
 	</Popover.Trigger>
-	<Popover.Content align="start" class="p-0">
+	<Popover.Content class="w-[200px] p-0">
 		<Command.Root>
 			<Command.Input placeholder={searchPlaceholder} aria-label={searchPlaceholder} />
 			<Command.List>

@@ -83,7 +83,7 @@ Trigger의 `slots.child`에는 이 묶음의 DOM 부품 하나를 넣습니다. 
   import { components as Calendar } from '@viewstem/svelte-ui/shadcn/calendar';
   import { parseDate } from '@internationalized/date';
 </script>
-<Calendar.Root type="single" value={parseDate('2026-11-03')} />
+<Calendar.Calendar type="single" value={parseDate('2026-11-03')} />
 ```
 
 전체 native 문맥 조합 예제는 [RawComposition.svelte](test/fixtures/RawComposition.svelte), 66개 JSON 예제는 [samples.mjs](test/fixtures/samples.mjs)에 있습니다. 함수 props, DOM ref, FileList, scoped formatter/cell snippet, Svelte `bind:` 등은 host 코드에서 사용합니다. JSON에 함수나 DOM 객체를 직렬화하는 문법은 추가하지 않습니다.

@@ -16,7 +16,7 @@
 	data-viewstem-shadcn="" data-slot="input-otp"
 	spellcheck={false}
 	class={cn(
-		"gap-2 flex items-center has-disabled:opacity-50",
+		"viewstem-shadcn-root gap-2 flex items-center has-disabled:opacity-50",
 		"disabled:cursor-not-allowed",
 		className
 	)}

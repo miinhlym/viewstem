@@ -25,6 +25,7 @@ export const recipes = [
     data: array({ type: 'object' }), columns: array(object({ id: string, accessorKey: string, label: string, sortable: boolean, filterable: boolean }, ['id', 'accessorKey', 'label'])),
     sorting, pageIndex: { type: 'integer', minimum: 0 }, pageSize: { type: 'integer', minimum: 1 },
     filter: string, selectedIds: strings, rowId: string,
+    labels: object({ filter: string, select: string, selectRow: string, noRows: string, previous: string, next: string, page: string, rowsPerPage: string }),
   }, { sortingChange: sorting, pageIndexChange: number, pageSizeChange: number, filterChange: string, selectedIdsChange: strings }),
   recipe('typography', 'Typography', {
     as: { enum: ['h1','h2','h3','h4','h5','h6','p','blockquote','code','span','small','strong','em','div'] },

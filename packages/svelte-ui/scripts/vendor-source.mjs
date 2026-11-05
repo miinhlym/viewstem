@@ -131,6 +131,16 @@ for (const [path, json] of Object.entries(archive)) {
 				return quote + localImport(filename, prefix + tail) + quote;
 			});
 		if (filename.endsWith('.svelte')) content = transformComponent(content, filename);
+		if (filename === resolve(vendor, 'input-otp/input-otp.svelte')) {
+			// Bits PinInput sends data props to its input but class to its wrapper.
+			// Scope the actual styled wrapper without changing its DOM or behavior.
+			content = content.replace('"cn-input-otp flex items-center', '"viewstem-shadcn-root cn-input-otp flex items-center');
+		}
+		if (filename === resolve(vendor, 'marker/marker.svelte')) {
+			// Marker spreads its styled root props instead of spelling class/data-slot
+			// on the element. Keep the scope marker in both native and child branches.
+			content = content.replace('"data-slot": "marker",', '"data-slot": "marker",\n\t\t"data-viewstem-shadcn": "",');
+		}
 		if (filename === resolve(vendor, 'avatar/avatar.svelte')) {
 			content = content.replace('<script lang="ts">', `<script lang="ts">
 	import { setContext } from "svelte";

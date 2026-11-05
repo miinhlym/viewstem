@@ -490,6 +490,9 @@ test('audit/questionnaire: required validation, controlled steps and keyboard su
   view.render.on = { ...bind('item', 'itemChange'), ...bind('submitted', 'submit', path('/event/type')) };
   const page = await setup(t, view);
   const next = slot(page, 'questionnaire-next');
+  assert.equal(await slot(page, 'questionnaire-submit').isVisible(), false);
+  assert.equal(await slot(page, 'questionnaire-previous').isVisible(), false);
+  assert.equal(await slot(page, 'questionnaire-item').filter({ hasText: '추가 범위' }).isVisible(), false);
   await next.press('Enter');
   await exact(page, '보고서 형식을 선택하세요').waitFor();
   assert.equal(await read(page, 'item'), 'format');

@@ -29,8 +29,15 @@
 </script>
 
 <script lang="ts">
+	import ArrowDownIcon from '@lucide/svelte/icons/arrow-down';
+	import ArrowUpIcon from '@lucide/svelte/icons/arrow-up';
+	import ArrowUpDownIcon from '@lucide/svelte/icons/arrow-up-down';
 	import { createTable, functionalUpdate, type ColumnDef, type SortingState } from '@tanstack/svelte-table';
 	import { Button } from '../vendor/button/index.js';
+	import { Checkbox } from '../vendor/checkbox/index.js';
+	import { Input } from '../vendor/input/index.js';
+	import { Label } from '../vendor/label/index.js';
+	import * as NativeSelect from '../vendor/native-select/index.js';
 	import * as Table from '../vendor/table/index.js';
 
 	type Row = Record<string, unknown>;
@@ -45,6 +52,7 @@
 		filter = '',
 		selectedIds = [],
 		rowId = 'id',
+		labels,
 		onSortingChange,
 		onPageIndexChange,
 		onPageSizeChange,
@@ -59,12 +67,33 @@
 		filter?: string;
 		selectedIds?: string[];
 		rowId?: string;
+		labels?: {
+			filter?: string;
+			select?: string;
+			selectRow?: string;
+			noRows?: string;
+			previous?: string;
+			next?: string;
+			page?: string;
+			rowsPerPage?: string;
+		};
 		onSortingChange?: (sorting: SortingState) => void;
 		onPageIndexChange?: (index: number) => void;
 		onPageSizeChange?: (size: number) => void;
 		onFilterChange?: (filter: string) => void;
 		onSelectedIdsChange?: (ids: string[]) => void;
 	} = $props();
+	const pageSizeId = $props.id();
+	const text = $derived({
+		filter: labels?.filter ?? 'Filter rows',
+		select: labels?.select ?? 'Select',
+		selectRow: labels?.selectRow ?? 'Select row {id}',
+		noRows: labels?.noRows ?? 'No rows.',
+		previous: labels?.previous ?? 'Previous',
+		next: labels?.next ?? 'Next',
+		page: labels?.page ?? 'Page {page} of {pages}',
+		rowsPerPage: labels?.rowsPerPage ?? 'Rows per page',
+	});
 
 	function cellValue(row: Row, key: string) {
 		const value = Object.hasOwn(row, key) ? row[key] : undefined;
@@ -136,6 +165,9 @@
 	// it. The fallback uses the same TanStack filtered/sorted row model.
 	const pageCount = $derived(Math.max(1, table.getPageCount()));
 	const displayedPage = $derived(Math.min(pageIndex, pageCount - 1));
+	const pageText = $derived(text.page
+		.replaceAll('{page}', () => String(displayedPage + 1))
+		.replaceAll('{pages}', () => String(pageCount)));
 	const displayedRows = $derived(pageIndex === displayedPage
 		? table.getRowModel().rows
 		: table.getPrePaginatedRowModel().rows.slice(displayedPage * pageSize, (displayedPage + 1) * pageSize));
@@ -145,71 +177,72 @@
 	}
 </script>
 
-<div data-viewstem-shadcn="" class="grid gap-3">
-	<div class="flex items-center gap-2">
-		{#if safeColumns.some((column) => column.filterable)}
-			<input
+<div data-viewstem-shadcn="" class="w-full">
+	{#if safeColumns.some((column) => column.filterable)}
+		<div class="flex items-center py-4">
+			<Input
 				type="search"
-				aria-label="Filter rows"
-				placeholder="Filter rows"
-				class="rounded-md border bg-background px-3 py-1 text-sm"
+				aria-label={text.filter}
+				placeholder={text.filter}
+				class="max-w-sm"
 				value={filter}
 				oninput={(event) => table.setGlobalFilter(event.currentTarget.value)}
 			/>
-		{/if}
-	</div>
-	<Table.Root>
-		<Table.Header>
-			{#each table.getHeaderGroups() as group (group.id)}
-				<Table.Row>
-					<Table.Head scope="col">Select</Table.Head>
-					{#each group.headers as header (header.id)}
-						{@const direction = header.column.getIsSorted()}
-						<Table.Head scope="col" aria-sort={direction === 'asc' ? 'ascending' : direction === 'desc' ? 'descending' : undefined}>
-							{#if header.column.getCanSort()}
-								<Button variant="ghost" size="sm" onclick={header.column.getToggleSortingHandler()}>
+		</div>
+	{/if}
+	<div data-viewstem-shadcn="" class="overflow-hidden rounded-md border">
+		<Table.Root>
+			<Table.Header>
+				{#each table.getHeaderGroups() as group (group.id)}
+					<Table.Row>
+						<Table.Head scope="col">{text.select}</Table.Head>
+						{#each group.headers as header (header.id)}
+							{@const direction = header.column.getIsSorted()}
+							<Table.Head scope="col" aria-sort={direction === 'asc' ? 'ascending' : direction === 'desc' ? 'descending' : undefined}>
+								{#if header.column.getCanSort()}
+									{@const SortIcon = direction === 'asc' ? ArrowUpIcon : direction === 'desc' ? ArrowDownIcon : ArrowUpDownIcon}
+									<Button variant="ghost" size="sm" onclick={header.column.getToggleSortingHandler()}>
+										{header.column.columnDef.header}
+										<SortIcon data-icon="inline-end" />
+									</Button>
+								{:else}
 									{header.column.columnDef.header}
-									{#if direction}<span aria-hidden="true">{direction === 'asc' ? '↑' : '↓'}</span>{/if}
-								</Button>
-							{:else}
-								{header.column.columnDef.header}
-							{/if}
-						</Table.Head>
-					{/each}
-				</Table.Row>
-			{/each}
-		</Table.Header>
-		<Table.Body>
-			{#each displayedRows as row (row.id)}
-				<Table.Row data-state={row.getIsSelected() ? 'selected' : undefined}>
-					<Table.Cell>
-						<input
-							type="checkbox"
-							aria-label={`Select row ${row.original[rowId]}`}
-							checked={row.getIsSelected()}
-							onchange={row.getToggleSelectedHandler()}
-						/>
-					</Table.Cell>
-					{#each row.getAllCells() as cell (cell.id)}
-						<Table.Cell>{String(cell.getValue() ?? '')}</Table.Cell>
-					{/each}
-				</Table.Row>
-			{:else}
-				<Table.Row><Table.Cell colspan={definitions.length + 1}>No rows.</Table.Cell></Table.Row>
-			{/each}
-		</Table.Body>
-	</Table.Root>
-	<div class="flex flex-wrap items-center gap-2">
-		<Button variant="outline" size="sm" disabled={displayedPage === 0} onclick={() => table.setPageIndex(displayedPage - 1)}>Previous</Button>
-		<span>Page {displayedPage + 1} of {pageCount}</span>
-		<Button variant="outline" size="sm" disabled={displayedPage >= pageCount - 1} onclick={() => table.setPageIndex(displayedPage + 1)}>Next</Button>
-		<label class="flex items-center gap-2">
-			Rows per page
-			<select value={pageSize} class="rounded-md border bg-background" onchange={(event) => table.setPageSize(Number(event.currentTarget.value))}>
-				{#each [...new Set([10, 25, 50, pageSize])].sort((a, b) => a - b) as size (size)}
-					<option value={size}>{size}</option>
+								{/if}
+							</Table.Head>
+						{/each}
+					</Table.Row>
 				{/each}
-			</select>
-		</label>
+			</Table.Header>
+			<Table.Body>
+				{#each displayedRows as row (row.id)}
+					<Table.Row data-state={row.getIsSelected() ? 'selected' : undefined}>
+						<Table.Cell>
+							<Checkbox
+								aria-label={text.selectRow.replaceAll('{id}', () => String(row.original[rowId]))}
+								bind:checked={() => row.getIsSelected(), (checked) => row.toggleSelected(checked)}
+							/>
+						</Table.Cell>
+						{#each row.getAllCells() as cell (cell.id)}
+							<Table.Cell>{String(cell.getValue() ?? '')}</Table.Cell>
+						{/each}
+					</Table.Row>
+				{:else}
+					<Table.Row><Table.Cell colspan={definitions.length + 1} class="h-24 text-center">{text.noRows}</Table.Cell></Table.Row>
+				{/each}
+			</Table.Body>
+		</Table.Root>
+	</div>
+	<div class="flex flex-wrap items-center justify-end gap-2 py-4">
+		<Button variant="outline" size="sm" disabled={displayedPage === 0} onclick={() => table.setPageIndex(displayedPage - 1)}>{text.previous}</Button>
+		<span class="text-sm text-muted-foreground">{pageText}</span>
+		<Button variant="outline" size="sm" disabled={displayedPage >= pageCount - 1} onclick={() => table.setPageIndex(displayedPage + 1)}>{text.next}</Button>
+		<div class="flex items-center gap-2">
+			<Label for={pageSizeId}>{text.rowsPerPage}</Label>
+			<NativeSelect.Root id={pageSizeId} value={pageSize} size="sm" onchange={(event) => table.setPageSize(Number(event.currentTarget.value))}>
+				{#each [...new Set([10, 25, 50, pageSize])].sort((a, b) => a - b) as size (size)}
+					<NativeSelect.Option value={size}>{size}</NativeSelect.Option>
+				{/each}
+			</NativeSelect.Root>
+		</div>
 	</div>
 </div>

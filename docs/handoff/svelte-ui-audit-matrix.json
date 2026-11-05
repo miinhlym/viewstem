@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "upstreamCommit": "fe4b0ad3b8b30c6745346db008c3307b5afeabb1",
   "supportFile": "packages/svelte-ui/src/lib/shadcn/support.json",
-  "supportSha256": "37cb7a89ab0686036bdaacc8b68e35e256f90dde00fedd7e0646de2e610d983a",
+  "supportSha256": "30617841c369891504fd7867ef1a282c4d8e115210a4840d21a5631fc8ac2999",
   "scope": "Per-family observable behavior cases plus complete support-entry inventory; not an exhaustive cross-product of every HTML attribute, optional prop, and browser.",
   "counts": {
     "families": 66,
