@@ -1,0 +1,212 @@
+---
+import SiteHead from './SiteHead.astro';
+import { Code } from 'astro:components';
+import { Icon } from '@astrojs/starlight/components';
+import SiteHeader from './SiteHeader.astro';
+import { copy, customers } from './home-content';
+import { lessons } from '../examples/catalog';
+import Button from './site/Button.svelte';
+import HomeCustomerTable from './site/HomeCustomerTable.svelte';
+import '../styles/home.css';
+
+
+interface Props {
+  locale: 'en' | 'ko';
+}
+
+const { locale } = Astro.props;
+const korean = locale === 'ko';
+const text = copy[locale];
+const home = korean ? '/ko/' : '/';
+const docs = `${home}docs/`;
+const repo = 'https://github.com/miinhlym/viewstem';
+const activeCount = customers.filter(row => row.status === 'active').length;
+
+const viewExcerpt = `{
+  "id": "customer-table",
+  "componentRef": "shadcn.DataTable",
+  "inputs": {
+    "data": {
+      "@path": "/queries/customers/data"
+    }
+  }
+}`;
+
+const integrationExcerpt = `const renderer = createRenderer();
+registerComponents(renderer, [button]);
+
+const mounted = await renderer.mount({
+  target,
+  view: {
+    render: {
+      id: "hello",
+      componentRef: "shadcn.Button",
+      inputs: { text: "Hello, Viewstem" }
+    }
+  }
+});
+await mounted.initialComplete;`;
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <SiteHead {locale} title="Viewstem" fontText={text.title.join(' ')} description={text.description} />
+  </head>
+  <body class="home-landing">
+    <a class="skip-link" href="#main">{text.skip}</a>
+    <SiteHeader {locale} />
+
+    <main id="main" tabindex="-1">
+      <section class="hero home-shell" aria-labelledby="home-title">
+        <div class="hero-intro" data-motion-enter>
+          <h1 id="home-title">{text.title.map(line => <span>{line}{' '}</span>)}</h1>
+          <p class="hero-description">{text.description}</p>
+          <div class="hero-actions">
+            <Button href={`${docs}quickstart/`} size="lg">{text.start}<Icon name="right-arrow" data-icon="inline-end" /></Button>
+            <Button href="#example" size="lg" variant="outline">{text.seeExample}</Button>
+          </div>
+        </div>
+
+        <div class="workbench" id="example" tabindex={-1} data-motion-enter>
+          <div class="workbench-grid">
+            <div class="flow-example" data-customer-example>
+              <div class="panel-header">
+                <strong>{text.customers}</strong>
+                <span>{text.output}</span>
+              </div>
+              <div class="preview-body">
+                <HomeCustomerTable
+                  client:load
+                  rows={customers.map(row => ({ name: row[locale], status: row.status }))}
+                  caption={text.customers}
+                  customerLabel={text.customer}
+                  statusLabel={text.status}
+                  statuses={{ active: text.active, trial: text.trial }}
+                  filterLabel={text.flow.filter}
+                  filterLabels={{ all: text.all, active: text.flow.activeFilter }}
+                  countLabels={{ all: text.flow.count(customers.length), active: text.flow.count(activeCount) }}
+                />
+              </div>
+            </div>
+            <figure class="view-code">
+              <figcaption class="panel-header">
+                <code>customers.view.json</code>
+                <span>{text.excerpt}</span>
+              </figcaption>
+              <Code code={viewExcerpt} lang="json" theme="github-dark-dimmed" />
+            </figure>
+          </div>
+          <div class="workbench-caption">
+            <span>{text.connection}</span>
+            <span>{text.flow.sample}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="flow-section" aria-labelledby="flow-title" tabindex="-1">
+        <div class="home-shell section-pad">
+          <div class="section-heading">
+            <h2 id="flow-title">{text.flow.title}</h2>
+            <p>{text.flow.description}</p>
+          </div>
+          <ol class="flow-steps" role="list" aria-label={text.flow.trace}>
+            {text.flow.steps.map(([name, description], index) => (
+              <li class="flow-step">
+                <h3><span class="flow-number" aria-hidden="true">{index + 1}.</span> {name}</h3>
+                <p>{description}</p>
+                {name === 'State' && <code class="flow-value">filter = <span data-flow-value>"active"</span></code>}
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section class="home-shell section-pad features" aria-labelledby="features-title">
+        <div class="section-heading"><h2 id="features-title">{text.features.title}</h2></div>
+        <ul role="list">
+          {text.features.items.map(([title, description]) => (
+            <li>
+              <h3>{title}</h3>
+              <p>{description}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="integration-section" aria-labelledby="integration-title">
+        <div class="home-shell section-pad integration">
+          <div class="integration-intro">
+            <h2 id="integration-title">{text.integration.title}</h2>
+            <p>{text.integration.description}</p>
+            <div class="integration-actions">
+              <Button variant="link" href={`${docs}quickstart/`}>{text.start}</Button>
+              <Button variant="link" href={`${docs}reference/`}>{text.reference}</Button>
+            </div>
+          </div>
+          <figure class="integration-code" data-motion-enter>
+            <figcaption class="panel-header"><code>main.js</code><span>{text.integration.codeLabel}</span></figcaption>
+            <Code code={integrationExcerpt} lang="js" theme="github-dark-dimmed" />
+          </figure>
+          <dl class="integration-packages">
+            {text.integration.packages.map(([name, description]) => (
+              <div><dt><code>{name}</code></dt><dd>{description}</dd></div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      <section class="home-shell section-pad examples" id="examples" aria-labelledby="examples-title" tabindex="-1">
+        <div class="examples-heading">
+          <h2 id="examples-title">{text.examples.title}</h2>
+          <Button variant="link" href={`${home}examples/`}>{text.examples.all(lessons.length)}</Button>
+        </div>
+        <ul role="list">
+          {text.examples.featured.map(([id, title, description]) => (
+            <li>
+              <a class="guide-link" href={`${home}examples/${id}/`}>
+                <h3>{title}</h3>
+                <p>{description}</p>
+                <Icon name="right-arrow" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </main>
+
+    <footer class="home-shell home-footer">
+      <p>Viewstem</p>
+      <nav aria-label={text.projectLinks}>
+        <a href={repo}>GitHub</a>
+        <a href={`${repo}/blob/main/${korean ? 'CONTRIBUTING.ko.md' : 'CONTRIBUTING.md'}`}>{text.contributing}</a>
+        <a href={`${repo}/blob/main/LICENSE`}>{text.license}</a>
+      </nav>
+    </footer>
+  </body>
+</html>
+
+<script>
+  import { emphasize, playMotion } from '../lib/site-motion';
+
+  const example = document.querySelector<HTMLElement>('[data-customer-example]');
+  const stateValue = document.querySelector<HTMLElement>('[data-flow-value]');
+
+  if (example && stateValue) {
+    example.addEventListener('customer-filter-change', (event) => {
+      if (!(event instanceof CustomEvent)) return;
+      const filter = event.detail;
+      if (filter !== 'all' && filter !== 'active') return;
+      if (filter === 'all') {
+        for (const row of example.querySelectorAll('[data-customer-status]:not([data-customer-status="active"])')) {
+          playMotion(row, [{ opacity: 0.4 }, { opacity: 1 }]);
+        }
+      }
+      stateValue.textContent = JSON.stringify(filter);
+      const count = example.querySelector('[data-customer-count]');
+      if (count) emphasize(count);
+      playMotion(stateValue, [{ opacity: 0.4 }, { opacity: 1 }]);
+      document.querySelectorAll('.flow-step h3').forEach((heading, index) => emphasize(heading, index * 90));
+    });
+  }
+</script>

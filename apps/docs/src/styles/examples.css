@@ -1,0 +1,197 @@
+.examples-layout {
+  display: grid;
+  grid-template-columns: var(--site-sidebar-width) minmax(0, 1fr);
+  width: 100%;
+  align-items: start;
+  --example-content-pad: 1rem;
+}
+
+.example-nav {
+  position: sticky;
+  inset-block-start: var(--masthead-height);
+  height: calc(100dvh - var(--masthead-height));
+  border-inline-end: 1px solid var(--viewstem-border);
+  background: var(--viewstem-card);
+  overflow: hidden;
+}
+
+.example-main {
+  min-width: 0;
+  max-width: var(--site-content-width);
+}
+.examples-layout > .example-main {
+  width: 100%;
+  max-width: calc(var(--site-content-width) + 2 * var(--example-content-pad));
+  padding: 1.5rem var(--example-content-pad) 4rem;
+}
+@media (min-width: 72rem) {
+  .examples-layout { --example-content-pad: 1.5rem; }
+  .examples-layout > .example-main { justify-self: center; }
+}
+@media (width < 50rem) {
+  .examples-layout { grid-template-columns: minmax(0, 1fr); }
+  .examples-layout > .example-nav { display: none; }
+}
+.example-main :is(h1, h2) {
+  margin: 0;
+}
+.example-main .example-intro { margin-block-start: .65rem; color: var(--viewstem-muted-foreground); }
+.example-main .example-stage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .25rem .65rem;
+  margin-block-end: .5rem;
+  color: var(--viewstem-muted-foreground);
+  font-size: .875rem;
+  font-variant-numeric: tabular-nums;
+}
+.example-stage span { font: .75rem var(--site-mono); }
+
+.example-stage-list { margin-block-start: 2rem; }
+.example-stage-list :is(ol, ul) { margin-block-start: .65rem; padding-inline-start: 1.5rem; }
+.example-stage-list ol { list-style: decimal; }
+.example-stage-list ul { list-style: disc; }
+.example-stage-list li { padding-block: .5rem; border-bottom: 1px solid var(--viewstem-border); }
+.example-stage-list li::marker { color: var(--viewstem-muted-foreground); }
+.example-stage-list li a, .example-setup a { color: var(--viewstem-primary); text-decoration: underline; text-underline-offset: .2em; }
+.example-stage-list li code { display: inline-block; margin-inline-start: .65rem; color: var(--viewstem-muted-foreground); font-size: .8rem; }
+
+.example-lesson-page {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
+.example-lesson-layout, .example-lesson {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.example-lesson-toolbar {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  min-height: 3.25rem;
+  padding: .35rem clamp(.75rem, 2vw, 1.5rem);
+  border-block-end: 1px solid var(--viewstem-border);
+  background: var(--viewstem-card);
+}
+
+.example-lesson-toolbar > nav:not(.example-breadcrumb) {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+}
+
+.example-breadcrumb {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--viewstem-muted-foreground);
+}
+
+.example-breadcrumb ol { flex-wrap: nowrap; }
+.example-breadcrumb li { flex-shrink: 0; }
+.example-breadcrumb li[data-current-crumb]:last-child { min-width: 0; flex-shrink: 1; overflow: hidden; }
+.example-breadcrumb [aria-current="page"] { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.example-lesson-body {
+  display: grid;
+  flex: 1;
+  min-height: 0;
+  grid-template-columns: clamp(19rem, 33%, 29rem) minmax(0, 1fr);
+}
+
+.example-lesson-body .example-instructions {
+  max-width: none;
+  overflow: visible;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  border-inline-end: 1px solid var(--viewstem-border);
+  background: var(--viewstem-card);
+}
+
+.example-instructions > h2, .example-experiment { margin-block-start: 1.5rem; }
+.example-instructions h2 { font-size: var(--site-text-h3); }
+.example-instructions h2 + p { margin-block-start: .5rem; }
+
+.example-workbench {
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+  min-height: 0;
+  background: var(--viewstem-card);
+}
+.example-editor, .example-preview {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.example-editor { border-block-end: 1px solid var(--viewstem-border); }
+.example-workbench > :is(.example-editor, .example-preview) > header {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: space-between;
+  align-items: center;
+  gap: .5rem;
+  min-height: 2.75rem;
+  padding-inline: clamp(.75rem, 2vw, 1.5rem);
+  border-bottom: 1px solid var(--viewstem-border);
+  background: var(--viewstem-background);
+}
+.example-files { display: flex; flex-wrap: wrap; }
+.example-editor > header > code { font-size: .875rem; }
+.example-auto-run { font-size: .75rem; color: var(--viewstem-muted-foreground); }
+.example-mobile-link { display: none; }
+.example-editor [data-source-key] { flex: 1; min-height: 0; }
+.example-editor :is([data-editor-host], [data-editor-fallback], .cm-editor) { height: 100%; }
+.example-editor [data-editor-fallback] { overflow: auto; }
+.example-editor .cm-editor.cm-focused { outline: 2px solid var(--viewstem-ring); outline-offset: -2px; }
+.example-preview > header h2 { margin: 0; color: var(--viewstem-foreground); font-size: .875rem; font-weight: 600; line-height: 1.4; }
+.example-preview [data-example-target] { flex: 1; min-height: 0; padding: 1rem; overflow: visible; overflow-wrap: anywhere; }
+.example-preview [data-example-target] [data-slot="card-content"] { display: flex; flex-wrap: wrap; gap: .65rem; align-items: center; }
+.example-preview [data-example-status]:not([hidden]) { margin: .75rem 1rem 0; width: calc(100% - 2rem); overflow-wrap: anywhere; }
+.example-preview [data-example-running]:not([hidden]) { margin: .75rem 1rem 0; color: var(--viewstem-muted-foreground); font-size: .875rem; }
+
+.example-setup { margin-block-start: 1.5rem; font-size: .9rem; color: var(--viewstem-muted-foreground); }
+.example-setup summary { cursor: pointer; font-weight: 600; color: var(--viewstem-foreground); }
+.example-setup > p { margin-block-start: .5rem; }
+.example-pagination { margin-top: 1.75rem; font-size: .875rem; }
+.example-lesson .example-lesson-body > .example-pagination-mobile { display: none; }
+
+@media (max-width: 47rem) {
+  .example-stage-list li a { display: block; }
+  .example-stage-list li code { margin: .15rem 0 0; }
+  .example-lesson-page { height: auto; min-height: 100dvh; }
+  .example-lesson-body { display: block; }
+  .example-lesson-body .example-instructions {
+    border-inline-end: 0;
+    border-block-end: 1px solid var(--viewstem-border);
+  }
+  .example-instructions > h2, .example-experiment { margin-block-start: 1.25rem; }
+  .example-lesson .example-instructions .example-pagination { display: none; }
+  .example-lesson .example-lesson-body > .example-pagination-mobile { display: grid; margin: 0; padding: 1.25rem; font-size: .875rem; background: var(--viewstem-card); }
+  .example-breadcrumb [data-current-crumb] { display: none; }
+  .example-workbench { grid-template-rows: 16.5rem minmax(14rem, auto); }
+  .example-workbench > .example-editor > header { flex-wrap: wrap; gap: 0 .5rem; padding-block: .25rem; }
+  .example-files, .example-editor > header > code { flex: 1 1 100%; }
+  .example-files { flex-wrap: nowrap; }
+  .example-editor .example-mobile-link { margin-inline-start: auto; }
+  .example-mobile-link {
+    display: inline;
+    color: var(--viewstem-primary);
+    font-size: .75rem;
+    text-underline-offset: .2em;
+  }
+  .example-preview .example-mobile-link { margin-inline-start: auto; }
+}
+
+.example-instructions-scroll { height: 100%; border-inline-end: 1px solid var(--viewstem-border); }
+.example-lesson-body .example-instructions { border-inline-end: 0; }
+@media (max-width: 47rem) { .example-instructions-scroll { height: auto; border-inline-end: 0; } }
+
+.example-preview [data-example-running]:not([hidden]) { display: flex; align-items: center; gap: .5rem; }

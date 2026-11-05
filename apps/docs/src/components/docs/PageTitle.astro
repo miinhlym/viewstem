@@ -1,0 +1,57 @@
+---
+import SiteBreadcrumb from '../site/Breadcrumb.svelte';
+import DefaultPageTitle from '@astrojs/starlight/components/PageTitle.astro';
+const { lang, entry } = Astro.locals.starlightRoute;
+const ko = lang === 'ko';
+const base = ko ? '/ko/docs/' : '/docs/';
+const path = Astro.url.pathname.slice(base.length).split('/').filter(Boolean);
+const names: Record<string, string> = {
+  core: '@viewstem/core', svelte: '@viewstem/svelte', 'svelte-ui': '@viewstem/svelte-ui',
+  concepts: ko ? '핵심 개념' : 'Core concepts', guides: ko ? '가이드' : 'Guides',
+  dsl: ko ? 'DSL 레퍼런스' : 'DSL reference', reference: ko ? '레퍼런스 안내' : 'Reference overview',
+};
+const section = path[0];
+const links = [{ label: ko ? '문서' : 'Docs', href: base }];
+if (path.length > 1 && names[section]) {
+  links.push({ label: names[section], href: section === 'concepts' ? `${base}#core-concepts` : section === 'guides' ? `${base}#task-guides` : `${base}${section}/` });
+}
+if (section === 'svelte-ui' && (path[1] === 'components' || path[1] === 'attributes')) {
+  links.push({ label: ko ? '컴포넌트 세트' : 'Component sets', href: `${base}svelte-ui/component-sets/` });
+}
+---
+{path.length > 0 && <SiteBreadcrumb links={links} title={entry.data.title} label={ko ? '문서 위치' : 'Breadcrumb'} />}
+<DefaultPageTitle />
+
+
+<script>
+  // Make only overflowing tables keyboard-scrollable, keeping native table semantics.
+  const observeTables = () => {
+    const revealHash = () => {
+      let id: string;
+      try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
+      if (!id) return;
+      const target = document.getElementById(id);
+      let opened = false;
+      for (let element = target; element; element = element.parentElement) {
+        if (element instanceof HTMLDetailsElement && !element.open) { element.open = true; opened = true; }
+      }
+      if (opened) target?.scrollIntoView({ block: 'start' });
+    };
+    revealHash();
+    window.addEventListener('hashchange', revealHash);
+    const observer = new ResizeObserver(entries => {
+      for (const { target } of entries) {
+        if (target instanceof HTMLElement) {
+          if (target.scrollWidth > target.clientWidth + 1) target.setAttribute('tabindex', '0');
+          else target.removeAttribute('tabindex');
+        }
+      }
+    });
+    const connect = () => document.querySelectorAll('.sl-markdown-content table').forEach(table => observer.observe(table));
+    connect();
+    window.addEventListener('pagehide', () => observer.disconnect());
+    window.addEventListener('pageshow', (event) => { if (event.persisted) connect(); });
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', observeTables, { once: true });
+  else observeTables();
+</script>

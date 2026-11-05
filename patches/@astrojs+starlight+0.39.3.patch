@@ -1,0 +1,13 @@
+diff --git a/node_modules/@astrojs/starlight/utils/i18n.ts b/node_modules/@astrojs/starlight/utils/i18n.ts
+index fdce74e..240855a 100644
+--- a/node_modules/@astrojs/starlight/utils/i18n.ts
++++ b/node_modules/@astrojs/starlight/utils/i18n.ts
+@@ -91,7 +91,7 @@ function getStarlightI18nConfig(
+ 		);
+ 	}
+ 
+-	const prefixDefaultLocale = astroI18nConfig.routing.prefixDefaultLocale;
++	const prefixDefaultLocale = astroI18nConfig.routing?.prefixDefaultLocale ?? false;
+ 	const isMultilingual = astroI18nConfig.locales.length > 1;
+ 	const isMonolingualWithRootLocale = !isMultilingual && !prefixDefaultLocale;
+ 

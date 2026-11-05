@@ -1,0 +1,19 @@
+---
+import SiteHeader from '../SiteHeader.astro';
+import MobileDocsMenu from './MobileDocsMenu.svelte';
+import Search from './Search.svelte';
+
+const { lang, id, hasSidebar, sidebar } = Astro.locals.starlightRoute;
+const locale = lang === 'ko' ? 'ko' : 'en';
+const isNotFound = id === '404';
+const alternateHref = isNotFound
+  ? locale === 'ko' ? '/' : '/ko/'
+  : locale === 'ko' ? Astro.url.pathname.replace(/^\/ko(?=\/)/, '') : `/ko${Astro.url.pathname}`;
+---
+
+<SiteHeader {locale} page="docs" as="div" {alternateHref}>
+  <div slot="docs-tools" class="masthead-doc-tools">
+    {hasSidebar && <MobileDocsMenu client:load {locale} entries={sidebar} />}
+    <Search client:load {locale} hasIndex={import.meta.env.PROD} />
+  </div>
+</SiteHeader>

@@ -1,0 +1,26 @@
+{
+  "cli": "shadcn@4.23.0",
+  "style": "radix-nova",
+  "baseColor": "neutral",
+  "installedAt": "2026-11-05",
+  "files": {
+    "alert.tsx": "f253568242c1c69b343f12474002fdbe229f603158171c59e21c491ab79f2e6e",
+    "breadcrumb.tsx": "0a8bde9cce18e08b8189d86eec603709c6ffa04238f062875685b90a44037154",
+    "button.tsx": "08e5f87833c5db8436e89337ebde0f776bcdbf649d3de69fb89be6441ca2e366",
+    "checkbox.tsx": "0241c7d2b3723789f4ac40278c150b1b9960ad551a3f1a356fefd1f9f4ffd8ed",
+    "collapsible.tsx": "c6598e5584f4258b5d9fefadbc5ad6a66888ad58729f4b634a0bb2d9c513188b",
+    "dialog.tsx": "bf7537e2aca3a9bbc83f9bc3b40e634faca0de915d2dad3a0a1be688a572c0c8",
+    "dropdown-menu.tsx": "1b9c748a8ea8c2890124f316e3edf840153ef43f6df76b3ff1878d8fd37f9685",
+    "field.tsx": "8e54d2838051eeb741f6925863b690c98928b25bbb26f3cd26a5b75121d06acb",
+    "input.tsx": "75418e030b2a54dd017ac0f4588db4bbdbabca7525e88bbc9d84cb3e18bcb905",
+    "label.tsx": "344bde38b8531615dbf8e14af3895517c24d8ef6ce56ddeda7e2e6fe4b5d0c00",
+    "native-select.tsx": "93262e9e6c108df664725a0043f0c06ef844e173088b18c0f807e753e2f86d22",
+    "pagination.tsx": "70c3dbfd2e58c88d87f8f073dcd4925d0e015c401f61720e71bb9aa3ab40f503",
+    "resizable.tsx": "565714189484affdabde40be5028fa7232c91a045ad7e955423703fd8ed8c73b",
+    "separator.tsx": "b5b5460e5337c2d5f361c1512001615b2e5eacb38c7449a4418bb9ddb47c4bba",
+    "sheet.tsx": "fa77751132b70dee3f473b2ba16d3e8a02b0c43cf83e91e4bd772c2c03240291",
+    "table.tsx": "300dc171ff0e09543dce0787f43a3ceb0d168fa800eaecb98b6c5630f3c6d7e9",
+    "tabs.tsx": "b977274550595594055d850a16775c75761765e1cd76b4827e101c2f432762df",
+    "tooltip.tsx": "fc4380a53b7c847ff3d692c320f8d889eaaf3d6878dcba1da926ec4ab3a7c037"
+  }
+}

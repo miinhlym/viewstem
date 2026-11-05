@@ -1,0 +1,7 @@
+---
+import DefaultHead from '@astrojs/starlight/components/Head.astro';
+import FontPreload from '../FontPreload.astro';
+const { entry, lang } = Astro.locals.starlightRoute;
+---
+<DefaultHead />
+<FontPreload text={entry.data.title} locale={lang} />

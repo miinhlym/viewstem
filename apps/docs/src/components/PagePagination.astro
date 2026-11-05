@@ -1,0 +1,14 @@
+---
+import Pagination from './site/Pagination.svelte';
+interface Props {
+  previous?: { href: string; label: string };
+  next?: { href: string; label: string };
+  previousLabel: string;
+  nextLabel: string;
+  label: string;
+  dir?: 'ltr' | 'rtl';
+  class?: string;
+}
+
+---
+{(Astro.props.previous || Astro.props.next) && <Pagination {...Astro.props} />}

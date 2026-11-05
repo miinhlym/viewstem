@@ -1,0 +1,11 @@
+---
+import SidebarNavigation from './SidebarNavigation.svelte';
+import bootstrap from '../../lib/docs-sidebar-bootstrap.js?raw';
+
+const { sidebar, lang } = Astro.locals.starlightRoute;
+---
+
+<div data-docs-sidebar data-persist-key={lang}>
+  <SidebarNavigation client:load entries={sidebar} persistKey={lang} />
+</div>
+<script is:inline aria-hidden="true" set:html={bootstrap} />

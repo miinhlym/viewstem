@@ -1,0 +1,6 @@
+---
+import ThemeMenu from './site/ThemeMenu.svelte';
+interface Props { locale: 'en' | 'ko'; }
+const { locale } = Astro.props;
+---
+<ThemeMenu locale={locale} client:load />

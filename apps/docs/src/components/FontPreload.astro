@@ -1,0 +1,23 @@
+---
+import fontCss from '../../public/fonts/site-fonts.css?raw';
+
+interface Props { text: string; locale: string; }
+const { text, locale } = Astro.props;
+// Derive subsets from the same Unicode ranges used by CSS, including uncommon
+// title characters. Avoid downloading the entire Korean family on every page.
+const navigation = locale === 'ko' ? '문서 예제 플레이그라운드 검색' : 'Docs Examples Playground Search';
+const characters = [...new Set(`${text} Viewstem ${navigation}`)].map(char => char.codePointAt(0)!);
+const preloads = [...fontCss.matchAll(/src: url\(([^)]+)\)[^;]+;\s*unicode-range: ([^;]+);/g)]
+  .filter(([, , ranges]) => ranges.split(',').some(range => {
+    const [start, end = start] = range.trim().replace(/^U\+/i, '').split('-');
+    return characters.some(code => code >= parseInt(start, 16) && code <= parseInt(end, 16));
+  }))
+  .map(([, href]) => href);
+---
+{preloads.map(href => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin="anonymous" />)}
+<!-- The shared search shortcut and inline code use this on every entry point. -->
+<link rel="preload" href="/fonts/d2coding/D2Coding-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+
+<!-- Keep font faces outside Vite CSS modules: re-inserting them during client
+     startup can replace already-rendered glyphs with a fallback font. -->
+<link rel="stylesheet" href="/fonts/site-fonts.css" />

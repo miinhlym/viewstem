@@ -1,0 +1,5 @@
+---
+import SiteToc from './SiteToc.svelte';
+const { toc } = Astro.locals.starlightRoute;
+---
+{toc && <SiteToc items={toc.items} label={Astro.locals.t('tableOfContents.onThisPage')} client:load />}

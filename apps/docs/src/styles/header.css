@@ -1,0 +1,54 @@
+:root { --masthead-height: 4rem; }
+.masthead {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  background: var(--viewstem-card);
+  color: var(--viewstem-foreground);
+  border-block-end: 1px solid var(--viewstem-border);
+}
+.masthead-inner, .masthead-nav, .masthead-links, .masthead-tools, .masthead-doc-tools {
+  display: flex;
+  align-items: center;
+}
+.masthead-inner { width: min(69rem, calc(100% - 3rem)); margin-inline: auto; min-height: var(--masthead-height); gap: clamp(.5rem, 2vw, 1.75rem); }
+.masthead .brand { flex: none; }
+.masthead .brand picture { display: block; }
+.masthead .brand img { display: block; inline-size: auto; block-size: 1.75rem; }
+.masthead .brand .brand-dark, :root[data-theme="dark"] .masthead .brand .brand-light { display: none; }
+:root[data-theme="dark"] .masthead .brand .brand-dark { display: block; }
+.masthead-nav { flex: 1; justify-content: space-between; gap: .25rem; }
+.masthead-links, .masthead-tools { gap: .2rem; }
+.masthead .language-short { display: none; }
+.masthead-doc-tools { gap: .5rem; margin-inline-end: .5rem; }
+
+@media (width < 50rem) {
+  .masthead-docs { height: calc(var(--masthead-height) + 2.75rem); }
+  .masthead-doc-tools {
+    position: absolute;
+    inset: var(--masthead-height) 0 auto;
+    height: 2.75rem;
+    margin: 0;
+    padding-inline: 1rem;
+    justify-content: space-between;
+    border-block-start: 1px solid var(--viewstem-border);
+  }
+}
+@media (max-width: 38rem) {
+  :root { --masthead-height: 3.65rem; }
+  .masthead-inner { width: calc(100% - 2rem); }
+  .masthead .brand img { block-size: 1.3rem; }
+  .masthead-links, .masthead-tools { gap: .05rem; }
+  .masthead .language-name, .masthead .language svg { display: none; }
+  .masthead .language-short { display: inline; }
+}
+@media (max-width: 22rem) {
+  .masthead-inner { width: calc(100% - 1rem); gap: .3rem; }
+}
+
+.masthead-mobile { display: none; }
+.masthead-links [aria-current="page"] { background: var(--accent); color: var(--accent-foreground); }
+@media (max-width: 38rem) {
+  .masthead-links { display: none; }
+  .masthead-mobile { display: block; }
+}

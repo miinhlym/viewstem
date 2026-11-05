@@ -1,0 +1,25 @@
+<script>
+  import { mount, unmount } from 'svelte';
+  import StaticScrollRegion from './StaticScrollRegion.svelte';
+
+  // Prose is server-rendered Markdown, rather than a Svelte component tree.
+  const regions = new Map<HTMLElement, ReturnType<typeof mount>>();
+  const enhance = () => {
+    for (const element of document.querySelectorAll<HTMLElement>('.sl-markdown-content pre, .sl-markdown-content table, .home-landing pre')) {
+      if (element.closest('[data-site-scroll], [data-viewstem-shadcn], .viewstem-shadcn-root')) continue;
+      const host = document.createElement('div');
+      host.className = 'static-scroll-host';
+      element.before(host);
+      const ko = document.documentElement.lang === 'ko';
+      const label = element.tagName === 'TABLE' ? (ko ? '표' : 'Table') : (ko ? '코드' : 'Code');
+      regions.set(host, mount(StaticScrollRegion, { target: host, props: { element, label } }));
+    }
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enhance, { once: true });
+  else enhance();
+  window.addEventListener('pagehide', event => {
+    if (event.persisted) return;
+    for (const region of regions.values()) void unmount(region);
+    regions.clear();
+  });
+</script>

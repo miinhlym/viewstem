@@ -1,0 +1,46 @@
+---
+import previewStyles from '@viewstem/svelte-ui/shadcn/styles.css?url';
+import SiteHead from './SiteHead.astro';
+import SiteHeader from './SiteHeader.astro';
+import Playground from './Playground.svelte';
+import { copy } from './home-content';
+import { playgroundCopy, type Locale } from './playground-copy';
+import '../styles/playground-layout.css';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const text = playgroundCopy[locale];
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <link rel="stylesheet" href={previewStyles} />
+    <SiteHead {locale} title={`${text.title} · Viewstem`} fontText={text.title} description={text.description} />
+  </head>
+  <body class="playground-page">
+    <a class="skip-link" href="#main">{copy[locale].skip}</a>
+    <SiteHeader {locale} page="playground" />
+    <main class="playground-main" id="main" tabindex="-1">
+      <Playground {locale} client:load />
+    </main>
+  </body>
+</html>
+
+<style>
+  .playground-page {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+  }
+
+  .playground-main {
+    display: grid;
+    flex: 1;
+    min-height: 0;
+    grid-template-rows: minmax(0, 1fr);
+  }
+</style>

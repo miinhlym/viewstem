@@ -1,0 +1,61 @@
+:root {
+  --sl-font: var(--site-font);
+  --sl-font-mono: var(--site-mono);
+  --sl-line-height: var(--site-leading-body);
+  --sl-line-height-headings: var(--site-leading-heading);
+  --sl-nav-height: var(--masthead-height);
+  --sl-sidebar-width: var(--site-sidebar-width);
+  --sl-sidebar-pad-x: var(--site-sidebar-pad-x);
+  --sl-content-width: var(--site-content-width);
+  --sl-text-h1: var(--site-text-h1);
+  --sl-text-h2: var(--site-text-h2);
+  --sl-text-h3: var(--site-text-h3);
+  --sl-text-h4: var(--site-text-h4);
+  --sl-text-h5: var(--site-text-h5);
+  --sl-text-h6: var(--site-text-h6);
+  --sl-color-accent-low: var(--viewstem-secondary);
+  --sl-color-accent: var(--viewstem-primary);
+  --sl-color-accent-high: var(--viewstem-secondary-foreground);
+  --sl-color-text: var(--viewstem-foreground);
+  --sl-color-text-accent: var(--viewstem-primary);
+  --sl-color-text-invert: var(--viewstem-primary-foreground);
+  --sl-color-bg: var(--viewstem-background);
+  --sl-color-bg-nav: var(--viewstem-card);
+  --sl-color-bg-sidebar: var(--viewstem-card);
+  --sl-color-bg-inline-code: var(--viewstem-muted);
+  --sl-color-bg-accent: var(--viewstem-primary);
+  --sl-color-hairline: var(--viewstem-border);
+  --sl-color-hairline-light: var(--viewstem-border);
+  --sl-color-hairline-shade: var(--viewstem-border);
+}
+
+/* Keep prose spacing consistent across text, tables, and code blocks. */
+.sl-markdown-content > :is(p, ul, ol, table, .expressive-code, blockquote):not(:first-child) { margin-block-start: 1rem; }
+.sl-markdown-content > .sl-heading-wrapper:not(:first-child) { margin-block-start: 2rem; }
+.sl-markdown-content > .sl-heading-wrapper + :where(p, ul, ol) { margin-block-start: .65rem; }
+.sl-markdown-content :not(pre) > code { border-radius: .3rem; }
+.main-pane footer:has(.docs-pagination) > .meta:not(:has(*)) { display: none; }
+.main-pane footer:has(.docs-pagination) { margin-block-start: 2rem; }
+
+/* Starlight owns the fixed frame; the shared header supplies its contents. */
+.page > header.header { padding: 0; border: 0; }
+@media (width < 50rem) {
+  :root { --sl-nav-height: calc(var(--masthead-height) + 2.75rem); }
+}
+
+/* Reading surfaces use one type hierarchy, including heading anchor wrappers. */
+.sl-markdown-content :is(h2, h3, h4) code { font-size: .9em; background: transparent; padding: 0; }
+.sl-markdown-content table { width: 100%; font-size: .9rem; line-height: 1.65; }
+.sl-markdown-content :is(th, td) { vertical-align: top; padding: .65rem .75rem; }
+.sl-markdown-content th { white-space: nowrap; color: var(--viewstem-foreground); }
+.sl-markdown-content td code { overflow-wrap: anywhere; }
+.sl-markdown-content details { border: 1px solid var(--viewstem-border); border-radius: .3rem; padding: .75rem 1rem; }
+.sl-markdown-content summary { cursor: pointer; font-weight: 600; color: var(--viewstem-foreground); }
+.sl-markdown-content details > :not(summary) { margin-block-start: .75rem; }
+.main-pane .content-panel:first-child { padding-block-end: 1.25rem; border-bottom: 0; }
+.main-pane .content-panel + .content-panel { border-top: 0; padding-block-start: .5rem; }
+@media (width < 50rem) {
+  .sl-markdown-content :is(th, td) { padding: .5rem .6rem; }
+}
+
+.sl-markdown-content details[id] { scroll-margin-block-start: calc(var(--sl-nav-height) + 1.5rem); }

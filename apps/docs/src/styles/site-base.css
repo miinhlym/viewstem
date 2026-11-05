@@ -1,0 +1,74 @@
+/* Site defaults override framework resets, but yield to component utilities.
+   Portals inherit these same defaults from body; page layouts do not redefine them. */
+@layer site-base {
+  html {
+    font-family: var(--site-font);
+    font-size: 100%;
+    font-weight: 400;
+    line-height: var(--site-leading-body);
+    font-style: normal;
+    font-feature-settings: normal;
+    font-variation-settings: normal;
+    font-kerning: auto;
+    font-optical-sizing: auto;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    text-autospace: no-autospace;
+    color: var(--foreground);
+    background-color: var(--background);
+    accent-color: var(--primary);
+    color-scheme: light;
+    scroll-padding-block-start: calc(var(--masthead-height) + .75rem);
+  }
+  html[data-theme="dark"] { color-scheme: dark; }
+  body {
+    margin: 0;
+    font: inherit;
+    -webkit-font-smoothing: inherit;
+    color: inherit;
+    background-color: var(--background);
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+  body:lang(ko) { word-break: keep-all; }
+  :where(p, h1, h2, h3, h4, h5, h6, code) { overflow-wrap: inherit; }
+
+  :where(button, input, select, textarea) {
+    font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+  }
+  :where(h1, h2, h3, h4, h5, h6) {
+    color: var(--foreground);
+    font-weight: var(--site-weight-heading);
+    line-height: var(--site-leading-heading);
+  }
+  h1 { font-size: var(--site-text-h1); }
+  h2 { font-size: var(--site-text-h2); }
+  h3 { font-size: var(--site-text-h3); }
+  h4 { font-size: var(--site-text-h4); }
+  h5 { font-size: var(--site-text-h5); }
+  h6 { font-size: var(--site-text-h6); }
+  :where(pre, code, kbd, samp) {
+    font-family: var(--site-mono);
+    font-variant-ligatures: none;
+    text-autospace: no-autospace;
+  }
+  :where(a, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+}
+
+/* A navigation tree keeps the same rhythm inside a Sheet with its own text size. */
+.site-sidebar-scroll { font-family: var(--site-font); line-height: var(--site-leading-body); }
+.skip-link { position: fixed; z-index: 3; inset: .65rem auto auto .65rem; padding: .55rem .85rem; background: var(--card); transform: translateY(-150%); }
+.skip-link:focus { transform: none; }
+.visually-hidden { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

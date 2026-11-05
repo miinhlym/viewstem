@@ -1,0 +1,70 @@
+---
+import { Code } from 'astro:components';
+import ScrollRegion from './site/ScrollRegion.svelte';
+import DemoWorkbench from './DemoWorkbench.svelte';
+import '../styles/component-demo-theme.css';
+import '../styles/demo-workbench.css';
+import '../styles/demo-options-layout.css';
+import styles from '@viewstem/svelte-ui/shadcn/styles.css?url';
+import { getComponentDemo } from '../examples/component-demos.mjs';
+import { getDemoControls } from '../examples/component-demo-controls.mjs';
+import { demoSetupSource } from '../examples/component-demo-setup';
+
+interface Props { family: string; locale: 'en' | 'ko'; }
+const { family, locale } = Astro.props;
+const ko = locale === 'ko';
+const demo = getComponentDemo(family, locale);
+if (!demo) throw new Error(`Missing component demo: ${family}/${locale}`);
+const source = JSON.stringify(demo.view, null, 2);
+const controls = getDemoControls(family, locale, demo.view);
+const serialized = source.replace(/</g, '\\u003c');
+---
+<link rel="stylesheet" href={styles} />
+<section class="component-demo" data-component-demo data-family={family} data-locale={locale} aria-labelledby="component-preview">
+  <h2 id="component-preview">{ko ? '직접 사용해 보기' : 'Try it'}</h2>
+  <p>{demo.description}</p>
+  {demo.instructions && <p class="instructions">{demo.instructions}</p>}
+  <DemoWorkbench ko={ko} controls={controls} client:load>
+    <div slot="preview"><ScrollRegion client:load><div class="preview-surface"><div class="preview-stage" data-demo-target aria-busy="true"></div></div></ScrollRegion></div>
+    <div slot="source">
+      <h3 id="component-json" class="source-heading">view.json</h3>
+      <p class="source-description">{ko ? '현재 설정의 초기 실행 정의입니다. 미리보기 안에서 바꾼 실행 상태는 포함되지 않습니다.' : 'Initial definition for the current settings. Runtime changes inside the preview are not included.'}</p>
+      <ScrollRegion class="source-scroll" label="view.json" client:load><div class="source-code"><Code code={source} lang="json" themes={{ light: 'github-light', dark: 'github-dark' }} /></div></ScrollRegion>
+    </div>
+  </DemoWorkbench>
+  <noscript><p>{ko ? '동작하는 미리보기에는 JavaScript가 필요합니다. JSON은 그대로 읽고 복사할 수 있습니다.' : 'The interactive preview requires JavaScript. You can still read and copy the JSON.'}</p></noscript>
+  <details class="setup-code">
+    <summary>{ko ? '앱에서 실행하기 · setup.ts' : 'Run in your app · setup.ts'}</summary>
+    <p>{ko ? 'HTML에 <div id="preview"></div>를 만들고 view.json과 함께 사용하세요.' : 'Add <div id="preview"></div> to your HTML and use this with view.json.'}</p>
+    <ScrollRegion client:load label="setup.ts"><Code code={demoSetupSource(demo.view, family)} lang="ts" themes={{ light: 'github-light', dark: 'github-dark' }} /></ScrollRegion>
+  </details>
+  <script type="application/json" data-demo-view set:html={serialized} />
+</section>
+
+<style>
+  .component-demo { margin-block-end: 2.5rem; min-width: 0; }
+  h2 { margin: 0; scroll-margin-top: calc(var(--sl-nav-height) + 1.5rem); }
+  p { margin-block: .75rem; }
+  .instructions, .source-description { color: var(--viewstem-muted-foreground); font-size: .9rem; }
+  .source-heading { margin: 0; padding: .875rem 1rem 0; font: 500 .8125rem var(--site-mono); }
+  .source-description { margin: 0; padding: .5rem 1rem .875rem; font-size: .75rem; line-height: 1.5; border-bottom: 1px solid var(--viewstem-border); }
+  /* The frame controls demo layout only; the package owns every widget style. */
+  .preview-surface { font-size: 1rem; line-height: 1.5; display: grid; place-items: center; min-height: 20rem; padding: 2rem; background: var(--demo-background); color: var(--demo-foreground); position: relative; min-width: 0; }
+  .preview-stage { width: 100%; max-width: 24rem; min-width: 0; }
+  .component-demo:is([data-family="chart"], [data-family="data-table"], [data-family="table"], [data-family="sidebar"], [data-family="resizable"], [data-family="typography"]) .preview-stage { max-width: 36rem; }
+  .source-code { background: var(--viewstem-muted); }
+  .source-code :global(pre), .setup-code :global(pre) { margin: 0; padding: 1rem; font-size: var(--site-text-code); line-height: var(--site-leading-code); overflow: visible; }
+  :global([data-theme="dark"]) .component-demo :global(.astro-code),
+  :global([data-theme="dark"]) .component-demo :global(.astro-code span) { color: var(--shiki-dark) !important; background-color: var(--shiki-dark-bg) !important; }
+  .setup-code { margin-top: .75rem; border-bottom: 1px solid var(--viewstem-border); padding-block: .75rem; }
+  summary { cursor: pointer; font-size: .875rem; font-weight: 600; }
+  @media (width < 50rem) { .preview-surface { padding: 1rem; min-height: 16rem; } }
+  .source-code :global(.live-json) { background: var(--viewstem-card); color: var(--viewstem-foreground); }
+  .source-code :global(.json-line) { display: inline-block; min-width: 100%; }
+  .source-code :global(.json-key) { color: var(--code-key); }
+  .source-code :global(.json-string) { color: var(--code-string); }
+  .source-code :global(.json-value) { color: var(--code-value); }
+  .source-code :global(.json-changed) { background: color-mix(in srgb, var(--viewstem-primary) 14%, transparent); box-shadow: inset 2px 0 var(--viewstem-primary); animation: option-mark 1.2s ease-out; }
+  @keyframes option-mark { from { background: color-mix(in srgb, var(--viewstem-primary) 30%, transparent); } }
+  @media (prefers-reduced-motion: reduce) { .source-code :global(.json-changed) { animation: none; } }
+</style>

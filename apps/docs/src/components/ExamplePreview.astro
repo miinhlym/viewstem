@@ -1,0 +1,229 @@
+---
+import * as Alert from './ui/alert/index.js';
+import { Spinner } from './ui/spinner/index.js';
+import ScrollRegion from './site/ScrollRegion.svelte';
+import { Code } from 'astro:components';
+import Button from './site/Button.svelte';
+import ExampleFileTabs from './site/ExampleFileTabs.svelte';
+import { exampleCopy } from '../examples/catalog';
+import type { ExampleDefinition, Locale } from '../examples/definitions';
+
+interface Props {
+  definition: ExampleDefinition;
+  locale: Locale;
+}
+
+const { definition, locale } = Astro.props;
+const text = exampleCopy[locale];
+const files = [
+  { key: 'view', name: 'view.json', source: JSON.stringify(definition.view, null, 2) },
+  ...(definition.resources ? [{ key: 'resources', name: 'resources.json', source: JSON.stringify(definition.resources, null, 2) }] : []),
+  ...(definition.inputs ? [{ key: 'inputs', name: 'inputs.json', source: JSON.stringify(definition.inputs, null, 2) }] : []),
+];
+---
+
+<section
+  class="example-workbench"
+  aria-label={text.source}
+  data-example-preview
+  data-locale={locale}
+  data-fixture={definition.fixture}
+  data-error={text.error}
+  data-retained={text.retained}
+  data-editor-error={text.editorError}
+>
+  <div class="example-editor" id="example-code">
+    <header>
+      {files.length > 1 ? (
+        <ExampleFileTabs files={files.map(({ key, name }) => ({ key, name }))} label={text.sourceFiles} client:load />
+      ) : (
+        <code>{files[0].name}</code>
+      )}
+      <span class="example-auto-run">{text.autoRun}</span>
+      <a class="example-mobile-link" href="#example-result">{text.toPreview}</a>
+    </header>
+    {files.map((file, index) => (
+      <div id={"source-" + file.key} data-source-key={file.key} data-source-name={file.name} hidden={index !== 0}>
+        <ScrollRegion class="editor-scroll" client:load><div data-editor-host hidden></div>
+        <div data-editor-fallback>
+          <Code code={file.source} lang="json" theme="github-light" />
+        </div></ScrollRegion>
+        <textarea data-source-original hidden readonly aria-hidden="true" tabindex="-1">{file.source}</textarea>
+      </div>
+    ))}
+  </div>
+  <div class="example-preview" id="example-result">
+    <header>
+      <h2>{text.preview}</h2>
+      <a class="example-mobile-link" href="#example-code">{text.toCode}</a>
+      <Button data-example-run size="sm" aria-keyshortcuts="Control+Enter Meta+Enter" disabled>{text.run}</Button>
+    </header>
+    <p data-example-running role="status" hidden><Spinner aria-hidden="true" /> {text.running}</p>
+    <Alert.Root variant="destructive" data-example-status hidden><Alert.Description><span data-example-error-message></span></Alert.Description></Alert.Root>
+    <ScrollRegion class="preview-scroll" client:load><div data-example-target></div></ScrollRegion>
+  </div>
+</section>
+
+<script>
+  import type { JsonValue, ViewSpec, AnyResource } from '@viewstem/svelte';
+  import type { ExampleDefinition, Locale } from '../examples/definitions';
+  import type { createJsonEditor } from '../lib/json-editor';
+  import type { createExamplePreview } from '../examples/preview';
+  import { playMotion } from '../lib/site-motion';
+
+  const container = document.querySelector<HTMLElement>('[data-example-preview]');
+
+  async function setup(container: HTMLElement) {
+    const runButton = container.querySelector<HTMLButtonElement>('[data-example-run]')!;
+    const resetButton = document.querySelector<HTMLButtonElement>('[data-example-reset]')!;
+    const jumpButton = document.querySelector<HTMLButtonElement>('[data-example-jump]')!;
+    const sourcePanels = container.querySelectorAll<HTMLElement>('[data-source-key]');
+    const target = container.querySelector<HTMLElement>('[data-example-target]')!;
+    const status = container.querySelector<HTMLElement>('[data-example-status]')!;
+    const progress = container.querySelector<HTMLElement>('[data-example-running]')!;
+    const { locale, fixture, error, retained, editorError } = container.dataset;
+    const editors = new Map<string, ReturnType<typeof createJsonEditor>>();
+    const originals = new Map<string, string>();
+    let preview: ReturnType<typeof createExamplePreview> | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let running = false;
+    let queued = false;
+    let runFailed = false;
+
+    function showError(message: string) {
+      status.querySelector<HTMLElement>('[data-example-error-message]')!.textContent = message;
+      status.hidden = false;
+    }
+
+    function readFile(key: string) {
+      const editor = editors.get(key);
+      if (!editor) return undefined;
+      try {
+        return JSON.parse(editor.state.doc.toString()) as unknown;
+      } catch (cause) {
+        const detail = cause instanceof Error ? cause.message : '';
+        throw new Error(`${key}.json · ${detail}`);
+      }
+    }
+
+    async function run() {
+      clearTimeout(timer);
+      if (running) {
+        queued = true;
+        return;
+      }
+      running = true;
+      runFailed = false;
+      runButton.disabled = true;
+      status.hidden = true;
+      progress.hidden = false;
+      const surface = document.createElement('div');
+      let next: typeof preview;
+
+      try {
+        const source: ExampleDefinition = {
+          view: readFile('view') as ViewSpec,
+          resources: readFile('resources') as AnyResource[] | undefined,
+          inputs: readFile('inputs') as Record<string, JsonValue> | undefined,
+          fixture: fixture === 'projects' || fixture === 'project-write' ? fixture : undefined,
+        };
+        const { createExamplePreview } = await import('../examples/preview');
+        surface.hidden = true;
+        target.append(surface);
+        next = createExamplePreview(surface, source, locale as Locale, ({ error: diagnostic }) => {
+          if (preview === next && !runFailed) showError(diagnostic.message);
+        });
+        await next.run();
+        await preview?.dispose();
+        preview = next;
+        surface.hidden = false;
+        target.replaceChildren(surface);
+        playMotion(surface, [{ opacity: 0.65 }, { opacity: 1 }], { duration: 180 });
+      } catch (cause) {
+        runFailed = true;
+        await next?.dispose().catch(() => {});
+        surface.remove();
+        const detail = typeof cause === 'object' && cause && 'message' in cause ? String(cause.message) : '';
+        showError([error, detail, preview && retained].filter(Boolean).join(' '));
+      } finally {
+        running = false;
+        progress.hidden = true;
+        runButton.disabled = false;
+        if (queued) {
+          queued = false;
+          void run();
+        }
+      }
+    }
+
+    function scheduleRun() {
+      clearTimeout(timer);
+      timer = setTimeout(() => void run(), 450);
+    }
+
+    function showFile(key: string) {
+      for (const file of sourcePanels) file.hidden = file.dataset.sourceKey !== key;
+      container.dataset.activeFile = key;
+      container.dispatchEvent(new Event('example-file-state'));
+      const editor = editors.get(key);
+      editor?.requestMeasure();
+      return editor;
+    }
+
+    try {
+      const [{ createJsonEditor }, { EditorView }] = await Promise.all([
+        import('../lib/json-editor'),
+        import('@codemirror/view'),
+      ]);
+      for (const file of sourcePanels) {
+        const key = file.dataset.sourceKey!;
+        const host = file.querySelector<HTMLElement>('[data-editor-host]')!;
+        const fallback = file.querySelector<HTMLElement>('[data-editor-fallback]')!;
+        const source = file.querySelector<HTMLTextAreaElement>('[data-source-original]')!.value;
+        originals.set(key, source);
+        editors.set(key, createJsonEditor({
+          parent: host,
+          source,
+          label: file.dataset.sourceName ?? key,
+          onChange: scheduleRun,
+          onRun: () => void run(),
+        }));
+        fallback.hidden = true;
+        host.hidden = false;
+      }
+
+      container.dataset.filesReady = 'true';
+      container.dispatchEvent(new Event('example-file-state'));
+      container.addEventListener('example-file-change', (event) => showFile((event as CustomEvent<string>).detail));
+      jumpButton.disabled = false;
+      jumpButton.addEventListener('click', () => {
+        const editor = showFile(jumpButton.dataset.file!);
+        if (!editor) return;
+        const offset = editor.state.doc.toString().indexOf(jumpButton.dataset.find!);
+        if (offset >= 0) editor.dispatch({
+          selection: { anchor: offset },
+          effects: EditorView.scrollIntoView(offset, { y: 'center' }),
+        });
+        editor.focus();
+      });
+      resetButton.disabled = false;
+      resetButton.addEventListener('click', () => {
+        for (const [key, editor] of editors) {
+          editor.dispatch({ changes: { from: 0, to: editor.state.doc.length, insert: originals.get(key) ?? '' } });
+        }
+        void run();
+      });
+      runButton.addEventListener('click', () => void run());
+      function dismissActionError() {
+        if (!runFailed) status.hidden = true;
+      }
+      target.addEventListener('click', dismissActionError, { capture: true });
+      target.addEventListener('input', dismissActionError, { capture: true });
+      void run();
+    } catch {
+      showError(editorError ?? '');
+    }
+  }
+
+  if (container) void setup(container);
+</script>

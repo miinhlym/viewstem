@@ -1,0 +1,3 @@
+/* Framework resets → shared site defaults → original component utilities.
+   Declare this before Starlight, Tailwind, or preview CSS first creates layers. */
+@layer theme, base, starlight, site-base, components, component, utilities, viewstem-theme, viewstem-base, viewstem-utilities;

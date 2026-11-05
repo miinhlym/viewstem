@@ -1,0 +1,10 @@
+<!-- Apply the saved choice before painting on every site entry point. -->
+<script is:inline>
+  (() => {
+    let choice = '';
+    try { choice = localStorage.getItem('starlight-theme') || ''; } catch {}
+    document.documentElement.dataset.theme = choice === 'light' || choice === 'dark'
+      ? choice : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.classList.toggle('dark', document.documentElement.dataset.theme === 'dark');
+  })();
+</script>

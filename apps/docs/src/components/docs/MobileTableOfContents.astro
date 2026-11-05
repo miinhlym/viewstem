@@ -1,0 +1,9 @@
+---
+import SiteToc from './SiteToc.svelte';
+const { toc } = Astro.locals.starlightRoute;
+---
+{toc && <SiteToc items={toc.items} label={Astro.locals.t('tableOfContents.onThisPage')} mobile client:load />}
+<style is:global>
+.site-mobile-toc { position: fixed; z-index: var(--sl-z-index-toc); top: calc(var(--sl-nav-height) - 1px); inset-inline: 0; display: flex; align-items: center; gap: .75rem; height: var(--sl-mobile-toc-height); padding-inline: 1rem; border-block: 1px solid var(--border); background: var(--background); }
+@media (min-width: 50rem) { .site-mobile-toc { inset-inline-start: var(--sl-content-inline-start, 0); } }
+</style>

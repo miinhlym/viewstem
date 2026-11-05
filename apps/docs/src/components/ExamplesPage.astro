@@ -1,0 +1,142 @@
+---
+import previewStyles from '@viewstem/svelte-ui/shadcn/styles.css?url';
+import SiteHead from './SiteHead.astro';
+import { Icon } from '@astrojs/starlight/components';
+import Button from './site/Button.svelte';
+import ScrollRegion from './site/ScrollRegion.svelte';
+import SidebarNavigation from './site/SidebarNavigation.svelte';
+import { exampleNavigationEntries } from '../examples/navigation';
+import Breadcrumb from './site/Breadcrumb.svelte';
+import ExampleMenu from './site/ExampleMenu.svelte';
+import SiteHeader from './SiteHeader.astro';
+import ExamplePreview from './ExamplePreview.astro';
+import PagePagination from './PagePagination.astro';
+import { copy } from './home-content';
+import { exampleCopy, lessons, localize, stages } from '../examples/catalog';
+import { exampleDefinitions, type ExampleDefinition, type ExampleId, type Locale } from '../examples/definitions';
+
+import '../styles/examples.css';
+
+interface Props {
+  locale: Locale;
+  slug?: ExampleId;
+}
+
+const { locale, slug } = Astro.props;
+const text = exampleCopy[locale];
+const home = locale === 'ko' ? '/ko/' : '/';
+const index = lessons.findIndex(lesson => lesson.id === slug);
+const lesson = lessons[index];
+const activeStage = stages.find(stage => stage.lessons.includes(lesson));
+const pageTitle = lesson ? localize(locale, lesson.title) : text.title;
+const definition: ExampleDefinition | undefined = lesson && exampleDefinitions(locale)[lesson.id];
+const exampleUrl = (id: ExampleId) => `${home}examples/${id}/`;
+const previous = lessons[index - 1];
+const next = lessons[index + 1];
+const pagination = {
+  previous: previous && { href: exampleUrl(previous.id), label: localize(locale, previous.title) },
+  next: next && { href: exampleUrl(next.id), label: localize(locale, next.title) },
+  previousLabel: text.previous,
+  nextLabel: text.next,
+  label: text.navigation,
+};
+const navigation = { label: text.stages, title: text.title, home: `${home}examples/`, current: slug ? exampleUrl(slug) : undefined, groups: stages.map(stage => ({ title: localize(locale, stage.title), items: stage.lessons.map(item => ({ href: exampleUrl(item.id), label: localize(locale, item.title) })) })) };
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <link rel="stylesheet" href={previewStyles} />
+    <SiteHead {locale} title={`${pageTitle} · Viewstem`} fontText={pageTitle} description={lesson ? localize(locale, lesson.explanation) : text.description} />
+  </head>
+  <body class:list={['examples-page', { 'example-lesson-page': lesson }]}>
+    <a class="skip-link" href="#main">{copy[locale].skip}</a>
+    <SiteHeader {locale} page="examples" example={slug} />
+
+    <div class:list={[lesson ? 'example-lesson-layout' : 'examples-layout']}>
+      {!lesson && <aside class="example-nav"><SidebarNavigation entries={exampleNavigationEntries(navigation)} label={navigation.label} client:load /></aside>}
+
+      <main id="main" tabindex="-1" class:list={[lesson ? 'example-lesson' : 'example-main']}>
+        {lesson && definition ? (
+          <>
+            <header class="example-lesson-toolbar">
+              <ExampleMenu {...navigation} client:load />
+              <nav aria-label={text.navigation}>
+                <Button href={previous && exampleUrl(previous.id)} variant="ghost" size="icon" rel="prev" disabled={!previous} aria-label={text.previous}>
+                  <Icon name="left-arrow" />
+                </Button>
+                <Button href={next && exampleUrl(next.id)} variant="ghost" size="icon" rel="next" disabled={!next} aria-label={text.next}>
+                  <Icon name="right-arrow" />
+                </Button>
+              </nav>
+              <Breadcrumb class="example-breadcrumb" label={locale === 'ko' ? '예제 위치' : 'Breadcrumb'}
+                links={[{ href: `${home}examples/`, label: text.title }, { label: localize(locale, activeStage!.title) }]}
+                title={pageTitle} />
+              <Button data-example-reset size="sm" variant="outline" disabled>{text.reset}</Button>
+            </header>
+            <div class="example-lesson-body">
+              <ScrollRegion class="example-instructions-scroll" orientation="vertical" client:load><article class="example-main example-instructions">
+                <p class="example-stage">{index + 1} / {lessons.length} <span>{lesson.concept}</span></p>
+                <h1>{pageTitle}</h1>
+                <p class="example-intro">{localize(locale, lesson.explanation)}</p>
+                <h2>{text.expect}</h2>
+                <p>{localize(locale, lesson.check)}</p>
+                <section class="example-experiment">
+                  <h2>{text.tryEdit}</h2>
+                  <p>{localize(locale, lesson.experiment.instruction)}</p>
+                  <Button variant="link" type="button" data-example-jump data-file={lesson.experiment.file ?? 'view'} data-find={lesson.experiment.find} disabled>
+                    {text.openCode} <code>{lesson.experiment.file ?? 'view'}.json</code>
+                  </Button>
+                </section>
+                <details class="example-setup">
+                  <summary>{text.setup}</summary>
+                  <p>
+                    {locale === 'ko'
+                      ? ' 시작 가이드의 renderer에 필요한 shadcn 컴포넌트를 등록하고 view.json을 mount의 view로 전달하세요.'
+                      : ' Register the shadcn components you need with the Quickstart renderer and pass view.json as the mount view.'}
+                    {definition.resources && (locale === 'ko'
+                      ? ' 마운트 전에 renderer.registry.registerResources에 resources.json을 전달하세요.'
+                      : ' Pass resources.json to renderer.registry.registerResources before mounting.')}
+                    {definition.inputs && (locale === 'ko'
+                      ? ' inputs.json은 mount의 inputs로 전달하세요.'
+                      : ' Pass inputs.json as the mount inputs.')}
+                    {definition.fixture && (locale === 'ko'
+                      ? ' 앱에서는 Datasource의 주소를 실제 API로 바꾸고 title을 포함한 JSON 응답을 반환하세요.'
+                      : ' In your app, set the Datasource URL to an API that returns JSON with a title.')}
+                    {' '}<a href={`${home}docs/quickstart/`}>{text.quickstart}</a>
+                  </p>
+                </details>
+                <PagePagination {...pagination} class="example-pagination" />
+              </article></ScrollRegion>
+              <ExamplePreview {definition} {locale} />
+              <PagePagination {...pagination} class="example-pagination-mobile" />
+            </div>
+          </>
+        ) : (
+          <>
+            <h1>{text.title}</h1>
+            <p class="example-intro">{text.description}</p>
+            {stages.map(stage => (
+              <section class="example-stage-list">
+                <h2>{localize(locale, stage.title)}</h2>
+                <ol start={lessons.indexOf(stage.lessons[0]) + 1}>
+                  {stage.lessons.map(item => (
+                    <li><a href={exampleUrl(item.id)}>{localize(locale, item.title)}</a><code>{item.concept}</code></li>
+                  ))}
+                </ol>
+              </section>
+            ))}
+            <section class="example-stage-list">
+              <h2>{locale === 'ko' ? '기능을 조합하는 가이드' : 'Combine features'}</h2>
+              <ul>
+                <li><a href={`${home}docs/guides/form-validation/`}>{locale === 'ko' ? '폼 입력 검증' : 'Form validation'}</a></li>
+                <li><a href={`${home}docs/guides/query-dashboard/`}>{locale === 'ko' ? '조회 대시보드' : 'Query-driven dashboard'}</a></li>
+                <li><a href={`${home}docs/reference/#host-examples`}>{locale === 'ko' ? '앱에서 View를 등록하고 변경하기' : 'Register and update a View in your app'}</a></li>
+              </ul>
+            </section>
+          </>
+        )}
+      </main>
+    </div>
+  </body>
+</html>

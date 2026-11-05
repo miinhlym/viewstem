@@ -1,0 +1,39 @@
+:root {
+  --site-leading-body: 1.75;
+  --site-leading-heading: 1.2;
+  --site-leading-code: 1.65;
+  --site-weight-heading: 600;
+  --site-text-code: .875rem;
+  --site-text-h5: 1rem;
+  --site-text-h6: .875rem;
+  --site-sidebar-width: 16.5rem;
+  --site-sidebar-pad-x: 1rem;
+  --site-content-width: 46rem;
+  --site-text-h1: clamp(1.8rem, 3vw, 2.25rem);
+  --site-text-h2: clamp(1.4rem, 2.2vw, 1.65rem);
+  --site-text-h3: 1.2rem;
+  --site-text-h4: 1.05rem;
+  --site-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+  --site-font: "Pretendard Variable", system-ui, var(--site-emoji), "Noto Sans Symbols 2", sans-serif;
+  --site-mono: "D2Coding", ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", var(--site-emoji), "Noto Sans Symbols 2", monospace;
+  --viewstem-radius: var(--radius);
+  --viewstem-background: var(--background);
+  --viewstem-foreground: var(--foreground);
+  --viewstem-card: var(--card);
+  --viewstem-card-foreground: var(--card-foreground);
+  --viewstem-muted: var(--muted);
+  --viewstem-muted-foreground: var(--muted-foreground);
+  --viewstem-primary: var(--primary);
+  --viewstem-primary-foreground: var(--primary-foreground);
+  --viewstem-secondary: var(--secondary);
+  --viewstem-secondary-foreground: var(--secondary-foreground);
+  --viewstem-border: var(--border);
+  --viewstem-input: var(--input);
+  --viewstem-ring: var(--ring);
+  --viewstem-accent: var(--accent);
+  --viewstem-accent-foreground: var(--accent-foreground);
+
+}
+
+:root { --code-key: #0550ae; --code-string: #116329; --code-value: #8250df; }
+:root[data-theme="dark"] { --code-key: #79c0ff; --code-string: #a5d6ff; --code-value: #d2a8ff; }

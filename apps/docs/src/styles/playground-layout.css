@@ -1,0 +1,46 @@
+.playground-main {
+
+  .playground-panels {
+    min-height: 0;
+    background: var(--viewstem-card);
+  }
+
+  .editor-panel, .result-panel {
+    display: grid;
+    min-width: 0;
+    height: 100%;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    min-height: 3rem;
+    padding: .375rem clamp(.75rem, 2vw, 1.5rem);
+    border-bottom: 1px solid var(--viewstem-border);
+    background: var(--viewstem-background);
+  }
+
+  .panel-title h2 {
+    margin: 0;
+    color: var(--viewstem-foreground);
+    font-size: .875rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .editor-host { min-width: 0; min-height: 0; }
+  .editor-host .cm-editor { height: 100%; }
+  .editor-panel { container-type: inline-size; }
+  .editor-title { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; }
+  .run-status { color: var(--viewstem-muted-foreground); font-size: .75rem; line-height: 1.4; text-align: end; }
+  @container (max-width: 30rem) {
+    .editor-title { grid-template-columns: minmax(0, 1fr) auto; }
+    .editor-title > button { grid-column: 2; grid-row: 1; }
+    .run-status { grid-column: 1 / -1; grid-row: 2; text-align: start; }
+  }
+  .result-content { min-height: 0; padding: 1rem clamp(.75rem, 2vw, 1.5rem); overflow: visible; }
+  .preview-target:not(:empty) { padding: .15rem; }
+}

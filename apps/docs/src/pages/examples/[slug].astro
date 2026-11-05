@@ -1,0 +1,12 @@
+---
+import ExamplesPage from '../../components/ExamplesPage.astro';
+import { lessons } from '../../examples/catalog';
+import type { ExampleId } from '../../examples/definitions';
+
+export function getStaticPaths() {
+  return lessons.map(lesson => ({ params: { slug: lesson.id } }));
+}
+const slug = Astro.params.slug as ExampleId;
+---
+
+<ExamplesPage locale="en" {slug} />

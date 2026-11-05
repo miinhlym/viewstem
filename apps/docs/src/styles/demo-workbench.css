@@ -1,0 +1,36 @@
+.demo-workbench {
+  container-type: inline-size;
+  margin-block: 1.25rem 1rem;
+  min-width: 0;
+  color: var(--viewstem-foreground);
+}
+.demo-workbench .workbench-tabs {
+  gap: 0;
+  border: 1px solid var(--viewstem-border);
+  border-radius: var(--radius, .625rem);
+  background: var(--viewstem-background);
+  overflow: clip;
+}
+.workbench-toolbar { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .625rem; border-bottom: 1px solid var(--viewstem-border); }
+.workbench-actions { display: flex; align-items: center; gap: .125rem; }
+.workbench-body { min-width: 0; }
+.workbench-preview, .workbench-json, .workbench-options { min-width: 0; margin: 0; }
+.demo-workbench .workbench-preview, .demo-workbench .workbench-json, .demo-workbench .workbench-options { display: none; }
+.demo-workbench[data-panel="preview"] .workbench-preview,
+.demo-workbench[data-panel="json"] .workbench-json,
+.demo-workbench[data-panel="options"] .workbench-options { display: block; }
+.workbench-options { padding: 1rem; background: var(--viewstem-card); }
+.workbench-status { display: flex; flex-wrap: wrap; gap: .25rem 1rem; min-height: 1.25rem; margin-top: .5rem; font-size: .75rem; line-height: 1.5; color: var(--viewstem-muted-foreground); }
+.workbench-status p { margin: 0; }
+.workbench-status p:empty { display: none; }
+@container (min-width: 42rem) {
+  .demo-workbench[data-has-options="true"] .workbench-body { display: grid; grid-template-columns: minmax(0, 1fr) 16rem; align-items: stretch; }
+  .demo-workbench[data-has-options="true"] .workbench-options { display: block; grid-column: 2; grid-row: 1; border-left: 1px solid var(--viewstem-border); }
+  .workbench-preview, .workbench-json { grid-column: 1; grid-row: 1; }
+  .demo-workbench .workbench-options-tab { display: none; }
+}
+@media (scripting: none) {
+  .demo-workbench .workbench-json { display: block; }
+  .demo-workbench .workbench-preview, .demo-workbench .workbench-options, .workbench-toolbar, .workbench-status { display: none !important; }
+  .demo-workbench[data-has-options="true"] .workbench-body { display: block; }
+}

@@ -1,0 +1,38 @@
+/* ScrollArea owns the viewport and scrollbar; these rules only size its hosts. */
+.site-scroll-area { min-width: 0; min-height: 0; max-height: inherit; }
+.site-scroll-area > [data-slot="scroll-area-viewport"] { max-height: inherit; overscroll-behavior: contain; }
+/* Allow SSR navigation before Bits UI has registered its scrollbars. */
+[data-site-scroll="vertical"] > [data-slot="scroll-area-viewport"] { overflow-y: auto !important; overflow-x: hidden !important; }
+[data-site-scroll="both"] > [data-slot="scroll-area-viewport"] { overflow: auto !important; }
+[data-site-scroll="horizontal"] > [data-slot="scroll-area-viewport"] { overflow-x: auto !important; }
+.site-scroll-area > [data-slot="scroll-area-viewport"] > div { min-width: 100%; }
+.source-scroll pre, .content-scroll pre, .setup-code pre { overflow: visible !important; }
+.editor-scroll { flex: 1; height: 100%; min-height: 0; }
+.editor-scroll > [data-slot="scroll-area-viewport"] > div { height: 100%; }
+.editor-scroll .cm-editor { min-height: 100%; height: auto !important; }
+.editor-scroll .cm-scroller { overflow: visible; }
+.editor-scroll .editor-host, .editor-scroll [data-editor-host] { height: 100% !important; min-height: 100%; }
+.editor-scroll [data-editor-fallback] { height: auto !important; overflow: visible !important; }
+.preview-scroll { flex: 1; min-height: 0; }
+.preview-scroll [data-example-target] { overflow: visible; }
+.source-scroll { max-height: 30rem; background: var(--viewstem-muted); }
+.content-scroll { max-width: 100%; }
+.content-scroll table { display: table; overflow: visible; }
+.content-scroll .expressive-code { margin-block: 0; }
+.content-scroll .expressive-code pre { max-height: none; }
+
+#starlight__sidebar { overflow: hidden; scrollbar-gutter: auto; }
+.site-sidebar-scroll { height: 100%; }
+.site-sidebar-scroll > [data-slot="scroll-area-viewport"] > div { padding: 1rem var(--site-sidebar-pad-x); }
+@media (min-width: 50rem) {
+  #starlight__sidebar .sidebar-content { height: 100%; padding: 0; }
+  [data-docs-sidebar], [data-docs-sidebar] > astro-island { display: block; height: 100%; min-height: 0; }
+}
+@media (min-width: 72rem) {
+  .right-sidebar { overflow: hidden !important; }
+  .toc-scroll { max-height: calc(100dvh - var(--sl-nav-height) - 2rem); }
+}
+@media (max-width: 47rem) {
+  .example-instructions-scroll { max-height: none; }
+  .preview-scroll { max-height: 32rem; }
+}

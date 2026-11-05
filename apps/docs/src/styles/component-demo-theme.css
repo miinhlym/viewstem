@@ -1,0 +1,38 @@
+/* Preserve the pinned shadcn-svelte Neutral defaults, including body portals.
+   Site branding must not redefine the components being documented. */
+html:has([data-component-demo]) :is([data-viewstem-shadcn], .viewstem-shadcn-root):not(.masthead *) {
+  --viewstem-background: initial;
+  --viewstem-foreground: initial;
+  --viewstem-card: initial;
+  --viewstem-card-foreground: initial;
+  --viewstem-popover: initial;
+  --viewstem-popover-foreground: initial;
+  --viewstem-primary: initial;
+  --viewstem-primary-foreground: initial;
+  --viewstem-secondary: initial;
+  --viewstem-secondary-foreground: initial;
+  --viewstem-muted: initial;
+  --viewstem-muted-foreground: initial;
+  --viewstem-accent: initial;
+  --viewstem-accent-foreground: initial;
+  --viewstem-destructive: initial;
+  --viewstem-border: initial;
+  --viewstem-input: initial;
+  --viewstem-ring: initial;
+  --viewstem-chart-1: initial;
+  --viewstem-chart-2: initial;
+  --viewstem-chart-3: initial;
+  --viewstem-chart-4: initial;
+  --viewstem-chart-5: initial;
+  --viewstem-radius: initial;
+  --viewstem-sidebar: initial;
+  --viewstem-sidebar-foreground: initial;
+  --viewstem-sidebar-primary: initial;
+  --viewstem-sidebar-primary-foreground: initial;
+  --viewstem-sidebar-accent: initial;
+  --viewstem-sidebar-accent-foreground: initial;
+  --viewstem-sidebar-border: initial;
+  --viewstem-sidebar-ring: initial;
+}
+.component-demo { --demo-background: oklch(1 0 0); --demo-foreground: oklch(0.145 0 0); }
+[data-theme="dark"] .component-demo { --demo-background: oklch(0.145 0 0); --demo-foreground: oklch(0.985 0 0); }

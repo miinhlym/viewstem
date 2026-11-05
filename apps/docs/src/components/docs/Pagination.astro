@@ -1,0 +1,15 @@
+---
+import PagePagination from '../PagePagination.astro';
+
+const { dir, pagination, locale } = Astro.locals.starlightRoute;
+---
+
+<PagePagination
+  class="docs-pagination print:hidden"
+  {dir}
+  previous={pagination.prev || undefined}
+  next={pagination.next || undefined}
+  previousLabel={Astro.locals.t('page.previousLink')}
+  nextLabel={Astro.locals.t('page.nextLink')}
+  label={locale === 'ko' ? '문서 탐색' : 'Documentation navigation'}
+/>

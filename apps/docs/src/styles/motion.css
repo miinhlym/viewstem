@@ -1,0 +1,63 @@
+:root {
+  --motion-quick: 140ms;
+  --motion-panel: 200ms;
+  --motion-ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+@keyframes site-panel-enter {
+  from { opacity: .6; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes site-feedback-enter {
+  from { opacity: .5; }
+  to { opacity: 1; }
+}
+@keyframes site-target-highlight {
+  from { background-color: var(--viewstem-secondary); }
+  to { background-color: transparent; }
+}
+@keyframes site-status-emphasis {
+  from { color: var(--viewstem-primary); }
+  to { color: var(--viewstem-muted-foreground); }
+}
+
+/* Restrict transitions to paint/transform; responsive typography must not tween. */
+.masthead [data-slot="button"], .hero-actions [data-slot="button"],
+.preview-toolbar [data-slot="toggle-group-item"],
+.integration-actions [data-slot="button"], .examples-heading [data-slot="button"], .guide-link h3,
+.page-pagination strong, #starlight__sidebar a, .example-nav a,
+.example-files button, .home-footer a {
+  transition-property: color, background-color, border-color, text-decoration-color;
+  transition-duration: var(--motion-quick);
+  transition-timing-function: var(--motion-ease);
+}
+.guide-link svg, .page-pagination svg, .hero-actions [data-icon="inline-end"] {
+  transition: transform var(--motion-panel) var(--motion-ease);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .guide-link:is(:hover, :focus-visible) svg,
+  .page-pagination a[rel="next"]:is(:hover, :focus-visible) svg,
+  .hero-actions a:is(:hover, :focus-visible) [data-icon="inline-end"] { transform: translateX(3px); }
+  .page-pagination a[rel="prev"]:is(:hover, :focus-visible) svg { transform: translateX(-3px); }
+
+  site-search dialog[open], .example-nav:popover-open {
+    animation: site-panel-enter var(--motion-panel) var(--motion-ease);
+  }
+  site-search dialog[open]::backdrop { animation: site-feedback-enter var(--motion-panel) ease-out; }
+  .sl-markdown-content :is(h2, h3):target { animation: site-target-highlight 900ms ease-out; }
+  .example-preview [data-example-status]:not([hidden]),
+  .example-preview [data-example-running]:not([hidden]),
+  .playground-page .result-content > [role="alert"] { animation: site-feedback-enter var(--motion-panel) ease-out; }
+  .playground-page .run-status:not(:empty) { animation: site-status-emphasis 480ms ease-out; }
+
+  @media (width < 50rem) {
+    [data-mobile-menu-expanded] #starlight__sidebar { animation: site-panel-enter var(--motion-panel) var(--motion-ease); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Also cover animations inherited from site UI dependencies. */
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

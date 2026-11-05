@@ -1,0 +1,72 @@
+---
+import ScrollEnhancements from './site/ScrollEnhancements.astro';
+import { Icon } from '@astrojs/starlight/components';
+import Button from './site/Button.svelte';
+import { copy } from './home-content';
+import MobileNavigation from './site/MobileNavigation.svelte';
+import ThemeControl from './ThemeControl.astro';
+import type { ExampleId } from '../examples/definitions';
+import '../styles/header.css';
+
+interface Props {
+  locale: 'en' | 'ko';
+  page?: 'home' | 'playground' | 'examples' | 'docs';
+  as?: 'header' | 'div';
+  alternateHref?: string;
+  example?: ExampleId | undefined;
+}
+
+const { locale, page = 'home', example, as: Tag = 'header', alternateHref } = Astro.props;
+const korean = locale === 'ko';
+const text = copy[locale];
+const home = korean ? '/ko/' : '/';
+const docs = `${home}docs/`;
+const alternateHome = korean ? '/' : '/ko/';
+const section = page === 'home' ? '' : `${page}/`;
+const alternate = alternateHref ?? `${alternateHome}${section}${example ? `${example}/` : ''}`;
+const repo = 'https://github.com/miinhlym/viewstem';
+const navigation = [
+  { label: text.docs, href: docs, current: page === 'docs' },
+  { label: text.navExamples, href: `${home}examples/`, current: page === 'examples' },
+  { label: text.navPlayground, href: `${home}playground/`, current: page === 'playground' },
+];
+---
+
+<Tag class:list={["masthead", { "masthead-docs": page === "docs" }]}>
+  <div class="masthead-inner">
+    <a class="brand" href={home}>
+      <picture class="brand-light">
+        <source media="(max-width: 28rem)" srcset="/brand/viewstem-mark.svg" width="48" height="48" />
+        <img src="/brand/viewstem-logo.svg" width="226" height="48" alt="Viewstem" />
+      </picture>
+      <picture class="brand-dark">
+        <source media="(max-width: 28rem)" srcset="/brand/viewstem-mark.svg" width="48" height="48" />
+        <img src="/brand/viewstem-logo-dark.svg" width="226" height="48" alt="Viewstem" />
+      </picture>
+    </a>
+    <nav class="masthead-nav" aria-label={text.nav}>
+      <div class="masthead-links">
+        {navigation.map(link => <Button href={link.href} variant="ghost" aria-current={link.current ? 'page' : undefined}>{link.label}</Button>)}
+      </div>
+      <div class="masthead-mobile"><MobileNavigation locale={locale} label={text.nav} links={navigation} client:load /></div>
+      <div class="masthead-tools">
+        <slot name="docs-tools" />
+        <ThemeControl {locale} />
+        <Button class="github-link" href={repo} variant="ghost" size="icon" aria-label="GitHub">
+          <Icon name="github" size="1.15rem" />
+        </Button>
+        <Button class="language" variant="ghost" href={alternate} lang={korean ? 'en' : 'ko'} hreflang={korean ? 'en' : 'ko'} aria-label={korean ? 'English' : '한국어'}>
+          <Icon name="translate" size="1rem" />
+          <span class="language-name">{korean ? 'English' : '한국어'}</span>
+          <span class="language-short" aria-hidden="true">{korean ? 'EN' : 'KO'}</span>
+        </Button>
+      </div>
+    </nav>
+  </div>
+</Tag>
+
+<script>
+  import '../lib/site-motion';
+</script>
+
+<ScrollEnhancements />

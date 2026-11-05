@@ -1,10 +1,13 @@
 /context-archive/
 
 /node_modules/
+/apps/docs/.astro/
+/apps/docs/.wrangler/
+/apps/docs/dist/
+/apps/docs/node_modules/
 /packages/*/dist/
 /packages/*/node_modules/
 /packages/core/test/results/
-
 
 /packages/svelte/test/results/
 /packages/svelte/.svelte-kit/
@@ -12,3 +15,7 @@
 packages/svelte-ui/.type-cache/
 /packages/svelte-ui/test/results/
 /packages/svelte-ui/.svelte-kit/
+
+/apps/docs/src/styles/shadcn.generated.css
+/apps/docs/src/styles/playground.generated.css
+/apps/docs/src/styles/example-preview.generated.css

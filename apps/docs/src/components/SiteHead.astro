@@ -1,0 +1,19 @@
+---
+import '../styles/site.css';
+import ThemeInit from './ThemeInit.astro';
+import FontPreload from './FontPreload.astro';
+interface Props {
+  locale: 'en' | 'ko';
+  title: string;
+  description: string;
+  fontText?: string;
+}
+const { locale, title, description, fontText = title } = Astro.props;
+---
+<ThemeInit />
+<FontPreload text={fontText} {locale} />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content={description} />
+<link rel="icon" type="image/svg+xml" href="/brand/viewstem-mark.svg" />
+<title>{title}</title>

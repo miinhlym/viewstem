@@ -8,6 +8,7 @@
     "isolatedModules": true,
     "resolveJsonModule": true,
     "skipLibCheck": false,
+    "types": ["svelte"],
     "lib": ["ES2022", "DOM", "DOM.Iterable"]
   },
   "include": ["src/**/*.ts", "src/**/*.svelte", "test/types/**/*.ts", "test/types/**/*.svelte"]
