@@ -1,0 +1,724 @@
+{
+  "origin": "http://127.0.0.1:4323",
+  "expected": 8,
+  "viewportHeight": 1000,
+  "baseline": {
+    "browser": "Chromium",
+    "source": "React static build before migration",
+    "screenshots": [
+      "baseline/playground-320-dark.png",
+      "baseline/playground-1440-light.png"
+    ],
+    "rectFormat": [
+      "x",
+      "y",
+      "width",
+      "height"
+    ],
+    "emptyLayout": {
+      "320": {
+        "toolbar": [
+          0,
+          59.390625,
+          320,
+          43.375
+        ],
+        "editor": [
+          0,
+          102.765625,
+          320,
+          448.109375
+        ],
+        "preview": [
+          0,
+          551.875,
+          320,
+          448.125
+        ],
+        "editorTitle": [
+          0,
+          102.765625,
+          320,
+          40
+        ],
+        "editorHost": [
+          0,
+          142.765625,
+          320,
+          408.109375
+        ],
+        "handle": [
+          0,
+          550.875,
+          320,
+          1
+        ]
+      },
+      "1440": {
+        "toolbar": [
+          0,
+          65,
+          1440,
+          43.375
+        ],
+        "editor": [
+          0,
+          108.375,
+          719.5,
+          891.625
+        ],
+        "preview": [
+          720.5,
+          108.375,
+          719.5,
+          891.625
+        ],
+        "editorTitle": [
+          0,
+          108.375,
+          719.5,
+          40
+        ],
+        "editorHost": [
+          0,
+          148.375,
+          719.5,
+          851.625
+        ],
+        "handle": [
+          719.5,
+          108.375,
+          1,
+          891.625
+        ]
+      }
+    },
+    "keyboardSizes": [
+      50,
+      55,
+      75,
+      25
+    ]
+  },
+  "checked": 8,
+  "cases": [
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 320,
+      "pageErrors": [],
+      "failedRequests": [],
+      "emptyLayout": {
+        "toolbar": [
+          0,
+          59.390625,
+          320,
+          43.375
+        ],
+        "editor": [
+          0,
+          102.765625,
+          320,
+          448.109375
+        ],
+        "preview": [
+          0,
+          551.875,
+          320,
+          448.125
+        ],
+        "editorTitle": [
+          0,
+          102.765625,
+          320,
+          40
+        ],
+        "editorHost": [
+          0,
+          142.765625,
+          320,
+          408.109375
+        ],
+        "handle": [
+          0,
+          550.875,
+          320,
+          1
+        ]
+      },
+      "baselineLayoutMatches": true,
+      "initialEditorColors": [
+        "oklch(1 0 0)",
+        "oklch(0.97 0 0)"
+      ],
+      "gutterWidth": 30,
+      "keyboardSizes": [
+        50,
+        55,
+        75,
+        25
+      ],
+      "pointer": {
+        "input": "touch",
+        "size": 33
+      },
+      "runtimeError": "REFERENCE_NOT_FOUND",
+      "starter": true,
+      "dirtyStatus": true,
+      "jsonError": true,
+      "shapeError": true,
+      "runShortcut": true,
+      "resizePreservesPreview": true,
+      "themeUpdatesEditor": true,
+      "languageRestoresDraftWithoutRunning": true,
+      "clearRemovesStoredDraft": true
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1440,
+      "pageErrors": [],
+      "failedRequests": [],
+      "emptyLayout": {
+        "toolbar": [
+          0,
+          65,
+          1440,
+          43.375
+        ],
+        "editor": [
+          0,
+          108.375,
+          719.5,
+          891.625
+        ],
+        "preview": [
+          720.5,
+          108.375,
+          719.5,
+          891.625
+        ],
+        "editorTitle": [
+          0,
+          108.375,
+          719.5,
+          40
+        ],
+        "editorHost": [
+          0,
+          148.375,
+          719.5,
+          851.625
+        ],
+        "handle": [
+          719.5,
+          108.375,
+          1,
+          891.625
+        ]
+      },
+      "baselineLayoutMatches": true,
+      "initialEditorColors": [
+        "oklch(1 0 0)",
+        "oklch(0.97 0 0)"
+      ],
+      "gutterWidth": 30,
+      "keyboardSizes": [
+        50,
+        55,
+        75,
+        25
+      ],
+      "pointer": {
+        "input": "mouse",
+        "size": 30
+      },
+      "runtimeError": "REFERENCE_NOT_FOUND",
+      "starter": true,
+      "dirtyStatus": true,
+      "jsonError": true,
+      "shapeError": true,
+      "runShortcut": true,
+      "resizePreservesPreview": true,
+      "themeUpdatesEditor": true,
+      "languageRestoresDraftWithoutRunning": true,
+      "clearRemovesStoredDraft": true
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 320,
+      "pageErrors": [],
+      "failedRequests": [],
+      "emptyLayout": {
+        "toolbar": [
+          0,
+          59.390625,
+          320,
+          43.375
+        ],
+        "editor": [
+          0,
+          102.765625,
+          320,
+          448.109375
+        ],
+        "preview": [
+          0,
+          551.875,
+          320,
+          448.125
+        ],
+        "editorTitle": [
+          0,
+          102.765625,
+          320,
+          40
+        ],
+        "editorHost": [
+          0,
+          142.765625,
+          320,
+          408.109375
+        ],
+        "handle": [
+          0,
+          550.875,
+          320,
+          1
+        ]
+      },
+      "baselineLayoutMatches": true,
+      "initialEditorColors": [
+        "oklch(0.145 0 0)",
+        "oklch(0.269 0 0)"
+      ],
+      "gutterWidth": 30,
+      "keyboardSizes": [
+        50,
+        55,
+        75,
+        25
+      ],
+      "pointer": {
+        "input": "touch",
+        "size": 33
+      },
+      "runtimeError": "REFERENCE_NOT_FOUND",
+      "starter": true,
+      "dirtyStatus": true,
+      "jsonError": true,
+      "shapeError": true,
+      "runShortcut": true,
+      "resizePreservesPreview": true,
+      "themeUpdatesEditor": true,
+      "languageRestoresDraftWithoutRunning": true,
+      "clearRemovesStoredDraft": true
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1440,
+      "pageErrors": [],
+      "failedRequests": [],
+      "emptyLayout": {
+        "toolbar": [
+          0,
+          65,
+          1440,
+          43.375
+        ],
+        "editor": [
+          0,
+          108.375,
+          719.5,
+          891.625
+        ],
+        "preview": [
+          720.5,
+          108.375,
+          719.5,
+          891.625
+        ],
+        "editorTitle": [
+          0,
+          108.375,
+          719.5,
+          40
+        ],
+        "editorHost": [
+          0,
+          148.375,
+          719.5,
+          851.625
+        ],
+        "handle": [
+          719.5,
+          108.375,
+          1,
+          891.625
+        ]
+      },
+      "baselineLayoutMatches": true,
+      "initialEditorColors": [
+        "oklch(0.145 0 0)",
+        "oklch(0.269 0 0)"
+      ],
+      "gutterWidth": 30,
+      "gutterFont": "D2Coding",
+      "keyboardSizes": [
+        50,
+        55,
+        75,
+        25
+      ],
+      "pointer": {
+        "input": "mouse",
+        "size": 30
+      },
+      "runtimeError": "REFERENCE_NOT_FOUND",
+      "starter": true,
+      "dirtyStatus": true,
+      "jsonError": true,
+      "shapeError": true,
+      "runShortcut": true,
+      "resizePreservesPreview": true,
+      "themeUpdatesEditor": true,
+      "languageRestoresDraftWithoutRunning": true,
+      "clearRemovesStoredDraft": true
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 320,
+      "pageErrors": [],
+      "failedRequests": [],
+      "emptyLayout": {
+        "toolbar": [
+          0,
+          59.390625,
+          320,
+          43.375
+        ],
+        "editor": [
+          0,
+          102.765625,
+          320,
+          448.109375
+        ],
+        "preview": [
+          0,
+          551.875,
+          320,
+          448.125
+        ],
+        "editorTitle": [
+          0,
+          102.765625,
+          320,
+          40
+        ],
+        "editorHost": [
+          0,
+          142.765625,
+          320,
+          408.109375
+        ],
+        "handle": [
+          0,
+          550.875,
+          320,
+          1
+        ]
+      },
+      "baselineLayoutMatches": true,
+      "initialEditorColors": [
+        "oklch(1 0 0)",
+        "oklch(0.97 0 0)"
+      ],
+      "gutterWidth": 30,
+      "keyboardSizes": [
+        50,
+        55,
+        75,
+        25
+      ],
+      "pointer": {
+        "input": "touch",
+        "size": 33
+      },
+      "runtimeError": "REFERENCE_NOT_FOUND",
+      "starter": true,
+      "dirtyStatus": true,
+      "jsonError": true,
+      "shapeError": true,
+      "runShortcut": true,
+      "resizePreservesPreview": true,
+      "themeUpdatesEditor": true,
+      "languageRestoresDraftWithoutRunning": true,
+      "clearRemovesStoredDraft": true
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 1440,
+      "pageErrors": [],
+      "failedRequests": [],
+      "emptyLayout": {
+        "toolbar": [
+          0,
+          65,
+          1440,
+          43.375
+        ],
+        "editor": [
+          0,
+          108.375,
+          719.5,
+          891.625
+        ],
+        "preview": [
+          720.5,
+          108.375,
+          719.5,
+          891.625
+        ],
+        "editorTitle": [
+          0,
+          108.375,
+          719.5,
+          40
+        ],
+        "editorHost": [
+          0,
+          148.375,
+          719.5,
+          851.625
+        ],
+        "handle": [
+          719.5,
+          108.375,
+          1,
+          891.625
+        ]
+      },
+      "baselineLayoutMatches": true,
+      "initialEditorColors": [
+        "oklch(1 0 0)",
+        "oklch(0.97 0 0)"
+      ],
+      "gutterWidth": 30,
+      "gutterFont": "D2Coding",
+      "keyboardSizes": [
+        50,
+        55,
+        75,
+        25
+      ],
+      "pointer": {
+        "input": "mouse",
+        "size": 30
+      },
+      "runtimeError": "REFERENCE_NOT_FOUND",
+      "starter": true,
+      "dirtyStatus": true,
+      "jsonError": true,
+      "shapeError": true,
+      "runShortcut": true,
+      "resizePreservesPreview": true,
+      "themeUpdatesEditor": true,
+      "languageRestoresDraftWithoutRunning": true,
+      "clearRemovesStoredDraft": true
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 320,
+      "pageErrors": [],
+      "failedRequests": [],
+      "emptyLayout": {
+        "toolbar": [
+          0,
+          59.390625,
+          320,
+          43.375
+        ],
+        "editor": [
+          0,
+          102.765625,
+          320,
+          448.109375
+        ],
+        "preview": [
+          0,
+          551.875,
+          320,
+          448.125
+        ],
+        "editorTitle": [
+          0,
+          102.765625,
+          320,
+          40
+        ],
+        "editorHost": [
+          0,
+          142.765625,
+          320,
+          408.109375
+        ],
+        "handle": [
+          0,
+          550.875,
+          320,
+          1
+        ]
+      },
+      "baselineLayoutMatches": true,
+      "initialEditorColors": [
+        "oklch(0.145 0 0)",
+        "oklch(0.269 0 0)"
+      ],
+      "gutterWidth": 30,
+      "keyboardSizes": [
+        50,
+        55,
+        75,
+        25
+      ],
+      "pointer": {
+        "input": "touch",
+        "size": 33
+      },
+      "runtimeError": "REFERENCE_NOT_FOUND",
+      "starter": true,
+      "dirtyStatus": true,
+      "jsonError": true,
+      "shapeError": true,
+      "runShortcut": true,
+      "resizePreservesPreview": true,
+      "themeUpdatesEditor": true,
+      "languageRestoresDraftWithoutRunning": true,
+      "clearRemovesStoredDraft": true
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 1440,
+      "pageErrors": [],
+      "failedRequests": [],
+      "emptyLayout": {
+        "toolbar": [
+          0,
+          65,
+          1440,
+          43.375
+        ],
+        "editor": [
+          0,
+          108.375,
+          719.5,
+          891.625
+        ],
+        "preview": [
+          720.5,
+          108.375,
+          719.5,
+          891.625
+        ],
+        "editorTitle": [
+          0,
+          108.375,
+          719.5,
+          40
+        ],
+        "editorHost": [
+          0,
+          148.375,
+          719.5,
+          851.625
+        ],
+        "handle": [
+          719.5,
+          108.375,
+          1,
+          891.625
+        ]
+      },
+      "baselineLayoutMatches": true,
+      "initialEditorColors": [
+        "oklch(0.145 0 0)",
+        "oklch(0.269 0 0)"
+      ],
+      "gutterWidth": 31.4375,
+      "gutterFont": "Menlo",
+      "keyboardSizes": [
+        50,
+        55,
+        75,
+        25
+      ],
+      "pointer": {
+        "input": "mouse",
+        "size": 30
+      },
+      "runtimeError": "REFERENCE_NOT_FOUND",
+      "starter": true,
+      "dirtyStatus": true,
+      "jsonError": true,
+      "shapeError": true,
+      "runShortcut": true,
+      "resizePreservesPreview": true,
+      "themeUpdatesEditor": true,
+      "languageRestoresDraftWithoutRunning": true,
+      "clearRemovesStoredDraft": true
+    }
+  ],
+  "noJavaScript": [
+    {
+      "locale": "en",
+      "text": "Enable JavaScript to run the preview.",
+      "visible": true,
+      "quickstart": true
+    },
+    {
+      "locale": "ko",
+      "text": "실행 결과를 보려면 JavaScript를 켜세요.",
+      "visible": true,
+      "quickstart": true
+    }
+  ],
+  "screenshots": [
+    {
+      "baseline": "baseline/playground-320-dark.png",
+      "after": "after/playground-320-dark.png",
+      "region": {
+        "left": 0,
+        "top": 60,
+        "width": 320,
+        "height": 940
+      },
+      "differingPixels": 0,
+      "totalPixels": 300800
+    },
+    {
+      "baseline": "baseline/playground-1440-light.png",
+      "after": "after/playground-1440-light.png",
+      "region": {
+        "left": 0,
+        "top": 65,
+        "width": 1440,
+        "height": 935
+      },
+      "differingPixels": 2904,
+      "totalPixels": 1346400,
+      "differingPixelsBySection": {
+        "toolbar": 205,
+        "panelTitles": 543,
+        "editor": 1754,
+        "preview": 402
+      }
+    }
+  ],
+  "failures": []
+}

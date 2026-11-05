@@ -1,0 +1,38 @@
+
+> @viewstem/core@0.1.0 typecheck
+> tsc -p test/types/tsconfig.json
+
+
+> @viewstem/svelte@0.1.0 typecheck
+> svelte-check --tsconfig ./tsconfig.json --fail-on-warnings && svelte-check --tsconfig ./example/tsconfig.json --fail-on-warnings
+
+Loading svelte-check in workspace: /Users/minholim/dev/minh/viewstem/packages/svelte
+Getting Svelte diagnostics...
+
+svelte-check found 0 errors and 0 warnings
+Loading svelte-check in workspace: /Users/minholim/dev/minh/viewstem/packages/svelte
+Getting Svelte diagnostics...
+
+svelte-check found 0 errors and 0 warnings
+
+> @viewstem/svelte-ui@0.1.0 typecheck
+> svelte-check --tsconfig ./tsconfig.json --fail-on-warnings
+
+Loading svelte-check in workspace: /Users/minholim/dev/minh/viewstem/packages/svelte-ui
+Getting Svelte diagnostics...
+
+svelte-check found 0 errors and 0 warnings
+
+> typecheck
+> astro check && tsc --noEmit -p tsconfig.json
+
+[astro] `markdown.remarkPlugins`, `markdown.rehypePlugins`, and `markdown.remarkRehype` are deprecated. Pass them to `unified({...})` from `@astrojs/markdown-remark` directly instead.
+20:33:48 [content] Syncing content
+20:33:48 [content] Synced content
+20:33:48 [types] Generated 496ms
+20:33:48 [check] Getting diagnostics for Astro files in /Users/minholim/dev/minh/viewstem/apps/docs...
+Result (96 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+

@@ -1,0 +1,98 @@
+{
+  "date": "2026-11-05",
+  "scope": "Public library documentation website; Korean and English. No runtime contract changes or publication.",
+  "review": {
+    "method": "Adapted EGM fresh-context personas; three initial reviews and one independent post-fix review. Not the full design-document workflow or a claim of two clean rounds.",
+    "remainingBlockerOrMajorFindings": 0,
+    "coverage": "See review.md for detailed reading versus inventory and source-review boundaries."
+  },
+  "build": {
+    "status": "passed",
+    "command": "Astro build in apps/docs using already-built workspace packages",
+    "generatedPages": 331,
+    "indexedHtmlFiles": 335
+  },
+  "static": {
+    "htmlPages": 335,
+    "localizedPagePairs": 123,
+    "familyPages": 132,
+    "checkedLinks": 29146,
+    "errors": []
+  },
+  "uiReference": {
+    "generatorCheck": "passed",
+    "typedSnippets": 150,
+    "typeErrors": 0,
+    "typeWarnings": 0,
+    "chromiumChecks": 34,
+    "preservedPartAnchorsPerLocale": 357,
+    "preservedInputNamesPerLocale": 34133,
+    "evidence": "Implementation agent execution report; generator and static checks independently completed by main agent."
+  },
+  "taskGuides": {
+    "executedMarkdownScripts": 4,
+    "chromiumResult": "passed",
+    "pageErrors": 0,
+    "externalRequests": 0,
+    "scenarios": [
+      "Form invalid / valid / whitespace input and untrimmed stored value",
+      "Query initial success / pending / month success / HTTP_ERROR with stale data / recovery"
+    ],
+    "http": "Injected public transport mock; no live backend tested."
+  },
+  "browser": {
+    "engine": "Chromium",
+    "mobile": {
+      "viewport": 320,
+      "theme": "dark",
+      "pages": 246,
+      "horizontalPageOverflow": 0,
+      "evidence": "mobile-verification.json"
+    },
+    "desktop": {
+      "viewport": 1440,
+      "theme": "light",
+      "pages": 20,
+      "horizontalPageOverflow": 0,
+      "evidence": "desktop-verification.json"
+    },
+    "flowsPassed": [
+      "Mobile menu current page, Escape dismissal and focus return",
+      "Overflowing table keyboard scrolling",
+      "Light / dark / system selection and live OS preference changes",
+      "Theme preserved through docs, examples and playground",
+      "Korean and English search",
+      "Language switch preserves documentation path",
+      "Deep link opens nested details",
+      "Theme select disabled without JavaScript",
+      "Reduced-motion menu",
+      "Family pagination follows catalog order"
+    ],
+    "consoleErrors": 0
+  },
+  "types": {
+    "changedAstroClientScripts": {
+      "strictDiagnostics": 0
+    },
+    "wholeSite": {
+      "status": "passed",
+      "command": "npm run typecheck:docs",
+      "checks": [
+        "astro check",
+        "tsc --noEmit -p tsconfig.json"
+      ],
+      "astroCheckedFiles": 41,
+      "errors": 0,
+      "warnings": 0,
+      "hints": 0,
+      "previousFailure": "TS18048 in Starlight 0.39.3 resolved by versioned dependency patch; see typecheck-verification.json."
+    }
+  },
+  "limitations": [
+    "All 246 documentation pages received mobile layout metrics checks, not a complete manual reading of every page.",
+    "No Firefox or WebKit execution.",
+    "All UI contract names were preserved; not every component behavior was executed.",
+    "BFCache observer reconnection was reviewed in source; no dedicated browser BFCache reproduction."
+  ],
+  "preview": "http://localhost:4321/ko/docs/svelte-ui/components/button/"
+}

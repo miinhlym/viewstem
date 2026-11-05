@@ -1,0 +1,463 @@
+{
+  "date": "2026-11-05",
+  "environment": "macOS in-app browser; live dev functional checks and final static build",
+  "audit": {
+    "filter": {
+      "state": "\"all\"",
+      "rows": 3,
+      "animations": [
+        {
+          "target": "TR",
+          "duration": 240,
+          "delay": 0
+        },
+        {
+          "target": "OUTPUT",
+          "duration": 420,
+          "delay": 0
+        },
+        {
+          "target": "SPAN",
+          "duration": 240,
+          "delay": 0
+        },
+        {
+          "target": "H3",
+          "duration": 420,
+          "delay": 0
+        },
+        {
+          "target": "H3",
+          "duration": 420,
+          "delay": 90
+        },
+        {
+          "target": "H3",
+          "duration": 420,
+          "delay": 180
+        },
+        {
+          "target": "H3",
+          "duration": 420,
+          "delay": 270
+        }
+      ]
+    },
+    "reducedDuringMotion": {
+      "reduced": true,
+      "animations": 5,
+      "entry": [
+        {
+          "opacity": "1",
+          "transform": "none"
+        },
+        {
+          "opacity": "1",
+          "transform": "none"
+        },
+        {
+          "opacity": "1",
+          "transform": "none"
+        }
+      ]
+    },
+    "reducedFilter": {
+      "rows": 2,
+      "state": "\"active\"",
+      "animations": 0
+    },
+    "reducedAfterMediaEvent": {
+      "reduced": true,
+      "animations": 0
+    },
+    "rapid": {
+      "state": "\"all\"",
+      "rows": 3,
+      "headingAnimations": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "settled": {
+      "animations": 0,
+      "inlineStyles": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    "entryFirst": {
+      "count": 1,
+      "frames": [
+        {
+          "opacity": "0.65",
+          "transform": "translateY(6px)"
+        },
+        {
+          "opacity": "1",
+          "transform": "translateY(0px)"
+        }
+      ]
+    },
+    "entryRepeat": {
+      "count": 0
+    },
+    "mobileMenu": {
+      "expanded": "true",
+      "inert": true,
+      "animation": "site-panel-enter",
+      "duration": "0.2s"
+    },
+    "menuEscape": {
+      "expanded": "false",
+      "inert": false,
+      "focused": true
+    },
+    "search": {
+      "open": true,
+      "animation": "site-panel-enter",
+      "duration": "0.2s"
+    },
+    "reducedMenu": {
+      "animation": "none",
+      "expanded": "true"
+    },
+    "noScript": {
+      "title": "화면과 동작을 JSON으로 정의하세요. ",
+      "visible": [
+        {
+          "opacity": "1",
+          "visibility": "visible",
+          "display": "block"
+        },
+        {
+          "opacity": "1",
+          "visibility": "visible",
+          "display": "block"
+        },
+        {
+          "opacity": "1",
+          "visibility": "visible",
+          "display": "block"
+        }
+      ],
+      "filterHidden": true
+    },
+    "exampleResult": {
+      "text": "안녕, Viewstem",
+      "animations": [
+        {
+          "duration": 180,
+          "frames": [
+            "0.65",
+            "1"
+          ]
+        }
+      ]
+    },
+    "exampleError": {
+      "message": "예제를 실행하지 못했습니다. view.json · Expected property name or '}' in JSON at position 1 (line 1 column 2) 마지막으로 성공한 결과를 표시합니다.",
+      "animation": "site-feedback-enter",
+      "retained": "안녕, Viewstem"
+    },
+    "exampleMenu": {
+      "open": true,
+      "animation": "site-panel-enter"
+    },
+    "playgroundError": {
+      "animation": "site-feedback-enter",
+      "message": "실행 오류 JSON 문법을 확인한 뒤 다시 실행하세요. Expected property name or '}' in JSON at position 1 (line 1 column 2)"
+    },
+    "playgroundSuccess": {
+      "status": "실행 결과가 갱신되었습니다",
+      "animation": "site-status-emphasis"
+    },
+    "anchor": {
+      "target": "H2",
+      "animation": "site-target-highlight"
+    },
+    "direction": {
+      "focused": "next",
+      "arrow": "matrix(1, 0, 0, 1, 3, 0)",
+      "outline": "solid"
+    },
+    "reducedSearch": {
+      "animation": "none",
+      "open": true
+    },
+    "searchResults": [
+      "계산된 값",
+      "계산된 값",
+      "계산 선언하기",
+      "State와 Derived 선택하기",
+      "리소스와 타입",
+      "리소스와 타입",
+      "리소스 종류 구분하기",
+      "State",
+      "초기값과 지속적인 연결 구분하기",
+      "이벤트와 Action",
+      "단계 순서와 결과",
+      "폼 입력 검증하기",
+      "폼 입력 검증하기"
+    ],
+    "noScriptNormal": {
+      "reduced": false,
+      "visible": true,
+      "animations": 0
+    },
+    "hashEntry": {
+      "hash": "#example",
+      "entryAnimations": 0,
+      "opacity": "1"
+    }
+  },
+  "layout": [
+    {
+      "route": "/",
+      "width": 390,
+      "preference": "no-preference",
+      "scrollWidth": 375,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": false
+    },
+    {
+      "route": "/",
+      "width": 1440,
+      "preference": "no-preference",
+      "scrollWidth": 1425,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": false
+    },
+    {
+      "route": "/ko/",
+      "width": 390,
+      "preference": "no-preference",
+      "scrollWidth": 375,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": false
+    },
+    {
+      "route": "/ko/",
+      "width": 1440,
+      "preference": "no-preference",
+      "scrollWidth": 1425,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": false
+    },
+    {
+      "route": "/docs/concepts/values-and-inputs/",
+      "width": 390,
+      "preference": "no-preference",
+      "scrollWidth": 375,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": false
+    },
+    {
+      "route": "/docs/concepts/values-and-inputs/",
+      "width": 1440,
+      "preference": "no-preference",
+      "scrollWidth": 1425,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": false
+    },
+    {
+      "route": "/ko/docs/concepts/values-and-inputs/",
+      "width": 390,
+      "preference": "no-preference",
+      "scrollWidth": 375,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": false
+    },
+    {
+      "route": "/ko/docs/concepts/values-and-inputs/",
+      "width": 1440,
+      "preference": "no-preference",
+      "scrollWidth": 1425,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": false
+    },
+    {
+      "route": "/ko/examples/first-view/",
+      "width": 390,
+      "preference": "no-preference",
+      "scrollWidth": 375,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": false
+    },
+    {
+      "route": "/ko/examples/first-view/",
+      "width": 1440,
+      "preference": "no-preference",
+      "scrollWidth": 1440,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": false
+    },
+    {
+      "route": "/ko/playground/",
+      "width": 390,
+      "preference": "no-preference",
+      "scrollWidth": 390,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": false
+    },
+    {
+      "route": "/ko/playground/",
+      "width": 1440,
+      "preference": "no-preference",
+      "scrollWidth": 1440,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": false
+    },
+    {
+      "route": "/",
+      "width": 390,
+      "preference": "reduce",
+      "scrollWidth": 375,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": true
+    },
+    {
+      "route": "/",
+      "width": 1440,
+      "preference": "reduce",
+      "scrollWidth": 1425,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": true
+    },
+    {
+      "route": "/ko/",
+      "width": 390,
+      "preference": "reduce",
+      "scrollWidth": 375,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": true
+    },
+    {
+      "route": "/ko/",
+      "width": 1440,
+      "preference": "reduce",
+      "scrollWidth": 1425,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": true
+    },
+    {
+      "route": "/docs/concepts/values-and-inputs/",
+      "width": 390,
+      "preference": "reduce",
+      "scrollWidth": 375,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": true
+    },
+    {
+      "route": "/docs/concepts/values-and-inputs/",
+      "width": 1440,
+      "preference": "reduce",
+      "scrollWidth": 1425,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": true
+    },
+    {
+      "route": "/ko/docs/concepts/values-and-inputs/",
+      "width": 390,
+      "preference": "reduce",
+      "scrollWidth": 375,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": true
+    },
+    {
+      "route": "/ko/docs/concepts/values-and-inputs/",
+      "width": 1440,
+      "preference": "reduce",
+      "scrollWidth": 1425,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": true
+    },
+    {
+      "route": "/ko/examples/first-view/",
+      "width": 390,
+      "preference": "reduce",
+      "scrollWidth": 375,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": true
+    },
+    {
+      "route": "/ko/examples/first-view/",
+      "width": 1440,
+      "preference": "reduce",
+      "scrollWidth": 1440,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": true
+    },
+    {
+      "route": "/ko/playground/",
+      "width": 390,
+      "preference": "reduce",
+      "scrollWidth": 390,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": true
+    },
+    {
+      "route": "/ko/playground/",
+      "width": 1440,
+      "preference": "reduce",
+      "scrollWidth": 1440,
+      "overlap": false,
+      "settledAnimations": 0,
+      "visible": true,
+      "reduced": true
+    }
+  ]
+}

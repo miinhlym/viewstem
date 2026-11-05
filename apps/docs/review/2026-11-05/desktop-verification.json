@@ -1,0 +1,152 @@
+{
+  "viewport": 1440,
+  "theme": "light",
+  "pages": [
+    {
+      "route": "docs/core/runtime/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "docs/core/state-store/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "docs/core/types/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "docs/dsl/queries/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "docs/svelte/renderer/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "docs/svelte-ui/component-sets/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "docs/svelte-ui/components/dialog/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "docs/svelte-ui/components/sonner/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "docs/svelte-ui/components/spinner/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "docs/guides/query-dashboard/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "ko/docs/core/runtime/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "ko/docs/core/state-store/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "ko/docs/core/types/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "ko/docs/dsl/queries/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "ko/docs/svelte/renderer/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "ko/docs/svelte-ui/component-sets/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "ko/docs/svelte-ui/components/dialog/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "ko/docs/svelte-ui/components/sonner/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "ko/docs/svelte-ui/components/spinner/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    },
+    {
+      "route": "ko/docs/guides/query-dashboard/",
+      "scroll": 1425,
+      "theme": "light",
+      "width": 1425
+    }
+  ],
+  "headings": [
+    {
+      "h1": "28.8px",
+      "h2": "22.4px",
+      "h3": "19.2px",
+      "header": 305,
+      "scroll": 305,
+      "width": 320
+    },
+    {
+      "h1": "28.8px",
+      "h2": "22.4px",
+      "h3": "19.2px",
+      "header": 753,
+      "scroll": 753,
+      "width": 768
+    },
+    {
+      "h1": "36px",
+      "h2": "26.4px",
+      "h3": "19.2px",
+      "header": 1425,
+      "scroll": 1425,
+      "width": 1440
+    }
+  ]
+}

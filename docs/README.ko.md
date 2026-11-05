@@ -18,6 +18,7 @@
 | Svelte 앱에 렌더러 연결하기 | [Svelte 패키지 사용법](../packages/svelte/README.ko.md), [실행 예제](../packages/svelte/example/README.ko.md), [구현 인계](handoff/svelte-implementation-2026-11-02.md) |
 | Svelte shadcn UI 등록하기 | [UI 사용법](../packages/svelte-ui/README.ko.md), [U44 구현·검증 인계](handoff/svelte-ui-shadcn-implementation-2026-11-03.md), [66개 카탈로그·386개 부품 목록](handoff/shadcn-component-inventory.json) |
 | 여러 컴포넌트를 결합한 화면 만들기 | [연결 계약](spec/06-composition-examples.md), [UI 사용법](../packages/svelte-ui/README.ko.md) |
+| 사이트 패키지 가이드·API 레퍼런스 확인 | [공식 문서 조사·페이지 구성·검증](handoff/docs-package-reference-2026-11-05.md) |
 | 리소스와 실행 규칙 이해하기 | [전체 계약](VIEWSTEM-SPEC.md) → 아래 주제별 명세 |
 | 기존 core를 수정하고 검증하기 | [현재 작업 시작 절차](handoff/implementation-start.md#새-채팅에서-시작할-때) |
 | 지원 범위와 제한 확인하기 | [구현 인수인계](handoff/core-implementation-2026-11-02.md), [CEL 지원 범위](handoff/core-cel-support.md) |

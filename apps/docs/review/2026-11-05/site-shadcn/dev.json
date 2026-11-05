@@ -1,0 +1,9 @@
+{
+  "origin": "http://localhost:4321",
+  "home": true,
+  "theme": true,
+  "accordion": true,
+  "searchDevelopmentNotice": true,
+  "mobileDocsMenu": true,
+  "errors": []
+}

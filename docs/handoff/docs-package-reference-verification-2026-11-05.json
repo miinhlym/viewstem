@@ -1,0 +1,3969 @@
+{
+  "date": "2026-11-05",
+  "scope": "Bilingual package guides and public API/DSL reference",
+  "coverage": {
+    "core": [
+      {
+        "entry": "@viewstem/core",
+        "name": "Awaitable",
+        "route": "/docs/core/types/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 1
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "JsonValue",
+        "route": "/docs/core/types/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 2
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "Schema",
+        "route": "/docs/dsl/types/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 4
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "TypeContract",
+        "route": "/docs/dsl/types/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 5
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ResourceKind",
+        "route": "/docs/dsl/resources/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 9
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "Resource",
+        "route": "/docs/dsl/resources/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 10
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "PublicError",
+        "route": "/docs/core/runtime/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 11
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "DeepReadonly",
+        "route": "/docs/core/types/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 19
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ValueSnapshot",
+        "route": "/docs/core/state-store/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 24
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "StateAddress",
+        "route": "/docs/core/state-store/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 25
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "StateHandle",
+        "route": "/docs/core/state-store/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 26
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "QuerySnapshot",
+        "route": "/docs/core/view/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 31
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "QueryHandle",
+        "route": "/docs/core/view/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 36
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "StateDeclaration",
+        "route": "/docs/core/state-store/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 38
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "StateScope",
+        "route": "/docs/core/state-store/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 39
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "StoreObservation",
+        "route": "/docs/core/state-store/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 45
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "UrlAdapter",
+        "route": "/docs/core/url/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 49
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "UrlConnection",
+        "route": "/docs/core/url/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 53
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "StateStore",
+        "route": "/docs/core/state-store/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 59
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "createStateStore",
+        "route": "/docs/core/state-store/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 70
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "Clock",
+        "route": "/docs/core/state-store/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 72
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "TimerClock",
+        "route": "/docs/core/runtime/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 74
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ValuePort",
+        "route": "/docs/dsl/state-and-ports/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 76
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "StatePort",
+        "route": "/docs/dsl/state-and-ports/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 77
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "QueryPort",
+        "route": "/docs/dsl/state-and-ports/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 78
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "Port",
+        "route": "/docs/dsl/state-and-ports/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 79
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ChildActionRequest",
+        "route": "/docs/core/registry/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 93
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ActionContext",
+        "route": "/docs/core/registry/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 94
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ActionHandler",
+        "route": "/docs/core/registry/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 95
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "CodeActionSpec",
+        "route": "/docs/core/registry/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 96
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "CodeActionDefinition",
+        "route": "/docs/core/registry/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 97
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ActionSnapshot",
+        "route": "/docs/core/view/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 98
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ValueExpression",
+        "route": "/docs/dsl/values/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 100
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "InputExpressions",
+        "route": "/docs/dsl/values/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 101
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "PathExpression",
+        "route": "/docs/dsl/values/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 102
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ActionSpec",
+        "route": "/docs/dsl/actions/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 103
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ActionCall",
+        "route": "/docs/dsl/actions/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 104
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "Step",
+        "route": "/docs/dsl/actions/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 105
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "HttpRequest",
+        "route": "/docs/dsl/datasources/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 113
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "DatasourceSpec",
+        "route": "/docs/dsl/datasources/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 114
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "QuerySource",
+        "route": "/docs/dsl/queries/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 115
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "TransformStep",
+        "route": "/docs/dsl/queries/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 117
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "QuerySpec",
+        "route": "/docs/dsl/queries/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 118
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "VariableSpec",
+        "route": "/docs/dsl/state-and-ports/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 119
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "QueryUse",
+        "route": "/docs/dsl/queries/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 120
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "QueryDefaults",
+        "route": "/docs/dsl/queries/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 121
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ResourceStateDeclaration",
+        "route": "/docs/dsl/state-and-ports/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 122
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "Reaction",
+        "route": "/docs/dsl/state-and-ports/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 123
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ComponentPublicContract",
+        "route": "/docs/dsl/view-and-component/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 124
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ComponentContract",
+        "route": "/docs/core/registry/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 125
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ComponentSpec",
+        "route": "/docs/dsl/view-and-component/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 126
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ViewSpec",
+        "route": "/docs/dsl/view-and-component/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 127
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ComponentNode",
+        "route": "/docs/dsl/view-and-component/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 128
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ResourceSpecs",
+        "route": "/docs/dsl/resources/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 133
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "AnyResource",
+        "route": "/docs/dsl/resources/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 134
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "RegisteredResource",
+        "route": "/docs/dsl/resources/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 135
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "Registry",
+        "route": "/docs/core/registry/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 137
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "createRegistry",
+        "route": "/docs/core/registry/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 150
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ViewTarget",
+        "route": "/docs/core/runtime/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 151
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "InitialReport",
+        "route": "/docs/core/runtime/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 152
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ApplicationResult",
+        "route": "/docs/core/runtime/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 154
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "NodeSnapshot",
+        "route": "/docs/core/view/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 155
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "ViewSnapshot",
+        "route": "/docs/core/view/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 156
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "RuntimeOptions",
+        "route": "/docs/core/runtime/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 157
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "Runtime",
+        "route": "/docs/core/runtime/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 163
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "createRuntime",
+        "route": "/docs/core/runtime/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 171
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "View",
+        "route": "/docs/core/view/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 172
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "CelValue",
+        "route": "/docs/core/cel/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 182
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "CelFunction",
+        "route": "/docs/core/cel/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 184
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "HttpExecutionPlan",
+        "route": "/docs/core/http/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 185
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "HttpResponse",
+        "route": "/docs/core/http/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 186
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "RequestExecutor",
+        "route": "/docs/core/http/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 187
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "mergeOwnedUrl",
+        "route": "/docs/core/url/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 188
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "GridConfig",
+        "route": "/docs/core/utilities/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 189
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "GridPlacement",
+        "route": "/docs/core/utilities/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 190
+      },
+      {
+        "entry": "@viewstem/core",
+        "name": "computeGridLayout",
+        "route": "/docs/core/utilities/",
+        "source": "packages/core/src/index.d.ts",
+        "line": 191
+      },
+      {
+        "entry": "@viewstem/core/http",
+        "name": "HttpExecutionPlan",
+        "route": "/docs/core/http/",
+        "source": "packages/core/src/http.d.ts",
+        "line": 2
+      },
+      {
+        "entry": "@viewstem/core/http",
+        "name": "HttpResponse",
+        "route": "/docs/core/http/",
+        "source": "packages/core/src/http.d.ts",
+        "line": 2
+      },
+      {
+        "entry": "@viewstem/core/http",
+        "name": "RequestExecutor",
+        "route": "/docs/core/http/",
+        "source": "packages/core/src/http.d.ts",
+        "line": 2
+      },
+      {
+        "entry": "@viewstem/core/http",
+        "name": "HttpExecutorOptions",
+        "route": "/docs/core/http/",
+        "source": "packages/core/src/http.d.ts",
+        "line": 4
+      },
+      {
+        "entry": "@viewstem/core/http",
+        "name": "createHttpExecutor",
+        "route": "/docs/core/http/",
+        "source": "packages/core/src/http.d.ts",
+        "line": 10
+      },
+      {
+        "entry": "@viewstem/core/cel",
+        "name": "CelFunction",
+        "route": "/docs/core/cel/",
+        "source": "packages/core/src/cel.d.ts",
+        "line": 2
+      },
+      {
+        "entry": "@viewstem/core/cel",
+        "name": "CelValue",
+        "route": "/docs/core/cel/",
+        "source": "packages/core/src/cel.d.ts",
+        "line": 2
+      },
+      {
+        "entry": "@viewstem/core/cel",
+        "name": "CelLimits",
+        "route": "/docs/core/cel/",
+        "source": "packages/core/src/cel.d.ts",
+        "line": 4
+      },
+      {
+        "entry": "@viewstem/core/cel",
+        "name": "defaultCelLimits",
+        "route": "/docs/core/cel/",
+        "source": "packages/core/src/cel.d.ts",
+        "line": 5
+      },
+      {
+        "entry": "@viewstem/core/cel",
+        "name": "CelOptions",
+        "route": "/docs/core/cel/",
+        "source": "packages/core/src/cel.d.ts",
+        "line": 6
+      },
+      {
+        "entry": "@viewstem/core/cel",
+        "name": "compileCel",
+        "route": "/docs/core/cel/",
+        "source": "packages/core/src/cel.d.ts",
+        "line": 7
+      },
+      {
+        "entry": "@viewstem/core/cel",
+        "name": "evaluateCel",
+        "route": "/docs/core/cel/",
+        "source": "packages/core/src/cel.d.ts",
+        "line": 8
+      }
+    ],
+    "svelte": {
+      "package": "@viewstem/svelte",
+      "source": "packages/svelte/src/lib/index.ts",
+      "ownedExports": {
+        "createRenderer": {
+          "kind": "value",
+          "routes": {
+            "en": "/docs/svelte/renderer/#createrenderer",
+            "ko": "/ko/docs/svelte/renderer/#createrenderer"
+          }
+        },
+        "Renderer": {
+          "kind": "type",
+          "routes": {
+            "en": "/docs/svelte/renderer/#renderer",
+            "ko": "/ko/docs/svelte/renderer/#renderer"
+          }
+        },
+        "RendererOptions": {
+          "kind": "type",
+          "routes": {
+            "en": "/docs/svelte/renderer/#rendereroptions",
+            "ko": "/ko/docs/svelte/renderer/#rendereroptions"
+          }
+        },
+        "RenderOptions": {
+          "kind": "type",
+          "routes": {
+            "en": "/docs/svelte/renderer/#renderoptions",
+            "ko": "/ko/docs/svelte/renderer/#renderoptions"
+          }
+        },
+        "MountedView": {
+          "kind": "type",
+          "routes": {
+            "en": "/docs/svelte/mounted-view/#mountedview",
+            "ko": "/ko/docs/svelte/mounted-view/#mountedview"
+          }
+        },
+        "RenderAttachment": {
+          "kind": "type",
+          "routes": {
+            "en": "/docs/svelte/mounted-view/#renderattachment",
+            "ko": "/ko/docs/svelte/mounted-view/#renderattachment"
+          }
+        },
+        "ComponentAdapter": {
+          "kind": "type",
+          "routes": {
+            "en": "/docs/svelte/adapters/#componentadapter",
+            "ko": "/ko/docs/svelte/adapters/#componentadapter"
+          }
+        },
+        "ComponentAdapterProps": {
+          "kind": "type",
+          "routes": {
+            "en": "/docs/svelte/adapters/#componentadapterprops",
+            "ko": "/ko/docs/svelte/adapters/#componentadapterprops"
+          }
+        },
+        "ComponentRegistration": {
+          "kind": "type",
+          "routes": {
+            "en": "/docs/svelte/adapters/#componentregistration",
+            "ko": "/ko/docs/svelte/adapters/#componentregistration"
+          }
+        },
+        "ViewstemView": {
+          "kind": "value",
+          "routes": {
+            "en": "/docs/svelte/viewstem-view/#viewstemview",
+            "ko": "/ko/docs/svelte/viewstem-view/#viewstemview"
+          }
+        },
+        "ViewstemViewProps": {
+          "kind": "type",
+          "routes": {
+            "en": "/docs/svelte/viewstem-view/#viewstemviewprops",
+            "ko": "/ko/docs/svelte/viewstem-view/#viewstemviewprops"
+          }
+        },
+        "transformError": {
+          "kind": "value",
+          "routes": {
+            "en": "/docs/svelte/errors/#transformerror",
+            "ko": "/ko/docs/svelte/errors/#transformerror"
+          }
+        },
+        "RendererDiagnostic": {
+          "kind": "type",
+          "routes": {
+            "en": "/docs/svelte/errors/#rendererdiagnostic",
+            "ko": "/ko/docs/svelte/errors/#rendererdiagnostic"
+          }
+        },
+        "RendererErrorListener": {
+          "kind": "type",
+          "routes": {
+            "en": "/docs/svelte/errors/#renderererrorlistener",
+            "ko": "/ko/docs/svelte/errors/#renderererrorlistener"
+          }
+        },
+        "RenderFallback": {
+          "kind": "type",
+          "routes": {
+            "en": "/docs/svelte/errors/#renderfallback",
+            "ko": "/ko/docs/svelte/errors/#renderfallback"
+          }
+        }
+      },
+      "coreReexports": {
+        "count": 70,
+        "routes": {
+          "en": "/docs/core/types/",
+          "ko": "/ko/docs/core/types/"
+        }
+      },
+      "pageFiles": [
+        "/docs/svelte/adapters.md",
+        "/docs/svelte/errors.md",
+        "/docs/svelte/guides/manage-view-lifecycle.md",
+        "/docs/svelte/guides/mount-in-svelte.md",
+        "/docs/svelte/guides/write-an-adapter.md",
+        "/docs/svelte/index.md",
+        "/docs/svelte/mounted-view.md",
+        "/docs/svelte/renderer.md",
+        "/docs/svelte/types.md",
+        "/docs/svelte/viewstem-view.md",
+        "/ko/docs/svelte/adapters.md",
+        "/ko/docs/svelte/errors.md",
+        "/ko/docs/svelte/guides/manage-view-lifecycle.md",
+        "/ko/docs/svelte/guides/mount-in-svelte.md",
+        "/ko/docs/svelte/guides/write-an-adapter.md",
+        "/ko/docs/svelte/index.md",
+        "/ko/docs/svelte/mounted-view.md",
+        "/ko/docs/svelte/renderer.md",
+        "/ko/docs/svelte/types.md",
+        "/ko/docs/svelte/viewstem-view.md"
+      ]
+    },
+    "ui": {
+      "package": "@viewstem/svelte-ui",
+      "exportPaths": {
+        "en": {
+          ".": "/docs/svelte-ui/registration/",
+          "./shadcn": "/docs/svelte-ui/component-sets/",
+          "./shadcn/styles.css": "/docs/svelte-ui/support/#stylesheet",
+          "./shadcn/support.json": "/docs/svelte-ui/support/",
+          "./shadcn/accordion": "/docs/svelte-ui/components/accordion/",
+          "./shadcn/alert-dialog": "/docs/svelte-ui/components/alert-dialog/",
+          "./shadcn/alert": "/docs/svelte-ui/components/alert/",
+          "./shadcn/aspect-ratio": "/docs/svelte-ui/components/aspect-ratio/",
+          "./shadcn/attachment": "/docs/svelte-ui/components/attachment/",
+          "./shadcn/avatar": "/docs/svelte-ui/components/avatar/",
+          "./shadcn/badge": "/docs/svelte-ui/components/badge/",
+          "./shadcn/breadcrumb": "/docs/svelte-ui/components/breadcrumb/",
+          "./shadcn/bubble": "/docs/svelte-ui/components/bubble/",
+          "./shadcn/button-group": "/docs/svelte-ui/components/button-group/",
+          "./shadcn/button": "/docs/svelte-ui/components/button/",
+          "./shadcn/calendar": "/docs/svelte-ui/components/calendar/",
+          "./shadcn/card": "/docs/svelte-ui/components/card/",
+          "./shadcn/carousel": "/docs/svelte-ui/components/carousel/",
+          "./shadcn/chart": "/docs/svelte-ui/components/chart/",
+          "./shadcn/checkbox": "/docs/svelte-ui/components/checkbox/",
+          "./shadcn/code-block": "/docs/svelte-ui/components/code-block/",
+          "./shadcn/collapsible": "/docs/svelte-ui/components/collapsible/",
+          "./shadcn/combobox": "/docs/svelte-ui/components/combobox/",
+          "./shadcn/command": "/docs/svelte-ui/components/command/",
+          "./shadcn/context-menu": "/docs/svelte-ui/components/context-menu/",
+          "./shadcn/data-table": "/docs/svelte-ui/components/data-table/",
+          "./shadcn/date-picker": "/docs/svelte-ui/components/date-picker/",
+          "./shadcn/dialog": "/docs/svelte-ui/components/dialog/",
+          "./shadcn/drawer": "/docs/svelte-ui/components/drawer/",
+          "./shadcn/dropdown-menu": "/docs/svelte-ui/components/dropdown-menu/",
+          "./shadcn/empty": "/docs/svelte-ui/components/empty/",
+          "./shadcn/field": "/docs/svelte-ui/components/field/",
+          "./shadcn/hover-card": "/docs/svelte-ui/components/hover-card/",
+          "./shadcn/input-group": "/docs/svelte-ui/components/input-group/",
+          "./shadcn/input-otp": "/docs/svelte-ui/components/input-otp/",
+          "./shadcn/input": "/docs/svelte-ui/components/input/",
+          "./shadcn/item": "/docs/svelte-ui/components/item/",
+          "./shadcn/kbd": "/docs/svelte-ui/components/kbd/",
+          "./shadcn/label": "/docs/svelte-ui/components/label/",
+          "./shadcn/marker": "/docs/svelte-ui/components/marker/",
+          "./shadcn/menubar": "/docs/svelte-ui/components/menubar/",
+          "./shadcn/message-scroller": "/docs/svelte-ui/components/message-scroller/",
+          "./shadcn/message": "/docs/svelte-ui/components/message/",
+          "./shadcn/native-select": "/docs/svelte-ui/components/native-select/",
+          "./shadcn/navigation-menu": "/docs/svelte-ui/components/navigation-menu/",
+          "./shadcn/pagination": "/docs/svelte-ui/components/pagination/",
+          "./shadcn/popover": "/docs/svelte-ui/components/popover/",
+          "./shadcn/progress": "/docs/svelte-ui/components/progress/",
+          "./shadcn/questionnaire": "/docs/svelte-ui/components/questionnaire/",
+          "./shadcn/radio-group": "/docs/svelte-ui/components/radio-group/",
+          "./shadcn/range-calendar": "/docs/svelte-ui/components/range-calendar/",
+          "./shadcn/resizable": "/docs/svelte-ui/components/resizable/",
+          "./shadcn/scroll-area": "/docs/svelte-ui/components/scroll-area/",
+          "./shadcn/select": "/docs/svelte-ui/components/select/",
+          "./shadcn/separator": "/docs/svelte-ui/components/separator/",
+          "./shadcn/sheet": "/docs/svelte-ui/components/sheet/",
+          "./shadcn/sidebar": "/docs/svelte-ui/components/sidebar/",
+          "./shadcn/skeleton": "/docs/svelte-ui/components/skeleton/",
+          "./shadcn/slider": "/docs/svelte-ui/components/slider/",
+          "./shadcn/sonner": "/docs/svelte-ui/components/sonner/",
+          "./shadcn/spinner": "/docs/svelte-ui/components/spinner/",
+          "./shadcn/switch": "/docs/svelte-ui/components/switch/",
+          "./shadcn/table": "/docs/svelte-ui/components/table/",
+          "./shadcn/tabs": "/docs/svelte-ui/components/tabs/",
+          "./shadcn/textarea": "/docs/svelte-ui/components/textarea/",
+          "./shadcn/toggle-group": "/docs/svelte-ui/components/toggle-group/",
+          "./shadcn/toggle": "/docs/svelte-ui/components/toggle/",
+          "./shadcn/tooltip": "/docs/svelte-ui/components/tooltip/",
+          "./shadcn/trace": "/docs/svelte-ui/components/trace/",
+          "./shadcn/typography": "/docs/svelte-ui/components/typography/"
+        },
+        "ko": {
+          ".": "/ko/docs/svelte-ui/registration/",
+          "./shadcn": "/ko/docs/svelte-ui/component-sets/",
+          "./shadcn/styles.css": "/ko/docs/svelte-ui/support/#stylesheet",
+          "./shadcn/support.json": "/ko/docs/svelte-ui/support/",
+          "./shadcn/accordion": "/ko/docs/svelte-ui/components/accordion/",
+          "./shadcn/alert-dialog": "/ko/docs/svelte-ui/components/alert-dialog/",
+          "./shadcn/alert": "/ko/docs/svelte-ui/components/alert/",
+          "./shadcn/aspect-ratio": "/ko/docs/svelte-ui/components/aspect-ratio/",
+          "./shadcn/attachment": "/ko/docs/svelte-ui/components/attachment/",
+          "./shadcn/avatar": "/ko/docs/svelte-ui/components/avatar/",
+          "./shadcn/badge": "/ko/docs/svelte-ui/components/badge/",
+          "./shadcn/breadcrumb": "/ko/docs/svelte-ui/components/breadcrumb/",
+          "./shadcn/bubble": "/ko/docs/svelte-ui/components/bubble/",
+          "./shadcn/button-group": "/ko/docs/svelte-ui/components/button-group/",
+          "./shadcn/button": "/ko/docs/svelte-ui/components/button/",
+          "./shadcn/calendar": "/ko/docs/svelte-ui/components/calendar/",
+          "./shadcn/card": "/ko/docs/svelte-ui/components/card/",
+          "./shadcn/carousel": "/ko/docs/svelte-ui/components/carousel/",
+          "./shadcn/chart": "/ko/docs/svelte-ui/components/chart/",
+          "./shadcn/checkbox": "/ko/docs/svelte-ui/components/checkbox/",
+          "./shadcn/code-block": "/ko/docs/svelte-ui/components/code-block/",
+          "./shadcn/collapsible": "/ko/docs/svelte-ui/components/collapsible/",
+          "./shadcn/combobox": "/ko/docs/svelte-ui/components/combobox/",
+          "./shadcn/command": "/ko/docs/svelte-ui/components/command/",
+          "./shadcn/context-menu": "/ko/docs/svelte-ui/components/context-menu/",
+          "./shadcn/data-table": "/ko/docs/svelte-ui/components/data-table/",
+          "./shadcn/date-picker": "/ko/docs/svelte-ui/components/date-picker/",
+          "./shadcn/dialog": "/ko/docs/svelte-ui/components/dialog/",
+          "./shadcn/drawer": "/ko/docs/svelte-ui/components/drawer/",
+          "./shadcn/dropdown-menu": "/ko/docs/svelte-ui/components/dropdown-menu/",
+          "./shadcn/empty": "/ko/docs/svelte-ui/components/empty/",
+          "./shadcn/field": "/ko/docs/svelte-ui/components/field/",
+          "./shadcn/hover-card": "/ko/docs/svelte-ui/components/hover-card/",
+          "./shadcn/input-group": "/ko/docs/svelte-ui/components/input-group/",
+          "./shadcn/input-otp": "/ko/docs/svelte-ui/components/input-otp/",
+          "./shadcn/input": "/ko/docs/svelte-ui/components/input/",
+          "./shadcn/item": "/ko/docs/svelte-ui/components/item/",
+          "./shadcn/kbd": "/ko/docs/svelte-ui/components/kbd/",
+          "./shadcn/label": "/ko/docs/svelte-ui/components/label/",
+          "./shadcn/marker": "/ko/docs/svelte-ui/components/marker/",
+          "./shadcn/menubar": "/ko/docs/svelte-ui/components/menubar/",
+          "./shadcn/message-scroller": "/ko/docs/svelte-ui/components/message-scroller/",
+          "./shadcn/message": "/ko/docs/svelte-ui/components/message/",
+          "./shadcn/native-select": "/ko/docs/svelte-ui/components/native-select/",
+          "./shadcn/navigation-menu": "/ko/docs/svelte-ui/components/navigation-menu/",
+          "./shadcn/pagination": "/ko/docs/svelte-ui/components/pagination/",
+          "./shadcn/popover": "/ko/docs/svelte-ui/components/popover/",
+          "./shadcn/progress": "/ko/docs/svelte-ui/components/progress/",
+          "./shadcn/questionnaire": "/ko/docs/svelte-ui/components/questionnaire/",
+          "./shadcn/radio-group": "/ko/docs/svelte-ui/components/radio-group/",
+          "./shadcn/range-calendar": "/ko/docs/svelte-ui/components/range-calendar/",
+          "./shadcn/resizable": "/ko/docs/svelte-ui/components/resizable/",
+          "./shadcn/scroll-area": "/ko/docs/svelte-ui/components/scroll-area/",
+          "./shadcn/select": "/ko/docs/svelte-ui/components/select/",
+          "./shadcn/separator": "/ko/docs/svelte-ui/components/separator/",
+          "./shadcn/sheet": "/ko/docs/svelte-ui/components/sheet/",
+          "./shadcn/sidebar": "/ko/docs/svelte-ui/components/sidebar/",
+          "./shadcn/skeleton": "/ko/docs/svelte-ui/components/skeleton/",
+          "./shadcn/slider": "/ko/docs/svelte-ui/components/slider/",
+          "./shadcn/sonner": "/ko/docs/svelte-ui/components/sonner/",
+          "./shadcn/spinner": "/ko/docs/svelte-ui/components/spinner/",
+          "./shadcn/switch": "/ko/docs/svelte-ui/components/switch/",
+          "./shadcn/table": "/ko/docs/svelte-ui/components/table/",
+          "./shadcn/tabs": "/ko/docs/svelte-ui/components/tabs/",
+          "./shadcn/textarea": "/ko/docs/svelte-ui/components/textarea/",
+          "./shadcn/toggle-group": "/ko/docs/svelte-ui/components/toggle-group/",
+          "./shadcn/toggle": "/ko/docs/svelte-ui/components/toggle/",
+          "./shadcn/tooltip": "/ko/docs/svelte-ui/components/tooltip/",
+          "./shadcn/trace": "/ko/docs/svelte-ui/components/trace/",
+          "./shadcn/typography": "/ko/docs/svelte-ui/components/typography/"
+        }
+      },
+      "rootSymbols": {
+        "registerComponents": {
+          "en": "/docs/svelte-ui/registration/",
+          "ko": "/ko/docs/svelte-ui/registration/"
+        },
+        "ComponentSet": {
+          "en": "/docs/svelte-ui/registration/",
+          "ko": "/ko/docs/svelte-ui/registration/"
+        }
+      },
+      "families": [
+        {
+          "slug": "accordion",
+          "set": "accordion",
+          "en": "/docs/svelte-ui/components/accordion/",
+          "ko": "/ko/docs/svelte-ui/components/accordion/",
+          "json": [
+            "shadcn.Accordion.Root",
+            "shadcn.Accordion.Content",
+            "shadcn.Accordion.Item",
+            "shadcn.Accordion.Trigger"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Accordion",
+            "Content",
+            "AccordionContent",
+            "Item",
+            "AccordionItem",
+            "Trigger",
+            "AccordionTrigger"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "alert-dialog",
+          "set": "alertDialog",
+          "en": "/docs/svelte-ui/components/alert-dialog/",
+          "ko": "/ko/docs/svelte-ui/components/alert-dialog/",
+          "json": [
+            "shadcn.AlertDialog.Root",
+            "shadcn.AlertDialog.Action",
+            "shadcn.AlertDialog.Cancel",
+            "shadcn.AlertDialog.Content",
+            "shadcn.AlertDialog.Description",
+            "shadcn.AlertDialog.Footer",
+            "shadcn.AlertDialog.Header",
+            "shadcn.AlertDialog.Media",
+            "shadcn.AlertDialog.Overlay",
+            "shadcn.AlertDialog.Portal",
+            "shadcn.AlertDialog.Title",
+            "shadcn.AlertDialog.Trigger"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "AlertDialog",
+            "Action",
+            "AlertDialogAction",
+            "Cancel",
+            "AlertDialogCancel",
+            "Content",
+            "AlertDialogContent",
+            "Description",
+            "AlertDialogDescription",
+            "Footer",
+            "AlertDialogFooter",
+            "Header",
+            "AlertDialogHeader",
+            "Media",
+            "AlertDialogMedia",
+            "Overlay",
+            "AlertDialogOverlay",
+            "Portal",
+            "AlertDialogPortal",
+            "Title",
+            "AlertDialogTitle",
+            "Trigger",
+            "AlertDialogTrigger"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "alert",
+          "set": "alert",
+          "en": "/docs/svelte-ui/components/alert/",
+          "ko": "/ko/docs/svelte-ui/components/alert/",
+          "json": [
+            "shadcn.Alert.Root",
+            "shadcn.Alert.Action",
+            "shadcn.Alert.Description",
+            "shadcn.Alert.Title"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Alert",
+            "Action",
+            "AlertAction",
+            "Description",
+            "AlertDescription",
+            "Title",
+            "AlertTitle"
+          ],
+          "nativeTypeExports": [
+            "AlertVariant"
+          ],
+          "nativeHelperExports": [
+            "alertVariants"
+          ],
+          "extraExports": []
+        },
+        {
+          "slug": "aspect-ratio",
+          "set": "aspectRatio",
+          "en": "/docs/svelte-ui/components/aspect-ratio/",
+          "ko": "/ko/docs/svelte-ui/components/aspect-ratio/",
+          "json": [
+            "shadcn.AspectRatio"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "AspectRatio"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "attachment",
+          "set": "attachment",
+          "en": "/docs/svelte-ui/components/attachment/",
+          "ko": "/ko/docs/svelte-ui/components/attachment/",
+          "json": [
+            "shadcn.Attachment.Root",
+            "shadcn.Attachment.Action",
+            "shadcn.Attachment.Actions",
+            "shadcn.Attachment.Content",
+            "shadcn.Attachment.Description",
+            "shadcn.Attachment.Group",
+            "shadcn.Attachment.Media",
+            "shadcn.Attachment.Title",
+            "shadcn.Attachment.Trigger"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Attachment",
+            "Action",
+            "AttachmentAction",
+            "Actions",
+            "AttachmentActions",
+            "Content",
+            "AttachmentContent",
+            "Description",
+            "AttachmentDescription",
+            "Group",
+            "AttachmentGroup",
+            "Media",
+            "AttachmentMedia",
+            "Title",
+            "AttachmentTitle",
+            "Trigger",
+            "AttachmentTrigger"
+          ],
+          "nativeTypeExports": [
+            "AttachmentOrientation",
+            "AttachmentSize",
+            "AttachmentState"
+          ],
+          "nativeHelperExports": [
+            "attachmentVariants"
+          ],
+          "extraExports": []
+        },
+        {
+          "slug": "avatar",
+          "set": "avatar",
+          "en": "/docs/svelte-ui/components/avatar/",
+          "ko": "/ko/docs/svelte-ui/components/avatar/",
+          "json": [
+            "shadcn.Avatar.Root",
+            "shadcn.Avatar.Badge",
+            "shadcn.Avatar.Fallback",
+            "shadcn.Avatar.Group",
+            "shadcn.Avatar.GroupCount",
+            "shadcn.Avatar.Image"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Avatar",
+            "Badge",
+            "AvatarBadge",
+            "Fallback",
+            "AvatarFallback",
+            "Group",
+            "AvatarGroup",
+            "GroupCount",
+            "AvatarGroupCount",
+            "Image",
+            "AvatarImage"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "badge",
+          "set": "badge",
+          "en": "/docs/svelte-ui/components/badge/",
+          "ko": "/ko/docs/svelte-ui/components/badge/",
+          "json": [
+            "shadcn.Badge"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Badge"
+          ],
+          "nativeTypeExports": [
+            "BadgeVariant"
+          ],
+          "nativeHelperExports": [
+            "badgeVariants"
+          ],
+          "extraExports": []
+        },
+        {
+          "slug": "breadcrumb",
+          "set": "breadcrumb",
+          "en": "/docs/svelte-ui/components/breadcrumb/",
+          "ko": "/ko/docs/svelte-ui/components/breadcrumb/",
+          "json": [
+            "shadcn.Breadcrumb.Root",
+            "shadcn.Breadcrumb.Ellipsis",
+            "shadcn.Breadcrumb.Item",
+            "shadcn.Breadcrumb.Link",
+            "shadcn.Breadcrumb.List",
+            "shadcn.Breadcrumb.Page",
+            "shadcn.Breadcrumb.Separator"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Breadcrumb",
+            "Ellipsis",
+            "BreadcrumbEllipsis",
+            "Item",
+            "BreadcrumbItem",
+            "Link",
+            "BreadcrumbLink",
+            "List",
+            "BreadcrumbList",
+            "Page",
+            "BreadcrumbPage",
+            "Separator",
+            "BreadcrumbSeparator"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "bubble",
+          "set": "bubble",
+          "en": "/docs/svelte-ui/components/bubble/",
+          "ko": "/ko/docs/svelte-ui/components/bubble/",
+          "json": [
+            "shadcn.Bubble.Root",
+            "shadcn.Bubble.Content",
+            "shadcn.Bubble.Group",
+            "shadcn.Bubble.Reactions"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Bubble",
+            "Content",
+            "BubbleContent",
+            "Group",
+            "BubbleGroup",
+            "Reactions",
+            "BubbleReactions"
+          ],
+          "nativeTypeExports": [
+            "BubbleReactionsAlign",
+            "BubbleReactionsSide",
+            "BubbleVariant"
+          ],
+          "nativeHelperExports": [
+            "bubbleReactionsVariants",
+            "bubbleVariants"
+          ],
+          "extraExports": []
+        },
+        {
+          "slug": "button-group",
+          "set": "buttonGroup",
+          "en": "/docs/svelte-ui/components/button-group/",
+          "ko": "/ko/docs/svelte-ui/components/button-group/",
+          "json": [
+            "shadcn.ButtonGroup.Root",
+            "shadcn.ButtonGroup.Separator",
+            "shadcn.ButtonGroup.Text"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "ButtonGroup",
+            "Separator",
+            "ButtonGroupSeparator",
+            "Text",
+            "ButtonGroupText"
+          ],
+          "nativeTypeExports": [
+            "ButtonGroupOrientation"
+          ],
+          "nativeHelperExports": [
+            "buttonGroupVariants"
+          ],
+          "extraExports": []
+        },
+        {
+          "slug": "button",
+          "set": "button",
+          "en": "/docs/svelte-ui/components/button/",
+          "ko": "/ko/docs/svelte-ui/components/button/",
+          "json": [
+            "shadcn.Button"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Button"
+          ],
+          "nativeTypeExports": [
+            "ButtonProps",
+            "ButtonSize",
+            "ButtonVariant",
+            "Props"
+          ],
+          "nativeHelperExports": [
+            "buttonVariants"
+          ],
+          "extraExports": []
+        },
+        {
+          "slug": "calendar",
+          "set": "calendar",
+          "en": "/docs/svelte-ui/components/calendar/",
+          "ko": "/ko/docs/svelte-ui/components/calendar/",
+          "json": [
+            "shadcn.Calendar.Root"
+          ],
+          "nativeOnly": [
+            "shadcn.Calendar.Caption",
+            "shadcn.Calendar.Cell",
+            "shadcn.Calendar.Day",
+            "shadcn.Calendar.Grid",
+            "shadcn.Calendar.GridBody",
+            "shadcn.Calendar.GridHead",
+            "shadcn.Calendar.GridRow",
+            "shadcn.Calendar.HeadCell",
+            "shadcn.Calendar.Header",
+            "shadcn.Calendar.Heading",
+            "shadcn.Calendar.Month",
+            "shadcn.Calendar.Months",
+            "shadcn.Calendar.MonthSelect",
+            "shadcn.Calendar.Nav",
+            "shadcn.Calendar.NextButton",
+            "shadcn.Calendar.PrevButton",
+            "shadcn.Calendar.YearSelect"
+          ],
+          "nativeExports": [
+            "Calendar",
+            "Caption",
+            "Cell",
+            "Day",
+            "Grid",
+            "GridBody",
+            "GridHead",
+            "GridRow",
+            "HeadCell",
+            "Header",
+            "Heading",
+            "Month",
+            "Months",
+            "MonthSelect",
+            "Nav",
+            "NextButton",
+            "PrevButton",
+            "YearSelect"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "card",
+          "set": "card",
+          "en": "/docs/svelte-ui/components/card/",
+          "ko": "/ko/docs/svelte-ui/components/card/",
+          "json": [
+            "shadcn.Card.Root",
+            "shadcn.Card.Action",
+            "shadcn.Card.Content",
+            "shadcn.Card.Description",
+            "shadcn.Card.Footer",
+            "shadcn.Card.Header",
+            "shadcn.Card.Title"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Card",
+            "Action",
+            "CardAction",
+            "Content",
+            "CardContent",
+            "Description",
+            "CardDescription",
+            "Footer",
+            "CardFooter",
+            "Header",
+            "CardHeader",
+            "Title",
+            "CardTitle"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "carousel",
+          "set": "carousel",
+          "en": "/docs/svelte-ui/components/carousel/",
+          "ko": "/ko/docs/svelte-ui/components/carousel/",
+          "json": [
+            "shadcn.Carousel.Root",
+            "shadcn.Carousel.Content",
+            "shadcn.Carousel.Item",
+            "shadcn.Carousel.Next",
+            "shadcn.Carousel.Previous"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Carousel",
+            "Content",
+            "CarouselContent",
+            "Item",
+            "CarouselItem",
+            "Next",
+            "CarouselNext",
+            "Previous",
+            "CarouselPrevious"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "chart",
+          "set": "chart",
+          "en": "/docs/svelte-ui/components/chart/",
+          "ko": "/ko/docs/svelte-ui/components/chart/",
+          "json": [
+            "shadcn.Chart.Container",
+            "shadcn.Chart"
+          ],
+          "nativeOnly": [
+            "shadcn.Chart.Tooltip"
+          ],
+          "nativeExports": [
+            "ChartContainer",
+            "Container",
+            "ChartTooltip",
+            "Tooltip"
+          ],
+          "nativeTypeExports": [
+            "ChartConfig"
+          ],
+          "nativeHelperExports": [
+            "getPayloadConfigFromPayload"
+          ],
+          "extraExports": []
+        },
+        {
+          "slug": "checkbox",
+          "set": "checkbox",
+          "en": "/docs/svelte-ui/components/checkbox/",
+          "ko": "/ko/docs/svelte-ui/components/checkbox/",
+          "json": [
+            "shadcn.Checkbox"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Checkbox"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "code-block",
+          "set": "codeBlock",
+          "en": "/docs/svelte-ui/components/code-block/",
+          "ko": "/ko/docs/svelte-ui/components/code-block/",
+          "json": [
+            "shadcn.CodeBlock.Root",
+            "shadcn.CodeBlock.Actions",
+            "shadcn.CodeBlock.Content",
+            "shadcn.CodeBlock.CopyButton",
+            "shadcn.CodeBlock.Footer",
+            "shadcn.CodeBlock.Header",
+            "shadcn.CodeBlock.Line",
+            "shadcn.CodeBlock.Title"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "CodeBlock",
+            "Actions",
+            "CodeBlockActions",
+            "Content",
+            "CodeBlockContent",
+            "CopyButton",
+            "CodeBlockCopyButton",
+            "Footer",
+            "CodeBlockFooter",
+            "Header",
+            "CodeBlockHeader",
+            "Line",
+            "CodeBlockLine",
+            "Title",
+            "CodeBlockTitle"
+          ],
+          "nativeTypeExports": [
+            "CodeBlockLineToken",
+            "CodeBlockLineVariant",
+            "CodeBlockSize",
+            "CodeBlockVariant"
+          ],
+          "nativeHelperExports": [
+            "codeBlockLineVariants",
+            "codeBlockVariants"
+          ],
+          "extraExports": []
+        },
+        {
+          "slug": "collapsible",
+          "set": "collapsible",
+          "en": "/docs/svelte-ui/components/collapsible/",
+          "ko": "/ko/docs/svelte-ui/components/collapsible/",
+          "json": [
+            "shadcn.Collapsible.Root",
+            "shadcn.Collapsible.Content",
+            "shadcn.Collapsible.Trigger"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Collapsible",
+            "Content",
+            "CollapsibleContent",
+            "Trigger",
+            "CollapsibleTrigger"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "combobox",
+          "set": "combobox",
+          "en": "/docs/svelte-ui/components/combobox/",
+          "ko": "/ko/docs/svelte-ui/components/combobox/",
+          "json": [
+            "shadcn.Combobox"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "command",
+          "set": "command",
+          "en": "/docs/svelte-ui/components/command/",
+          "ko": "/ko/docs/svelte-ui/components/command/",
+          "json": [
+            "shadcn.Command.Root",
+            "shadcn.Command.Dialog",
+            "shadcn.Command.Empty",
+            "shadcn.Command.Group",
+            "shadcn.Command.Input",
+            "shadcn.Command.Item",
+            "shadcn.Command.LinkItem",
+            "shadcn.Command.List",
+            "shadcn.Command.Loading",
+            "shadcn.Command.Separator",
+            "shadcn.Command.Shortcut"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Command",
+            "Dialog",
+            "CommandDialog",
+            "Empty",
+            "CommandEmpty",
+            "Group",
+            "CommandGroup",
+            "Input",
+            "CommandInput",
+            "Item",
+            "CommandItem",
+            "LinkItem",
+            "CommandLinkItem",
+            "List",
+            "CommandList",
+            "Loading",
+            "CommandLoading",
+            "Separator",
+            "CommandSeparator",
+            "Shortcut",
+            "CommandShortcut"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "context-menu",
+          "set": "contextMenu",
+          "en": "/docs/svelte-ui/components/context-menu/",
+          "ko": "/ko/docs/svelte-ui/components/context-menu/",
+          "json": [
+            "shadcn.ContextMenu.Root",
+            "shadcn.ContextMenu.CheckboxItem",
+            "shadcn.ContextMenu.Content",
+            "shadcn.ContextMenu.Group",
+            "shadcn.ContextMenu.GroupHeading",
+            "shadcn.ContextMenu.Item",
+            "shadcn.ContextMenu.Label",
+            "shadcn.ContextMenu.Portal",
+            "shadcn.ContextMenu.RadioGroup",
+            "shadcn.ContextMenu.RadioItem",
+            "shadcn.ContextMenu.Separator",
+            "shadcn.ContextMenu.Shortcut",
+            "shadcn.ContextMenu.Sub",
+            "shadcn.ContextMenu.SubContent",
+            "shadcn.ContextMenu.SubTrigger",
+            "shadcn.ContextMenu.Trigger"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "ContextMenu",
+            "CheckboxItem",
+            "ContextMenuCheckboxItem",
+            "Content",
+            "ContextMenuContent",
+            "Group",
+            "ContextMenuGroup",
+            "GroupHeading",
+            "ContextMenuGroupHeading",
+            "Item",
+            "ContextMenuItem",
+            "Label",
+            "ContextMenuLabel",
+            "Portal",
+            "ContextMenuPortal",
+            "RadioGroup",
+            "ContextMenuRadioGroup",
+            "RadioItem",
+            "ContextMenuRadioItem",
+            "Separator",
+            "ContextMenuSeparator",
+            "Shortcut",
+            "ContextMenuShortcut",
+            "Sub",
+            "ContextMenuSub",
+            "SubContent",
+            "ContextMenuSubContent",
+            "SubTrigger",
+            "ContextMenuSubTrigger",
+            "Trigger",
+            "ContextMenuTrigger"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "data-table",
+          "set": "dataTable",
+          "en": "/docs/svelte-ui/components/data-table/",
+          "ko": "/ko/docs/svelte-ui/components/data-table/",
+          "json": [
+            "shadcn.DataTable"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "date-picker",
+          "set": "datePicker",
+          "en": "/docs/svelte-ui/components/date-picker/",
+          "ko": "/ko/docs/svelte-ui/components/date-picker/",
+          "json": [
+            "shadcn.DatePicker"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "dialog",
+          "set": "dialog",
+          "en": "/docs/svelte-ui/components/dialog/",
+          "ko": "/ko/docs/svelte-ui/components/dialog/",
+          "json": [
+            "shadcn.Dialog.Root",
+            "shadcn.Dialog.Close",
+            "shadcn.Dialog.Content",
+            "shadcn.Dialog.Description",
+            "shadcn.Dialog.Footer",
+            "shadcn.Dialog.Header",
+            "shadcn.Dialog.Overlay",
+            "shadcn.Dialog.Portal",
+            "shadcn.Dialog.Title",
+            "shadcn.Dialog.Trigger"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Dialog",
+            "Close",
+            "DialogClose",
+            "Content",
+            "DialogContent",
+            "Description",
+            "DialogDescription",
+            "Footer",
+            "DialogFooter",
+            "Header",
+            "DialogHeader",
+            "Overlay",
+            "DialogOverlay",
+            "Portal",
+            "DialogPortal",
+            "Title",
+            "DialogTitle",
+            "Trigger",
+            "DialogTrigger"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "drawer",
+          "set": "drawer",
+          "en": "/docs/svelte-ui/components/drawer/",
+          "ko": "/ko/docs/svelte-ui/components/drawer/",
+          "json": [
+            "shadcn.Drawer.Root",
+            "shadcn.Drawer.Close",
+            "shadcn.Drawer.Content",
+            "shadcn.Drawer.Description",
+            "shadcn.Drawer.Footer",
+            "shadcn.Drawer.Header",
+            "shadcn.Drawer.NestedRoot",
+            "shadcn.Drawer.Overlay",
+            "shadcn.Drawer.Portal",
+            "shadcn.Drawer.Title",
+            "shadcn.Drawer.Trigger"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Drawer",
+            "Close",
+            "DrawerClose",
+            "Content",
+            "DrawerContent",
+            "Description",
+            "DrawerDescription",
+            "Footer",
+            "DrawerFooter",
+            "Header",
+            "DrawerHeader",
+            "NestedRoot",
+            "DrawerNestedRoot",
+            "Overlay",
+            "DrawerOverlay",
+            "Portal",
+            "DrawerPortal",
+            "Title",
+            "DrawerTitle",
+            "Trigger",
+            "DrawerTrigger"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "dropdown-menu",
+          "set": "dropdownMenu",
+          "en": "/docs/svelte-ui/components/dropdown-menu/",
+          "ko": "/ko/docs/svelte-ui/components/dropdown-menu/",
+          "json": [
+            "shadcn.DropdownMenu.Root",
+            "shadcn.DropdownMenu.CheckboxGroup",
+            "shadcn.DropdownMenu.CheckboxItem",
+            "shadcn.DropdownMenu.Content",
+            "shadcn.DropdownMenu.Group",
+            "shadcn.DropdownMenu.GroupHeading",
+            "shadcn.DropdownMenu.Item",
+            "shadcn.DropdownMenu.Label",
+            "shadcn.DropdownMenu.Portal",
+            "shadcn.DropdownMenu.RadioGroup",
+            "shadcn.DropdownMenu.RadioItem",
+            "shadcn.DropdownMenu.Separator",
+            "shadcn.DropdownMenu.Shortcut",
+            "shadcn.DropdownMenu.Sub",
+            "shadcn.DropdownMenu.SubContent",
+            "shadcn.DropdownMenu.SubTrigger",
+            "shadcn.DropdownMenu.Trigger"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "DropdownMenu",
+            "Root",
+            "CheckboxGroup",
+            "DropdownMenuCheckboxGroup",
+            "CheckboxItem",
+            "DropdownMenuCheckboxItem",
+            "Content",
+            "DropdownMenuContent",
+            "DropdownMenuGroup",
+            "Group",
+            "DropdownMenuGroupHeading",
+            "GroupHeading",
+            "DropdownMenuItem",
+            "Item",
+            "DropdownMenuLabel",
+            "Label",
+            "Portal",
+            "DropdownMenuPortal",
+            "DropdownMenuRadioGroup",
+            "RadioGroup",
+            "DropdownMenuRadioItem",
+            "RadioItem",
+            "DropdownMenuSeparator",
+            "Separator",
+            "DropdownMenuShortcut",
+            "Shortcut",
+            "DropdownMenuSub",
+            "Sub",
+            "DropdownMenuSubContent",
+            "SubContent",
+            "DropdownMenuSubTrigger",
+            "SubTrigger",
+            "DropdownMenuTrigger",
+            "Trigger"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "empty",
+          "set": "empty",
+          "en": "/docs/svelte-ui/components/empty/",
+          "ko": "/ko/docs/svelte-ui/components/empty/",
+          "json": [
+            "shadcn.Empty.Root",
+            "shadcn.Empty.Content",
+            "shadcn.Empty.Description",
+            "shadcn.Empty.Header",
+            "shadcn.Empty.Media",
+            "shadcn.Empty.Title"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Empty",
+            "Content",
+            "EmptyContent",
+            "Description",
+            "EmptyDescription",
+            "Header",
+            "EmptyHeader",
+            "Media",
+            "EmptyMedia",
+            "Title",
+            "EmptyTitle"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "field",
+          "set": "field",
+          "en": "/docs/svelte-ui/components/field/",
+          "ko": "/ko/docs/svelte-ui/components/field/",
+          "json": [
+            "shadcn.Field.Field",
+            "shadcn.Field.Content",
+            "shadcn.Field.Description",
+            "shadcn.Field.Error",
+            "shadcn.Field.Group",
+            "shadcn.Field.Label",
+            "shadcn.Field.Legend",
+            "shadcn.Field.Separator",
+            "shadcn.Field.Set",
+            "shadcn.Field.Title"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Field",
+            "Content",
+            "FieldContent",
+            "Description",
+            "FieldDescription",
+            "Error",
+            "FieldError",
+            "Group",
+            "FieldGroup",
+            "Label",
+            "FieldLabel",
+            "Legend",
+            "FieldLegend",
+            "Separator",
+            "FieldSeparator",
+            "Set",
+            "FieldSet",
+            "Title",
+            "FieldTitle"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "hover-card",
+          "set": "hoverCard",
+          "en": "/docs/svelte-ui/components/hover-card/",
+          "ko": "/ko/docs/svelte-ui/components/hover-card/",
+          "json": [
+            "shadcn.HoverCard.Root",
+            "shadcn.HoverCard.Content",
+            "shadcn.HoverCard.Portal",
+            "shadcn.HoverCard.Trigger"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "HoverCard",
+            "Content",
+            "HoverCardContent",
+            "Portal",
+            "HoverCardPortal",
+            "Trigger",
+            "HoverCardTrigger"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "input-group",
+          "set": "inputGroup",
+          "en": "/docs/svelte-ui/components/input-group/",
+          "ko": "/ko/docs/svelte-ui/components/input-group/",
+          "json": [
+            "shadcn.InputGroup.Root",
+            "shadcn.InputGroup.Addon",
+            "shadcn.InputGroup.Button",
+            "shadcn.InputGroup.Input",
+            "shadcn.InputGroup.Text",
+            "shadcn.InputGroup.Textarea"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "InputGroup",
+            "Addon",
+            "InputGroupAddon",
+            "Button",
+            "InputGroupButton",
+            "Input",
+            "InputGroupInput",
+            "Text",
+            "InputGroupText",
+            "Textarea",
+            "InputGroupTextarea"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "input-otp",
+          "set": "inputOtp",
+          "en": "/docs/svelte-ui/components/input-otp/",
+          "ko": "/ko/docs/svelte-ui/components/input-otp/",
+          "json": [
+            "shadcn.InputOtp.Root",
+            "shadcn.InputOtp.Group",
+            "shadcn.InputOtp.Separator",
+            "shadcn.InputOtp.Slot"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "InputOTP",
+            "Group",
+            "InputOTPGroup",
+            "Separator",
+            "InputOTPSeparator",
+            "Slot",
+            "InputOTPSlot"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "input",
+          "set": "input",
+          "en": "/docs/svelte-ui/components/input/",
+          "ko": "/ko/docs/svelte-ui/components/input/",
+          "json": [
+            "shadcn.Input"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Input"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "item",
+          "set": "item",
+          "en": "/docs/svelte-ui/components/item/",
+          "ko": "/ko/docs/svelte-ui/components/item/",
+          "json": [
+            "shadcn.Item.Root",
+            "shadcn.Item.Actions",
+            "shadcn.Item.Content",
+            "shadcn.Item.Description",
+            "shadcn.Item.Footer",
+            "shadcn.Item.Group",
+            "shadcn.Item.Header",
+            "shadcn.Item.Media",
+            "shadcn.Item.Separator",
+            "shadcn.Item.Title"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Item",
+            "Actions",
+            "ItemActions",
+            "Content",
+            "ItemContent",
+            "Description",
+            "ItemDescription",
+            "Footer",
+            "ItemFooter",
+            "Group",
+            "ItemGroup",
+            "Header",
+            "ItemHeader",
+            "Media",
+            "ItemMedia",
+            "Separator",
+            "ItemSeparator",
+            "Title",
+            "ItemTitle"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "kbd",
+          "set": "kbd",
+          "en": "/docs/svelte-ui/components/kbd/",
+          "ko": "/ko/docs/svelte-ui/components/kbd/",
+          "json": [
+            "shadcn.Kbd.Root",
+            "shadcn.Kbd.Group"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Kbd",
+            "Group",
+            "KbdGroup"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "label",
+          "set": "label",
+          "en": "/docs/svelte-ui/components/label/",
+          "ko": "/ko/docs/svelte-ui/components/label/",
+          "json": [
+            "shadcn.Label"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Label"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "marker",
+          "set": "marker",
+          "en": "/docs/svelte-ui/components/marker/",
+          "ko": "/ko/docs/svelte-ui/components/marker/",
+          "json": [
+            "shadcn.Marker.Root",
+            "shadcn.Marker.Content",
+            "shadcn.Marker.Icon"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Marker",
+            "Content",
+            "MarkerContent",
+            "Icon",
+            "MarkerIcon"
+          ],
+          "nativeTypeExports": [
+            "MarkerVariant"
+          ],
+          "nativeHelperExports": [
+            "markerVariants"
+          ],
+          "extraExports": []
+        },
+        {
+          "slug": "menubar",
+          "set": "menubar",
+          "en": "/docs/svelte-ui/components/menubar/",
+          "ko": "/ko/docs/svelte-ui/components/menubar/",
+          "json": [
+            "shadcn.Menubar.Root",
+            "shadcn.Menubar.CheckboxItem",
+            "shadcn.Menubar.Content",
+            "shadcn.Menubar.Group",
+            "shadcn.Menubar.GroupHeading",
+            "shadcn.Menubar.Item",
+            "shadcn.Menubar.Label",
+            "shadcn.Menubar.Menu",
+            "shadcn.Menubar.Portal",
+            "shadcn.Menubar.RadioGroup",
+            "shadcn.Menubar.RadioItem",
+            "shadcn.Menubar.Separator",
+            "shadcn.Menubar.Shortcut",
+            "shadcn.Menubar.Sub",
+            "shadcn.Menubar.SubContent",
+            "shadcn.Menubar.SubTrigger",
+            "shadcn.Menubar.Trigger"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Menubar",
+            "CheckboxItem",
+            "MenubarCheckboxItem",
+            "Content",
+            "MenubarContent",
+            "Group",
+            "MenubarGroup",
+            "GroupHeading",
+            "MenubarGroupHeading",
+            "Item",
+            "MenubarItem",
+            "Label",
+            "MenubarLabel",
+            "Menu",
+            "MenubarMenu",
+            "Portal",
+            "MenubarPortal",
+            "RadioGroup",
+            "MenubarRadioGroup",
+            "RadioItem",
+            "MenubarRadioItem",
+            "Separator",
+            "MenubarSeparator",
+            "Shortcut",
+            "MenubarShortcut",
+            "Sub",
+            "MenubarSub",
+            "SubContent",
+            "MenubarSubContent",
+            "SubTrigger",
+            "MenubarSubTrigger",
+            "Trigger",
+            "MenubarTrigger"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "message-scroller",
+          "set": "messageScroller",
+          "en": "/docs/svelte-ui/components/message-scroller/",
+          "ko": "/ko/docs/svelte-ui/components/message-scroller/",
+          "json": [
+            "shadcn.MessageScroller.Root",
+            "shadcn.MessageScroller.Button",
+            "shadcn.MessageScroller.Content",
+            "shadcn.MessageScroller.Item",
+            "shadcn.MessageScroller.Provider",
+            "shadcn.MessageScroller.Viewport"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "MessageScroller",
+            "Button",
+            "MessageScrollerButton",
+            "Content",
+            "MessageScrollerContent",
+            "Item",
+            "MessageScrollerItem",
+            "Provider",
+            "MessageScrollerProvider",
+            "Viewport",
+            "MessageScrollerViewport"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [
+            "useMessageScroller",
+            "useMessageScrollerScrollable",
+            "useMessageScrollerVisibility"
+          ],
+          "extraExports": []
+        },
+        {
+          "slug": "message",
+          "set": "message",
+          "en": "/docs/svelte-ui/components/message/",
+          "ko": "/ko/docs/svelte-ui/components/message/",
+          "json": [
+            "shadcn.Message.Root",
+            "shadcn.Message.Avatar",
+            "shadcn.Message.Content",
+            "shadcn.Message.Footer",
+            "shadcn.Message.Group",
+            "shadcn.Message.Header"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Message",
+            "Avatar",
+            "MessageAvatar",
+            "Content",
+            "MessageContent",
+            "Footer",
+            "MessageFooter",
+            "Group",
+            "MessageGroup",
+            "Header",
+            "MessageHeader"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "native-select",
+          "set": "nativeSelect",
+          "en": "/docs/svelte-ui/components/native-select/",
+          "ko": "/ko/docs/svelte-ui/components/native-select/",
+          "json": [
+            "shadcn.NativeSelect.Root",
+            "shadcn.NativeSelect.OptGroup",
+            "shadcn.NativeSelect.Option"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "NativeSelect",
+            "OptGroup",
+            "NativeSelectOptGroup",
+            "Option",
+            "NativeSelectOption"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "navigation-menu",
+          "set": "navigationMenu",
+          "en": "/docs/svelte-ui/components/navigation-menu/",
+          "ko": "/ko/docs/svelte-ui/components/navigation-menu/",
+          "json": [
+            "shadcn.NavigationMenu.Root",
+            "shadcn.NavigationMenu.Content",
+            "shadcn.NavigationMenu.Indicator",
+            "shadcn.NavigationMenu.Item",
+            "shadcn.NavigationMenu.Link",
+            "shadcn.NavigationMenu.List",
+            "shadcn.NavigationMenu.Trigger",
+            "shadcn.NavigationMenu.Viewport"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "NavigationMenu",
+            "Content",
+            "NavigationMenuContent",
+            "Indicator",
+            "NavigationMenuIndicator",
+            "Item",
+            "NavigationMenuItem",
+            "Link",
+            "NavigationMenuLink",
+            "List",
+            "NavigationMenuList",
+            "Trigger",
+            "NavigationMenuTrigger",
+            "Viewport",
+            "NavigationMenuViewport"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "pagination",
+          "set": "pagination",
+          "en": "/docs/svelte-ui/components/pagination/",
+          "ko": "/ko/docs/svelte-ui/components/pagination/",
+          "json": [
+            "shadcn.Pagination.Root",
+            "shadcn.Pagination.Content",
+            "shadcn.Pagination.Ellipsis",
+            "shadcn.Pagination.Item",
+            "shadcn.Pagination.Link",
+            "shadcn.Pagination.Next",
+            "shadcn.Pagination.NextButton",
+            "shadcn.Pagination.PrevButton",
+            "shadcn.Pagination.Previous"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Pagination",
+            "Content",
+            "PaginationContent",
+            "Ellipsis",
+            "PaginationEllipsis",
+            "Item",
+            "PaginationItem",
+            "Link",
+            "PaginationLink",
+            "Next",
+            "PaginationNext",
+            "NextButton",
+            "PaginationNextButton",
+            "PrevButton",
+            "PaginationPrevButton",
+            "Previous",
+            "PaginationPrevious"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "popover",
+          "set": "popover",
+          "en": "/docs/svelte-ui/components/popover/",
+          "ko": "/ko/docs/svelte-ui/components/popover/",
+          "json": [
+            "shadcn.Popover.Root",
+            "shadcn.Popover.Close",
+            "shadcn.Popover.Content",
+            "shadcn.Popover.Description",
+            "shadcn.Popover.Header",
+            "shadcn.Popover.Portal",
+            "shadcn.Popover.Title",
+            "shadcn.Popover.Trigger"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Popover",
+            "Close",
+            "PopoverClose",
+            "Content",
+            "PopoverContent",
+            "Description",
+            "PopoverDescription",
+            "Header",
+            "PopoverHeader",
+            "Portal",
+            "PopoverPortal",
+            "Title",
+            "PopoverTitle",
+            "Trigger",
+            "PopoverTrigger"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "progress",
+          "set": "progress",
+          "en": "/docs/svelte-ui/components/progress/",
+          "ko": "/ko/docs/svelte-ui/components/progress/",
+          "json": [
+            "shadcn.Progress"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Progress"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "questionnaire",
+          "set": "questionnaire",
+          "en": "/docs/svelte-ui/components/questionnaire/",
+          "ko": "/ko/docs/svelte-ui/components/questionnaire/",
+          "json": [
+            "shadcn.Questionnaire.Root",
+            "shadcn.Questionnaire.Actions",
+            "shadcn.Questionnaire.Choice",
+            "shadcn.Questionnaire.ChoiceDescription",
+            "shadcn.Questionnaire.Choices",
+            "shadcn.Questionnaire.Description",
+            "shadcn.Questionnaire.Error",
+            "shadcn.Questionnaire.Input",
+            "shadcn.Questionnaire.Item",
+            "shadcn.Questionnaire.Next",
+            "shadcn.Questionnaire.Previous",
+            "shadcn.Questionnaire.Progress",
+            "shadcn.Questionnaire.Skip",
+            "shadcn.Questionnaire.Submit",
+            "shadcn.Questionnaire.Title"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Questionnaire",
+            "Actions",
+            "QuestionnaireActions",
+            "Choice",
+            "QuestionnaireChoice",
+            "ChoiceDescription",
+            "QuestionnaireChoiceDescription",
+            "Choices",
+            "QuestionnaireChoices",
+            "Description",
+            "QuestionnaireDescription",
+            "Error",
+            "QuestionnaireError",
+            "Input",
+            "QuestionnaireInput",
+            "Item",
+            "QuestionnaireItem",
+            "Next",
+            "QuestionnaireNext",
+            "Previous",
+            "QuestionnairePrevious",
+            "Progress",
+            "QuestionnaireProgress",
+            "Skip",
+            "QuestionnaireSkip",
+            "Submit",
+            "QuestionnaireSubmit",
+            "Title",
+            "QuestionnaireTitle"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "radio-group",
+          "set": "radioGroup",
+          "en": "/docs/svelte-ui/components/radio-group/",
+          "ko": "/ko/docs/svelte-ui/components/radio-group/",
+          "json": [
+            "shadcn.RadioGroup.Root",
+            "shadcn.RadioGroup.Item"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "RadioGroup",
+            "Item",
+            "RadioGroupItem"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "range-calendar",
+          "set": "rangeCalendar",
+          "en": "/docs/svelte-ui/components/range-calendar/",
+          "ko": "/ko/docs/svelte-ui/components/range-calendar/",
+          "json": [
+            "shadcn.RangeCalendar.Root"
+          ],
+          "nativeOnly": [
+            "shadcn.RangeCalendar.Caption",
+            "shadcn.RangeCalendar.Cell",
+            "shadcn.RangeCalendar.Day",
+            "shadcn.RangeCalendar.Grid",
+            "shadcn.RangeCalendar.GridBody",
+            "shadcn.RangeCalendar.GridHead",
+            "shadcn.RangeCalendar.GridRow",
+            "shadcn.RangeCalendar.HeadCell",
+            "shadcn.RangeCalendar.Header",
+            "shadcn.RangeCalendar.Heading",
+            "shadcn.RangeCalendar.Month",
+            "shadcn.RangeCalendar.Months",
+            "shadcn.RangeCalendar.MonthSelect",
+            "shadcn.RangeCalendar.Nav",
+            "shadcn.RangeCalendar.NextButton",
+            "shadcn.RangeCalendar.PrevButton",
+            "shadcn.RangeCalendar.YearSelect"
+          ],
+          "nativeExports": [
+            "Caption",
+            "Cell",
+            "Day",
+            "Grid",
+            "GridBody",
+            "GridHead",
+            "GridRow",
+            "HeadCell",
+            "Header",
+            "Heading",
+            "Month",
+            "Months",
+            "MonthSelect",
+            "Nav",
+            "NextButton",
+            "PrevButton",
+            "RangeCalendar",
+            "YearSelect"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "resizable",
+          "set": "resizable",
+          "en": "/docs/svelte-ui/components/resizable/",
+          "ko": "/ko/docs/svelte-ui/components/resizable/",
+          "json": [
+            "shadcn.Resizable.Handle",
+            "shadcn.Resizable.Pane",
+            "shadcn.Resizable.PaneGroup"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Handle",
+            "ResizableHandle",
+            "Pane",
+            "ResizablePane",
+            "PaneGroup",
+            "ResizablePaneGroup"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "scroll-area",
+          "set": "scrollArea",
+          "en": "/docs/svelte-ui/components/scroll-area/",
+          "ko": "/ko/docs/svelte-ui/components/scroll-area/",
+          "json": [
+            "shadcn.ScrollArea.Root",
+            "shadcn.ScrollArea.Scrollbar"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "ScrollArea",
+            "Scrollbar",
+            "ScrollAreaScrollbar"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "select",
+          "set": "select",
+          "en": "/docs/svelte-ui/components/select/",
+          "ko": "/ko/docs/svelte-ui/components/select/",
+          "json": [
+            "shadcn.Select.Root",
+            "shadcn.Select.Content",
+            "shadcn.Select.Group",
+            "shadcn.Select.GroupHeading",
+            "shadcn.Select.Item",
+            "shadcn.Select.Label",
+            "shadcn.Select.Portal",
+            "shadcn.Select.ScrollDownButton",
+            "shadcn.Select.ScrollUpButton",
+            "shadcn.Select.Separator",
+            "shadcn.Select.Trigger",
+            "shadcn.Select.Value"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Select",
+            "Content",
+            "SelectContent",
+            "Group",
+            "SelectGroup",
+            "GroupHeading",
+            "SelectGroupHeading",
+            "Item",
+            "SelectItem",
+            "Label",
+            "SelectLabel",
+            "Portal",
+            "SelectPortal",
+            "ScrollDownButton",
+            "SelectScrollDownButton",
+            "ScrollUpButton",
+            "SelectScrollUpButton",
+            "Separator",
+            "SelectSeparator",
+            "Trigger",
+            "SelectTrigger",
+            "Value",
+            "SelectValue"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "separator",
+          "set": "separator",
+          "en": "/docs/svelte-ui/components/separator/",
+          "ko": "/ko/docs/svelte-ui/components/separator/",
+          "json": [
+            "shadcn.Separator"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Separator"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "sheet",
+          "set": "sheet",
+          "en": "/docs/svelte-ui/components/sheet/",
+          "ko": "/ko/docs/svelte-ui/components/sheet/",
+          "json": [
+            "shadcn.Sheet.Root",
+            "shadcn.Sheet.Close",
+            "shadcn.Sheet.Content",
+            "shadcn.Sheet.Description",
+            "shadcn.Sheet.Footer",
+            "shadcn.Sheet.Header",
+            "shadcn.Sheet.Overlay",
+            "shadcn.Sheet.Portal",
+            "shadcn.Sheet.Title",
+            "shadcn.Sheet.Trigger"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Sheet",
+            "Close",
+            "SheetClose",
+            "Content",
+            "SheetContent",
+            "Description",
+            "SheetDescription",
+            "Footer",
+            "SheetFooter",
+            "Header",
+            "SheetHeader",
+            "Overlay",
+            "SheetOverlay",
+            "Portal",
+            "SheetPortal",
+            "Title",
+            "SheetTitle",
+            "Trigger",
+            "SheetTrigger"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "sidebar",
+          "set": "sidebar",
+          "en": "/docs/svelte-ui/components/sidebar/",
+          "ko": "/ko/docs/svelte-ui/components/sidebar/",
+          "json": [
+            "shadcn.Sidebar.Root",
+            "shadcn.Sidebar.Content",
+            "shadcn.Sidebar.Footer",
+            "shadcn.Sidebar.Group",
+            "shadcn.Sidebar.GroupAction",
+            "shadcn.Sidebar.GroupContent",
+            "shadcn.Sidebar.GroupLabel",
+            "shadcn.Sidebar.Header",
+            "shadcn.Sidebar.Input",
+            "shadcn.Sidebar.Inset",
+            "shadcn.Sidebar.Menu",
+            "shadcn.Sidebar.MenuAction",
+            "shadcn.Sidebar.MenuBadge",
+            "shadcn.Sidebar.MenuButton",
+            "shadcn.Sidebar.MenuItem",
+            "shadcn.Sidebar.MenuSkeleton",
+            "shadcn.Sidebar.MenuSub",
+            "shadcn.Sidebar.MenuSubButton",
+            "shadcn.Sidebar.MenuSubItem",
+            "shadcn.Sidebar.Provider",
+            "shadcn.Sidebar.Rail",
+            "shadcn.Sidebar.Separator",
+            "shadcn.Sidebar.Trigger"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Sidebar",
+            "Content",
+            "SidebarContent",
+            "Footer",
+            "SidebarFooter",
+            "Group",
+            "SidebarGroup",
+            "GroupAction",
+            "SidebarGroupAction",
+            "GroupContent",
+            "SidebarGroupContent",
+            "GroupLabel",
+            "SidebarGroupLabel",
+            "Header",
+            "SidebarHeader",
+            "Input",
+            "SidebarInput",
+            "Inset",
+            "SidebarInset",
+            "Menu",
+            "SidebarMenu",
+            "MenuAction",
+            "SidebarMenuAction",
+            "MenuBadge",
+            "SidebarMenuBadge",
+            "MenuButton",
+            "SidebarMenuButton",
+            "MenuItem",
+            "SidebarMenuItem",
+            "MenuSkeleton",
+            "SidebarMenuSkeleton",
+            "MenuSub",
+            "SidebarMenuSub",
+            "MenuSubButton",
+            "SidebarMenuSubButton",
+            "MenuSubItem",
+            "SidebarMenuSubItem",
+            "Provider",
+            "SidebarProvider",
+            "Rail",
+            "SidebarRail",
+            "Separator",
+            "SidebarSeparator",
+            "SidebarTrigger",
+            "Trigger"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [
+            "useSidebar"
+          ],
+          "extraExports": []
+        },
+        {
+          "slug": "skeleton",
+          "set": "skeleton",
+          "en": "/docs/svelte-ui/components/skeleton/",
+          "ko": "/ko/docs/svelte-ui/components/skeleton/",
+          "json": [
+            "shadcn.Skeleton"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Skeleton"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "slider",
+          "set": "slider",
+          "en": "/docs/svelte-ui/components/slider/",
+          "ko": "/ko/docs/svelte-ui/components/slider/",
+          "json": [
+            "shadcn.Slider"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Slider"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "sonner",
+          "set": "sonner",
+          "en": "/docs/svelte-ui/components/sonner/",
+          "ko": "/ko/docs/svelte-ui/components/sonner/",
+          "json": [
+            "shadcn.Sonner",
+            "shadcn.Notifications"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Toaster"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": [
+            "toast"
+          ]
+        },
+        {
+          "slug": "spinner",
+          "set": "spinner",
+          "en": "/docs/svelte-ui/components/spinner/",
+          "ko": "/ko/docs/svelte-ui/components/spinner/",
+          "json": [
+            "shadcn.Spinner"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Spinner"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "switch",
+          "set": "switchSet",
+          "en": "/docs/svelte-ui/components/switch/",
+          "ko": "/ko/docs/svelte-ui/components/switch/",
+          "json": [
+            "shadcn.Switch"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Switch"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "table",
+          "set": "table",
+          "en": "/docs/svelte-ui/components/table/",
+          "ko": "/ko/docs/svelte-ui/components/table/",
+          "json": [
+            "shadcn.Table.Root",
+            "shadcn.Table.Body",
+            "shadcn.Table.Caption",
+            "shadcn.Table.Cell",
+            "shadcn.Table.Footer",
+            "shadcn.Table.Head",
+            "shadcn.Table.Header",
+            "shadcn.Table.Row"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Table",
+            "Body",
+            "TableBody",
+            "Caption",
+            "TableCaption",
+            "Cell",
+            "TableCell",
+            "Footer",
+            "TableFooter",
+            "Head",
+            "TableHead",
+            "Header",
+            "TableHeader",
+            "Row",
+            "TableRow"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "tabs",
+          "set": "tabs",
+          "en": "/docs/svelte-ui/components/tabs/",
+          "ko": "/ko/docs/svelte-ui/components/tabs/",
+          "json": [
+            "shadcn.Tabs.Root",
+            "shadcn.Tabs.Content",
+            "shadcn.Tabs.List",
+            "shadcn.Tabs.Trigger"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Tabs",
+            "Content",
+            "TabsContent",
+            "List",
+            "TabsList",
+            "Trigger",
+            "TabsTrigger"
+          ],
+          "nativeTypeExports": [
+            "TabsListVariant"
+          ],
+          "nativeHelperExports": [
+            "tabsListVariants"
+          ],
+          "extraExports": []
+        },
+        {
+          "slug": "textarea",
+          "set": "textarea",
+          "en": "/docs/svelte-ui/components/textarea/",
+          "ko": "/ko/docs/svelte-ui/components/textarea/",
+          "json": [
+            "shadcn.Textarea"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Textarea"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "toggle-group",
+          "set": "toggleGroup",
+          "en": "/docs/svelte-ui/components/toggle-group/",
+          "ko": "/ko/docs/svelte-ui/components/toggle-group/",
+          "json": [
+            "shadcn.ToggleGroup.Root",
+            "shadcn.ToggleGroup.Item"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "ToggleGroup",
+            "Item",
+            "ToggleGroupItem"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "toggle",
+          "set": "toggle",
+          "en": "/docs/svelte-ui/components/toggle/",
+          "ko": "/ko/docs/svelte-ui/components/toggle/",
+          "json": [
+            "shadcn.Toggle"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Toggle"
+          ],
+          "nativeTypeExports": [
+            "ToggleSize",
+            "ToggleVariant",
+            "ToggleVariants"
+          ],
+          "nativeHelperExports": [
+            "toggleVariants"
+          ],
+          "extraExports": []
+        },
+        {
+          "slug": "tooltip",
+          "set": "tooltip",
+          "en": "/docs/svelte-ui/components/tooltip/",
+          "ko": "/ko/docs/svelte-ui/components/tooltip/",
+          "json": [
+            "shadcn.Tooltip.Root",
+            "shadcn.Tooltip.Content",
+            "shadcn.Tooltip.Portal",
+            "shadcn.Tooltip.Provider",
+            "shadcn.Tooltip.Trigger"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Tooltip",
+            "Content",
+            "TooltipContent",
+            "Portal",
+            "TooltipPortal",
+            "Provider",
+            "TooltipProvider",
+            "Trigger",
+            "TooltipTrigger"
+          ],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "trace",
+          "set": "trace",
+          "en": "/docs/svelte-ui/components/trace/",
+          "ko": "/ko/docs/svelte-ui/components/trace/",
+          "json": [
+            "shadcn.Trace.Root",
+            "shadcn.Trace.Collapsible",
+            "shadcn.Trace.CollapsibleContent",
+            "shadcn.Trace.CollapsibleTrigger",
+            "shadcn.Trace.Description",
+            "shadcn.Trace.Icon",
+            "shadcn.Trace.Line",
+            "shadcn.Trace.Title"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [
+            "Root",
+            "Trace",
+            "Collapsible",
+            "TraceCollapsible",
+            "CollapsibleContent",
+            "TraceCollapsibleContent",
+            "CollapsibleTrigger",
+            "TraceCollapsibleTrigger",
+            "Description",
+            "TraceDescription",
+            "Icon",
+            "TraceIcon",
+            "Line",
+            "TraceLine",
+            "Title",
+            "TraceTitle"
+          ],
+          "nativeTypeExports": [
+            "TraceLineStatus"
+          ],
+          "nativeHelperExports": [],
+          "extraExports": []
+        },
+        {
+          "slug": "typography",
+          "set": "typography",
+          "en": "/docs/svelte-ui/components/typography/",
+          "ko": "/ko/docs/svelte-ui/components/typography/",
+          "json": [
+            "shadcn.Typography"
+          ],
+          "nativeOnly": [],
+          "nativeExports": [],
+          "nativeTypeExports": [],
+          "nativeHelperExports": [],
+          "extraExports": []
+        }
+      ]
+    },
+    "dsl": {
+      "scope": "Current DSL declaration exports plus public host, native, and observation types described in the DSL as cross-references. Pure JS runtime APIs are indexed separately by Core.",
+      "locales": [
+        "en",
+        "ko"
+      ],
+      "pagesPerLocale": 9,
+      "declarationsCovered": [
+        {
+          "name": "JsonValue",
+          "source": "packages/core/src/index.d.ts",
+          "line": 2,
+          "en": "/docs/dsl/resources/#resource-envelope",
+          "ko": "/ko/docs/dsl/resources/#리소스-외피"
+        },
+        {
+          "name": "Schema",
+          "source": "packages/core/src/index.d.ts",
+          "line": 4,
+          "en": "/docs/dsl/types/#schema-vocabulary",
+          "ko": "/ko/docs/dsl/types/#스키마-키워드"
+        },
+        {
+          "name": "TypeContract",
+          "source": "packages/core/src/index.d.ts",
+          "line": 5,
+          "en": "/docs/dsl/types/#type-resource",
+          "ko": "/ko/docs/dsl/types/#type-리소스"
+        },
+        {
+          "name": "ResourceKind",
+          "source": "packages/core/src/index.d.ts",
+          "line": 9,
+          "en": "/docs/dsl/resources/#resource-envelope",
+          "ko": "/ko/docs/dsl/resources/#리소스-외피"
+        },
+        {
+          "name": "Resource",
+          "source": "packages/core/src/index.d.ts",
+          "line": 10,
+          "en": "/docs/dsl/resources/#resource-envelope",
+          "ko": "/ko/docs/dsl/resources/#리소스-외피"
+        },
+        {
+          "name": "QuerySnapshot",
+          "source": "packages/core/src/index.d.ts",
+          "line": 31,
+          "en": "/docs/dsl/queries/#querysnapshot",
+          "ko": "/ko/docs/dsl/queries/#querysnapshot"
+        },
+        {
+          "name": "ValuePort",
+          "source": "packages/core/src/index.d.ts",
+          "line": 76,
+          "en": "/docs/dsl/state-and-ports/#ports",
+          "ko": "/ko/docs/dsl/state-and-ports/#포트"
+        },
+        {
+          "name": "StatePort",
+          "source": "packages/core/src/index.d.ts",
+          "line": 77,
+          "en": "/docs/dsl/state-and-ports/#ports",
+          "ko": "/ko/docs/dsl/state-and-ports/#포트"
+        },
+        {
+          "name": "QueryPort",
+          "source": "packages/core/src/index.d.ts",
+          "line": 78,
+          "en": "/docs/dsl/state-and-ports/#ports",
+          "ko": "/ko/docs/dsl/state-and-ports/#포트"
+        },
+        {
+          "name": "Port",
+          "source": "packages/core/src/index.d.ts",
+          "line": 79,
+          "en": "/docs/dsl/state-and-ports/#ports",
+          "ko": "/ko/docs/dsl/state-and-ports/#포트"
+        },
+        {
+          "name": "CodeActionSpec",
+          "source": "packages/core/src/index.d.ts",
+          "line": 96,
+          "en": "/docs/dsl/actions/#code-action-definitions",
+          "ko": "/ko/docs/dsl/actions/#코드형-action-정의"
+        },
+        {
+          "name": "CodeActionDefinition",
+          "source": "packages/core/src/index.d.ts",
+          "line": 97,
+          "en": "/docs/dsl/actions/#code-action-definitions",
+          "ko": "/ko/docs/dsl/actions/#코드형-action-정의"
+        },
+        {
+          "name": "ActionSnapshot",
+          "source": "packages/core/src/index.d.ts",
+          "line": 98,
+          "en": "/docs/dsl/actions/#actioncall",
+          "ko": "/ko/docs/dsl/actions/#actioncall"
+        },
+        {
+          "name": "ValueExpression",
+          "source": "packages/core/src/index.d.ts",
+          "line": 100,
+          "en": "/docs/dsl/values/#valueexpression-and-pathexpression",
+          "ko": "/ko/docs/dsl/values/#valueexpression과-pathexpression"
+        },
+        {
+          "name": "InputExpressions",
+          "source": "packages/core/src/index.d.ts",
+          "line": 101,
+          "en": "/docs/dsl/values/#valueexpression-and-pathexpression",
+          "ko": "/ko/docs/dsl/values/#valueexpression과-pathexpression"
+        },
+        {
+          "name": "PathExpression",
+          "source": "packages/core/src/index.d.ts",
+          "line": 102,
+          "en": "/docs/dsl/values/#valueexpression-and-pathexpression",
+          "ko": "/ko/docs/dsl/values/#valueexpression과-pathexpression"
+        },
+        {
+          "name": "ActionSpec",
+          "source": "packages/core/src/index.d.ts",
+          "line": 103,
+          "en": "/docs/dsl/actions/#actionspec",
+          "ko": "/ko/docs/dsl/actions/#actionspec"
+        },
+        {
+          "name": "ActionCall",
+          "source": "packages/core/src/index.d.ts",
+          "line": 104,
+          "en": "/docs/dsl/actions/#actioncall",
+          "ko": "/ko/docs/dsl/actions/#actioncall"
+        },
+        {
+          "name": "Step",
+          "source": "packages/core/src/index.d.ts",
+          "line": 105,
+          "en": "/docs/dsl/actions/#steps",
+          "ko": "/ko/docs/dsl/actions/#단계"
+        },
+        {
+          "name": "HttpRequest",
+          "source": "packages/core/src/index.d.ts",
+          "line": 113,
+          "en": "/docs/dsl/datasources/#httprequest",
+          "ko": "/ko/docs/dsl/datasources/#httprequest"
+        },
+        {
+          "name": "DatasourceSpec",
+          "source": "packages/core/src/index.d.ts",
+          "line": 114,
+          "en": "/docs/dsl/datasources/#datasourcespec",
+          "ko": "/ko/docs/dsl/datasources/#datasourcespec"
+        },
+        {
+          "name": "QuerySource",
+          "source": "packages/core/src/index.d.ts",
+          "line": 115,
+          "en": "/docs/dsl/queries/#querysource",
+          "ko": "/ko/docs/dsl/queries/#querysource"
+        },
+        {
+          "name": "TransformStep",
+          "source": "packages/core/src/index.d.ts",
+          "line": 117,
+          "en": "/docs/dsl/queries/#transformstep",
+          "ko": "/ko/docs/dsl/queries/#transformstep"
+        },
+        {
+          "name": "QuerySpec",
+          "source": "packages/core/src/index.d.ts",
+          "line": 118,
+          "en": "/docs/dsl/queries/#queryspec",
+          "ko": "/ko/docs/dsl/queries/#queryspec"
+        },
+        {
+          "name": "VariableSpec",
+          "source": "packages/core/src/index.d.ts",
+          "line": 119,
+          "en": "/docs/dsl/state-and-ports/#variablespec",
+          "ko": "/ko/docs/dsl/state-and-ports/#variablespec"
+        },
+        {
+          "name": "QueryUse",
+          "source": "packages/core/src/index.d.ts",
+          "line": 120,
+          "en": "/docs/dsl/queries/#queryuse-and-querydefaults",
+          "ko": "/ko/docs/dsl/queries/#queryuse-and-querydefaults"
+        },
+        {
+          "name": "QueryDefaults",
+          "source": "packages/core/src/index.d.ts",
+          "line": 121,
+          "en": "/docs/dsl/queries/#queryuse-and-querydefaults",
+          "ko": "/ko/docs/dsl/queries/#queryuse-and-querydefaults"
+        },
+        {
+          "name": "ResourceStateDeclaration",
+          "source": "packages/core/src/index.d.ts",
+          "line": 122,
+          "en": "/docs/dsl/state-and-ports/#state-declarations",
+          "ko": "/ko/docs/dsl/state-and-ports/#state-선언"
+        },
+        {
+          "name": "Reaction",
+          "source": "packages/core/src/index.d.ts",
+          "line": 123,
+          "en": "/docs/dsl/state-and-ports/#reactions",
+          "ko": "/ko/docs/dsl/state-and-ports/#reaction"
+        },
+        {
+          "name": "ComponentPublicContract",
+          "source": "packages/core/src/index.d.ts",
+          "line": 124,
+          "en": "/docs/dsl/view-and-component/#viewspec-and-componentspec",
+          "ko": "/ko/docs/dsl/view-and-component/#viewspec-and-componentspec"
+        },
+        {
+          "name": "ComponentContract",
+          "source": "packages/core/src/index.d.ts",
+          "line": 125,
+          "en": "/docs/dsl/view-and-component/#viewspec-and-componentspec",
+          "ko": "/ko/docs/dsl/view-and-component/#viewspec-and-componentspec"
+        },
+        {
+          "name": "ComponentSpec",
+          "source": "packages/core/src/index.d.ts",
+          "line": 126,
+          "en": "/docs/dsl/view-and-component/#viewspec-and-componentspec",
+          "ko": "/ko/docs/dsl/view-and-component/#viewspec-and-componentspec"
+        },
+        {
+          "name": "ViewSpec",
+          "source": "packages/core/src/index.d.ts",
+          "line": 127,
+          "en": "/docs/dsl/view-and-component/#viewspec-and-componentspec",
+          "ko": "/ko/docs/dsl/view-and-component/#viewspec-and-componentspec"
+        },
+        {
+          "name": "ComponentNode",
+          "source": "packages/core/src/index.d.ts",
+          "line": 128,
+          "en": "/docs/dsl/view-and-component/#componentnode",
+          "ko": "/ko/docs/dsl/view-and-component/#componentnode"
+        },
+        {
+          "name": "ResourceSpecs",
+          "source": "packages/core/src/index.d.ts",
+          "line": 133,
+          "en": "/docs/dsl/resources/#resource-envelope",
+          "ko": "/ko/docs/dsl/resources/#리소스-외피"
+        },
+        {
+          "name": "AnyResource",
+          "source": "packages/core/src/index.d.ts",
+          "line": 134,
+          "en": "/docs/dsl/resources/#resource-envelope",
+          "ko": "/ko/docs/dsl/resources/#리소스-외피"
+        },
+        {
+          "name": "RegisteredResource",
+          "source": "packages/core/src/index.d.ts",
+          "line": 135,
+          "en": "/docs/dsl/resources/#resource-envelope",
+          "ko": "/ko/docs/dsl/resources/#리소스-외피"
+        },
+        {
+          "name": "ViewTarget",
+          "source": "packages/core/src/index.d.ts",
+          "line": 151,
+          "en": "/docs/dsl/resources/#references-and-inline-bodies",
+          "ko": "/ko/docs/dsl/resources/#참조와-인라인-본문"
+        },
+        {
+          "name": "CelFunction",
+          "source": "packages/core/src/index.d.ts",
+          "line": 184,
+          "en": "/docs/dsl/values/#calling-value-functions",
+          "ko": "/ko/docs/dsl/values/#값-함수-호출"
+        },
+        {
+          "name": "GridConfig",
+          "source": "packages/core/src/index.d.ts",
+          "line": 189,
+          "en": "/docs/dsl/view-and-component/#grid-placement",
+          "ko": "/ko/docs/dsl/view-and-component/#grid-배치"
+        },
+        {
+          "name": "GridPlacement",
+          "source": "packages/core/src/index.d.ts",
+          "line": 190,
+          "en": "/docs/dsl/view-and-component/#grid-placement",
+          "ko": "/ko/docs/dsl/view-and-component/#grid-배치"
+        },
+        {
+          "name": "computeGridLayout",
+          "source": "packages/core/src/index.d.ts",
+          "line": 191,
+          "en": "/docs/dsl/view-and-component/#grid-placement",
+          "ko": "/ko/docs/dsl/view-and-component/#grid-배치"
+        }
+      ],
+      "verification": {
+        "examples": {
+          "command": "node apps/docs/scripts/verify-dsl-docs.mjs",
+          "assertionsPassed": 16,
+          "log": "/tmp/viewstem-dsl-docs-verification.log",
+          "limits": [
+            "Uses public built package entry points",
+            "Core snapshots verified against shadcn support catalog schemas; no browser DOM checks in this script",
+            "Mocks HTTP transport and secret resolution"
+          ]
+        },
+        "sourceLinks": {
+          "checked": 100,
+          "log": "/tmp/viewstem-dsl-docs-links.log"
+        },
+        "coreTests": {
+          "command": "npm run test -w @viewstem/core",
+          "passed": 1080,
+          "failed": 0,
+          "log": "/tmp/viewstem-dsl-docs-core-test.log"
+        }
+      },
+      "differences": [
+        {
+          "topic": "Action step inputs",
+          "spec": "docs/VIEWSTEM-SPEC.md:378",
+          "publicDeclaration": "packages/core/src/index.d.ts:106",
+          "implementation": [
+            "packages/core/src/registry.mjs:313",
+            "packages/core/src/action.mjs:185"
+          ],
+          "result": "Public type, registration and execution allow omitted inputs when no required child input is unsupplied. Spec overview says to explicitly declare inputs. DSL describes current executable form."
+        },
+        {
+          "topic": "Retained Query scheduling settings",
+          "spec": "docs/spec/02-query.md:198",
+          "implementation": [
+            "packages/core/src/runtime.mjs:316",
+            "packages/core/src/query/usage.mjs:57"
+          ],
+          "result": "Retained use can keep previous refresh and intervalMs when removed from a View update with no inherited value. New uses receive documented defaults. DSL records the observed difference."
+        },
+        {
+          "topic": "State initialization and Derived context",
+          "implementation": [
+            "packages/core/src/registry.mjs:346",
+            "packages/core/src/registry.mjs:352",
+            "packages/core/src/runtime.mjs:181"
+          ],
+          "result": "Registry rejects /queries in State.initial and Derived inputs; this constrains public behavior despite /queries being listed in a lower-level runtime evaluator."
+        }
+      ],
+      "probes": "/tmp/viewstem-dsl-docs-contract-probes.log"
+    }
+  },
+  "coreExamples": {
+    "examples": 14,
+    "publicBindings": 88,
+    "runs": [
+      {
+        "file": "apps/docs/src/content/docs/docs/core/cel.md",
+        "example": "cel-evaluation.mjs",
+        "output": "3\n5"
+      },
+      {
+        "file": "apps/docs/src/content/docs/docs/core/guides/http-and-actions.md",
+        "example": "http-action.mjs",
+        "output": "0\nProject\nHello, Viewstem"
+      },
+      {
+        "file": "apps/docs/src/content/docs/docs/core/guides/runtime.md",
+        "example": "run-view.mjs",
+        "output": "Hello\nUpdated"
+      },
+      {
+        "file": "apps/docs/src/content/docs/docs/core/guides/state-and-url.md",
+        "example": "state-url.mjs",
+        "output": "\narchived\ntrue"
+      },
+      {
+        "file": "apps/docs/src/content/docs/docs/core/http.md",
+        "example": "http-executor.mjs",
+        "output": "{ ok: true }"
+      },
+      {
+        "file": "apps/docs/src/content/docs/docs/core/url.md",
+        "example": "merge-url.mjs",
+        "output": "https://example.test/?campaign=a%20b&filter=active#list"
+      },
+      {
+        "file": "apps/docs/src/content/docs/docs/core/utilities.md",
+        "example": "grid-layout.mjs",
+        "output": "{ rowSpan: 1, columnSpan: 6, row: 1, column: 7 }"
+      },
+      {
+        "file": "apps/docs/src/content/docs/ko/docs/core/cel.md",
+        "example": "cel-evaluation.mjs",
+        "output": "3\n5"
+      },
+      {
+        "file": "apps/docs/src/content/docs/ko/docs/core/guides/http-and-actions.md",
+        "example": "http-action.mjs",
+        "output": "0\nProject\nHello, Viewstem"
+      },
+      {
+        "file": "apps/docs/src/content/docs/ko/docs/core/guides/runtime.md",
+        "example": "run-view.mjs",
+        "output": "Hello\nUpdated"
+      },
+      {
+        "file": "apps/docs/src/content/docs/ko/docs/core/guides/state-and-url.md",
+        "example": "state-url.mjs",
+        "output": "\narchived\ntrue"
+      },
+      {
+        "file": "apps/docs/src/content/docs/ko/docs/core/http.md",
+        "example": "http-executor.mjs",
+        "output": "{ ok: true }"
+      },
+      {
+        "file": "apps/docs/src/content/docs/ko/docs/core/url.md",
+        "example": "merge-url.mjs",
+        "output": "https://example.test/?campaign=a%20b&filter=active#list"
+      },
+      {
+        "file": "apps/docs/src/content/docs/ko/docs/core/utilities.md",
+        "example": "grid-layout.mjs",
+        "output": "{ rowSpan: 1, columnSpan: 6, row: 1, column: 7 }"
+      }
+    ]
+  },
+  "links": {
+    "htmlPages": 335,
+    "localLinks": 27922,
+    "localizedPagePairs": {
+      "core": 13,
+      "svelte": 10,
+      "svelte-ui": 74,
+      "dsl": 9
+    },
+    "errors": []
+  },
+  "browser": {
+    "mobile": [
+      {
+        "route": "docs/core/runtime/",
+        "h1": "Runtime",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "docs/core/types/",
+        "h1": "Public API and type index",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "docs/core/guides/runtime/",
+        "h1": "Run and observe a View",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "docs/dsl/queries/",
+        "h1": "Queries",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "docs/svelte/renderer/",
+        "h1": "createRenderer and Renderer",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "docs/svelte/guides/write-an-adapter/",
+        "h1": "Write an adapter with a slot and an event",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "docs/svelte-ui/component-sets/",
+        "h1": "Component sets",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "docs/svelte-ui/components/button/",
+        "h1": "Button",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "docs/svelte-ui/components/calendar/",
+        "h1": "Calendar",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "docs/svelte-ui/attributes/",
+        "h1": "HTML, ARIA, and DOM events",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "ko/docs/core/runtime/",
+        "h1": "Runtime",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "ko/docs/core/types/",
+        "h1": "공개 API·타입 색인",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "ko/docs/core/guides/runtime/",
+        "h1": "View 실행하고 관찰하기",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "ko/docs/dsl/queries/",
+        "h1": "Query",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "ko/docs/svelte/renderer/",
+        "h1": "createRenderer와 Renderer",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "ko/docs/svelte/guides/write-an-adapter/",
+        "h1": "슬롯과 이벤트가 있는 어댑터 만들기",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "ko/docs/svelte-ui/component-sets/",
+        "h1": "컴포넌트 세트",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "ko/docs/svelte-ui/components/button/",
+        "h1": "Button",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "ko/docs/svelte-ui/components/calendar/",
+        "h1": "Calendar",
+        "scrollWidth": 305,
+        "width": 305
+      },
+      {
+        "route": "ko/docs/svelte-ui/attributes/",
+        "h1": "HTML·ARIA 입력과 DOM 이벤트",
+        "scrollWidth": 305,
+        "width": 305
+      }
+    ],
+    "desktop": [
+      {
+        "route": "docs/core/runtime/",
+        "h1": "Runtime",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "docs/core/types/",
+        "h1": "Public API and type index",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "docs/core/guides/runtime/",
+        "h1": "Run and observe a View",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "docs/dsl/queries/",
+        "h1": "Queries",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "docs/svelte/renderer/",
+        "h1": "createRenderer and Renderer",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "docs/svelte/guides/write-an-adapter/",
+        "h1": "Write an adapter with a slot and an event",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "docs/svelte-ui/component-sets/",
+        "h1": "Component sets",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "docs/svelte-ui/components/button/",
+        "h1": "Button",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "docs/svelte-ui/components/calendar/",
+        "h1": "Calendar",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "docs/svelte-ui/attributes/",
+        "h1": "HTML, ARIA, and DOM events",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "ko/docs/core/runtime/",
+        "h1": "Runtime",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "ko/docs/core/types/",
+        "h1": "공개 API·타입 색인",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "ko/docs/core/guides/runtime/",
+        "h1": "View 실행하고 관찰하기",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "ko/docs/dsl/queries/",
+        "h1": "Query",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "ko/docs/svelte/renderer/",
+        "h1": "createRenderer와 Renderer",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "ko/docs/svelte/guides/write-an-adapter/",
+        "h1": "슬롯과 이벤트가 있는 어댑터 만들기",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "ko/docs/svelte-ui/component-sets/",
+        "h1": "컴포넌트 세트",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "ko/docs/svelte-ui/components/button/",
+        "h1": "Button",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "ko/docs/svelte-ui/components/calendar/",
+        "h1": "Calendar",
+        "scrollWidth": 1425,
+        "width": 1425
+      },
+      {
+        "route": "ko/docs/svelte-ui/attributes/",
+        "h1": "HTML·ARIA 입력과 DOM 이벤트",
+        "scrollWidth": 1425,
+        "width": 1425
+      }
+    ],
+    "flows": [
+      "ko createHttpExecutor search",
+      "en createRenderer search",
+      "mobile package menu navigation closes menu",
+      "same-page ko to en switch"
+    ]
+  },
+  "verification": {
+    "dslExamples": 16,
+    "coreRegressionTests": 1080,
+    "svelteGuideFences": 18,
+    "svelteReferenceImportFences": 2,
+    "svelteRunnableApps": 6,
+    "uiTypecheckedSnippets": 150,
+    "uiChromiumChecks": 20
+  },
+  "limitations": [
+    "HTTP examples use mocked transport.",
+    "Browser viewport checks cover 20 representative localized pages at 320 and 1440 CSS pixels, not every page.",
+    "Query settings omitted during retained-use update can remain active; this is existing runtime behavior, not a new contract.",
+    "Existing Action step inputs requirement in the design overview differs from the optional public declaration/implementation."
+  ],
+  "sourceSha256": {
+    "apps/docs/src/content/docs/docs/core/cel.md": "f9a2ef64312c05332f51e4c1de3273b2e8bc798699b9da8f3397fdc8e002f4a2",
+    "apps/docs/src/content/docs/docs/core/guides/http-and-actions.md": "4db98004f0f7570cf0d59c23ae045591cc98f3b3759cda906f96df340b73d269",
+    "apps/docs/src/content/docs/docs/core/guides/runtime.md": "52768cb923c9116478cae2dbb6b93e316d5583670008f229b6e44e42b1b7e0b5",
+    "apps/docs/src/content/docs/docs/core/guides/state-and-url.md": "ef386f76d04c5df5e16f0d93c870aaffaa575ba457b0a79dd5fe05f317849a6c",
+    "apps/docs/src/content/docs/docs/core/http.md": "17f0a9601d18728d8bb6261b8ed9edb3b40281f2dc5e42455388babff8ecb72c",
+    "apps/docs/src/content/docs/docs/core/index.md": "0a28441894025de75950af5f84a2129c27abec5c80b5f663ab90240b47903b65",
+    "apps/docs/src/content/docs/docs/core/registry.md": "57307ed0b3891b127af44b3717cb10e4e547d45c40ad26067e3e2d1588f827d9",
+    "apps/docs/src/content/docs/docs/core/runtime.md": "f02cbf49127131a5ac81f16b90c83cb2602272d8ea365215fd973f76d2c14506",
+    "apps/docs/src/content/docs/docs/core/state-store.md": "69dc3a469cd3eb520615e4ca011473a3bb3fd3f96ab8c1a04dbef80e99462f65",
+    "apps/docs/src/content/docs/docs/core/types.md": "4b4ff4571fa6beeea61376c0fd6879713ec5780080fef02aac59e7efe7a0bb5c",
+    "apps/docs/src/content/docs/docs/core/url.md": "56ee03588f9786aa7f6f0e1f3efb970391088bfc26f33e9bf85577c4150fcbe8",
+    "apps/docs/src/content/docs/docs/core/utilities.md": "e55fbd325acc27570228743bf13c2202605b38555b64a2cdfafad63e22e0f562",
+    "apps/docs/src/content/docs/docs/core/view.md": "f409405d0fd16f4bb36a33f9057ef007182c2f1c2a0e2b744482e9fc8f42a370",
+    "apps/docs/src/content/docs/docs/dsl/actions.md": "b55b90c5ca2f0ec5905243e60fc6c097538a9c75abdc7389dedf0c137b7f8f38",
+    "apps/docs/src/content/docs/docs/dsl/datasources.md": "a40b3e7daffe134a3c887bedb42778b25ef10ad613b07a4e9fb8f78ac3b12268",
+    "apps/docs/src/content/docs/docs/dsl/index.md": "70478654f5ca4d23e11ea15284560e7c531b25a688dc1df81a0ee0c43a51d425",
+    "apps/docs/src/content/docs/docs/dsl/queries.md": "9a6a77e7030207eab29fc6db2fb4e2b831331c064736cde04f9b809bae03fd61",
+    "apps/docs/src/content/docs/docs/dsl/resources.md": "5a9e9ac1993f04b3f4bf2825df77503cd9f804ea410ce13d15f63e870108e722",
+    "apps/docs/src/content/docs/docs/dsl/state-and-ports.md": "6e32d42ed840ef1443274c4824b6883aafb5903a97b5c06522dc5d0442269f94",
+    "apps/docs/src/content/docs/docs/dsl/types.md": "52afcca55b39dd4ec040126881aa261b19cf8523aa6a4766f0e0369bcf7435d0",
+    "apps/docs/src/content/docs/docs/dsl/values.md": "84453108661f58ae14b5291c089b4a4f4229da780c2b3b7575c924d49a6de85f",
+    "apps/docs/src/content/docs/docs/dsl/view-and-component.md": "d52f212d77630d7b4bb16f607e5e49020d67dc6fe0f94cc090c517c7bdbeb0e7",
+    "apps/docs/src/content/docs/docs/svelte/adapters.md": "b12a49a041b5bd0432e0396adb9e69495ee1b00bc53f441e70b03cab6f0157ed",
+    "apps/docs/src/content/docs/docs/svelte/errors.md": "3c9f8e9033010c99db04dabcb65f1e9b8569b29a0bdb802a173dd8c4f194b62f",
+    "apps/docs/src/content/docs/docs/svelte/guides/manage-view-lifecycle.md": "debf8bf4072dbbaada00c70693ce169af9a9f372e8a5ebe01a18474952bf625c",
+    "apps/docs/src/content/docs/docs/svelte/guides/mount-in-svelte.md": "b6cec74292011e02a5945b62f0fae0b1ddebda7cb145d67a19332e7e9ba34f85",
+    "apps/docs/src/content/docs/docs/svelte/guides/write-an-adapter.md": "ba9c5a5e6c5708fa0459ae09f3b78ffa89d22837f91d6544ac449f28ce331a4a",
+    "apps/docs/src/content/docs/docs/svelte/index.md": "fd2da7a4f14062fa1ee50d104d7c55feffd9036b88195cf71fb24136c07b246c",
+    "apps/docs/src/content/docs/docs/svelte/mounted-view.md": "af9644d521c9130a7d9575b4debb5cf197fd160615f9b934c54a49a3801a9247",
+    "apps/docs/src/content/docs/docs/svelte/renderer.md": "48bd2fd2e87b3fdf19eaa5337eb3e2d0558329ba7b09f19a7f28ab6218cb555d",
+    "apps/docs/src/content/docs/docs/svelte/types.md": "7bbd8456d17b3da9652220d5eff744f71a09cccaa2bb0d6dc763094f1b445fd7",
+    "apps/docs/src/content/docs/docs/svelte/viewstem-view.md": "404800b05ce8eee7845ac4caaee1a959ce8b9740fcbf81abc0f13a511a4f156d",
+    "apps/docs/src/content/docs/docs/svelte-ui/attributes/index.md": "0e23b231f9b64c55ecf016e91435e2c5b6c6d2c5a632746ef86c8660231b5f36",
+    "apps/docs/src/content/docs/docs/svelte-ui/component-sets/index.md": "8f1ae8d0d4c9a48b5ee8a233e5fc0c27d1280e868588999b957745f5a14bbd3b",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/accordion.md": "51cea6bfa387da618d42bbcaec5e4ae5de538f29449e32ce36025e37ffe06d81",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/alert-dialog.md": "be34de19688fe34342b427945655ca7960ffcd6bc0d007f2a26076058f985df7",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/alert.md": "6ad1e7a4752ae657e65e1b5d8c91cc891e4227f679f6ec46e43d2669c8cf86ac",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/aspect-ratio.md": "3b67265d00340af7c8182fc06b38fc171380577e46f5985e957a6ba0ed9db579",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/attachment.md": "fb915a1dd0e3ed5cc5478f2d5d82a30ae7dcb6f3922e293a958529266929506a",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/avatar.md": "d8dc20d5e17f55f271ae4ee04f78f1e12f18c59d563ca77dbb6c2167283ce6fe",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/badge.md": "8d862386239ad74a39e5a19fde4f69a86c7ccf313ce9003515d52ac4e783c8e9",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/breadcrumb.md": "8a266eaee473571df232df9650cffe60ba46d1a4bfa9efad8e38ba42c4a274d8",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/bubble.md": "b74d79ac3cbc73a23bd375542a7e062cd746d0b9a2627d7c73e9d868dd6f61e3",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/button-group.md": "c17c170188224b65b72e03f78bc831b2b91940b912deca6df4b712a828564e0d",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/button.md": "3a756355243ad4c52d191873946be78fa667cca981afa60dfafd4a2e98f79e7c",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/calendar.md": "0f4ff5bc26eee4067d6efa5f910f97e44cd2546ade2ec9c02ff468ea7f5a07fb",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/card.md": "e6157fe05726cc0bfee21b6a08395cd4f87127cf875c2afdbc04ab527f7bc8da",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/carousel.md": "b24ab3764a0b8f83db5370a3e4d30d5e2ca83e360619c92681dbd45842fe24ec",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/chart.md": "26e744f9345622d82d61c02f5612a24c2f7afc709b300bb4733c5592a2bb64bb",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/checkbox.md": "31a981419ab9dccc06eb6b08bd1e5808e205231fa496863769b8c12de581b089",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/code-block.md": "7212646917db8a9fce6311bb5525461423c90539b074abf7b6ab9c4925551dfa",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/collapsible.md": "6be480e3802cb54cb363f58d6eab7d205a14e63f0f6bb0eb1e6c3a1663d1ce72",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/combobox.md": "eac239107cf9e23661fe3ba5630d2bd6777e58d91a1b7d3d654d492d0b24dd11",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/command.md": "ed5146bf3e2cdfdd5b8d3c0e3a43e8956f51ddb210a2795e6cff24626e7ef339",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/context-menu.md": "0c0cbf0c838a3fe1fc3ea9e79226e04cc4b559e88afef49e08b8f94bf89a5a87",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/data-table.md": "0e4ed10db42f9980135ed64ab2f1c716e10ab46e15b608337c9b4a78d3adba16",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/date-picker.md": "ee49482760ef2ffee06bec709f948037a1bb6f1c2c6289d22acfa2a2b91b855d",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/dialog.md": "5395485b1bee9c46eb8e8b36ed9dd192e2acbfa43ea0d266e704137e5e9a323a",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/drawer.md": "6900d0e28dc941bf878f8731635ec5bc5efebe601eb26af4419ba3cf91eee8b2",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/dropdown-menu.md": "ef1ed690857f9ae1f6948d10d1ab96d3fc567c9c8f876790f0392084ef59bd72",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/empty.md": "d61eff02696d25d1d34f2fe46650d6d79dbcb867f3866e75b16926bf08f62128",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/field.md": "8d73b2683024b76953d485ab870b5160fd8ab374d8d278b5596416381dd0993e",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/hover-card.md": "a7ecc81b81563ef61a5da3503dd4307b941d4b807b098e958734e4d5651ab110",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/input-group.md": "4025671f0008976b914ea045d160e31d99796ca7ea2d33064a587047aebcbf5c",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/input-otp.md": "7664fd8c8fe3b572d01bc7723d15afca184aec2dfe62b0eeb05afb96adb607a4",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/input.md": "989bd89f916d21a56e99930c7ecdb566b62ef410fa599c872a3fa56ede03667b",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/item.md": "bca8bf911a292e5248c47cffe0615bc59d46717d30cb1335e3b1efdfee1884af",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/kbd.md": "d74374f765d8f013d2074dd465f37192d49e3ee9e0d418bb7ea2aef6dcff9528",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/label.md": "5d5164780f4fbc16c52d2feb3be4ccc10e59f4dd0e498b1fb4a76434521dc029",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/marker.md": "c42bbdb277a1a130bf6cc5d19565e94505fc5ce4bb16a135f3092d0cb420eb22",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/menubar.md": "d0f95b42f9c19ea7d544031e0b8f4ed3b42496f12c1c1153d435708deb35104b",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/message-scroller.md": "83267b72d2ab0b2f2260b9e646ec8395ef12201ed50ef610bdba95f922417d83",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/message.md": "ccb197bb3603a0a8bd8c9072c822881685d998c13141e93d97f12d77c76a7616",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/native-select.md": "3324eba8587454e43ff89fd88c625bd8775bf22d5722a01420abb60196c113c3",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/navigation-menu.md": "93f00591b2083c8b6a1bebeb082c68420a7ea0ed4da376eb1e6f6656d2041143",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/pagination.md": "c7167f06d8f34907fba422e6926b706be3e518a2b3496660a42d6234be7fdc38",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/popover.md": "04e5044ed3a052fc484d460a3ef379beaa334299319382aaf64045dbec4a8134",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/progress.md": "907ded3dc53f4ad60507c0b408a091ba345610331961b23c5f3b3477a1d1a088",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/questionnaire.md": "9a60da5fb8aa84e04faf32aeec25eef6326e6d87858b480b5434c40b138f94f1",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/radio-group.md": "52f0912dd1b1bee11b1adbbf01b7afb03b3647d8dd61b5afc901928452ac8f6c",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/range-calendar.md": "cb06bfda45dae9ccf226a83a28028eb9d983a9ff4b23e763ad13a556e2c06acf",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/resizable.md": "a48d9902c980108bbafa28a1e4ba22d7861fd4ee1bf4fa6aac2c7a5ecd7fabbf",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/scroll-area.md": "7f0e052eb4bb6c038cc72d194cb8d39821bce1459bfed01d66ce304bfbbe8e66",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/select.md": "4b0ab265ceb73a52e841ccb6448e56501d638f503660301e6b8a135a7fa0206d",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/separator.md": "269ed7cf8baa8e39ba7db96b852daefa483e0d369cd4e2c68180ab2e143b5abc",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/sheet.md": "ba5b3af00f6e90f42e6b0bc5d50de145ab62f9b15ed95d49b9e030d281460920",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/sidebar.md": "e21cc1539ee359a37d63339f0f4fe2523a2f5d58a22e947ee9403b7916fad1ce",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/skeleton.md": "fbf48ad645c45fc0ea637ebc548445103db719e613000c53ac10441c7553c838",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/slider.md": "518d72362f7e2af0553bcf7ba219b64e40d3e72ed8a9f33b5011c763514a0f35",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/sonner.md": "d7a04158024650064d95d5d4a3311d564054764e2094b9eb95fa32a161daaf45",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/spinner.md": "a63910b9f104ba3fb60b8b9704fa816201f38cf1d3add2fcf183527dd257536f",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/switch.md": "17ef1db92e1494b740f2a9ee910c41922c095b45ee2f320b5e5dd020bee23c41",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/table.md": "cd8960b05e9d2e2d199ae193a325a15c4fde98ed4c85080d4d2ff0da96bacb3d",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/tabs.md": "db91318e0ec5f8cef0c4c6615e1fe42b2a53ed185ac9039fb4acb0d379c6c567",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/textarea.md": "ef0f4dcd97fa22008a8a6ff79a8766218e522868376cdc681af5a7848768eb3b",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/toggle-group.md": "f4672e7ecb2637364cc6414ad46aef889c223520bc68a717e100cbc25bf4a976",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/toggle.md": "336a51f730dd0e2d29089730af5c882bb2530dce978aa5e38a85e90b662b6b40",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/tooltip.md": "3180d7282f20759856c1e239a484484666ede9497ede697781aef86c9de36975",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/trace.md": "a6a66845c5b79fdf896cb1748d5a9cf425408b79c67e869afc26b08fe748e366",
+    "apps/docs/src/content/docs/docs/svelte-ui/components/typography.md": "7dc8f1b07217000ead5279e61ed7b9c3e16ec5599edca1c7219f00344a7bd7b8",
+    "apps/docs/src/content/docs/docs/svelte-ui/guides/compose-json.md": "f35242651472fd504447c4f5ff325e79e16d85fdc03e1042b9026499784cd2a7",
+    "apps/docs/src/content/docs/docs/svelte-ui/guides/register-families.md": "42e8b15f5a2ee55a7a765f2d6a36e51d5e9edb27f5dc4be042310ed6824cc509",
+    "apps/docs/src/content/docs/docs/svelte-ui/guides/style-and-native.md": "b3a18b56dd2bae285a3a0936afc0f2ab7e19ef07a0ad7ad144d95fa05c86297d",
+    "apps/docs/src/content/docs/docs/svelte-ui/index.md": "95bd29a22f0eef35c3a7eee32c809af36b89e0e752724d55edd220e7c2200788",
+    "apps/docs/src/content/docs/docs/svelte-ui/registration/index.md": "a6daf8d7835fd7e2e3e08123b1dcd24ae4d8094132e3ecc6f8c8d03af54cc781",
+    "apps/docs/src/content/docs/docs/svelte-ui/support/index.md": "76fc5a227506a834974e36bcb78ea85534db208e490da6b7aa22e1928b4fd78f",
+    "apps/docs/src/content/docs/ko/docs/core/cel.md": "580c8158aa8158e46b0c90008f81525be22a64b10399aebd2b20cb9602050aa3",
+    "apps/docs/src/content/docs/ko/docs/core/guides/http-and-actions.md": "09b9ac7ca29aa65676875a5749404e733f49d3490bc3c9f55dbae0403ce2f307",
+    "apps/docs/src/content/docs/ko/docs/core/guides/runtime.md": "91a9eede16d40563510537212f25439e97967ae4b405fe4f066049958842f525",
+    "apps/docs/src/content/docs/ko/docs/core/guides/state-and-url.md": "90cf7d192029c29f43dca6bc86112fe0ba27ed3c7425b76fd974faec62341882",
+    "apps/docs/src/content/docs/ko/docs/core/http.md": "ad4a68afcef738608120b4bfe7a823ae72c06201281133ef5448796a1e7dd105",
+    "apps/docs/src/content/docs/ko/docs/core/index.md": "52485896f6d4e4b179145c942b8b9ca292c8f5d9b78d3615cda8a2594d554b6f",
+    "apps/docs/src/content/docs/ko/docs/core/registry.md": "8e2ac40b4e23d4b859d70f2b138312a4a59e2143a86b45bc381859b644fe2c70",
+    "apps/docs/src/content/docs/ko/docs/core/runtime.md": "84fbb9cc9dc0c3541718b494029239adcf034d7dfdeee1ccfb5267be8c1800a1",
+    "apps/docs/src/content/docs/ko/docs/core/state-store.md": "638bce4ff03297d33c1787850da445b97c9b2a2fa6a03cbea903e4c08200e395",
+    "apps/docs/src/content/docs/ko/docs/core/types.md": "f44fae5a9a23252cd250b0974f447f55b243d65f0ed5612f384bdbb27ec92e32",
+    "apps/docs/src/content/docs/ko/docs/core/url.md": "041ec63e0c9356fcff00557569d382376e25c96f4d5c3ecf29df45f5992cdb43",
+    "apps/docs/src/content/docs/ko/docs/core/utilities.md": "0ec451672a3ed424b551707ff1cc3cbf4fe7d5a60dda83bd2014a4935285a09d",
+    "apps/docs/src/content/docs/ko/docs/core/view.md": "8affa7136f30c00ff7c4a1d1702b05405fb2b9316f38aee9117e7675a62653ed",
+    "apps/docs/src/content/docs/ko/docs/dsl/actions.md": "ec8bfedead62e7a229c447b6ff38b17259cfcc541f7e86fbe30cd36b2d0366aa",
+    "apps/docs/src/content/docs/ko/docs/dsl/datasources.md": "10c45bb2054b0caaa96961a88a27629c714f8e5f67248d16a76ff8d4959b8fa4",
+    "apps/docs/src/content/docs/ko/docs/dsl/index.md": "f30fded4d6b59d50345cd4e8faa1847fbd3502daa90720e028c2c38fbe536378",
+    "apps/docs/src/content/docs/ko/docs/dsl/queries.md": "a2dfa64123a55b1ec65ab7ab39074418c0d4350687c272f4b5a54b36e374df11",
+    "apps/docs/src/content/docs/ko/docs/dsl/resources.md": "c425bef606e7ec6fbad0ee3ef4a45ae14546c0c9cdb71114ef0944833b662c5b",
+    "apps/docs/src/content/docs/ko/docs/dsl/state-and-ports.md": "f9c916447043bef05a1b7aa70c1b63d02218e2a6f82b06d4da79950a22889f69",
+    "apps/docs/src/content/docs/ko/docs/dsl/types.md": "e5a52018cb53389552bb616ce8300149e4f3af67b5796e71610367a5b2c43bbf",
+    "apps/docs/src/content/docs/ko/docs/dsl/values.md": "bc71ad7cd844e6e5720f9bb22e4a02784a1766d33c83c78a0806c4c84773898d",
+    "apps/docs/src/content/docs/ko/docs/dsl/view-and-component.md": "fc2c41f123df49c6ebf9627bd52e40bec25c589f86b93d553f8bd69e1e9ca0b6",
+    "apps/docs/src/content/docs/ko/docs/svelte/adapters.md": "8822f7115e4d3f1f71d1b496ae1c969332b9da7dc9fe22ed114aa29b8535ea74",
+    "apps/docs/src/content/docs/ko/docs/svelte/errors.md": "ec0300590f2dfb51316a344b2cb74ae6c1385618874959ac2b6a772dcb63dae8",
+    "apps/docs/src/content/docs/ko/docs/svelte/guides/manage-view-lifecycle.md": "c5bb203670a2aa4c53d468a5c844454681ede15a7d00ed44e0ad9547a920a1f2",
+    "apps/docs/src/content/docs/ko/docs/svelte/guides/mount-in-svelte.md": "4b13b9c59697757557c1d5286c03cedbb3458bef23d088cab6e9c90bfd1ef321",
+    "apps/docs/src/content/docs/ko/docs/svelte/guides/write-an-adapter.md": "ba7219dac1939f474ab5a15daad598d9952f090cddb8a56eb33710c5bbe8b47a",
+    "apps/docs/src/content/docs/ko/docs/svelte/index.md": "d300a580237ef3375d15c7e5d66517f0d16a7d056fbc105b5a5df043f3560b0a",
+    "apps/docs/src/content/docs/ko/docs/svelte/mounted-view.md": "72f6434e4618d969ce9ada8884048a7c089b87321d6b019afe1441da3e58cc52",
+    "apps/docs/src/content/docs/ko/docs/svelte/renderer.md": "06305aa834514d8da79fd129c52d60f3106ee14d11f0b25a037ad5231489893e",
+    "apps/docs/src/content/docs/ko/docs/svelte/types.md": "c51965e48e3e35cfca1d38c4414ae87934a533e590b05429dec485f602879dbd",
+    "apps/docs/src/content/docs/ko/docs/svelte/viewstem-view.md": "543d1b5d832767525dd4fb4795adc93810f2197e9d8c0b885983eb1cd9313067",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/attributes/index.md": "48182f880477430704d95115c92358ad52e149617ba8e42a24d8b160569c5451",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/component-sets/index.md": "baff89cdaedb8a46737b547df222b9123ab84dd88c5c8f38f97a9273f1c2c83c",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/accordion.md": "1d51b4bd0aca1a505b1479aaa65bf4cd26a31a0b7069627739b8fb5ee48c6e6b",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/alert-dialog.md": "e9f4947c7fded53f620a9529f7d5c5b5fbe04e349e1b3a41c324fddedc92ae67",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/alert.md": "9e7fad3bf58718799e501ff428e34bc9a744fc322978db4b35130f4516550dbe",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/aspect-ratio.md": "dc603db6d230074c528ec5bc852be7987f82cbd93b8728dd19868f9d839bf04c",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/attachment.md": "2b42bece0f9b84d6ce6564a59802a7ab2a710fd10f9f9a6ab233a120370ea318",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/avatar.md": "3d7be6523fe3f551e28fea82d1eda7e89af9ec0de630ecdb6fb268cd50dcb743",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/badge.md": "42f94875624ab1c208ed403876198bd8dfbbd2b9c882c472600d60a36735349b",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/breadcrumb.md": "bc17904afaafea82c52e7c4b364bd1b586d4eddd7d5057239037003a1dcc8c07",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/bubble.md": "888416ae966204c2edc69696053975564f65dd733bff8a0afad73ae13b5787db",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/button-group.md": "e0f4b4f7b79bb54af3dfbd5784c09e8e97a4aa46d55535af4489d99cb2d9b60e",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/button.md": "29bfcd3eaf0ba42899a412a942c55528d93ecfb4694cb956576c4a23635f9e37",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/calendar.md": "8ebc1c8b5a825d29763ca7d860fd2f7d1bbdcbd122f6db7eb216b8726911ffe0",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/card.md": "b3347760dd31c79ba878a4e112be42b45d55264958ba315fef0aab6f3ecee560",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/carousel.md": "5e2d7def9051ba72c1a866fa9424c2da9080fafbc43344e0b7bf6e1ba74d93fc",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/chart.md": "67870aa421d234697e767fa83b9bc372a6a7f058592e200a7d7fc5403c735f04",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/checkbox.md": "d3f22247b5de001566d86218634963efa6d8845c8eaf16d08c1b04fa32be5b20",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/code-block.md": "7b99831fa1d017883b0ec2193853e14dca2baf0d5e9069e258da57bc58dec79d",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/collapsible.md": "9b894d46f0a9d6b82b05fb12b9ecaabc34ec00d9fcaded506b424a05766a7853",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/combobox.md": "e9efd11ff690bfb226e9e501fbe5b477205848409de73d63915e1990e3f1c2b7",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/command.md": "e87c43f38157442893e8c084408cab29610b0c3337da33180711fb0fc190b915",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/context-menu.md": "f5cf444ba5cd2d630debd8b85ec1c33afdbdc18b5bb12d22ac8ccd8449cb1754",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/data-table.md": "59da1a86ee06ce7528347967e6bee7db77c577d06c961e25426565dce94cd25b",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/date-picker.md": "7f2609b8625b4ce1f1ff57e0b2de7582523a183d00d8c72e12b04ebf23f33df3",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/dialog.md": "5b953260504fdaa23f486233cd27795c9d6d3ff48d62613db17f2f40b1d2bc0f",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/drawer.md": "cc55da5ed2c0eadbd717bbb40dc3cb16cd14fe983de6b005eb96ac4ac101ad49",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/dropdown-menu.md": "66d72bba803958815d968a25670cfe0c5cf0a728faab03645d34b4abd1ce5825",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/empty.md": "05530aed6037cd96dfdbeb040fef6f1ebc0f502d1d414959bbadd4bca5e658c8",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/field.md": "1f95c0cf5b6259d6b64e3735286159cee52ffc8654f79fe1583a1e123330d686",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/hover-card.md": "89b7bf53df61b068b40ba3889c96ed3429bf7fd58acaa5717786ff55dbaee732",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/input-group.md": "93f80a88f7b5589b1a7d0d7fdde0a15c55fe896059e9c316643a0ff16a716962",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/input-otp.md": "073c0c2f91e1ad5e1c6830cd23c5c40a24496308a559b6fab33f6020e1b62f27",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/input.md": "578321668af6119d8e5a40f4ea09978962890a2b10e5598b493ea056805432f6",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/item.md": "5cd80516165a6f42bdb59796aa04e8baa20650c9399afd41cf726fd44035388b",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/kbd.md": "cdc377b4921a8b1d799af73a469c1e9b3b149179f319cef3f0d0340f4b0b23ba",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/label.md": "0e009b4b6dca234116f63cff01fccd413c14ae11e3d7b90c9d6b41a2a9e9af8c",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/marker.md": "59031b4d522678e38e95712286ec31af36a885256433415fa388a744fdbaf167",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/menubar.md": "29a88126e99960b7e19faeea43135e3727b9504c0a1c4badd47034da1b2747c9",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/message-scroller.md": "afa85afbaacf18a0314df2547f9ba6ee0780c6b706848105b2b8843fd8908d3e",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/message.md": "b6f02f26e9719cce5ba838be57dedc4e236ab311c200e23ad4b6ba502acb4b67",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/native-select.md": "f1e7dcb4752848f0dbcafc15ba56eedbc421d16f13680caada6ad79ce455cd33",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/navigation-menu.md": "c9da2d94bc3471fe02b21abe08c70cd211ea15e95c1018d310558b0ffd1cf66d",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/pagination.md": "cddd3f79238f6c00a930f25c0b81a7b4b0b39d4ab6c678273c99cf440766e251",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/popover.md": "d90e7d38c4de5b360e34a3f23af57f41ab6db328a223e6e20b1f5a264401cf9f",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/progress.md": "d3cae791f7524242639e8c1cd467bb63f029085e2569303b36b530027be4a75e",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/questionnaire.md": "887162484baf0e3068c76f3d25db3ba845c90ae82803079c0d42b260577c58fd",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/radio-group.md": "2b87ac816ca519c7327e1616c3a5bdd3b1bdfefa337a5c97b3938a733eacc160",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/range-calendar.md": "77cf9648c1f486095e712f44bf7c4d2474b0a0dab20e577db93bed07dae8daee",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/resizable.md": "7b43852ac047364585e7ce7d942f2bf7671842378ff78e19c640fcc4cd6f5dc7",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/scroll-area.md": "11f59f1b283ffcb4555503fb5d55161336c5ce99dc46bcad318959315ec87846",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/select.md": "c231623b80a86e0543988601884be882c85d926ad785531e11525ee0f5c77b42",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/separator.md": "ce524ab3a3ee201ac18b940598fd76d637b1f2336656e291767434a9b67f4a7c",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/sheet.md": "41da7f4b13505d265df1871137d20fd9cb0e292fa8292fb260817a103fd32fb2",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/sidebar.md": "db520a9371feb14dfd9f3e6caf9176dca6fd8afc11564d60f3e5c0e0786c223d",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/skeleton.md": "11c569803cc4c6839d641de99ca76ac7561da8fefaf1c0c3890370d9f1d33c2f",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/slider.md": "301290548e26ec9143810e018cc13cc2ba3b5f4e691a345daf1ac87315bd513b",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/sonner.md": "bf4f2f51f44be2a261fe1c78abc2763aabe4bcd221a115b047e55dd845d0a452",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/spinner.md": "f44053499bcf9f6087a8fd45de1b067f6be212b5790861ffc833fd290f84a2a1",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/switch.md": "dca44e4e55808245403668725ae0107b0a7d9e51c916822fa4da8ab9617a72ce",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/table.md": "81c2fe1ae783b46718c8692608beb6ff216e357c80f34036b57f16db14165d4e",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/tabs.md": "a1b74236562479b5e191a59b28dfb1d835407244ce0d4cf6afb00133ebdea208",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/textarea.md": "32ef9af416ecac10530273c068fae6b084d86ebb4947943c5e33def27cd49d2f",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/toggle-group.md": "ae6aad2e7ac2fe6b42c694676b36aae16ada4e07355a29139e8918eb7ca8d662",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/toggle.md": "2b70ad0b9490935f15f3eb36efccbb8456ba3394ca7e2ccc8ada5b67e07019b5",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/tooltip.md": "1b2ebf59d0780a087f879aebd018c36364f4a45fdeb235cebe28ef7eeffc79d8",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/trace.md": "5adeeae2fc9fb0d3468dc97e695072d8e8103285aca5176955d6c824e2ad7c39",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/components/typography.md": "9769c67b0c2e107d31af01245e68102d446fe29d28e55cc81560e3f4e3da8732",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/guides/compose-json.md": "f9374331a7c3b5904796d20e52bbcea15fa84f37b612480fb58c9319337d83ec",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/guides/register-families.md": "ed076f724fc57e53b0e8a3231dd9829db341e0b9f407c97b832172b063843655",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/guides/style-and-native.md": "2a46947fb4837c76799bb170b7225563e61b56365eea225718a0f1ecbf3f5500",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/index.md": "ccdbd04f4ccb8a836cc8b190bbefe05b055ee41854a014cd481fbd8a202eb8c7",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/registration/index.md": "f2b972ef3baa867875c54c36e70e6707ff538e4e2987116c9406ab2da0b615a4",
+    "apps/docs/src/content/docs/ko/docs/svelte-ui/support/index.md": "449a220dd41db785ca1c3112ea8c77f058430aa04dc64677800c1b849f64fe0a"
+  },
+  "coverageDestinations": {
+    "count": 236,
+    "errors": []
+  }
+}

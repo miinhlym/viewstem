@@ -1,0 +1,18 @@
+
+> typecheck:docs
+> npm run typecheck -w @viewstem/docs
+
+
+> typecheck
+> astro check && tsc --noEmit -p tsconfig.json
+
+[astro] `markdown.remarkPlugins`, `markdown.rehypePlugins`, and `markdown.remarkRehype` are deprecated. Pass them to `unified({...})` from `@astrojs/markdown-remark` directly instead.
+19:12:23 [content] Syncing content
+19:12:24 [content] Synced content
+19:12:24 [types] Generated 1.65s
+19:12:24 [check] Getting diagnostics for Astro files in /Users/minholim/dev/minh/viewstem/apps/docs...
+Result (60 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+

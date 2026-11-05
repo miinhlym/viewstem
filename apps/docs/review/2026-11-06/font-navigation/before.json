@@ -1,0 +1,549 @@
+{
+  "origin": "http://localhost:4321",
+  "channel": "chrome",
+  "results": [
+    {
+      "locale": "ko",
+      "family": "attachment",
+      "fcp": 300,
+      "frames": 117,
+      "states": [
+        [
+          [
+            "Alert Dialog",
+            66.46875,
+            15
+          ],
+          [
+            "Aspect Ratio",
+            72.46875,
+            15
+          ],
+          [
+            "Navigation Menu",
+            96.546875,
+            15
+          ]
+        ]
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular",
+          "isCustomFont": true,
+          "glyphCount": 12
+        }
+      ]
+    },
+    {
+      "locale": "ko",
+      "family": "avatar",
+      "fcp": 216,
+      "frames": 113,
+      "states": [
+        [
+          [
+            "Alert Dialog",
+            66.46875,
+            15
+          ],
+          [
+            "Aspect Ratio",
+            72.46875,
+            15
+          ],
+          [
+            "Navigation Menu",
+            96.546875,
+            15
+          ]
+        ]
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular",
+          "isCustomFont": true,
+          "glyphCount": 12
+        }
+      ]
+    },
+    {
+      "locale": "ko",
+      "family": "badge",
+      "fcp": 200,
+      "frames": 126,
+      "states": [
+        [
+          [
+            "Alert Dialog",
+            66.46875,
+            15
+          ],
+          [
+            "Aspect Ratio",
+            72.46875,
+            15
+          ],
+          [
+            "Navigation Menu",
+            96.546875,
+            15
+          ]
+        ]
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular",
+          "isCustomFont": true,
+          "glyphCount": 12
+        }
+      ]
+    },
+    {
+      "locale": "ko",
+      "family": "breadcrumb",
+      "fcp": 296,
+      "frames": 116,
+      "states": [
+        [
+          [
+            "Alert Dialog",
+            66.46875,
+            15
+          ],
+          [
+            "Aspect Ratio",
+            72.46875,
+            15
+          ],
+          [
+            "Navigation Menu",
+            96.546875,
+            15
+          ]
+        ]
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular",
+          "isCustomFont": true,
+          "glyphCount": 12
+        }
+      ]
+    },
+    {
+      "locale": "ko",
+      "family": "bubble",
+      "fcp": 288,
+      "frames": 123,
+      "states": [
+        [
+          [
+            "Alert Dialog",
+            66.46875,
+            15
+          ],
+          [
+            "Aspect Ratio",
+            72.46875,
+            15
+          ],
+          [
+            "Navigation Menu",
+            96.546875,
+            15
+          ]
+        ]
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular",
+          "isCustomFont": true,
+          "glyphCount": 12
+        }
+      ]
+    },
+    {
+      "locale": "ko",
+      "family": "button-group",
+      "fcp": 272,
+      "frames": 121,
+      "states": [
+        [
+          [
+            "Alert Dialog",
+            66.46875,
+            15
+          ],
+          [
+            "Aspect Ratio",
+            72.46875,
+            15
+          ],
+          [
+            "Navigation Menu",
+            96.546875,
+            15
+          ]
+        ]
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular",
+          "isCustomFont": true,
+          "glyphCount": 12
+        }
+      ]
+    },
+    {
+      "locale": "ko",
+      "family": "button",
+      "fcp": 164,
+      "frames": 132,
+      "states": [
+        [
+          [
+            "Alert Dialog",
+            66.46875,
+            15
+          ],
+          [
+            "Aspect Ratio",
+            72.46875,
+            15
+          ],
+          [
+            "Navigation Menu",
+            96.546875,
+            15
+          ]
+        ]
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular",
+          "isCustomFont": true,
+          "glyphCount": 12
+        }
+      ]
+    },
+    {
+      "locale": "ko",
+      "family": "calendar",
+      "fcp": 184,
+      "frames": 135,
+      "states": [
+        [
+          [
+            "Alert Dialog",
+            66.46875,
+            15
+          ],
+          [
+            "Aspect Ratio",
+            72.46875,
+            15
+          ],
+          [
+            "Navigation Menu",
+            96.546875,
+            15
+          ]
+        ]
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular",
+          "isCustomFont": true,
+          "glyphCount": 12
+        }
+      ]
+    },
+    {
+      "locale": "ko",
+      "family": "card",
+      "fcp": 184,
+      "frames": 130,
+      "states": [
+        [
+          [
+            "Alert Dialog",
+            66.46875,
+            15
+          ],
+          [
+            "Aspect Ratio",
+            72.46875,
+            15
+          ],
+          [
+            "Navigation Menu",
+            96.546875,
+            15
+          ]
+        ]
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular",
+          "isCustomFont": true,
+          "glyphCount": 12
+        }
+      ]
+    },
+    {
+      "locale": "ko",
+      "family": "carousel",
+      "fcp": 200,
+      "frames": 116,
+      "states": [
+        [
+          [
+            "Alert Dialog",
+            66.46875,
+            15
+          ],
+          [
+            "Aspect Ratio",
+            72.46875,
+            15
+          ],
+          [
+            "Navigation Menu",
+            96.546875,
+            15
+          ]
+        ]
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular",
+          "isCustomFont": true,
+          "glyphCount": 12
+        }
+      ]
+    },
+    {
+      "locale": "ko",
+      "family": "chart",
+      "fcp": 184,
+      "frames": 126,
+      "states": [
+        [
+          [
+            "Alert Dialog",
+            66.46875,
+            15
+          ],
+          [
+            "Aspect Ratio",
+            72.46875,
+            15
+          ],
+          [
+            "Navigation Menu",
+            96.546875,
+            15
+          ]
+        ],
+        [
+          [
+            "Alert Dialog",
+            69.84375,
+            15
+          ],
+          [
+            "Aspect Ratio",
+            75.953125,
+            15
+          ],
+          [
+            "Navigation Menu",
+            100.265625,
+            15
+          ]
+        ]
+      ],
+      "fonts": [
+        {
+          "familyName": ".SF NS",
+          "postScriptName": ".SFNS-Regular",
+          "isCustomFont": false,
+          "glyphCount": 12
+        }
+      ]
+    },
+    {
+      "locale": "ko",
+      "family": "checkbox",
+      "fcp": 184,
+      "frames": 132,
+      "states": [
+        [
+          [
+            "Alert Dialog",
+            66.46875,
+            15
+          ],
+          [
+            "Aspect Ratio",
+            72.46875,
+            15
+          ],
+          [
+            "Navigation Menu",
+            96.546875,
+            15
+          ]
+        ]
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular",
+          "isCustomFont": true,
+          "glyphCount": 12
+        }
+      ]
+    },
+    {
+      "locale": "ko",
+      "family": "code-block",
+      "fcp": 148,
+      "frames": 125,
+      "states": [
+        [
+          [
+            "Alert Dialog",
+            66.46875,
+            15
+          ],
+          [
+            "Aspect Ratio",
+            72.46875,
+            15
+          ],
+          [
+            "Navigation Menu",
+            96.546875,
+            15
+          ]
+        ]
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular",
+          "isCustomFont": true,
+          "glyphCount": 12
+        }
+      ]
+    },
+    {
+      "locale": "ko",
+      "family": "collapsible",
+      "fcp": 200,
+      "frames": 131,
+      "states": [
+        [
+          [
+            "Alert Dialog",
+            66.46875,
+            15
+          ],
+          [
+            "Aspect Ratio",
+            72.46875,
+            15
+          ],
+          [
+            "Navigation Menu",
+            96.546875,
+            15
+          ]
+        ]
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular",
+          "isCustomFont": true,
+          "glyphCount": 12
+        }
+      ]
+    },
+    {
+      "locale": "ko",
+      "family": "combobox",
+      "fcp": 184,
+      "frames": 138,
+      "states": [
+        [
+          [
+            "Alert Dialog",
+            66.46875,
+            15
+          ],
+          [
+            "Aspect Ratio",
+            72.46875,
+            15
+          ],
+          [
+            "Navigation Menu",
+            96.546875,
+            15
+          ]
+        ]
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular",
+          "isCustomFont": true,
+          "glyphCount": 12
+        }
+      ]
+    },
+    {
+      "locale": "ko",
+      "reapply": {
+        "before": {
+          "width": 66.46875,
+          "height": 15,
+          "font": "12.8px / 22.4px \"Pretendard Variable\", system-ui, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif, -apple-system, \"system-ui\", \"Segoe UI\", Roboto, \"Helvetica Neue\", \"Noto Sans\", Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\""
+        },
+        "immediate": {
+          "width": 69.84375,
+          "height": 15,
+          "font": "12.8px / 22.4px \"Pretendard Variable\", system-ui, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif, -apple-system, \"system-ui\", \"Segoe UI\", Roboto, \"Helvetica Neue\", \"Noto Sans\", Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\""
+        },
+        "settled": {
+          "width": 66.46875,
+          "height": 15,
+          "font": "12.8px / 22.4px \"Pretendard Variable\", system-ui, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif, -apple-system, \"system-ui\", \"Segoe UI\", Roboto, \"Helvetica Neue\", \"Noto Sans\", Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\""
+        }
+      }
+    }
+  ],
+  "failures": [
+    {
+      "locale": "ko",
+      "family": "chart",
+      "error": "AssertionError [ERR_ASSERTION]: non-current labels changed width after first paint\n\n2 !== 1\n"
+    },
+    {
+      "locale": "ko",
+      "reapply": "AssertionError [ERR_ASSERTION]: Vite CSS replacement changed text metrics\n+ actual - expected\n\n  {\n    font: '12.8px / 22.4px \"Pretendard Variable\", system-ui, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif, -apple-system, \"system-ui\", \"Segoe UI\", Roboto, \"Helvetica Neue\", \"Noto Sans\", Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"',\n    height: 15,\n+   width: 69.84375\n-   width: 66.46875\n  }\n"
+    }
+  ]
+}

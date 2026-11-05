@@ -20,6 +20,7 @@ Use this map to find the reference for your task. The language-independent contr
 | Connect the renderer to a Svelte app | [Svelte package guide](../packages/svelte/README.md), [runnable example](../packages/svelte/example/README.md), [implementation handoff](handoff/svelte-implementation-2026-11-02.md) |
 | Register shadcn UI for Svelte | [UI package guide](../packages/svelte-ui/README.md), [U44 implementation and verification handoff](handoff/svelte-ui-shadcn-implementation-2026-11-03.md), [inventory of 66 catalog entries and 386 parts](handoff/shadcn-component-inventory.json) |
 | Compose a view from several components | [Composition contracts](spec/06-composition-examples.md), [UI package guide](../packages/svelte-ui/README.md) |
+| Read package guides and API references | [Site documentation research, structure, and verification](handoff/docs-package-reference-2026-11-05.md) (Korean) |
 | Understand resources and execution rules | [Full specification](VIEWSTEM-SPEC.md) and the topic specifications below |
 | Modify and verify the existing core | [Current setup procedure](handoff/implementation-start.md#새-채팅에서-시작할-때) |
 | Check support and limits | [Implementation handoff](handoff/core-implementation-2026-11-02.md), [CEL support](handoff/core-cel-support.md) |

@@ -1,0 +1,470 @@
+{
+  "checks": [
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 320,
+      "family": "checkbox",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 320,
+      "family": "switch",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 320,
+      "family": "button",
+      "controls": 4
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 320,
+      "family": "input",
+      "controls": 3
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 320,
+      "family": "slider",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 320,
+      "family": "tabs",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 320,
+      "family": "sonner",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 320,
+      "family": "dialog",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1440,
+      "family": "button",
+      "controls": 4
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1440,
+      "family": "input",
+      "controls": 3
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1440,
+      "family": "switch",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1440,
+      "family": "checkbox",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1440,
+      "family": "tabs",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1440,
+      "family": "slider",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1440,
+      "family": "dialog",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1440,
+      "family": "sonner",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 320,
+      "family": "input",
+      "controls": 3
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 320,
+      "family": "button",
+      "controls": 4
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 320,
+      "family": "checkbox",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 320,
+      "family": "switch",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 320,
+      "family": "tabs",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 320,
+      "family": "slider",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 320,
+      "family": "dialog",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 320,
+      "family": "sonner",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1440,
+      "family": "button",
+      "controls": 4
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1440,
+      "family": "input",
+      "controls": 3
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1440,
+      "family": "switch",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1440,
+      "family": "checkbox",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1440,
+      "family": "tabs",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1440,
+      "family": "slider",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1440,
+      "family": "sonner",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 320,
+      "family": "button",
+      "controls": 4
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1440,
+      "family": "dialog",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 320,
+      "family": "input",
+      "controls": 3
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 320,
+      "family": "checkbox",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 320,
+      "family": "switch",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 320,
+      "family": "slider",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 320,
+      "family": "tabs",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 1440,
+      "family": "input",
+      "controls": 3
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 1440,
+      "family": "button",
+      "controls": 4
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 320,
+      "family": "sonner",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 320,
+      "family": "dialog",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 1440,
+      "family": "checkbox",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 1440,
+      "family": "switch",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 1440,
+      "family": "tabs",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 1440,
+      "family": "slider",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 1440,
+      "family": "sonner",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 1440,
+      "family": "dialog",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 320,
+      "family": "button",
+      "controls": 4
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 320,
+      "family": "input",
+      "controls": 3
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 320,
+      "family": "checkbox",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 320,
+      "family": "switch",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 320,
+      "family": "slider",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 320,
+      "family": "tabs",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 1440,
+      "family": "button",
+      "controls": 4
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 1440,
+      "family": "input",
+      "controls": 3
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 320,
+      "family": "sonner",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 320,
+      "family": "dialog",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 1440,
+      "family": "checkbox",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 1440,
+      "family": "switch",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 1440,
+      "family": "tabs",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 1440,
+      "family": "slider",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 1440,
+      "family": "sonner",
+      "controls": 2
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 1440,
+      "family": "dialog",
+      "controls": 2
+    },
+    {
+      "locale": "en",
+      "flows": "IME, runtime reset, binding preservation, rapid edits, reference round trip, JSON focus, numeric validation"
+    },
+    {
+      "locale": "ko",
+      "flows": "IME, runtime reset, binding preservation, rapid edits, reference round trip, JSON focus, numeric validation"
+    },
+    {
+      "flows": "streamed HTML hydration, SSR option deep link, omitted defaults, reduced motion, Tabs runtime reset, delayed import with latest edits, page lifecycle signals, failed module load and reload recovery"
+    },
+    {
+      "flows": "mobile tab isolation, Svelte preview input identity and runtime state, keyboard ArrowRight/Home/End, mobile JSON and option direct links and focus, wide options rail, responsive focus preservation, enlarged root text"
+    },
+    {
+      "flows": "visible JSON and expandable setup snippet with JavaScript disabled"
+    }
+  ],
+  "failures": []
+}

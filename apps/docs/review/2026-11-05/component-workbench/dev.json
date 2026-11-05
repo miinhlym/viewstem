@@ -1,0 +1,10 @@
+{
+  "origin": "http://localhost:4321",
+  "checks": [
+    "Input runtime value preserved through JSON tab",
+    "Button variant/source highlight and details",
+    "Mobile dark options",
+    "Accordion without controls preserves expanded state"
+  ],
+  "errors": []
+}

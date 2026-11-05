@@ -1,0 +1,287 @@
+{
+  "expected": 40,
+  "checked": 40,
+  "checks": [
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 320,
+      "name": "home",
+      "path": "/"
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 320,
+      "name": "docs",
+      "path": "/docs/svelte-ui/components/button/"
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 320,
+      "name": "examples",
+      "path": "/examples/"
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 320,
+      "name": "lesson",
+      "path": "/examples/value-call/"
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 320,
+      "name": "playground",
+      "path": "/playground/"
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1440,
+      "name": "home",
+      "path": "/"
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1440,
+      "name": "docs",
+      "path": "/docs/svelte-ui/components/button/"
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1440,
+      "name": "examples",
+      "path": "/examples/"
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1440,
+      "name": "playground",
+      "path": "/playground/"
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1440,
+      "name": "lesson",
+      "path": "/examples/value-call/"
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 320,
+      "name": "home",
+      "path": "/"
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 320,
+      "name": "docs",
+      "path": "/docs/svelte-ui/components/button/"
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 320,
+      "name": "examples",
+      "path": "/examples/"
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 320,
+      "name": "playground",
+      "path": "/playground/"
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 320,
+      "name": "lesson",
+      "path": "/examples/value-call/"
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1440,
+      "name": "home",
+      "path": "/"
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1440,
+      "name": "docs",
+      "path": "/docs/svelte-ui/components/button/"
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1440,
+      "name": "examples",
+      "path": "/examples/"
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1440,
+      "name": "playground",
+      "path": "/playground/"
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1440,
+      "name": "lesson",
+      "path": "/examples/value-call/"
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 320,
+      "name": "home",
+      "path": "/"
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 320,
+      "name": "docs",
+      "path": "/docs/svelte-ui/components/button/"
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 320,
+      "name": "examples",
+      "path": "/examples/"
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 320,
+      "name": "playground",
+      "path": "/playground/"
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 320,
+      "name": "lesson",
+      "path": "/examples/value-call/"
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 1440,
+      "name": "home",
+      "path": "/"
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 1440,
+      "name": "docs",
+      "path": "/docs/svelte-ui/components/button/"
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 1440,
+      "name": "examples",
+      "path": "/examples/"
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 1440,
+      "name": "playground",
+      "path": "/playground/"
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 1440,
+      "name": "lesson",
+      "path": "/examples/value-call/"
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 320,
+      "name": "home",
+      "path": "/"
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 320,
+      "name": "docs",
+      "path": "/docs/svelte-ui/components/button/"
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 320,
+      "name": "examples",
+      "path": "/examples/"
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 320,
+      "name": "lesson",
+      "path": "/examples/value-call/"
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 320,
+      "name": "playground",
+      "path": "/playground/"
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 1440,
+      "name": "home",
+      "path": "/"
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 1440,
+      "name": "docs",
+      "path": "/docs/svelte-ui/components/button/"
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 1440,
+      "name": "examples",
+      "path": "/examples/"
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 1440,
+      "name": "playground",
+      "path": "/playground/"
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 1440,
+      "name": "lesson",
+      "path": "/examples/value-call/"
+    }
+  ],
+  "failures": []
+}

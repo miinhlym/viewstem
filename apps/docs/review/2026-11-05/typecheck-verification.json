@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-05",
+  "rootCause": "Starlight 0.39.3 dereferenced optional AstroConfig.i18n.routing without a guard. Its distributed .ts source is checked by the consuming project.",
+  "fix": "routing?.prefixDefaultLocale ?? false; versioned patch-package patch applied by root postinstall with --error-on-fail",
+  "relatedFix": "Svelte tsconfig.types=[\"svelte\"] prevents unrelated workspace MDX global types from being auto-included; strict=true and skipLibCheck=false retained.",
+  "checks": [
+    {
+      "command": "npm run typecheck --workspaces --if-present",
+      "exitCode": 0,
+      "coverage": [
+        "core public type tests",
+        "Svelte package and example",
+        "Svelte UI package",
+        "docs astro check (41 files) and tsc"
+      ],
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "command": "node apps/docs/scripts/verify-starlight-i18n.mjs",
+      "exitCode": 0,
+      "scenarios": 8
+    },
+    {
+      "command": "npx patch-package --reverse --error-on-fail && npm run postinstall",
+      "exitCode": 0,
+      "result": "Patch removed and reapplied successfully, followed by passing i18n verification."
+    },
+    {
+      "command": "npm run build:docs",
+      "exitCode": 0,
+      "pages": 331,
+      "indexedHtmlFiles": 335,
+      "includes": "theme generation and all workspace library builds"
+    },
+    {
+      "command": "node apps/docs/scripts/verify-docs-site.mjs",
+      "exitCode": 0,
+      "checkedLinks": 29146,
+      "errors": []
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  ],
+  "notes": [
+    "Existing Astro markdown deprecation, bundle-size, and missing sitemap site warnings are unrelated to type diagnostics.",
+    "No Astro or Starlight version upgrade. No public runtime API changes."
+  ],
+  "sources": [
+    "https://docs.astro.build/en/reference/configuration-reference/#i18nroutingprefixdefaultlocale",
+    "https://www.typescriptlang.org/tsconfig/types.html"
+  ]
+}

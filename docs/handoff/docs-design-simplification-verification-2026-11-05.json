@@ -1,0 +1,407 @@
+{
+  "date": "2026-11-05",
+  "environment": "macOS in-app browser, static Astro build",
+  "layout": [
+    {
+      "route": "/",
+      "width": 320,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 305,
+      "title": "Viewstem"
+    },
+    {
+      "route": "/",
+      "width": 768,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 753,
+      "title": "Viewstem"
+    },
+    {
+      "route": "/",
+      "width": 1440,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 1425,
+      "title": "Viewstem"
+    },
+    {
+      "route": "/ko/",
+      "width": 320,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 305,
+      "title": "Viewstem"
+    },
+    {
+      "route": "/ko/",
+      "width": 768,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 753,
+      "title": "Viewstem"
+    },
+    {
+      "route": "/ko/",
+      "width": 1440,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 1425,
+      "title": "Viewstem"
+    },
+    {
+      "route": "/examples/",
+      "width": 320,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 305,
+      "title": "Examples · Viewstem"
+    },
+    {
+      "route": "/examples/",
+      "width": 768,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 753,
+      "title": "Examples · Viewstem"
+    },
+    {
+      "route": "/examples/",
+      "width": 1440,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 1425,
+      "title": "Examples · Viewstem"
+    },
+    {
+      "route": "/ko/examples/",
+      "width": 320,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 305,
+      "title": "예제 · Viewstem"
+    },
+    {
+      "route": "/ko/examples/",
+      "width": 768,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 753,
+      "title": "예제 · Viewstem"
+    },
+    {
+      "route": "/ko/examples/",
+      "width": 1440,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 1425,
+      "title": "예제 · Viewstem"
+    },
+    {
+      "route": "/examples/first-view/",
+      "width": 320,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 305,
+      "title": "Render a button from JSON · Viewstem"
+    },
+    {
+      "route": "/examples/first-view/",
+      "width": 768,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 768,
+      "title": "Render a button from JSON · Viewstem"
+    },
+    {
+      "route": "/examples/first-view/",
+      "width": 1440,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 1440,
+      "title": "Render a button from JSON · Viewstem"
+    },
+    {
+      "route": "/ko/examples/first-view/",
+      "width": 320,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 305,
+      "title": "JSON으로 버튼 하나 그리기 · Viewstem"
+    },
+    {
+      "route": "/ko/examples/first-view/",
+      "width": 768,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 768,
+      "title": "JSON으로 버튼 하나 그리기 · Viewstem"
+    },
+    {
+      "route": "/ko/examples/first-view/",
+      "width": 1440,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 1440,
+      "title": "JSON으로 버튼 하나 그리기 · Viewstem"
+    },
+    {
+      "route": "/playground/",
+      "width": 320,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 320,
+      "title": "Playground · Viewstem"
+    },
+    {
+      "route": "/playground/",
+      "width": 768,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 768,
+      "title": "Playground · Viewstem"
+    },
+    {
+      "route": "/playground/",
+      "width": 1440,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 1440,
+      "title": "Playground · Viewstem"
+    },
+    {
+      "route": "/ko/playground/",
+      "width": 320,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 320,
+      "title": "플레이그라운드 · Viewstem"
+    },
+    {
+      "route": "/ko/playground/",
+      "width": 768,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 768,
+      "title": "플레이그라운드 · Viewstem"
+    },
+    {
+      "route": "/ko/playground/",
+      "width": 1440,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif",
+      "headerOverlap": false,
+      "pager": [],
+      "scrollWidth": 1440,
+      "title": "플레이그라운드 · Viewstem"
+    },
+    {
+      "route": "/docs/concepts/values-and-inputs/",
+      "width": 320,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif, -apple-system, \"system-ui\", \"Segoe UI\", Roboto, \"Helvetica Neue\", \"Noto Sans\", Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "headerOverlap": false,
+      "pager": [
+        {
+          "rel": "prev",
+          "scrollWidth": 125,
+          "width": 124.5
+        },
+        {
+          "rel": "next",
+          "scrollWidth": 125,
+          "width": 124.5
+        }
+      ],
+      "scrollWidth": 305,
+      "title": "Values and inputs | Viewstem"
+    },
+    {
+      "route": "/docs/concepts/values-and-inputs/",
+      "width": 768,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif, -apple-system, \"system-ui\", \"Segoe UI\", Roboto, \"Helvetica Neue\", \"Noto Sans\", Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "headerOverlap": false,
+      "pager": [
+        {
+          "rel": "prev",
+          "scrollWidth": 349,
+          "width": 348.5
+        },
+        {
+          "rel": "next",
+          "scrollWidth": 349,
+          "width": 348.5
+        }
+      ],
+      "scrollWidth": 753,
+      "title": "Values and inputs | Viewstem"
+    },
+    {
+      "route": "/docs/concepts/values-and-inputs/",
+      "width": 1440,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif, -apple-system, \"system-ui\", \"Segoe UI\", Roboto, \"Helvetica Neue\", \"Noto Sans\", Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "headerOverlap": false,
+      "pager": [
+        {
+          "rel": "prev",
+          "scrollWidth": 372,
+          "width": 372
+        },
+        {
+          "rel": "next",
+          "scrollWidth": 372,
+          "width": 372
+        }
+      ],
+      "scrollWidth": 1425,
+      "title": "Values and inputs | Viewstem"
+    },
+    {
+      "route": "/ko/docs/concepts/values-and-inputs/",
+      "width": 320,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif, -apple-system, \"system-ui\", \"Segoe UI\", Roboto, \"Helvetica Neue\", \"Noto Sans\", Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "headerOverlap": false,
+      "pager": [
+        {
+          "rel": "prev",
+          "scrollWidth": 125,
+          "width": 124.5
+        },
+        {
+          "rel": "next",
+          "scrollWidth": 125,
+          "width": 124.5
+        }
+      ],
+      "scrollWidth": 305,
+      "title": "값과 입력 | Viewstem"
+    },
+    {
+      "route": "/ko/docs/concepts/values-and-inputs/",
+      "width": 768,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif, -apple-system, \"system-ui\", \"Segoe UI\", Roboto, \"Helvetica Neue\", \"Noto Sans\", Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "headerOverlap": false,
+      "pager": [
+        {
+          "rel": "prev",
+          "scrollWidth": 349,
+          "width": 348.5
+        },
+        {
+          "rel": "next",
+          "scrollWidth": 349,
+          "width": 348.5
+        }
+      ],
+      "scrollWidth": 753,
+      "title": "값과 입력 | Viewstem"
+    },
+    {
+      "route": "/ko/docs/concepts/values-and-inputs/",
+      "width": 1440,
+      "badges": 0,
+      "cards": 0,
+      "font": "\"Pretendard Variable\", \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Noto Color Emoji\", \"Noto Sans Symbols 2\", sans-serif, -apple-system, \"system-ui\", \"Segoe UI\", Roboto, \"Helvetica Neue\", \"Noto Sans\", Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\"",
+      "headerOverlap": false,
+      "pager": [
+        {
+          "rel": "prev",
+          "scrollWidth": 372,
+          "width": 372
+        },
+        {
+          "rel": "next",
+          "scrollWidth": 372,
+          "width": 372
+        }
+      ],
+      "scrollWidth": 1425,
+      "title": "값과 입력 | Viewstem"
+    }
+  ],
+  "links": {
+    "pages": 122,
+    "internal_links_and_anchors": 5684,
+    "issues": []
+  }
+}

@@ -1,0 +1,2612 @@
+{
+  "origin": "http://localhost:4321",
+  "cases": 24,
+  "results": [
+    {
+      "mode": "normal",
+      "path": "/",
+      "visit": "cold",
+      "fcp": 92,
+      "heading": "Define screens and behavior in JSON. ",
+      "geometryStates": 23,
+      "geometry": [
+        [
+          {
+            "x": 320,
+            "y": 142.953125,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 141.95248413085938,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.9538116455078,
+            "width": 800,
+            "height": 162.31248474121094
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.04669189453125,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 139.3165283203125,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 138.765380859375,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 138.35635375976562,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 138.04693603515625,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.80735778808594,
+            "width": 800,
+            "height": 162.31251525878906
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.6201171875,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.47268676757812,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.35418701171875,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.25906372070312,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.1826629638672,
+            "width": 800,
+            "height": 162.31251525878906
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.12176513671875,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.07302856445312,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.03475952148438,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.00550842285156,
+            "width": 800,
+            "height": 162.31248474121094
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 136.983642578125,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 136.96835327148438,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 136.95858764648438,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 136.953857421875,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 136.953125,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 105,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Bold",
+          "isCustomFont": true,
+          "glyphCount": 35
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/",
+      "visit": "cached",
+      "fcp": 40,
+      "heading": "Define screens and behavior in JSON. ",
+      "geometryStates": 23,
+      "geometry": [
+        [
+          {
+            "x": 320,
+            "y": 136.953125,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 142.953125,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 141.95565795898438,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.95684814453125,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.0443115234375,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 139.31849670410156,
+            "width": 800,
+            "height": 162.31248474121094
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 138.766845703125,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 138.3574676513672,
+            "width": 800,
+            "height": 162.31251525878906
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 138.0477752685547,
+            "width": 800,
+            "height": 162.31251525878906
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.80801391601562,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.62063598632812,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.47232055664062,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.3538818359375,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.25881958007812,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.18287658691406,
+            "width": 800,
+            "height": 162.31248474121094
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.1219482421875,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.07315063476562,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.0348663330078,
+            "width": 800,
+            "height": 162.31248474121094
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 137.00543212890625,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 136.98370361328125,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 136.96832275390625,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 136.95864868164062,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 136.953857421875,
+            "width": 800,
+            "height": 162.3125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 108,
+      "shifts": [
+        {
+          "time": 44.40000000037253,
+          "value": 0.015896930467477387
+        }
+      ],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Bold",
+          "isCustomFont": true,
+          "glyphCount": 35
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/ko/",
+      "visit": "cold",
+      "fcp": 96,
+      "heading": "화면과 동작을 JSON으로 정의하세요. ",
+      "geometryStates": 23,
+      "geometry": [
+        [
+          {
+            "x": 320,
+            "y": 145.953125,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 144.95742797851562,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 143.99949645996094,
+            "width": 800,
+            "height": 154.70314025878906
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 143.04574584960938,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 142.3157958984375,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 141.76766967773438,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 141.35595703125,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 141.05970764160156,
+            "width": 800,
+            "height": 154.70310974121094
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.80712890625,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.61993408203125,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.47174072265625,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.35406494140625,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.25897216796875,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.1829833984375,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.1217041015625,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.07296752929688,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.034912109375,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.0054931640625,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 139.98361206054688,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 139.96826171875,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 139.9586181640625,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 139.953857421875,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 139.953125,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 105,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.89.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.90.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Bold",
+          "isCustomFont": true,
+          "glyphCount": 20
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/ko/",
+      "visit": "cached",
+      "fcp": 68,
+      "heading": "화면과 동작을 JSON으로 정의하세요. ",
+      "geometryStates": 23,
+      "geometry": [
+        [
+          {
+            "x": 320,
+            "y": 139.953125,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 145.953125,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 144.95913696289062,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 143.954345703125,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 143.047119140625,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 142.31686401367188,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 141.76846313476562,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 141.35655212402344,
+            "width": 800,
+            "height": 154.70314025878906
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 141.056884765625,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.80746459960938,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.62020874023438,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.4719696044922,
+            "width": 800,
+            "height": 154.70314025878906
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.35423278808594,
+            "width": 800,
+            "height": 154.70314025878906
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.25912475585938,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.18310546875,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.12179565429688,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.0730438232422,
+            "width": 800,
+            "height": 154.70314025878906
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.03497314453125,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 140.00552368164062,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 139.983642578125,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 139.96829223632812,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 139.95864868164062,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 320,
+            "y": 139.953857421875,
+            "width": 800,
+            "height": 154.703125
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 107,
+      "shifts": [
+        {
+          "time": 81,
+          "value": 0.016588393172903806
+        }
+      ],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.89.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.90.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Bold",
+          "isCustomFont": true,
+          "glyphCount": 20
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/docs/svelte-ui/",
+      "visit": "cold",
+      "fcp": 120,
+      "heading": "Svelte UI",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 328,
+            "y": 132.796875,
+            "width": 147.234375,
+            "height": 43
+          },
+          {
+            "x": 328,
+            "y": 207.984375,
+            "width": 706,
+            "height": 75
+          },
+          {
+            "x": 334,
+            "y": 211.984375,
+            "width": 123.5,
+            "height": 14
+          },
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 103,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-SemiBold",
+          "isCustomFont": true,
+          "glyphCount": 9
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/docs/svelte-ui/",
+      "visit": "cached",
+      "fcp": 52,
+      "heading": "Svelte UI",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 328,
+            "y": 132.796875,
+            "width": 147.234375,
+            "height": 43
+          },
+          {
+            "x": 328,
+            "y": 207.984375,
+            "width": 706,
+            "height": 75
+          },
+          {
+            "x": 334,
+            "y": 211.984375,
+            "width": 123.5,
+            "height": 14
+          },
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 108,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-SemiBold",
+          "isCustomFont": true,
+          "glyphCount": 9
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/ko/docs/svelte-ui/",
+      "visit": "cold",
+      "fcp": 116,
+      "heading": "Svelte UI",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 328,
+            "y": 132.796875,
+            "width": 147.234375,
+            "height": 43
+          },
+          {
+            "x": 328,
+            "y": 207.984375,
+            "width": 707.796875,
+            "height": 47
+          },
+          {
+            "x": 334,
+            "y": 211.984375,
+            "width": 123.5,
+            "height": 14
+          },
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 103,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.89.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.90.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-SemiBold",
+          "isCustomFont": true,
+          "glyphCount": 9
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/ko/docs/svelte-ui/",
+      "visit": "cached",
+      "fcp": 64,
+      "heading": "Svelte UI",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 328,
+            "y": 132.796875,
+            "width": 147.234375,
+            "height": 43
+          },
+          {
+            "x": 328,
+            "y": 207.984375,
+            "width": 707.796875,
+            "height": 47
+          },
+          {
+            "x": 334,
+            "y": 211.984375,
+            "width": 123.5,
+            "height": 14
+          },
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 107,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.89.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.90.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-SemiBold",
+          "isCustomFont": true,
+          "glyphCount": 9
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/docs/svelte-ui/component-sets/",
+      "visit": "cold",
+      "fcp": 108,
+      "heading": "Component sets",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 328,
+            "y": 132.796875,
+            "width": 275.15625,
+            "height": 43
+          },
+          {
+            "x": 328,
+            "y": 395.671875,
+            "width": 686.140625,
+            "height": 47
+          },
+          {
+            "x": 329,
+            "y": 264.671875,
+            "width": 734,
+            "height": 98
+          },
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 103,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-SemiBold",
+          "isCustomFont": true,
+          "glyphCount": 14
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/docs/svelte-ui/component-sets/",
+      "visit": "cached",
+      "fcp": 56,
+      "heading": "Component sets",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 328,
+            "y": 132.796875,
+            "width": 275.15625,
+            "height": 43
+          },
+          {
+            "x": 328,
+            "y": 395.671875,
+            "width": 686.140625,
+            "height": 47
+          },
+          {
+            "x": 329,
+            "y": 264.671875,
+            "width": 734,
+            "height": 98
+          },
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 108,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-SemiBold",
+          "isCustomFont": true,
+          "glyphCount": 14
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/ko/docs/svelte-ui/component-sets/",
+      "visit": "cold",
+      "fcp": 116,
+      "heading": "컴포넌트 세트",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 328,
+            "y": 132.796875,
+            "width": 195.25,
+            "height": 43
+          },
+          {
+            "x": 328,
+            "y": 395.671875,
+            "width": 687.84375,
+            "height": 47
+          },
+          {
+            "x": 329,
+            "y": 264.671875,
+            "width": 734,
+            "height": 98
+          },
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 104,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.80.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.86.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.89.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.90.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-SemiBold",
+          "isCustomFont": true,
+          "glyphCount": 7
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/ko/docs/svelte-ui/component-sets/",
+      "visit": "cached",
+      "fcp": 56,
+      "heading": "컴포넌트 세트",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 328,
+            "y": 132.796875,
+            "width": 195.25,
+            "height": 43
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ],
+        [
+          {
+            "x": 328,
+            "y": 132.796875,
+            "width": 195.25,
+            "height": 43
+          },
+          {
+            "x": 328,
+            "y": 395.671875,
+            "width": 687.734375,
+            "height": 47
+          },
+          {
+            "x": 329,
+            "y": 264.671875,
+            "width": 734,
+            "height": 98
+          },
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 108,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.80.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.86.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.89.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.90.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-SemiBold",
+          "isCustomFont": true,
+          "glyphCount": 7
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/examples/",
+      "visit": "cold",
+      "fcp": 184,
+      "heading": "Examples",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 472,
+            "y": 95,
+            "width": 203.125,
+            "height": 58
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 103,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Bold",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/examples/",
+      "visit": "cached",
+      "fcp": 48,
+      "heading": "Examples",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 472,
+            "y": 95,
+            "width": 203.125,
+            "height": 58
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 107,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Bold",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/ko/examples/",
+      "visit": "cold",
+      "fcp": 124,
+      "heading": "예제",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 472,
+            "y": 95,
+            "width": 79.140625,
+            "height": 58
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 104,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.89.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.90.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Bold",
+          "isCustomFont": true,
+          "glyphCount": 2
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/ko/examples/",
+      "visit": "cached",
+      "fcp": 44,
+      "heading": "예제",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 472,
+            "y": 95,
+            "width": 79.140625,
+            "height": 58
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 108,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.89.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.90.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Bold",
+          "isCustomFont": true,
+          "glyphCount": 2
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/playground/",
+      "visit": "cold",
+      "fcp": 1936,
+      "heading": "Playground",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 24,
+            "y": 76.546875,
+            "width": 80.390625,
+            "height": 18
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 4,
+      "shifts": [
+        {
+          "time": 1958.1000000005588,
+          "value": 2.2085952235510972e-05
+        }
+      ],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular_wght28A0000",
+          "isCustomFont": true,
+          "glyphCount": 10
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/playground/",
+      "visit": "cached",
+      "fcp": 44,
+      "heading": "Playground",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 24,
+            "y": 76.546875,
+            "width": 80.390625,
+            "height": 18
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 108,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular_wght28A0000",
+          "isCustomFont": true,
+          "glyphCount": 10
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/ko/playground/",
+      "visit": "cold",
+      "fcp": 152,
+      "heading": "플레이그라운드",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 24,
+            "y": 76.546875,
+            "width": 91.96875,
+            "height": 18
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 103,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.89.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.90.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular_wght28A0000",
+          "isCustomFont": true,
+          "glyphCount": 7
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "normal",
+      "path": "/ko/playground/",
+      "visit": "cached",
+      "fcp": 52,
+      "heading": "플레이그라운드",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 24,
+            "y": 76.546875,
+            "width": 91.96875,
+            "height": 18
+          },
+          null,
+          null,
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 108,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.89.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.90.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": "Pretendard Variable",
+          "postScriptName": "PretendardVariable-Regular_wght28A0000",
+          "isCustomFont": true,
+          "glyphCount": 7
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "delayed",
+      "path": "/docs/svelte-ui/component-sets/",
+      "visit": "cold",
+      "fcp": 144,
+      "heading": "Component sets",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 328,
+            "y": 132.796875,
+            "width": 268.484375,
+            "height": 43
+          },
+          {
+            "x": 328,
+            "y": 396.671875,
+            "width": 701.03125,
+            "height": 46
+          },
+          {
+            "x": 329,
+            "y": 264.671875,
+            "width": 734,
+            "height": 98
+          },
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 102,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": ".SF NS",
+          "postScriptName": ".SFNS-Regular_wdth_opsz240000_GRAD_wght2580000",
+          "isCustomFont": false,
+          "glyphCount": 14
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "delayed",
+      "path": "/ko/docs/svelte-ui/component-sets/",
+      "visit": "cold",
+      "fcp": 144,
+      "heading": "컴포넌트 세트",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 328,
+            "y": 132.796875,
+            "width": 194.421875,
+            "height": 43
+          },
+          {
+            "x": 328,
+            "y": 396.671875,
+            "width": 699.59375,
+            "height": 46
+          },
+          {
+            "x": 329,
+            "y": 264.671875,
+            "width": 734,
+            "height": 98
+          },
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 102,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.80.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.86.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.89.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.90.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": ".SF NS",
+          "postScriptName": ".SFNS-Regular_wdth_opsz240000_GRAD_wght2580000",
+          "isCustomFont": false,
+          "glyphCount": 1
+        },
+        {
+          "familyName": "Apple SD Gothic Neo",
+          "postScriptName": "AppleSDGothicNeo-SemiBold",
+          "isCustomFont": false,
+          "glyphCount": 6
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "unavailable",
+      "path": "/docs/svelte-ui/component-sets/",
+      "visit": "cold",
+      "fcp": 68,
+      "heading": "Component sets",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 328,
+            "y": 132.796875,
+            "width": 268.484375,
+            "height": 43
+          },
+          {
+            "x": 328,
+            "y": 396.671875,
+            "width": 701.03125,
+            "height": 46
+          },
+          {
+            "x": 329,
+            "y": 264.671875,
+            "width": 734,
+            "height": 98
+          },
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 107,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": ".SF NS",
+          "postScriptName": ".SFNS-Regular_wdth_opsz240000_GRAD_wght2580000",
+          "isCustomFont": false,
+          "glyphCount": 14
+        }
+      ],
+      "errors": []
+    },
+    {
+      "mode": "unavailable",
+      "path": "/ko/docs/svelte-ui/component-sets/",
+      "visit": "cold",
+      "fcp": 76,
+      "heading": "컴포넌트 세트",
+      "geometryStates": 1,
+      "geometry": [
+        [
+          {
+            "x": 328,
+            "y": 132.796875,
+            "width": 194.421875,
+            "height": 43
+          },
+          {
+            "x": 328,
+            "y": 396.671875,
+            "width": 699.59375,
+            "height": 46
+          },
+          {
+            "x": 329,
+            "y": 264.671875,
+            "width": 734,
+            "height": 98
+          },
+          {
+            "x": 168,
+            "y": 18,
+            "width": 131.828125,
+            "height": 28
+          }
+        ]
+      ],
+      "frames": 106,
+      "shifts": [],
+      "preloads": [
+        "/fonts/pretendard/PretendardVariable.subset.80.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.86.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.89.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.90.woff2",
+        "/fonts/pretendard/PretendardVariable.subset.91.woff2",
+        "/fonts/d2coding/D2Coding-Regular.woff2"
+      ],
+      "fonts": [
+        {
+          "familyName": ".SF NS",
+          "postScriptName": ".SFNS-Regular_wdth_opsz240000_GRAD_wght2580000",
+          "isCustomFont": false,
+          "glyphCount": 1
+        },
+        {
+          "familyName": "Apple SD Gothic Neo",
+          "postScriptName": "AppleSDGothicNeo-SemiBold",
+          "isCustomFont": false,
+          "glyphCount": 6
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "baseline": {
+    "path": "/ko/docs/svelte-ui/component-sets/",
+    "headingWidths": [
+      222.84375,
+      195.25
+    ],
+    "headingY": [
+      130.796875,
+      132.796875
+    ],
+    "source": "Pre-fix Chromium measurement in prior diagnosis turn"
+  },
+  "verification": {
+    "typecheck": "npm run typecheck:docs passed (44 files, 0 errors/warnings/hints)",
+    "build": "npm run build:docs passed; 331 pages / 335 indexed HTML",
+    "staticLinks": "29,146 checked; 0 errors",
+    "renderedGlyphs": "CDP sample 한글 English → ✓ ⠿ 😀: Pretendard / D2Coding, Noto Sans Symbols 2, Apple Color Emoji, and system fallback observed",
+    "limitations": "Chromium on macOS. The home hero entrance animation and hydrated examples/playground are not asserted to have zero whole-page motion. No Firefox/WebKit run."
+  }
+}

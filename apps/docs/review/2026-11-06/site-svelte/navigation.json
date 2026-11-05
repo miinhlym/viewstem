@@ -1,0 +1,61 @@
+{
+  "browser": "Chromium 151.0.7922.34",
+  "origin": "http://127.0.0.1:4323",
+  "checks": [
+    {
+      "locale": "en",
+      "viewport": "1440×900",
+      "sidebarLinks": 66,
+      "currentHref": "/docs/svelte-ui/components/typography/",
+      "groupExpanded": true,
+      "shortcut": "Control+k",
+      "inputFocus": true,
+      "escapeRestoredFocus": true,
+      "firstStatus": "Showing 8 of 93 results",
+      "firstResultLinks": 31,
+      "expandedResultLinks": 55,
+      "rapidChangeClearedResults": true,
+      "sectionDestination": "/docs/core/runtime/#createruntimeoptions",
+      "errors": []
+    },
+    {
+      "locale": "en",
+      "viewport": "375×800",
+      "sheetLinks": 66,
+      "sheetCurrentHref": "/docs/svelte-ui/components/typography/",
+      "focusTrapped": true,
+      "escapeRestoredFocus": true,
+      "tocItemCount": 5,
+      "tocSelectedHash": "#component-preview",
+      "errors": []
+    },
+    {
+      "locale": "ko",
+      "viewport": "1440×900",
+      "sidebarLinks": 66,
+      "currentHref": "/ko/docs/svelte-ui/components/typography/",
+      "groupExpanded": true,
+      "shortcut": "Meta+k",
+      "inputFocus": true,
+      "escapeRestoredFocus": true,
+      "firstStatus": "검색 결과 12개 중 8개 표시",
+      "firstResultLinks": 18,
+      "expandedResultLinks": 26,
+      "rapidChangeClearedResults": true,
+      "sectionDestination": "/ko/docs/reference/#%ED%98%B8%EC%8A%A4%ED%8A%B8-%EC%95%B1-%EC%98%88%EC%A0%9C",
+      "errors": []
+    },
+    {
+      "locale": "ko",
+      "viewport": "375×800",
+      "sheetLinks": 66,
+      "sheetCurrentHref": "/ko/docs/svelte-ui/components/typography/",
+      "focusTrapped": true,
+      "escapeRestoredFocus": true,
+      "tocItemCount": 5,
+      "tocSelectedHash": "#component-preview",
+      "errors": []
+    }
+  ],
+  "failures": []
+}

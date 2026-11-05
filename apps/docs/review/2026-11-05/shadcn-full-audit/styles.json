@@ -1,0 +1,1877 @@
+{
+  "source": "Pinned Nova registry + unmodified Tailwind preflight/utilities; same rendered DOM, without site styles",
+  "properties": [
+    "fontSize",
+    "fontWeight",
+    "lineHeight",
+    "letterSpacing",
+    "paddingTop",
+    "paddingRight",
+    "paddingBottom",
+    "paddingLeft",
+    "marginTop",
+    "marginRight",
+    "marginBottom",
+    "marginLeft",
+    "borderTopWidth",
+    "borderTopStyle",
+    "borderTopLeftRadius",
+    "color",
+    "backgroundColor",
+    "display",
+    "alignItems",
+    "justifyContent",
+    "boxSizing"
+  ],
+  "checks": [
+    {
+      "family": "accordion",
+      "theme": "light",
+      "width": 1440,
+      "compared": 11,
+      "diffs": []
+    },
+    {
+      "family": "accordion",
+      "theme": "dark",
+      "width": 375,
+      "compared": 11,
+      "diffs": []
+    },
+    {
+      "family": "accordion",
+      "theme": "light",
+      "width": 375,
+      "compared": 11,
+      "diffs": []
+    },
+    {
+      "family": "accordion",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 11,
+      "diffs": []
+    },
+    {
+      "family": "alert-dialog",
+      "theme": "light",
+      "width": 375,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "alert-dialog",
+      "theme": "light",
+      "width": 1440,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "alert",
+      "theme": "light",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "alert-dialog",
+      "theme": "dark",
+      "width": 375,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "alert-dialog",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "alert",
+      "theme": "light",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "alert",
+      "theme": "dark",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "alert",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "aspect-ratio",
+      "theme": "light",
+      "width": 375,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "aspect-ratio",
+      "theme": "light",
+      "width": 1440,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "aspect-ratio",
+      "theme": "dark",
+      "width": 375,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "aspect-ratio",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "attachment",
+      "theme": "light",
+      "width": 1440,
+      "compared": 7,
+      "diffs": []
+    },
+    {
+      "family": "attachment",
+      "theme": "light",
+      "width": 375,
+      "compared": 7,
+      "diffs": []
+    },
+    {
+      "family": "attachment",
+      "theme": "dark",
+      "width": 375,
+      "compared": 7,
+      "diffs": []
+    },
+    {
+      "family": "avatar",
+      "theme": "light",
+      "width": 375,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "attachment",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 7,
+      "diffs": []
+    },
+    {
+      "family": "avatar",
+      "theme": "light",
+      "width": 1440,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "avatar",
+      "theme": "dark",
+      "width": 375,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "avatar",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "badge",
+      "theme": "light",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "badge",
+      "theme": "light",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "badge",
+      "theme": "dark",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "badge",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "breadcrumb",
+      "theme": "light",
+      "width": 375,
+      "compared": 8,
+      "diffs": []
+    },
+    {
+      "family": "breadcrumb",
+      "theme": "light",
+      "width": 1440,
+      "compared": 8,
+      "diffs": []
+    },
+    {
+      "family": "breadcrumb",
+      "theme": "dark",
+      "width": 375,
+      "compared": 8,
+      "diffs": []
+    },
+    {
+      "family": "breadcrumb",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 8,
+      "diffs": []
+    },
+    {
+      "family": "bubble",
+      "theme": "light",
+      "width": 375,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "bubble",
+      "theme": "light",
+      "width": 1440,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "bubble",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "bubble",
+      "theme": "dark",
+      "width": 375,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "button-group",
+      "theme": "light",
+      "width": 375,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "button-group",
+      "theme": "dark",
+      "width": 375,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "button-group",
+      "theme": "light",
+      "width": 1440,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "button-group",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "button",
+      "theme": "light",
+      "width": 1440,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "button",
+      "theme": "light",
+      "width": 375,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "button",
+      "theme": "dark",
+      "width": 375,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "button",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "calendar",
+      "theme": "light",
+      "width": 1440,
+      "compared": 103,
+      "diffs": []
+    },
+    {
+      "family": "calendar",
+      "theme": "light",
+      "width": 375,
+      "compared": 103,
+      "diffs": []
+    },
+    {
+      "family": "calendar",
+      "theme": "dark",
+      "width": 375,
+      "compared": 103,
+      "diffs": []
+    },
+    {
+      "family": "card",
+      "theme": "light",
+      "width": 375,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "calendar",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 103,
+      "diffs": []
+    },
+    {
+      "family": "card",
+      "theme": "dark",
+      "width": 375,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "card",
+      "theme": "light",
+      "width": 1440,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "card",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "carousel",
+      "theme": "light",
+      "width": 1440,
+      "compared": 21,
+      "diffs": []
+    },
+    {
+      "family": "carousel",
+      "theme": "light",
+      "width": 375,
+      "compared": 21,
+      "diffs": []
+    },
+    {
+      "family": "carousel",
+      "theme": "dark",
+      "width": 375,
+      "compared": 21,
+      "diffs": []
+    },
+    {
+      "family": "chart",
+      "theme": "light",
+      "width": 375,
+      "compared": 55,
+      "diffs": []
+    },
+    {
+      "family": "carousel",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 21,
+      "diffs": []
+    },
+    {
+      "family": "chart",
+      "theme": "light",
+      "width": 1440,
+      "compared": 70,
+      "diffs": []
+    },
+    {
+      "family": "chart",
+      "theme": "dark",
+      "width": 375,
+      "compared": 55,
+      "diffs": []
+    },
+    {
+      "family": "chart",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 70,
+      "diffs": []
+    },
+    {
+      "family": "checkbox",
+      "theme": "light",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "checkbox",
+      "theme": "light",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "checkbox",
+      "theme": "dark",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "checkbox",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "code-block",
+      "theme": "light",
+      "width": 375,
+      "compared": 12,
+      "diffs": []
+    },
+    {
+      "family": "code-block",
+      "theme": "light",
+      "width": 1440,
+      "compared": 12,
+      "diffs": []
+    },
+    {
+      "family": "code-block",
+      "theme": "dark",
+      "width": 375,
+      "compared": 12,
+      "diffs": []
+    },
+    {
+      "family": "code-block",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 12,
+      "diffs": []
+    },
+    {
+      "family": "collapsible",
+      "theme": "light",
+      "width": 375,
+      "compared": 2,
+      "diffs": []
+    },
+    {
+      "family": "collapsible",
+      "theme": "light",
+      "width": 1440,
+      "compared": 2,
+      "diffs": []
+    },
+    {
+      "family": "collapsible",
+      "theme": "dark",
+      "width": 375,
+      "compared": 2,
+      "diffs": []
+    },
+    {
+      "family": "collapsible",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 2,
+      "diffs": []
+    },
+    {
+      "family": "combobox",
+      "theme": "light",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "combobox",
+      "theme": "light",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "combobox",
+      "theme": "dark",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "combobox",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "command",
+      "theme": "light",
+      "width": 375,
+      "compared": 13,
+      "diffs": []
+    },
+    {
+      "family": "command",
+      "theme": "light",
+      "width": 1440,
+      "compared": 13,
+      "diffs": []
+    },
+    {
+      "family": "command",
+      "theme": "dark",
+      "width": 375,
+      "compared": 13,
+      "diffs": []
+    },
+    {
+      "family": "command",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 13,
+      "diffs": []
+    },
+    {
+      "family": "context-menu",
+      "theme": "light",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "context-menu",
+      "theme": "light",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "context-menu",
+      "theme": "dark",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "context-menu",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "data-table",
+      "theme": "light",
+      "width": 375,
+      "compared": 38,
+      "diffs": []
+    },
+    {
+      "family": "data-table",
+      "theme": "light",
+      "width": 1440,
+      "compared": 38,
+      "diffs": []
+    },
+    {
+      "family": "data-table",
+      "theme": "dark",
+      "width": 375,
+      "compared": 38,
+      "diffs": []
+    },
+    {
+      "family": "data-table",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 38,
+      "diffs": []
+    },
+    {
+      "family": "date-picker",
+      "theme": "light",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "date-picker",
+      "theme": "dark",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "date-picker",
+      "theme": "light",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "date-picker",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "dialog",
+      "theme": "light",
+      "width": 1440,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "dialog",
+      "theme": "light",
+      "width": 375,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "dialog",
+      "theme": "dark",
+      "width": 375,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "drawer",
+      "theme": "light",
+      "width": 375,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "dialog",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "drawer",
+      "theme": "light",
+      "width": 1440,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "drawer",
+      "theme": "dark",
+      "width": 375,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "drawer",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "dropdown-menu",
+      "theme": "light",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "dropdown-menu",
+      "theme": "light",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "dropdown-menu",
+      "theme": "dark",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "empty",
+      "theme": "light",
+      "width": 375,
+      "compared": 7,
+      "diffs": []
+    },
+    {
+      "family": "dropdown-menu",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "empty",
+      "theme": "light",
+      "width": 1440,
+      "compared": 7,
+      "diffs": []
+    },
+    {
+      "family": "empty",
+      "theme": "dark",
+      "width": 375,
+      "compared": 7,
+      "diffs": []
+    },
+    {
+      "family": "empty",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 7,
+      "diffs": []
+    },
+    {
+      "family": "field",
+      "theme": "light",
+      "width": 375,
+      "compared": 16,
+      "diffs": []
+    },
+    {
+      "family": "field",
+      "theme": "light",
+      "width": 1440,
+      "compared": 16,
+      "diffs": []
+    },
+    {
+      "family": "field",
+      "theme": "dark",
+      "width": 375,
+      "compared": 16,
+      "diffs": []
+    },
+    {
+      "family": "field",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 16,
+      "diffs": []
+    },
+    {
+      "family": "hover-card",
+      "theme": "light",
+      "width": 375,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "hover-card",
+      "theme": "light",
+      "width": 1440,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "hover-card",
+      "theme": "dark",
+      "width": 375,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "hover-card",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "input-group",
+      "theme": "light",
+      "width": 375,
+      "compared": 11,
+      "diffs": []
+    },
+    {
+      "family": "input-group",
+      "theme": "light",
+      "width": 1440,
+      "compared": 11,
+      "diffs": []
+    },
+    {
+      "family": "input-group",
+      "theme": "dark",
+      "width": 375,
+      "compared": 11,
+      "diffs": []
+    },
+    {
+      "family": "input-group",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 11,
+      "diffs": []
+    },
+    {
+      "family": "input-otp",
+      "theme": "light",
+      "width": 375,
+      "compared": 12,
+      "diffs": []
+    },
+    {
+      "family": "input-otp",
+      "theme": "light",
+      "width": 1440,
+      "compared": 12,
+      "diffs": []
+    },
+    {
+      "family": "input-otp",
+      "theme": "dark",
+      "width": 375,
+      "compared": 12,
+      "diffs": []
+    },
+    {
+      "family": "input-otp",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 12,
+      "diffs": []
+    },
+    {
+      "family": "input",
+      "theme": "light",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "input",
+      "theme": "light",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "input",
+      "theme": "dark",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "input",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "item",
+      "theme": "light",
+      "width": 375,
+      "compared": 14,
+      "diffs": []
+    },
+    {
+      "family": "item",
+      "theme": "light",
+      "width": 1440,
+      "compared": 14,
+      "diffs": []
+    },
+    {
+      "family": "item",
+      "theme": "dark",
+      "width": 375,
+      "compared": 14,
+      "diffs": []
+    },
+    {
+      "family": "item",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 14,
+      "diffs": []
+    },
+    {
+      "family": "kbd",
+      "theme": "light",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "kbd",
+      "theme": "light",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "kbd",
+      "theme": "dark",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "kbd",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "label",
+      "theme": "light",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "label",
+      "theme": "light",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "label",
+      "theme": "dark",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "label",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "marker",
+      "theme": "light",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "marker",
+      "theme": "light",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "marker",
+      "theme": "dark",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "marker",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "menubar",
+      "theme": "light",
+      "width": 375,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "menubar",
+      "theme": "light",
+      "width": 1440,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "menubar",
+      "theme": "dark",
+      "width": 375,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "menubar",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "message-scroller",
+      "theme": "light",
+      "width": 375,
+      "compared": 20,
+      "diffs": []
+    },
+    {
+      "family": "message-scroller",
+      "theme": "light",
+      "width": 1440,
+      "compared": 20,
+      "diffs": []
+    },
+    {
+      "family": "message-scroller",
+      "theme": "dark",
+      "width": 375,
+      "compared": 20,
+      "diffs": []
+    },
+    {
+      "family": "message-scroller",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 20,
+      "diffs": []
+    },
+    {
+      "family": "message",
+      "theme": "light",
+      "width": 375,
+      "compared": 9,
+      "diffs": []
+    },
+    {
+      "family": "message",
+      "theme": "light",
+      "width": 1440,
+      "compared": 9,
+      "diffs": []
+    },
+    {
+      "family": "message",
+      "theme": "dark",
+      "width": 375,
+      "compared": 9,
+      "diffs": []
+    },
+    {
+      "family": "message",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 9,
+      "diffs": []
+    },
+    {
+      "family": "native-select",
+      "theme": "light",
+      "width": 375,
+      "compared": 5,
+      "diffs": []
+    },
+    {
+      "family": "native-select",
+      "theme": "light",
+      "width": 1440,
+      "compared": 5,
+      "diffs": []
+    },
+    {
+      "family": "native-select",
+      "theme": "dark",
+      "width": 375,
+      "compared": 5,
+      "diffs": []
+    },
+    {
+      "family": "native-select",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 5,
+      "diffs": []
+    },
+    {
+      "family": "navigation-menu",
+      "theme": "light",
+      "width": 375,
+      "compared": 7,
+      "diffs": []
+    },
+    {
+      "family": "navigation-menu",
+      "theme": "light",
+      "width": 1440,
+      "compared": 7,
+      "diffs": []
+    },
+    {
+      "family": "navigation-menu",
+      "theme": "dark",
+      "width": 375,
+      "compared": 7,
+      "diffs": []
+    },
+    {
+      "family": "navigation-menu",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 7,
+      "diffs": []
+    },
+    {
+      "family": "pagination",
+      "theme": "light",
+      "width": 375,
+      "compared": 8,
+      "diffs": []
+    },
+    {
+      "family": "pagination",
+      "theme": "light",
+      "width": 1440,
+      "compared": 8,
+      "diffs": []
+    },
+    {
+      "family": "pagination",
+      "theme": "dark",
+      "width": 375,
+      "compared": 8,
+      "diffs": []
+    },
+    {
+      "family": "pagination",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 8,
+      "diffs": []
+    },
+    {
+      "family": "popover",
+      "theme": "light",
+      "width": 375,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "popover",
+      "theme": "light",
+      "width": 1440,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "popover",
+      "theme": "dark",
+      "width": 375,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "popover",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "progress",
+      "theme": "light",
+      "width": 375,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "progress",
+      "theme": "dark",
+      "width": 375,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "progress",
+      "theme": "light",
+      "width": 1440,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "progress",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "questionnaire",
+      "theme": "light",
+      "width": 375,
+      "compared": 21,
+      "diffs": []
+    },
+    {
+      "family": "questionnaire",
+      "theme": "light",
+      "width": 1440,
+      "compared": 21,
+      "diffs": []
+    },
+    {
+      "family": "questionnaire",
+      "theme": "dark",
+      "width": 375,
+      "compared": 21,
+      "diffs": []
+    },
+    {
+      "family": "radio-group",
+      "theme": "light",
+      "width": 375,
+      "compared": 11,
+      "diffs": []
+    },
+    {
+      "family": "questionnaire",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 21,
+      "diffs": []
+    },
+    {
+      "family": "radio-group",
+      "theme": "light",
+      "width": 1440,
+      "compared": 11,
+      "diffs": []
+    },
+    {
+      "family": "radio-group",
+      "theme": "dark",
+      "width": 375,
+      "compared": 11,
+      "diffs": []
+    },
+    {
+      "family": "radio-group",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 11,
+      "diffs": []
+    },
+    {
+      "family": "range-calendar",
+      "theme": "light",
+      "width": 375,
+      "compared": 101,
+      "diffs": []
+    },
+    {
+      "family": "range-calendar",
+      "theme": "light",
+      "width": 1440,
+      "compared": 101,
+      "diffs": []
+    },
+    {
+      "family": "range-calendar",
+      "theme": "dark",
+      "width": 375,
+      "compared": 101,
+      "diffs": []
+    },
+    {
+      "family": "range-calendar",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 101,
+      "diffs": []
+    },
+    {
+      "family": "resizable",
+      "theme": "light",
+      "width": 375,
+      "compared": 5,
+      "diffs": []
+    },
+    {
+      "family": "resizable",
+      "theme": "light",
+      "width": 1440,
+      "compared": 5,
+      "diffs": []
+    },
+    {
+      "family": "resizable",
+      "theme": "dark",
+      "width": 375,
+      "compared": 5,
+      "diffs": []
+    },
+    {
+      "family": "resizable",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 5,
+      "diffs": []
+    },
+    {
+      "family": "scroll-area",
+      "theme": "light",
+      "width": 375,
+      "compared": 13,
+      "diffs": []
+    },
+    {
+      "family": "scroll-area",
+      "theme": "light",
+      "width": 1440,
+      "compared": 13,
+      "diffs": []
+    },
+    {
+      "family": "scroll-area",
+      "theme": "dark",
+      "width": 375,
+      "compared": 13,
+      "diffs": []
+    },
+    {
+      "family": "scroll-area",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 13,
+      "diffs": []
+    },
+    {
+      "family": "select",
+      "theme": "light",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "select",
+      "theme": "light",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "select",
+      "theme": "dark",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "select",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "separator",
+      "theme": "light",
+      "width": 375,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "separator",
+      "theme": "light",
+      "width": 1440,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "separator",
+      "theme": "dark",
+      "width": 375,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "separator",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "sheet",
+      "theme": "light",
+      "width": 375,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "sheet",
+      "theme": "light",
+      "width": 1440,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "sheet",
+      "theme": "dark",
+      "width": 375,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "sheet",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "sidebar",
+      "theme": "light",
+      "width": 375,
+      "compared": 13,
+      "diffs": []
+    },
+    {
+      "family": "sidebar",
+      "theme": "light",
+      "width": 1440,
+      "compared": 13,
+      "diffs": []
+    },
+    {
+      "family": "sidebar",
+      "theme": "dark",
+      "width": 375,
+      "compared": 13,
+      "diffs": []
+    },
+    {
+      "family": "sidebar",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 13,
+      "diffs": []
+    },
+    {
+      "family": "skeleton",
+      "theme": "light",
+      "width": 375,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "skeleton",
+      "theme": "light",
+      "width": 1440,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "skeleton",
+      "theme": "dark",
+      "width": 375,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "skeleton",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "slider",
+      "theme": "light",
+      "width": 375,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "slider",
+      "theme": "light",
+      "width": 1440,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "slider",
+      "theme": "dark",
+      "width": 375,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "slider",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "sonner",
+      "theme": "light",
+      "width": 375,
+      "compared": 2,
+      "diffs": []
+    },
+    {
+      "family": "sonner",
+      "theme": "light",
+      "width": 1440,
+      "compared": 2,
+      "diffs": []
+    },
+    {
+      "family": "sonner",
+      "theme": "dark",
+      "width": 375,
+      "compared": 2,
+      "diffs": []
+    },
+    {
+      "family": "sonner",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 2,
+      "diffs": []
+    },
+    {
+      "family": "spinner",
+      "theme": "light",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "spinner",
+      "theme": "light",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "spinner",
+      "theme": "dark",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "spinner",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "switch",
+      "theme": "light",
+      "width": 375,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "switch",
+      "theme": "light",
+      "width": 1440,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "switch",
+      "theme": "dark",
+      "width": 375,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "switch",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 4,
+      "diffs": []
+    },
+    {
+      "family": "table",
+      "theme": "light",
+      "width": 375,
+      "compared": 24,
+      "diffs": []
+    },
+    {
+      "family": "table",
+      "theme": "light",
+      "width": 1440,
+      "compared": 24,
+      "diffs": []
+    },
+    {
+      "family": "table",
+      "theme": "dark",
+      "width": 375,
+      "compared": 24,
+      "diffs": []
+    },
+    {
+      "family": "table",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 24,
+      "diffs": []
+    },
+    {
+      "family": "tabs",
+      "theme": "light",
+      "width": 375,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "tabs",
+      "theme": "light",
+      "width": 1440,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "tabs",
+      "theme": "dark",
+      "width": 375,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "textarea",
+      "theme": "light",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "tabs",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 6,
+      "diffs": []
+    },
+    {
+      "family": "textarea",
+      "theme": "light",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "textarea",
+      "theme": "dark",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "toggle-group",
+      "theme": "light",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "textarea",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "toggle-group",
+      "theme": "light",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "toggle-group",
+      "theme": "dark",
+      "width": 375,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "toggle-group",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 3,
+      "diffs": []
+    },
+    {
+      "family": "toggle",
+      "theme": "light",
+      "width": 375,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "toggle",
+      "theme": "light",
+      "width": 1440,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "toggle",
+      "theme": "dark",
+      "width": 375,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "toggle",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "tooltip",
+      "theme": "light",
+      "width": 375,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "tooltip",
+      "theme": "light",
+      "width": 1440,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "tooltip",
+      "theme": "dark",
+      "width": 375,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "tooltip",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 1,
+      "diffs": []
+    },
+    {
+      "family": "trace",
+      "theme": "light",
+      "width": 375,
+      "compared": 8,
+      "diffs": []
+    },
+    {
+      "family": "trace",
+      "theme": "light",
+      "width": 1440,
+      "compared": 8,
+      "diffs": []
+    },
+    {
+      "family": "trace",
+      "theme": "dark",
+      "width": 375,
+      "compared": 8,
+      "diffs": []
+    },
+    {
+      "family": "trace",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 8,
+      "diffs": []
+    },
+    {
+      "family": "typography",
+      "theme": "light",
+      "width": 375,
+      "compared": 5,
+      "diffs": []
+    },
+    {
+      "family": "typography",
+      "theme": "light",
+      "width": 1440,
+      "compared": 5,
+      "diffs": []
+    },
+    {
+      "family": "typography",
+      "theme": "dark",
+      "width": 375,
+      "compared": 5,
+      "diffs": []
+    },
+    {
+      "family": "typography",
+      "theme": "dark",
+      "width": 1440,
+      "compared": 5,
+      "diffs": []
+    }
+  ],
+  "failures": []
+}

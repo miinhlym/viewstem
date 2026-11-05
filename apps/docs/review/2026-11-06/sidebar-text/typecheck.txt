@@ -1,0 +1,19 @@
+
+> typecheck
+> astro check && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings
+
+[astro] `markdown.remarkPlugins`, `markdown.rehypePlugins`, and `markdown.remarkRehype` are deprecated. Pass them to `unified({...})` from `@astrojs/markdown-remark` directly instead.
+11:05:12 [vite] Re-optimizing dependencies because vite config has changed
+11:05:13 [content] Syncing content
+11:05:13 [content] Synced content
+11:05:13 [types] Generated 889ms
+11:05:13 [check] Getting diagnostics for Astro files in /Users/minholim/dev/minh/viewstem/apps/docs...
+Result (87 files): 
+- 0 errors
+- 0 warnings
+- 0 hints
+
+Loading svelte-check in workspace: /Users/minholim/dev/minh/viewstem/apps/docs
+Getting Svelte diagnostics...
+
+svelte-check found 0 errors and 0 warnings

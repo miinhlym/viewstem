@@ -1,0 +1,91 @@
+{
+  "checks": [
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1024,
+      "expected": 1936,
+      "frames": 48,
+      "min": 1936,
+      "max": 1936,
+      "hydrationDelayMs": 350
+    },
+    {
+      "locale": "en",
+      "theme": "light",
+      "width": 1440,
+      "expected": 1936,
+      "frames": 47,
+      "min": 1936,
+      "max": 1936,
+      "hydrationDelayMs": 350
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1024,
+      "expected": 1936,
+      "frames": 47,
+      "min": 1936,
+      "max": 1936,
+      "hydrationDelayMs": 350
+    },
+    {
+      "locale": "en",
+      "theme": "dark",
+      "width": 1440,
+      "expected": 1936,
+      "frames": 50,
+      "min": 1936,
+      "max": 1936,
+      "hydrationDelayMs": 350
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 1024,
+      "expected": 1936,
+      "frames": 47,
+      "min": 1936,
+      "max": 1936,
+      "hydrationDelayMs": 350
+    },
+    {
+      "locale": "ko",
+      "theme": "light",
+      "width": 1440,
+      "expected": 1936,
+      "frames": 49,
+      "min": 1936,
+      "max": 1936,
+      "hydrationDelayMs": 350
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 1024,
+      "expected": 1936,
+      "frames": 48,
+      "min": 1936,
+      "max": 1936,
+      "hydrationDelayMs": 350
+    },
+    {
+      "locale": "ko",
+      "theme": "dark",
+      "width": 1440,
+      "expected": 1936,
+      "frames": 54,
+      "min": 1936,
+      "max": 1936,
+      "hydrationDelayMs": 350
+    },
+    {
+      "storageUnavailable": "current item visible, no errors"
+    },
+    {
+      "mobile": "menu works without overwriting desktop scroll"
+    }
+  ],
+  "failures": []
+}

@@ -1,0 +1,23 @@
+{
+  "checks": [
+    {
+      "locale": "en",
+      "homeFilters": "3 all / 2 active",
+      "sidebar": {
+        "expected": 1830,
+        "actual": 1830
+      },
+      "errors": []
+    },
+    {
+      "locale": "ko",
+      "homeFilters": "3 all / 2 active",
+      "sidebar": {
+        "expected": 1830,
+        "actual": 1830
+      },
+      "errors": []
+    }
+  ],
+  "failures": []
+}

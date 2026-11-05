@@ -1,0 +1,4742 @@
+{
+  "date": "2026-11-05",
+  "scope": {
+    "content_routes": 118,
+    "home": 2,
+    "docs": 34,
+    "example_indexes": 2,
+    "example_details": 78,
+    "playground": 2
+  },
+  "static_links": {
+    "pages": 122,
+    "internal_links_and_anchors": 5838,
+    "issues": []
+  },
+  "observations": [
+    {
+      "route": "/docs/concepts/component-composition/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Reusing Components",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/conditions-and-lists/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Conditions and lists",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/derived-values/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Derived values",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/events-and-actions/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Events and Actions",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/queries-and-data/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Queries and data",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/resources-and-types/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Resources and types",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/state/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "State",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/values-and-inputs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Values and inputs",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/view-and-component/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "View and Component",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/conditional-settings/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Show settings with a switch",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/form-validation/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Validate form input",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/keyed-list/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Render a list with stable keys",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/query-dashboard/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Build a query-driven dashboard",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Overview",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/installation/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Installation",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/quickstart/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Quick Start",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/reference/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "DSL and API reference",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-assert/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Stop an Action with Assert",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Allow saving\nDraft\nSave",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-branch/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Branch an Action with If",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Enable setting\nDraft\nCheck setting",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-output/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Pass an Action result to the next step",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nSave",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-ref/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Call a registered Action",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nSave",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-status/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Display an Action’s execution status",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "idle\nRun check",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-variable/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Calculate a value inside an Action",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects\nAdd a mark",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/component-event/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Send an event from a Component to its caller",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "No project selected\nPick Onboarding",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/component-inputs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Configure a button with inputs",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/component-state/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Keep State separate per Component instance",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nDraft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/conditional-ui/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Show and hide content with State",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Show details",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/conditions/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Show a node with when",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/derived/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Compute a Derived value",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Task\nShort name\nUse a longer name",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/event-payload/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Read typed text from an event",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Project name\nProjects",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/first-view/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Render a button from JSON",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Hello, Viewstem",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/forward-slot/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Forward a slot to another component",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/http-datasource/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Read a field from an HTTP response",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects 1",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Examples",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "pagers": 0
+    },
+    {
+      "route": "/examples/inline-component/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Define a Component inline",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/port-default/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Use a default input",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-concat/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Combine arrays in a Query",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nBilling",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-gate/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Run a Query only when allowed",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Allow request\nwaiting",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-inputs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Rerun a Query when inputs change",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects\nProjects\nRename",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-join/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Join records by key",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nSaved\nBilling\nDraft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-on-click/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Send a POST request on click",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "No project created\nCreate project",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-polling/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Refresh a Query on an interval",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Auto-refresh\nProjects 1",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-ref/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Use a registered Query",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-result/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Read a Query result",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-sources/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Combine the results of two Queries",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nBilling",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/refresh-query/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Refetch data on click",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects 1\nRefresh",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/repeat/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Render one badge per item",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nBilling",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/reusable-component/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Reuse a declared Component",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nBilling",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/set-state/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Change State on click",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nSave",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/shared-state-port/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Share State through a Component port",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nDraft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/shared-type/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Validate two inputs with one Type",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Saved\nDraft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/slots/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Put badges inside a card",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nSaved",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/state/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Render the initial State value",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/state-reaction/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Reset State when another value changes",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nRow selected\nOpen Billing",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/value-call/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Build a label with @call",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Open Projects",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/variable-ref/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Reuse a registered Variable",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects!\nBilling!",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/view-inputs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Read inputs passed to a View",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects",
+      "pagers": 1
+    },
+    {
+      "route": "/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Define screens and behavior in JSON. ",
+      "header": 59.3984375,
+      "active": [],
+      "error": null,
+      "pagers": 0
+    },
+    {
+      "route": "/ko/docs/concepts/component-composition/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Component 재사용",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/conditions-and-lists/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "조건과 목록",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/derived-values/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "계산된 값",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/events-and-actions/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "이벤트와 Action",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/queries-and-data/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Query와 데이터",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/resources-and-types/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "리소스와 타입",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/state/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "State",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/values-and-inputs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "값과 입력",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/view-and-component/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "View와 Component",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/guides/conditional-settings/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "스위치로 설정 항목 표시하기",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/guides/form-validation/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "폼 입력 검증하기",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/guides/keyed-list/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "고유 키로 목록 그리기",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/guides/query-dashboard/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "조회 대시보드 만들기",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "개요",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/installation/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "설치",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/quickstart/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "빠른 시작",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/reference/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "DSL·API 레퍼런스",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-assert/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Assert로 저장 조건 검사하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "저장 허용\n초안\n저장",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-branch/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "If로 Action 실행 분기하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "설정 켜기\n초안\n설정 확인",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-output/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Action 결과를 다음 단계에 전달하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안\n저장",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-ref/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "등록한 Action 호출하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안\n저장",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-status/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Action 실행 상태 표시하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "idle\n검사 실행",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-variable/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Action 안에서 Variable 계산하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트\n기호 붙이기",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/component-event/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Component 이벤트를 호출자에게 보내기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "선택한 프로젝트 없음\n온보딩 선택",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/component-inputs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "inputs로 버튼 설정하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/component-state/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Component 인스턴스마다 상태 갖기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안\n초안",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/conditional-ui/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "State로 내용 표시하고 숨기기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "세부 정보 표시",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/conditions/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "when으로 표시 조건 정하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/derived/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Derived로 값 계산하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "업무\n짧은 이름\n긴 이름으로 변경",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/event-payload/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "입력 이벤트에서 텍스트 읽기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트 이름\n프로젝트",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/first-view/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "JSON으로 버튼 하나 그리기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "안녕, Viewstem",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/forward-slot/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "슬롯을 다른 컴포넌트로 전달하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "온보딩",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/http-datasource/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "HTTP 응답에서 값 읽기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트 1",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "예제",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "pagers": 0
+    },
+    {
+      "route": "/ko/examples/inline-component/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "사용하는 곳에 Component 정의하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "온보딩",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/port-default/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "입력 생략 시 기본값 쓰기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-concat/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Query에서 배열 합치기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "온보딩\n결제",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-gate/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "조건이 맞을 때만 Query 실행하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "요청 허용\nwaiting",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-inputs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "입력이 바뀌면 Query 다시 실행하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트\n프로젝트\n이름 변경",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-join/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "키로 레코드 결합하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "온보딩\n저장됨\n결제\n초안",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-on-click/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "클릭해서 POST 요청 보내기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "만들어진 프로젝트 없음\n프로젝트 만들기",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-polling/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Query를 일정 간격으로 갱신하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "자동 갱신\n프로젝트 1",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-ref/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "등록한 Query 사용하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-result/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Query 결과 읽기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-sources/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "두 Query의 결과 합치기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "온보딩\n결제",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/refresh-query/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "버튼으로 Query 다시 요청하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트 1\n새로고침",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/repeat/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "목록 항목마다 배지 그리기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "온보딩\n결제",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/reusable-component/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "선언한 Component 재사용하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "온보딩\n결제",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/set-state/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "클릭해서 State 바꾸기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안\n저장",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/shared-state-port/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "State 포트로 상태 공유하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안\n초안",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/shared-type/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Type 하나로 입력 두 개 검증하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "저장됨\n초안",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/slots/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "카드 슬롯에 배지 넣기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안\n저장됨",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/state/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "State 초기값 표시하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/state-reaction/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "다른 State가 바뀌면 선택 초기화하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "온보딩\n행 선택됨\n결제 열기",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/value-call/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "@call로 문구 만들기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "열기 · 프로젝트",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/variable-ref/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "등록한 Variable 재사용하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트!\n결제!",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/view-inputs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "View에 전달된 입력 읽기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "화면과 동작을 JSON으로 정의하세요. ",
+      "header": 59.3984375,
+      "active": [],
+      "error": null,
+      "pagers": 0
+    },
+    {
+      "route": "/ko/playground/",
+      "viewport": 320,
+      "width": 320,
+      "h1": "플레이그라운드",
+      "header": 59.3984375,
+      "active": [
+        "플레이그라운드"
+      ],
+      "error": null,
+      "pagers": 0
+    },
+    {
+      "route": "/playground/",
+      "viewport": 320,
+      "width": 320,
+      "h1": "Playground",
+      "header": 59.3984375,
+      "active": [
+        "Playground"
+      ],
+      "error": null,
+      "pagers": 0
+    },
+    {
+      "route": "/docs/concepts/component-composition/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Reusing Components",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/conditions-and-lists/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Conditions and lists",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/derived-values/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Derived values",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/events-and-actions/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Events and Actions",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/queries-and-data/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Queries and data",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/resources-and-types/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Resources and types",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/state/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "State",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/values-and-inputs/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Values and inputs",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/view-and-component/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "View and Component",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/conditional-settings/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Show settings with a switch",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/form-validation/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Validate form input",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/keyed-list/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Render a list with stable keys",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/query-dashboard/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Build a query-driven dashboard",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Overview",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/installation/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Installation",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/quickstart/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Quick Start",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/reference/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "DSL and API reference",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-assert/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Stop an Action with Assert",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Allow saving\nDraft\nSave",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-branch/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Branch an Action with If",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Enable setting\nDraft\nCheck setting",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-output/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Pass an Action result to the next step",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nSave",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-ref/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Call a registered Action",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nSave",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-status/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Display an Action’s execution status",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "idle\nRun check",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-variable/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Calculate a value inside an Action",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects\nAdd a mark",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/component-event/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Send an event from a Component to its caller",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "No project selected\nPick Onboarding",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/component-inputs/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Configure a button with inputs",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/component-state/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Keep State separate per Component instance",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nDraft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/conditional-ui/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Show and hide content with State",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Show details",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/conditions/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Show a node with when",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/derived/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Compute a Derived value",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Task\nShort name\nUse a longer name",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/event-payload/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Read typed text from an event",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Project name\nProjects",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/first-view/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Render a button from JSON",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Hello, Viewstem",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/forward-slot/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Forward a slot to another component",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/http-datasource/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Read a field from an HTTP response",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects 1",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Examples",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "pagers": 0
+    },
+    {
+      "route": "/examples/inline-component/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Define a Component inline",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/port-default/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Use a default input",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-concat/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Combine arrays in a Query",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nBilling",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-gate/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Run a Query only when allowed",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Allow request\nwaiting",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-inputs/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Rerun a Query when inputs change",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects\nProjects\nRename",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-join/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Join records by key",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nSaved\nBilling\nDraft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-on-click/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Send a POST request on click",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "No project created\nCreate project",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-polling/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Refresh a Query on an interval",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Auto-refresh\nProjects 1",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-ref/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Use a registered Query",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-result/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Read a Query result",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-sources/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Combine the results of two Queries",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nBilling",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/refresh-query/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Refetch data on click",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects 1\nRefresh",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/repeat/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Render one badge per item",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nBilling",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/reusable-component/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Reuse a declared Component",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nBilling",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/set-state/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Change State on click",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nSave",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/shared-state-port/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Share State through a Component port",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nDraft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/shared-type/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Validate two inputs with one Type",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Saved\nDraft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/slots/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Put badges inside a card",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nSaved",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/state/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Render the initial State value",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/state-reaction/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Reset State when another value changes",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nRow selected\nOpen Billing",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/value-call/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Build a label with @call",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Open Projects",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/variable-ref/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Reuse a registered Variable",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects!\nBilling!",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/view-inputs/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Read inputs passed to a View",
+      "header": 65,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects",
+      "pagers": 1
+    },
+    {
+      "route": "/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Define screens and behavior in JSON. ",
+      "header": 65,
+      "active": [],
+      "error": null,
+      "pagers": 0
+    },
+    {
+      "route": "/ko/docs/concepts/component-composition/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Component 재사용",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/conditions-and-lists/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "조건과 목록",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/derived-values/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "계산된 값",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/events-and-actions/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "이벤트와 Action",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/queries-and-data/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Query와 데이터",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/resources-and-types/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "리소스와 타입",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/state/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "State",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/values-and-inputs/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "값과 입력",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/view-and-component/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "View와 Component",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/guides/conditional-settings/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "스위치로 설정 항목 표시하기",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/guides/form-validation/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "폼 입력 검증하기",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/guides/keyed-list/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "고유 키로 목록 그리기",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/guides/query-dashboard/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "조회 대시보드 만들기",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "개요",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/installation/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "설치",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/quickstart/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "빠른 시작",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/reference/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "DSL·API 레퍼런스",
+      "header": 65,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-assert/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Assert로 저장 조건 검사하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "저장 허용\n초안\n저장",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-branch/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "If로 Action 실행 분기하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "설정 켜기\n초안\n설정 확인",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-output/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Action 결과를 다음 단계에 전달하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안\n저장",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-ref/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "등록한 Action 호출하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안\n저장",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-status/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Action 실행 상태 표시하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "idle\n검사 실행",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-variable/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Action 안에서 Variable 계산하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트\n기호 붙이기",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/component-event/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Component 이벤트를 호출자에게 보내기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "선택한 프로젝트 없음\n온보딩 선택",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/component-inputs/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "inputs로 버튼 설정하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/component-state/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Component 인스턴스마다 상태 갖기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안\n초안",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/conditional-ui/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "State로 내용 표시하고 숨기기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "세부 정보 표시",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/conditions/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "when으로 표시 조건 정하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/derived/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Derived로 값 계산하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "업무\n짧은 이름\n긴 이름으로 변경",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/event-payload/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "입력 이벤트에서 텍스트 읽기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트 이름\n프로젝트",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/first-view/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "JSON으로 버튼 하나 그리기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "안녕, Viewstem",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/forward-slot/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "슬롯을 다른 컴포넌트로 전달하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "온보딩",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/http-datasource/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "HTTP 응답에서 값 읽기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트 1",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "예제",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "pagers": 0
+    },
+    {
+      "route": "/ko/examples/inline-component/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "사용하는 곳에 Component 정의하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "온보딩",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/port-default/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "입력 생략 시 기본값 쓰기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-concat/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Query에서 배열 합치기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "온보딩\n결제",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-gate/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "조건이 맞을 때만 Query 실행하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "요청 허용\nwaiting",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-inputs/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "입력이 바뀌면 Query 다시 실행하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트\n프로젝트\n이름 변경",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-join/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "키로 레코드 결합하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "온보딩\n저장됨\n결제\n초안",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-on-click/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "클릭해서 POST 요청 보내기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "만들어진 프로젝트 없음\n프로젝트 만들기",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-polling/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Query를 일정 간격으로 갱신하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "자동 갱신\n프로젝트 1",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-ref/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "등록한 Query 사용하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-result/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Query 결과 읽기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/query-sources/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "두 Query의 결과 합치기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "온보딩\n결제",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/refresh-query/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "버튼으로 Query 다시 요청하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트 1\n새로고침",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/repeat/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "목록 항목마다 배지 그리기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "온보딩\n결제",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/reusable-component/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "선언한 Component 재사용하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "온보딩\n결제",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/set-state/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "클릭해서 State 바꾸기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안\n저장",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/shared-state-port/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "State 포트로 상태 공유하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안\n초안",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/shared-type/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Type 하나로 입력 두 개 검증하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "저장됨\n초안",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/slots/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "카드 슬롯에 배지 넣기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안\n저장됨",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/state/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "State 초기값 표시하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/state-reaction/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "다른 State가 바뀌면 선택 초기화하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "온보딩\n행 선택됨\n결제 열기",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/value-call/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "@call로 문구 만들기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "열기 · 프로젝트",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/variable-ref/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "등록한 Variable 재사용하기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트!\n결제!",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/view-inputs/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "View에 전달된 입력 읽기",
+      "header": 65,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "프로젝트",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "화면과 동작을 JSON으로 정의하세요. ",
+      "header": 65,
+      "active": [],
+      "error": null,
+      "pagers": 0
+    },
+    {
+      "route": "/ko/playground/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "플레이그라운드",
+      "header": 65,
+      "active": [
+        "플레이그라운드"
+      ],
+      "error": null,
+      "pagers": 0
+    },
+    {
+      "route": "/playground/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Playground",
+      "header": 65,
+      "active": [
+        "Playground"
+      ],
+      "error": null,
+      "pagers": 0
+    },
+    {
+      "route": "/docs/concepts/component-composition/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Reusing Components",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/conditions-and-lists/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Conditions and lists",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/derived-values/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Derived values",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/events-and-actions/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Events and Actions",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/queries-and-data/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Queries and data",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/resources-and-types/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Resources and types",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/state/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "State",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/values-and-inputs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Values and inputs",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/view-and-component/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "View and Component",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/conditional-settings/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Show settings with a switch",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/form-validation/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Validate form input",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/keyed-list/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Render a list with stable keys",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/query-dashboard/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Build a query-driven dashboard",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Overview",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/installation/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Installation",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/quickstart/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Quick Start",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/reference/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "DSL and API reference",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-assert/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Stop an Action with Assert",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Allow saving\nDraft\nSave",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-branch/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Branch an Action with If",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Enable setting\nDraft\nCheck setting",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-output/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Pass an Action result to the next step",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nSave",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-ref/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Call a registered Action",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nSave",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-status/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Display an Action’s execution status",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "idle\nRun check",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/action-variable/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Calculate a value inside an Action",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects\nAdd a mark",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/component-event/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Send an event from a Component to its caller",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "No project selected\nPick Onboarding",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/component-inputs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Configure a button with inputs",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/component-state/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Keep State separate per Component instance",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nDraft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/conditional-ui/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Show and hide content with State",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Show details",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/conditions/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Show a node with when",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/derived/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Compute a Derived value",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Task\nShort name\nUse a longer name",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/event-payload/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Read typed text from an event",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Project name\nProjects",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/first-view/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Render a button from JSON",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Hello, Viewstem",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/forward-slot/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Forward a slot to another component",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/http-datasource/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Read a field from an HTTP response",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects 1",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Examples",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "pagers": 0
+    },
+    {
+      "route": "/examples/inline-component/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Define a Component inline",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/port-default/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Use a default input",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-concat/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Combine arrays in a Query",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nBilling",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-gate/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Run a Query only when allowed",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Allow request\nwaiting",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-inputs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Rerun a Query when inputs change",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects\nProjects\nRename",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-join/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Join records by key",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nSaved\nBilling\nDraft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-on-click/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Send a POST request on click",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "No project created\nCreate project",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-polling/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Refresh a Query on an interval",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Auto-refresh\nProjects 1",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-ref/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Use a registered Query",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-result/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Read a Query result",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/query-sources/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Combine the results of two Queries",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nBilling",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/refresh-query/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Refetch data on click",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects 1\nRefresh",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/repeat/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Render one badge per item",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nBilling",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/reusable-component/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Reuse a declared Component",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nBilling",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/set-state/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Change State on click",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nSave",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/shared-state-port/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Share State through a Component port",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nDraft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/shared-type/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Validate two inputs with one Type",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Saved\nDraft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/slots/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Put badges inside a card",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft\nSaved",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/state/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Render the initial State value",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Draft",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/state-reaction/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Reset State when another value changes",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Onboarding\nRow selected\nOpen Billing",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/value-call/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Build a label with @call",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Open Projects",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/variable-ref/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Reuse a registered Variable",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects!\nBilling!",
+      "pagers": 1
+    },
+    {
+      "route": "/examples/view-inputs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Read inputs passed to a View",
+      "header": 59.3984375,
+      "active": [
+        "Examples"
+      ],
+      "error": null,
+      "preview": "Projects",
+      "pagers": 1
+    },
+    {
+      "route": "/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Define screens and behavior in JSON. ",
+      "header": 59.3984375,
+      "active": [],
+      "error": null,
+      "pagers": 0
+    },
+    {
+      "route": "/ko/docs/concepts/component-composition/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Component 재사용",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/conditions-and-lists/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "조건과 목록",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/derived-values/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "계산된 값",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/events-and-actions/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "이벤트와 Action",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/queries-and-data/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Query와 데이터",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/resources-and-types/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "리소스와 타입",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/state/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "State",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/values-and-inputs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "값과 입력",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/concepts/view-and-component/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "View와 Component",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/guides/conditional-settings/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "스위치로 설정 항목 표시하기",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/guides/form-validation/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "폼 입력 검증하기",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/guides/keyed-list/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "고유 키로 목록 그리기",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/guides/query-dashboard/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "조회 대시보드 만들기",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "개요",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/installation/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "설치",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/quickstart/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "빠른 시작",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/docs/reference/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "DSL·API 레퍼런스",
+      "header": 102.3984375,
+      "active": [
+        "문서"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-assert/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Assert로 저장 조건 검사하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "저장 허용\n초안\n저장",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-branch/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "If로 Action 실행 분기하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "설정 켜기\n초안\n설정 확인",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-output/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Action 결과를 다음 단계에 전달하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안\n저장",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-ref/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "등록한 Action 호출하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "초안\n저장",
+      "pagers": 1
+    },
+    {
+      "route": "/ko/examples/action-status/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Action 실행 상태 표시하기",
+      "header": 59.3984375,
+      "active": [
+        "예제"
+      ],
+      "error": null,
+      "preview": "idle\n검사 실행",
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/component-composition/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Reusing Components",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/conditions-and-lists/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Conditions and lists",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/derived-values/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Derived values",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/events-and-actions/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Events and Actions",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/queries-and-data/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Queries and data",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/resources-and-types/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Resources and types",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/state/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "State",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/values-and-inputs/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Values and inputs",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/view-and-component/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "View and Component",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/conditional-settings/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Show settings with a switch",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/form-validation/",
+      "viewport": 768,
+      "width": 768,
+      "h1": "Validate form input",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/keyed-list/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Render a list with stable keys",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/component-composition/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Reusing Components",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/conditions-and-lists/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Conditions and lists",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/derived-values/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Derived values",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/events-and-actions/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Events and Actions",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/queries-and-data/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Queries and data",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/resources-and-types/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Resources and types",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/state/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "State",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/values-and-inputs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Values and inputs",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/view-and-component/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "View and Component",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/conditional-settings/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Show settings with a switch",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/form-validation/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Validate form input",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/keyed-list/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Render a list with stable keys",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/query-dashboard/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Build a query-driven dashboard",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Overview",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/installation/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Installation",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/quickstart/",
+      "viewport": 320,
+      "width": 305,
+      "h1": "Quick Start",
+      "header": 102.3984375,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/component-composition/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Reusing Components",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/conditions-and-lists/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Conditions and lists",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/derived-values/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Derived values",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/events-and-actions/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Events and Actions",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/queries-and-data/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Queries and data",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/resources-and-types/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Resources and types",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/state/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "State",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/values-and-inputs/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Values and inputs",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/view-and-component/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "View and Component",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/conditional-settings/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Show settings with a switch",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/form-validation/",
+      "viewport": 768,
+      "width": 768,
+      "h1": "Validate form input",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/keyed-list/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Render a list with stable keys",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/query-dashboard/",
+      "viewport": 768,
+      "width": 768,
+      "h1": "Build a query-driven dashboard",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Overview",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/installation/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Installation",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/quickstart/",
+      "viewport": 768,
+      "width": 753,
+      "h1": "Quick Start",
+      "header": 108,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/component-composition/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Reusing Components",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/conditions-and-lists/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Conditions and lists",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/derived-values/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Derived values",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/events-and-actions/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Events and Actions",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/queries-and-data/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Queries and data",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/resources-and-types/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Resources and types",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/state/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "State",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/values-and-inputs/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Values and inputs",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/concepts/view-and-component/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "View and Component",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/conditional-settings/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Show settings with a switch",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/form-validation/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Validate form input",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/keyed-list/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Render a list with stable keys",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/guides/query-dashboard/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Build a query-driven dashboard",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/",
+      "viewport": 1440,
+      "width": 1440,
+      "h1": "Overview",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/installation/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Installation",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    },
+    {
+      "route": "/docs/quickstart/",
+      "viewport": 1440,
+      "width": 1425,
+      "h1": "Quick Start",
+      "header": 65,
+      "active": [
+        "Docs"
+      ],
+      "error": null,
+      "pagers": 1
+    }
+  ],
+  "source_sha256": {
+    "components/PagePagination.astro": "1a3b82ae6588731e84fd9bbe54fd2679adff878935f6384db9d0568782928054",
+    "components/docs/Pagination.astro": "f3c3597491559bc6f24790b10df06636c683e09d22de91e5b123b052e4edaf02",
+    "components/ExamplesPage.astro": "15ac53de29d63dd135e8515cd9da248fc50178962d542d4f874fcf25cf6f31e7",
+    "components/Playground.svelte": "614e442a473393667de6ab2edb19eae6aa0635c75a560e20c420853ddde1c655",
+    "components/playground-copy.ts": "59f921728db71bb39633c2ed6f06d8df393f378eb245b6925c26563ecec5f633",
+    "styles/examples.css": "888d345afe6798153d1a9489b4ca8dbc80cfa8b2fad60acec6b51d2d8d959f2c",
+    "styles/docs.css": "9bee71b348530b0d7a4be2980f383282c1e134902e190f2c5f6be54cf8835640",
+    "styles/motion.css": "d52fa16f5be396212a20c17a665f27d3fd4e036366d661bdf5d922a67362d7ca",
+    "content.config.ts": "9fa63c352c64e6735fe69b9eb5badeaf098d117efed5ea4248de111cf31dfd01",
+    "content/i18n/ko.json": "c3a7fe097212f9fda2e504e606fc68f2b3a7f8d269898a60f06b8ef6d9f29d12"
+  },
+  "full_typecheck": {
+    "passed": false,
+    "diagnostic": "node_modules/@astrojs/starlight/utils/i18n.ts:94 TS18048 astroI18nConfig.routing is possibly undefined"
+  },
+  "svelte_component_check": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "build": "passed",
+  "interaction_evidence": "See docs-site-consistency-2026-11-05.md for observed steps and results."
+}

@@ -1,0 +1,11 @@
+{
+  "toc": true,
+  "themePersists": true,
+  "preview": true,
+  "colors": {
+    "background": "oklch(0.145 0 0)",
+    "gutter": "oklch(0.269 0 0)",
+    "text": "{\"render\": {\"id\": \"a\", \"componentRef\": \"shadcn.Button\", \"inputs\": {\"text\": \"한글 Ω 🙂\"}}}"
+  },
+  "errors": []
+}

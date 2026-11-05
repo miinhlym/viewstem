@@ -1,0 +1,15 @@
+{
+  "checks": [
+    {
+      "locale": "en",
+      "exampleGroups": "collapse/expand",
+      "lessonMenu": "links/Escape/focus return"
+    },
+    {
+      "locale": "ko",
+      "exampleGroups": "collapse/expand",
+      "lessonMenu": "links/Escape/focus return"
+    }
+  ],
+  "failures": []
+}
