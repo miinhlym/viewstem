@@ -1,5 +1,7 @@
 # Codex 스킬 확장 비교와 배포 판단 — 2026-11-05
 
+2026-11-06 범위 변경: 아래 평가는 2026-11-05의 조건과 판단을 보존한다. D129에서 Claude Code를 지원·검증 및 첫 배포 필수 조건에서 제외했다. [현재 범위와 남은 배포 조건](viewstem-skills-scope-2026-11-06.md)을 따른다.
+
 판정: **공식 첫 배포는 보류한다.** Codex의 공통 스킬 발견과 소비 작업 검증은 확보했지만, 현재 개발 라이브러리에서 투영 불일치가 재현됐고 Claude Code 실행·다른 호스트 발견 경로·공개 immutable ref는 아직 검증되지 않았다. Claude Code는 사용자 지시에 따라 준비만 유지했다. 제품 코드나 공개 발행은 이번 작업에서 변경하지 않았다.
 
 최종 후보는 [공통 스킬 B3](../../skills/viewstem/SKILL.md)다. 배포 파일은 여전히 본문·Codex 표시 정보·두 호스트 안내의 4개이며 추가 참조나 조회 helper는 만들지 않았다. [원래 초기 비교](viewstem-skills-initial-2026-11-05.md), [확장 실행 계약](../designs/viewstem-skills-extended-2026-11-05.md), [전체 측정·산출물](../../skills/tests/extended-results.json)을 구분한다.

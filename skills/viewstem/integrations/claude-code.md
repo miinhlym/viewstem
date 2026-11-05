@@ -1,5 +1,10 @@
 # Claude Code installation and discovery
 
+Status as of 2026-11-06: deferred and unverified. Claude Code is outside the
+current support and release-validation scope. This guide and the prepared
+fixtures remain reference material for a possible future evaluation; they do
+not establish Claude Code support or require its installation.
+
 Install Viewstem libraries and this skill separately. Use the identical common
 skill folder used for Codex; no Claude-specific copy of its instructions or
 library examples is needed. This development candidate has no published install

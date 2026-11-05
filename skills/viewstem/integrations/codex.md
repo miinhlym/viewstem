@@ -1,5 +1,9 @@
 # Codex installation and discovery
 
+Codex is the current support and release-validation target. Recorded execution
+evidence covers the local CLI; other surfaces still require their own checks.
+The common skill instructions remain independent of the host.
+
 The library and this skill are installed separately. Install the complete
 `viewstem/` folder from one reviewed revision; installing an npm package does
 not install this skill. This development candidate has no published install ref.
