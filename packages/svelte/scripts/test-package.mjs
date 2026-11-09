@@ -28,7 +28,7 @@ try {
   const installedManifest = JSON.parse(await readFile(join(directory, 'node_modules/@viewstem/svelte/package.json'), 'utf8'));
   assert.equal(installedManifest.license, 'MIT');
   assert.equal(await readFile(join(directory, 'node_modules/@viewstem/svelte/LICENSE'), 'utf8'), await readFile(join(root, 'LICENSE'), 'utf8'));
-  assert.equal(installedManifest.dependencies['@viewstem/core'], '0.1.0');
+  assert.equal(installedManifest.dependencies['@viewstem/core'], core.version);
   await writeFile(join(directory, 'consumer.ts'), `import { createRenderer, ViewstemView, type ComponentAdapter, type MountedView, type ComponentAdapterProps, type ComponentContract, type ViewSpec, type Runtime, type RequestExecutor } from '@viewstem/svelte';
 import type { Component, Snippet } from 'svelte';
 const renderer = createRenderer();

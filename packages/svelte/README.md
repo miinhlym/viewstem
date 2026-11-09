@@ -6,7 +6,7 @@ Viewstem is [MIT licensed](LICENSE).
 
 This client-side renderer connects Viewstem core's view projection to Svelte 5. **It registers no default Components, Actions, themes, or CSS.** The app registers each code-backed Component's public contract in the core Registry and associates the Svelte implementation with the same ID in the renderer. Core executes State, Query, Action, `when` and `repeat`, and evaluates slots in their author's context.
 
-Version `0.1.0` is built and installation-tested in this repository. It is awaiting public release on npm. `@viewstem/core@0.1.0` is a direct dependency and Svelte `^5.57.3` is a peer dependency. Apps import the API and shared types from `@viewstem/svelte`, which provides everything they need from core. See the repository's verification records for the exact tested versions and limits.
+`@viewstem/core` is a direct dependency and Svelte `^5.57.3` is a peer dependency. Apps import the API and shared types from `@viewstem/svelte`, which provides everything they need from core. See the repository's verification records for the exact tested versions and limits.
 
 ## Registration and setup
 
@@ -114,7 +114,7 @@ npm run example:svelte
 
 The example runs at `http://127.0.0.1:4174`. The app supplies and registers the four example adapters. `check:svelte` builds core and Svelte, checks strict consumer types and the example, runs conformance checks in Chromium, and verifies installation, types, and DOM behavior for a standalone tarball consumer. Skipped and todo browser tests fail the check. Use a Svelte-aware bundler to compile the distributed `.svelte` files for client-side DOM rendering.
 
-The supported scope is the Svelte 5 client-side renderer. This verification excludes Svelte 4, passing a runtime through SSR and hydration, other browser engines, real mobile IMEs, Grid and chart UI, a default design system, and public release. See the [implementation handoff (Korean)](../../docs/handoff/svelte-implementation-2026-11-02.md) and [verification results](../../docs/handoff/svelte-verification-results.json) at the same source revision. The tarball excludes source documentation. When publishing, link to the public documentation for the verified tag or commit.
+The supported scope is the Svelte 5 client-side renderer. This verification excludes Svelte 4, passing a runtime through SSR and hydration, other browser engines, real mobile IMEs, Grid and chart UI, a default design system, and public release. See the [implementation handoff (Korean)](../../docs/handoff/svelte-implementation-2026-11-02.md) and [verification results](../../docs/handoff/svelte-verification-results.json) at the same source revision. The tarball excludes source documentation. Published tarballs link to the documentation at their source commit.
 
 ## Optional UI package
 

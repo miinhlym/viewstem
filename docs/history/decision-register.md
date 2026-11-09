@@ -142,6 +142,7 @@
 | D129 | 소비자 스킬의 현재 지원을 Codex로 한정 | Claude Code CLI를 제거하고 현재 지원·실행 검증 및 첫 배포 필수 조건에서 제외한다. D119의 두 호스트 동시 첫 지원 조건을 대체하며, 공통 본문·호스트 차이 분리와 D120·D121은 유지한다. Claude 준비 자료는 미검증 참고 자료로 보존한다. Codex의 실제 검증 범위, 런타임 미해결 문제와 공개 ref 조건은 별도로 유지한다. [현재 명세](../VIEWSTEM-SPEC.md#85-외부-앱-개발용-공통-스킬)·[설치 제거와 현재 범위](../handoff/viewstem-skills-scope-2026-11-06.md) | 2026-11-06: 사용자가 CLI 제거와 Claude Code 제외를 요청 |
 | D130 | 사이트 기본 UI를 공식 shadcn-svelte로 통일 | D127의 React 구현 선택을 대체한다. 사이트용 공식 원본 부품을 직접 설치하고 React 런타임·Astro 통합·관련 의존성을 제거한다. 사이트 UI와 선언형 라이브러리 실행 영역의 경계, 기존 디자인 및 D128 작업 영역을 유지한다. 한영·모바일·테마·사이드바 스크롤·전체 미리보기 회귀를 검증한다. [현재 명세](../VIEWSTEM-SPEC.md#34-공개-문서와-playground-배포)·[구현·검증](../../apps/docs/review/2026-11-06/site-svelte.md) | 2026-11-06: 사용자가 사이트 UI 전체의 공식 shadcn-svelte 통일, React 의존성 제거와 회귀 검증을 요청 |
 | D131 | View 투영 중 재진입 State 변경의 후속 갱신 | 진행 중인 투영에서 구독자가 State를 쓰면 재계산 요청을 기존 microtask 큐에 합친다. 현재 snapshot 통지를 마친 뒤 현재 View 수명으로 갱신하고, 예약 갱신이 남으면 초기 완료를 먼저 확정하지 않는다. 폐기·교체·같은 값 쓰기 회귀와 원본 실패 앱의 수정 core 패키지 검증을 완료했다. [현재 계약](../spec/07-host-integration.md)·[원인·수정·검증](../handoff/view-subscription-projection-fix-2026-11-06.md) | 2026-11-06: 사용자가 정확한 원인 확인, 런타임 수정, 재현 회귀 테스트와 수정 패키지로 원본 앱 재검증을 요청 |
+| D132 | 패키지별 버전과 Release PR 기반 npm 발행 | Changesets로 세 공개 패키지의 버전을 독립 관리한다. 보호된 `main`에 Release PR을 병합하고 해당 커밋의 CI가 통과하면 GitHub Actions와 npm OIDC로 발행한다. 발행 확인 후 패키지별 Git 태그와 GitHub Release를 생성한다. 첫 공개와 Trusted Publisher 연결은 [npm 릴리스 절차](../ci.ko.md#npm-릴리스)를 따른다 | 2026-11-09: 사용자가 조합, 패키지별 버전, Release PR 발행과 main 보호 설정을 확정 |
 
 ## B. 대체·기각된 방향
 

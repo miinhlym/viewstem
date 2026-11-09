@@ -5,7 +5,7 @@ English | [한국어](README.ko.md)
 Viewstem is [MIT licensed](LICENSE). Vendored CEL attribution and license text
 are shipped in [THIRD-PARTY-NOTICES.txt](dist/THIRD-PARTY-NOTICES.txt).
 
-This ESM library validates declarative UI definitions and runs their values, state, queries, actions, and view lifecycles. It is independent of the DOM, Svelte, and any business domain. Version `0.1.0` has been built and installation-tested in this repository. This does not establish publication on npm.
+This ESM library validates declarative UI definitions and runs their values, state, queries, actions, and view lifecycles. It is independent of the DOM, Svelte, and any business domain.
 
 ```ts
 import { createRegistry, createRuntime } from '@viewstem/core';
@@ -88,7 +88,7 @@ Read the following links in the **source repository at the same revision**. The 
 - [CEL semantics and limits (Korean)](../../docs/handoff/core-cel-support.md) and [patches and reproducible builds](vendor/README.md).
 - [Verification after the public API refactor](../../docs/handoff/public-api-verification-results.json), [initial product verification](../../docs/handoff/core-verification-results.json), and [remaining work (Korean)](../../docs/handoff/open-contracts.md#실제-남은-작업).
 
-The [public repository](https://github.com/miinhlym/viewstem) and local unpublished changes are separate. The package is awaiting public release. When publishing, provide the documentation at the corresponding source tag or commit and point these source links to the public URLs for that revision. Use only release URLs and documents that are available remotely.
+Published tarballs link to the documentation at their source commit.
 
 ## Reproduce verification
 

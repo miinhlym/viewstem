@@ -111,6 +111,9 @@ The submitter must understand the change, verify its behavior, check its sources
 and submission rights, and respond to review feedback. Do not submit unreviewed
 generated changes or claim checks that were not run.
 
+For a change that should appear in an npm release, run `npx changeset` and
+commit the generated file with the PR. See [npm releases](docs/ci.md#npm-releases).
+
 ## Contribution licensing
 
 By intentionally submitting a contribution for inclusion, you agree to license
