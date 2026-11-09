@@ -63,6 +63,40 @@ CI uploads individual shard reports and a merged `ui-browser-results` artifact
 for 14 days. A partial shard is not a complete family audit. Full local runs and
 successful merges write `packages/svelte-ui/test/results/current.json`.
 
+## npm releases
+
+Run `npx changeset` for a PR that changes a published package and commit the
+generated file with the PR. Choose the affected packages, their SemVer bumps,
+and a summary for the changelog. Changesets tracks `core`, `svelte`, and
+`svelte-ui` independently. The Release PR includes any internal dependency
+updates and the refreshed npm lockfile.
+
+On a successful `main` CI run, Changesets opens or updates the Release PR.
+A maintainer may need to approve its CI run in GitHub because it was created by
+`GITHUB_TOKEN`. Merge the Release PR after **CI complete**. The same check
+must pass on the merged commit before npm publishing runs. Package tags such as
+`@viewstem/core@0.1.1` and GitHub Releases follow successful npm publishing. If
+publishing fails partway through, rerun the failed jobs on the same commit. The
+job skips existing versions with matching tarball integrity.
+
+### First public release
+
+1. Confirm publishing rights in the npm `@viewstem` scope. From a clean, verified
+   `main` checkout, run `npm ci --ignore-scripts`, `npm run build:svelte-ui`,
+   then `node .github/scripts/npm-release.mjs pack-initial /tmp/viewstem-release`.
+   The tarballs include documentation links pinned to the source commit.
+2. Publish the three tarballs with interactive 2FA and `npm publish <tarball> --access public`
+   in this order: core, svelte, svelte-ui. Record their package tags on that commit.
+3. Add a Trusted Publisher for each npm package. Use GitHub owner `miinhlym`,
+   repository `viewstem`, and workflow filename `core.yml`, with direct
+   `npm publish` allowed. `core.yml` calls `npm-release.yml`. Set up trust when
+   ready to validate the first OIDC publish within npm's two-day window.
+   See [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/).
+
+The repository's Actions settings must allow GitHub Actions to create PRs.
+The workflow grants PR write access only to the Release PR job. The npm publish
+job has OIDC permission and the tagging job has contents write permission.
+
 ## Time budget
 
 The target is **at most five minutes**, with **three minutes** as a stretch goal,

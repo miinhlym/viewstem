@@ -37,9 +37,11 @@
     "test:svelte-ui": "npm run build:svelte-ui && npm run test -w @viewstem/svelte-ui",
     "test:svelte-ui:package": "node packages/svelte-ui/scripts/test-package.mjs",
     "postinstall": "patch-package --error-on-fail",
-    "typecheck:docs": "npm run typecheck -w @viewstem/docs"
+    "typecheck:docs": "npm run typecheck -w @viewstem/docs",
+    "release:version": "changeset version && npm install --package-lock-only --ignore-scripts --no-audit --no-fund"
   },
   "devDependencies": {
+    "@changesets/cli": "3.0.3",
     "@marcbachmann/cel-js": "8.0.0",
     "@sveltejs/package": "2.5.8",
     "@tailwindcss/oxide": "4.3.3",

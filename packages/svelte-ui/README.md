@@ -121,7 +121,7 @@ CSS is scoped to `data-viewstem-shadcn` and adds no host-wide reset. Switch to d
 
 Verification covers Node 22 and 24, Svelte 5.57.3, browser clients, and TypeScript Bundler resolution. SSR and hydration integration are outside the renderer's current scope. The full set's mode-watcher uses an origin with localStorage access. Consumer type checks use `strict: true, skipLibCheck: true` because of errors in upstream LayerChart and TanStack declarations. Package source must pass its own type checks.
 
-The upstream shadcn commit is `fe4b0ad3b8b30c6745346db008c3307b5afeabb1`, and the CLI version is 1.7.2. The repository keeps the pinned source archive and hash, vendor conversion scripts, the pinned Sonner runtime and license, and the lockfile. Publishing to npm is tracked separately. [NOTICE](upstream/NOTICE.txt)
+The upstream shadcn commit is `fe4b0ad3b8b30c6745346db008c3307b5afeabb1`, and the CLI version is 1.7.2. The repository keeps the pinned source archive and hash, vendor conversion scripts, the pinned Sonner runtime and license, and the lockfile. [NOTICE](upstream/NOTICE.txt)
 
 ```sh
 npm run check:svelte-ui         # Build, types, reproducibility, browser, isolated tarball

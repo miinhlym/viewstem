@@ -6,7 +6,7 @@ Viewstem은 [MIT 라이선스](LICENSE)로 배포합니다.
 
 Viewstem core의 화면 projection을 Svelte 5에 연결하는 클라이언트 렌더러입니다. **기본 Component·Action·테마·CSS를 등록하지 않습니다.** 앱이 코드 Component의 공개 계약을 core Registry에 등록하고, 같은 ID의 실제 Svelte 구현을 렌더러에 연결합니다. State·Query·Action·when/repeat·slot 작성자 문맥은 core가 실행합니다.
 
-현재 `0.1.0`은 저장소에서 빌드·설치 검증하는 버전이며 npm 공개 발행을 뜻하지 않습니다. `@viewstem/core@0.1.0`은 내부 dependency, Svelte `^5.57.3`는 peer dependency입니다. 앱은 `@viewstem/svelte`에서 API와 공통 타입을 가져오며 core를 직접 설치·import할 필요가 없습니다. 정확한 검증 버전과 제한은 저장소의 검증 기록을 따릅니다.
+`@viewstem/core`는 내부 dependency, Svelte `^5.57.3`는 peer dependency입니다. 앱은 `@viewstem/svelte`에서 API와 공통 타입을 가져오며 core를 직접 설치·import할 필요가 없습니다. 정확한 검증 버전과 제한은 저장소의 검증 기록을 따릅니다.
 
 ## 등록과 실행
 
@@ -114,7 +114,7 @@ npm run example:svelte
 
 예제 주소는 `http://127.0.0.1:4174`입니다. 네 개 예제 어댑터는 앱 코드이며 패키지 기본 등록이 아닙니다. `check:svelte`는 core/Svelte 빌드, strict 소비자 타입·예제 검사, 실제 Chromium 적합성 검사, 독립 tarball 소비자 설치·타입·DOM 검사를 수행합니다. 브라우저 테스트의 skip/todo도 실패입니다. Svelte-aware bundler가 배포된 `.svelte` 파일을 컴파일하는 패키지이며, 일반 Node에서 직접 DOM 렌더링하는 패키지가 아닙니다.
 
-지원 범위는 Svelte 5 클라이언트 렌더러입니다. Svelte 4, SSR·hydration의 runtime 전달, 다른 브라우저 엔진·실제 모바일 IME, Grid/차트 UI·기본 디자인 시스템·공개 발행은 이번 검증 범위가 아닙니다. 현재 상세 기록은 같은 소스 revision의 [구현 인계](../../docs/handoff/svelte-implementation-2026-11-02.md)와 [검증 결과](../../docs/handoff/svelte-verification-results.json)를 따릅니다. 소스 문서는 tarball에 포함하지 않으며 발행 시 검증한 tag/commit의 공개 문서 URL을 연결해야 합니다.
+지원 범위는 Svelte 5 클라이언트 렌더러입니다. Svelte 4, SSR·hydration의 runtime 전달, 다른 브라우저 엔진·실제 모바일 IME, Grid/차트 UI·기본 디자인 시스템·공개 발행은 이번 검증 범위가 아닙니다. 현재 상세 기록은 같은 소스 revision의 [구현 인계](../../docs/handoff/svelte-implementation-2026-11-02.md)와 [검증 결과](../../docs/handoff/svelte-verification-results.json)를 따릅니다. 소스 문서는 tarball에 포함하지 않으며 발행된 tarball에는 해당 소스 커밋의 공개 문서 링크가 포함됩니다.
 
 ## 선택 UI 묶음
 

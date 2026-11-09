@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -113,3 +113,13 @@ jobs:
           path: packages/svelte-ui/test/results/current.json
           if-no-files-found: error
           retention-days: 14
+
+  release:
+    name: npm release
+    needs: complete
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'miinhlym/viewstem'
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    uses: ./.github/workflows/npm-release.yml

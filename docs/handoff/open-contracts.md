@@ -17,7 +17,7 @@ Svelte 5 클라이언트 렌더러는 [U39 구현·검증 인계](svelte-impleme
 | 선택 차트 패키지 | 엔진별 실제 지원표·공개 입력·렌더링을 제품 패키지로 검증. 독립 실험 통과를 제품 완료로 옮기지 않음 | [차트 계약](../spec/11-optional-charts.md), 제품 인수 대응표의 X 항목 |
 | 실제 서비스 연결 | 서비스가 resolver·권한·secret 저장소·router를 구현하고 해당 환경에서 검증. core에 도메인 의존성을 추가하지 않음 | [HTTP·인증](../spec/01-datasource-auth.md), [호스트 권한](../spec/07-host-integration.md) |
 | 검증 환경 확대 | 다른 브라우저·운영 부하/성능은 실제 대상과 관찰 기준을 정해 검증. 현재 로컬 결과로 지원을 확대하지 않음 | [검증 환경·한계](core-verification-results.json), [CEL 제한](core-cel-support.md) |
-| 공개 발행 | 자체 MIT 라이선스·기여·보안·지원 정책은 확정. npm scope 권한·릴리스 버전/태그·발행 절차와 원격 CI 확인은 남아 있음. 배포할 소스 revision의 문서를 원격에 제공하고 영·한 패키지 README에 해당 tag/commit의 문서 URL 연결 | [기여 정책](../../CONTRIBUTING.ko.md), [지원](../../SUPPORT.ko.md), [보안 제보](../../SECURITY.ko.md), [패키지 배포 경계](../../packages/core/README.ko.md#상세-계약과-문서-버전) |
+| 공개 발행 | npm 스코프 권한 확인, 첫 2FA 발행, 패키지별 Trusted Publisher 연결 및 실제 자동 발행 검증이 남아 있음. 발행 흐름은 D132를 따름 | [npm 릴리스 절차](../ci.ko.md#npm-릴리스) |
 
 GitHub 비공개 취약점 제보는 2026-11-03 사용자가 활성화했고, 저장소 API의 `enabled: true` 응답으로 확인했다. 미설정 과제에서 제외하며, 제보 양식을 사용할 수 없는 경우의 이메일 대체 경로는 [보안 정책](../../SECURITY.md)에 유지한다.
 

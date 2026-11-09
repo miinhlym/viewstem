@@ -4,7 +4,7 @@
 
 Viewstem은 [MIT 라이선스](LICENSE)로 배포합니다. 함께 배포하는 CEL 코드의 저작자 표시와 라이선스는 [THIRD-PARTY-NOTICES.txt](dist/THIRD-PARTY-NOTICES.txt)에 포함합니다.
 
-선언형 UI의 검증·값·상태·Query·Action·화면 수명을 실행하는 ESM 라이브러리입니다. DOM, Svelte, 회사 도메인에 의존하지 않습니다. 현재 버전은 저장소에서 빌드·설치 검증한 `0.1.0`이며 npm 발행을 뜻하지 않습니다.
+선언형 UI의 검증·값·상태·Query·Action·화면 수명을 실행하는 ESM 라이브러리입니다. DOM, Svelte, 회사 도메인에 의존하지 않습니다.
 
 ```ts
 import { createRegistry, createRuntime } from '@viewstem/core';
@@ -87,7 +87,7 @@ CEL AST·비용·결과 크기 제한은 `defaultCelLimits`로 확인할 수 있
 - [CEL 지원 의미·제한](../../docs/handoff/core-cel-support.md), [패치와 재현 빌드](vendor/README.md).
 - [API 정리 이후 검증 결과](../../docs/handoff/public-api-verification-results.json), [초기 제품 검증 결과](../../docs/handoff/core-verification-results.json), [후속 범위](../../docs/handoff/open-contracts.md#실제-남은-작업).
 
-[공개 저장소](https://github.com/miinhlym/viewstem)와 로컬 미반영 변경은 구분한다. 현재 공개 발행 전이며, 발행할 때는 해당 소스 tag/commit에 문서를 함께 제공하고 위 소스 문서 링크를 그 revision의 공개 URL로 연결해야 한다. 존재하지 않는 릴리스 URL이나 원격에 없는 문서를 이미 제공하는 것으로 표시하지 않는다.
+발행된 tarball에는 해당 소스 커밋의 공개 문서 링크가 포함됩니다.
 
 ## 재현
 

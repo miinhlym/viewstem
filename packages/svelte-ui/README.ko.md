@@ -121,7 +121,7 @@ CSS는 `data-viewstem-shadcn` 영역에 적용하고 호스트의 전역 reset�
 
 Node 22/24, Svelte 5.57.3, 브라우저 클라이언트와 TypeScript Bundler 해석을 검증합니다. SSR/hydration 통합은 현재 renderer 범위 밖입니다. 전체 묶음의 mode-watcher는 localStorage 접근이 가능한 origin을 사용합니다. upstream LayerChart/TanStack 선언 자체의 오류 때문에 소비자 typecheck는 `strict: true, skipLibCheck: true`를 사용하며, 자체 소스의 타입 오류는 허용하지 않습니다.
 
-원본 shadcn commit은 `fe4b0ad3b8b30c6745346db008c3307b5afeabb1`이고 CLI 기준은 1.7.2입니다. [NOTICE](upstream/NOTICE.txt), 고정 원본 archive/hash, vendor 변환 스크립트, Sonner의 고정 runtime/license와 lockfile을 함께 보존합니다. npm 발행은 별도 작업입니다.
+원본 shadcn commit은 `fe4b0ad3b8b30c6745346db008c3307b5afeabb1`이고 CLI 기준은 1.7.2입니다. [NOTICE](upstream/NOTICE.txt), 고정 원본 archive/hash, vendor 변환 스크립트, Sonner의 고정 runtime/license와 lockfile을 함께 보존합니다.
 
 ```sh
 npm run check:svelte-ui         # 빌드·타입·재생성 일치·브라우저·격리 tarball

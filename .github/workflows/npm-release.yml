@@ -1,0 +1,114 @@
+name: npm release
+
+on:
+  workflow_call:
+
+permissions: {}
+
+jobs:
+  plan:
+    name: Identify a merged Release PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      targets: ${{ steps.plan.outputs.targets }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.1.0'
+      - name: Select package versions from the tested commit
+        id: plan
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/npm-release.mjs plan
+
+  version:
+    name: Update the Release PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+      pull-requests: write
+    concurrency:
+      group: changesets-release-pr
+      queue: max
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check for pending changesets on the current main
+        id: pending
+        run: |
+          main_sha="$(git ls-remote origin refs/heads/main | cut -f1)"
+          test -n "$main_sha"
+          if [ "$GITHUB_SHA" = "$main_sha" ] && compgen -G '.changeset/*.md' | grep -Fxv '.changeset/README.md' > /dev/null; then
+            echo 'exists=true' >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        if: steps.pending.outputs.exists == 'true'
+        with:
+          node-version: '24.1.0'
+      - if: steps.pending.outputs.exists == 'true'
+        run: npm ci --ignore-scripts
+      - if: steps.pending.outputs.exists == 'true'
+        uses: changesets/action/version@198f833dd7d863100ea6e28967bc9a9fdefadb0a # v2.1.0
+        with:
+          script: npm run release:version
+          commit-message: 'chore: version npm packages'
+          pr-title: 'chore: release npm packages'
+
+  publish:
+    name: Publish npm packages with OIDC
+    needs: plan
+    if: needs.plan.outputs.targets != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    concurrency:
+      group: npm-publish
+      queue: max
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.1.0'
+          package-manager-cache: false
+          registry-url: https://registry.npmjs.org
+      - run: npm install --global npm@11.21.2 --ignore-scripts --no-audit --no-fund
+      - run: npm ci --ignore-scripts
+      - run: npm run build:svelte-ui
+      - env:
+          RELEASE_TARGETS: ${{ needs.plan.outputs.targets }}
+        run: node .github/scripts/npm-release.mjs publish
+
+  tag:
+    name: Tag and create GitHub releases
+    needs: [plan, publish]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.1.0'
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TARGETS: ${{ needs.plan.outputs.targets }}
+        run: node .github/scripts/npm-release.mjs tag
