@@ -148,6 +148,7 @@
 | D135 | 공통 날짜·테이블 JSON 어댑터 | Data Table은 Svelte UI와 같은 TanStack Table Core 버전을 사용한다. Calendar·Range Calendar·Date Picker는 Zag Vanilla에 연결하고 날짜 문자열과 범위 이벤트를 기존 JSON 형식으로 반환한다. 네 계열의 Svelte UI 원본 JSON fixture를 양쪽 렌더러에 전달한다. [패키지 계약](../../packages/ui/README.md) | 2026-11-09 사용자가 네 계열의 구현, 원본 JSON 검증, 임시 비교 페이지 추가를 요청 |
 | D136 | 브라우저 DOM의 전체 JSON 카탈로그 등록 | 66개 계열과 JSON Component ID 357개를 등록한다. 중첩 메뉴는 Zag Vanilla, Carousel은 Embla를 사용하고 브라우저 DOM 어댑터가 기존 JSON과 이벤트 연결을 맡는다. 추가 범위의 원본 fixture 23개를 수정 없이 두 렌더러에 전달한다. [패키지 계약](../../packages/ui/README.md) | 2026-11-09 사용자가 남은 20개 계열과 하위 부품 6개 및 원본 비교를 요청 |
 | D137 | 달력 이벤트와 차트 축의 렌더러 호환 | Calendar는 월 뷰의 기준 일자로 이동한다. Range Calendar는 최종 범위에서 실제로 바뀐 시작일과 종료일을 한 번씩 전달한다. 브라우저 Chart는 D3 스케일로 Svelte와 동일한 축 눈금 및 보조선 배치를 계산한다. | 2026-11-09 사용자가 달력 보조 이벤트와 차트 축의 일관성을 요청 |
+| D138 | 두 UI 패키지의 기본 스타일을 Vega로 전환 | Svelte 패키지는 고정 shadcn-svelte 리비전의 Vega 소스를, DOM 패키지는 Basecoat 1.1.0의 Vega CSS를 사용한다. Neutral 색상과 기존 JSON 계약을 유지하며 66개 예제에서 두 렌더러를 비교한다. D134의 Nova 선택을 대체한다. | 2026-11-11 사용자가 두 패키지의 Vega 전환과 브라우저 비교를 요청 |
 
 ## B. 대체·기각된 방향
 

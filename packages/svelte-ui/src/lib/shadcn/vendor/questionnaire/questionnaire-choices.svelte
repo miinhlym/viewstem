@@ -12,6 +12,6 @@
 <QuestionnairePrimitive.Choices
 	bind:ref
 	data-viewstem-shadcn="" data-slot="questionnaire-choices"
-	class={cn("gap-2 group/questionnaire-choices grid min-w-0", className)}
+	class={cn("gap-3 group/questionnaire-choices grid min-w-0", className)}
 	{...restProps}
 />

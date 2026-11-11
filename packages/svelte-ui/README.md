@@ -115,7 +115,7 @@ To send notifications from a code Action, use `toast` from `/shadcn/sonner`. It 
 
 ## Styling, environments, and reproducibility
 
-The package pins Nova, neutral, and Lucide. Prebuilt CSS works in hosts without a Tailwind configuration. Selective imports reduce the JS bundle. All families share the package's npm dependencies and the same stylesheet. Use host CSS or the host's Tailwind build for additional Tailwind classes.
+The package pins Vega, neutral, and Lucide. Prebuilt CSS works in hosts without a Tailwind configuration. Selective imports reduce the JS bundle. All families share the package's npm dependencies and the same stylesheet. Use host CSS or the host's Tailwind build for additional Tailwind classes.
 
 CSS is scoped to `data-viewstem-shadcn` and adds no host-wide reset. Switch to dark mode with `html.dark` or `data-theme="dark"`. Customize colors with variables such as `--viewstem-primary`. Set the theme and variables on html or body to apply them to body portals as well. A subtree theme applies only within that subtree.
 

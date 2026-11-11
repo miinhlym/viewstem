@@ -146,6 +146,12 @@ export function modal(element: HTMLElement, send: Send, signal: AbortSignal): Be
     const current = ++transition;
     target.toggleAttribute(closingAttribute, !open);
     if (open) {
+      if (drawer && panel) {
+        // Vaul does not autofocus a control by default. Start on the panel so
+        // the first Tab still reaches the first control inside the drawer.
+        panel.tabIndex = -1;
+        panel.autofocus = true;
+      }
       if (!target.matches(':modal')) {
         if (target.open) target.close();
         target.showModal();
@@ -922,7 +928,7 @@ export function chart(element: HTMLElement): Behavior {
   const { signal } = events;
   element.append(svg, tooltip);
 
-  // Keep the Nova chart recipe's outer aspect ratio while laying out the axes
+  // Keep the chart recipe's outer aspect ratio while laying out the axes
   // in CSS pixels, including its 20px label gutters and 4px opposite gutters.
   const left = 20;
   const top = 4;

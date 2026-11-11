@@ -20,7 +20,7 @@
 <PaginationPrimitive.NextButton
 	bind:ref
 	aria-label="Go to next page"
-	data-viewstem-shadcn="" class={cn(buttonVariants({ variant: "ghost" }), "pr-1.5!", className)}
+	data-viewstem-shadcn="" class={cn(buttonVariants({ variant: "ghost" }), "pr-2!", className)}
 	{...restProps}
 >
 	{#if children}

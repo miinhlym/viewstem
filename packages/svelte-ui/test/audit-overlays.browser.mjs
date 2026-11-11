@@ -426,7 +426,7 @@ test('audit/button: native keyboard activation and disabled host control', async
   assert.deepEqual(await events(page), []);
   await write(page, 'disabled', false);
   assert.equal(await save.getAttribute('type'), 'button');
-  assert.equal(await save.evaluate(element => getComputedStyle(element).height), '28px');
+  assert.equal(await save.evaluate(element => getComputedStyle(element).height), '32px');
   assert.equal(await save.evaluate(element => element.classList.contains('border-border')), true);
   await save.press('Enter');
   await waitEvent(page, 'save');

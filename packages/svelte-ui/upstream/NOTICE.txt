@@ -1,4 +1,4 @@
-This package includes Nova UI components and Tailwind utilities from shadcn-svelte.
+This package includes Vega UI components and Tailwind utilities from shadcn-svelte.
 Source: https://github.com/huntabyte/shadcn-svelte/tree/fe4b0ad3b8b30c6745346db008c3307b5afeabb1
 The Viewstem generator rewrites import paths, selects Lucide icons, resolves
 remaining default preset markers, and attaches style scope markers.

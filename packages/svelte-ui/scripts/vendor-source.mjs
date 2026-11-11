@@ -120,7 +120,7 @@ function transformComponent(content, filename) {
 }
 
 for (const [path, json] of Object.entries(archive)) {
-	if (!path.startsWith('docs/static/registry/styles/nova/')) continue;
+	if (!path.startsWith(`docs/static/registry/styles/${provenance.style}/`)) continue;
 	const item = JSON.parse(json);
 	for (const file of item.files) {
 		const filename = resolve(vendor, file.type === 'registry:hook' ? `hooks/${file.target}` : file.target);
@@ -310,4 +310,4 @@ if (existsSync(vendor)) {
 	}
 }
 if (stale.length) throw new Error(`Unexpected or stale vendor files:\n${stale.join('\n')}`);
-console.log(`${check ? 'Checked' : 'Generated'} ${outputs.size} files, ${provenance.families.length} Nova families, ${provenance.components} components`);
+console.log(`${check ? 'Checked' : 'Generated'} ${outputs.size} files, ${provenance.families.length} ${provenance.style} families, ${provenance.components} components`);

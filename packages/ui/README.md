@@ -1,6 +1,6 @@
 # @viewstem/ui
 
-Browser prototype for rendering Viewstem JSON into a DOM container. The package depends on `@viewstem/core`. Its renderer uses Basecoat 1.1.0 Nova styles and selected Vanilla JS controllers without a React, Vue, or Svelte runtime. The host supplies a connected element.
+Browser prototype for rendering Viewstem JSON into a DOM container. The package depends on `@viewstem/core`. Its renderer uses Basecoat 1.1.0 Vega styles and selected Vanilla JS controllers without a React, Vue, or Svelte runtime. The host supplies a connected element.
 
 ```js
 import { createRegistry, createRuntime } from '@viewstem/core';

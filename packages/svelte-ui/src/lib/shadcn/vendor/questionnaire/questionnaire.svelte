@@ -14,6 +14,6 @@
 	bind:item
 	bind:ref
 	data-viewstem-shadcn="" data-slot="questionnaire"
-	class={cn("gap-4 flex w-full min-w-0 flex-col", className)}
+	class={cn("gap-6 flex w-full min-w-0 flex-col", className)}
 	{...restProps}
 />

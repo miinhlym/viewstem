@@ -1,6 +1,6 @@
 # shadcn-svelte source snapshot
 
-The snapshot contains the official Nova registry payloads from the revision in
+The snapshot contains the official Vega registry payloads from the revision in
 [source.json](source.json), the Neutral palette, shared helpers, and CSS utilities.
 It preserves the original JSON/CSS text and records the SHA-256 of each file.
 The generated sources include all 62 direct-source catalog families, covering
@@ -23,7 +23,7 @@ checks all 62 original barrels against the catalog inventory.
 node packages/svelte-ui/scripts/vendor-snapshot.mjs /path/to/pinned/shadcn-svelte
 ```
 
-The registry has already applied Nova utility classes. Generation selects Lucide
+The registry has already applied Vega utility classes. Generation selects Lucide
 icons, resolves library and hook paths, applies the default menu treatment,
 keeps host typography, and inserts `data-viewstem-shadcn` where widgets own
 styled DOM. Marker carries the attribute through its shared root props; Bits

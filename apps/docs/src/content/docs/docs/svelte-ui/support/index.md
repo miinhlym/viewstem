@@ -51,6 +51,6 @@ The adapter prevents navigation on supported DOM `submit` events. For an input o
 
 ## `@viewstem/svelte-ui/shadcn/styles.css`
 
-Import this stylesheet for the complete kit. It contains the prebuilt theme, component utilities, and scoped base styles. The default palette is Nova neutral. CSS custom properties prefixed with `--viewstem-` can override theme tokens. See [style the kit](../guides/style-and-native/) for a theme that also reaches portals.
+Import this stylesheet for the complete kit. It contains the prebuilt theme, component utilities, and scoped base styles. The kit uses Vega styles with the Neutral palette. CSS custom properties prefixed with `--viewstem-` can override theme tokens. See [style the kit](../guides/style-and-native/) for a theme that also reaches portals.
 
 Package consumer verification uses Node 22 and 24, Svelte 5, a browser client, and TypeScript Bundler resolution. The renderer's integration target is the browser client. The full set's mode watcher needs an origin with access to local storage.

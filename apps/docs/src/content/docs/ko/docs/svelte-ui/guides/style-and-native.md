@@ -7,7 +7,7 @@ sidebar:
 
 ## 번들 CSS 적용
 
-브라우저 진입점에서 `@viewstem/svelte-ui/shadcn/styles.css`를 한 번 import하세요. 스타일시트에는 Nova 스타일과 neutral 테마가 포함됩니다. 컴포넌트 규칙과 리셋은 키트의 `data-viewstem-shadcn` 요소와 그 내용에 적용됩니다. 호스트 Tailwind 빌드 없이 쓸 수 있습니다.
+브라우저 진입점에서 `@viewstem/svelte-ui/shadcn/styles.css`를 한 번 import하세요. 스타일시트에는 Vega 스타일과 Neutral 팔레트가 포함됩니다. 컴포넌트 규칙과 리셋은 키트의 `data-viewstem-shadcn` 요소와 그 내용에 적용됩니다. 호스트 Tailwind 빌드 없이 쓸 수 있습니다.
 
 ## 오버레이에도 테마 적용
 

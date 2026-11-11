@@ -185,10 +185,10 @@
 [data-viewstem-ui] [data-vs-component="CodeBlock.Root"] {
   position: relative; display: flex; width: 100%; min-width: 0; flex-direction: column; overflow: hidden;
   border: 1px solid var(--input); border-radius: var(--radius-lg); color: var(--foreground); font-size: var(--text-sm); line-height: var(--text-sm--line-height);
-  --vs-code-padding: .75rem;
+  --vs-code-padding: 1rem;
 }
 [data-viewstem-ui] [data-vs-component="CodeBlock.Root"][data-variant="destructive"] { border-color: color-mix(in oklab, var(--destructive) 30%, transparent); }
-[data-viewstem-ui] [data-vs-component="CodeBlock.Root"][data-size="sm"] { font-size: var(--text-xs); line-height: var(--text-xs--line-height); --vs-code-padding: .625rem; }
+[data-viewstem-ui] [data-vs-component="CodeBlock.Root"][data-size="sm"] { font-size: var(--text-xs); line-height: var(--text-xs--line-height); --vs-code-padding: .75rem; }
 [data-viewstem-ui] [data-vs-component="CodeBlock.Root"]:has([data-vs-component="CodeBlock.Content"]:focus-visible) {
   border-color: var(--ring); box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
 }

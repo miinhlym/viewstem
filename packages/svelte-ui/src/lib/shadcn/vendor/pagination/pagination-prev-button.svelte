@@ -20,7 +20,7 @@
 <PaginationPrimitive.PrevButton
 	bind:ref
 	aria-label="Go to previous page"
-	data-viewstem-shadcn="" class={cn(buttonVariants({ variant: "ghost" }), "pl-1.5!", className)}
+	data-viewstem-shadcn="" class={cn(buttonVariants({ variant: "ghost" }), "pl-2!", className)}
 	{...restProps}
 >
 	{#if children}

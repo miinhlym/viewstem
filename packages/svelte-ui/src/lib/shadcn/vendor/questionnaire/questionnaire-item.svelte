@@ -12,6 +12,6 @@
 <QuestionnairePrimitive.Item
 	bind:ref
 	data-viewstem-shadcn="" data-slot="questionnaire-item"
-	class={cn("flex flex-col gap-4 min-w-0 border-0 p-0 outline-none", className)}
+	class={cn("flex flex-col gap-5 min-w-0 border-0 p-0 outline-none", className)}
 	{...restProps}
 />

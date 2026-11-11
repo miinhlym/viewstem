@@ -132,6 +132,7 @@ export function menus(root: HTMLElement, family: Family, send: Send, signal: Abo
     const panel = readInputs(driver.panel);
     const side = String(panel.side ?? (driver.parent || family === 'ContextMenu' ? 'right' : 'bottom'));
     const align = String(panel.align ?? 'start');
+    const atPointer = family === 'ContextMenu' && !driver.parent;
     const placement = (align === 'center' ? side : side + '-' + align) as NonNullable<MenuProps['positioning']>['placement'];
     return {
       id: driver.id,
@@ -142,8 +143,10 @@ export function menus(root: HTMLElement, family: Family, send: Send, signal: Abo
       positioning: {
         placement,
         strategy: panel.strategy === 'absolute' ? 'absolute' : 'fixed',
-        gutter: typeof panel.sideOffset === 'number' ? panel.sideOffset : driver.parent ? 0 : menubar ? 8 : 4,
+        gutter: typeof panel.sideOffset === 'number' ? panel.sideOffset : driver.parent ? 0 : menubar ? 8 : atPointer ? 2 : 4,
         shift: typeof panel.alignOffset === 'number' ? panel.alignOffset : driver.parent ? -3 : menubar ? -4 : undefined,
+        // Zag applies arrow padding to virtual pointer anchors even without an arrow.
+        ...(atPointer ? { arrowPadding: 0 } : {}),
         overflowPadding: typeof panel.collisionPadding === 'number' ? panel.collisionPadding : undefined,
         flip: panel.avoidCollisions !== false,
       },

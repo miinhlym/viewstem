@@ -12,6 +12,6 @@
 <QuestionnairePrimitive.Error
 	bind:ref
 	data-viewstem-shadcn="" data-slot="questionnaire-error"
-	class={cn("mt-2 text-sm text-destructive", className)}
+	class={cn("text-sm text-destructive", className)}
 	{...restProps}
 />

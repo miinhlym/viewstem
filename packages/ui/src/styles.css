@@ -2,7 +2,9 @@
 [data-viewstem-ui] [data-vs-component=""][data-vs-part="group"] { display: contents; }
 
 [data-viewstem-ui] .vs-ui-transparent { display: contents; }
-[data-viewstem-ui] .vs-ui-field-group { display: flex; flex-direction: column; gap: 1.25rem; }
+[data-viewstem-ui] .vs-ui-field-group { display: flex; flex-direction: column; gap: 1.75rem; }
+[data-viewstem-ui] .vs-ui-field-group > .vs-ui-field-group { gap: 1rem; }
+[data-viewstem-ui] .vs-ui-field-group[data-slot="checkbox-group"] { gap: .75rem; }
 [data-viewstem-ui] [data-vs-component="Field.Legend"] { font-size: var(--text-base); line-height: var(--text-base--line-height); }
 [data-viewstem-ui] [data-vs-component="Field.Legend"][data-variant="label"] { font-size: var(--text-sm); line-height: var(--text-sm--line-height); }
 [data-viewstem-ui] [data-vs-component="Field.Label"] { line-height: 1.375; }
@@ -14,7 +16,7 @@
   font-size: var(--text-sm);
   line-height: var(--text-sm--line-height);
 }
-[data-viewstem-ui] .vs-ui-pagination-list { display: flex; align-items: center; gap: .25rem; }
+[data-viewstem-ui] .vs-ui-pagination-list { display: flex; align-items: center; gap: .25rem; list-style: none; padding: 0; }
 [data-viewstem-ui] .vs-ui-kbd-group { display: inline-flex; align-items: center; gap: .25rem; }
 [data-viewstem-ui] [data-vs-component="InputGroup.Input"] { height: 2rem; }
 [data-viewstem-ui] [data-vs-component="InputGroup.Textarea"] { min-height: 4rem; field-sizing: content; }
@@ -28,10 +30,9 @@
   [data-viewstem-ui] input[data-vs-component="Switch"]::before { transition: none; }
 }
 [data-viewstem-ui] .vs-ui-pagination { display: flex; width: 100%; justify-content: center; }
-[data-viewstem-ui] .vs-ui-pagination-list { list-style: none; padding: 0; gap: .125rem; }
 [data-viewstem-ui] .vs-ui-pagination :is([data-vs-component="Pagination.Previous"], [data-vs-component="Pagination.PrevButton"], [data-vs-component="Pagination.Next"], [data-vs-component="Pagination.NextButton"]) { gap: .25rem; }
 [data-viewstem-ui] .vs-ui-pagination [data-vs-component="Pagination.Ellipsis"] {
-  display: grid; place-items: center; width: 2rem; height: 2rem;
+  display: grid; place-items: center; width: 2.25rem; height: 2.25rem;
 }
 [data-viewstem-ui] .vs-ui-pagination :is([data-vs-component="Pagination.Previous"], [data-vs-component="Pagination.PrevButton"])::before,
 [data-viewstem-ui] .vs-ui-pagination :is([data-vs-component="Pagination.Next"], [data-vs-component="Pagination.NextButton"])::after {
@@ -41,7 +42,7 @@
 [data-viewstem-ui] .vs-ui-pagination :is([data-vs-component="Pagination.Next"], [data-vs-component="Pagination.NextButton"])::after { transform: rotate(180deg); }
 @media (width < 40rem) {
   [data-viewstem-ui] .vs-ui-pagination :is([data-vs-component="Pagination.Previous"], [data-vs-component="Pagination.Next"]) {
-    width: 2.125rem; padding-inline: 0; font-size: 0;
+    width: 2.25rem; padding-inline: 0; font-size: 0;
   }
 }
 
@@ -61,13 +62,13 @@
   [data-viewstem-ui] :is(.vs-ui-spinner, .skeleton) { animation: none; }
 }
 [data-viewstem-ui] [data-vs-component="Empty.Media"][data-variant="icon"] {
-  width: 2rem;
-  height: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: var(--radius-lg);
   background: var(--muted);
 }
 
-[data-viewstem-ui] .vs-ui-tooltip { display: inline-flex; position: relative; }
+[data-viewstem-ui] .vs-ui-tooltip { display: inline-flex; position: relative; vertical-align: top; }
 [data-viewstem-ui] .vs-ui-tooltip-content {
   visibility: hidden;
   position: absolute;
@@ -117,7 +118,8 @@
 [data-viewstem-ui] [data-vs-component="Sidebar.MenuItem"]:has(> [data-vs-component="Sidebar.MenuAction"]) > [data-vs-component="Sidebar.MenuBadge"] { inset-inline-end: 1.75rem; }
 [data-viewstem-ui] .vs-ui-sidebar-provider [data-vs-component="Sidebar.MenuSkeleton"] { width: 50%; height: 1rem; margin: .5rem; }
 [data-viewstem-ui] .sidebar > nav [data-vs-component="Sidebar.MenuSub"] { margin-inline: .875rem; }
-[data-viewstem-ui] .sidebar > nav [data-vs-component="Sidebar.Input"] { background-color: var(--background); }
+[data-viewstem-ui] .sidebar > nav [data-vs-component="Sidebar.Input"] { height: 2rem; background-color: var(--background); }
+[data-viewstem-ui] .sidebar > nav [data-vs-component="Sidebar.Input"]:not(:focus-visible, [aria-invalid="true"]) { box-shadow: none; }
 [data-viewstem-ui] .vs-ui-sidebar-provider [data-vs-component="Sidebar.Rail"] { display: none; }
 [data-viewstem-ui] .vs-ui-sidebar-provider [data-vs-component="Sidebar.Trigger"]::before {
   content: "";
@@ -287,18 +289,17 @@
 [data-viewstem-ui] .dialog > div > footer > [data-vs-component="Dialog.Close"],
 [data-viewstem-ui] .drawer > div > footer > [data-vs-component="Drawer.Close"],
 [data-viewstem-ui] [data-vs-component="Drawer.Trigger"] { cursor: pointer; }
-[data-viewstem-ui] .dialog > div > p,
 [data-viewstem-ui] .dialog > div > header > p { line-height: var(--text-sm--line-height); }
 [data-viewstem-ui] .drawer > div > header > h2 {
-  font-size: var(--text-base);
-  line-height: var(--text-base--line-height);
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
   font-weight: 500;
   letter-spacing: normal;
 }
 [data-viewstem-ui] .drawer > div > .vs-ui-modal > [data-vs-component="Drawer.Trigger"] { display: block; width: 100%; }
 [data-viewstem-ui] .dialog > div > .vs-dialog-dismiss {
-  inset-block-start: .5rem;
-  inset-inline-end: .5rem;
+  inset-block-start: 1rem;
+  inset-inline-end: 1rem;
   opacity: 1;
 }
 [data-viewstem-ui] .dialog > div > .vs-dialog-dismiss[hidden] { display: none; }
@@ -318,7 +319,7 @@
   align-self: center;
   flex: none;
   width: 100px;
-  height: .25rem;
+  height: .375rem;
   margin-block-start: 1rem;
   border-radius: 999px;
   background: var(--muted);
@@ -353,21 +354,20 @@
 [data-viewstem-ui] .vs-date-calendar[data-picker] { display: inline-block; }
 [data-viewstem-ui] .vs-date-trigger { width: 13.25rem; max-width: 100%; justify-content: space-between; font-weight: 400; }
 [data-viewstem-ui] .vs-date-trigger::after { content: ''; width: .45rem; height: .45rem; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translateY(-2px); }
-[data-viewstem-ui] .vs-date-panel { --vs-date-padding: .5rem; }
-[data-viewstem-ui] [data-vs-component="RangeCalendar.Root"] .vs-date-panel { --vs-date-padding: .75rem; }
+[data-viewstem-ui] .vs-date-panel { --vs-date-padding: .75rem; --vs-date-cell-size: 2rem; }
 [data-viewstem-ui] .vs-date-panel:not([hidden]) {
   position: relative;
   padding: var(--vs-date-padding);
   color: var(--popover-foreground);
 }
 [data-viewstem-ui] .vs-date-calendar[data-picker] .vs-date-panel:not([hidden]) {
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   background: var(--popover);
   box-shadow: 0 0 0 1px color-mix(in oklab, var(--foreground) 10%, transparent), 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
   transform-origin: var(--transform-origin, top left);
 }
 [data-viewstem-ui] .vs-date-navigation { position: absolute; inset: var(--vs-date-padding) var(--vs-date-padding) auto; display: flex; justify-content: space-between; pointer-events: none; }
-[data-viewstem-ui] .vs-date-navigation button { width: 1.75rem; height: 1.75rem; padding: 0; pointer-events: auto; }
+[data-viewstem-ui] .vs-date-navigation button { width: var(--vs-date-cell-size); height: var(--vs-date-cell-size); padding: 0; pointer-events: auto; }
 [data-viewstem-ui] .vs-date-navigation button::after {
   content: "";
   width: 1rem;
@@ -379,16 +379,16 @@
 [data-viewstem-ui] .vs-date-navigation button:last-child::after { rotate: -90deg; }
 [data-viewstem-ui] .vs-date-navigation:dir(rtl) button::after { scale: -1 1; }
 [data-viewstem-ui] .vs-date-navigation button[aria-disabled="true"] { opacity: .5; }
-[data-viewstem-ui] .vs-date-heading { height: 1.75rem; display: flex; justify-content: center; align-items: center; gap: .375rem; margin-block-end: 1rem; }
+[data-viewstem-ui] .vs-date-heading { height: var(--vs-date-cell-size); display: flex; justify-content: center; align-items: center; gap: .375rem; margin-block-end: 1rem; }
 [data-viewstem-ui] .vs-date-months { display: flex; flex-wrap: wrap; gap: 1rem; }
 [data-viewstem-ui] .vs-date-months section:only-child { width: 100%; }
 [data-viewstem-ui] .vs-date-months section { min-width: 0; }
 [data-viewstem-ui] .vs-date-caption { text-align: center; font-size: .875rem; font-weight: 500; }
 [data-viewstem-ui] .vs-date-heading:has(> select:nth-child(2):not([hidden])) .vs-date-caption { order: 1; }
 [data-viewstem-ui] .vs-date-months .select {
-  height: 1.875rem;
+  height: calc(var(--vs-date-cell-size) + 2px);
   padding-block: 0;
-  padding-inline: .5rem 1.25rem;
+  padding-inline: .5rem 1.375rem;
   background-size: .875rem;
   background-position: right .25rem center;
   background-image: var(--chevron-down-icon);
@@ -405,7 +405,7 @@
 [data-viewstem-ui] .vs-date-calendar[data-picker] .vs-date-months th { line-height: var(--text-sm--line-height); }
 [data-viewstem-ui] .vs-date-months td { padding-block-start: .5rem; }
 [data-viewstem-ui] .vs-date-day {
-  width: 1.75rem; height: 1.75rem; padding: 0;
+  width: var(--vs-date-cell-size); height: var(--vs-date-cell-size); padding: 0;
   border-radius: var(--radius-md); font-weight: 400; line-height: 1;
 }
 [data-viewstem-ui] .vs-date-day:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); }
@@ -454,12 +454,18 @@
 [data-viewstem-ui] .vs-data-table th > button > svg { width: .875rem; height: .875rem; flex: none; }
 [data-viewstem-ui] .vs-data-table .vs-data-table-empty { height: 6rem; text-align: center; }
 
+[data-viewstem-ui] .popover { vertical-align: top; }
+
 /* Match the unstyled trigger and close primitives used by the Svelte adapter. */
 [data-viewstem-ui] :is([data-vs-component="Popover.Trigger"], [data-vs-component="Popover.Close"], [data-vs-component="Tooltip.Trigger"]) {
   display: inline-block; appearance: none; padding: 0; border: 0; border-radius: 0;
-  background: transparent; color: inherit; box-shadow: none; font: inherit; line-height: inherit; transition: none;
+  background: transparent; color: inherit; box-shadow: none; font: inherit; line-height: normal; transition: none;
 }
-[data-viewstem-ui] [data-vs-component="Popover.Close"] { display: block; width: 100%; }
+[data-viewstem-ui] [data-vs-component="Popover.Close"] { display: block; width: 100%; line-height: inherit; }
+[data-viewstem-ui] [data-vs-component="Popover.Close"]:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid var(--ring);
+}
 [data-viewstem-ui] .combobox { width: 12.5rem; max-width: 100%; }
 [data-viewstem-ui] .combobox > button {
   width: 100%;
@@ -560,7 +566,7 @@
   [data-viewstem-ui] :is(.combobox, .popover, .select) > [data-popover],
   [data-viewstem-ui] .vs-date-calendar[data-picker] .vs-date-panel { animation: none; transition-delay: 0s; }
 }
-[data-viewstem-ui] .vs-ui-field-group:has(> [data-vs-component="Sonner"])::before { content: ""; height: 1.25rem; }
+[data-viewstem-ui] .vs-ui-field-group:has(> [data-vs-component="Sonner"])::before { content: ""; height: 1.75rem; }
 [data-viewstem-ui] .vs-ui-toasts .toast { position: relative; overflow: visible; }
 [data-viewstem-ui] .vs-ui-toasts .toast-content { min-height: 4.625rem; padding: 1rem; border-radius: .5rem; box-shadow: 0 4px 12px rgba(0,0,0,.1); }
 [data-viewstem-ui] .vs-ui-toasts .toast[data-category="success"] .toast-content::before {
@@ -653,15 +659,15 @@
 @starting-style {
   [data-viewstem-ui] dialog.vs-sheet[open] > div { translate: var(--vs-sheet-x, 0) var(--vs-sheet-y, 0); }
 }
-[data-viewstem-ui] dialog.vs-sheet > div > header { padding: 1rem; gap: .125rem; }
-[data-viewstem-ui] dialog.vs-sheet > div > header > h2 { font-size: 1rem; line-height: 1.5rem; font-weight: 500; }
+[data-viewstem-ui] dialog.vs-sheet > div > header { padding: 1rem; gap: .375rem; }
+[data-viewstem-ui] dialog.vs-sheet > div > header > h2 { font-size: inherit; line-height: inherit; font-weight: 500; }
 [data-viewstem-ui] dialog.vs-sheet > div > footer {
   margin: auto 0 0;
   padding: 1rem;
   border: 0;
   background: transparent;
 }
-[data-viewstem-ui] dialog.vs-sheet > div > .vs-dialog-dismiss { inset-block-start: .75rem; inset-inline-end: .75rem; }
+[data-viewstem-ui] dialog.vs-sheet > div > .vs-dialog-dismiss { inset-block-start: 1rem; inset-inline-end: 1rem; }
 @media (prefers-reduced-motion: reduce) {
   [data-viewstem-ui] dialog.vs-sheet, [data-viewstem-ui] dialog.vs-sheet > div, [data-viewstem-ui] dialog.vs-sheet::backdrop { transition: none; }
 }

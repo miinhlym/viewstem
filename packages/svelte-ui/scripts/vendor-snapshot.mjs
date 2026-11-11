@@ -19,7 +19,8 @@ function snapshot(path) {
 }
 
 const families = inventory.catalogItems.filter((item) => item.category === 'direct-source');
-const registryPath = 'docs/static/registry/styles/nova';
+const style = 'vega';
+const registryPath = `docs/static/registry/styles/${style}`;
 const queue = ['utils', ...families.map(({ slug }) => slug)];
 const seen = new Set();
 for (const name of queue) {
@@ -43,7 +44,7 @@ const provenance = {
 	repository: inventory.source.repository,
 	commit: inventory.source.commit,
 	cli: inventory.source.cliPackageVersion,
-	style: 'nova',
+	style,
 	baseColor: 'neutral',
 	iconLibrary: 'lucide',
 	families: families.map(({ slug }) => slug),

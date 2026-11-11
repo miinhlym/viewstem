@@ -115,7 +115,7 @@ DataTable은 데이터나 필터가 바뀌어 `pageIndex`가 전체 페이지를
 
 ## 스타일·환경·재현
 
-Nova·neutral·Lucide 한 조합을 고정했습니다. CSS는 사전 빌드하며 호스트에 Tailwind 설정이 없어도 동작합니다. 선택 import는 JS 번들을 줄이며 npm 설치 의존성은 패키지 전체가 공유합니다. 전체 CSS를 공유하므로 family import가 CSS를 부품별로 나누지는 않습니다. 임의 Tailwind class의 CSS를 런타임에 생성하지 않으므로 호스트 CSS 또는 호스트 Tailwind 빌드를 사용합니다.
+Vega·neutral·Lucide 한 조합을 고정했습니다. CSS는 사전 빌드하며 호스트에 Tailwind 설정이 없어도 동작합니다. 선택 import는 JS 번들을 줄이며 npm 설치 의존성은 패키지 전체가 공유합니다. 전체 CSS를 공유하므로 family import가 CSS를 부품별로 나누지는 않습니다. 임의 Tailwind class의 CSS를 런타임에 생성하지 않으므로 호스트 CSS 또는 호스트 Tailwind 빌드를 사용합니다.
 
 CSS는 `data-viewstem-shadcn` 영역에 적용하고 호스트의 전역 reset을 추가하지 않습니다. `html.dark` 또는 `data-theme="dark"`로 전환하며, `--viewstem-primary` 같은 변수로 색상을 조절합니다. body portal도 같은 테마를 쓰려면 html/body에 theme와 변수를 두세요. 특정 subtree의 theme가 body portal로 자동 이동하지 않습니다.
 

@@ -12,6 +12,6 @@
 <MessageScrollerPrimitive.Content
 	bind:ref
 	data-viewstem-shadcn="" data-slot="message-scroller-content"
-	class={cn("gap-6 flex h-max min-h-full flex-col", className)}
+	class={cn("gap-8 flex h-max min-h-full flex-col", className)}
 	{...restProps}
 />

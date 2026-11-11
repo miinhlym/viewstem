@@ -14,7 +14,7 @@
 <PaginationPrimitive.NextButton
 	bind:ref
 	aria-label="Go to next page"
-	data-viewstem-shadcn="" class={cn(buttonVariants({ variant: "ghost", size: "default" }), "pr-1.5!", className)}
+	data-viewstem-shadcn="" class={cn(buttonVariants({ variant: "ghost", size: "default" }), "pr-2!", className)}
 	{...restProps}
 >
 	<span data-viewstem-shadcn="" class="hidden sm:block">Next</span>

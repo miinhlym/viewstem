@@ -3,15 +3,14 @@
 [data-viewstem-ui] [data-vs-component="ContextMenu.Root"] { display: block; }
 [data-viewstem-ui] .vs-dropdown-root > .vs-menu-trigger { width: 100%; }
 [data-viewstem-ui] .vs-menu-trigger { cursor: pointer; }
-[data-viewstem-ui] .vs-context-trigger {
-  font-size: .875rem; user-select: none;
-}
+[data-viewstem-ui] .vs-context-trigger { user-select: none; }
 [data-viewstem-ui] .vs-menubar {
-  display: flex; align-items: center; gap: .125rem; width: 100%; height: 2rem; padding: 3px;
-  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  display: flex; align-items: center; gap: .25rem; width: 100%; height: 2.25rem; padding: .25rem;
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  box-shadow: 0 1px 2px rgb(0 0 0 / .05);
 }
 [data-viewstem-ui] .vs-menubar .vs-menu-trigger {
-  display: inline-flex; align-items: center; padding: 2px .375rem;
+  display: inline-flex; align-items: center; padding: .25rem .5rem;
   border-radius: var(--radius-sm); font-size: .875rem; line-height: 1.25rem; font-weight: 500;
 }
 [data-viewstem-ui] .vs-menubar .vs-menu-trigger:is(:focus-visible,[aria-expanded="true"]) { background: var(--muted); outline: none; }
@@ -27,7 +26,7 @@
   width: max-content; min-width: 8rem; max-width: calc(100vw - .5rem); max-height: var(--available-height, 75vh);
   overflow: auto; padding: .25rem; outline: none;
   color: var(--popover-foreground); background: var(--popover);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   box-shadow: 0 0 0 1px color-mix(in oklab, var(--foreground) 10%, transparent), 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
   transform-origin: var(--transform-origin, top left);
   font-size: .875rem; line-height: 1.25rem;
@@ -49,12 +48,12 @@
 [data-viewstem-ui] .vs-menu-sub-panel[data-vs-sub-side="right"] { --vs-popup-x: -8px; --vs-popup-y: 0; transform-origin: top left; }
 [data-viewstem-ui] .vs-menu-item {
   position: relative; display: flex; align-items: center; gap: .5rem;
-  min-height: 1.75rem; padding: .25rem .375rem; border-radius: var(--radius-md); cursor: default;
+  min-height: 2rem; padding: .375rem .5rem; border-radius: var(--radius-sm); cursor: default;
 }
 [data-viewstem-ui] .vs-menu-item:is([data-highlighted], [aria-expanded="true"]) { color: var(--accent-foreground); background: var(--accent); }
 [data-viewstem-ui] .vs-menu-item:is([data-disabled], [aria-disabled="true"]) { opacity: .5; pointer-events: none; }
 [data-viewstem-ui] .vs-menu-item[data-variant="destructive"] { color: var(--destructive); }
-[data-viewstem-ui] .vs-menu-label { padding: .25rem .375rem; font-size: .75rem; line-height: 1rem; color: var(--muted-foreground); font-weight: 500; }
+[data-viewstem-ui] .vs-menu-label { padding: .375rem .5rem; font-size: .75rem; line-height: 1rem; color: var(--muted-foreground); font-weight: 500; }
 [data-viewstem-ui] .vs-menubar .vs-menu-label { color: var(--foreground); font-size: .875rem; line-height: 1.25rem; }
 [data-viewstem-ui] .vs-menubar :is([role="menuitemcheckbox"], [role="menuitemradio"]) { padding-inline-start: 1.75rem; }
 [data-viewstem-ui] .vs-menu-separator { height: 1px; border: 0; background: var(--border); margin: .25rem -.25rem; }

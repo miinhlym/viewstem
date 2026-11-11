@@ -7,7 +7,7 @@ sidebar:
 
 ## Apply the bundled CSS
 
-Import `@viewstem/svelte-ui/shadcn/styles.css` once from your browser entry point. The stylesheet includes the kit's Nova styles and neutral theme. It scopes the component rules and reset to the kit's `data-viewstem-shadcn` elements and their content. It works without a host Tailwind build.
+Import `@viewstem/svelte-ui/shadcn/styles.css` once from your browser entry point. The stylesheet includes the kit's Vega styles and the Neutral palette. It scopes the component rules and reset to the kit's `data-viewstem-shadcn` elements and their content. It works without a host Tailwind build.
 
 ## Set a theme for overlays too
 

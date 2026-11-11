@@ -84,9 +84,10 @@ JSON 예시는 확정된 구조의 의미를 설명한다. 외부 코드형 Comp
 - U46·D103에서 임시 바닐라 playground와 shadcn 갤러리를 제거했다. 패키지 사용은 각 공개 README를 따르며, UI 검증은 패키지를 직접 마운트하는 내부 fixture로 수행한다. 도구 제거는 core·renderer·UI 패키지의 공개 계약이나 지원 목록을 변경하지 않는다. [제거와 검증 범위](handoff/temporary-tools-removal-2026-11-04.md)를 따른다.
 - U39–U40의 [Svelte 클라이언트 렌더러](../packages/svelte/README.md)는 공개 core projection·수명·이벤트에 Svelte 구현을 연결한다. `@viewstem/svelte`의 `createRenderer()`만으로 시작하며 기본 UI·Action·테마 자동 등록 없이 호스트가 Component 계약과 구현을 각각 등록한다. 실제 패키지 검증과 지원 한계는 [인계](handoff/svelte-implementation-2026-11-02.md)를 따른다.
 - U44의 [Svelte UI 패키지](../packages/svelte-ui/README.md)는 별도의 명시적 ComponentSet으로 shadcn 카탈로그를 제공한다. 묶음 등록은 계약과 구현을 원자적으로 등록하며, core의 JSON DSL·State 엔진에 UI 의존성을 추가하지 않는다. 351개 JSON 원본 부품·6개 조합과 35개 native 문맥 전용 부품의 경계는 [U44 인계](handoff/svelte-ui-shadcn-implementation-2026-11-03.md)를 따른다. scoped slot 값 전달이나 ECharts/Canvas 계약을 확장하지 않는다.
-- D133의 [`@viewstem/ui` 프로토타입](../packages/ui/README.md)은 공개 core View를 빌려 브라우저 DOM에 반영한다. Basecoat Nova 스타일과 Vanilla JS 컨트롤러를 사용하고 D134에서 Basecoat 대응 42개 계열을 연결했다. D135에서 TanStack Table Core 기반 Data Table과 Zag Vanilla 기반 Calendar·Range Calendar·Date Picker를 추가했다. 정확한 부품·입력·이벤트 범위는 패키지의 `support.json`을 따른다. 순수 JS·React·Vue·Svelte 호스트는 같은 JSON과 DOM 연결 API를 사용한다.
+- D133의 [`@viewstem/ui` 프로토타입](../packages/ui/README.md)은 공개 core View를 빌려 브라우저 DOM에 반영한다. D134에서 Basecoat 스타일과 Vanilla JS 컨트롤러로 대응 42개 계열을 연결했다. D135에서 TanStack Table Core 기반 Data Table과 Zag Vanilla 기반 Calendar·Range Calendar·Date Picker를 추가했다. 정확한 부품·입력·이벤트 범위는 패키지의 `support.json`을 따른다. 순수 JS·React·Vue·Svelte 호스트는 같은 JSON과 DOM 연결 API를 사용한다.
 - D136에서 나머지 20개 계열과 하위 부품 6개를 브라우저 DOM 카탈로그에 추가한다. 메뉴 계열은 Zag Vanilla의 중첩 메뉴 동작을 공유하고 Carousel은 Embla를 사용한다. 브라우저 카탈로그는 Svelte UI의 JSON Component ID 357개를 등록하며, 실제 입력·슬롯·이벤트 지원 범위는 생성된 `support.json`이 정의한다.
 - D137에서 Calendar의 월 이동은 달력 뷰를 만들 때의 일자를 기준으로 계산한다. Range Calendar의 JSON 어댑터는 확정된 범위에서 바뀐 시작일과 종료일만 순서대로 발행한 뒤 전체 범위를 알린다. 브라우저 Chart는 D3 스케일을 사용해 Svelte Chart와 축·보조선의 눈금과 여백을 맞춘다.
+- D138에서 `@viewstem/ui`와 `@viewstem/svelte-ui`의 기본 스타일을 Vega로 전환한다. Neutral 색상 팔레트와 기존 JSON 계약은 유지한다. Svelte 패키지는 고정 shadcn-svelte 리비전의 Vega 원본을 사용하고 DOM 패키지는 Basecoat 1.1.0의 Vega CSS를 사용한다.
 
 - Rust/WASM 통합 코어는 검토했지만 현재 채택 경로는 아니다.
 

@@ -44,7 +44,7 @@
 		{#if showCloseButton}
 			<SheetPrimitive.Close data-viewstem-shadcn="" data-slot="sheet-close">
 				{#snippet child({ props })}
-					<Button variant="ghost" data-viewstem-shadcn="" class="absolute top-3 right-3" size="icon-sm" {...props}>
+					<Button variant="ghost" data-viewstem-shadcn="" class="absolute top-4 right-4" size="icon-sm" {...props}>
 						<XIcon data-viewstem-shadcn="" />
 						<span data-viewstem-shadcn="" class="sr-only">Close</span>
 					</Button>

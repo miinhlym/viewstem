@@ -16,7 +16,7 @@
 	aria-label="Go to previous page"
 	data-viewstem-shadcn="" class={cn(
 		buttonVariants({ variant: "ghost", size: "default" }),
-		"pl-1.5!",
+		"pl-2!",
 		className
 	)}
 	{...restProps}

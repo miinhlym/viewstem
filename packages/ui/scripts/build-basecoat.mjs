@@ -10,7 +10,7 @@ const packageRoot = dirname(require.resolve('basecoat-css/package.json'));
 const packageInfo = JSON.parse(readFileSync(join(packageRoot, 'package.json'), 'utf8'));
 if (packageInfo.version !== '1.1.0') throw new Error('Expected basecoat-css 1.1.0');
 const outputDir = fileURLToPath(new URL('../dist/', import.meta.url));
-const css = postcss.parse(readFileSync(join(packageRoot, 'dist/basecoat-nova.cdn.css'), 'utf8'));
+const css = postcss.parse(readFileSync(join(packageRoot, 'dist/basecoat-vega.cdn.css'), 'utf8'));
 const marker = '[data-viewstem-ui]';
 const scope = `:where(${marker}, ${marker} *)`;
 const dark = ':is(.dark, [data-theme="dark"])';
@@ -70,5 +70,5 @@ const output = css.toString().replaceAll('--tw-', '--viewstem-ui-tw-');
 mkdirSync(outputDir, { recursive: true });
 const styles = ['styles.css', 'menus.css', 'markup-families.css', 'widget-families.css', 'form-scroll-families.css']
   .map(file => readFileSync(new URL('../src/' + file, import.meta.url), 'utf8'));
-writeFileSync(join(outputDir, 'styles.css'), `/* Basecoat CSS ${packageInfo.version}, Nova; scoped for Viewstem. */\n${output}\n${styles.join('\n')}`);
+writeFileSync(join(outputDir, 'styles.css'), `/* Basecoat CSS ${packageInfo.version}, Vega; scoped for Viewstem. */\n${output}\n${styles.join('\n')}`);
 copyFileSync(join(packageRoot, 'LICENSE.md'), join(outputDir, 'BASECOAT-LICENSE.md'));
