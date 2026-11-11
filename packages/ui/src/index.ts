@@ -384,6 +384,7 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
       control.setAttribute('aria-disabled', String(inputs.disabled));
     }
 
+    const fieldValue = typeof inputs.value === 'number' ? String(inputs.value) : inputs.value;
     if (control.localName === 'input') {
       const input = control as HTMLInputElement;
       if (name === 'Checkbox' || name === 'Switch' || name === 'RadioGroup.Item') {
@@ -393,12 +394,12 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
       } else if (name !== 'Slider') {
         const type = typeof inputs.type === 'string' ? inputs.type : 'text';
         if (input.type !== type) input.type = type;
-        if (!entry.composing && typeof inputs.value === 'string' && input.value !== inputs.value && type !== 'file') input.value = inputs.value;
+        if (!entry.composing && typeof fieldValue === 'string' && input.value !== fieldValue && type !== 'file') input.value = fieldValue;
       }
     }
-    if (control.localName === 'textarea' && !entry.composing && typeof inputs.value === 'string') {
+    if (control.localName === 'textarea' && !entry.composing && typeof fieldValue === 'string') {
       const textarea = control as HTMLTextAreaElement;
-      if (textarea.value !== inputs.value) textarea.value = inputs.value;
+      if (textarea.value !== fieldValue) textarea.value = fieldValue;
     }
     if (control.localName === 'option') {
       setAttribute(control, 'value', inputs.value);

@@ -72,6 +72,36 @@ function resizableTable() {
   return view;
 }
 
+test('Input and Textarea render numeric State values', { timeout: 30_000 }, async t => {
+  const browser = await chromium.launch({ headless: true });
+  t.after(() => browser.close());
+  const page = await browser.newPage();
+  await page.setContent('<!doctype html><main id="app"></main>');
+  await page.addScriptTag({ content: bundle.outputFiles[0].text });
+  const value = { '@path': '/states/quantity' };
+  await page.evaluate(definition => window.mountRecipe(definition), {
+    states: { quantity: { kind: 'State', schema: { type: 'number' }, initial: 42 } },
+    render: {
+      id: 'fields', componentRef: 'shadcn.Field.Group', slots: { default: [
+        { id: 'quantity', componentRef: 'shadcn.Input', inputs: { type: 'number', value, 'aria-label': 'Quantity' } },
+        { id: 'notes', componentRef: 'shadcn.Textarea', inputs: { value, 'aria-label': 'Notes' } },
+      ] },
+    },
+  });
+
+  const input = page.getByLabel('Quantity');
+  const textarea = page.getByLabel('Notes');
+  assert.equal(await input.inputValue(), '42');
+  assert.equal(await textarea.inputValue(), '42');
+  for (const next of [0, -3.5]) {
+    await page.evaluate(value => window.view.getState('quantity').write(value), next);
+    assert.equal(await input.inputValue(), String(next));
+    assert.equal(await textarea.inputValue(), String(next));
+  }
+  assert.deepEqual(await page.evaluate(() => [window.errors, window.view.getSnapshot().errors]), [[], []]);
+  await page.evaluate(() => window.disposeRecipe());
+});
+
 test('multi-thumb Slider emits the whole range and accepts external State updates', { timeout: 30_000 }, async t => {
   const browser = await chromium.launch({ headless: true });
   t.after(() => browser.close());
