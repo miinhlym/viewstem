@@ -882,9 +882,6 @@
   .h-\[calc\(100\%_-_1px\)\]:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
     height: calc(100% - 1px);
   }
-  .h-\[calc\(var\(--bits-navigation-menu-viewport-height\)_\+_1rem\)\]:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
-    height: calc(var(--bits-navigation-menu-viewport-height) + 1rem);
-  }
   .h-auto:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
     height: auto;
   }
@@ -1007,6 +1004,9 @@
   }
   .max-w-\[calc\(100\%_-_2rem\)\]:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
     max-width: calc(100% - 2rem);
+  }
+  .max-w-\[calc\(100vw-2rem\)\]:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
+    max-width: calc(100vw - 2rem);
   }
   .max-w-full:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
     max-width: 100%;
@@ -1241,6 +1241,9 @@
   }
   .touch-none:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
     touch-action: none;
+  }
+  .resize:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
+    resize: both;
   }
   .resize-none:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
     resize: none;
@@ -4493,9 +4496,6 @@
     .md\:flex:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
       display: flex;
     }
-    .md\:w-\[calc\(var\(--bits-navigation-menu-viewport-width\)_\+_1rem\)\]:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
-      width: calc(var(--bits-navigation-menu-viewport-width) + 1rem);
-    }
     .md\:w-auto:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
       width: auto;
     }
@@ -5550,6 +5550,12 @@
       background-color: color-mix(in oklab, var(--muted) 50%, transparent);
     }
   }
+  .\[\&\>\[data-slot\=navigation-menu-content\]\]\:static:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) > [data-slot=navigation-menu-content] {
+    position: static;
+  }
+  .\[\&\>\[data-slot\=navigation-menu-content\]\]\:\[grid-area\:1\/1\]:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) > [data-slot=navigation-menu-content] {
+    grid-area: 1/1;
+  }
   .has-\[select\[aria-hidden\=true\]\:last-child\]\:\[\&\>\[data-slot\=select-trigger\]\:last-of-type\]\:rounded-r-lg:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *):has(:is(select[aria-hidden=true]:last-child)) > [data-slot=select-trigger]:last-of-type {
     border-top-right-radius: calc(var(--radius) * 1);
     border-bottom-right-radius: calc(var(--radius) * 1);
@@ -5707,6 +5713,32 @@
   }
   [data-side=right][data-state=collapsed] .\[\[data-side\=right\]\[data-state\=collapsed\]_\&\]\:cursor-w-resize:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
     cursor: w-resize;
+  }
+  [data-slot=attachment-actions] > .\[\[data-slot\=attachment-actions\]\>\&\]\:static:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
+    position: static;
+  }
+  [data-slot=attachment-actions] > .\[\[data-slot\=attachment-actions\]\>\&\]\:h-6:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
+    height: calc(var(--spacing) * 6);
+  }
+  [data-slot=attachment-actions] > .\[\[data-slot\=attachment-actions\]\>\&\]\:shrink-0:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
+    flex-shrink: 0;
+  }
+  [data-slot=attachment-actions] > .\[\[data-slot\=attachment-actions\]\>\&\]\:rounded-md:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
+    border-radius: calc(var(--radius) * 0.8);
+  }
+  [data-slot=attachment-actions] > .\[\[data-slot\=attachment-actions\]\>\&\]\:px-2:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
+    padding-inline: calc(var(--spacing) * 2);
+  }
+  [data-slot=attachment-actions] > .\[\[data-slot\=attachment-actions\]\>\&\]\:whitespace-nowrap:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
+    white-space: nowrap;
+  }
+  @media (hover: hover) {
+    [data-slot=attachment-actions] > .\[\[data-slot\=attachment-actions\]\>\&\]\:hover\:bg-muted:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *):hover {
+      background-color: var(--muted);
+    }
+  }
+  [data-slot=attachment-actions] > .\[\[data-slot\=attachment-actions\]\>\&\]\:focus-visible\:bg-muted:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *):focus-visible {
+    background-color: var(--muted);
   }
   [data-slot=card-content] .\[\[data-slot\=card-content\]_\&\]\:bg-transparent:where(:is([data-viewstem-shadcn], .viewstem-shadcn-root), :is([data-viewstem-shadcn], .viewstem-shadcn-root) *) {
     background-color: transparent;

@@ -14,6 +14,33 @@
 	}: DropdownMenuPrimitive.SubContentProps & {
 		portalProps?: WithoutChildrenOrChild<ComponentProps<typeof DropdownMenuPortal>>;
 	} = $props();
+
+	$effect(() => {
+		const wrapper = ref?.parentElement;
+		const win = wrapper?.ownerDocument.defaultView;
+		if (!wrapper || !win || restProps.avoidCollisions === false) return;
+
+		const keepInViewport = () => {
+			const rect = wrapper.getBoundingClientRect();
+			const left = rect.left - (Number.parseFloat(wrapper.style.translate) || 0);
+			const maxLeft = Math.max(4, wrapper.ownerDocument.documentElement.clientWidth - rect.width - 4);
+			const offset = Math.round(Math.max(4, Math.min(left, maxLeft)) - left);
+			const translate = offset ? `${offset}px` : "";
+			if (wrapper.style.translate !== translate) wrapper.style.translate = translate;
+		};
+		const position = new MutationObserver(keepInViewport);
+		position.observe(wrapper, { attributes: true, attributeFilter: ["style"] });
+		const size = new ResizeObserver(keepInViewport);
+		size.observe(wrapper);
+		win.addEventListener("resize", keepInViewport);
+		keepInViewport();
+		return () => {
+			position.disconnect();
+			size.disconnect();
+			win.removeEventListener("resize", keepInViewport);
+			wrapper.style.removeProperty("translate");
+		};
+	});
 </script>
 
 <DropdownMenuPortal {...portalProps}>

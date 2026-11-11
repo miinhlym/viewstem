@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { getContext } from "svelte";
+	import { calendarPlaceholderContext } from "../../adapters/types.js";
 	import { DateFormatter, getLocalTimeZone, type DateValue } from "@internationalized/date";
 	import CalendarMonthSelect from "./calendar-month-select.svelte";
 	import CalendarYearSelect from "./calendar-year-select.svelte";
@@ -38,6 +40,7 @@
 		if (typeof monthFormat === "function") return monthFormat(dateObj.getMonth() + 1);
 		return new DateFormatter(locale, { month: monthFormat }).format(dateObj);
 	}
+	const onPlaceholderChange = getContext<((value: DateValue) => void) | undefined>(calendarPlaceholderContext);
 </script>
 
 {#snippet MonthSelect()}
@@ -49,7 +52,10 @@
 			if (!placeholder) return;
 			const v = Number.parseInt(e.currentTarget.value);
 			const newPlaceholder = placeholder.set({ month: v });
-			placeholder = newPlaceholder.subtract({ months: monthIndex });
+			const adjusted = newPlaceholder.subtract({ months: monthIndex });
+			if (adjusted.compare(placeholder) === 0) return;
+			placeholder = adjusted;
+			onPlaceholderChange?.(adjusted);
 		}}
 	/>
 {/snippet}

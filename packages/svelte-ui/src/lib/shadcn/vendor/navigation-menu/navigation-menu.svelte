@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { getContext } from "svelte";
+	import { navigationViewportContext } from "../../adapters/types.js";
 	import { NavigationMenu as NavigationMenuPrimitive } from "bits-ui";
 	import { cn } from "../utils.js";
 	import NavigationMenuViewport from "./navigation-menu-viewport.svelte";
@@ -12,6 +14,8 @@
 	}: NavigationMenuPrimitive.RootProps & {
 		viewport?: boolean;
 	} = $props();
+
+	const hasExplicitViewport = getContext<(() => boolean) | undefined>(navigationViewportContext);
 </script>
 
 <NavigationMenuPrimitive.Root
@@ -25,7 +29,7 @@
 	{...restProps}
 >
 	{@render children?.()}
-	{#if viewport}
+	{#if viewport && !hasExplicitViewport?.()}
 		<NavigationMenuViewport />
 	{/if}
 </NavigationMenuPrimitive.Root>

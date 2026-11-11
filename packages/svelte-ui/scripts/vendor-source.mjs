@@ -141,6 +141,81 @@ for (const [path, json] of Object.entries(archive)) {
 			// on the element. Keep the scope marker in both native and child branches.
 			content = content.replace('"data-slot": "marker",', '"data-slot": "marker",\n\t\t"data-viewstem-shadcn": "",');
 		}
+		for (const family of ['calendar', 'range-calendar']) {
+			if (filename === resolve(vendor, family, family + '.svelte')) {
+				content = content.replace('<script lang="ts">', `<script lang="ts">
+	import { setContext } from "svelte";
+	import { calendarPlaceholderContext } from "../../adapters/types.js";`)
+					.replace('placeholder = $bindable(),', 'placeholder = $bindable(),\n\t\tonPlaceholderChange,')
+					.replace('\n\tbind:placeholder\n', '\n\tbind:placeholder\n\t{onPlaceholderChange}\n')
+					.replace('</script>', '\tsetContext(calendarPlaceholderContext, (value: DateValue) => onPlaceholderChange?.(value));\n</script>');
+			}
+			if (filename === resolve(vendor, family, family + '-caption.svelte')) {
+				// The caption handles monthIndex itself, so the primitive's change
+				// handler never observes this write to the bound placeholder.
+				content = content.replace('<script lang="ts">', `<script lang="ts">
+	import { getContext } from "svelte";
+	import { calendarPlaceholderContext } from "../../adapters/types.js";`)
+					.replace('</script>', '\tconst onPlaceholderChange = getContext<((value: DateValue) => void) | undefined>(calendarPlaceholderContext);\n</script>')
+					.replace('placeholder = newPlaceholder.subtract({ months: monthIndex });',
+						'const adjusted = newPlaceholder.subtract({ months: monthIndex });\n\t\t\tif (adjusted.compare(placeholder) === 0) return;\n\t\t\tplaceholder = adjusted;\n\t\t\tonPlaceholderChange?.(adjusted);');
+			}
+		}
+		if (filename === resolve(vendor, 'navigation-menu/navigation-menu.svelte')) {
+			// The JSON root can supply its own viewport while keeping viewport styling enabled.
+			content = content.replace('<script lang="ts">', `<script lang="ts">
+	import { getContext } from "svelte";
+	import { navigationViewportContext } from "../../adapters/types.js";`)
+				.replace('</script>', `
+	const hasExplicitViewport = getContext<(() => boolean) | undefined>(navigationViewportContext);
+</script>`)
+				.replace('{#if viewport}', '{#if viewport && !hasExplicitViewport?.()}');
+		}
+		if (filename === resolve(vendor, 'navigation-menu/navigation-menu-viewport.svelte')) {
+			// The primitive measures the first child of the active content. Size the
+			// viewport from the whole content and overlay outgoing and incoming panels.
+			content = content.replace('relative mt-1.5 w-full overflow-hidden', 'relative mt-1.5 grid w-max max-w-[calc(100vw-2rem)] overflow-hidden')
+				.replace('h-[calc(var(--bits-navigation-menu-viewport-height)_+_1rem)] md:w-[calc(var(--bits-navigation-menu-viewport-width)_+_1rem)]',
+					'[&>[data-slot=navigation-menu-content]]:static [&>[data-slot=navigation-menu-content]]:[grid-area:1/1]');
+		}
+		if (filename === resolve(vendor, 'dropdown-menu/dropdown-menu-sub-content.svelte')) {
+			// Floating UI can leave a horizontal submenu clipped when neither side
+			// of a full-width trigger has room. Shift the positioned wrapper in that case.
+			content = content.replace('</script>', `
+	$effect(() => {
+		const wrapper = ref?.parentElement;
+		const win = wrapper?.ownerDocument.defaultView;
+		if (!wrapper || !win || restProps.avoidCollisions === false) return;
+
+		const keepInViewport = () => {
+			const rect = wrapper.getBoundingClientRect();
+			const left = rect.left - (Number.parseFloat(wrapper.style.translate) || 0);
+			const maxLeft = Math.max(4, wrapper.ownerDocument.documentElement.clientWidth - rect.width - 4);
+			const offset = Math.round(Math.max(4, Math.min(left, maxLeft)) - left);
+			const translate = offset ? \`\${offset}px\` : "";
+			if (wrapper.style.translate !== translate) wrapper.style.translate = translate;
+		};
+		const position = new MutationObserver(keepInViewport);
+		position.observe(wrapper, { attributes: true, attributeFilter: ["style"] });
+		const size = new ResizeObserver(keepInViewport);
+		size.observe(wrapper);
+		win.addEventListener("resize", keepInViewport);
+		keepInViewport();
+		return () => {
+			position.disconnect();
+			size.disconnect();
+			win.removeEventListener("resize", keepInViewport);
+			wrapper.style.removeProperty("translate");
+		};
+	});
+</script>`);
+		}
+		if (filename === resolve(vendor, 'attachment/attachment-trigger.svelte')) {
+			// The default trigger covers the card. Inside Actions it is an inline control.
+			content = content.replace('absolute inset-0 z-10 outline-none',
+				'absolute inset-0 z-10 outline-none [[data-slot=attachment-actions]>&]:static [[data-slot=attachment-actions]>&]:h-6 [[data-slot=attachment-actions]>&]:shrink-0 [[data-slot=attachment-actions]>&]:rounded-md [[data-slot=attachment-actions]>&]:px-2 [[data-slot=attachment-actions]>&]:whitespace-nowrap [[data-slot=attachment-actions]>&]:hover:bg-muted [[data-slot=attachment-actions]>&]:focus-visible:bg-muted')
+				.replace('"data-slot": "attachment-trigger",', '"data-slot": "attachment-trigger",\n\t\t"data-viewstem-shadcn": "",');
+		}
 		if (filename === resolve(vendor, 'avatar/avatar.svelte')) {
 			content = content.replace('<script lang="ts">', `<script lang="ts">
 	import { setContext } from "svelte";

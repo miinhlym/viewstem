@@ -7,7 +7,7 @@ let harness;
 before(async () => { harness = await createAuditHarness({ fullCatalog: true }); });
 after(async () => { await harness?.close(); });
 
-const setup = (t, slug) => harness.setup(t, sampleBySlug.get(slug).view);
+const setup = (t, slug, options) => harness.setup(t, sampleBySlug.get(slug).view, options);
 const family = (page, slug) => replace(page, sampleBySlug.get(slug).view);
 const slot = (preview, name) => preview.locator(`[data-slot="${name}"]`);
 
@@ -89,11 +89,13 @@ test('Resizable drag and Sidebar toggling change the layout', async t => {
 });
 
 test('Navigation Menu and Questionnaire expose their next action through native controls', async t => {
-  const page = await setup(t, 'navigation-menu');
+  const page = await setup(t, 'navigation-menu', { viewport: { width: 460, height: 700 } });
   const preview = page.locator('#app');
   await preview.getByRole('button', { name: '문서' }).click();
   await preview.getByRole('link', { name: '시작하기' }).waitFor();
-  await page.keyboard.press('Escape');
+  assert.equal(await slot(preview, 'navigation-menu-viewport').count(), 1);
+  await preview.getByRole('link', { name: 'API', exact: true }).click();
+  assert.equal(new URL(page.url()).hash, '#api');
   await family(page, 'questionnaire');
   await preview.locator('input[name=format][value=summary]').check();
   await slot(preview, 'questionnaire-next').click();

@@ -195,6 +195,11 @@ for (const [slug, family] of [['dropdown-menu', 'DropdownMenu'], ['context-menu'
       l('Trigger', name, context ? { tabindex: 0 } : {}),
       p('Portal', {}, [p('Content', { loop: true }, items)]),
     ];
+    const submenuBindings = openBindings('sub');
+    submenuBindings.on.openChange.action.steps.push({
+      kind: 'Action', actionRef: 'audit-record',
+      inputs: { name: 'sub-transition', payload: { value: path('/ports/next') } },
+    });
     const items = [
       p('Group', {}, [
         l('Item', 'Archive', {}, on('select', 'archive')),
@@ -207,7 +212,7 @@ for (const [slug, family] of [['dropdown-menu', 'DropdownMenu'], ['context-menu'
       p('Sub', { open: ref('sub') }, [
         l('SubTrigger', 'Export', { textValue: 'Export' }),
         p('SubContent', {}, [l('Item', 'CSV', {}, on('select', 'csv'))]),
-      ], openBindings('sub')),
+      ], submenuBindings),
     ];
     const page = await setup(t, menubar ? p('Root', { value: ref('menu'), loop: true }, [
       p('Menu', { value: 'actions' }, menu('Actions', items), on('openChange', 'menu-change')),
@@ -262,6 +267,7 @@ for (const [slug, family] of [['dropdown-menu', 'DropdownMenu'], ['context-menu'
     await focus(page, item('CSV'));
     await page.keyboard.press('Enter');
     await waitEvent(page, 'csv', { type: 'menuitemselect' });
+    await waitState(page, 'sub', false);
     await absent(item('Archive'));
     if (!context) await focus(page, trigger);
     await show();
@@ -274,6 +280,8 @@ for (const [slug, family] of [['dropdown-menu', 'DropdownMenu'], ['context-menu'
       await focus(page, item('Other'));
     }
     assert.equal((await events(page)).some(entry => entry.name === 'blocked' || entry.name === 'archive'), false);
+    assert.deepEqual((await events(page)).filter(entry => entry.name === 'sub-transition').map(entry => entry.payload.value),
+      [true, false, true, false]);
   });
 }
 

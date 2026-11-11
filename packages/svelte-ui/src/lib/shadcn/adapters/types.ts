@@ -11,4 +11,6 @@ export interface Definition {
 }
 export type NativeComponent = Component<any>;
 export const childContext = Symbol('viewstem.shadcn.child');
+export const navigationViewportContext = Symbol('viewstem.shadcn.navigationViewport');
+export const calendarPlaceholderContext = Symbol('viewstem.shadcn.calendarPlaceholder');
 export interface ChildBridge { readonly target: string; readonly props: Record<PropertyKey, unknown> }

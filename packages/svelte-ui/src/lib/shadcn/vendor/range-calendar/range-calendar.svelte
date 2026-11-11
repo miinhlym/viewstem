@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { setContext } from "svelte";
+	import { calendarPlaceholderContext } from "../../adapters/types.js";
 	import { isEqualMonth, type DateValue } from "@internationalized/date";
 	import { RangeCalendar as RangeCalendarPrimitive } from "bits-ui";
 	import type { ButtonVariant } from "../button/index.js";
@@ -10,6 +12,7 @@
 		ref = $bindable(null),
 		value = $bindable(),
 		placeholder = $bindable(),
+		onPlaceholderChange,
 		weekdayFormat = "short",
 		class: className,
 		buttonVariant = "ghost",
@@ -37,12 +40,14 @@
 		if (captionLayout.startsWith("dropdown")) return "short";
 		return "long";
 	});
+	setContext(calendarPlaceholderContext, (value: DateValue) => onPlaceholderChange?.(value));
 </script>
 
 <RangeCalendarPrimitive.Root
 	bind:ref
 	bind:value
 	bind:placeholder
+	{onPlaceholderChange}
 	{weekdayFormat}
 	{disableDaysOutsideMonth}
 	data-viewstem-shadcn="" class={cn(

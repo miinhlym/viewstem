@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { getContext, onDestroy, untrack } from 'svelte';
+  import { getContext, onDestroy, setContext, untrack } from 'svelte';
+  import type { NodeSnapshot } from '@viewstem/core';
   import type { ComponentAdapterProps } from '@viewstem/svelte';
-  import { childContext, type ChildBridge, type Definition, type NativeComponent } from './types.js';
+  import { childContext, navigationViewportContext, type ChildBridge, type Definition, type NativeComponent } from './types.js';
   import { committedText, decode, domPayload, encode, mergeChild, sameInputValue, validateInputs } from './values.js';
   import Child from './Child.svelte';
 
@@ -9,6 +10,18 @@
     component: NativeComponent; definition: Definition;
   } = $props();
   const inherited = getContext<ChildBridge | undefined>(childContext);
+  function hasNavigationViewport(nodes: readonly NodeSnapshot[]): boolean {
+    return nodes.some(child => child.componentRef === 'shadcn.NavigationMenu.Viewport' ||
+      (child.componentRef !== 'shadcn.NavigationMenu.Root' &&
+        (hasNavigationViewport(child.children) || Object.values(child.slots).some(hasNavigationViewport))));
+  }
+  if (untrack(() => definition.id) === 'shadcn.NavigationMenu.Root') {
+    setContext(navigationViewportContext, () => hasNavigationViewport(node.slots.default ?? []));
+  }
+  const menuTransition = $derived(
+    definition.family === 'navigation-menu' ? { callback: 'onValueChange', input: 'value' } :
+      ['dropdown-menu', 'context-menu', 'menubar'].includes(definition.family) ? { callback: 'onOpenChange', input: 'open' } : undefined
+  );
   let alive = true;
   let composing = false;
   let draft: string | undefined;
@@ -28,6 +41,16 @@
     constructor(value: unknown) { this.value = value; }
   }
   const cells = $state<Record<PropertyKey, NativeValue>>({});
+  const pendingRanges = new Map<string, unknown>();
+  type CalendarRange = { start: string | null; end: string | null };
+  const isRangeCalendar = $derived(definition.id === 'shadcn.RangeCalendar.Root');
+  const isCalendar = $derived(isRangeCalendar || definition.id === 'shadcn.Calendar.Root');
+  let calendarValue: unknown;
+  let calendarPlaceholder: unknown;
+  let pendingCalendarValue: { value: unknown } | undefined;
+  let pendingCalendarPlaceholder: { value: unknown } | undefined;
+  let calendarFlushQueued = false;
+  let lastMenuValue: unknown;
   const nativeProps = new Proxy(Object.create(null) as Record<PropertyKey, unknown>, {
     get: (_, key) => cells[key]?.value,
     has: (_, key) => Object.hasOwn(cells, key),
@@ -38,11 +61,55 @@
   });
   onDestroy(() => { alive = false; });
 
-  function send(name: string, value: unknown) {
+  function send(name: string, value: unknown, dateRange = false) {
+    if (dateRange) {
+      // Bits UI can update both endpoints synchronously during one selection.
+      const queued = pendingRanges.has(name);
+      pendingRanges.set(name, value);
+      if (queued) return;
+    }
     // Native callbacks can run while Bits UI is constructing an effect scope.
     // Publish into core after that stack so a projection cannot orphan its cleanup.
     queueMicrotask(() => {
-      if (alive && node.status === 'ready') void emit(name, value).catch(() => {});
+      const payload = dateRange ? pendingRanges.get(name) : value;
+      if (dateRange) pendingRanges.delete(name);
+      if (alive && node.status === 'ready') void emit(name, payload).catch(() => {});
+    });
+  }
+  function calendarRange(value: unknown): CalendarRange {
+    const range = value as Partial<CalendarRange> | null | undefined;
+    return { start: range?.start ?? null, end: range?.end ?? null };
+  }
+  function calendarFocus(value: unknown) {
+    if (isRangeCalendar) return calendarRange(value).start;
+    return Array.isArray(value) ? value.at(-1) : value;
+  }
+  function queueCalendarChange(name: string, value: unknown) {
+    if (name === 'valueChange') pendingCalendarValue = { value };
+    else pendingCalendarPlaceholder = { value };
+    if (calendarFlushQueued) return;
+    calendarFlushQueued = true;
+    queueMicrotask(() => {
+      const next = pendingCalendarValue;
+      const placeholder = pendingCalendarPlaceholder;
+      pendingCalendarValue = pendingCalendarPlaceholder = undefined;
+      calendarFlushQueued = false;
+      if (next && !sameInputValue(calendarValue, next.value)) {
+        // Range endpoints are a projection of the settled range, not of Bits'
+        // internal writes while it clears, orders, or echoes that range.
+        if (isRangeCalendar) {
+          const previous = calendarRange(calendarValue);
+          const range = calendarRange(next.value);
+          if (previous.start !== range.start) send('startValueChange', { value: range.start });
+          if (previous.end !== range.end) send('endValueChange', { value: range.end });
+        }
+        calendarValue = next.value;
+        send('valueChange', next);
+      }
+      if (placeholder && !sameInputValue(calendarPlaceholder, placeholder.value)) {
+        calendarPlaceholder = placeholder.value;
+        send('placeholderChange', placeholder);
+      }
     });
   }
   function createCallbacks(): Record<string, unknown> {
@@ -70,7 +137,20 @@
             if (committedDomain === event) { committedDomain = undefined; return; }
             committedDomain = undefined;
           }
-          send(callback.event, { value: encode(event, callback.codec) });
+          if (name === menuTransition?.callback) {
+            // Bits can close the same submenu through both selection and its parent's close watcher.
+            if (Object.is(lastMenuValue, event)) return;
+            lastMenuValue = event;
+          }
+          if (isCalendar) {
+            if (callback.event === 'startValueChange' || callback.event === 'endValueChange') return;
+            if (callback.event === 'valueChange' || callback.event === 'placeholderChange') {
+              queueCalendarChange(callback.event, encode(event, callback.codec));
+              return;
+            }
+          }
+          const dateRange = callback.codec === 'dateRange' || (definition.id === 'shadcn.DatePicker' && name === 'onRangeChange');
+          send(callback.event, { value: encode(event, callback.codec) }, dateRange);
         }
       };
     }
@@ -119,6 +199,20 @@
     if (current.status === 'ready' && !sameInputValue(acceptedInputs, nextInputs)) {
       validateInputs(definition, nextInputs);
       const previous = acceptedInputs;
+      if (isCalendar) {
+        const nextValue = isRangeCalendar ? calendarRange(nextInputs.value) : nextInputs.value ?? null;
+        if (!previous || (!sameInputValue(previous.value, nextInputs.value) && !sameInputValue(calendarValue, nextValue))) {
+          calendarValue = nextValue;
+          calendarPlaceholder = calendarFocus(nextValue) ?? nextInputs.placeholder;
+        }
+        if (!previous || !sameInputValue(previous.placeholder, nextInputs.placeholder)) {
+          calendarPlaceholder = nextInputs.placeholder ?? calendarFocus(nextValue);
+        }
+      }
+      const menuInput = menuTransition?.input;
+      if (menuInput && !Object.is(previous?.[menuInput], nextInputs[menuInput])) {
+        lastMenuValue = nextInputs[menuInput];
+      }
       const decoded = Object.fromEntries(Object.entries(definition.props)
         .filter(([name]) => name !== 'text' && Object.hasOwn(nextInputs, name))
         .map(([name, property]) => [
@@ -134,6 +228,9 @@
 
     const text = acceptedInputs?.text;
     const props: Record<PropertyKey, unknown> = { ...accepted, ...callbacks };
+    if (definition.id === 'shadcn.Attachment.Action' && props.size === undefined && typeof text === 'string' && text) {
+      props.size = 'xs';
+    }
     if (composing && nextInputs.value === compositionInput && draft !== undefined && definition.props.value) props.value = draft;
     if (current.status !== 'ready' && definition.props.disabled) props.disabled = true;
     if (definition.slots.includes('default') && (hasDefault || text !== undefined)) props.children = content;

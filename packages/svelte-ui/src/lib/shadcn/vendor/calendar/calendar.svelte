@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { setContext } from "svelte";
+	import { calendarPlaceholderContext } from "../../adapters/types.js";
 	import { isEqualMonth, type DateValue } from "@internationalized/date";
 	import { Calendar as CalendarPrimitive } from "bits-ui";
 	import { cn, type WithoutChildrenOrChild } from "../utils.js";
@@ -10,6 +12,7 @@
 		ref = $bindable(null),
 		value = $bindable(),
 		placeholder = $bindable(),
+		onPlaceholderChange,
 		class: className,
 		weekdayFormat = "short",
 		buttonVariant = "ghost",
@@ -37,6 +40,7 @@
 		if (captionLayout.startsWith("dropdown")) return "short";
 		return "long";
 	});
+	setContext(calendarPlaceholderContext, (value: DateValue) => onPlaceholderChange?.(value));
 </script>
 
 <!--
@@ -47,6 +51,7 @@ get along, so we shut typescript up by casting `value` to `never`.
 	bind:value={value as never}
 	bind:ref
 	bind:placeholder
+	{onPlaceholderChange}
 	{weekdayFormat}
 	{disableDaysOutsideMonth}
 	data-viewstem-shadcn="" class={cn(

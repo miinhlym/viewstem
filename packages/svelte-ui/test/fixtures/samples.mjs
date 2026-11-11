@@ -61,7 +61,7 @@ function modal(family, heading, body, { nested = false } = {}) {
     ]),
     text('Typography', body),
     part('Footer', {}, [label(family === 'AlertDialog' ? 'Cancel' : 'Close', '닫기'),
-      ...(family === 'AlertDialog' ? [label('Action', '확인')] : [])]),
+      ...(family === 'AlertDialog' ? [{ ...label('Action', '확인'), on: controlled('open', boolean, 'click', false) }] : [])]),
   ];
   if (family === 'AlertDialog') contents[0].slots.default.unshift(label('Media', '!'));
   if (nested) contents.splice(2, 0, part('NestedRoot', {}, [
@@ -342,7 +342,7 @@ export const samples = [
     ...Array.from({ length: 16 }, (_, i) => text('Typography', '보고서 ' + (i + 1))),
     node('ScrollArea.Scrollbar', { orientation: 'horizontal' }),
   ])),
-  example('select', 'Select', bound('Select.Root', 'site', string, { type: 'single' }, 'value', 'valueChange', [
+  example('select', 'Select', bound('Select.Root', 'site', string, { type: 'single', items: sites }, 'value', 'valueChange', [
     node('Select.Trigger', {}, [node('Select.Value', { placeholder: '지역 선택' })]),
     node('Select.Portal', {}, [node('Select.Content', {}, [
       node('Select.ScrollUpButton'),
