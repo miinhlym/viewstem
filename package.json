@@ -38,7 +38,9 @@
     "test:svelte-ui:package": "node packages/svelte-ui/scripts/test-package.mjs",
     "postinstall": "patch-package --error-on-fail",
     "typecheck:docs": "npm run typecheck -w @viewstem/docs",
-    "release:version": "changeset version && npm install --package-lock-only --ignore-scripts --no-audit --no-fund"
+    "release:version": "changeset version && npm install --package-lock-only --ignore-scripts --no-audit --no-fund",
+    "build:ui": "npm run build && npm run build -w @viewstem/ui",
+    "check:ui": "npm run build:svelte-ui && npm run build -w @viewstem/ui && npm run test -w @viewstem/ui"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.3",

@@ -1,0 +1,667 @@
+/* DOM adapter glue for logical nodes that have no Basecoat box. */
+[data-viewstem-ui] [data-vs-component=""][data-vs-part="group"] { display: contents; }
+
+[data-viewstem-ui] .vs-ui-transparent { display: contents; }
+[data-viewstem-ui] .vs-ui-field-group { display: flex; flex-direction: column; gap: 1.25rem; }
+[data-viewstem-ui] [data-vs-component="Field.Legend"] { font-size: var(--text-base); line-height: var(--text-base--line-height); }
+[data-viewstem-ui] [data-vs-component="Field.Legend"][data-variant="label"] { font-size: var(--text-sm); line-height: var(--text-sm--line-height); }
+[data-viewstem-ui] [data-vs-component="Field.Label"] { line-height: 1.375; }
+[data-viewstem-ui] [data-vs-component="Field.Title"] { min-height: 1.25rem; }
+[data-viewstem-ui] [data-vs-component="NativeSelect.Root"] { font-size: var(--text-sm); line-height: var(--text-sm--line-height); padding-inline-end: 1.875rem; }
+[data-viewstem-ui] [data-vs-component="Table.Footer"] { background: color-mix(in oklab, var(--muted) 50%, transparent); border-top: 1px solid var(--border); font-weight: 500; }
+[data-viewstem-ui] [data-vs-component="Card.Description"] {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+}
+[data-viewstem-ui] .vs-ui-pagination-list { display: flex; align-items: center; gap: .25rem; }
+[data-viewstem-ui] .vs-ui-kbd-group { display: inline-flex; align-items: center; gap: .25rem; }
+[data-viewstem-ui] [data-vs-component="InputGroup.Input"] { height: 2rem; }
+[data-viewstem-ui] [data-vs-component="InputGroup.Textarea"] { min-height: 4rem; field-sizing: content; }
+[data-viewstem-ui] [data-vs-component="InputGroup.Button"][data-size="xs"] {
+  padding-inline: .375rem;
+  font-size: .875rem;
+  line-height: 1.25rem;
+}
+[data-viewstem-ui] input[data-vs-component="Switch"]::before { transition: translate 150ms cubic-bezier(.4, 0, .2, 1); }
+@media (prefers-reduced-motion: reduce) {
+  [data-viewstem-ui] input[data-vs-component="Switch"]::before { transition: none; }
+}
+[data-viewstem-ui] .vs-ui-pagination { display: flex; width: 100%; justify-content: center; }
+[data-viewstem-ui] .vs-ui-pagination-list { list-style: none; padding: 0; gap: .125rem; }
+[data-viewstem-ui] .vs-ui-pagination :is([data-vs-component="Pagination.Previous"], [data-vs-component="Pagination.PrevButton"], [data-vs-component="Pagination.Next"], [data-vs-component="Pagination.NextButton"]) { gap: .25rem; }
+[data-viewstem-ui] .vs-ui-pagination [data-vs-component="Pagination.Ellipsis"] {
+  display: grid; place-items: center; width: 2rem; height: 2rem;
+}
+[data-viewstem-ui] .vs-ui-pagination :is([data-vs-component="Pagination.Previous"], [data-vs-component="Pagination.PrevButton"])::before,
+[data-viewstem-ui] .vs-ui-pagination :is([data-vs-component="Pagination.Next"], [data-vs-component="Pagination.NextButton"])::after {
+  content: ""; width: 1rem; height: 1rem; flex: none; background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m15 18-6-6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+[data-viewstem-ui] .vs-ui-pagination :is([data-vs-component="Pagination.Next"], [data-vs-component="Pagination.NextButton"])::after { transform: rotate(180deg); }
+@media (width < 40rem) {
+  [data-viewstem-ui] .vs-ui-pagination :is([data-vs-component="Pagination.Previous"], [data-vs-component="Pagination.Next"]) {
+    width: 2.125rem; padding-inline: 0; font-size: 0;
+  }
+}
+
+
+[data-viewstem-ui] .vs-ui-separator { border: 0; border-block-start: 1px solid var(--border); }
+[data-viewstem-ui] .vs-ui-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 12a9 9 0 1 1-9-9' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  animation: viewstem-ui-rotate 1s linear infinite;
+}
+@keyframes viewstem-ui-rotate { to { transform: rotate(1turn); } }
+@media (prefers-reduced-motion: reduce) {
+  [data-viewstem-ui] :is(.vs-ui-spinner, .skeleton) { animation: none; }
+}
+[data-viewstem-ui] [data-vs-component="Empty.Media"][data-variant="icon"] {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+}
+
+[data-viewstem-ui] .vs-ui-tooltip { display: inline-flex; position: relative; }
+[data-viewstem-ui] .vs-ui-tooltip-content {
+  visibility: hidden;
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 100%;
+  width: max-content;
+  max-width: min(20rem, calc(100vw - 16px));
+  overflow-wrap: anywhere;
+  color: var(--primary-foreground);
+  background: var(--primary);
+  border-radius: var(--radius);
+  padding: .25rem .5rem;
+}
+[data-viewstem-ui] :is([role="menuitemcheckbox"], [role="menuitemradio"]) { position: relative; padding-inline-end: 2rem; }
+[data-viewstem-ui] .alert-dialog > div > header > figure {
+  margin-block-end: .5rem;
+}
+[data-viewstem-ui] .alert-dialog[data-size="sm"] > div > header > figure {
+  grid-row: auto;
+}
+[data-viewstem-ui] .vs-ui-sidebar-provider { min-block-size: 18rem; }
+[data-viewstem-ui] .vs-ui-sidebar-inset { min-width: 0; }
+[data-viewstem-ui] .vs-ui-sidebar-provider [data-vs-component="Sidebar.GroupAction"],
+[data-viewstem-ui] .vs-ui-sidebar-provider [data-vs-component="Sidebar.MenuAction"] {
+  position: absolute;
+  inset-inline-end: .5rem;
+  inset-block-start: .5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+}
+[data-viewstem-ui] .vs-ui-sidebar-provider [data-vs-component="Sidebar.MenuBadge"] {
+  position: absolute;
+  inset-block-start: .375rem;
+  inset-inline-end: .25rem;
+  display: grid;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding-inline: .25rem;
+  font-size: .75rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+[data-viewstem-ui] [data-vs-component="Sidebar.MenuItem"]:has(> [data-vs-component="Sidebar.MenuAction"]) > [data-vs-component="Sidebar.MenuBadge"] { inset-inline-end: 1.75rem; }
+[data-viewstem-ui] .vs-ui-sidebar-provider [data-vs-component="Sidebar.MenuSkeleton"] { width: 50%; height: 1rem; margin: .5rem; }
+[data-viewstem-ui] .sidebar > nav [data-vs-component="Sidebar.MenuSub"] { margin-inline: .875rem; }
+[data-viewstem-ui] .sidebar > nav [data-vs-component="Sidebar.Input"] { background-color: var(--background); }
+[data-viewstem-ui] .vs-ui-sidebar-provider [data-vs-component="Sidebar.Rail"] { display: none; }
+[data-viewstem-ui] .vs-ui-sidebar-provider [data-vs-component="Sidebar.Trigger"]::before {
+  content: "";
+  width: .9rem;
+  height: .8rem;
+  border: 1px solid currentColor;
+  border-radius: .15rem;
+  background: linear-gradient(currentColor, currentColor) 35% 0 / 1px 100% no-repeat;
+}
+@media (width < 48rem) {
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    visibility: visible;
+    transition: background-color 100ms ease, backdrop-filter 100ms ease;
+  }
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar[aria-hidden="false"] {
+    background: rgb(0 0 0 / .1);
+    backdrop-filter: blur(4px);
+  }
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar[aria-hidden="true"] {
+    visibility: hidden;
+    pointer-events: none;
+    transition: background-color 100ms ease, backdrop-filter 100ms ease, visibility 0s 200ms;
+  }
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar > nav { width: 75vw; transition-duration: 200ms; }
+}
+@media (40rem <= width < 48rem) {
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar > nav { max-width: 24rem; }
+}
+@media (width >= 48rem) {
+  [data-viewstem-ui] .vs-ui-sidebar-provider { display: flex; }
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar {
+    flex: 0 0 var(--sidebar-width);
+    min-inline-size: 0;
+    max-inline-size: var(--sidebar-width);
+    overflow: clip;
+    transition: max-inline-size 200ms linear;
+  }
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar[aria-hidden="true"] { max-inline-size: 0; }
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar > nav {
+    position: sticky;
+    inset-block-start: 0;
+    min-block-size: 18rem;
+    transition-duration: 200ms;
+  }
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .vs-ui-sidebar-inset { flex: 1; margin-inline: 0; }
+  [data-viewstem-ui] .vs-ui-sidebar-provider [data-vs-component="Sidebar.Rail"] {
+    display: block;
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    width: .25rem;
+    cursor: ew-resize;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar,
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar[aria-hidden="true"],
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar > nav { transition: none; }
+}
+[data-viewstem-ui] .vs-ui-toasts:empty { display: none; }
+[data-viewstem-ui] .vs-ui-toasts[data-edge="top"] { top: 0; bottom: auto; }
+[data-viewstem-ui] .avatar > img:not([data-vs-loaded]),
+[data-viewstem-ui] .avatar:has(> img[data-vs-loaded]) > [data-vs-component="Avatar.Fallback"] { display: none; }
+[data-viewstem-ui] .chart {
+  position: relative;
+  --chart-1: var(--viewstem-chart-1, oklch(0.87 0 0));
+  --chart-2: var(--viewstem-chart-2, oklch(0.556 0 0));
+  --chart-3: var(--viewstem-chart-3, oklch(0.439 0 0));
+  --chart-4: var(--viewstem-chart-4, oklch(0.371 0 0));
+  --chart-5: var(--viewstem-chart-5, oklch(0.269 0 0));
+}
+[data-viewstem-ui] [data-vs-component="Chart"] { aspect-ratio: 16 / 9; }
+[data-viewstem-ui] .chart > svg { display: block; overflow: visible; }
+[data-viewstem-ui] .vs-chart-gridline { fill: transparent; stroke: color-mix(in oklab, var(--border) 50%, transparent); stroke-width: 1px; }
+[data-viewstem-ui] .vs-chart-axis-label { fill: var(--muted-foreground); stroke: transparent; stroke-width: 2px; font-size: .75rem; font-weight: 400; }
+[data-viewstem-ui] .vs-chart-point { filter: drop-shadow(0 1px 2px rgb(0 0 0 / .15)); pointer-events: none; }
+[data-viewstem-ui] .vs-chart-tooltip:not([hidden]) {
+  position: absolute; z-index: 50; display: grid; gap: .375rem; min-width: 8rem;
+  padding: .375rem .625rem; border: 1px solid color-mix(in oklab, var(--border) 50%, transparent);
+  border-radius: var(--radius-lg); background: var(--background); color: var(--foreground);
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / .1), 0 8px 10px -6px rgb(0 0 0 / .1);
+  font-size: .75rem; line-height: 1rem; pointer-events: none; user-select: none;
+  animation: vs-chart-tooltip-enter 100ms linear;
+}
+[data-viewstem-ui] .vs-chart-tooltip[data-exiting] { animation: vs-chart-tooltip-exit 100ms linear both; }
+[data-viewstem-ui] .vs-chart-tooltip-title { font-weight: 500; }
+[data-viewstem-ui] .vs-chart-tooltip-rows { display: grid; gap: .375rem; }
+[data-viewstem-ui] .vs-chart-tooltip-row { display: flex; align-items: center; gap: .5rem; color: var(--muted-foreground); line-height: 1; }
+[data-viewstem-ui] .vs-chart-tooltip-value {
+  margin-inline-start: auto; color: var(--foreground); font-weight: 500; font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+[data-viewstem-ui] .vs-chart-swatch { flex: none; width: .625rem; height: .625rem; border-radius: 2px; }
+@keyframes vs-chart-tooltip-enter { from { opacity: 0; } }
+@keyframes vs-chart-tooltip-exit { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  [data-viewstem-ui] .vs-chart-tooltip:not([hidden]) { animation: none; }
+}
+
+/* Match the reference accordion's 200ms height animation while retaining
+   native details semantics. Unsupported browsers keep the instant fallback. */
+@supports (interpolate-size: allow-keywords) and (transition-behavior: allow-discrete) {
+  [data-viewstem-ui] .accordion > details { interpolate-size: allow-keywords; }
+  [data-viewstem-ui] .accordion > details::details-content {
+    height: 0;
+    overflow: clip;
+    transition: height .2s ease-out, content-visibility .2s allow-discrete;
+  }
+  [data-viewstem-ui] .accordion > details[open]::details-content { height: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-viewstem-ui] .accordion > details::details-content { transition: none; }
+}
+[data-viewstem-ui] .collapsible::details-content { transition: none; }
+[data-viewstem-ui] .accordion > details > summary { cursor: pointer; }
+[data-viewstem-ui] .accordion > details > summary::after,
+[data-viewstem-ui] .combobox > button::after,
+[data-viewstem-ui] .select:not(select) > button::after {
+  content: "";
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  background: var(--chevron-down-icon-50) center / contain no-repeat;
+}
+[data-viewstem-ui] .accordion > details[open] > summary::after { transform: rotate(180deg); }
+[data-viewstem-ui] .command [data-vs-component="Command.Empty"] {
+  padding-block: 1.5rem;
+  text-align: center;
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+}
+[data-viewstem-ui] .command [role="menu"]:has([role="menuitem"]:not([aria-hidden="true"])) [data-vs-component="Command.Empty"],
+[data-viewstem-ui] .command [role="menu"][data-empty]::before { display: none; }
+[data-viewstem-ui] .combobox [role="listbox"]:has(.vs-combobox-empty)::before,
+[data-viewstem-ui] .combobox [role="listbox"]:has([role="option"]:not([aria-hidden="true"])) > .vs-combobox-empty {
+  display: none;
+}
+[data-viewstem-ui] .vs-combobox-empty { padding-block: 1.5rem; text-align: center; }
+[data-viewstem-ui] input[data-vs-component="Slider"] { width: 100%; height: .25rem; }
+[data-viewstem-ui] [data-vs-component="ScrollArea.Root"] { overflow: auto; }
+[data-viewstem-ui] [data-vs-component="RadioGroup.Item"]:disabled + label { opacity: .5; cursor: not-allowed; }
+
+/* Basecoat centers the inner dialog panel with position:fixed. Give the
+   semantic dialog a box even though its panel is outside normal flow. */
+[data-viewstem-ui] dialog:not([open]) { display: none; }
+[data-viewstem-ui] dialog:is(.dialog, .alert-dialog)[open] {
+  min-width: 1px;
+  min-height: 1px;
+  overflow: visible;
+}
+[data-viewstem-ui] dialog:is(.dialog, .alert-dialog) {
+  transition: opacity 100ms ease;
+}
+[data-viewstem-ui] dialog:is(.dialog, .alert-dialog)::backdrop { transition: opacity 100ms ease; }
+[data-viewstem-ui] dialog:is(.dialog, .alert-dialog) > div { transition: scale 100ms ease; }
+[data-viewstem-ui] dialog[data-vs-closing],
+[data-viewstem-ui] dialog[data-vs-closing]::backdrop { opacity: 0; }
+[data-viewstem-ui] dialog[data-vs-closing] > div { scale: .95; }
+[data-viewstem-ui] .vs-ui-modal:has(> .vs-ui-modal-overlay) > dialog::backdrop {
+  /* The Svelte content adds its own overlay beside the declared overlay. */
+  background-color: rgb(0 0 0 / .19);
+  backdrop-filter: blur(5.66px);
+}
+[data-viewstem-ui] .dialog > div > footer > [data-vs-component="Dialog.Close"],
+[data-viewstem-ui] .drawer > div > footer > [data-vs-component="Drawer.Close"],
+[data-viewstem-ui] [data-vs-component="Drawer.Trigger"] { cursor: pointer; }
+[data-viewstem-ui] .dialog > div > p,
+[data-viewstem-ui] .dialog > div > header > p { line-height: var(--text-sm--line-height); }
+[data-viewstem-ui] .drawer > div > header > h2 {
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  font-weight: 500;
+  letter-spacing: normal;
+}
+[data-viewstem-ui] .drawer > div > .vs-ui-modal > [data-vs-component="Drawer.Trigger"] { display: block; width: 100%; }
+[data-viewstem-ui] .dialog > div > .vs-dialog-dismiss {
+  inset-block-start: .5rem;
+  inset-inline-end: .5rem;
+  opacity: 1;
+}
+[data-viewstem-ui] .dialog > div > .vs-dialog-dismiss[hidden] { display: none; }
+[data-viewstem-ui] .vs-dialog-dismiss::before,
+[data-viewstem-ui] .vs-dialog-dismiss::after {
+  content: "";
+  position: absolute;
+  width: .75rem;
+  height: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
+  rotate: 45deg;
+}
+[data-viewstem-ui] .vs-dialog-dismiss::after { rotate: -45deg; }
+[data-viewstem-ui] .drawer > div > .vs-drawer-handle {
+  order: -1;
+  align-self: center;
+  flex: none;
+  width: 100px;
+  height: .25rem;
+  margin-block-start: 1rem;
+  border-radius: 999px;
+  background: var(--muted);
+  touch-action: none;
+  cursor: grab;
+}
+[data-viewstem-ui] .drawer[data-vs-dragging] > div {
+  transition-duration: 0ms;
+  translate: 0 var(--vs-drawer-drag) !important;
+}
+[data-viewstem-ui] dialog.drawer[open] { opacity: 1; transition: none; --vs-drawer-exit-x: 0px; --vs-drawer-exit-y: 100%; }
+[data-viewstem-ui] dialog.drawer[open][data-side="top"] { --vs-drawer-exit-y: -100%; }
+[data-viewstem-ui] dialog.drawer[open][data-side="left"] { --vs-drawer-exit-x: -100%; --vs-drawer-exit-y: 0px; }
+[data-viewstem-ui] dialog.drawer[open][data-side="right"] { --vs-drawer-exit-x: 100%; --vs-drawer-exit-y: 0px; }
+[data-viewstem-ui] dialog.drawer[open] > div { transition: none; animation: viewstem-ui-drawer-slide-in .5s cubic-bezier(.32,.72,0,1); }
+[data-viewstem-ui] dialog.drawer[open][data-closing] > div { animation-name: viewstem-ui-drawer-slide-out; }
+[data-viewstem-ui] dialog.drawer[open]::backdrop { transition: none; animation: viewstem-ui-drawer-fade-in .5s cubic-bezier(.32,.72,0,1); }
+[data-viewstem-ui] dialog.drawer[open][data-closing]::backdrop { animation-name: viewstem-ui-drawer-fade-out; }
+@keyframes viewstem-ui-drawer-slide-in { from { translate: var(--vs-drawer-exit-x) var(--vs-drawer-exit-y); } to { translate: 0 0; } }
+@keyframes viewstem-ui-drawer-slide-out { from { translate: 0 0; } to { translate: var(--vs-drawer-exit-x) var(--vs-drawer-exit-y); } }
+@keyframes viewstem-ui-drawer-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes viewstem-ui-drawer-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  [data-viewstem-ui] dialog:is(.dialog, .alert-dialog, .drawer),
+  [data-viewstem-ui] dialog:is(.dialog, .alert-dialog, .drawer) > div,
+  [data-viewstem-ui] dialog:is(.dialog, .alert-dialog, .drawer)::backdrop { transition-duration: 0ms; }
+  [data-viewstem-ui] dialog.drawer[open] > div,
+  [data-viewstem-ui] dialog.drawer[open]::backdrop { animation: none; }
+}
+
+[data-viewstem-ui] .vs-date-calendar { display: block; max-width: 100%; }
+[data-viewstem-ui] .vs-date-calendar[data-picker] { display: inline-block; }
+[data-viewstem-ui] .vs-date-trigger { width: 13.25rem; max-width: 100%; justify-content: space-between; font-weight: 400; }
+[data-viewstem-ui] .vs-date-trigger::after { content: ''; width: .45rem; height: .45rem; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg) translateY(-2px); }
+[data-viewstem-ui] .vs-date-panel { --vs-date-padding: .5rem; }
+[data-viewstem-ui] [data-vs-component="RangeCalendar.Root"] .vs-date-panel { --vs-date-padding: .75rem; }
+[data-viewstem-ui] .vs-date-panel:not([hidden]) {
+  position: relative;
+  padding: var(--vs-date-padding);
+  color: var(--popover-foreground);
+}
+[data-viewstem-ui] .vs-date-calendar[data-picker] .vs-date-panel:not([hidden]) {
+  border-radius: var(--radius-lg);
+  background: var(--popover);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--foreground) 10%, transparent), 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
+  transform-origin: var(--transform-origin, top left);
+}
+[data-viewstem-ui] .vs-date-navigation { position: absolute; inset: var(--vs-date-padding) var(--vs-date-padding) auto; display: flex; justify-content: space-between; pointer-events: none; }
+[data-viewstem-ui] .vs-date-navigation button { width: 1.75rem; height: 1.75rem; padding: 0; pointer-events: auto; }
+[data-viewstem-ui] .vs-date-navigation button::after {
+  content: "";
+  width: 1rem;
+  height: 1rem;
+  background: currentColor;
+  mask: var(--chevron-down-icon) center / contain no-repeat;
+  rotate: 90deg;
+}
+[data-viewstem-ui] .vs-date-navigation button:last-child::after { rotate: -90deg; }
+[data-viewstem-ui] .vs-date-navigation:dir(rtl) button::after { scale: -1 1; }
+[data-viewstem-ui] .vs-date-navigation button[aria-disabled="true"] { opacity: .5; }
+[data-viewstem-ui] .vs-date-heading { height: 1.75rem; display: flex; justify-content: center; align-items: center; gap: .375rem; margin-block-end: 1rem; }
+[data-viewstem-ui] .vs-date-months { display: flex; flex-wrap: wrap; gap: 1rem; }
+[data-viewstem-ui] .vs-date-months section:only-child { width: 100%; }
+[data-viewstem-ui] .vs-date-months section { min-width: 0; }
+[data-viewstem-ui] .vs-date-caption { text-align: center; font-size: .875rem; font-weight: 500; }
+[data-viewstem-ui] .vs-date-heading:has(> select:nth-child(2):not([hidden])) .vs-date-caption { order: 1; }
+[data-viewstem-ui] .vs-date-months .select {
+  height: 1.875rem;
+  padding-block: 0;
+  padding-inline: .5rem 1.25rem;
+  background-size: .875rem;
+  background-position: right .25rem center;
+  background-image: var(--chevron-down-icon);
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 2px rgb(0 0 0 / .05);
+  field-sizing: content;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: normal;
+}
+[data-viewstem-ui] .vs-date-months table { border-collapse: separate; border-spacing: 0; }
+[data-viewstem-ui] .vs-date-months th { font-size: .8rem; font-weight: 400; color: var(--muted-foreground); }
+[data-viewstem-ui] [data-vs-component="RangeCalendar.Root"] .vs-date-months th { padding-block-end: .25rem; }
+[data-viewstem-ui] .vs-date-calendar[data-picker] .vs-date-months th { line-height: var(--text-sm--line-height); }
+[data-viewstem-ui] .vs-date-months td { padding-block-start: .5rem; }
+[data-viewstem-ui] .vs-date-day {
+  width: 1.75rem; height: 1.75rem; padding: 0;
+  border-radius: var(--radius-md); font-weight: 400; line-height: 1;
+}
+[data-viewstem-ui] .vs-date-day:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent); }
+[data-viewstem-ui] .vs-date-months td:has(> .vs-date-day:is([data-in-range], [data-in-hover-range])) { position: relative; }
+[data-viewstem-ui] .vs-date-months td:has(> .vs-date-day:is([data-in-range], [data-in-hover-range]))::before {
+  content: "";
+  position: absolute;
+  inset: .5rem 0 0;
+  background: var(--accent);
+}
+[data-viewstem-ui] .vs-date-months td:has(> .vs-date-day:is([data-range-start], [data-hover-range-start]))::before { border-start-start-radius: var(--radius-md); border-end-start-radius: var(--radius-md); }
+[data-viewstem-ui] .vs-date-months td:has(> .vs-date-day:is([data-range-end], [data-hover-range-end]))::before { border-start-end-radius: var(--radius-md); border-end-end-radius: var(--radius-md); }
+[data-viewstem-ui] .vs-date-day:is([data-in-range], [data-in-hover-range]) { position: relative; color: var(--accent-foreground); }
+[data-viewstem-ui] .vs-date-day:is([data-selected], [data-range-start], [data-range-end]) {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+[data-viewstem-ui] .vs-date-day[data-disabled] { opacity: .5; cursor: default; }
+[data-viewstem-ui] .vs-date-day[data-outside-month]:not([data-selected]) { color: var(--muted-foreground); }
+[data-viewstem-ui] .vs-date-calendar[data-picker] .vs-date-day[data-outside-month]:not([data-selected]) { opacity: .55; }
+[data-viewstem-ui] .vs-date-day[data-today]:not([data-selected]) { background: var(--accent); color: var(--accent-foreground); }
+[data-viewstem-ui] .vs-date-calendar [data-part="positioner"] { z-index: 20; }
+[data-viewstem-ui] .vs-data-table {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+[data-viewstem-ui] .vs-data-table > .input { max-width: 24rem; margin-block-start: 1rem; }
+[data-viewstem-ui] .vs-data-table > .table-container {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+[data-viewstem-ui] .vs-data-table th { height: 2.5rem; }
+[data-viewstem-ui] .vs-data-table-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .5rem;
+  padding-block-end: 1rem;
+}
+[data-viewstem-ui] .vs-data-table-page { font-size: .875rem; color: var(--muted-foreground); }
+[data-viewstem-ui] .vs-data-table-page-size { display: flex; align-items: center; gap: .5rem; font-size: .875rem; font-weight: 500; }
+[data-viewstem-ui] .vs-data-table-page-size select { font-size: inherit; font-weight: 400; line-height: 1.25rem; background-image: var(--chevron-down-icon); }
+[data-viewstem-ui] .vs-data-table th > button { gap: .375rem; padding-inline-end: .375rem; }
+[data-viewstem-ui] .vs-data-table th > button > svg { width: .875rem; height: .875rem; flex: none; }
+[data-viewstem-ui] .vs-data-table .vs-data-table-empty { height: 6rem; text-align: center; }
+
+/* Match the unstyled trigger and close primitives used by the Svelte adapter. */
+[data-viewstem-ui] :is([data-vs-component="Popover.Trigger"], [data-vs-component="Popover.Close"], [data-vs-component="Tooltip.Trigger"]) {
+  display: inline-block; appearance: none; padding: 0; border: 0; border-radius: 0;
+  background: transparent; color: inherit; box-shadow: none; font: inherit; line-height: inherit; transition: none;
+}
+[data-viewstem-ui] [data-vs-component="Popover.Close"] { display: block; width: 100%; }
+[data-viewstem-ui] .combobox { width: 12.5rem; max-width: 100%; }
+[data-viewstem-ui] .combobox > button {
+  width: 100%;
+  justify-content: space-between;
+  padding-inline-end: .5rem;
+  font-weight: 400;
+}
+[data-viewstem-ui] .combobox > button::after { background-image: var(--chevron-down-icon); }
+[data-viewstem-ui] .combobox > [data-popover] { width: 12.5rem; max-width: calc(100vw - 16px); padding: .25rem; }
+[data-viewstem-ui] .vs-combobox-search {
+  position: relative;
+  height: 2rem;
+  margin: .25rem .25rem 0;
+  border: 1px solid color-mix(in oklab, var(--input) 30%, transparent);
+  border-radius: var(--radius-lg);
+  background-color: color-mix(in oklab, var(--input) 30%, transparent);
+}
+[data-viewstem-ui] :is(.vs-combobox-search, .command > header)::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: .5rem;
+  width: 1rem;
+  height: 1rem;
+  translate: 0 -50%;
+  background: var(--muted-foreground);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") center / contain no-repeat;
+  opacity: .5;
+  pointer-events: none;
+}
+[data-viewstem-ui] :is(.combobox .vs-combobox-search input[role="combobox"], .command > header input) {
+  width: 100%;
+  height: 100%;
+  padding-block: .25rem;
+  padding-inline: 1.875rem .625rem;
+  border: 0;
+  border-radius: inherit;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+}
+[data-viewstem-ui] :is(.combobox .vs-combobox-search, .command > header) input::placeholder { color: var(--muted-foreground); }
+[data-viewstem-ui] .command > header { position: relative; padding: 0; }
+[data-viewstem-ui] .combobox [role="listbox"] { padding: .25rem; }
+[data-viewstem-ui] .combobox [role="option"] {
+  min-height: 2rem;
+  padding: .375rem .5rem;
+  padding-inline-end: 2rem;
+  border-radius: var(--radius-sm);
+}
+[data-viewstem-ui] :is(.combobox, .select:not(select)) [role="option"][aria-selected="true"] { background-image: none; }
+[data-viewstem-ui] :is(.combobox, .select:not(select)) [role="option"][aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: .5rem;
+  width: 1rem;
+  height: 1rem;
+  translate: 0 -50%;
+  background: currentColor;
+  mask: var(--check-icon) center / contain no-repeat;
+}
+[data-viewstem-ui] .combobox [role="option"].active { background-color: var(--muted); }
+[data-viewstem-ui] [data-vs-component="Popover.Content"] { width: 18rem; max-width: calc(100vw - 16px); }
+[data-viewstem-ui] [data-vs-component="Select.Content"] { padding: 0; }
+[data-viewstem-ui] [data-vs-component="Select.Content"] [role="separator"] { margin-inline: .25rem; }
+[data-viewstem-ui] .vs-ui-tooltip-content { background: var(--foreground); color: var(--background); font-size: .75rem; line-height: 1rem; padding: .375rem .75rem; }
+[data-viewstem-ui] :is([data-vs-component="Popover.Trigger"], [data-vs-component="Popover.Close"], [data-vs-component="Tooltip.Trigger"]) { min-height: 0; height: auto; }
+@keyframes viewstem-ui-popup-enter { from { opacity: 0; transform: translate(var(--vs-popup-x, 0), var(--vs-popup-y, -8px)) scale(.95); } }
+@keyframes viewstem-ui-popup-exit {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: scale(.95); }
+}
+[data-viewstem-ui] :is(.combobox, .popover, .select) > [data-popover] {
+  scale: none;
+  translate: none;
+  transform-origin: center top;
+  transition: visibility 0s;
+}
+[data-viewstem-ui] :is(.combobox, .popover, .select) > [data-popover][data-side="top"] { --vs-popup-y: 8px; transform-origin: center bottom; }
+[data-viewstem-ui] :is(.combobox, .popover, .select) > [data-popover][data-side="left"] { --vs-popup-x: 8px; --vs-popup-y: 0px; transform-origin: right center; }
+[data-viewstem-ui] :is(.combobox, .popover, .select) > [data-popover][data-side="right"] { --vs-popup-x: -8px; --vs-popup-y: 0px; transform-origin: left center; }
+[data-viewstem-ui] :is(.combobox, .popover, .select) > [data-popover][aria-hidden="false"] { animation: viewstem-ui-popup-enter .1s ease; }
+[data-viewstem-ui] :is(.combobox, .popover, .select) > [data-popover][aria-hidden="true"] {
+  animation: viewstem-ui-popup-exit .1s ease both;
+  transition-delay: .1s;
+  pointer-events: none;
+}
+[data-viewstem-ui] .vs-date-calendar[data-picker] .vs-date-panel[data-state="open"] { animation: viewstem-ui-popup-enter .1s ease; }
+[data-viewstem-ui] .vs-date-calendar[data-picker] .vs-date-panel[data-placement^="top"] { --vs-popup-y: 8px; }
+[data-viewstem-ui] .vs-date-calendar[data-picker] .vs-date-panel[data-state="closed"]:not([hidden]) {
+  animation: viewstem-ui-popup-exit .1s ease both;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-viewstem-ui] :is(.combobox, .popover, .select) > [data-popover],
+  [data-viewstem-ui] .vs-date-calendar[data-picker] .vs-date-panel { animation: none; transition-delay: 0s; }
+}
+[data-viewstem-ui] .vs-ui-field-group:has(> [data-vs-component="Sonner"])::before { content: ""; height: 1.25rem; }
+[data-viewstem-ui] .vs-ui-toasts .toast { position: relative; overflow: visible; }
+[data-viewstem-ui] .vs-ui-toasts .toast-content { min-height: 4.625rem; padding: 1rem; border-radius: .5rem; box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+[data-viewstem-ui] .vs-ui-toasts .toast[data-category="success"] .toast-content::before {
+  content: "";
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  background-color: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+[data-viewstem-ui] .vs-ui-toasts .toast-content section :is(h2, p) { letter-spacing: normal; line-height: 1.25rem; }
+[data-viewstem-ui] .vs-ui-toasts .toast-content section p { color: inherit; overflow-wrap: anywhere; word-break: normal; }
+[data-viewstem-ui] .vs-ui-toasts [data-toast-cancel] {
+  position: absolute; top: -6px; left: -6px; width: 20px; height: 20px; padding: 0;
+  border: 1px solid var(--border); border-radius: 50%; background: var(--background); color: var(--foreground);
+  font-size: 14px; line-height: 1; box-shadow: none;
+}
+[data-viewstem-ui] .vs-ui-toasts .toast-content { overflow: visible; }
+[data-viewstem-ui] .combobox [role="listbox"]:not(:has([role="option"]:not([aria-hidden="true"]))) { padding: 0; }
+[data-viewstem-ui] .combobox [role="listbox"][data-empty]:not(:has([role="option"]:not([aria-hidden="true"])))::before {
+  padding-block: 1.5rem;
+  color: var(--popover-foreground);
+}
+[data-viewstem-ui] .vs-ui-tooltip .vs-ui-tooltip-content {
+  visibility: hidden;
+  border-radius: var(--radius-md);
+  transform-origin: var(--vs-tooltip-arrow, 50%) top;
+  transition: visibility 0s .15s;
+  animation: viewstem-ui-popup-exit .15s ease both;
+  pointer-events: none;
+}
+[data-viewstem-ui] .vs-ui-tooltip .vs-ui-tooltip-content[data-side="top"] { --vs-popup-y: 8px; transform-origin: var(--vs-tooltip-arrow, 50%) bottom; }
+[data-viewstem-ui] .vs-ui-tooltip[data-tooltip-open] .vs-ui-tooltip-content { visibility: visible; animation: none; transition-delay: 0s; }
+[data-viewstem-ui] .vs-ui-tooltip[data-tooltip-open][data-tooltip-delayed] .vs-ui-tooltip-content { animation: viewstem-ui-popup-enter .15s ease; }
+[data-viewstem-ui] .vs-ui-tooltip .vs-ui-tooltip-content::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: var(--vs-tooltip-arrow, 50%);
+  width: .625rem;
+  height: .625rem;
+  translate: -50%;
+  rotate: 45deg;
+  border-radius: 2px;
+  background: inherit;
+}
+[data-viewstem-ui] .vs-ui-tooltip .vs-ui-tooltip-content[data-side="top"]::after { top: auto; bottom: -4px; }
+@media (prefers-reduced-motion: reduce) {
+  [data-viewstem-ui] .vs-ui-tooltip .vs-ui-tooltip-content,
+  [data-viewstem-ui] .vs-ui-tooltip[data-tooltip-open][data-tooltip-delayed] .vs-ui-tooltip-content { animation: none; transition: none; }
+}
+[data-viewstem-ui] .vs-ui-toasts .toast { animation: viewstem-ui-toast-enter .4s ease; transition-duration: .4s; }
+@keyframes viewstem-ui-toast-enter { from { opacity: 0; transform: translateY(100%); } }
+[data-viewstem-ui] .vs-ui-toasts .toast[data-vs-toast-exit] { animation: viewstem-ui-toast-exit .4s ease both; }
+@keyframes viewstem-ui-toast-exit { to { opacity: 0; transform: translateY(40%); } }
+@media (prefers-reduced-motion: reduce) { [data-viewstem-ui] .vs-ui-toasts .toast { animation: none; transition: none; } }
+
+[data-viewstem-ui] dialog.vs-sheet { transition: opacity 200ms ease-in-out; }
+[data-viewstem-ui] dialog.vs-sheet::backdrop { transition: opacity 100ms ease-in-out; }
+[data-viewstem-ui] dialog.vs-sheet > div {
+  inset: auto;
+  translate: none;
+  scale: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: none;
+  max-height: 100dvh;
+  width: 100%;
+  padding: 0;
+  overflow: auto;
+  border-radius: 0;
+  background: var(--popover);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);
+  transition: translate 200ms ease-in-out;
+}
+[data-viewstem-ui] dialog.vs-sheet:is([data-side="left"], [data-side="right"]) > div {
+  inset-block: 0;
+  height: 100dvh;
+  width: 75%;
+}
+@media (width >= 40rem) {
+  [data-viewstem-ui] dialog.vs-sheet:is([data-side="left"], [data-side="right"]) > div { max-width: 24rem; }
+}
+[data-viewstem-ui] dialog.vs-sheet[data-side="right"] > div { right: 0; border-left: 1px solid var(--border); --vs-sheet-x: 2.5rem; }
+[data-viewstem-ui] dialog.vs-sheet[data-side="left"] > div { left: 0; border-right: 1px solid var(--border); --vs-sheet-x: -2.5rem; }
+[data-viewstem-ui] dialog.vs-sheet[data-side="top"] > div { top: 0; border-bottom: 1px solid var(--border); --vs-sheet-y: -2.5rem; }
+[data-viewstem-ui] dialog.vs-sheet[data-side="bottom"] > div { bottom: 0; border-top: 1px solid var(--border); --vs-sheet-y: 2.5rem; }
+[data-viewstem-ui] dialog.vs-sheet[data-vs-closing] > div { scale: 1; translate: var(--vs-sheet-x, 0) var(--vs-sheet-y, 0); }
+@starting-style {
+  [data-viewstem-ui] dialog.vs-sheet[open] > div { translate: var(--vs-sheet-x, 0) var(--vs-sheet-y, 0); }
+}
+[data-viewstem-ui] dialog.vs-sheet > div > header { padding: 1rem; gap: .125rem; }
+[data-viewstem-ui] dialog.vs-sheet > div > header > h2 { font-size: 1rem; line-height: 1.5rem; font-weight: 500; }
+[data-viewstem-ui] dialog.vs-sheet > div > footer {
+  margin: auto 0 0;
+  padding: 1rem;
+  border: 0;
+  background: transparent;
+}
+[data-viewstem-ui] dialog.vs-sheet > div > .vs-dialog-dismiss { inset-block-start: .75rem; inset-inline-end: .75rem; }
+@media (prefers-reduced-motion: reduce) {
+  [data-viewstem-ui] dialog.vs-sheet, [data-viewstem-ui] dialog.vs-sheet > div, [data-viewstem-ui] dialog.vs-sheet::backdrop { transition: none; }
+}
