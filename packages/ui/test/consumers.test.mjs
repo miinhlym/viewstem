@@ -9,8 +9,8 @@ import test from 'node:test';
 import { build } from 'esbuild';
 import { chromium } from 'playwright';
 import { compile } from 'svelte/compiler';
-import { examples, expandedExamples } from './comparison-fixtures.mjs';
-import { sampleBySlug } from '../../svelte-ui/test/fixtures/samples.mjs';
+import { samples as examples } from './fixtures/samples.mjs';
+import support from '../dist/support.json' with { type: 'json' };
 
 const workspace = fileURLToPath(new URL('../../../', import.meta.url));
 const testDir = fileURLToPath(new URL('.', import.meta.url));
@@ -68,6 +68,7 @@ test('packed UI renders the same View JSON in four browser hosts', async t => {
     '@zag-js/menu': '1.47.0',
     '@zag-js/navigation-menu': '1.47.0',
     '@zag-js/scroll-area': '1.47.0',
+    '@zag-js/slider': '1.47.0',
     '@zag-js/splitter': '1.47.0',
     '@zag-js/vanilla': '1.47.0',
     'd3-scale': '4.0.2',
@@ -176,11 +177,11 @@ test('packed UI renders the same View JSON in four browser hosts', async t => {
         assert.equal(await page.evaluate(() => window.fixture.view.getState('name').read()), nameBeforeDetach);
         await page.evaluate(() => window.fixture.reattach());
         if (host === 'vanilla') {
-          assert.equal(examples.length, 66);
-          assert.equal(expandedExamples.size, 23);
-          for (const slug of expandedExamples) {
-            assert.equal(examples.find(example => example.slug === slug)?.view, sampleBySlug.get(slug)?.view, slug);
-          }
+          assert.deepEqual(
+            examples.map(({ slug }) => slug).sort(),
+            [...new Set(support.map(({ family }) => family))].sort(),
+            'Every supported family must run its unchanged original ViewSpec',
+          );
           for (const { slug } of examples) {
             const roots = await page.evaluate(slug => window.fixture.showExample(slug), slug);
             function assertReady(nodes) {

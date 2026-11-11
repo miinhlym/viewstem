@@ -36,7 +36,7 @@ if (command === 'prepare') {
   if ((await readdir(project)).length) throw Error('Project directory must be empty');
   const names = await readdir(tarballs);
   const archives = [];
-  for (const name of ['core', 'svelte', 'svelte-ui']) {
+  for (const name of ['core', 'svelte', 'ui']) {
     const matches = names.filter(file => new RegExp(`^viewstem-${name}-\\d.*\\.tgz$`).test(file));
     if (matches.length !== 1) throw Error(`Expected exactly one ${name} tarball, found ${matches.length}`);
     archives.push(join(tarballs, matches[0]));
@@ -63,7 +63,7 @@ try {
 `);
   const installed = run('npm', ['install', ...archives, 'svelte@5.57.3', '--ignore-scripts', '--no-audit', '--no-fund', '--prefer-offline'], project);
   if (!installed.ok) throw Error(`Installation failed: ${installed.output}`);
-  for (const name of ['core', 'svelte', 'svelte-ui']) {
+  for (const name of ['core', 'svelte', 'ui']) {
     const manifest = JSON.parse(await readFile(join(project, 'node_modules/@viewstem', name, 'package.json'), 'utf8'));
     if (manifest.name !== `@viewstem/${name}`) throw Error(`Unexpected installed package ${manifest.name}`);
   }
@@ -79,7 +79,7 @@ try {
   const files = async dir => (await Promise.all((await readdir(dir, { withFileTypes: true })).map(entry => entry.isDirectory() ? files(join(dir, entry.name)) : [join(dir, entry.name)]))).flat();
   const sources = (await files(join(project, 'src'))).filter(path => /\.(?:[cm]?[jt]s|svelte)$/.test(path));
   const forbidden = [];
-  const exportsByPackage = Object.fromEntries(await Promise.all(['core', 'svelte', 'svelte-ui'].map(async name => {
+  const exportsByPackage = Object.fromEntries(await Promise.all(['core', 'svelte', 'ui'].map(async name => {
     const manifest = JSON.parse(await readFile(join(project, 'node_modules/@viewstem', name, 'package.json'), 'utf8'));
     return [name, manifest.exports];
   })));
@@ -101,11 +101,9 @@ try {
   try {
     bundled = await build({ absWorkingDir: project, entryPoints: ['bootstrap.ts'], bundle: true, write: false, metafile: true, platform: 'browser', format: 'esm', target: 'es2022', outdir: 'out', conditions: ['svelte', 'browser'], plugins: [plugin], logLevel: 'silent' });
     const renderer = Object.keys(bundled.metafile.inputs).some(path => /node_modules\/@viewstem\/svelte\/dist\//.test(path));
-    const calendar = Object.entries(bundled.metafile.inputs).some(([path, input]) =>
-      resolve(project, path).startsWith(join(project, 'src') + '/') &&
-      input.imports.some(item => item.original === '@viewstem/svelte-ui/shadcn/calendar'));
-    const requiredImports = scenario === 'native' ? calendar : !scenario || renderer;
-    result.build = { ok: forbidden.length === 0 && requiredImports, forbiddenImports: forbidden, rendererIncluded: renderer, calendarImported: calendar, errors: [] };
+    const ui = Object.keys(bundled.metafile.inputs).some(path => /node_modules\/@viewstem\/ui\/dist\//.test(path));
+    const requiredImports = !scenario || ui;
+    result.build = { ok: forbidden.length === 0 && requiredImports, forbiddenImports: forbidden, rendererIncluded: renderer, uiIncluded: ui, errors: [] };
   } catch (error) { result.build = { ok: false, forbiddenImports: forbidden, errors: [error.message] }; }
   if (scenario && result.build.ok) {
     const js = bundled.outputFiles.find(file => file.path.endsWith('.js'));

@@ -303,7 +303,7 @@ export function disclosure(element: HTMLElement, name: string, send: Send, signa
   element.addEventListener('keydown', event => {
     if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
     const triggers = Array.from(element.querySelectorAll<HTMLElement>(':scope > details > summary'))
-      .filter(trigger => !trigger.hasAttribute('disabled') && trigger.getAttribute('aria-disabled') !== 'true');
+      .filter(trigger => !trigger.matches('[disabled], [aria-disabled="true"], details[aria-disabled="true"] > summary'));
     const index = triggers.indexOf(event.target as HTMLElement);
     if (index < 0 || triggers.length === 0) return;
     const next = event.key === 'Home' ? 0 : event.key === 'End' ? triggers.length - 1
@@ -534,6 +534,10 @@ export function popup(element: Widget, kind: 'popover' | 'select', send: Send, s
         });
       }
       if (kind === 'select' && list) {
+        const selectedLabel = next.querySelector<HTMLElement>('[data-vs-component="Select.Value"]');
+        const placeholder = selectedLabel && readInputs(selectedLabel).placeholder;
+        if (typeof placeholder === 'string') element.dataset.placeholder = placeholder;
+        else delete element.dataset.placeholder;
         list.id ||= uniqueId();
         next.setAttribute('aria-controls', list.id);
         list.setAttribute('aria-multiselectable', String(inputs.type === 'multiple'));
@@ -624,6 +628,7 @@ export function combobox(element: Widget, send: Send, signal: AbortSignal): Beha
     sync(inputs) {
       trigger.disabled = inputs.disabled === true;
       trigger.dataset.placeholder = string(inputs.placeholder, 'Select…');
+      value.dataset.placeholder = trigger.dataset.placeholder;
       element.dataset.placeholder = trigger.dataset.placeholder;
       field.placeholder = string(inputs.searchPlaceholder, 'Search…');
       empty.textContent = string(inputs.emptyText, 'No options found.');
@@ -712,13 +717,12 @@ export function command(element: Widget, send: Send, signal: AbortSignal): Behav
 
 export function range(element: HTMLInputElement, send: Send, signal: AbortSignal): Behavior {
   const control = manage(element, 'range');
-  const read = () => ({ value: element.dataset.multiple === 'true' ? [element.valueAsNumber] : element.valueAsNumber });
+  const read = () => ({ value: element.valueAsNumber });
   element.addEventListener('input', () => send('valueChange', read()), { signal });
   element.addEventListener('change', () => send('valueCommit', read()), { signal });
   return {
     sync(inputs) {
       const value = Array.isArray(inputs.value) ? inputs.value[0] : inputs.value;
-      element.dataset.multiple = String(inputs.type === 'multiple');
       for (const key of ['min', 'max', 'step'] as const) {
         if (typeof inputs[key] === 'number') element[key] = String(inputs[key]);
         else element.removeAttribute(key);
@@ -809,9 +813,11 @@ export function group(element: HTMLElement, name: string, send: Send, signal: Ab
       props = inputs;
       if (sidebar) {
         const panel = element.querySelector<Widget & { open?: () => void; close?: () => void }>(selector);
-        if (panel && readInputs(panel).collapsible === 'none') {
+        const panelInputs = panel && readInputs(panel);
+        if (panel && panelInputs?.collapsible === 'none') {
           control?.update(null);
           panel.setAttribute('aria-hidden', 'false');
+          if (panelInputs.inert !== true) panel.removeAttribute('inert');
           return;
         }
         control?.update(panel);
@@ -1062,7 +1068,7 @@ export function chart(element: HTMLElement): Behavior {
     svg.setAttribute('height', String(height));
     if (chartKind === 'pie') {
       svg.setAttribute('viewBox', '0 0 320 160');
-      svg.setAttribute('preserveAspectRatio', 'none');
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
     } else {
       svg.removeAttribute('viewBox');
       svg.removeAttribute('preserveAspectRatio');
@@ -1147,9 +1153,18 @@ export function chart(element: HTMLElement): Behavior {
     for (const tick of y.ticks(tickCount)) {
       add(svg, 'text', { x: left - 4, y: y(tick) + 3.5, 'text-anchor': 'end', class: 'vs-chart-axis-label' }, format(tick));
     }
-    categories.forEach((category, index) => {
-      add(svg, 'text', { x: positions[index]!, y: bottom + 15, 'text-anchor': 'middle', class: 'vs-chart-axis-label' }, String(category));
+    const labels = categories.map((category, index) => add(svg, 'text', {
+      x: positions[index]!, y: bottom + 15, 'text-anchor': 'middle', class: 'vs-chart-axis-label',
+    }, String(category)) as SVGTextElement);
+    let lastLabelEnd = -Infinity;
+    const overlapping = labels.filter((label, index) => {
+      const x = positions[index]!;
+      const halfWidth = label.getComputedTextLength() / 2;
+      if (x - halfWidth < lastLabelEnd + 4) return true;
+      lastLabelEnd = x + halfWidth;
+      return false;
     });
+    for (const label of overlapping) label.remove();
     svg.append(highlights);
   }
 

@@ -116,6 +116,6 @@ The example runs at `http://127.0.0.1:4174`. The app supplies and registers the 
 
 The supported scope is the Svelte 5 client-side renderer. This verification excludes Svelte 4, passing a runtime through SSR and hydration, other browser engines, real mobile IMEs, Grid and chart UI, a default design system, and public release. See the [implementation handoff (Korean)](../../docs/handoff/svelte-implementation-2026-11-02.md) and [verification results](../../docs/handoff/svelte-verification-results.json) at the same source revision. The tarball excludes source documentation. Published tarballs link to the documentation at their source commit.
 
-## Optional UI package
+## Browser UI catalog
 
-Register shadcn-svelte components explicitly, either all at once or by family, through the separate [@viewstem/svelte-ui](../svelte-ui/README.md) package. The renderer ships without default UI components. The [UI verification record](../../docs/handoff/svelte-ui-shadcn-verification-results.json) contains the latest U44 regression evidence for registration and callback lifetimes.
+Use [@viewstem/ui](../ui/README.md) to render the default JSON catalog in a browser container. This package renders app-owned Svelte adapters.

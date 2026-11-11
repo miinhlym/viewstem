@@ -1,9 +1,8 @@
 {
   "name": "@viewstem/ui",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
-  "description": "Framework-independent browser UI prototype for Viewstem",
+  "description": "Framework-independent browser UI for Viewstem",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -21,6 +20,7 @@
   "files": [
     "dist",
     "README.md",
+    "README.ko.md",
     "LICENSE"
   ],
   "sideEffects": [
@@ -39,6 +39,7 @@
     "@zag-js/menu": "1.47.0",
     "@zag-js/navigation-menu": "1.47.0",
     "@zag-js/scroll-area": "1.47.0",
+    "@zag-js/slider": "1.47.0",
     "@zag-js/splitter": "1.47.0",
     "@zag-js/vanilla": "1.47.0",
     "d3-scale": "4.0.2",

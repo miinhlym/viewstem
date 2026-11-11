@@ -11,7 +11,7 @@ export const components = new Map<string, Markup>(Object.entries({
 
 export const attributes = new Set([
   'id', 'class', 'style', 'title', 'role', 'dir', 'lang', 'tabindex', 'hidden', 'inert',
-  'name', 'for', 'label', 'alt', 'src', 'href', 'target', 'rel', 'placeholder', 'rows', 'cols',
+  'name', 'for', 'label', 'alt', 'src', 'href', 'target', 'rel', 'placeholder', 'rows', 'cols', 'colspan', 'rowspan',
   'disabled', 'required', 'readonly', 'multiple', 'autocomplete', 'maxlength', 'minlength', 'inputmode', 'pattern',
   'data-icon', 'data-invalid', 'data-disabled', 'aria-label', 'aria-labelledby', 'aria-describedby',
   'aria-current', 'aria-hidden', 'aria-invalid', 'aria-busy', 'aria-disabled', 'aria-live',

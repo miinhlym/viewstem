@@ -15,11 +15,11 @@ user's requested scope and response language.
   change. Package versions and exports come from the installed manifest; a
   workspace version does not prove that version has been published to npm.
 - Use `@viewstem/core` for DOM-independent work, `@viewstem/svelte` for the
-  Svelte renderer, and `@viewstem/svelte-ui` for optional provided UI.
+  Svelte adapter for app-owned components, and `@viewstem/ui` for the default browser catalog.
 - If a package is missing, use the project's intended released version or a
   supplied local tarball. Do not substitute repository source imports.
 - Resolve public JSON files from the target app, not from this skill's install
-  directory: `@viewstem/svelte-ui/shadcn/support.json` and
+  directory: `@viewstem/ui/support.json` and
   `@viewstem/core/cel-support.json`. Read JSON as data; no runtime import is
   needed to inspect it. Resolve from the app's `package.json` with Node's
   `createRequire` when the current working directory differs.
@@ -28,27 +28,16 @@ user's requested scope and response language.
 
 - Use public factories such as `createRegistry`, `createRuntime`, and
   `createRenderer`; `Registry`, `Runtime`, and `View` are types, not constructors.
-- The renderer registers no default UI. Register the needed public component
-  sets explicitly and import the UI package stylesheet when using that set.
-  Registering the same set twice is an error.
-- Start from an installed README example when it already covers the exact API
-  and inputs you need; do not expand a catalog merely to repeat that example.
-  For an unknown UI input, event, or support mode, locate its component entry
-  and inspect only the needed named members of `propertiesRef`, `callbacksRef`,
-  or `unsupportedRef`. Never print entire referenced dictionaries: even one
-  component's shared DOM callbacks are large. Preserve the selected member's
-  `required`, `uncertain`, schema booleans, and codec. A partial lookup does not
-  establish support for unselected members.
-  Exclude the minified UI support catalog from broad recursive text searches.
-  `head` limits lines, not bytes; one matching JSON line can contain the whole
-  catalog. Parse it with Node's `JSON.parse` and select the needed IDs or keys.
-- `native-context` entries have no JSON component contract. Compose the native
-  parts in host Svelte through the family's public `components` namespace.
-  Read the exported type to find the actual symbol; do not derive it from an ID.
-- DOM event codecs deliver their payload directly. Other UI callbacks deliver
-  `{value: argument}`. Supported event keys and unsupported native prop names
-  are distinct: an unsupported `onStateChange` is not automatically a JSON
-  `stateChange` event. Do not invent aliases or remove unsupported prefixes.
+- For the default catalog, call `registerShadcn(registry)` once, import
+  `@viewstem/ui/styles.css`, and attach a core View to a connected DOM container.
+  Use the Svelte renderer to register and render app-owned adapters.
+- For an unknown JSON input, slot or event, find the component by `id` in the
+  installed support file and inspect the required entries in `ports`, `slots`
+  or `events`. Keep the schema and required flags when explaining a contract.
+  Parse the file and select entries by name to avoid printing the full catalog.
+- Check the declared event payload schema before writing an Action binding.
+  Native DOM events project JSON fields directly, and value callbacks use a
+  `{ value: ... }` payload. Read the supported key from `events`.
 - Pass a writable State handle explicitly through a State port when an Action
   needs to write it. Value inputs and node snapshots are read-only. Bind UI
   values back to State so changes are visible on the next projection.
@@ -62,7 +51,7 @@ user's requested scope and response language.
   error channel and the actual rendered result rather than treating resolution
   alone as success.
 - Release resources according to ownership. `renderer.mount` owns its View;
-  `attach` and `ViewstemView` borrow one. Dispose resources created by the app
+  `@viewstem/ui.attach` and `ViewstemView` borrow one. Dispose resources created by the app
   while preserving resources borrowed from its host.
 
 ## Verify the requested outcome

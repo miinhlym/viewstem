@@ -26,6 +26,22 @@
   line-height: 1.25rem;
 }
 [data-viewstem-ui] input[data-vs-component="Switch"]::before { transition: translate 150ms cubic-bezier(.4, 0, .2, 1); }
+[data-viewstem-ui] input[data-vs-component="Checkbox"]:indeterminate {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+}
+[data-viewstem-ui] input[data-vs-component="Checkbox"]:indeterminate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: .5rem;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  mask: none;
+}
 @media (prefers-reduced-motion: reduce) {
   [data-viewstem-ui] input[data-vs-component="Switch"]::before { transition: none; }
 }
@@ -129,15 +145,41 @@
   border-radius: .15rem;
   background: linear-gradient(currentColor, currentColor) 35% 0 / 1px 100% no-repeat;
 }
+[data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar[data-collapsible="none"] {
+  position: static; visibility: visible; pointer-events: auto;
+  max-inline-size: var(--sidebar-width); background: none; backdrop-filter: none;
+}
+[data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar[data-collapsible="none"] > nav {
+  width: var(--sidebar-width); max-width: none;
+}
 @media (width < 48rem) {
-  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar {
+  [data-viewstem-ui] .vs-ui-sidebar-provider:has(> .sidebar[data-collapsible="none"]) {
+    display: flex;
+  }
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar[data-collapsible="none"] {
+    display: block;
+    position: relative;
+    inset: auto;
+    z-index: auto;
+    flex: 0 0 var(--sidebar-width);
+    min-inline-size: 0;
+    background: none;
+    backdrop-filter: none;
+  }
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar[data-collapsible="none"] > nav {
+    position: relative;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+  }
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar:not([data-collapsible="none"]) {
     position: fixed;
     inset: 0;
     z-index: 40;
     visibility: visible;
     transition: background-color 100ms ease, backdrop-filter 100ms ease;
   }
-  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar[aria-hidden="false"] {
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar:not([data-collapsible="none"])[aria-hidden="false"] {
     background: rgb(0 0 0 / .1);
     backdrop-filter: blur(4px);
   }
@@ -146,10 +188,10 @@
     pointer-events: none;
     transition: background-color 100ms ease, backdrop-filter 100ms ease, visibility 0s 200ms;
   }
-  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar > nav { width: 75vw; transition-duration: 200ms; }
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar:not([data-collapsible="none"]) > nav { width: 75vw; transition-duration: 200ms; }
 }
 @media (40rem <= width < 48rem) {
-  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar > nav { max-width: 24rem; }
+  [data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar:not([data-collapsible="none"]) > nav { max-width: 24rem; }
 }
 @media (width >= 48rem) {
   [data-viewstem-ui] .vs-ui-sidebar-provider { display: flex; }
@@ -262,6 +304,24 @@
 }
 [data-viewstem-ui] .vs-combobox-empty { padding-block: 1.5rem; text-align: center; }
 [data-viewstem-ui] input[data-vs-component="Slider"] { width: 100%; height: .25rem; }
+[data-viewstem-ui] .vs-slider-group { width: 100%; padding-inline: .5rem; }
+[data-viewstem-ui] .vs-slider-group [data-part="control"] { display: flex; align-items: center; min-height: 2rem; cursor: pointer; }
+[data-viewstem-ui] .vs-slider-group [data-part="track"] { width: 100%; height: .375rem; border-radius: 999px; background: var(--muted); }
+[data-viewstem-ui] .vs-slider-group [data-part="range"] { inset-block: 0; border-radius: inherit; background: var(--primary); }
+[data-viewstem-ui] .vs-slider-group [data-part="thumb"] {
+  top: calc(50% - .5rem);
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid var(--primary);
+  border-radius: 50%;
+  background: var(--background);
+  box-shadow: 0 1px 2px rgb(0 0 0 / .12);
+}
+[data-viewstem-ui] .vs-slider-group [data-part="thumb"]:focus-visible {
+  outline: 3px solid color-mix(in oklab, var(--ring) 50%, transparent);
+  outline-offset: 1px;
+}
+[data-viewstem-ui] .vs-slider-group [data-part="control"][data-disabled] { cursor: not-allowed; opacity: .5; }
 [data-viewstem-ui] [data-vs-component="ScrollArea.Root"] { overflow: auto; }
 [data-viewstem-ui] [data-vs-component="RadioGroup.Item"]:disabled + label { opacity: .5; cursor: not-allowed; }
 
@@ -670,12 +730,4 @@
 [data-viewstem-ui] dialog.vs-sheet > div > .vs-dialog-dismiss { inset-block-start: 1rem; inset-inline-end: 1rem; }
 @media (prefers-reduced-motion: reduce) {
   [data-viewstem-ui] dialog.vs-sheet, [data-viewstem-ui] dialog.vs-sheet > div, [data-viewstem-ui] dialog.vs-sheet::backdrop { transition: none; }
-}
-
-[data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar[data-collapsible="none"] {
-  position: static; visibility: visible; pointer-events: auto;
-  max-inline-size: var(--sidebar-width); background: none; backdrop-filter: none;
-}
-[data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar[data-collapsible="none"] > nav {
-  width: var(--sidebar-width); max-width: none;
 }

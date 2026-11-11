@@ -88,6 +88,7 @@ const allowedTypographyTags = new Set<keyof HTMLElementTagNameMap>([
 ]);
 
 export function markupTag(name: string, inputs: Props): keyof HTMLElementTagNameMap | undefined {
+  if (name === 'Slider') return inputs.type === 'multiple' ? 'div' : 'input';
   if (name === 'Button' || name === 'Attachment.Action' || name === 'CodeBlock.CopyButton') return inputs.href ? 'a' : 'button';
   if (name !== 'Typography') return undefined;
   const as = inputs.as as keyof HTMLElementTagNameMap;

@@ -3,6 +3,7 @@ import { attributes, components, domEvents, support } from './shadcn.js';
 import { chart, combobox, command, disclosure, group, modal, notifications, popup, range, tabs, tooltip, uniqueId, type Behavior, type Send } from './behaviors.js';
 
 import { dateCalendar } from './date-calendar.js';
+import { multiSlider } from './slider.js';
 import { dataTable } from './data-table.js';
 import { bindComponent, emitFrom, readInputs } from './component-context.js';
 import { menus } from './menus.js';
@@ -39,6 +40,7 @@ const contracts = new Map(support.map(spec => [spec.id, spec]));
 const detailsGroup = new Set(['RadioGroup.Root', 'Pagination.Root', 'Sidebar.Provider']);
 const modalRoots = /^(?:Dialog|AlertDialog|Drawer|Sheet)\.(?:Root|NestedRoot)$/;
 const modalParts = /^(?:Dialog|AlertDialog|Drawer|Sheet)\.(Trigger|Close|Content|Title|Description|Action|Cancel|Overlay)$/;
+const labelledMenuParts = /^(?:Command\.(?:Item|LinkItem)|(?:ContextMenu|DropdownMenu|Menubar)\.Item)$/;
 
 function domEvent(event: Event, target: HTMLElement) {
   const payload: Record<string, string | boolean | number> = { type: event.type };
@@ -103,7 +105,8 @@ function behavior(name: string, element: HTMLElement, send: Send, signal: AbortS
   if (name === 'Tooltip.Root') return tooltip(element, send, signal);
   if (name === 'Combobox') return combobox(element, send, signal);
   if (name === 'Command.Root') return command(element, send, signal);
-  if (name === 'Slider') return range(element as HTMLInputElement, send, signal);
+  if (name === 'Slider') return element.localName === 'input'
+    ? range(element as HTMLInputElement, send, signal) : multiSlider(element, send, signal);
   if (detailsGroup.has(name)) return group(element, name, send, signal);
   if (name === 'Notifications') return notifications(element, send);
   if (name === 'Chart') return chart(element);
@@ -152,7 +155,9 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
   function createEntry(node: NodeSnapshot): Entry {
     const name = node.componentRef?.startsWith('shadcn.') ? node.componentRef.slice('shadcn.'.length) : '';
     const definition = components.get(name);
-    const markup = definition ?? ['div', ''] as const;
+    const markup = name === 'Slider' && node.inputs.type === 'multiple'
+      ? ['div', 'vs-slider-group', { role: 'group' }] as const
+      : definition ?? ['div', ''] as const;
     const tag = markupTag(name, node.inputs) ?? markup[0];
     const defaults = markup[2];
     const part = modalParts.exec(name)?.[1]?.toLowerCase();
@@ -326,8 +331,12 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
       : name === 'Breadcrumb.Separator' ? '›'
       : name === 'Pagination.NextButton' || name === 'Pagination.Next' ? 'Next'
       : name === 'Pagination.PrevButton' || name === 'Pagination.Previous' ? 'Previous'
+      : name === 'Pagination.Link' && inputs.page && typeof inputs.page === 'object' && 'value' in inputs.page ? String(inputs.page.value)
       : name === 'Select.Value' && typeof inputs.placeholder === 'string' ? inputs.placeholder : '';
-    const content = descendants.length ? '' : typeof inputs.text === 'string' ? inputs.text : defaultText;
+    const shortcutRef = labelledMenuParts.test(name) ? 'shadcn.' + name.split('.')[0] + '.Shortcut' : undefined;
+    const replacesLabel = descendants.length && (!shortcutRef || descendants.some(child => child.componentRef !== shortcutRef));
+    const content = replacesLabel ? ''
+      : typeof inputs.text === 'string' ? inputs.text : defaultText;
     if (label.data !== content) label.data = content;
 
     const [, className, defaults] = markup;
