@@ -14,8 +14,6 @@ Chrome에서 [공식 컴포넌트 목록](https://www.shadcn-svelte.com/docs/com
 
 Chrome에서 기본 예제의 컨트롤을 직접 조작해 확인한 상태에는 Accordion·Collapsible 펼침, Dialog·Alert Dialog·Drawer·Sheet 열기, Context Menu 오른쪽 클릭, 메뉴와 하위 그룹 표시, Combobox·Command 검색, Select·Native Select, 체크·스위치·토글, Slider·Resizable 키보드 조작, Sidebar 축소, Hover Card·Tooltip 표시가 포함된다. 각 페이지의 모든 변형에서 모든 상호작용과 애니메이션을 재현한 검증 범위는 아니다.
 
-두 Viewstem 상세 페이지에는 공식 페이지의 기본 구성을 바탕으로 한 66개 예제와 22개 변형을 추가했다. [공통 View JSON 정의](../../src/examples/component-reference-demos.mjs)는 언어별로 두 패키지가 함께 사용한다. 기존 JSON 사용 예제는 같은 페이지의 별도 실행 영역에서 사용한다. 새 예제의 실행 영역은 공식 미리보기의 가운데 배치, 기본 높이 및 계열별 너비를 참고하고, 각 패키지의 Vega·Neutral 스타일을 사용한다. 각 페이지에 전체 공식 예제로 가는 링크가 있다.
-
-최종 정적 빌드에서 Chromium으로 한·영 상세 페이지 264개와 두 렌더러의 예제 352개 실행을 확인했다. 선택한 예제의 표시 JSON과 실행 JSON이 일치했고 320px에서 페이지 가로 넘침이 없었다. 프로필 Dialog 편집·닫기, Sidebar 전환, 메시지 추가를 두 렌더러에서 실행했다. 문서 타입 검사, 생성물 검사, 내부 링크 검사도 통과했다.
+상세 페이지 예제는 공식 미리보기의 배치와 계열별 너비를 참고했다. [View JSON 정의](../../src/examples/component-reference-demos.mjs)
 
 남은 범위는 공식 사이트의 나머지 변형과 일부 기본 예제의 세부 기능이다. Data Table의 열 표시 메뉴와 행 메뉴, Code Block의 줄바꿈 및 내려받기, Message Scroller의 응답 스트리밍, Sidebar의 전체 탐색 메뉴, Slider의 범위와 다중 핸들은 새 예제에서 재현하지 않았다. 장식 아이콘·문구·데이터·사이트 테마가 달라 픽셀 일치를 보장하지 않는다.

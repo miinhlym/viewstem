@@ -4,7 +4,7 @@
 
 상세 명세·인계·이력은 한국어로 제공한다. [문서 언어 정책](../CONTRIBUTING.ko.md#문서-언어)을 따른다.
 
-기존 공개 API 이름은 [U42 네이밍 적용](handoff/public-api-naming-2026-11-02.md)을 따르며, U44의 일괄 등록 API 추가는 [Svelte UI 인계](handoff/svelte-ui-shadcn-implementation-2026-11-03.md)를 따른다. [U42 검증 기록](handoff/public-api-naming-verification-results.json)과 이전 API 이름·해시는 당시 증거로 보존한다.
+기존 공개 API 이름은 [U42 네이밍 적용](handoff/public-api-naming-2026-11-02.md)을 따른다. [U42 검증 기록](handoff/public-api-naming-verification-results.json)과 이전 API 이름·해시는 당시 증거로 보존한다.
 
 이 문서는 독자의 작업을 현재 기준 문서로 연결한다. 언어 독립 계약은 `VIEWSTEM-SPEC.md`와 `spec/`, JS/TS 사용법은 패키지 README, 실행 결과는 제품 검증 기록을 따른다. 이전 채팅이나 비공개 원문은 필수 읽기 자료가 아니다.
 
@@ -38,10 +38,6 @@ U46에서 임시 playground와 shadcn 갤러리를 제거했다. 사용자는 �
 
 후속 클라이언트 렌더러는 [U39–U40 Svelte 인계](handoff/svelte-implementation-2026-11-02.md)를 따른다. `@viewstem/svelte`만 import해 시작하며 core는 내부 의존성이다. 기본 UI는 자동 등록하지 않는다. 브라우저 기본 UI는 `@viewstem/ui`에서 명시적으로 등록한다.
 
-U44에서 변경한 Registry·Svelte 일괄 등록 및 폐기 후 emit 계약의 재검증, 당시 core·Svelte·playground 회귀 결과와 해시는 [U44 실행 기록](handoff/svelte-ui-shadcn-verification-results.json)에 있다. 이전 단계의 검증 파일을 덮어쓰지 않는다.
-
-분리 커밋 이후 Svelte UI 전체의 검토와 수명·사용자 함수·갤러리 복원 수정은 [branch preflight 인계](handoff/svelte-ui-preflight-2026-11-03.md), 해당 수정 후 실제 패키지 검사는 [preflight 실행 결과](handoff/svelte-ui-preflight-verification-results.json)를 따른다.
-
 ## 현재 명세
 
 각 행은 해당 질문의 기준 문서다. 예제는 계약 이해를 돕고, 실행 결과를 대신하지 않는다. 실제 JS/TS 시그니처는 [공개 타입](../packages/core/src/index.d.ts)과 [HTTP 타입](../packages/core/src/http.d.ts), [CEL 타입](../packages/core/src/cel.d.ts)을 따른다.
@@ -73,8 +69,6 @@ U44에서 변경한 Registry·Svelte 일괄 등록 및 폐기 후 emit 계약의
 | 실제 실행 환경·결과·해시 | [제품 검증 결과](handoff/core-verification-results.json) | 실행 보고서와 검증 증거로 갱신; `test:report`가 이 요약 JSON까지 자동 갱신하지는 않음 |
 | Svelte 렌더러·공개 타입·tarball 소비자 | [Svelte 검증 결과](handoff/svelte-verification-results.json), [구현 범위](handoff/svelte-implementation-2026-11-02.md) | `check:svelte`와 실제 예제 확인 후 갱신; core 인수 수와 별도 추적 |
 | 브라우저 UI 카탈로그와 동작 | [지원 범위](../packages/ui/README.ko.md) | `npm run check:ui` |
-| shadcn 66개별 입력·이벤트·State·중첩·키보드 | [동작 검증표](handoff/svelte-ui-audit-matrix.md), [감사 인계](handoff/svelte-ui-audit-2026-11-03.md), [실행 결과](handoff/svelte-ui-audit-verification-results.json) | 공개 패키지 브라우저 검사와 미실행 사례 검사; 기존 U44 mount/참조 수와 구분 |
-| Svelte UI 전체 branch preflight와 후속 수정 | [검토·수정 인계](handoff/svelte-ui-preflight-2026-11-03.md), [실행 결과](handoff/svelte-ui-preflight-verification-results.json) | 비교 기준·기존 증거 재사용·수정 후 회귀·미커밋 인계 상태 구분 |
 | 구현 전 독립 실험의 이력 | [검증 진행표](handoff/verification-ledger.md), [원래 인수 목록](../experiments/verification/coverage.json) | 원래 실험·실패 증거 보존; 제품 통과 증거와 구분 |
 
 ## 배경과 이력

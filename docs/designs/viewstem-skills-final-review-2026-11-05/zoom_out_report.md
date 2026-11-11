@@ -27,7 +27,6 @@ Reviewer: `/root/final_stage5_zoom_out`; actual FINAL_ANSWER received; fresh con
 - Persona 먼저, standard 다음 전문 확인: EGM `agents/zoom_out.md`, `resources/document_standards/zoom-out-standard.md`.
 - 대상 1–267행 전체 및 SHA-256 `93d6a46b61ed990fb2385b3e6565950d90033bdeeb72015406f2f8a1820b6967` 확인.
 - 지침·기준선: `AGENTS.md`, `goldfish_context.md`, `docs/README.md`, `docs/VIEWSTEM-SPEC.md` 목적/계층/§8.5, `docs/history/decision-register.md` D119–121, `concepts_brief.md` 1–150행, `docs/designs/viewstem-skills-inspection-2026-11-05.json`.
-- 코드: `package.json`, `packages/svelte-ui/scripts/generate-components.mjs`, `packages/svelte-ui/scripts/test-package.mjs` 1–200행, `apps/docs/scripts/generate-ui-reference.mjs` 1–90 및 620–690행.
 - 공식 snapshot: specification, best-practices, evaluating, OpenAI build-skills, Claude skills의 개요/설치/클라우드/공통 frontmatter 절.
 - OSS snapshot: Supabase Postgres, Vercel React; Expo eval은 평가/기준선/비용 검색 부분.
 - 검색: `rg --files`, `rg -n 'support\.json|propertiesRef|callbacksRef|unsupportedRef|createRequire|inspect-ui'`로 packages/apps 및 skills 존재 확인. 없는 루트 scripts/skills 대신 실제 디렉터리에서 재검색. 의존성·배포 산출물·vendor 제외.

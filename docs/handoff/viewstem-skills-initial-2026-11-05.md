@@ -33,8 +33,6 @@
 
 실제 환경은 macOS, Node `v22.21.1`, npm `11.14.1`, `codex-cli 0.160.0`, `gpt-6.1-terra/high`다. 각 모델 실행은 새 ephemeral 세션, 최대 360초·명령 호출 50회, workspace-write, approval never였다. 같은 시나리오의 A/B/B2에는 같은 prompt·초기 앱·공개 패키지를 제공했다. 기대 구현과 다른 실행 결과를 모델에 전달하지 않았다.
 
-`npm run build:svelte-ui`를 완료한 뒤 `npm pack --ignore-scripts --json`으로 만든 `@viewstem/core`, `@viewstem/svelte`, `@viewstem/svelte-ui` 각 `0.1.0` tarball과 Svelte `5.57.3`을 외부 앱에 설치했다. 이것은 개발 산출물의 소비 검사이며 npm 공개 버전 검증이 아니다. tarball별 integrity·SHA-256은 [결과 JSON](../../skills/tests/behavior-results.json)에 고정했다.
-
 검사기는 저장소의 esbuild·Playwright·svelte-check를 사용하지만 Svelte compiler는 **소비 앱의 설치본**에서 해석한다. UI 타입 검사는 strict/Bundler/ES2022/DOM과 현재 선언 제한에 따른 skipLibCheck를 사용했다. 에이전트에는 `npm run check/build`만 제공하고 검사기 내부나 원 저장소를 읽지 않도록 했다. 실제 명령 trace에서 원 저장소 자료를 읽은 명령은 관찰하지 않았다. CWD·sandbox만으로 전체 파일 읽기를 격리했다는 주장은 하지 않는다.
 
 세 과제는 첫 View와 Start 버튼, 입력→State→Action→저장 결과, JSON 계약이 없는 Calendar 부품의 native 조합이다. 타입·빌드·브라우저 표시·서비스 호출·정리를 외부 판정자가 검사했다. 생성 코드의 공개 import, State/Action 의미, native 경계를 별도로 검토했다. `npm run check/build`만 실행한 모델의 자체 보고와 실제 Chromium 판정 결과를 구분했다.
@@ -82,7 +80,6 @@ B는 부품 하나의 참조 사전도 통째로 출력해 불필요한 양이 �
 
 ## 검증·재현 자료
 
-- `npm run build:svelte-ui`: 통과. 제품 빌드 뒤 고정 tarball 사용.
 - `consumer.mjs`: 실제 외부 앱의 정상 3과제 통과, TODO·타입 오류·폼 입력 누락 3개 실패 사례를 각각 거부. 결과는 JSON의 `harnessSelfCheck`에 보존.
 - Codex 9개 산출물: 타입·빌드·Chromium 동작·정리 통과. TS-only 앱의 Svelte 입력 파일 없음 경고는 오류와 구분해 기록.
 - `skill-creator/scripts/quick_validate.py`: 최종 후보 통과. 설치된 구형 validator가 optional `compatibility`를 거부해 Node 요구사항을 본문으로 이동했다. PyYAML은 임시 venv에만 설치했다.

@@ -29,4 +29,4 @@ Chromium에서 132개 페이지 전부 실제 마운트·예제 원본/표시 JS
 
 전체 페이지 검사는 모든 공개 옵션 조합을 실행했다는 뜻이 아니다. Firefox/WebKit은 실행하지 않았다. 공개 locale 입력이 없는 DataTable 등의 패키지 내부 기본 문구 일부는 영문으로 남는다. 빌드의 기존 markdown deprecation·chunk size·sitemap site 미설정 경고는 남아 있다. 커밋·외부 배포는 하지 않았다.
 
-전체 workspace 타입 검사 `npm run typecheck --workspaces --if-present`도 최종 통과했다. Core, Svelte와 consumer example, Svelte UI, Docs를 포함한다. [실행 로그](component-previews-typecheck.log).
+전체 workspace 타입 검사 `npm run typecheck --workspaces --if-present`도 최종 통과했다. Core, Svelte와 consumer example, Docs를 포함한다. [실행 로그](component-previews-typecheck.log).

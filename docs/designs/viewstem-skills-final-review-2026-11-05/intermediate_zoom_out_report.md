@@ -38,7 +38,6 @@ Reviewer `/root/final_stage8_zoom_out`, actual FINAL_ANSWER received.
 
 ## 재사용 확인
 
-`apps/docs/scripts/generate-ui-reference.mjs:636`은 세 참조 사전을 해석하지만 저장소 소스, Svelte compiler, TypeScript, 문서 출력에 결합돼 있다. 이를 소비자 도구로 직접 가져오거나 공용 parser 패키지로 먼저 추출하는 것은 현재 필요보다 크다. 도구 도입 조건이 충족되면 해당 해석 규칙을 참고해 설치된 공개 JSON만 읽는 경계를 유지하는 편이 단순하다. `packages/svelte-ui/scripts/test-package.mjs:27`의 외부 설치·산출물 식별 방식도 활용할 수 있고, 대상 202행이 이미 이를 반영한다. 검색 범위에서 완성된 소비자용 선택 조회 helper는 확인하지 못했다.
 
 ## 실제 읽기
 

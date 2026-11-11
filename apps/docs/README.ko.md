@@ -174,6 +174,5 @@ DEMO_INTERACTIONS_ONLY=1 node apps/docs/scripts/verify-component-demos.mjs
 렌더링·상호작용 증거를 수집하는 명령이며 시각 검토를 대체하지 않는다.
 `--family=<slug>`로 특정 계열만 검사할 수도 있다. 표본 검사와 전체 목록 감사를
 구분한다. 임시 스크린샷·DOM 캡처는 소스 트리 밖에 둔다. 과거 발견 사항과 한계는
-[미리보기 리뷰 인수인계](../../docs/handoff/svelte-ui-preview-review-2026-11-06.md)와
 날짜가 있는 [리뷰 기록](review)을 참고한다. 실제 실행한 명령·범위·실패·미검증 영역을
 보고하며 과거 결과를 새 통과 기록으로 바꾸지 않는다.

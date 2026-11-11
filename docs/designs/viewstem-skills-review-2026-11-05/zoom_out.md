@@ -36,10 +36,7 @@
 
 읽기 기록은 다음과 같습니다. 저장소 경로는 `/Users/minholim/dev/minh/viewstem` 기준입니다.
 
-- **전문:** `AGENTS.md`, `concepts_brief.md` 전체 138행, `docs/README.md`, `docs/VIEWSTEM-SPEC.md`, `docs/handoff/docs-package-reference-2026-11-05.md`, `docs/handoff/open-contracts.md`, `packages/core/README.md`, `packages/svelte/README.md`, `packages/svelte-ui/README.md`, `packages/core/src/cel/supported-functions.json`, `apps/docs/scripts/verify-dsl-docs.mjs`.
 - **전문:** `/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/agents/zoom_out.md`, `/Users/minholim/.codex/skills/.system/skill-creator/SKILL.md`, `/Users/minholim/.agents/skills/svelte-code-writer/SKILL.md`.
-- **부분:** `apps/docs/scripts/generate-ui-reference.mjs` 1–210행 및 610–695행. `packages/svelte-ui/src/lib/shadcn/support.json`은 전체 파싱 후 구조·개수·선택 항목 메타데이터·참조 크기를 확인했으며 전체 스키마 본문을 읽지는 않았습니다.
-- **검색 결과만:** `packages/svelte-ui/scripts/audit-matrix.mjs`, `generate-components.mjs`, `test-package.mjs`; `packages/core/scripts/build.mjs`, `test-package.mjs`의 지원 메타데이터 관련 일치 구문.
 - **별도 심사 표준:** 제공되지 않았습니다. 지정 persona의 BRAINSTORM 기준을 적용했습니다.
 
 실제 에이전트 행동 평가·소비자 설치·제품 빌드는 실행하지 않았습니다. 기존 검증 기록을 재실행 증거로 취급하지 않았으며, 파일 변경·worktree 생성·대화 원문·다른 검토 보고서 조회는 하지 않았습니다.

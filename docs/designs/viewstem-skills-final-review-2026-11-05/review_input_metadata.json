@@ -37,12 +37,6 @@
       "inside": true
     },
     {
-      "link": "packages/svelte-ui/README.md",
-      "path": "/Users/minholim/dev/minh/viewstem/packages/svelte-ui/README.md",
-      "exists": true,
-      "inside": true
-    },
-    {
       "link": "docs/README.md",
       "path": "/Users/minholim/dev/minh/viewstem/docs/README.md",
       "exists": true,
@@ -51,12 +45,6 @@
     {
       "link": "packages/core/src/index.d.ts",
       "path": "/Users/minholim/dev/minh/viewstem/packages/core/src/index.d.ts",
-      "exists": true,
-      "inside": true
-    },
-    {
-      "link": "packages/svelte-ui/src/lib/shadcn/support.json",
-      "path": "/Users/minholim/dev/minh/viewstem/packages/svelte-ui/src/lib/shadcn/support.json",
       "exists": true,
       "inside": true
     },

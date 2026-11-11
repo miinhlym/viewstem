@@ -2,9 +2,7 @@
   "mode": "optimization",
   "decision": "PASS",
   "canonicalOwner": [
-    ".github/workflows/core.yml",
-    "packages/svelte-ui/scripts/browser-plan.json",
-    "packages/svelte-ui/scripts/test-reports.mjs"
+    ".github/workflows/core.yml"
   ],
   "recordedAtUtc": "2026-11-03T10:22:00Z",
   "summary": {
@@ -112,11 +110,6 @@
       "name": "report-integrity",
       "decision": "PASS",
       "coverage": "Missing/duplicate/stale/mixed-source/failed/cancelled/skipped/todo reports and unassigned browser files are rejected, including external catalog acceptance input changes."
-    },
-    {
-      "name": "product-contract",
-      "decision": "PASS",
-      "evidence": "No changes under packages/core/src, packages/svelte/src or packages/svelte-ui/src; dependencies and public API unchanged."
     }
   ],
   "runs": [

@@ -68,11 +68,28 @@ async function verify(locale) {
     await initial.waitFor();
     await page.getByRole('alert').waitFor({ state: 'hidden' });
 
-    await page.goto(`${origin}${prefix}/docs/svelte-ui/components/button/`);
-    await page.waitForURL(`${origin}${prefix}/docs/ui/components/button/`);
-    await page.locator('[data-demo-target] [data-viewstem-ui]').first().waitFor();
+    const componentPreview = async slug => {
+      const response = await page.goto(`${origin}${prefix}/docs/ui/components/${slug}/`);
+      assert.equal(response?.status(), 200);
+      const preview = page.locator('[data-demo-target] [data-viewstem-ui]').first();
+      await preview.waitFor();
+      return preview;
+    };
+
+    const breadcrumb = await componentPreview('breadcrumb');
+    const components = breadcrumb.getByRole('link', { name: t('Components', '컴포넌트'), exact: true });
+    assert.equal(await components.getAttribute('href'), `${prefix}/docs/ui/components/`);
+    await components.click();
+    await page.waitForURL(`${origin}${prefix}/docs/ui/components/`);
+
+    const navigation = await componentPreview('navigation-menu');
+    await navigation.getByRole('button', { name: t('Components', '컴포넌트'), exact: true }).click();
+    const alertDialog = page.locator('[data-viewstem-ui]').getByRole('link', { name: 'Alert Dialog', exact: true });
+    assert.equal(await alertDialog.getAttribute('href'), `${prefix}/docs/ui/components/alert-dialog/`);
+    await alertDialog.click();
+    await page.waitForURL(`${origin}${prefix}/docs/ui/components/alert-dialog/`);
     assert.deepEqual(errors, []);
-    return { locale, lessonPages: lessons.length, events: ['input', 'checkedChange', 'click', 'RefreshQuery'], playground: 'run, invalid definition, retained preview and rerun', redirect: true };
+    return { locale, lessonPages: lessons.length, events: ['input', 'checkedChange', 'click', 'RefreshQuery'], playground: 'run, invalid definition, retained preview and rerun', componentLinks: ['breadcrumb', 'navigation-menu'] };
   } finally { await context.close(); }
 }
 

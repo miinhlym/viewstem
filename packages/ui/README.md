@@ -37,13 +37,13 @@ runtime.dispose();
 
 The renderer registers 66 families and 357 JSON Component IDs. Use the generated `@viewstem/ui/support.json` export for the implemented port schemas, slots, and event payloads. The build derives this reference from the package’s `catalog/shadcn-contracts.json` and the supported inputs, slots, and events of the DOM adapters.
 
-Dropdown Menu, Context Menu, and Menubar share a Zag Vanilla menu adapter, including nested menus. Hover Card, Navigation Menu, Resizable, and Scroll Area also use Zag Vanilla. Carousel uses Embla 8.6.0, the same engine version used by the Svelte UI. Select scroll buttons extend the existing Select controller. The remaining components use browser DOM controls and CSS.
+Dropdown Menu, Context Menu, and Menubar share a Zag Vanilla menu adapter, including nested menus. Hover Card, Navigation Menu, Resizable, and Scroll Area also use Zag Vanilla. Carousel uses Embla 8.6.0. Select scroll buttons extend the existing Select controller. The remaining components use browser DOM controls and CSS.
 
 The DOM adapters support documented JSON input and event subsets. Portal slots are rendered in the owning subtree, so custom portal destinations are outside the catalog. The modal families use the browser dialog top layer. The Chart recipe uses an SVG rendering of the data. Sonner comparisons use the JSON `Notifications` component. Rendering takes place in a connected client-side DOM container.
 
 Slider uses a native range input for `type: "single"` and Zag Vanilla for `type: "multiple"`. In multiple mode, each number in `value` creates a thumb. The thumbs stay in ascending order, and `thumbLabels` can give them distinct accessible names. `valueChange` carries the current values during interaction, and `valueCommit` carries the final values when the drag ends or a keyboard adjustment takes effect. The payload is `{ value: number[] }` in multiple mode and `{ value: number }` in single mode.
 
-Calendar, Range Calendar, and Date Picker use Zag Vanilla for date navigation and selection. They retain the date-only JSON strings, range objects, and event names from the Svelte UI. Calendar and Range Calendar render complete grids through their Root IDs.
+Calendar, Range Calendar, and Date Picker use Zag Vanilla for date navigation and selection. Their JSON contracts use date-only strings and range objects. Calendar and Range Calendar render complete grids through their Root IDs.
 
 Data Table uses TanStack Table Core. The JSON recipe keeps caller-owned sorting, filtering, pagination, and selection state. A page outside the available range is clamped for display, and selected IDs outside the current data remain in the selection state.
 

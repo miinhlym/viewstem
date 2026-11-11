@@ -13,6 +13,5 @@
 - `npm run typecheck:docs`: Astro 97파일 오류·경고·hint 0, TypeScript 통과.
 - `npm exec -w @viewstem/docs astro build`: 정적 빌드 성공.
 - [브라우저 회귀 결과](sidebar-scroll.json): 한영 × light/dark × 1024/1440px = 8조합. 메뉴를 직접 클릭해 이동하고 React 모듈 응답을 지연한 상태부터 매 animation frame의 스크롤을 기록했다. 모든 표시 프레임에서 저장 위치가 유지되었으며 hydration 전후 변화가 없었다. 추가로 새로고침·뒤로가기·다른 메뉴 그룹 이동 시 펼침 상태, 저장소 차단, 모바일 Sheet와 데스크톱 저장값 보존을 확인했다. console/page 오류 없음.
-- [4321 개발 서버](sidebar-scroll-dev.json): 실제 Tooltip → Toggle 이동 전후 scrollTop 1838 → 1838, 브라우저 오류 없음. 검사·빌드 후 서버를 재시작했다.
 
 회귀 스크립트: `apps/docs/scripts/verify-sidebar-scroll.mjs`. 검증 브라우저는 Chromium이다. 라이브러리 API나 미리보기 컴포넌트는 변경하지 않았다.

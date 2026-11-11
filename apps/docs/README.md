@@ -180,7 +180,6 @@ DEMO_INTERACTIONS_ONLY=1 node apps/docs/scripts/verify-component-demos.mjs
 These capture render and interaction evidence; they do not replace visual review.
 The runner also supports `--family=<slug>` for a focused check. Distinguish that
 sample from a full catalog audit. Keep temporary screenshots/DOM captures outside
-the source tree. For historical findings and limitations, see the
-[preview review handoff](../../docs/handoff/svelte-ui-preview-review-2026-11-06.md)
-(Korean) and dated [review records](review). Report actual commands, coverage,
+the source tree. For historical findings and limitations, see the dated
+[review records](review). Report actual commands, coverage,
 failures and unexecuted areas; do not rewrite old results as a new pass.

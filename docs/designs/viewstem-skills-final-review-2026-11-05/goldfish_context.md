@@ -11,10 +11,8 @@ The following linked local files were discovered automatically. Historical revie
 - /Users/minholim/dev/minh/viewstem/docs/designs/viewstem-skills-inspection-2026-11-05.json
 - /Users/minholim/dev/minh/viewstem/packages/core/src/index.d.ts
 - /Users/minholim/dev/minh/viewstem/packages/svelte/README.md
-- /Users/minholim/dev/minh/viewstem/packages/svelte-ui/README.md
 - /Users/minholim/dev/minh/viewstem/docs/README.md
 - /Users/minholim/dev/minh/viewstem/packages/core/src/index.d.ts
-- /Users/minholim/dev/minh/viewstem/packages/svelte-ui/src/lib/shadcn/support.json
 - /Users/minholim/dev/minh/viewstem/packages/core/src/cel/supported-functions.json
 - /Users/minholim/dev/minh/viewstem/docs/designs/viewstem-skills-review-2026-11-05/goldfish_review_report.md
 - /Users/minholim/dev/minh/viewstem/docs/designs/viewstem-skills-review-2026-11-05/review_input_snapshot.md
@@ -41,7 +39,6 @@ The user requested official best practices and representative active OSS skills.
 Optional current implementation context:
 - /Users/minholim/dev/minh/viewstem/docs/handoff/docs-package-reference-2026-11-05.md
 - /Users/minholim/dev/minh/viewstem/packages/core/README.md
-- /Users/minholim/dev/minh/viewstem/packages/svelte-ui/package.json
 - /Users/minholim/dev/minh/viewstem/package.json
 
 Report exactly which files and supplied standards you read. Large support JSON may be examined with focused read-only queries. Reviews must cite concrete target sections/lines and distinguish implementation entry blockers, release gates, and optional improvements. No product implementation or edits.

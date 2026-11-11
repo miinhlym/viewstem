@@ -24,16 +24,6 @@
       "bytes": 12482
     },
     {
-      "path": "packages/svelte-ui/README.md",
-      "sha256": "e8f4948a9e9f9940edb6081dd2082fedb1761b45012b08ef47ef28f696fbf0e2",
-      "bytes": 11123
-    },
-    {
-      "path": "packages/svelte-ui/src/lib/shadcn/support.json",
-      "sha256": "37cb7a89ab0686036bdaacc8b68e35e256f90dde00fedd7e0646de2e610d983a",
-      "bytes": 2287077
-    },
-    {
       "path": "packages/core/src/cel/supported-functions.json",
       "sha256": "44a3bf64ce1ec773a67026db104de2f9529ddd1588ebbdd1f985ae8e21bdbc7d",
       "bytes": 4132
@@ -44,59 +34,10 @@
       "bytes": 69666
     }
   ],
-  "ui": {
-    "formatVersion": 1,
-    "entries": 392,
-    "modes": {
-      "json": 357,
-      "native-context": 35
-    },
-    "samples": [
-      {
-        "id": "shadcn.Button",
-        "mode": "json",
-        "resolvedJsonUtf8Bytes": 45223,
-        "inputCount": 123,
-        "callbackCount": 40,
-        "requiredInputs": [],
-        "uncertainInputCount": 2
-      },
-      {
-        "id": "shadcn.Input",
-        "mode": "json",
-        "resolvedJsonUtf8Bytes": 46558,
-        "inputCount": 137,
-        "callbackCount": 40,
-        "requiredInputs": [],
-        "uncertainInputCount": 5
-      },
-      {
-        "id": "shadcn.Select.Root",
-        "mode": "json",
-        "resolvedJsonUtf8Bytes": 1568,
-        "inputCount": 15,
-        "callbackCount": 3,
-        "requiredInputs": [
-          "type"
-        ],
-        "uncertainInputCount": 0
-      },
-      {
-        "id": "shadcn.Calendar.Day",
-        "mode": "native-context",
-        "resolvedJsonUtf8Bytes": 42725,
-        "inputCount": 99,
-        "callbackCount": 40,
-        "requiredInputs": [],
-        "uncertainInputCount": 1
-      }
-    ]
-  },
   "resolutionProbe": {
     "base": "apps/docs/package.json",
     "method": "Node createRequire(...).resolve(specifier), no imports",
     "results": {
-      "@viewstem/svelte-ui/shadcn/support.json": "packages/svelte-ui/dist/shadcn/support.json",
       "@viewstem/core/cel-support.json": "packages/core/dist/cel-support.json",
       "@viewstem/core/package.json": "ERR_PACKAGE_PATH_NOT_EXPORTED"
     }

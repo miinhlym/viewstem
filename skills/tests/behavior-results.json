@@ -30,14 +30,6 @@
       "integrity": "sha512-H64zW1sU7FkGCarD/mNVt9nm6buY8Xzdl44e7fPgr7s7TAXRIfZbxGBzzrPDlmPyZyUO6qxXZ4SPKYP3tCFThQ==",
       "sha256": "6c6c4f659e7c1d63c5cdecf170f2c3a3b01bedb28d5fac6b9600c536d36f401b",
       "size": 17897
-    },
-    {
-      "name": "@viewstem/svelte-ui",
-      "version": "0.1.0",
-      "filename": "viewstem-svelte-ui-0.1.0.tgz",
-      "integrity": "sha512-Krx8OmpCEpdAVL72fvJE7WgyRvANDtN1vVmWhKOKokePw4PQoj1cxYS/OegSmPeua1oK7Unq4sWiz1Qwuxlr5w==",
-      "sha256": "93339445d8a7a3b9096808e3009b1359089f16c630559b7538e4b1eed0cb460f",
-      "size": 293680
     }
   ],
   "arms": {
@@ -152,13 +144,7 @@
       "protectedFileChanges": [],
       "commandOutputBytes": 50607,
       "failedCommands": 0,
-      "sourceFiles": [
-        {
-          "path": "src/app.ts",
-          "content": "import { createRenderer } from '@viewstem/svelte';\nimport { registerComponents } from '@viewstem/svelte-ui';\nimport { button } from '@viewstem/svelte-ui/shadcn/button';\nimport '@viewstem/svelte-ui/shadcn/styles.css';\n\nexport async function mountApp(\n  target: HTMLElement,\n  services: { save?: (name: string) => Promise<void> } = {},\n): Promise<{ dispose: () => void | Promise<void> }> {\n  const renderer = createRenderer();\n  try {\n    registerComponents(renderer, [button]);\n    const mounted = await renderer.mount({\n      target,\n      view: {\n        render: {\n          id: 'start',\n          componentRef: 'shadcn.Button',\n          inputs: { text: 'Start' },\n        },\n      },\n    });\n    await mounted.initialComplete;\n\n    let disposal: Promise<void> | undefined;\n    return {\n      dispose: () => (disposal ??= (async () => {\n        try {\n          await mounted.dispose();\n        } finally {\n          await renderer.dispose();\n        }\n      })()),\n    };\n  } catch (error) {\n    await renderer.dispose();\n    throw error;\n  }\n}\n",
-          "sha256": "a1bd70b574e8076fa4f61f037a456309121a5b48b9e99e4e71ac4bc47baf122a"
-        }
-      ],
+      "sourceFiles": [],
       "sourceCheckoutReadObserved": false,
       "packageLockUnchanged": true,
       "otherSkillReads": [],
@@ -259,13 +245,7 @@
       "protectedFileChanges": [],
       "commandOutputBytes": 150418,
       "failedCommands": 1,
-      "sourceFiles": [
-        {
-          "path": "src/app.ts",
-          "content": "import { createRenderer } from '@viewstem/svelte';\nimport { registerComponents } from '@viewstem/svelte-ui';\nimport { button } from '@viewstem/svelte-ui/shadcn/button';\nimport '@viewstem/svelte-ui/shadcn/styles.css';\n\nexport async function mountApp(target: HTMLElement, services: {save?: (name:string)=>Promise<void>} = {}): Promise<{dispose:()=>void|Promise<void>}> {\n  const renderer = createRenderer();\n  try {\n    registerComponents(renderer, [button]);\n    const mounted = await renderer.mount({\n      target,\n      view: {\n        render: {\n          id: 'start',\n          componentRef: 'shadcn.Button',\n          inputs: { text: 'Start', type: 'button' },\n        },\n      },\n    });\n    const report = await mounted.initialComplete;\n    if (report.queryErrors.length) throw report.queryErrors[0].error;\n    return {\n      dispose: async () => {\n        try {\n          await mounted.dispose();\n        } finally {\n          await renderer.dispose();\n        }\n      },\n    };\n  } catch (error) {\n    await renderer.dispose();\n    throw error;\n  }\n}\n",
-          "sha256": "0ae320e8f3c72ed237f052130b769e01a7d207040e46f02724e90137cbceabf7"
-        }
-      ],
+      "sourceFiles": [],
       "sourceCheckoutReadObserved": false,
       "packageLockUnchanged": true,
       "otherSkillReads": [],
@@ -366,13 +346,7 @@
       "protectedFileChanges": [],
       "commandOutputBytes": 55952,
       "failedCommands": 2,
-      "sourceFiles": [
-        {
-          "path": "src/app.ts",
-          "content": "import { createRenderer } from '@viewstem/svelte';\nimport { registerComponents } from '@viewstem/svelte-ui';\nimport { button } from '@viewstem/svelte-ui/shadcn/button';\nimport '@viewstem/svelte-ui/shadcn/styles.css';\n\nexport async function mountApp(\n  target: HTMLElement,\n  services: { save?: (name: string) => Promise<void> } = {},\n): Promise<{ dispose: () => void | Promise<void> }> {\n  const renderer = createRenderer();\n\n  try {\n    registerComponents(renderer, [button]);\n    const mounted = await renderer.mount({\n      target,\n      view: {\n        render: { id: 'start', componentRef: 'shadcn.Button', inputs: { text: 'Start' } },\n      },\n    });\n    await mounted.initialComplete;\n    return { dispose: () => renderer.dispose() };\n  } catch (error) {\n    await renderer.dispose();\n    throw error;\n  }\n}\n",
-          "sha256": "ad165b484c6f08827ffebb277ae61079169473ad556c750b7dc9a3d0c432dc7e"
-        }
-      ],
+      "sourceFiles": [],
       "sourceCheckoutReadObserved": false,
       "packageLockUnchanged": true,
       "otherSkillReads": [],
@@ -461,13 +435,7 @@
       "protectedFileChanges": [],
       "commandOutputBytes": 1126766,
       "failedCommands": 2,
-      "sourceFiles": [
-        {
-          "path": "src/app.ts",
-          "content": "import { createRenderer } from '@viewstem/svelte';\nimport { registerComponents } from '@viewstem/svelte-ui';\nimport { input } from '@viewstem/svelte-ui/shadcn/input';\nimport { button } from '@viewstem/svelte-ui/shadcn/button';\nimport { typography } from '@viewstem/svelte-ui/shadcn/typography';\n\nexport async function mountApp(target: HTMLElement, services: {save?: (name:string)=>Promise<void>} = {}): Promise<{dispose:()=>void|Promise<void>}> {\n  const renderer = createRenderer();\n  try {\n    registerComponents(renderer, [input, button, typography]);\n    renderer.registry.registerAction({\n      kind: 'Action', id: 'saveName', spec: { ports: {\n        name: { kind: 'Value', schema: { type: 'string' }, required: true },\n        result: { kind: 'State', schema: { type: 'string' }, required: true },\n        saved: { kind: 'State', schema: { type: 'boolean' }, required: true },\n      } },\n    }, async ({ inputs, signal }) => {\n      await services.save?.(inputs.name);\n      if (!signal.aborted) {\n        inputs.result.write(`Saved: ${inputs.name}`);\n        inputs.saved.write(true);\n      }\n    });\n    const mounted = await renderer.mount({ target, view: {\n      states: {\n        name: { kind: 'State', schema: { type: 'string' }, initial: '' },\n        result: { kind: 'State', schema: { type: 'string' }, initial: '' },\n        saved: { kind: 'State', schema: { type: 'boolean' }, initial: false },\n      },\n      render: { id: 'form', componentRef: 'shadcn.Typography', inputs: { as: 'div' }, slots: { default: [\n        { id: 'name', componentRef: 'shadcn.Input', inputs: { 'aria-label': 'Name', value: { '@path': '/states/name' } }, on: {\n          input: { action: { ports: {\n            target: { kind: 'State', schema: { type: 'string' }, required: true },\n            next: { kind: 'Value', schema: { type: 'string' }, required: true },\n          }, steps: [{ kind: 'SetState', target: { '@path': '/ports/target' }, value: { '@path': '/ports/next' } }] }, inputs: { target: { '@path': '/states/name' }, next: { '@path': '/event/value' } } },\n        } },\n        { id: 'save', componentRef: 'shadcn.Button', inputs: { text: 'Save', type: 'button' }, on: {\n          click: { actionRef: 'saveName', inputs: { name: { '@path': '/states/name' }, result: { '@path': '/states/result' }, saved: { '@path': '/states/saved' } } },\n        } },\n        { id: 'result', componentRef: 'shadcn.Typography', when: { '@path': '/states/saved' }, inputs: { as: 'p', text: { '@path': '/states/result' } } },\n      ] } },\n    } });\n    await mounted.initialComplete;\n    return { dispose: () => renderer.dispose() };\n  } catch (error) {\n    await renderer.dispose();\n    throw error;\n  }\n}\n",
-          "sha256": "8ac12efb99298e50d891975168ff7d1273cddc3cdd2419dcc4aa6a3ed02b8abf"
-        }
-      ],
+      "sourceFiles": [],
       "sourceCheckoutReadObserved": false,
       "packageLockUnchanged": true,
       "otherSkillReads": [
@@ -576,13 +544,7 @@
       "protectedFileChanges": [],
       "commandOutputBytes": 163510,
       "failedCommands": 0,
-      "sourceFiles": [
-        {
-          "path": "src/app.ts",
-          "content": "import { createRenderer } from '@viewstem/svelte';\nimport { registerComponents } from '@viewstem/svelte-ui';\nimport { input } from '@viewstem/svelte-ui/shadcn/input';\nimport { button } from '@viewstem/svelte-ui/shadcn/button';\nimport { typography } from '@viewstem/svelte-ui/shadcn/typography';\nimport '@viewstem/svelte-ui/shadcn/styles.css';\n\nexport async function mountApp(target: HTMLElement, services: {save?: (name:string)=>Promise<void>} = {}): Promise<{dispose:()=>void|Promise<void>}> {\n  const renderer = createRenderer();\n  try {\n    registerComponents(renderer, [input, button, typography]);\n    renderer.registry.registerAction({\n      kind: 'Action', id: 'saveName', spec: { ports: {\n        name: { kind: 'Value', schema: { type: 'string' }, required: true },\n        result: { kind: 'State', schema: { type: 'string' }, required: true },\n      } },\n    }, async ({ inputs, signal }) => {\n      await services.save?.(inputs.name);\n      if (!signal.aborted) inputs.result.write(`Saved: ${inputs.name}`);\n    });\n    const mounted = await renderer.mount({ target, view: {\n      states: {\n        name: { kind: 'State', schema: { type: 'string' }, initial: '' },\n        result: { kind: 'State', schema: { type: 'string' }, initial: '' },\n      },\n      render: { id: 'form', componentRef: 'shadcn.Typography', inputs: { as: 'div' }, slots: { default: [\n        { id: 'name', componentRef: 'shadcn.Input', inputs: { 'aria-label': 'Name', value: { '@path': '/states/name' } }, on: {\n          input: { action: { ports: {\n            target: { kind: 'State', schema: { type: 'string' }, required: true },\n            next: { kind: 'Value', schema: { type: 'string' }, required: true },\n          }, steps: [{ kind: 'SetState', target: { '@path': '/ports/target' }, value: { '@path': '/ports/next' } }] }, inputs: { target: { '@path': '/states/name' }, next: { '@path': '/event/value' } } },\n        } },\n        { id: 'save', componentRef: 'shadcn.Button', inputs: { text: 'Save' }, on: { click: { actionRef: 'saveName', inputs: { name: { '@path': '/states/name' }, result: { '@path': '/states/result' } } } } },\n        { id: 'result', componentRef: 'shadcn.Typography', inputs: { as: 'p', text: { '@path': '/states/result' } } },\n      ] } },\n    } });\n    const report = await mounted.initialComplete;\n    if (report.queryErrors.length) throw new Error('View initialization failed');\n    return { dispose: () => renderer.dispose() };\n  } catch (error) {\n    await renderer.dispose();\n    throw error;\n  }\n}\n",
-          "sha256": "1f0474a7a7cba8a4f27afd7b01a53afa84610e0fb7d8166b5b2a2be349591161"
-        }
-      ],
+      "sourceFiles": [],
       "sourceCheckoutReadObserved": false,
       "packageLockUnchanged": true,
       "otherSkillReads": [
@@ -691,13 +653,7 @@
       "protectedFileChanges": [],
       "commandOutputBytes": 66184,
       "failedCommands": 1,
-      "sourceFiles": [
-        {
-          "path": "src/app.ts",
-          "content": "import { createRenderer } from '@viewstem/svelte';\nimport { registerComponents } from '@viewstem/svelte-ui';\nimport { input } from '@viewstem/svelte-ui/shadcn/input';\nimport { button } from '@viewstem/svelte-ui/shadcn/button';\nimport { card } from '@viewstem/svelte-ui/shadcn/card';\nimport { typography } from '@viewstem/svelte-ui/shadcn/typography';\nimport '@viewstem/svelte-ui/shadcn/styles.css';\n\nexport async function mountApp(target: HTMLElement, services: { save?: (name: string) => Promise<void> } = {}): Promise<{ dispose: () => void | Promise<void> }> {\n  const renderer = createRenderer();\n  try {\n    registerComponents(renderer, [input, button, card, typography]);\n    renderer.registry.registerAction({\n      kind: 'Action', id: 'saveName',\n      spec: { ports: {\n        name: { kind: 'Value', schema: { type: 'string' }, required: true },\n        result: { kind: 'State', schema: { type: 'string' }, required: true },\n      } },\n    }, async ({ inputs, signal }) => {\n      await services.save?.(inputs.name);\n      if (!signal.aborted) inputs.result.write(`Saved: ${inputs.name}`);\n    });\n    const mounted = await renderer.mount({ target, view: {\n      states: {\n        name: { kind: 'State', schema: { type: 'string' }, initial: '' },\n        result: { kind: 'State', schema: { type: 'string' }, initial: '' },\n      },\n      render: { id: 'form', componentRef: 'shadcn.Card.Content', slots: { default: [\n        { id: 'name', componentRef: 'shadcn.Input',\n          inputs: { value: { '@path': '/states/name' }, 'aria-label': 'Name' },\n          on: { input: { action: {\n            ports: {\n              target: { kind: 'State', schema: { type: 'string' }, required: true },\n              next: { kind: 'Value', schema: { type: 'string' }, required: true },\n            },\n            steps: [{ kind: 'SetState', target: { '@path': '/ports/target' }, value: { '@path': '/ports/next' } }],\n          }, inputs: { target: { '@path': '/states/name' }, next: { '@path': '/event/value' } } } },\n        },\n        { id: 'save', componentRef: 'shadcn.Button', inputs: { text: 'Save', type: 'button' },\n          on: { click: { actionRef: 'saveName', inputs: { name: { '@path': '/states/name' }, result: { '@path': '/states/result' } } } },\n        },\n        { id: 'result', componentRef: 'shadcn.Typography', inputs: { text: { '@path': '/states/result' } } },\n      ] } },\n    } });\n    const report = await mounted.initialComplete;\n    if (report.queryErrors.length) throw new Error('View initialization failed');\n    return { dispose: () => renderer.dispose() };\n  } catch (error) {\n    await renderer.dispose();\n    throw error;\n  }\n}\n",
-          "sha256": "288bf55dd3cb7d93c8e3b270a042c4a151b293f1545e14352d78548c993c176e"
-        }
-      ],
+      "sourceFiles": [],
       "sourceCheckoutReadObserved": false,
       "packageLockUnchanged": true,
       "otherSkillReads": [],
@@ -705,110 +661,6 @@
         "publicImportsOnly": true,
         "declaredStateAndAction": true,
         "nativeBoundaryCorrect": null,
-        "userInterventions": 0,
-        "finalWrongApisObserved": 0,
-        "uiCssImported": true
-      }
-    },
-    {
-      "id": "codex-native-A",
-      "host": "codex",
-      "scenario": "native",
-      "arm": "A",
-      "project": "/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-native-A",
-      "promptSha256": "75220da7b6a6fd6d94c8ab54c714581422f641cda17d0b5c954fa443428927d6",
-      "skillPath": null,
-      "skillManifest": null,
-      "status": "completed",
-      "exitCode": 0,
-      "stopReason": null,
-      "wallSeconds": 100.123,
-      "commandCalls": 11,
-      "completedCommands": 11,
-      "usage": {
-        "input_tokens": 469326,
-        "cached_input_tokens": 440832,
-        "cache_write_input_tokens": 0,
-        "output_tokens": 2216,
-        "reasoning_output_tokens": 363
-      },
-      "skillReadObserved": false,
-      "finalResponse": "`shadcn.Calendar.Day`는 지원표에서 `native-context`로 분류되어 JSON 컴포넌트로 직접 등록할 수 없습니다. 대신 공개 `@viewstem/svelte-ui/shadcn/calendar` 네이티브 Calendar로 달력을 표시하고, 선택한 날짜를 화면에 표시하도록 구현했습니다.\n\n[src/app.ts](/private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-native-A/src/app.ts)는 기존 `mountApp(target, services)` 시그니처와 정리 함수를 유지합니다.\n\n`npm run check`와 `npm run build`가 통과했고 Svelte 진단은 오류와 경고 모두 0건입니다. 제공 검사에서 런타임 시나리오는 실행되지 않아 브라우저 상호작용은 별도로 확인하지 못했습니다. Svelte autofixer도 로컬에서 실행되지 않아 중단했습니다.",
-      "traceSha256": "1c3679f2ea5103eb9fe3ce9eaa9b418c89da7cd57835c5f80478c237cba13b70",
-      "checkExitCode": 0,
-      "checkSeconds": 3.346,
-      "verification": {
-        "ok": true,
-        "scenario": "native",
-        "typecheck": {
-          "ok": true,
-          "output": "Loading svelte-check in workspace: /private/var/folders/wv/2zqlsrz10lv73mczw_5wsm8w0000gn/T/viewstem-skill-run-p5pywarz/runs/codex-native-A\nGetting Svelte diagnostics...\n\nsvelte-check found 0 errors and 0 warnings\n"
-        },
-        "build": {
-          "ok": true,
-          "forbiddenImports": [],
-          "rendererIncluded": false,
-          "calendarImported": true,
-          "errors": []
-        },
-        "runtime": {
-          "ok": true,
-          "ready": true,
-          "error": ""
-        },
-        "pageErrors": [],
-        "assertions": [
-          {
-            "name": "Calendar day grid visible",
-            "ok": true,
-            "evidence": {
-              "dayButtons": 35
-            }
-          },
-          {
-            "name": "Dispose removes owned UI",
-            "ok": true,
-            "evidence": {
-              "remaining": 0
-            }
-          }
-        ]
-      },
-      "sourceManifest": [
-        {
-          "path": "app.ts",
-          "sha256": "01820f3a63bb2670b8f27ee429c4b5f1e91a0d71866ecf9becdb83d0b6a42438"
-        },
-        {
-          "path": "CalendarApp.svelte",
-          "sha256": "f1e91305dd51e35b1a3cf179a8756918366a33cd323dacfc0cc658e556e694aa"
-        }
-      ],
-      "protectedFileChanges": [],
-      "commandOutputBytes": 46477,
-      "failedCommands": 4,
-      "sourceFiles": [
-        {
-          "path": "src/CalendarApp.svelte",
-          "content": "<script lang=\"ts\">\n  import { components as Calendar } from '@viewstem/svelte-ui/shadcn/calendar';\n  import '@viewstem/svelte-ui/shadcn/styles.css';\n\n  let selected = $state('');\n</script>\n\n<main>\n  <section aria-labelledby=\"calendar-title\">\n    <h1 id=\"calendar-title\">Calendar</h1>\n    <p>Choose a date.</p>\n    <Calendar.Calendar\n      type=\"single\"\n      calendarLabel=\"Choose a date\"\n      onValueChange={(value) => { selected = value?.toString() ?? ''; }}\n    />\n    <p aria-live=\"polite\">{selected ? `Selected date: ${selected}` : 'No date selected'}</p>\n  </section>\n</main>\n\n<style>\n  main { font-family: system-ui, sans-serif; padding: 2rem; }\n  section { max-width: 24rem; }\n</style>\n",
-          "sha256": "f1e91305dd51e35b1a3cf179a8756918366a33cd323dacfc0cc658e556e694aa"
-        },
-        {
-          "path": "src/app.ts",
-          "content": "import { mount, unmount } from 'svelte';\nimport CalendarApp from './CalendarApp.svelte';\n\nexport async function mountApp(target: HTMLElement, services: {save?: (name:string)=>Promise<void>} = {}): Promise<{dispose:()=>void|Promise<void>}> {\n  void services;\n  const app = mount(CalendarApp, { target });\n  return { dispose: () => unmount(app) };\n}\n",
-          "sha256": "01820f3a63bb2670b8f27ee429c4b5f1e91a0d71866ecf9becdb83d0b6a42438"
-        }
-      ],
-      "sourceCheckoutReadObserved": false,
-      "packageLockUnchanged": true,
-      "otherSkillReads": [
-        "svelte-code-writer",
-        "svelte-core-bestpractices"
-      ],
-      "manualAssessment": {
-        "publicImportsOnly": true,
-        "declaredStateAndAction": null,
-        "nativeBoundaryCorrect": true,
         "userInterventions": 0,
         "finalWrongApisObserved": 0,
         "uiCssImported": true
@@ -909,11 +761,6 @@
       "commandOutputBytes": 374964,
       "failedCommands": 2,
       "sourceFiles": [
-        {
-          "path": "src/Calendar.svelte",
-          "content": "<script lang=\"ts\">\n  import { components as Calendar } from '@viewstem/svelte-ui/shadcn/calendar';\n  import '@viewstem/svelte-ui/shadcn/styles.css';\n\n  let selected = $state('');\n</script>\n\n<main data-viewstem-shadcn>\n  <h1>Calendar</h1>\n  <Calendar.Calendar type=\"single\" onValueChange={(value) => { selected = value?.toString() ?? ''; }}>\n    {#snippet day()}\n      <Calendar.Day />\n    {/snippet}\n  </Calendar.Calendar>\n  <p aria-live=\"polite\">{selected ? `Selected: ${selected}` : 'Select a date'}</p>\n</main>\n",
-          "sha256": "03f18b6bd0657462f59079b0d94ced0880c5297204bc5f5dc34a1afb7da41b09"
-        },
         {
           "path": "src/app.ts",
           "content": "import { mount, unmount, flushSync } from 'svelte';\nimport Calendar from './Calendar.svelte';\n\nexport async function mountApp(target: HTMLElement, services: {save?: (name:string)=>Promise<void>} = {}): Promise<{dispose:()=>void|Promise<void>}> {\n  void services;\n  const app = mount(Calendar, { target });\n  flushSync();\n  return { dispose: () => unmount(app) };\n}\n",
@@ -1029,18 +876,7 @@
       "protectedFileChanges": [],
       "commandOutputBytes": 54819,
       "failedCommands": 1,
-      "sourceFiles": [
-        {
-          "path": "src/CalendarApp.svelte",
-          "content": "<script lang=\"ts\">\n  import { components as Calendar } from '@viewstem/svelte-ui/shadcn/calendar';\n</script>\n\n<main data-viewstem-shadcn>\n  <h1>Calendar</h1>\n  <Calendar.Calendar type=\"single\" />\n</main>\n",
-          "sha256": "0c479e656b1b9b634919d8aea77810a264a571eac5b859aa96b444cf58b06f33"
-        },
-        {
-          "path": "src/app.ts",
-          "content": "import { mount, unmount } from 'svelte';\nimport '@viewstem/svelte-ui/shadcn/styles.css';\nimport CalendarApp from './CalendarApp.svelte';\n\nexport async function mountApp(target: HTMLElement, services: {save?: (name:string)=>Promise<void>} = {}): Promise<{dispose:()=>void|Promise<void>}> {\n  const app = mount(CalendarApp, { target });\n  return { dispose: () => unmount(app) };\n}\n",
-          "sha256": "120b9d3533ab659d9ba505fec3458916e9b2f608391e6eef1bd59adfefa94cbf"
-        }
-      ],
+      "sourceFiles": [],
       "sourceCheckoutReadObserved": false,
       "packageLockUnchanged": true,
       "otherSkillReads": [
@@ -1564,5 +1400,6 @@
     "finalReviewSnapshotUnchanged": true,
     "trackedDiffWhitespace": "passed",
     "finalSkillFileCount": 4
-  }
+  },
+  "evidenceScope": "Historical results with excerpts of generated files and command traces."
 }

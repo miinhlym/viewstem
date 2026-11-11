@@ -84,7 +84,7 @@ JSON 예시는 확정된 구조의 의미를 설명한다. 외부 코드형 Comp
 - U46·D103에서 임시 바닐라 playground와 shadcn 갤러리를 제거했다. 패키지 사용은 각 공개 README를 따르며, UI 검증은 패키지를 직접 마운트하는 내부 fixture로 수행한다. 도구 제거는 core·renderer·UI 패키지의 공개 계약이나 지원 목록을 변경하지 않는다. [제거와 검증 범위](handoff/temporary-tools-removal-2026-11-04.md)를 따른다.
 - U39–U40의 [Svelte 클라이언트 렌더러](../packages/svelte/README.md)는 공개 core projection·수명·이벤트에 Svelte 구현을 연결한다. `@viewstem/svelte`의 `createRenderer()`만으로 시작하며 기본 UI·Action·테마 자동 등록 없이 호스트가 Component 계약과 구현을 각각 등록한다. 실제 패키지 검증과 지원 한계는 [인계](handoff/svelte-implementation-2026-11-02.md)를 따른다.
 - [`@viewstem/ui`](../packages/ui/README.md)는 기본 컴포넌트 패키지다. `@viewstem/core`의 View를 브라우저 DOM에 연결하며 순수 JS·React·Vue·Svelte에서 같은 JSON을 사용한다. Basecoat Vega·Neutral 스타일과 Vanilla JS 컨트롤러를 사용한다. Calendar·Range Calendar·Date Picker는 Zag Vanilla, Data Table은 TanStack Table Core에 연결한다. Chart의 축과 보조선은 D3 스케일로 계산한다.
-- D144에서 `@viewstem/svelte-ui`를 제거하고 기존 JSON Component ID 357개와 66개 계열의 공통 지원 계약을 `@viewstem/ui`로 이관한다. 입력·슬롯·이벤트의 공개 범위는 `@viewstem/ui/support.json`을 따른다. 기존 `@viewstem/svelte`는 앱이 제공하는 Svelte 구현을 연결하는 어댑터로 유지한다. [D144](history/decision-register.md#a-현재-채택한-결정)
+- D144에 따라 `@viewstem/ui`는 JSON Component ID 357개와 66개 계열의 지원 계약을 제공한다. 입력·슬롯·이벤트의 공개 범위는 `@viewstem/ui/support.json`을 따른다. 기존 `@viewstem/svelte`는 앱이 제공하는 Svelte 구현을 연결하는 어댑터로 유지한다. [D144](history/decision-register.md#a-현재-채택한-결정)
 
 - Rust/WASM 통합 코어는 검토했지만 현재 채택 경로는 아니다.
 
@@ -100,7 +100,7 @@ JSON 예시는 확정된 구조의 의미를 설명한다. 외부 코드형 Comp
 
 공개 문서의 좌측 메뉴는 시작하기, 핵심 개념, 가이드, 레퍼런스 안내, DSL 레퍼런스, @viewstem/core, @viewstem/ui, @viewstem/svelte로 구성한다. 핵심 개념은 View와 Component, 값과 입력, State, 계산된 값, 이벤트와 Action, Query와 데이터, 조건과 목록, Component 재사용, 리소스와 타입의 9개 페이지로 구성한다. 각 페이지에서 정의·최소 코드·예상 결과·주요 실행 의미를 설명하고 대표 실습을 연결한다. 읽기 순서는 좌측 메뉴와 하단 이전·다음 탐색으로 제공하며, 개념 설명을 예제 링크 목록으로 대체하지 않는다. [조사와 페이지별 구성](handoff/docs-core-concepts-2026-11-05.md), [D110](history/decision-register.md#a-현재-채택한-결정)을 따른다. 문서 본문의 제목에서 페이지 목차를 만들고, 정적 빌드에서 Pagefind 검색 색인을 생성한다. [D108](history/decision-register.md#a-현재-채택한-결정)
 
-패키지 문서는 개요 → 작업별 사용 가이드 → 상세 API 레퍼런스 순서로 구성한다. 공개 export·타입·구현을 기준으로 시그니처, 옵션·기본값, 반환값, 오류와 수명을 한국어·영어로 제공한다. DSL은 리소스와 표현식의 필드 계약을 별도로 설명한다. `@viewstem/ui`는 한·영 개요, 브라우저 마운트 가이드, API와 66개 계열 상세 페이지를 제공한다. 입력·슬롯·이벤트 표는 UI 패키지의 지원 메타데이터에서 생성한다. 이전 Svelte UI 문서 주소는 대응하는 새 문서로 연결한다. [D144](history/decision-register.md#a-현재-채택한-결정)
+패키지 문서는 개요 → 작업별 사용 가이드 → 상세 API 레퍼런스 순서로 구성한다. 공개 export·타입·구현을 기준으로 시그니처, 옵션·기본값, 반환값, 오류와 수명을 한국어·영어로 제공한다. DSL은 리소스와 표현식의 필드 계약을 별도로 설명한다. `@viewstem/ui`는 한·영 개요, 브라우저 마운트 가이드, API와 66개 계열 상세 페이지를 제공한다. 입력·슬롯·이벤트 표는 UI 패키지의 지원 메타데이터에서 생성한다. [D144](history/decision-register.md#a-현재-채택한-결정)
 
 공개 문서의 상세 API 페이지는 상위 경로와 현재 메뉴 위치를 표시한다. UI의 지원 계열 66개를 좌측 컴포넌트 메뉴에 모두 나열하고, 현재 항목 표시·같은 언어의 인접 계열 이동을 제공한다. 각 계열 상세 페이지에는 실제 공개 렌더러로 실행되는 미리보기와 동일한 View JSON, 앱 등록 예제를 함께 제공한다. [D122](history/decision-register.md#a-현재-채택한-결정)를 따른다. 제목 크기는 h1 → h2 → h3 → h4 순서를 유지하고, 참조 표보다 목적·사용 예제를 먼저 설명한다. 일반 HTML·SVG 입력과 큰 중첩 타입은 펼침 영역으로 분리하되 지원 계약을 생략하지 않는다. 공통 헤더의 테마 선택은 밝게·어둡게·시스템 설정을 지원하며 모든 사이트 진입점에서 같은 선택을 적용한다. [D117](history/decision-register.md#a-현재-채택한-결정), [사이트 리뷰](../apps/docs/review/2026-11-05/review.md)를 따른다.
 

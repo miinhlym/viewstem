@@ -4,7 +4,7 @@ English | [한국어](README.ko.md)
 
 The detailed specifications, handoffs, and decision history linked from this map are in Korean. See the [documentation language policy](../CONTRIBUTING.md#documentation-languages).
 
-See the [U42 public API naming migration](handoff/public-api-naming-2026-11-02.md) for the current public names and the [Svelte UI handoff](handoff/svelte-ui-shadcn-implementation-2026-11-03.md) for the batch registration APIs added in U44. The [U42 verification record](handoff/public-api-naming-verification-results.json) and earlier API names and hashes remain evidence for their original revisions.
+See the [U42 public API naming migration](handoff/public-api-naming-2026-11-02.md) for the current public names. The [U42 verification record](handoff/public-api-naming-verification-results.json) and earlier API names and hashes remain evidence for their original revisions.
 
 Use this map to find the reference for your task. The language-independent contracts are in `VIEWSTEM-SPEC.md` and `spec/`, the JS/TS usage guides are in the package READMEs, and execution results are in the product verification records. The repository documentation can be read independently of earlier chats and private source material.
 
@@ -39,10 +39,6 @@ See the [U37 implementation handoff](handoff/core-implementation-2026-11-02.md) 
 See the [U41 public API refactor](handoff/public-api-refactor-2026-11-02.md) for the public API boundaries and migration from earlier usage, and the [API verification record](handoff/public-api-verification-results.json) for rerun results and hashes after that change. Earlier product and Svelte verification JSON files remain evidence for their original revisions.
 
 The [U39–U40 Svelte handoff](handoff/svelte-implementation-2026-11-02.md) covers the client-side renderer. Start by importing `@viewstem/svelte`, which depends on core internally. The renderer registers no default UI. Register the default browser UI explicitly from `@viewstem/ui`.
-
-The [U44 verification record](handoff/svelte-ui-shadcn-verification-results.json) contains re-verification of the changed Registry and Svelte batch registration APIs and the post-disposal emit contract, along with core, Svelte, and playground regression results and hashes from that revision. Keep the verification files from earlier stages.
-
-See the [branch preflight handoff](handoff/svelte-ui-preflight-2026-11-03.md) for the full Svelte UI review and the lifecycle, custom function, and gallery restoration fixes after the split commits. The [preflight results](handoff/svelte-ui-preflight-verification-results.json) record the package checks run after those fixes.
 
 <a id="현재-명세"></a>
 
@@ -79,8 +75,6 @@ Use the [change verification procedure](handoff/implementation-start.md#수정-�
 | Actual execution environment, results, and hashes | [Product verification results](handoff/core-verification-results.json) | Update using execution reports and evidence. The `test:report` command leaves this summary JSON as-is. |
 | Svelte renderer, public types, and tarball consumer | [Svelte verification results](handoff/svelte-verification-results.json), [implemented scope](handoff/svelte-implementation-2026-11-02.md) | Run `check:svelte` and inspect the example. Track separately from core acceptance counts. |
 | Browser UI catalog and behavior | [Supported scope](../packages/ui/README.md) | `npm run check:ui` |
-| Inputs, events, State, nesting, and keyboard behavior for each of the 66 shadcn entries | [Behavior matrix](handoff/svelte-ui-audit-matrix.md), [audit handoff](handoff/svelte-ui-audit-2026-11-03.md), [execution results](handoff/svelte-ui-audit-verification-results.json) | Use browser checks of the public package and review unexecuted cases. Track separately from earlier U44 mount and reference counts. |
-| Full Svelte UI branch preflight and follow-up fixes | [Review and fixes handoff](handoff/svelte-ui-preflight-2026-11-03.md), [execution results](handoff/svelte-ui-preflight-verification-results.json) | Distinguish the comparison baseline, reused evidence, regression checks after fixes, and uncommitted handoff status |
 | Standalone experiments before implementation | [Verification ledger](handoff/verification-ledger.md), [original acceptance inventory](../experiments/verification/coverage.json) | Keep the original experiments and failure evidence separate from passing product test evidence |
 
 <a id="배경과-이력"></a>

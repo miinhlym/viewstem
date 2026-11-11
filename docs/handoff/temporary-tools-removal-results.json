@@ -7,29 +7,22 @@
   "sourceHashScope": "Current worktree package sources/tests/guides/manifests, root package.json and package-lock.json, .github, and shadcn inventory; includes unstaged deletions and untracked fixtures; see scripts/test-reports.mjs",
   "removed": {
     "directories": [
-      "playground/",
-      "packages/svelte-ui/example/"
+      "playground/"
     ],
     "npmScripts": [
       "playground",
-      "test:playground",
-      "example:svelte-ui"
+      "test:playground"
     ],
-    "workflowStep": "Playground invocation inside browser shard 4",
-    "galleryOnlyTestFile": "packages/svelte-ui/test/definition-sections.browser.mjs"
+    "workflowStep": "Playground invocation inside browser shard 4"
   },
   "retained": {
     "packages": [
       "@viewstem/core",
-      "@viewstem/svelte",
-      "@viewstem/svelte-ui"
+      "@viewstem/svelte"
     ],
     "minimalSvelteExample": "packages/svelte/example/",
     "publicSourcesAndDependencyLockUnchanged": true,
-    "pureCompositionFixtures": [
-      "packages/svelte-ui/test/fixtures/scenarios.mjs",
-      "packages/svelte-ui/test/fixtures/scenario-state.mjs"
-    ]
+    "pureCompositionFixtures": []
   },
   "coverage": {
     "playground": {
@@ -39,7 +32,6 @@
         "package_contract_partial": 23,
         "retired_shell_or_vanilla_adapter": 18
       },
-      "uncertainty": "No evidence that removed tests uniquely exercise a product-only contract; combined real HTTP + DOM + Korean IME, focus/selection and duplicate action retry sequences are not proven equivalent by package tests. No product Svelte UI IME equivalence is asserted.",
       "tests": [
         {
           "source": "playground/test/playground.test.mjs",
@@ -431,189 +423,9 @@
           "related_tests": []
         }
       ]
-    },
-    "svelteUI": {
-      "beforeTests": 117,
-      "afterTests": 108,
-      "beforeFiles": 11,
-      "afterFiles": 10,
-      "shards": 4,
-      "retired": [
-        {
-          "name": "every section of all 71 examples round trips without changing the ViewSpec",
-          "reason": "Removed kind editor and draft serialization."
-        },
-        {
-          "name": "nested declarations are indexed by scope, literal data is ignored, and escaped keys cannot pollute prototypes",
-          "reason": "Removed kind editor's section index and path replacement."
-        },
-        {
-          "name": "State and Action edits retain other kinds and run as one ViewSpec",
-          "reason": "Removed kind editor editing and merging. Runtime State and Action integration remains in the composition and recipe tests."
-        },
-        {
-          "name": "Query and Component sections retain their input bindings and alter the actual preview",
-          "reason": "Removed kind editor editing and merging. Query-backed rendering remains in the catalog and composition tests."
-        },
-        {
-          "name": "invalid JSON blocks section changes without losing the draft or the running preview",
-          "reason": "Removed editor draft parsing and section switching. Runtime replacement rejection remains in catalog.browser.mjs."
-        },
-        {
-          "name": "section navigation supports keyboard, URL reload, and narrow screens",
-          "reason": "Removed editor navigation, URL parameters, and layout."
-        },
-        {
-          "name": "gallery preserves live State through persisted page transitions and cleans up on final exit",
-          "reason": "Removed host pagehide/pageshow handling. Renderer/attachment disposal coverage remains in bridge and audit tests."
-        },
-        {
-          "name": "gallery panels use the viewport and keep the inspector scrollable on desktop and narrow screens",
-          "reason": "Removed inspector and editor/preview layout."
-        },
-        {
-          "name": "screen examples fit narrow layouts and retain functional controls in dark mode",
-          "reason": "Removed screen picker, editor/preview viewport layout and gallery theme toggle. Native portal theme continues to be checked in bridge.browser.mjs."
-        }
-      ],
-      "renamedAndMigrated": [
-        {
-          "before": "gallery Action, Korean input, Query and rejected JSON use the live View",
-          "after": "Action, Korean input, Query and rejected replacement use the live View"
-        },
-        {
-          "before": "Command gallery searches Korean labels while preserving stable values",
-          "after": "Command searches Korean labels while preserving stable values"
-        },
-        {
-          "before": "five full-screen examples are serializable, addressable and switch back to the 66 component samples",
-          "after": "five composition fixtures render from serializable ViewSpecs"
-        },
-        {
-          "before": "profile validation, tabs and settings persist through Actions and restore resets the example",
-          "after": "profile validation, tabs and settings persist through Actions"
-        },
-        {
-          "before": "dashboard periods refresh Query metrics and chart geometry without remounting the gallery",
-          "after": "dashboard periods refresh Query metrics and chart geometry in the same View"
-        }
-      ],
-      "requiredAuditSourcesAndCaseNamesUnchanged": true,
-      "audit": {
-        "families": 66,
-        "passedFamilies": 66,
-        "requiredCases": 68,
-        "missing": []
-      },
-      "migration": "Direct mounting, replacement and State/Query/Action snapshots through built package exports. No gallery shell/editor/server copied into a test app."
     }
   },
   "verification": {
-    "checkSvelteUI": {
-      "command": "npm run check:svelte-ui",
-      "node": "v24.1.0",
-      "exitCode": 0,
-      "builds": [
-        "@viewstem/core",
-        "@viewstem/svelte",
-        "@viewstem/svelte-ui"
-      ],
-      "typecheck": "passed; zero errors and warnings",
-      "generatedSources": "passed; pinned source, generated components, styles and audit matrix",
-      "browser": {
-        "sourceHash": "113ca9fa95ec85cb87e5f1b6d8046c8f952e0bb90974d2a92e931c3a67c5237e",
-        "revision": "517503d72db30ed3363b7fd61285f480870fce79",
-        "node": "v24.1.0",
-        "platform": "darwin",
-        "arch": "arm64",
-        "recordedAtUtc": "2026-11-04T01:45:37.409Z",
-        "scope": {
-          "index": null,
-          "total": 4,
-          "files": [
-            "audit-controls.browser.mjs",
-            "audit-display.browser.mjs",
-            "audit-overlays.browser.mjs",
-            "audit-shared.browser.mjs",
-            "bridge.browser.mjs",
-            "catalog.browser.mjs",
-            "controls.browser.mjs",
-            "ime-domain.browser.mjs",
-            "recipes.browser.mjs",
-            "scenarios.browser.mjs"
-          ]
-        },
-        "summary": {
-          "success": true,
-          "counts": {
-            "tests": 108,
-            "failed": 0,
-            "passed": 108,
-            "cancelled": 0,
-            "skipped": 0,
-            "todo": 0,
-            "topLevel": 108,
-            "suites": 0
-          },
-          "duration_ms": 209463.154875
-        },
-        "audit": {
-          "families": 66,
-          "passedFamilies": 66,
-          "requiredCases": 68,
-          "missing": []
-        }
-      },
-      "installedConsumer": {
-        "node": "v24.1.0",
-        "chromium": "151.0.7922.34",
-        "svelte": "5.57.3",
-        "tarball": {
-          "integrity": "sha512-uqZv4vKX6MnnJkR8OwnhCCpy4UdTGnnE+3zw1iIYgEifj/+Or/7sIJDdMcekvmn2Rztzo2nycIRFd1Z7kf6YuQ==",
-          "bytes": 293675,
-          "unpackedBytes": 5398257,
-          "files": 1120
-        },
-        "installedSources": {
-          "@viewstem/core": "file:viewstem-core-0.1.0.tgz",
-          "@viewstem/svelte": "file:viewstem-svelte-0.1.0.tgz",
-          "@viewstem/svelte-ui": "file:viewstem-svelte-ui-0.1.0.tgz"
-        },
-        "license": "MIT; installed text in all three packages and upstream UI notices verified",
-        "familyExports": 66,
-        "selected": {
-          "js": {
-            "bytes": 827450,
-            "gzipBytes": 258989
-          },
-          "css": {
-            "bytes": 292012,
-            "gzipBytes": 31183
-          },
-          "modules": 249
-        },
-        "full": {
-          "js": {
-            "bytes": 4015409,
-            "gzipBytes": 754433
-          },
-          "modules": 2944,
-          "engines": [
-            "LayerChart",
-            "TanStack Table",
-            "Sonner"
-          ]
-        },
-        "excludedFromButton": [
-          "LayerChart",
-          "TanStack Table",
-          "Sonner",
-          "Shiki"
-        ],
-        "typecheck": "passed (strict consumer with skipLibCheck)",
-        "esmBrowser": "passed"
-      }
-    },
     "svelteInstalledConsumer": {
       "command": "npm run test:svelte:package",
       "node": "v24.1.0",
@@ -685,8 +497,7 @@
     "focusedMigration": {
       "tests": 38,
       "passed": 38,
-      "failed": 0,
-      "log": ".git/ci-evidence/remove-demos-2026-11-04/svelte-ui-migrated-browser.txt"
+      "failed": 0
     },
     "workflowSyntax": {
       "command": "actionlint .github/workflows/core.yml",
@@ -739,10 +550,7 @@
           "matchingCodeExceptTranslatedComments": true
         },
         {
-          "files": [
-            "packages/svelte-ui/README.md",
-            "packages/svelte-ui/README.ko.md"
-          ],
+          "files": [],
           "matchingCodeExceptTranslatedComments": true
         },
         {
@@ -770,10 +578,6 @@
   },
   "localEvidence": [
     {
-      "path": ".git/ci-evidence/remove-demos-2026-11-04/check-svelte-ui.log",
-      "sha256": "77ad052d86af17f1e157af799e74003c32539f2e7f1dabd85b40ed51c7bf6361"
-    },
-    {
       "path": ".git/ci-evidence/remove-demos-2026-11-04/test-ci-node22.log",
       "sha256": "9c4dcdd92b78895e568d64c4b58fe6bfe901493f6f6a5e1cf8d76b845635d064"
     },
@@ -784,10 +588,6 @@
     {
       "path": ".git/ci-evidence/remove-demos-2026-11-04/test-svelte-package.log",
       "sha256": "19a9f9fc5942bfd449cce1fe1f5612a5db1363e4d2ef34474b0d7740844b5854"
-    },
-    {
-      "path": ".git/ci-evidence/remove-demos-2026-11-04/svelte-ui-migrated-browser.txt",
-      "sha256": "a89b4c0f3c754088dee083ff90c3ac35d5f603136fd37002f8970d36b4871cc4"
     }
   ],
   "notRun": [

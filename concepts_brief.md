@@ -44,8 +44,7 @@
 |---|---|
 | [Core README](packages/core/README.md), [공개 타입](packages/core/src/index.d.ts) | Core는 DOM 독립 실행기다. 실제 생성 API와 공개 메서드를 사용하며 과거 생성자·내부 엔진 API를 재사용하지 않는다. |
 | [Svelte README](packages/svelte/README.md) | Svelte 앱은 `createRenderer`로 시작한다. 기본 UI는 없고 명시 등록이 필요하다. 소유 View와 빌린 View의 정리 책임, core 완료와 DOM 반영 완료를 구분한다. |
-| [Svelte UI README](packages/svelte-ui/README.md) | JSON 지원 부품과 native 문맥 전용 부품, DOM 이벤트와 value callback의 payload가 다르다. 일반 shadcn 사용법만으로 Viewstem 조합을 작성할 수 없다. |
-| [UI support.json](packages/svelte-ui/src/lib/shadcn/support.json) | 조사 시점 파일은 2,287,077 bytes, 392개 항목이다. 351개 upstream JSON 부품 + 6개 조합 + 35개 native 전용 항목이 함께 들어 있다. 전체를 프롬프트에 넣기보다 ID별 계약을 추출할 근거가 있다. |
+| [UI README](packages/ui/README.ko.md) | JSON 지원 범위와 등록·마운트 방법을 안내한다. |
 | [CEL 지원 목록](packages/core/src/cel/supported-functions.json) | 표준 CEL의 모든 기능을 가정하지 않고 해당 패키지가 제공하는 함수·제외 목록을 조회할 수 있다. |
 | 사이트 패키지 문서 인계: `docs/handoff/docs-package-reference-2026-11-05.md` (별도 사이트 작업의 조사 경로) | 가이드·DSL·공개 API·UI 계열 문서가 구성돼 있다. 스킬에서 같은 설명을 새로 관리하기보다 작업에 맞는 근거로 연결할 수 있다. |
 | 같은 인계의 `발견한 기존 명세/구현 차이` 절 (별도 사이트 작업의 조사 경로) | Action 단계 inputs 생략, 유지되는 Query use의 설정 병합, State/Derived의 경로 제한에 차이가 기록돼 있다. 문서 또는 구현 하나가 항상 무조건 우선한다고 단순화하면 안 된다. |
@@ -65,7 +64,7 @@ skills/viewstem/
     definitions.md
     data-actions.md
     svelte-host.md
-    svelte-ui.md
+    ui.md
     troubleshooting.md
   scripts/
     inspect.mjs
@@ -83,14 +82,14 @@ skills/viewstem/
 | `definitions.md` | View/Component, State/Derived, ports, 표현식, when/repeat 작성 | 값과 핸들, 작성자 문맥과 명시 입력, 인스턴스 ID와 반복 key를 구분한다. 등록·실제 평가의 서로 다른 검증 범위를 설명한다. |
 | `data-actions.md` | Query/Datasource/Variable, 이벤트 Action, URL 연결 | 입력→조회→상태→동작의 연결, readiness·실패·취소·재조회 의미를 다룬다. secret 실행은 서버 경계에 둔다. |
 | `svelte-host.md` | 마운트, 기존 앱 연결, custom adapter, 정리 문제 | Component 계약과 구현의 등록, `emit`·slot, mount/attach 소유권, 완료 신호를 연결한다. |
-| `svelte-ui.md` | 제공 UI로 폼·테이블·대화상자 등 구성 | 필요한 계열의 등록·CSS·정확한 input/event/slot 계약을 확인한다. JSON으로 안 되는 요구는 공개 native 조합 또는 호스트 어댑터로 연결한다. |
+| `ui.md` | 제공 UI로 폼·테이블·대화상자 등 구성 | 필요한 계열의 등록·CSS·정확한 input/event/slot 계약을 확인한다. JSON으로 안 되는 요구는 공개 native 조합 또는 호스트 어댑터로 연결한다. |
 | `troubleshooting.md` | 출력 누락, 값 미변경, stale 결과, 취소·교체 오류 | 증상에 맞는 snapshot·진단·최소 재현을 수집한다. 정의·입력·수명·renderer 중 실패 경계를 좁히고 해당 흐름을 다시 검증한다. |
 
 첫 버전에는 생성기·전체 앱 템플릿·별도 MCP 서버를 기본 포함하지 않는 안이다. 실행 예제가 반복해서 필요하면 이미 검증하는 예제에서 추출하고, 필요가 입증된 템플릿만 나중에 포함한다.
 
 ### 보조 도구 후보
 
-`inspect.mjs`는 실제 설치된 패키지를 기준으로 버전·공개 진입점과 선택한 UI 부품의 `mode`, 입력 스키마, 이벤트 payload, slots, 제한을 읽는 도구다. `propertiesRef`·`callbacksRef`·`unsupportedRef`가 가리키는 정보까지 함께 반환해야 한다. CEL도 같은 방식으로 지원 여부를 좁혀 조회할 수 있다.
+`inspect.mjs`는 설치된 패키지의 버전과 공개 진입점을 확인하고 선택한 UI 부품의 입력, 이벤트 payload, 슬롯 계약을 읽는 도구다. CEL도 같은 방식으로 지원 여부를 좁혀 조회할 수 있다.
 
 이 이름과 인터페이스는 제안이며 현재 존재하는 Viewstem CLI가 아니다. 소비 프로젝트 경로를 명시적으로 받으며 스킬 설치 폴더를 앱 루트로 착각하지 않아야 한다. 패키지의 공개 파일만 읽고 앱 코드를 실행하거나 의존성을 설치하지 않는다. 미설치·알 수 없는 ID·지원 형식 불일치를 구분해 보고하며 필요하면 직접 파일 탐색으로 대체한다.
 
@@ -115,7 +114,6 @@ skills/viewstem/
 |---|---|---|
 | 문서와 검색 가능한 색인만 제공 | 유지보수 지점이 가장 적고 이미 작성 중인 문서를 활용 | 에이전트가 필요한 계약을 찾아 조합하는 반복 비용과 잘못된 API 추론을 줄이지 못할 수 있다. 실제 작업에서 충분하면 스킬 확장 필요성이 약해진다. |
 | **단일 `viewstem` + 작업별 참조 자료** — 현재 가설 | 설치·선택이 단순하고 폼 작성처럼 여러 패키지를 오가는 작업을 한 흐름으로 다룸 | 진입 설명이 너무 넓어지거나 참조 자료가 계속 늘면 필요한 정보를 못 찾을 수 있다. 행동 평가로 확인해야 한다. |
-| `viewstem`·`viewstem-svelte`·`viewstem-svelte-ui`로 분리 | core 단독 소비자, renderer 통합자, UI 작성자의 독립 진입점을 제공 | 등록·DSL·수명 규칙의 중복, 활성화 중첩, 별도 설치 시 형제 스킬 누락 문제가 생길 수 있다. 독립 사용 빈도와 평가 결과가 이를 상쇄할 때 분리한다. |
 
 리소스 7종 또는 UI 66계열마다 스킬을 만들 필요는 아직 입증되지 않았다. 리소스 간 연결이 실제 작업의 중심이므로 파일 분류를 그대로 작업 경계로 삼지 않는다. 반대로 단일 스킬에서 누락이 반복된다면 스킬 수 최소화를 고집하지 않는다.
 
@@ -137,7 +135,7 @@ skills/viewstem/
 
 동일한 라이브러리 버전·입력·환경·모델 조건에서 **문서만 제공한 기준선과 스킬을 제공한 경우**를 새 문맥으로 비교한다. 최종 산출물의 타입·실행·브라우저 동작을 우선 보고, 오작동·API 추측·사용자 수정 횟수·불필요한 파일 읽기·도구 호출·토큰을 함께 기록한다. 한 번의 성공으로 일반적인 개선을 주장하지 않는다.
 
-배포 전에는 frontmatter·상대 링크·보조 도구의 오류 처리와, **저장소가 없는 별도 소비 디렉터리**에서 설치된 패키지로 작업하는 흐름을 확인한다. 소비 앱에 이 저장소 전용 `npm run check:svelte-ui` 등을 실행하라고 요구하지 않는다. 지원을 선언할 에이전트 호스트마다 발견·참조 해석·도구 실행을 확인한다.
+배포 전에는 frontmatter·상대 링크·보조 도구의 오류 처리와, **저장소가 없는 별도 소비 디렉터리**에서 설치된 패키지로 작업하는 흐름을 확인한다. 소비 앱에 이 저장소 전용 `npm run check:ui` 등을 실행하라고 요구하지 않는다. 지원을 선언할 에이전트 호스트마다 발견·참조 해석·도구 실행을 확인한다.
 
 ## 8. EGM 검토 결과와 구체화
 
@@ -145,6 +143,6 @@ skills/viewstem/
 
 중복을 합친 결과는 Blocker 0 / Major 2 / Nit 5다. 주요 지적은 ID 하나의 UI 계약도 큰 출력을 만들 수 있다는 점과, 모든 구성을 묶은 평가로는 각 구성의 필요성을 판단하기 어렵다는 점이다. [통합 보고서](docs/designs/viewstem-skills-review-2026-11-05/goldfish_review_report.md)에 원문·읽기 기록·판정 범위를 연결했다.
 
-반영한 권고 구성은 `viewstem` 진입 스킬 하나와 작업별 자료이며, 도구 후보는 범용 `inspect.mjs` 대신 UI input/event를 선택하는 `inspect-ui.mjs`로 좁혔다. 원본 codec·uncertain와 조회 출처·범위를 보존하고, 진단 채널·부품 발견·암묵 활성화·버전/설치 경계를 구체화했다. 문서→얇은 지침→필요 자료→UI 조회의 순서로 각 요소의 효과를 확인한다. 상세 파일·도구·검증 계약과 발견별 처리 표는 [설계 문서](design_draft.md)를 따른다.
+반영한 권고 구성은 `viewstem` 진입 스킬 하나와 작업별 자료이며, 도구 후보는 범용 `inspect.mjs` 대신 UI input/event를 선택하는 `inspect-ui.mjs`로 좁혔다. 원본 스키마와 조회 출처·범위를 보존하고, 진단 채널·부품 발견·암묵 활성화·버전/설치 경계를 구체화했다. 문서→얇은 지침→필요 자료→UI 조회의 순서로 각 요소의 효과를 확인한다. 상세 파일·도구·검증 계약과 발견별 처리 표는 [설계 문서](design_draft.md)를 따른다.
 
 독립 검토 대상은 초기 가설이며, 상세 설계의 행동 평가나 실제 구현 검증은 아니다. 파일시스템과 호스트 지침까지 격리됐다는 보장도 하지 않는다. 스킬 구현·설치·발행과 제품 명세·결정 등록부 변경은 수행하지 않았다.

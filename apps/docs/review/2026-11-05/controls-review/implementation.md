@@ -25,8 +25,8 @@ ECharts에서 가져온 것은 작성자가 지정한 필드 조작, 공유 실�
 | 렌더러 수명 | 최신 요청, disposal 순서, 페이지 종료·재개, 실패 복구, debounce의 4개 테스트 통과. [결과](session-tests.tap) |
 | 문서 무결성 | 335 HTML, 123 언어 쌍, 132 계열 페이지, 246 전체 메뉴, 46,100 내부 링크·앵커 검사 오류 0. [결과](site-integrity.json) |
 | 생성·앱 코드 | 66계열 × 2언어 레퍼런스 생성 일치. 실제 표시된 setup.ts/view.json 132쌍 타입 검사 통과. [결과](setup-typecheck.log) |
-| 타입 | 전체 workspace 검사에서 core·Svelte와 예제·Svelte UI·docs 오류 0. docs의 미사용 import hint를 제거한 뒤 최종 docs 검사에서 오류·경고·hint 0. [전체 로그](workspace-typecheck.log), [최종 docs 로그](docs-typecheck.log) |
-| 개발 서버 | 4321 서버 재시작 후 375px 어두운 테마에서 한글·기호 옵션 변경, 실제 UI 갱신, JSON 이동, 기본 복원 및 브라우저 오류 0 확인. [결과](dev-smoke.json) |
+| 타입 | 전체 workspace 검사에서 core·Svelte와 예제·docs 오류 0. docs의 미사용 import hint를 제거한 뒤 최종 docs 검사에서 오류·경고·hint 0. [전체 로그](workspace-typecheck.log), [최종 docs 로그](docs-typecheck.log) |
+| 개발 서버 | 4321 서버 재시작 후 375px 어두운 테마에서 한글·기호 옵션 변경, 실제 UI 갱신, JSON 이동, 기본 복원 및 브라우저 오류 0 확인. |
 | 빌드 | Astro 정적 빌드 완료, Pagefind 335 HTML 색인 완료. 사이트 주소 미설정에 따른 기존 sitemap 생략 및 Astro Markdown 설정 폐기 예정 알림은 남아 있다. |
 
 독립 코드 리뷰에서 JSON을 수정한 뒤 Shiki의 밝은 배경 inline style이 남아 어두운 테마를 해치는 결함을 발견했다. 동적 JSON 표시로 바꿀 때 해당 style을 제거하고, 최종 매트릭스에 실제 계산된 배경색 검사를 추가해 확인했다. API 링크 왕복 시 브라우저의 기본 앵커 이동이 옵션 초점을 덮는 문제도 수정했다.

@@ -19,7 +19,6 @@
 | 항목 | 원래 가설 | 검토를 반영한 제안 |
 |---|---|---|
 | 진입 | `viewstem` 하나 | 유지. 분리를 정당화할 독립 사용·누락 증거가 생기면 재검토 |
-| 참조 자료 | setup, definitions, data-actions, svelte-host, svelte-ui, troubleshooting 후보 | 책임 경계 후보로 유지. 모든 파일을 미리 만들지 않고 기존 문서로 해결되지 않는 작업 지침만 추가 |
 | 보조 도구 | 설치 패키지의 ID별 UI·CEL 계약 조회 | 도구 포함은 평가 대상. UI는 큰 출력에 대해 필드 선택·중복 제거·명시적 생략과 상세 접근을 지원하는 방향(R1) |
 | 평가 | 문서와 전체 스킬 비교 | 문서 → 얇은 스킬 → 필요한 참조/도구 추가의 단계적 비교(R2) |
 | 진단 | snapshot·진단·최소 재현 | 증상별 공개 채널과 기대/실제 결과 연결(R3) |
@@ -47,7 +46,6 @@ R1–R7은 [통합 보고서](goldfish_review_report.md)의 요구 식별자다.
 | definitions | View/Component·State/Derived·ports·표현식·when/repeat | 값과 핸들·문맥과 입력·인스턴스와 key 경계 |
 | data-actions | Query/Datasource/Variable·Action·URL | 입력부터 조회·상태·동작까지의 연결, 실패·취소·재조회 의미 |
 | svelte-host | 마운트·기존 앱 연결·custom adapter·정리 | 계약/구현 등록, emit·slot, 소유/차용 View, 완료 신호 |
-| svelte-ui | 폼·표·대화상자 등 제공 UI 조합 | 계열·등록·CSS·input/event/slot·JSON/native 경계 |
 | troubleshooting | 출력 누락·값 미변경·stale·취소와 교체 | 실패 경계·공개 진단 채널·최소 재현·기대/실제 결과 |
 
 각 후보는 상세 API 문서의 복사본이 아니다. [현재 문서 지도](../../README.md), [패키지 가이드 구성](../../handoff/docs-package-reference-2026-11-05.md), 공개 패키지 README를 재사용한다. 원문에 기록한 알려진 구현 차이를 모든 버전의 영구 규칙으로 복제하지 않는다.

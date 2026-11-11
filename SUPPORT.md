@@ -31,8 +31,7 @@ Use the relevant package's documentation for its public contract and limitations
 
 - [Core](packages/core/README.md): framework-independent runtime and CEL support.
 - [Svelte](packages/svelte/README.md): Svelte 5 client renderer and explicit registration.
-- [Svelte UI](packages/svelte-ui/README.md): shadcn JSON adapters, native-only parts,
-  and supported combinations.
+- [UI](packages/ui/README.md): browser renderer and default JSON component catalog.
 
 The [CI workflow](.github/workflows/core.yml) defines the tested Node matrix.
 Current browser evidence covers Chromium. It does not establish Firefox, WebKit,

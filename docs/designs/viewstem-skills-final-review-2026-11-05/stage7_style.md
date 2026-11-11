@@ -19,7 +19,6 @@ Reviewer `/root/final_stage7_style`, actual FINAL_ANSWER received.
 - EGM `agents/style.md` 전체. SHA-256 `9330780622baaef8dc683ea78efb3ff8e4583e3dde7ab6092b84df50e8c9ea58`.
 - 대상: 1–231행 검토, 232–267행 문맥. SHA-256 `93d6a46b61ed990fb2385b3e6565950d90033bdeeb72015406f2f8a1820b6967`.
 - `goldfish_context.md` 전체.
-- 추가 근거: `docs/README.md` 전체, `docs/VIEWSTEM-SPEC.md` 도입부 일부·§8.5, `docs/designs/viewstem-skills-inspection-2026-11-05.json` 전체, `packages/svelte-ui/README.md`의 native 조합·callback payload·CSS·검증 범위, `packages/svelte/README.md`의 오류 관찰·완료·수명 부분.
 - 별도 스타일 표준은 제공되지 않았다. 파일 변경·컴파일·설치·실행 검증은 수행하지 않았다.
 
 경로 반복만 줄여 완료 응답을 보존했다.

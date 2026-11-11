@@ -34,7 +34,6 @@
 
 - 관점: design 1번, comprehension 1번; zoom-out 2번과 structural 1번을 중복 통합.
 - 대상: 원문 38, 81–87, 128행.
-- 근거: [지원 JSON](../../../packages/svelte-ui/src/lib/shadcn/support.json)은 2,287,077 bytes·392항목이다. design과 zoom-out의 compact 참조 확장 모형에서 Button 하나는 41,656 bytes였다. design의 Dialog Root·Trigger·Content·Title·Description + Input·Button 모형은 246,163 bytes였다. 다른 검토자의 직렬화 모형에서는 Button이 약 41.7–45.2KB였다. 표현 모형이 달라 수치를 하나의 동일 측정으로 섞지 않는다. 모두 실제 CLI 출력이나 토큰 측정이 아니다.
 - 실패 시나리오: 간단한 폼·대화상자에서도 공통 HTML/ARIA 입력과 DOM 이벤트 계약이 반복되어 필요한 value·payload·제약이 묻히거나 도구 출력이 잘릴 수 있다.
 - 요구: 부품 선택 뒤 필요한 input/event/slot을 좁혀 조회할 수 있게 하고, 공통 스키마는 중복을 줄인다. mode·필수 입력·선택 필드의 제약과 codec은 보존한다. 생략 범위와 전체 계약으로 가는 경로를 명시한다. 수동 대체 탐색도 JSON 파서로 출력 범위를 제한한다.
 - 평가: 여러 부품을 조합하는 작업에서 누적 출력량, 잘림, 계약 누락, 후속 조회 비용을 함께 비교한다. 짧은 출력 자체를 성공 조건으로 삼지 않는다.
@@ -85,7 +84,6 @@
 
 - 관점: structural 2번.
 - 대상: 원문 44, 83–87행.
-- 근거: [UI README](../../../packages/svelte-ui/README.md)는 callback schema와 실제 이벤트 payload를 구별한다. DOM codec의 직접 payload와 다른 callback의 `{value: argument}` 포장은 다르다. 선택 metadata에는 `schema: true`와 `uncertain: true`가 함께 있고, Trigger의 단일 DOM child 같은 제약은 README에 있으며 레코드의 slot 이름만으로는 드러나지 않는다.
 - 실패 시나리오: 도구의 가공 과정이 codec·uncertain을 지우거나 문서 제약을 수동 지원표로 복제하여 두 번째 계약 관리자가 된다.
 - 요구: 원본 metadata와 계산한 표현을 구별하고 codec·uncertain을 보존한다. metadata에 없는 동작 제약은 대응 revision 문서로 연결한다. 출력 축소를 이유로 지원 목록을 손으로 다시 만들지 않는다.
 - 분류 이유: 스키마 재작성 금지는 이미 있다. 정확한 출력 의미를 보강하면 되며 범용 해석기를 요구하지 않는다.

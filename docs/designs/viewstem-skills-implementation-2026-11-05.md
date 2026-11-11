@@ -15,7 +15,6 @@
 | 0. 리뷰 보완 | Modify `design_draft.md`, `docs/VIEWSTEM-SPEC.md`, `docs/history/decision-register.md`; Create 이 계획 | F1–F7 계약, 조건부 helper, 호스트 경로, 소비 검증, 초기 평가 범위 명시 |
 | 1. 최소 후보 B | Create `skills/viewstem/SKILL.md`, `skills/viewstem/agents/openai.yaml`, `skills/viewstem/integrations/codex.md`, `skills/viewstem/integrations/claude-code.md` | 공통 본문·상대 참조·공개 계약·호스트별 차이를 분리. 작업용 references는 아직 만들지 않음 |
 | 2. 초기 비교 | Create `skills/tests/scenarios.json`, `skills/tests/consumer.mjs`, `skills/tests/run-initial.mjs`, `skills/tests/behavior-results.json`; Create `docs/handoff/viewstem-skills-initial-2026-11-05.md` | 고정 tarball과 외부 앱 snapshot으로 Codex의 3과제 × A/B 각 1회 비교. 관찰 후 본문 보완 B2를 같은 3과제에 각 1회 재평가. Claude는 A/최종 B2 입력·호출 초안을 준비하고 not_run 기록 |
-| 3. 필요한 보강 C | 관찰 실패에 해당하는 `skills/viewstem/references/setup.md`, `definitions.md`, `data-actions.md`, `svelte-host.md`, `svelte-ui.md`, `troubleshooting.md` 중 필요한 파일만 Create; SKILL 라우팅 수정 | 추가 근거와 해결할 실패를 기록하고 해당 과제를 같은 조건으로 다시 실행 |
 | 4. 조건부 helper D | **C에서도 UI 선택 조회의 반복 오류/과도한 출력이 남을 때만** Create `skills/viewstem/scripts/inspect-ui.mjs`, `skills/tests/inspect-ui.test.mjs` | 아래 출력 계약과 원문 보존 검사, C 대비 해당 과제 재평가. 조건 미충족이면 근거와 생략을 기록 |
 
 초기 비교의 목적은 구성 선택이다. helper가 없어도 최소 스킬 완료가 가능하다. 전체 10개 시나리오 반복·클라우드 설치 실증·npm/스킬 공개 릴리스는 이번 초기 실행과 구분한다. 제품 API·루트 의존성·CI·문서 사이트는 변경 범위가 아니다. 테스트 도구는 배포 폴더 밖에 둔다.
@@ -30,7 +29,6 @@
 
 ## 3. 소비 검증 실행 계약 (F4)
 
-관리자가 기존 빌드 명령 `npm run build:svelte-ui`를 수행한 뒤 세 패키지를 `npm pack --ignore-scripts --json`으로 외부 작업 디렉터리에 만든다. package name/version/integrity/SHA-256을 고정한다. 소비자는 tarball 3개와 Svelte 5.57.3을 `--ignore-scripts`로 설치한다. npm 발행 여부를 가정하지 않는다.
 
 ```text
 node skills/tests/consumer.mjs prepare --project <새 외부 빈 디렉터리> --tarballs <고정 tarball 디렉터리>
@@ -67,25 +65,19 @@ node skills/tests/consumer.mjs check --project <외부 소비 앱> --scenario na
 
 이 절은 구현할 때의 고정 계약이며 현재 실행 가능한 도구가 아니다. stdout은 `JSON.stringify(envelope) + '\n'` 한 번, UTF-8 바이트 기준 **전체 성공 envelope와 끝 개행을 합해 16,384 bytes 이하**로 한다. 오류 envelope는 같은 한도를 넘는 긴 원문 메시지·스키마를 넣지 않는다.
 
-성공 공통 필드:
-
-```json
-{"outputVersion":1,"ok":true,"source":{"package":"@viewstem/svelte-ui","version":"0.1.0","path":"/absolute/support.json","formatVersion":1,"sha256":"<64 lowercase hex>"},"result":{}}
-```
-
-`result`의 고정 형태:
+성공 응답에는 `outputVersion`, `ok`, `source`, `result`를 둔다. `source`는 `@viewstem/ui`의 버전, 공개 지원 파일 경로, SHA-256을 포함한다.
 
 | 명령 | result |
 |---|---|
-| list | `{kind:"list",scope:"summary",family:null|string,total:number,offset:number,limit:number,nextOffset:null|number,items:[{id,family,mode}],pointers:["/components/<index>"]}` |
-| describe | `{kind:"describe",scope:"summary",id,family,mode,slots,requiredInputs:[],inputNames:[],eventNames:[],constraints,refs:{properties:null|string,callbacks:null|string,unsupported:null|string},unsupported:{count,pointer:null|string},pointers:[]}` |
-| input | `{kind:"input",scope:"selected-input",id,name,required:boolean,raw:<원본 항목>,refs:{properties:string},pointers:[]}` |
-| event | `{kind:"event",scope:"selected-event",id,name,raw:<원본 항목>,delivery:"direct"|"value-wrapper",refs:{callbacks:string},pointers:[]}` |
+| list | ID와 계열 목록, 전체 개수, 페이지 정보 |
+| describe | ID, 계열, 슬롯, 필수 입력, 입력·이벤트 이름 |
+| input | 지정한 `ports` 항목과 필수 여부 |
+| event | 지정한 `events` 항목의 payload 스키마 |
 
-field의 실제 의미가 원문에 없으면 constraints/slots는 null을 사용하고 추측하지 않는다. `raw`는 원본 항목 그대로다. required와 delivery는 원본에서 계산한 별도 필드이며 raw를 바꾸지 않는다. list의 포인터는 필터·정렬 이후 index가 아니라 원본 components 배열 index다. 선택된 항목과 해당 component/ref의 원본 포인터를 함께 남긴다.
+각 결과는 지원 파일에서 참조한 항목의 JSON Pointer를 제공한다. 목록의 인덱스는 정렬과 필터 적용 전 원본 배열 위치다.
 
 - list 정렬은 ID 오름차순. total은 family 필터 후 개수. 빈 목록 또는 `offset >= total`이면 items/pointers는 빈 배열, nextOffset은 null, 성공이다. 마지막 페이지도 nextOffset=null. 그 외 nextOffset=`offset+items.length`다. 없는 family는 NOT_FOUND다.
-- `schema:true`, uncertain, required, codec을 보존한다. supported event는 JSON event 키로 정확히 찾고 unsupported는 원래 native member 키로 정확히 찾는다. `shadcn.Command.Root`의 `onStateChange` 제한을 찾기 위해 stateChange 별칭을 만들지 않는다.
+- 입력과 이벤트는 지원 파일의 JSON 이름으로 조회하고 원본 스키마를 보존한다.
 - 초과 오류는 `{outputVersion:1,ok:false,error:{code:"OUTPUT_TOO_LARGE",message,nextStep,requiredBytes,limitBytes:16384,path,pointers:[]}}`다. requiredBytes는 반환하려던 전체 성공 envelope+개행의 바이트 수다. 다른 오류도 code/message/nextStep을 필수로 하며 원문 제한이 있으면 reason을 별도로 넣는다.
-- project/인자 오류 exit 2, 데이터/미설치/미지원/크기 오류 exit 1, 성공 exit 0. 일반 오류와 native-only 처리 순서는 기존 설계 §4를 따른다. 모든 입력이 유효한 경우에만 선택 항목을 반환한다.
-- helper 테스트에는 limit1/20/100, 빈/마지막/범위 밖 페이지, 멀티바이트 경계, 전체 envelope 한도, native 거절, 원본 이름의 unsupported, 앱 위치 변경과 no-write를 포함한다. 이 규칙 때문에 helper의 필요성이 자동 입증되는 것은 아니다.
+- project/인자 오류 exit 2, 데이터/미설치/미지원/크기 오류 exit 1, 성공 exit 0. 오류 처리 순서는 기존 설계 §4를 따른다. 모든 입력이 유효한 경우에만 선택 항목을 반환한다.
+- helper 테스트에는 limit1/20/100, 빈/마지막/범위 밖 페이지, 멀티바이트 경계, 전체 envelope 한도, 없는 입력·이벤트, 앱 위치 변경과 no-write를 포함한다. 이 규칙 때문에 helper의 필요성이 자동 입증되는 것은 아니다.

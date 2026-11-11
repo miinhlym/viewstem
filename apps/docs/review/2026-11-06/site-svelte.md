@@ -1,6 +1,6 @@
 # 사이트 UI의 공식 shadcn-svelte 전환
 
-2026-11-06. D130에 따라 홈·문서·예제·Playground의 사이트 UI를 공식 shadcn-svelte로 전환하고 React 관련 의존성을 제거했다. 기존 Neutral 테마·서체·레이아웃·한영 경로·상호작용은 유지한다. 선언형 미리보기의 `@viewstem/svelte-ui`와 사이트용 부품은 기존과 같이 별개다.
+2026-11-06. D130에 따라 홈·문서·예제·Playground의 사이트 UI를 공식 shadcn-svelte로 전환하고 React 관련 의존성을 제거했다. 기존 Neutral 테마·서체·레이아웃·한영 경로·상호작용은 유지한다.
 
 ## 구현 범위
 
@@ -26,7 +26,7 @@
 
 | 검증 | 결과·증거 |
 | --- | --- |
-| 전체 workspace 타입 검사 | core·svelte·svelte-ui·docs 통과. Astro 86파일 및 Svelte 진단 오류·경고 0. [로그](site-svelte/typecheck.txt) |
+| 전체 workspace 타입 검사 | core·svelte·docs 통과. Astro 86파일 및 Svelte 진단 오류·경고 0. [로그](site-svelte/typecheck.txt) |
 | 사이트 production 빌드 | 통과. [로그](site-svelte/build.txt) |
 | 공통 UI 행렬 | 한영 × 밝음·어둠 × 320·1440px × 홈·문서·예제 목록·레슨·Playground = 40/40. 테마 전환, 모바일 메뉴, Escape·포커스 복귀, 파일 탭, 넘침 검사. [기준선](site-svelte/baseline.json), [결과](site-svelte/site-ui.json) |
 | 옵션·JSON·미리보기 | 69개 검사 통과. 입력·IME·검증, 복사·재실행·기본값 복원, 런타임 DOM 유지, 지연 로딩·스트리밍·페이지 수명주기, 해시·반응형 포커스. [결과](site-svelte/options.json). 데모 세션 단위 검사 4개도 통과 |

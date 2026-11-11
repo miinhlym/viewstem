@@ -2,7 +2,6 @@ node:internal/modules/run_main:123
     triggerUncaughtException(
     ^
 
-AssertionError [ERR_ASSERTION]: {"mode":"normal","path":"/docs/svelte-ui/","visit":"cold","fcp":148,"heading":"Svelte UI","geometryStates":1,"geometry":[[{"x":328,"y":132,"width":147.234375,"height":43},{"x":328,"y":207.1875,"width":706,"height":75},{"x":334,"y":211.1875,"width":123.5,"height":14},{"x":168,"y":18,"width":131.828125,"height":28}]],"frames":102,"shifts":[{"time":209.8999999910593,"value":0.000009876543209876543}],"preloads":["/fonts/pretendard/PretendardVariable.subset.91.woff2","/fonts/d2coding/D2Coding-Regular.woff2"],"fonts":[{"familyName":"Pretendard Variable","postScriptName":"PretendardVariable-SemiBold","isCustomFont":true,"glyphCount":9}],"errors":[]}
 
 1 !== 0
 

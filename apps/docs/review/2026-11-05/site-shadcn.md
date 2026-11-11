@@ -1,6 +1,6 @@
 # 사이트 기본 UI의 shadcn/ui 적용
 
-2026-11-05 · D127. 대상은 사이트 자체의 UI이며, 라이브러리 `svelte-ui` 컴포넌트를 재설계하는 작업이 아니다. [공식 Astro 설치](https://ui.shadcn.com/docs/installation/astro)와 [테마](https://ui.shadcn.com/docs/theming)를 기준으로 React 통합·Tailwind·공식 CLI 컴포넌트를 설치했다. 소스·버전·라이선스는 [사이트 upstream](../../upstream/README.md)에 있다.
+2026-11-05 · D127. 대상은 사이트 자체의 UI다. [공식 Astro 설치](https://ui.shadcn.com/docs/installation/astro)와 [테마](https://ui.shadcn.com/docs/theming)를 기준으로 React 통합·Tailwind·공식 CLI 컴포넌트를 설치했다. 소스·버전·라이선스는 [사이트 upstream](../../upstream/README.md)에 있다.
 
 ## 적용 목록
 
@@ -14,8 +14,6 @@
 | Playground | Button, Alert, Resizable | 초안 유지·수동 실행·오류 복구·키보드 크기 조절 |
 
 사이트용 컴포넌트는 `apps/docs/src/components/ui`에 있다. 사이트의 Button은 공식 Button을 Astro 링크/속성에 연결하는 얇은 어댑터이며, 별도 모양을 재구현하지 않는다. 기존 사이트 색상은 기본 Neutral 토큰으로 전환했다. Pretendard/D2Coding 서체와 콘텐츠의 읽기용 레이아웃은 유지한다. CodeMirror 편집기는 사이트 토큰으로 배경·선택·줄 번호·JSON 구문 색상을 맞춘다. 문서 본문과 코드 블록은 기존 읽기·구문 강조 도구를 사용한다.
-
-`@viewstem/svelte-ui` import는 실제 JSON 실행 경로와 미리보기용 stylesheet에만 남는다. 문서 옵션과 Playground 조작부의 Svelte 컴포넌트는 React로 바꿨지만, 미리보기 renderer와 공개 API는 그대로다. 기존 D125/D126의 Svelte 미리보기 출처 계약은 유지하고 사이트 옵션 UI 선택만 D127로 대체한다.
 
 ## 통합에서 수정한 문제
 

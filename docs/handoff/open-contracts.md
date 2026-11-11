@@ -13,7 +13,6 @@ Svelte 5 클라이언트 렌더러는 [U39 구현·검증 인계](svelte-impleme
 | 범위 | 남은 작업과 완료 기준 | 기준 계약·근거 |
 |---|---|---|
 | Dart core·Flutter | 별도 실행기를 같은 의미로 구현하고 교차 적합성 검증. 기존 Dart CEL 후보의 불일치는 해결된 것으로 취급하지 않음 | [제품·언어 경계](implementation-start.md#2-제품과-의존성-경계), [후보 검증 기록](verification-ledger.md) |
-| Svelte UI 확장 | U44에서 고정 shadcn 66개 카탈로그 구현. 후속 kit·추가 preset·SSR·추가 브라우저·scoped JSON 문법은 별도 범위. 현재 native 전용 35개는 미구현이 아니라 host 조합 계약 | [구현·제한](svelte-ui-shadcn-implementation-2026-11-03.md), [실행 기록](svelte-ui-shadcn-verification-results.json) |
 | 선택 차트 패키지 | 엔진별 실제 지원표·공개 입력·렌더링을 제품 패키지로 검증. 독립 실험 통과를 제품 완료로 옮기지 않음 | [차트 계약](../spec/11-optional-charts.md), 제품 인수 대응표의 X 항목 |
 | 실제 서비스 연결 | 서비스가 resolver·권한·secret 저장소·router를 구현하고 해당 환경에서 검증. core에 도메인 의존성을 추가하지 않음 | [HTTP·인증](../spec/01-datasource-auth.md), [호스트 권한](../spec/07-host-integration.md) |
 | 검증 환경 확대 | 다른 브라우저·운영 부하/성능은 실제 대상과 관찰 기준을 정해 검증. 현재 로컬 결과로 지원을 확대하지 않음 | [검증 환경·한계](core-verification-results.json), [CEL 제한](core-cel-support.md) |

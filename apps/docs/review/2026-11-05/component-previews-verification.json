@@ -1131,7 +1131,6 @@
     "workspaces": [
       "core",
       "svelte (including example)",
-      "svelte-ui",
       "docs"
     ],
     "errors": 0,

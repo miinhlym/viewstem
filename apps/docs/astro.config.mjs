@@ -2,28 +2,11 @@ import starlight from '@astrojs/starlight';
 import svelte from '@astrojs/svelte';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
-import { componentDemoSlugs } from './src/examples/component-demos.mjs';
-
-const legacyUiPages = {
-  '': 'ui/',
-  'component-sets/': 'ui/components/',
-  'support/': 'ui/components/',
-  'attributes/': 'ui/components/',
-  'registration/': 'ui/api/',
-  'guides/register-families/': 'ui/api/',
-  'guides/compose-json/': 'ui/guides/mount-in-browser/',
-  'guides/style-and-native/': 'svelte/guides/write-an-adapter/',
-  ...Object.fromEntries(componentDemoSlugs.map(slug => [`components/${slug}/`, `ui/components/${slug}/`])),
-};
-const legacyUiRedirects = Object.fromEntries(['/docs/', '/ko/docs/'].flatMap(base =>
-  Object.entries(legacyUiPages).map(([from, to]) => [`${base}svelte-ui/${from}`, base + to])));
-
 
 export default defineConfig({
   output: 'static',
   vite: { plugins: [tailwindcss()] },
   redirects: {
-    ...legacyUiRedirects,
     '/docs/concepts/state-and-actions/': '/docs/concepts/state/',
     '/ko/docs/concepts/state-and-actions/': '/ko/docs/concepts/state/',
     '/docs/concepts/resources-and-ports/': '/docs/concepts/resources-and-types/',
