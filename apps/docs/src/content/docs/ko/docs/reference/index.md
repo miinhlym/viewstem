@@ -9,6 +9,7 @@ description: 개념을 익혔다면 해결하려는 작업은 패키지 가이�
 |---|---|
 | [DSL](../dsl/) | 리소스, 값 표현식, View·Component, State·포트, Query, Datasource, Action, 타입 |
 | [@viewstem/core](../core/) | UI 없이 런타임 실행, 상태·URL 연결, HTTP·Action 사용 |
+| [@viewstem/ui](../ui/) | 공통 UI 카탈로그를 등록하고 브라우저 DOM에 View 연결 |
 | [@viewstem/svelte](../svelte/) | View 마운트, Svelte 어댑터 작성, 연결 수명 관리 |
 | [@viewstem/svelte-ui](../svelte-ui/) | 컴포넌트 등록, JSON 조합, 스타일·네이티브 Svelte 사용 |
 

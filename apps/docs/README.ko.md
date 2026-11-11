@@ -77,8 +77,8 @@ npm run preview -w @viewstem/docs -- --port 4323
   원본을 site/docs 컴포넌트에서 조합한다. 출처·해시는
   [사이트 upstream 기록](upstream/README.md)이 소유한다. 원본과 라이선스를
   보존하며, 임의로 디자인을 바꾼 vendor 파일의 해시를 승인하는 식으로 검사를 통과시키지 않는다.
-- **JSON 실행 예제:** `@viewstem/svelte`가 `@viewstem/svelte-ui`를 렌더링한다.
-  고정된 라이브러리 원본과 생성물은
+- **JSON 실행 예제:** UI 레퍼런스는 `@viewstem/ui.attach`로, Svelte UI 레퍼런스와
+  예제·플레이그라운드는 `@viewstem/svelte`로 실행한다. 고정된 Svelte UI 원본과 생성물은
   [패키지 upstream 절차](../../packages/svelte-ui/upstream/README.md)가 소유한다.
   미리보기 프레임은 배치를 조절할 수 있지만, 위젯을 shadcn처럼 보이도록 다시
   디자인하지 않는다. 화면 안의 예제뿐 아니라 포털 콘텐츠도 확인한다.
@@ -106,6 +106,7 @@ npm run preview -w @viewstem/docs -- --port 4323
 패키지 계약을 수정한 뒤 저장소 루트에서 다시 생성한다.
 
 ```sh
+npm run build:ui
 node apps/docs/scripts/generate-ui-reference.mjs
 node apps/docs/scripts/generate-ui-reference.mjs --check
 ```
@@ -114,6 +115,8 @@ node apps/docs/scripts/generate-ui-reference.mjs --check
 [component-catalog.ts](src/examples/component-catalog.ts)도 생성하므로 이 매핑이나
 레퍼런스 표를 직접 수정하지 않는다. 라이브러리 계약이 바뀌면 패키지 생성 절차를
 먼저 따른다.
+
+두 UI 패키지에 대해 언어별 66개 상세 페이지를 생성한다. DOM 표는 `packages/ui/dist/support.json`을 기준으로 하므로 해당 패키지를 먼저 빌드한다. `/docs/ui/components/`는 [component-demo-ui-runtime.ts](src/examples/component-demo-ui-runtime.ts)의 core View와 `@viewstem/ui.attach`로 실행하며, Svelte 경로와 원본 예제 JSON을 공유한다. [component-demo-ui-setup.ts](src/examples/component-demo-ui-setup.ts)는 복사 가능한 앱 연결 코드를 만든다. Sonner의 호스트 Action은 별도의 DOM Notifications View에 연결한다.
 
 [MarkdownContent.astro](src/components/docs/MarkdownContent.astro)가 각 컴포넌트
 경로에 [ComponentDemo.astro](src/components/ComponentDemo.astro)를 삽입한다.
@@ -156,7 +159,7 @@ node apps/docs/scripts/generate-ui-reference.mjs --check
 | Astro/Svelte/TypeScript | `npm run typecheck:docs`; `node apps/docs/scripts/verify-site-svelte.mjs`는 사이트 원본·React 제외·빌드된 island를 검사한다 |
 | Core·DSL·UI 사용 코드 또는 작업 가이드 | 각각 `node apps/docs/scripts/verify-core-docs.mjs`, `node apps/docs/scripts/verify-dsl-docs.mjs`, `node apps/docs/scripts/verify-ui-docs.mjs`, `node apps/docs/scripts/verify-task-guides.mjs` |
 | 컴포넌트 레퍼런스·설정 코드 | 생성기 `--check`; `node apps/docs/scripts/verify-component-setup.mjs` |
-| 미리보기 실행·옵션 | `node --test apps/docs/scripts/component-demo-session.test.mjs`; `node apps/docs/scripts/verify-component-demos.mjs`; `node apps/docs/scripts/verify-component-options.mjs` |
+| 미리보기 실행·옵션 | `node --test apps/docs/scripts/component-demo-session.test.mjs`; `node apps/docs/scripts/verify-component-demos.mjs`; `DEMO_RENDERER=ui node apps/docs/scripts/verify-component-demos.mjs`; `node apps/docs/scripts/verify-component-options.mjs` |
 | 사이드바 복원·ScrollArea | `node apps/docs/scripts/verify-sidebar-scroll.mjs`; `node apps/docs/scripts/verify-sidebar-scrollarea.mjs`; 공통 구성·텍스트는 아래 실행 서버 검사 |
 | 라이브러리 미리보기 원본 스타일 | `node apps/docs/scripts/verify-shadcn-fidelity.mjs`; 소스 일치·계산 스타일·상호작용은 별도 증거로 구분한다 |
 

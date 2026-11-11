@@ -16,8 +16,9 @@ Viewstem 패키지는 공개 npm 레지스트리에 아직 발행되지 않았�
 | 하려는 일 | 필요한 패키지 |
 |---|---|
 | DOM 없이 실행·상태·Query를 사용하기 | `@viewstem/core` |
+| 공통 UI 카탈로그를 브라우저 DOM에 렌더링하기 | `@viewstem/core`, `@viewstem/ui` ([로컬 빌드 및 설치](../ui/guides/mount-in-browser/)) |
 | 직접 만든 Svelte 컴포넌트로 렌더링하기 | `@viewstem/core`, `@viewstem/svelte` |
-| 제공되는 shadcn 컴포넌트로 화면 만들기 | 위 두 패키지와 `@viewstem/svelte-ui` |
+| 제공되는 Svelte shadcn 컴포넌트로 화면 만들기 | `@viewstem/core`, `@viewstem/svelte`, `@viewstem/svelte-ui` |
 
 ### Core만 설치하기
 

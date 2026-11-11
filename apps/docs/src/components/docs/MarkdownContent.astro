@@ -2,7 +2,7 @@
 import DefaultMarkdownContent from '@astrojs/starlight/components/MarkdownContent.astro';
 import ComponentDemo from '../ComponentDemo.astro';
 const { entry, lang } = Astro.locals.starlightRoute;
-const family = entry.id.match(/(?:^|\/)docs\/svelte-ui\/components\/([^/]+)$/)?.[1];
+const component = entry.id.match(/(?:^|\/)docs\/(ui|svelte-ui)\/components\/([^/]+)$/);
 ---
-{family && <ComponentDemo family={family} locale={lang === 'ko' ? 'ko' : 'en'} />}
+{component && <ComponentDemo family={component[2]} renderer={component[1] === 'ui' ? 'ui' : 'svelte'} locale={lang === 'ko' ? 'ko' : 'en'} />}
 <DefaultMarkdownContent><slot /></DefaultMarkdownContent>

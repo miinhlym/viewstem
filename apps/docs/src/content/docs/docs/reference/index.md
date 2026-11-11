@@ -9,6 +9,7 @@ Use package guides to complete a task, then look up exact fields and method cont
 |---|---|
 | [DSL](../dsl/) | Resources, expressions, View and Component, State and ports, Query, Datasource, Action, and types |
 | [@viewstem/core](../core/) | Run without a UI, connect State and URLs, and use HTTP and Actions |
+| [@viewstem/ui](../ui/) | Register the shared UI catalog and attach a View to a browser DOM container |
 | [@viewstem/svelte](../svelte/) | Mount a View, write a Svelte adapter, and manage attachment lifetimes |
 | [@viewstem/svelte-ui](../svelte-ui/) | Register components, compose JSON, and use styles and native Svelte parts |
 

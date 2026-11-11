@@ -16,8 +16,9 @@ Viewstem packages are not published to the public npm registry yet. Install them
 | Your task | Packages |
 |---|---|
 | Use execution, State, and Query without a DOM | `@viewstem/core` |
+| Render the shared catalog in a browser DOM container | `@viewstem/core`, `@viewstem/ui` ([local build and installation](../ui/guides/mount-in-browser/)) |
 | Render with your own Svelte components | `@viewstem/core`, `@viewstem/svelte` |
-| Build with the supplied shadcn components | Both packages above plus `@viewstem/svelte-ui` |
+| Build with the supplied Svelte shadcn components | `@viewstem/core`, `@viewstem/svelte`, `@viewstem/svelte-ui` |
 
 ### Install Core only
 

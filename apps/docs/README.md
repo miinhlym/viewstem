@@ -78,8 +78,9 @@ Keep these two UI sources distinct:
   composed by site/docs components. [Site upstream records](upstream/README.md)
   own source provenance and hashes. Preserve upstream code and licenses; do not
   resolve a hash failure by merely accepting locally restyled vendor files.
-- **Runnable JSON examples:** `@viewstem/svelte` renders `@viewstem/svelte-ui`.
-  Its [upstream workflow](../../packages/svelte-ui/upstream/README.md) (Korean)
+- **Runnable JSON examples:** UI references use `@viewstem/ui.attach`; Svelte UI
+  references, examples, and the playground use `@viewstem/svelte`. The Svelte UI
+  [upstream workflow](../../packages/svelte-ui/upstream/README.md) (Korean)
   owns the pinned library sources and generated artifacts. Preview frames may
   arrange content, but must not restyle the widgets to imitate shadcn. Check
   portal content as well as the inline preview.
@@ -110,12 +111,13 @@ outputs. Change the [generator](scripts/generate-ui-reference.mjs), its bilingua
 explanations, or the owning package contract, then regenerate from the repository root:
 
 ```sh
+npm run build:ui
 node apps/docs/scripts/generate-ui-reference.mjs
 node apps/docs/scripts/generate-ui-reference.mjs --check
 ```
 
 The generator reads the package exports, support metadata, wrapper defaults and
-demo controls. It also writes [component-catalog.ts](src/examples/component-catalog.ts).
+demo controls. It generates 66 family pages per locale for both UI packages; DOM tables come from `packages/ui/dist/support.json`. Rebuild that package before regenerating its reference. It also writes [component-catalog.ts](src/examples/component-catalog.ts).
 Do not hand-edit that mapping or generated reference tables. When a library
 contract changes, follow the package generator workflow first.
 
@@ -133,7 +135,9 @@ copied and executed JSON must describe the same initial definition.
 [component-demo-client.ts](src/examples/component-demo-client.ts),
 [component-demo-session.mjs](src/examples/component-demo-session.mjs), and
 [component-demo-runtime.ts](src/examples/component-demo-runtime.ts) manage execution.
-[component-demo-setup.ts](src/examples/component-demo-setup.ts) generates the
+[component-demo-ui-runtime.ts](src/examples/component-demo-ui-runtime.ts) uses core Views and `@viewstem/ui.attach` for `/docs/ui/components/`; Svelte routes keep the Svelte renderer. Both use the same unmodified localized demo JSON. Sonner registers its host Action against a separate DOM Notifications View.
+[component-demo-ui-setup.ts](src/examples/component-demo-ui-setup.ts) and
+[component-demo-setup.ts](src/examples/component-demo-setup.ts) generate the
 consumer setup code. Preserve tab state, option-change reset, rerun versus default
 reset, and user-initiated JSON/reference navigation. Runtime interaction state
 does not rewrite the initial JSON.
@@ -163,7 +167,7 @@ include checks that launch installed Google Chrome.
 | Astro/Svelte/TypeScript | `npm run typecheck:docs`; `node apps/docs/scripts/verify-site-svelte.mjs` checks upstream site sources, React exclusion and built islands |
 | Core, DSL, UI usage snippets or task guides | Respectively `node apps/docs/scripts/verify-core-docs.mjs`, `node apps/docs/scripts/verify-dsl-docs.mjs`, `node apps/docs/scripts/verify-ui-docs.mjs`, `node apps/docs/scripts/verify-task-guides.mjs` |
 | Component references/setup | Generator `--check`; `node apps/docs/scripts/verify-component-setup.mjs` |
-| Demo execution/options | `node --test apps/docs/scripts/component-demo-session.test.mjs`; `node apps/docs/scripts/verify-component-demos.mjs`; `node apps/docs/scripts/verify-component-options.mjs` |
+| Demo execution/options | `node --test apps/docs/scripts/component-demo-session.test.mjs`; `node apps/docs/scripts/verify-component-demos.mjs`; `DEMO_RENDERER=ui node apps/docs/scripts/verify-component-demos.mjs`; `node apps/docs/scripts/verify-component-options.mjs` |
 | Sidebar persistence/ScrollArea | `node apps/docs/scripts/verify-sidebar-scroll.mjs`; `node apps/docs/scripts/verify-sidebar-scrollarea.mjs`; live checks below for shared markup and text |
 | Original library preview styling | `node apps/docs/scripts/verify-shadcn-fidelity.mjs`; source fidelity, computed styles and interactions remain separate evidence |
 

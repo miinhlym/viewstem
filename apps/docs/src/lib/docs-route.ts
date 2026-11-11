@@ -8,11 +8,12 @@ const link = (label: string, href: string, isCurrent = false): Link => ({ type: 
 export const onRequest = defineRouteMiddleware(async (context, next) => {
   await next();
   const route = context.locals.starlightRoute;
-  const base = route.lang === 'ko' ? '/ko/docs/svelte-ui/' : '/docs/svelte-ui/';
   const pathname = context.url.pathname;
+  const ui = /\/docs\/ui\/components\/[^/]+\/$/.test(pathname);
+  const base = `${route.lang === 'ko' ? '/ko' : ''}/docs/${ui ? 'ui' : 'svelte-ui'}/`;
   if (!pathname.startsWith(`${base}components/`) && pathname !== `${base}attributes/`) return;
-  const catalog = `${base}component-sets/`;
-  const back = link(route.lang === 'ko' ? '컴포넌트 세트' : 'Component sets', catalog);
+  const catalog = `${base}${ui ? 'components' : 'component-sets'}/`;
+  const back = link(ui ? (route.lang === 'ko' ? '컴포넌트' : 'Components') : (route.lang === 'ko' ? '컴포넌트 세트' : 'Component sets'), catalog);
   if (pathname === `${base}attributes/`) {
     route.pagination = { prev: back, next: undefined };
     return;

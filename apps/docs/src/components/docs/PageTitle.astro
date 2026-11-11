@@ -6,7 +6,7 @@ const ko = lang === 'ko';
 const base = ko ? '/ko/docs/' : '/docs/';
 const path = Astro.url.pathname.slice(base.length).split('/').filter(Boolean);
 const names: Record<string, string> = {
-  core: '@viewstem/core', svelte: '@viewstem/svelte', 'svelte-ui': '@viewstem/svelte-ui',
+  core: '@viewstem/core', ui: '@viewstem/ui', svelte: '@viewstem/svelte', 'svelte-ui': '@viewstem/svelte-ui',
   concepts: ko ? '핵심 개념' : 'Core concepts', guides: ko ? '가이드' : 'Guides',
   dsl: ko ? 'DSL 레퍼런스' : 'DSL reference', reference: ko ? '레퍼런스 안내' : 'Reference overview',
 };
@@ -17,6 +17,9 @@ if (path.length > 1 && names[section]) {
 }
 if (section === 'svelte-ui' && (path[1] === 'components' || path[1] === 'attributes')) {
   links.push({ label: ko ? '컴포넌트 세트' : 'Component sets', href: `${base}svelte-ui/component-sets/` });
+}
+if (section === 'ui' && path[1] === 'components' && path.length > 2) {
+  links.push({ label: ko ? '컴포넌트' : 'Components', href: `${base}ui/components/` });
 }
 ---
 {path.length > 0 && <SiteBreadcrumb links={links} title={entry.data.title} label={ko ? '문서 위치' : 'Breadcrumb'} />}

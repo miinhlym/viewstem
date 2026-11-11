@@ -20,3 +20,5 @@ sidebar:
 - [Support metadata and stylesheet](support/) explains the two static package exports, JSON input schemas, and event payloads.
 
 The catalog includes 66 families and 386 upstream Svelte parts. The full kit registers 351 of those parts and six additional JSON compositions, for 357 Viewstem component IDs. The other 35 upstream parts require native Svelte context.
+
+[Viewstem UI](../ui/) renders the shared JSON catalog into a browser DOM container from plain JavaScript or a framework host.

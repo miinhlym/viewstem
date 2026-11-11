@@ -29,9 +29,15 @@ export function setupComponentDemo(container: HTMLElement) {
   };
   const session = createDemoSession({
     async mount(snapshot, version) {
-      const { mountComponentDemo } = await import('./component-demo-runtime');
       const surface = document.createElement('div');
       target.replaceChildren(surface);
+      if (container.dataset.renderer === 'ui') {
+        const { mountUiComponentDemo } = await import('./component-demo-ui-runtime');
+        return mountUiComponentDemo(surface, JSON.parse(snapshot) as ViewSpec, container.dataset.family!, error => {
+          if (session.isCurrent(version)) showError(error);
+        });
+      }
+      const { mountComponentDemo } = await import('./component-demo-runtime');
       return mountComponentDemo(surface, JSON.parse(snapshot) as ViewSpec, container.dataset.family!, diagnostic => {
         if (session.isCurrent(version)) showError(diagnostic.error);
       });

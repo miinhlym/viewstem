@@ -1,6 +1,6 @@
-/* Preserve the pinned shadcn-svelte Neutral defaults, including body portals.
+/* Preserve both packages' Neutral defaults, including Svelte body portals.
    Site branding must not redefine the components being documented. */
-html:has([data-component-demo]) :is([data-viewstem-shadcn], .viewstem-shadcn-root):not(.masthead *) {
+html:has([data-component-demo]) :is([data-viewstem-shadcn], .viewstem-shadcn-root, [data-viewstem-ui]):not(.masthead *) {
   --viewstem-background: initial;
   --viewstem-foreground: initial;
   --viewstem-card: initial;

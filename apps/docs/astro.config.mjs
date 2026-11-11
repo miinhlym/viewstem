@@ -93,6 +93,14 @@ export default defineConfig({
           ],
         },
         {
+          label: '@viewstem/ui',
+          collapsed: true,
+          items: [
+            'docs/ui', 'docs/ui/guides/mount-in-browser', 'docs/ui/api', 'docs/ui/components',
+            { label: 'Components', translations: { ko: '컴포넌트' }, collapsed: false, items: [{ autogenerate: { directory: 'docs/ui/components' } }] },
+          ],
+        },
+        {
           label: '@viewstem/svelte',
           collapsed: true,
           items: [

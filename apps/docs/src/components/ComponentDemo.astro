@@ -5,25 +5,30 @@ import DemoWorkbench from './DemoWorkbench.svelte';
 import '../styles/component-demo-theme.css';
 import '../styles/demo-workbench.css';
 import '../styles/demo-options-layout.css';
-import styles from '@viewstem/svelte-ui/shadcn/styles.css?url';
+import svelteStyles from '@viewstem/svelte-ui/shadcn/styles.css?url';
+import uiStyles from '@viewstem/ui/styles.css?url';
 import { getComponentDemo } from '../examples/component-demos.mjs';
 import { getDemoControls } from '../examples/component-demo-controls.mjs';
 import { demoSetupSource } from '../examples/component-demo-setup';
+import { uiDemoSetupSource } from '../examples/component-demo-ui-setup';
 
-interface Props { family: string; locale: 'en' | 'ko'; }
-const { family, locale } = Astro.props;
+interface Props { family: string; locale: 'en' | 'ko'; renderer?: 'svelte' | 'ui'; }
+const { family, locale, renderer = 'svelte' } = Astro.props;
 const ko = locale === 'ko';
 const demo = getComponentDemo(family, locale);
 if (!demo) throw new Error(`Missing component demo: ${family}/${locale}`);
 const source = JSON.stringify(demo.view, null, 2);
 const controls = getDemoControls(family, locale, demo.view);
 const serialized = source.replace(/</g, '\\u003c');
+const setup = renderer === 'ui' ? uiDemoSetupSource(demo.view, family) : demoSetupSource(demo.view, family);
 ---
-<link rel="stylesheet" href={styles} />
-<section class="component-demo" data-component-demo data-family={family} data-locale={locale} aria-labelledby="component-preview">
+<link rel="stylesheet" href={renderer === 'ui' ? uiStyles : svelteStyles} />
+<section class="component-demo" data-component-demo data-family={family} data-locale={locale} data-renderer={renderer} aria-labelledby="component-preview">
   <h2 id="component-preview">{ko ? '직접 사용해 보기' : 'Try it'}</h2>
   <p>{demo.description}</p>
-  {demo.instructions && <p class="instructions">{demo.instructions}</p>}
+  {demo.instructions && <p class="instructions">{renderer === 'ui' && family === 'sonner'
+    ? (ko ? '호스트가 docs-show-toast Action을 등록하고 @viewstem/ui의 Notifications로 알림을 표시합니다. 앱 실행 코드에서 전체 연결을 확인할 수 있습니다.' : 'The host registers the docs-show-toast Action and displays notifications with @viewstem/ui Notifications. The app setup below includes this connection.')
+    : demo.instructions}</p>}
   <DemoWorkbench ko={ko} controls={controls} client:load>
     <div slot="preview"><ScrollRegion client:load><div class="preview-surface"><div class="preview-stage" data-demo-target aria-busy="true"></div></div></ScrollRegion></div>
     <div slot="source">
@@ -36,7 +41,7 @@ const serialized = source.replace(/</g, '\\u003c');
   <details class="setup-code">
     <summary>{ko ? '앱에서 실행하기 · setup.ts' : 'Run in your app · setup.ts'}</summary>
     <p>{ko ? 'HTML에 <div id="preview"></div>를 만들고 view.json과 함께 사용하세요.' : 'Add <div id="preview"></div> to your HTML and use this with view.json.'}</p>
-    <ScrollRegion client:load label="setup.ts"><Code code={demoSetupSource(demo.view, family)} lang="ts" themes={{ light: 'github-light', dark: 'github-dark' }} /></ScrollRegion>
+    <ScrollRegion client:load label="setup.ts"><Code code={setup} lang="ts" themes={{ light: 'github-light', dark: 'github-dark' }} /></ScrollRegion>
   </details>
   <script type="application/json" data-demo-view set:html={serialized} />
 </section>

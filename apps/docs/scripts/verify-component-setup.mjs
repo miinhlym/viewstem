@@ -18,8 +18,8 @@ try {
     types: [], lib: ['ES2022', 'DOM', 'DOM.Iterable'],
   }, include: ['**/*.ts'] }));
   let count = 0;
-  for (const locale of ['en', 'ko']) for (const family of componentDemoSlugs) {
-    const html = await readFile(join(root, 'apps/docs/dist', locale === 'ko' ? 'ko' : '', 'docs/svelte-ui/components', family, 'index.html'), 'utf8');
+  for (const renderer of ['ui', 'svelte-ui']) for (const locale of ['en', 'ko']) for (const family of componentDemoSlugs) {
+    const html = await readFile(join(root, 'apps/docs/dist', locale === 'ko' ? 'ko' : '', `docs/${renderer}/components`, family, 'index.html'), 'utf8');
     let setup;
     let source;
     function visit(node, insideSetup = false) {
@@ -31,7 +31,7 @@ try {
     }
     visit(parse(html));
     assert.ok(setup && source, `${locale}/${family} missing setup or JSON`);
-    const directory = join(temporary, `${locale}-${family}`);
+    const directory = join(temporary, `${renderer}-${locale}-${family}`);
     await mkdir(directory);
     await writeFile(join(directory, 'setup.ts'), setup);
     await writeFile(join(directory, 'view.json'), source);
