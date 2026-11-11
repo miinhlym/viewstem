@@ -658,6 +658,8 @@ export function combobox(element: Widget, send: Send, signal: AbortSignal): Beha
 export function command(element: Widget, send: Send, signal: AbortSignal): Behavior {
   const control = manage(element, 'command');
   const view = element.ownerDocument.defaultView!;
+  const boundary = '[data-vs-component="Command.Root"], [data-vs-component="Command.Dialog"]';
+  const owner = element.closest(boundary);
   let menu: HTMLElement | null = null;
   let items: HTMLElement[] = [];
   let filters = '';
@@ -685,7 +687,11 @@ export function command(element: Widget, send: Send, signal: AbortSignal): Behav
   }, { signal });
   return {
     sync(inputs) {
-      const nextMenu = element.querySelector<HTMLElement>('[role="menu"]');
+      const input = element.querySelector('header input');
+      const candidate = element.querySelector<HTMLElement>('[role="menu"]');
+      // An explicit Command.Root inside a dialog owns its own controller.
+      const nextMenu = input?.closest(boundary) === owner && candidate?.closest(boundary) === owner ? candidate : null;
+      if (element !== owner) element.classList.toggle('command', nextMenu !== null);
       if (nextMenu !== menu) {
         observer.disconnect();
         menu = nextMenu;
@@ -697,7 +703,7 @@ export function command(element: Widget, send: Send, signal: AbortSignal): Behav
       const nextItems = [...menu.querySelectorAll<HTMLElement>('[role="menuitem"]')];
       for (const item of nextItems) item.id ||= uniqueId();
       const signature = JSON.stringify(nextItems.map(item => [valueOf(item), item.textContent, item.dataset.keywords, item.getAttribute('aria-disabled')]));
-      if (!control.init([element.querySelector('header input'), menu])) return;
+      if (!control.init([input, menu])) return;
       if (filters !== signature || nextItems.some((item, index) => item !== items[index])) {
         element.refresh?.();
         filters = signature;

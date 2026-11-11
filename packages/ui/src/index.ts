@@ -316,7 +316,9 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
       handle.setAttribute('aria-hidden', 'true');
       host.append(handle);
     }
-    const enhancement = behavior(name, control, send, signal);
+    const enhancement = name === 'Command.Dialog'
+      ? command(host, send, signal)
+      : behavior(name, control, send, signal);
     if (enhancement) entry.behavior = enhancement;
     return entry;
   }

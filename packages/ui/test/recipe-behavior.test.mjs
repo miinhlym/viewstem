@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { build } from 'esbuild';
 import { chromium } from 'playwright';
@@ -100,6 +101,66 @@ test('Input and Textarea render numeric State values', { timeout: 30_000 }, asyn
   }
   assert.deepEqual(await page.evaluate(() => [window.errors, window.view.getSnapshot().errors]), [[], []]);
   await page.evaluate(() => window.disposeRecipe());
+});
+
+test('Command.Dialog searches and selects commands by keyboard', { timeout: 30_000 }, async t => {
+  const browser = await chromium.launch({ headless: true });
+  t.after(() => browser.close());
+  const styles = await readFile(new URL('../dist/styles.css', import.meta.url), 'utf8');
+  for (const nested of [false, true]) {
+    await t.test(nested ? 'explicit Command.Root' : 'direct command slots', async t => {
+      const page = await browser.newPage();
+      t.after(() => page.close());
+      await page.setContent('<!doctype html><main id="app"></main>');
+      await page.addStyleTag({ content: styles });
+      await page.addScriptTag({ content: bundle.outputFiles[0].text });
+      const schema = { type: 'string' };
+      const command = (id, text, disabled = false) => ({
+        id,
+        componentRef: 'shadcn.Command.Item',
+        inputs: { text, value: id, disabled },
+        on: { select: {
+          action: {
+            ports: { selection: { kind: 'State', schema, required: true } },
+            steps: [{ kind: 'SetState', target: { '@path': '/ports/selection' }, value: id }],
+          },
+          inputs: { selection: { '@path': '/states/selection' } },
+        } },
+      });
+      const parts = [
+        { id: 'search', componentRef: 'shadcn.Command.Input', inputs: { 'aria-label': 'Search commands' } },
+        { id: 'list', componentRef: 'shadcn.Command.List', slots: { default: [
+          command('apple', 'Apple'), command('bread', 'Banana Bread'),
+          command('disabled', 'Banana Disabled', true), command('split', 'Banana Split'),
+        ] } },
+      ];
+      const children = nested ? [{ id: 'command', componentRef: 'shadcn.Command.Root', slots: { default: parts } }] : parts;
+      await page.evaluate(definition => window.mountRecipe(definition), {
+        states: { selection: { kind: 'State', schema, initial: '' } },
+        render: {
+          id: 'palette', componentRef: 'shadcn.Command.Dialog',
+          inputs: { open: true, title: 'Commands' }, slots: { default: children },
+        },
+      });
+      const dialog = page.getByRole('dialog', { name: 'Commands' });
+      const search = dialog.getByLabel('Search commands');
+      assert.equal(await dialog.locator('[data-command-initialized]').count(), 1);
+      const activeCommand = () => search.evaluate(input =>
+        input.ownerDocument.getElementById(input.getAttribute('aria-activedescendant'))?.textContent);
+      await search.fill('banana');
+      assert.equal(await dialog.getByText('Apple', { exact: true }).isVisible(), false);
+      assert.equal(await activeCommand(), 'Banana Bread');
+      await search.press('ArrowDown');
+      assert.equal(await activeCommand(), 'Banana Split');
+      await search.press('ArrowUp');
+      assert.equal(await activeCommand(), 'Banana Bread');
+      await search.press('ArrowDown');
+      await search.press('Enter');
+      await expectState(page, 'selection', 'split');
+      assert.deepEqual(await page.evaluate(() => [window.errors, window.view.getSnapshot().errors]), [[], []]);
+      await page.evaluate(() => window.disposeRecipe());
+    });
+  }
 });
 
 test('multi-thumb Slider emits the whole range and accepts external State updates', { timeout: 30_000 }, async t => {
