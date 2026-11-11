@@ -23,4 +23,4 @@ Viewstem은 프레임워크에 독립적인 선언형 UI 런타임입니다. JSO
 
 ## 패키지별 사용법과 API
 
-[Core](./core/)에서 실행·상태·데이터 API를 확인하세요. 브라우저 DOM에서 공통 UI 카탈로그를 쓰려면 [Viewstem UI](./ui/)를, 네이티브 Svelte 컴포넌트를 쓰려면 [Svelte](./svelte/)와 [Svelte UI](./svelte-ui/)를 참고하세요. JSON 정의의 정확한 필드는 [DSL 레퍼런스](./dsl/)에서 찾을 수 있습니다.
+[Core](./core/)에서 실행·상태·데이터 API를 확인하세요. 브라우저 DOM에서 공통 UI 카탈로그를 쓰려면 [Viewstem UI](./ui/)를, 네이티브 Svelte 컴포넌트를 쓰려면 [Svelte](./svelte/)에서 앱 컴포넌트 등록 방법을 확인하세요. JSON 정의의 정확한 필드는 [DSL 레퍼런스](./dsl/)에서 찾을 수 있습니다.

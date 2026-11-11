@@ -50,7 +50,7 @@ try {
     }
     // Both menus use the same Sheet, ScrollArea and navigation tree.
     await page.setViewportSize({width:375,height:812});
-    await page.goto(origin+prefix+'/docs/svelte-ui/components/tooltip/');
+    await page.goto(origin+prefix+'/docs/ui/components/tooltip/');
     await page.getByRole('button',{name:ko?'문서 메뉴':'Docs menu',exact:true}).click();
     await page.getByRole('dialog').waitFor();
     const mobileDocs = await styles(page,'[role="dialog"]');

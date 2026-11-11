@@ -4,7 +4,7 @@ import { writeFile } from 'node:fs/promises';
 const origin = process.env.DOCS_ORIGIN ?? 'http://localhost:4321';
 const browser = await chromium.launch({ channel: 'chrome' });
 const properties = ['font-family','font-size','font-weight','font-style','line-height','letter-spacing','word-spacing','font-feature-settings','font-variation-settings','font-kerning','font-optical-sizing','font-synthesis','-webkit-font-smoothing','text-rendering','text-size-adjust','text-autospace','word-break','overflow-wrap','color'];
-const routes = ['/docs/quickstart/','/','/examples/','/examples/first-view/','/playground/','/docs/svelte-ui/components/button/'];
+const routes = ['/docs/quickstart/','/','/examples/','/examples/first-view/','/playground/','/docs/ui/components/button/'];
 const checks = [], failures = [];
 try {
  for (const locale of (process.env.TEST_LOCALES?.split(',') ?? ['ko','en'])) for (const width of (process.env.TEST_WIDTHS?.split(',').map(Number) ?? [375,768,1440])) for (const theme of (process.env.TEST_THEMES?.split(',') ?? ['light','dark'])) {

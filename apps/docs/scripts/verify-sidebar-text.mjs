@@ -16,7 +16,7 @@ try {
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
-    const base = `${locale === 'ko' ? '/ko' : ''}/docs/svelte-ui/components/`;
+    const base = `${locale === 'ko' ? '/ko' : ''}/docs/ui/components/`;
     try {
       await page.goto(`${origin}${base}button/`);
       await page.waitForFunction(() => !document.querySelector('[data-sidebar-bootstrap]'));

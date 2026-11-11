@@ -15,7 +15,15 @@ const reactImport=/(?:from\s*|import\s*\(|import\s*)["'](?:react(?:-dom)?(?:\/[^
 for(const name of sourceFiles.filter(name=>/\.(?:[cm]?[jt]s|svelte|astro)$/.test(name)))assert.ok(!reactImport.test(await readFile(name,'utf8')),name);
 const lock=JSON.parse(await readFile(join(root,'../../package-lock.json')));
 const reactPackage=/(?:^|\/)node_modules\/(?:react|react-dom|@astrojs\/react|@types\/react(?:-dom)?|@radix-ui\/react-[^/]+|radix-ui|lucide-react|react-resizable-panels|shadcn)$/;
-assert.deepEqual(Object.keys(lock.packages).filter(name=>reactPackage.test(name)),[],'No React runtime, types, integration or UI dependencies');
+const sitePackage=JSON.parse(await readFile(join(root,'package.json')));
+const siteDependencies=[...Object.keys(sitePackage.dependencies),...Object.keys(sitePackage.devDependencies)];
+const siteReactDependencies=siteDependencies.filter(name=>reactPackage.test(`node_modules/${name}`));
+assert.deepEqual(siteReactDependencies,[],'The site has no React dependencies');
+const uiTestDependencies=new Set(['node_modules/react','node_modules/react-dom']);
+const unexpectedReactPackages=Object.entries(lock.packages).filter(([name,entry])=>
+  reactPackage.test(name) && !(uiTestDependencies.has(name) && entry.dev === true)
+).map(([name])=>name);
+assert.deepEqual(unexpectedReactPackages,[],'Only the UI consumer fixtures may bring in React test dependencies');
 let islands=0;
 for(const name of (await walk(join(root,'dist'))).filter(name=>name.endsWith('.html'))){
   const html=await readFile(name,'utf8');const renderers=[...html.matchAll(/renderer-url="([^"]+)"/g)];

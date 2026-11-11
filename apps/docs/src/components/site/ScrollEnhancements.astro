@@ -6,7 +6,7 @@
   const regions = new Map<HTMLElement, ReturnType<typeof mount>>();
   const enhance = () => {
     for (const element of document.querySelectorAll<HTMLElement>('.sl-markdown-content pre, .sl-markdown-content table, .home-landing pre')) {
-      if (element.closest('[data-site-scroll], [data-viewstem-shadcn], .viewstem-shadcn-root')) continue;
+      if (element.closest('[data-site-scroll], [data-viewstem-ui]')) continue;
       const host = document.createElement('div');
       host.className = 'static-scroll-host';
       element.before(host);

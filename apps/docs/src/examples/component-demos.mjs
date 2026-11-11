@@ -492,7 +492,7 @@ export const componentDemoSlugs = Object.freeze([...localizedDemos.en.keys()]);
 /**
  * @param {string} slug
  * @param {'en' | 'ko'} locale
- * @returns {{ view: import('@viewstem/svelte').ViewSpec, title: string, description: string, instructions?: string } | undefined}
+ * @returns {{ view: import('@viewstem/core').ViewSpec, title: string, description: string, instructions?: string } | undefined}
  */
 export function getComponentDemo(slug, locale) {
   const demo = localizedDemos[locale].get(slug);
@@ -502,3 +502,5 @@ export function getComponentDemo(slug, locale) {
     description: descriptions[slug][locale === 'ko' ? 1 : 0],
   };
 }
+
+export { boolean, number, string, state, read, node, text, button, controlled, bound, field, example };

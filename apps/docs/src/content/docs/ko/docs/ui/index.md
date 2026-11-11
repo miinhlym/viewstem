@@ -5,7 +5,7 @@ description: 프레임워크에 독립적인 UI 패키지로 브라우저에서 
 
 `@viewstem/ui`는 [`@viewstem/core`](../core/)의 View를 브라우저 DOM 컨테이너에 렌더링합니다. Basecoat Vega 스타일과 Neutral 색상 팔레트를 적용한 공통 shadcn 컴포넌트 카탈로그를 제공합니다. 순수 JavaScript, React, Vue, Svelte 앱에서 같은 DOM 연결 API를 사용할 수 있습니다.
 
-현재 저장소에서 비공개 워크스페이스 프로토타입으로 관리합니다. 브라우저 가이드에서 로컬 패키지 파일을 만들어 설치하는 방법을 설명합니다.
+브라우저 가이드에서 패키지를 로컬 tarball로 빌드하고 설치하는 방법을 설명합니다.
 
 ## 가이드
 

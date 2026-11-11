@@ -1,9 +1,7 @@
 # Site UI sources
 
 The website uses official **shadcn-svelte**, installed directly in the Astro site.
-It follows https://www.shadcn-svelte.com/docs/installation/astro. Site controls do
-not import the library's `@viewstem/svelte-ui` catalog; that package remains the
-runtime behind the public JSON examples.
+It follows https://www.shadcn-svelte.com/docs/installation/astro. The public JSON examples use `@viewstem/ui` for rendering. The site controls are maintained separately in this app.
 
 - CLI: `shadcn-svelte@1.8.0`; configuration: `../components.json`.
 - Registry style: `nova`; icons: Lucide; base color: Neutral.

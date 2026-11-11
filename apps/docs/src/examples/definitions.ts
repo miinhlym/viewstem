@@ -1,7 +1,7 @@
 import type {
   ActionSpec, AnyResource, ComponentNode, InputExpressions, JsonValue,
   QuerySpec, ResourceStateDeclaration, Schema, Step, ValueExpression, ViewSpec,
-} from '@viewstem/svelte';
+} from '@viewstem/core';
 
 export type Locale = 'en' | 'ko';
 export type ExampleDefinition = {

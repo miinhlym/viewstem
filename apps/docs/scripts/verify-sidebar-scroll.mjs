@@ -24,7 +24,7 @@ try{
       window.sidebarFrames=[];
       function sample(){const el=document.getElementById('starlight__sidebar');if(el&&getComputedStyle(el).visibility==='visible')window.sidebarFrames.push(el.scrollTop);if(window.sidebarFrames.length<180)requestAnimationFrame(sample);}requestAnimationFrame(sample);
     });
-    const base=`${locale==='ko'?'/ko':''}/docs/svelte-ui/components/`;
+    const base=`${locale==='ko'?'/ko':''}/docs/ui/components/`;
     await page.goto(origin+base+'tooltip/');await ready(page);await page.evaluate(()=>document.fonts.ready);
     const extraGroup=page.locator('[data-docs-sidebar] > astro-island [data-sidebar-group]').first();
     const extraTrigger=extraGroup.locator(':scope > button');
@@ -60,9 +60,9 @@ try{
   }
   const blocked=await browser.newContext({viewport:{width:1440,height:900}});
   await blocked.addInitScript(()=>{Storage.prototype.getItem=()=>{throw Error('unavailable')};Storage.prototype.setItem=()=>{throw Error('unavailable')};});
-  const p=await blocked.newPage();const errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto(origin+'/ko/docs/svelte-ui/components/tooltip/');await ready(p);assert.ok(await top(p)>500);assert.deepEqual(errors,[]);await blocked.close();
+  const p=await blocked.newPage();const errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto(origin+'/ko/docs/ui/components/tooltip/');await ready(p);assert.ok(await top(p)>500);assert.deepEqual(errors,[]);await blocked.close();
   checks.push({storageUnavailable:'current item visible, no errors'});
   const mobile=await browser.newContext({viewport:{width:375,height:900}});await mobile.addInitScript(()=>sessionStorage.setItem('viewstem-docs-scroll:ko','1700'));
-  const m=await mobile.newPage();await m.goto(origin+'/ko/docs/svelte-ui/components/button/');await ready(m);await m.getByRole('button',{name:'문서 메뉴',exact:true}).click();await m.getByRole('dialog').waitFor();await m.keyboard.press('Escape');assert.equal(await m.evaluate(()=>sessionStorage.getItem('viewstem-docs-scroll:ko')),'1700');await mobile.close();checks.push({mobile:'menu works without overwriting desktop scroll'});
+  const m=await mobile.newPage();await m.goto(origin+'/ko/docs/ui/components/button/');await ready(m);await m.getByRole('button',{name:'문서 메뉴',exact:true}).click();await m.getByRole('dialog').waitFor();await m.keyboard.press('Escape');assert.equal(await m.evaluate(()=>sessionStorage.getItem('viewstem-docs-scroll:ko')),'1700');await mobile.close();checks.push({mobile:'menu works without overwriting desktop scroll'});
   console.log(JSON.stringify({checks,failures:[]},null,2));
 }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}

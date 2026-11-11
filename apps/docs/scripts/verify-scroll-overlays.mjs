@@ -11,7 +11,7 @@ try {
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
-    const base = `${origin}${ko ? '/ko' : ''}/docs/svelte-ui/components/`;
+    const base = `${origin}${ko ? '/ko' : ''}/docs/ui/components/`;
     await page.goto(base + 'tooltip/');
     await page.waitForFunction(() => !document.querySelector('astro-island[client="load"][ssr]'));
     if (width === 375) {
@@ -47,23 +47,21 @@ try {
     await page.waitForFunction(selector => document.querySelector(`[role="dialog"] ${selector}`)?.scrollTop > 0, viewport);
     await page.keyboard.press('Escape');
 
-    await page.goto(base + 'button/');
-    await page.locator('[data-demo-ready="true"]').waitFor();
-    if (width === 375) await page.getByRole('tab', { name: ko ? '옵션' : 'Options', exact: true }).click();
-    await page.getByRole('textbox', { name: ko ? '텍스트' : 'Text', exact: true }).fill('Scroll target');
-    if (width === 375) await page.getByRole('tab', { name: ko ? '미리보기' : 'Preview', exact: true }).click();
-    await page.locator('[data-demo-target] button').filter({ hasText: 'Scroll target' }).waitFor();
-    if (width === 375) await page.getByRole('tab', { name: ko ? '옵션' : 'Options', exact: true }).click();
-    await page.getByRole('button', { name: ko ? '옵션 설명: 텍스트' : 'Option details: Text', exact: true }).click();
-    await page.getByRole('button', { name: ko ? 'JSON에서 보기: 텍스트' : 'Show in JSON: Text', exact: true }).click();
-    const source = page.locator(`.source-scroll ${viewport}`);
-    await page.waitForFunction(() => document.activeElement?.getAttribute('data-slot') === 'scroll-area-viewport');
-    assert.ok(await source.evaluate(el => el.scrollTop > 0 && el.textContent.includes('Scroll target')));
-    if (width === 375) await page.getByRole('tab', { name: ko ? '옵션' : 'Options', exact: true }).click();
-    await page.getByRole('button', { name: ko ? '기본 예제로 되돌리기' : 'Restore default example', exact: true }).click();
-    await page.waitForFunction(() => !document.querySelector('.source-scroll')?.textContent.includes('Scroll target'));
+    await page.goto(base + 'data-table/#component-json');
+    const primary = page.locator('[data-component-demo][aria-labelledby="component-preview"]');
+    await page.locator('[aria-labelledby="component-preview"][data-demo-ready="true"]').waitFor();
+    const sourceSelector = `[aria-labelledby="component-preview"] .source-scroll ${viewport}`;
+    const source = page.locator(sourceSelector);
+    await source.waitFor();
+    await page.waitForFunction(() => document.activeElement?.id === 'component-json');
+    await source.focus();
+    assert.ok(await source.evaluate(el => el.scrollHeight > el.clientHeight));
+    await page.keyboard.press('End');
+    await page.waitForFunction(selector => document.querySelector(selector)?.scrollTop > 0, sourceSelector);
+    await primary.getByRole('tab', { name: ko ? '미리보기' : 'Preview', exact: true }).click();
+    await primary.locator('[data-demo-target] table').waitFor();
     assert.deepEqual(errors, []);
-    checks.push({ locale: ko ? 'ko' : 'en', width, search: true, sourceJump: true, reset: true, mobileMenus: width === 375 });
+    checks.push({ locale: ko ? 'ko' : 'en', width, search: true, sourceJump: true, sourceScroll: true, mobileMenus: width === 375 });
     await context.close();
   }
   console.log(JSON.stringify({ checks, failures: [] }, null, 2));

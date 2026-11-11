@@ -48,8 +48,8 @@ npx playwright install chromium
   관련 없는 테스트의 통과는 이번 변경의 증거가 아닙니다.
 - 승인된 공개 동작이 바뀌면 해당 기준 명세나 사용 문서를 갱신하세요.
   과거 실험과 검증 기록은 보존하세요.
-- 생성 파일은 원본과 생성기를 통해 수정하세요. shadcn 소스는
-  [upstream 절차](packages/svelte-ui/upstream/README.md), CEL은
+- 생성 파일은 원본과 생성기를 통해 수정하세요. 사이트의 shadcn 소스는
+  [upstream 절차](apps/docs/upstream/README.md), CEL은
   [vendor 절차](packages/core/vendor/README.md)를 따르세요.
 - 자격 증명, 개인정보, 로컬 대화 원문, 빌드 산출물, 무관한 변경은 커밋하지 마세요.
   민감한 정보를 제거한 최소 재현을 사용하세요.
@@ -70,18 +70,18 @@ npx playwright install chromium
 ## 검증
 
 변경 동작을 확인하는 검사를 실행하세요. CI는 설정된 두 Node 버전의 호환성을
-검사하고 대표 버전 하나에서 전체 브라우저 검증을 실행합니다. 작업 구성·shard
-보고서·시간 목표는 [CI 안내](docs/ci.ko.md)를 참고하세요. 아래는 변경별 로컬 검증 명령입니다.
+검사하고 대표 버전 하나에서 전체 브라우저 검증을 실행합니다. 작업 구성과
+시간 목표는 [CI 안내](docs/ci.ko.md)를 참고하세요. 아래는 변경별 로컬 검증 명령입니다.
 
 | 변경 | 검사 |
 |---|---|
 | core 동작 또는 계약 | `npm run check`; 브라우저 동작이면 `npm run test:browser` 추가 |
 | core 패키지 구성·타입 선언·패키지 README | `npm run build` 후 `npm run test:package` |
 | Svelte 렌더러 또는 해당 예제 | `npm run check:svelte` |
-| Svelte UI 어댑터·생성 소스·스타일·브라우저 fixture | `npm run check:svelte-ui` |
+| 브라우저 UI 카탈로그·생성 계약·스타일·fixture | `npm run check:ui` |
 | 사이트 UI·콘텐츠·탐색·예제 | [사이트 유지보수 안내](apps/docs/README.ko.md#변경-영역에-맞는-검증-선택)에서 수정 위치와 관련 검증 확인 |
-| CI 설정 또는 브라우저 보고서 | `npm run test:ci`; workflow 문법을 확인하고 [CI 안내](docs/ci.ko.md)의 영향받는 브라우저 검증 실행 |
-| 패키지 메타데이터나 라이선스 파일만 변경 | 해당 패키지를 빌드하고 기존 소비자 검사인 `test:package`, `test:svelte:package`, `test:svelte-ui:package` 실행 |
+| CI 설정 | `npm run test:ci`; workflow 문법을 확인하고 [CI 안내](docs/ci.ko.md)의 영향받는 브라우저 검증 실행 |
+| 패키지 메타데이터나 라이선스 파일만 변경 | 해당 패키지를 빌드하고 core는 `npm run test:package`, Svelte는 `npm run test:svelte:package`를 실행. UI는 `npm run check:ui` 후 `npm pack --dry-run -w @viewstem/ui`로 구성 확인 |
 | 커뮤니티 문서나 템플릿만 변경 | 링크·예제·해당 JSON/YAML 문법과 `git diff --check` 확인 |
 
 Svelte나 UI를 렌더링하는 테스트는 빌드한 패키지 export를 사용합니다.
@@ -118,5 +118,5 @@ npm 릴리스에 반영할 변경은 `npx changeset`을 실행하고 생성된 �
 
 Viewstem 자체 라이선스의 기준은 루트 `LICENSE`입니다. 설치된 패키지에도
 라이선스가 포함되도록 세 패키지 디렉터리에 동일한 사본을 둡니다.
-사본과 패키지의 `license` 필드를 함께 맞추세요. 기존 패키지 소비자 테스트가
-설치된 라이선스와 외부 고지를 확인합니다.
+사본과 패키지의 `license` 필드를 함께 맞추세요. core와 Svelte의 소비자 테스트는
+설치된 라이선스와 외부 고지를 확인합니다. UI 패키지 구성에서는 Viewstem과 Basecoat 라이선스를 확인하세요.

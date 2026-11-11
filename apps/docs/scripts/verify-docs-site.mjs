@@ -34,11 +34,9 @@ for (const [file, { links }] of pages) {
   const pageUrl = new URL(relative.replace(/index\.html$/, ''), 'https://docs.test/');
   if (/^(ko\/)?docs\//.test(relative) && links.some(a => a.sidebar)) {
     const locale = relative.startsWith('ko/') ? '/ko' : '';
-    for (const renderer of ['ui', 'svelte-ui']) {
-      const prefix = `${locale}/docs/${renderer}/components/`;
-      const components = links.filter(a => a.sidebar && a.href.startsWith(prefix) && a.href !== prefix);
-      if (components.length !== 66 || new Set(components.map(a => a.href)).size !== 66) errors.push(`${relative}: incomplete ${renderer} component sidebar`);
-    }
+    const prefix = `${locale}/docs/ui/components/`;
+    const components = links.filter(a => a.sidebar && a.href.startsWith(prefix) && a.href !== prefix);
+    if (components.length !== 66 || new Set(components.map(a => a.href)).size !== 66) errors.push(`${relative}: incomplete UI component sidebar`);
     componentMenus++;
   }
   for (const { href } of links) {
@@ -50,7 +48,7 @@ for (const [file, { links }] of pages) {
     if (!fs.existsSync(target)) errors.push(`${relative}: missing ${href}`);
     else if (url.hash && pages.has(target) && !pages.get(target).ids.has(decodeURIComponent(url.hash.slice(1)))) errors.push(`${relative}: missing anchor ${href}`);
   }
-  if (/^(ko\/)?docs\/(ui|svelte-ui)\/components\/[^/]+\/index\.html$/.test(relative)) {
+  if (/^(ko\/)?docs\/ui\/components\/[^/]+\/index\.html$/.test(relative)) {
     familyPages++;
     const current = links.filter(a => a.sidebar && a['aria-current'] === 'page');
     if (current.length !== 1 || current[0].href !== pageUrl.pathname) errors.push(`${relative}: missing or wrong current sidebar entry`);

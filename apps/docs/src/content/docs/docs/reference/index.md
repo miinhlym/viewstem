@@ -11,9 +11,8 @@ Use package guides to complete a task, then look up exact fields and method cont
 | [@viewstem/core](../core/) | Run without a UI, connect State and URLs, and use HTTP and Actions |
 | [@viewstem/ui](../ui/) | Register the shared UI catalog and attach a View to a browser DOM container |
 | [@viewstem/svelte](../svelte/) | Mount a View, write a Svelte adapter, and manage attachment lifetimes |
-| [@viewstem/svelte-ui](../svelte-ui/) | Register components, compose JSON, and use styles and native Svelte parts |
 
-Each package menu follows overview → usage guides → API reference. API pages explain signatures, options and defaults, return values, errors, and lifetimes. The Svelte UI [component catalog](../svelte-ui/component-sets/) links to detailed pages for all 66 families.
+Each package menu follows overview → usage guides → API reference. API pages explain signatures, options and defaults, return values, errors, and lifetimes. The Viewstem UI [component catalog](../ui/components/) links to detailed pages for all 66 families.
 
 <a id="host-examples"></a>
 

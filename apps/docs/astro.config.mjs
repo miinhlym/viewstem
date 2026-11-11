@@ -2,11 +2,28 @@ import starlight from '@astrojs/starlight';
 import svelte from '@astrojs/svelte';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
+import { componentDemoSlugs } from './src/examples/component-demos.mjs';
+
+const legacyUiPages = {
+  '': 'ui/',
+  'component-sets/': 'ui/components/',
+  'support/': 'ui/components/',
+  'attributes/': 'ui/components/',
+  'registration/': 'ui/api/',
+  'guides/register-families/': 'ui/api/',
+  'guides/compose-json/': 'ui/guides/mount-in-browser/',
+  'guides/style-and-native/': 'svelte/guides/write-an-adapter/',
+  ...Object.fromEntries(componentDemoSlugs.map(slug => [`components/${slug}/`, `ui/components/${slug}/`])),
+};
+const legacyUiRedirects = Object.fromEntries(['/docs/', '/ko/docs/'].flatMap(base =>
+  Object.entries(legacyUiPages).map(([from, to]) => [`${base}svelte-ui/${from}`, base + to])));
+
 
 export default defineConfig({
   output: 'static',
   vite: { plugins: [tailwindcss()] },
   redirects: {
+    ...legacyUiRedirects,
     '/docs/concepts/state-and-actions/': '/docs/concepts/state/',
     '/ko/docs/concepts/state-and-actions/': '/ko/docs/concepts/state/',
     '/docs/concepts/resources-and-ports/': '/docs/concepts/resources-and-types/',
@@ -107,16 +124,6 @@ export default defineConfig({
             'docs/svelte',
             { label: 'Usage guides', translations: { ko: '사용 가이드' }, items: ['docs/svelte/guides/mount-in-svelte', 'docs/svelte/guides/write-an-adapter', 'docs/svelte/guides/manage-view-lifecycle'] },
             { label: 'API reference', translations: { ko: 'API 레퍼런스' }, items: ['docs/svelte/renderer', 'docs/svelte/mounted-view', 'docs/svelte/adapters', 'docs/svelte/viewstem-view', 'docs/svelte/errors', 'docs/svelte/types'] },
-          ],
-        },
-        {
-          label: '@viewstem/svelte-ui',
-          collapsed: false,
-          items: [
-            'docs/svelte-ui',
-            { label: 'Usage guides', translations: { ko: '사용 가이드' }, collapsed: true, items: ['docs/svelte-ui/guides/register-families', 'docs/svelte-ui/guides/compose-json', 'docs/svelte-ui/guides/style-and-native'] },
-            { label: 'API reference', translations: { ko: 'API 레퍼런스' }, collapsed: true, items: ['docs/svelte-ui/registration', 'docs/svelte-ui/component-sets', 'docs/svelte-ui/support', 'docs/svelte-ui/attributes'] },
-            { label: 'Components', translations: { ko: '컴포넌트' }, collapsed: false, items: [{ autogenerate: { directory: 'docs/svelte-ui/components' } }] },
           ],
         },
       ],

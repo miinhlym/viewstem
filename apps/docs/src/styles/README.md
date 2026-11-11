@@ -13,7 +13,7 @@ page. Page CSS owns layout and explicitly scoped presentation only.
 | `site-base.css` | Root/body inheritance, font smoothing, text sizing, Korean wrapping, heading defaults, form inheritance, code font, focus and shared navigation typography. |
 | `docs.css` | Maps Starlight variables to site tokens; documentation frame, prose spacing and table/details layout. |
 | `header.css`, `home.css`, `examples.css`, `playground-layout.css` | Their own layouts. Home display headings are limited to hero/section headings, never all headings under body. |
-| `demo-workbench.css`, `demo-options-layout.css` | Demo pane and control arrangement. |
+| `demo-workbench.css` | Component example tabs and toolbar. |
 | `component-demo-theme.css` | Preserves original library preview theme defaults, including portals. |
 | `scroll-regions.css`, `motion.css` | Shared ScrollArea host sizing and motion/reduced-motion behavior. |
 

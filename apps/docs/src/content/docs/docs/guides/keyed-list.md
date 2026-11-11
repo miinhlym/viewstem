@@ -8,17 +8,16 @@ sidebar:
 Render a list of projects from one row template. Start with the workspace setup and `<div id="viewstem"></div>` from the [Quickstart](../../quickstart/), then replace its client entry with this code.
 
 ```js
-import { createRenderer } from '@viewstem/svelte';
-import { registerComponents } from '@viewstem/svelte-ui';
-import { card } from '@viewstem/svelte-ui/shadcn/card';
-import { typography } from '@viewstem/svelte-ui/shadcn/typography';
-import '@viewstem/svelte-ui/shadcn/styles.css';
+import { createRegistry, createRuntime } from '@viewstem/core';
+import { attach, registerShadcn } from '@viewstem/ui';
+import '@viewstem/ui/styles.css';
 
-const renderer = createRenderer();
-registerComponents(renderer, [card, typography]);
+const registry = createRegistry();
+registerShadcn(registry);
+const runtime = createRuntime({ registry });
 
-const mounted = await renderer.mount({
-  target: document.querySelector('#viewstem'),
+const target = document.querySelector('#viewstem');
+const mounted = await runtime.createView({
   view: {
     render: {
       id: 'projects',
@@ -50,6 +49,7 @@ const mounted = await renderer.mount({
     },
   },
 });
+const attachment = attach(mounted.view, target);
 await mounted.initialComplete;
 ```
 

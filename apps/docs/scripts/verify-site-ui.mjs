@@ -8,7 +8,7 @@ const screenshotDir = process.env.SITE_UI_SCREENSHOTS;
 if (screenshotDir) await fs.mkdir(screenshotDir, { recursive: true });
 const checks = [], failures = [];
 const browser = await chromium.launch();
-const pages = { home: '/', docs: '/docs/svelte-ui/components/button/', examples: '/examples/', lesson: '/examples/value-call/', playground: '/playground/' };
+const pages = { home: '/', docs: '/docs/ui/components/button/', examples: '/examples/', lesson: '/examples/value-call/', playground: '/playground/' };
 try {
   const queue = ['en', 'ko'].flatMap(locale => ['light','dark'].flatMap(theme => [320,1440].flatMap(width => Object.entries(pages).map(([name,path]) => ({locale,theme,width,name,path})))));
   await Promise.all(Array.from({length:2},async()=>{
@@ -20,12 +20,12 @@ try {
         await page.goto(origin+(locale==='ko'?'/ko':'')+path);
         const themeTrigger=page.getByRole('button',{name:locale==='ko'?'색상 테마':'Color theme',exact:true});
         await themeTrigger.waitFor();await page.waitForFunction(()=>!document.querySelector('.masthead-tools button')?.disabled);
-        if(name==='docs')await page.locator('[data-demo-ready]').waitFor();
-        if(name==='lesson')await page.locator('[data-example-target] [data-viewstem-shadcn]').first().waitFor();
+        if(name==='docs')await page.locator('[data-demo-ready]:not([data-demo-lazy])').waitFor();
+        if(name==='lesson')await page.locator('[data-example-target] [data-viewstem-ui]').first().waitFor();
         if(name==='playground')await page.locator('.cm-editor').waitFor();
         await page.evaluate(()=>document.fonts.ready);
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'page has horizontal overflow');
-        assert.equal(await page.locator('.masthead [data-viewstem-shadcn]').count(),0,'site header must not use svelte-ui');
+        assert.equal(await page.locator('.masthead [data-viewstem-ui]').count(),0,'site header must not use the Viewstem renderer');
         assert.equal(await page.locator('html').getAttribute('data-theme'),theme);
         assert.equal(await page.locator('html').evaluate(el=>el.classList.contains('dark')),theme==='dark');
         if(name==='docs'&&width===1440){

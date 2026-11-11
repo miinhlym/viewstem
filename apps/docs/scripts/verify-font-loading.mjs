@@ -7,8 +7,8 @@ const results = [];
 try {
   for (const mode of ['normal', 'delayed', 'unavailable']) {
     const routes = mode === 'normal'
-      ? ['/', '/ko/', '/docs/svelte-ui/', '/ko/docs/svelte-ui/', '/docs/svelte-ui/component-sets/', '/ko/docs/svelte-ui/component-sets/', '/examples/', '/ko/examples/', '/playground/', '/ko/playground/']
-      : ['/docs/svelte-ui/component-sets/', '/ko/docs/svelte-ui/component-sets/'];
+      ? ['/', '/ko/', '/docs/ui/', '/ko/docs/ui/', '/docs/ui/components/', '/ko/docs/ui/components/', '/examples/', '/ko/examples/', '/playground/', '/ko/playground/']
+      : ['/docs/ui/components/', '/ko/docs/ui/components/'];
     for (const path of routes) {
       const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
       const page = await context.newPage();

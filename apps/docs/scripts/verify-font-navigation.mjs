@@ -36,7 +36,7 @@ try {
       };
       requestAnimationFrame(sample);
     });
-    const base = `${locale === 'ko' ? '/ko' : ''}/docs/svelte-ui/components/`;
+    const base = `${locale === 'ko' ? '/ko' : ''}/docs/ui/components/`;
     for (const family of families) {
       if (family === families[0]) await page.goto(`${origin}${base}${family}/`);
       else await page.locator(`#starlight__sidebar a[href="${base}${family}/"]`).click();

@@ -23,4 +23,4 @@ The [form validation](./guides/form-validation/) and [query dashboard](./guides/
 
 ## Package guides and APIs
 
-Use [Core](./core/) for runtime, State, and data APIs, [Viewstem UI](./ui/) to render the shared UI catalog in a browser DOM container, and [Svelte](./svelte/) and [Svelte UI](./svelte-ui/) to work with native Svelte components. Look up exact JSON fields in the [DSL reference](./dsl/).
+Use [Core](./core/) for runtime, State, and data APIs, [Viewstem UI](./ui/) to render the shared UI catalog in a browser DOM container, and [Svelte](./svelte/) to work with native Svelte components. Look up exact JSON fields in the [DSL reference](./dsl/).

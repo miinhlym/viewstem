@@ -3,7 +3,6 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { chromium } from 'playwright';
-import { svelteConsumerPlugin } from '../../../packages/svelte-ui/test/fixtures/svelte-consumer-plugin.mjs';
 
 const content = new URL('../src/content/docs/', import.meta.url);
 const root = fileURLToPath(new URL('../../../', import.meta.url));
@@ -21,8 +20,6 @@ async function openExample(page, locale, guide) {
     write: false,
     format: 'esm',
     platform: 'browser',
-    conditions: ['svelte', 'browser'],
-    plugins: [svelteConsumerPlugin],
   });
   const assets = {
     '/': {

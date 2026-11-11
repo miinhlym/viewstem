@@ -11,7 +11,7 @@
 |---|---|
 | [@viewstem/core](packages/core/README.ko.md) | DOM·프레임워크 의존성 없이 검증, 값, 상태, Query·Action 실행, 화면 수명 관리 |
 | [@viewstem/svelte](packages/svelte/README.ko.md) | Svelte 5 클라이언트 렌더러. `createRenderer()`로 시작하고 컴포넌트를 명시적으로 등록 |
-| [@viewstem/svelte-ui](packages/svelte-ui/README.ko.md) | kit 또는 컴포넌트군 단위로 가져와 명시적으로 등록하는 선택 shadcn-svelte 컴포넌트 묶음 |
+| [@viewstem/ui](packages/ui/README.ko.md) | 브라우저에서 실행하는 기본 JSON 컴포넌트 카탈로그 |
 
 패키지는 로컬에서 빌드하고 검증했습니다. 패키지 버전이나 로컬 검증 결과가
 npm 공개 발행을 뜻하지는 않습니다. 공개 API, 지원 동작, 제한은 각 패키지의
@@ -34,4 +34,4 @@ README에서 확인하세요.
 별도 표시가 없는 Viewstem 자체 코드·예제·문서는 [MIT 라이선스](LICENSE)를
 따르며 저작권 표기는 copyright (c) 2026 miinhlym입니다. 외부 자료는 원래의
 라이선스와 고지를 유지합니다. 여기에는 [CEL](packages/core/vendor/cel-js/LICENSE)과
-[shadcn·Tailwind 및 관련 UI 소스](packages/svelte-ui/upstream/NOTICE.txt)가 포함됩니다.
+[사이트 UI의 shadcn-svelte 소스](apps/docs/upstream/README.md)와 `@viewstem/ui`에 포함된 Basecoat 라이선스가 포함됩니다.

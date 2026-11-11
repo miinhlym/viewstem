@@ -5,7 +5,7 @@ description: Render Viewstem JSON in the browser with the framework-independent 
 
 `@viewstem/ui` renders a View from [`@viewstem/core`](../core/) into a browser DOM container. It provides the shared shadcn component catalog with Basecoat Vega styles and the Neutral palette. Plain JavaScript, React, Vue, and Svelte apps can use the same DOM attachment API.
 
-The package is a private workspace prototype. The browser guide shows how to build and install local package files.
+The browser guide shows how to build and install the packages from local tarballs.
 
 ## Guides
 

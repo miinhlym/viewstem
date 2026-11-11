@@ -15,11 +15,11 @@ Use this map to find the reference for your task. The language-independent contr
 | Task | Start here |
 |---|---|
 | Contribute, check license terms, or get help | [MIT license](../LICENSE), [contributing](../CONTRIBUTING.md), [support](../SUPPORT.md), [security reporting](../SECURITY.md), [code of conduct](../CODE_OF_CONDUCT.md) |
-| Understand CI checks, browser shards, and the time budget | [CI guide](ci.md), [optimization evidence](handoff/ci-optimization-2026-11-03.md) (Korean) |
+| Understand CI checks and the time budget | [CI guide](ci.md), [optimization evidence](handoff/ci-optimization-2026-11-03.md) (Korean) |
 | Use a package or integrate it with a host | [Core package guide](../packages/core/README.md), [host integration contract](spec/07-host-integration.md) |
 | Connect the renderer to a Svelte app | [Svelte package guide](../packages/svelte/README.md), [runnable example](../packages/svelte/example/README.md), [implementation handoff](handoff/svelte-implementation-2026-11-02.md) |
-| Register shadcn UI for Svelte | [UI package guide](../packages/svelte-ui/README.md), [U44 implementation and verification handoff](handoff/svelte-ui-shadcn-implementation-2026-11-03.md), [inventory of 66 catalog entries and 386 parts](handoff/shadcn-component-inventory.json) |
-| Compose a view from several components | [Composition contracts](spec/06-composition-examples.md), [UI package guide](../packages/svelte-ui/README.md) |
+| Render default components in the browser | [UI package guide](../packages/ui/README.md), [D144](history/decision-register.md#a-현재-채택한-결정) |
+| Compose a view from several components | [Composition contracts](spec/06-composition-examples.md), [UI package guide](../packages/ui/README.md) |
 | Maintain the home, docs, examples, and playground | [Website maintenance guide](../apps/docs/README.md) |
 | Read package guides and API references | [Site documentation research, structure, and verification](handoff/docs-package-reference-2026-11-05.md) (Korean) |
 | Understand resources and execution rules | [Full specification](VIEWSTEM-SPEC.md) and the topic specifications below |
@@ -38,7 +38,7 @@ See the [U37 implementation handoff](handoff/core-implementation-2026-11-02.md) 
 
 See the [U41 public API refactor](handoff/public-api-refactor-2026-11-02.md) for the public API boundaries and migration from earlier usage, and the [API verification record](handoff/public-api-verification-results.json) for rerun results and hashes after that change. Earlier product and Svelte verification JSON files remain evidence for their original revisions.
 
-The [U39–U40 Svelte handoff](handoff/svelte-implementation-2026-11-02.md) covers the client-side renderer. Start by importing `@viewstem/svelte`, which depends on core internally. The renderer registers no default UI. Optional UI sets are registered explicitly from the separate package described in the [U44 Svelte UI handoff](handoff/svelte-ui-shadcn-implementation-2026-11-03.md).
+The [U39–U40 Svelte handoff](handoff/svelte-implementation-2026-11-02.md) covers the client-side renderer. Start by importing `@viewstem/svelte`, which depends on core internally. The renderer registers no default UI. Register the default browser UI explicitly from `@viewstem/ui`.
 
 The [U44 verification record](handoff/svelte-ui-shadcn-verification-results.json) contains re-verification of the changed Registry and Svelte batch registration APIs and the post-disposal emit contract, along with core, Svelte, and playground regression results and hashes from that revision. Keep the verification files from earlier stages.
 
@@ -78,7 +78,7 @@ Use the [change verification procedure](handoff/implementation-start.md#수정-�
 | Mapping from expected behavior to product tests | [Product acceptance coverage](handoff/core-acceptance-coverage.json) | [build-coverage.mjs](../packages/core/scripts/build-coverage.mjs) combines the original inventory and product test mapping. Regenerate the output to update it. |
 | Actual execution environment, results, and hashes | [Product verification results](handoff/core-verification-results.json) | Update using execution reports and evidence. The `test:report` command leaves this summary JSON as-is. |
 | Svelte renderer, public types, and tarball consumer | [Svelte verification results](handoff/svelte-verification-results.json), [implemented scope](handoff/svelte-implementation-2026-11-02.md) | Run `check:svelte` and inspect the example. Track separately from core acceptance counts. |
-| Svelte UI catalog, behavior, source/CSS, and bundles | [U44 verification record](handoff/svelte-ui-shadcn-verification-results.json), [supported scope](../packages/svelte-ui/README.md) | Run `check:svelte-ui` and distinguish the full catalog from JSON-compatible and native-only parts |
+| Browser UI catalog and behavior | [Supported scope](../packages/ui/README.md) | `npm run check:ui` |
 | Inputs, events, State, nesting, and keyboard behavior for each of the 66 shadcn entries | [Behavior matrix](handoff/svelte-ui-audit-matrix.md), [audit handoff](handoff/svelte-ui-audit-2026-11-03.md), [execution results](handoff/svelte-ui-audit-verification-results.json) | Use browser checks of the public package and review unexecuted cases. Track separately from earlier U44 mount and reference counts. |
 | Full Svelte UI branch preflight and follow-up fixes | [Review and fixes handoff](handoff/svelte-ui-preflight-2026-11-03.md), [execution results](handoff/svelte-ui-preflight-verification-results.json) | Distinguish the comparison baseline, reused evidence, regression checks after fixes, and uncommitted handoff status |
 | Standalone experiments before implementation | [Verification ledger](handoff/verification-ledger.md), [original acceptance inventory](../experiments/verification/coverage.json) | Keep the original experiments and failure evidence separate from passing product test evidence |

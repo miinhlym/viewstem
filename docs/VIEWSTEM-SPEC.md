@@ -83,11 +83,8 @@ JSON 예시는 확정된 구조의 의미를 설명한다. 외부 코드형 Comp
 
 - U46·D103에서 임시 바닐라 playground와 shadcn 갤러리를 제거했다. 패키지 사용은 각 공개 README를 따르며, UI 검증은 패키지를 직접 마운트하는 내부 fixture로 수행한다. 도구 제거는 core·renderer·UI 패키지의 공개 계약이나 지원 목록을 변경하지 않는다. [제거와 검증 범위](handoff/temporary-tools-removal-2026-11-04.md)를 따른다.
 - U39–U40의 [Svelte 클라이언트 렌더러](../packages/svelte/README.md)는 공개 core projection·수명·이벤트에 Svelte 구현을 연결한다. `@viewstem/svelte`의 `createRenderer()`만으로 시작하며 기본 UI·Action·테마 자동 등록 없이 호스트가 Component 계약과 구현을 각각 등록한다. 실제 패키지 검증과 지원 한계는 [인계](handoff/svelte-implementation-2026-11-02.md)를 따른다.
-- U44의 [Svelte UI 패키지](../packages/svelte-ui/README.md)는 별도의 명시적 ComponentSet으로 shadcn 카탈로그를 제공한다. 묶음 등록은 계약과 구현을 원자적으로 등록하며, core의 JSON DSL·State 엔진에 UI 의존성을 추가하지 않는다. 351개 JSON 원본 부품·6개 조합과 35개 native 문맥 전용 부품의 경계는 [U44 인계](handoff/svelte-ui-shadcn-implementation-2026-11-03.md)를 따른다. scoped slot 값 전달이나 ECharts/Canvas 계약을 확장하지 않는다.
-- D133의 [`@viewstem/ui` 프로토타입](../packages/ui/README.md)은 공개 core View를 빌려 브라우저 DOM에 반영한다. D134에서 Basecoat 스타일과 Vanilla JS 컨트롤러로 대응 42개 계열을 연결했다. D135에서 TanStack Table Core 기반 Data Table과 Zag Vanilla 기반 Calendar·Range Calendar·Date Picker를 추가했다. 정확한 부품·입력·이벤트 범위는 패키지의 `support.json`을 따른다. 순수 JS·React·Vue·Svelte 호스트는 같은 JSON과 DOM 연결 API를 사용한다.
-- D136에서 나머지 20개 계열과 하위 부품 6개를 브라우저 DOM 카탈로그에 추가한다. 메뉴 계열은 Zag Vanilla의 중첩 메뉴 동작을 공유하고 Carousel은 Embla를 사용한다. 브라우저 카탈로그는 Svelte UI의 JSON Component ID 357개를 등록하며, 실제 입력·슬롯·이벤트 지원 범위는 생성된 `support.json`이 정의한다.
-- D137에서 Calendar의 월 이동은 달력 뷰를 만들 때의 일자를 기준으로 계산한다. Range Calendar의 JSON 어댑터는 확정된 범위에서 바뀐 시작일과 종료일만 순서대로 발행한 뒤 전체 범위를 알린다. 브라우저 Chart는 D3 스케일을 사용해 Svelte Chart와 축·보조선의 눈금과 여백을 맞춘다.
-- D138에서 `@viewstem/ui`와 `@viewstem/svelte-ui`의 기본 스타일을 Vega로 전환한다. Neutral 색상 팔레트와 기존 JSON 계약은 유지한다. Svelte 패키지는 고정 shadcn-svelte 리비전의 Vega 원본을 사용하고 DOM 패키지는 Basecoat 1.1.0의 Vega CSS를 사용한다.
+- [`@viewstem/ui`](../packages/ui/README.md)는 기본 컴포넌트 패키지다. `@viewstem/core`의 View를 브라우저 DOM에 연결하며 순수 JS·React·Vue·Svelte에서 같은 JSON을 사용한다. Basecoat Vega·Neutral 스타일과 Vanilla JS 컨트롤러를 사용한다. Calendar·Range Calendar·Date Picker는 Zag Vanilla, Data Table은 TanStack Table Core에 연결한다. Chart의 축과 보조선은 D3 스케일로 계산한다.
+- D144에서 `@viewstem/svelte-ui`를 제거하고 기존 JSON Component ID 357개와 66개 계열의 공통 지원 계약을 `@viewstem/ui`로 이관한다. 입력·슬롯·이벤트의 공개 범위는 `@viewstem/ui/support.json`을 따른다. 기존 `@viewstem/svelte`는 앱이 제공하는 Svelte 구현을 연결하는 어댑터로 유지한다. [D144](history/decision-register.md#a-현재-채택한-결정)
 
 - Rust/WASM 통합 코어는 검토했지만 현재 채택 경로는 아니다.
 
@@ -101,19 +98,21 @@ JSON 예시는 확정된 구조의 의미를 설명한다. 외부 코드형 Comp
 
 공개 문서 사이트는 **Astro와 Starlight**로 구축한다. Starlight가 영·한 문서 탐색과 검색을 맡고, 같은 사이트의 `/playground/`에서 Svelte로 만든 편집·실행 화면을 제공한다. [D106](history/decision-register.md#a-현재-채택한-결정)
 
-공개 문서의 좌측 메뉴는 시작하기, 핵심 개념, 가이드, 레퍼런스 안내, DSL 레퍼런스, @viewstem/core, @viewstem/ui, @viewstem/svelte, @viewstem/svelte-ui로 구성한다. 핵심 개념은 View와 Component, 값과 입력, State, 계산된 값, 이벤트와 Action, Query와 데이터, 조건과 목록, Component 재사용, 리소스와 타입의 9개 페이지로 구성한다. 각 페이지에서 정의·최소 코드·예상 결과·주요 실행 의미를 설명하고 대표 실습을 연결한다. 읽기 순서는 좌측 메뉴와 하단 이전·다음 탐색으로 제공하며, 개념 설명을 예제 링크 목록으로 대체하지 않는다. [조사와 페이지별 구성](handoff/docs-core-concepts-2026-11-05.md), [D110](history/decision-register.md#a-현재-채택한-결정)을 따른다. 문서 본문의 제목에서 페이지 목차를 만들고, 정적 빌드에서 Pagefind 검색 색인을 생성한다. [D108](history/decision-register.md#a-현재-채택한-결정)
+공개 문서의 좌측 메뉴는 시작하기, 핵심 개념, 가이드, 레퍼런스 안내, DSL 레퍼런스, @viewstem/core, @viewstem/ui, @viewstem/svelte로 구성한다. 핵심 개념은 View와 Component, 값과 입력, State, 계산된 값, 이벤트와 Action, Query와 데이터, 조건과 목록, Component 재사용, 리소스와 타입의 9개 페이지로 구성한다. 각 페이지에서 정의·최소 코드·예상 결과·주요 실행 의미를 설명하고 대표 실습을 연결한다. 읽기 순서는 좌측 메뉴와 하단 이전·다음 탐색으로 제공하며, 개념 설명을 예제 링크 목록으로 대체하지 않는다. [조사와 페이지별 구성](handoff/docs-core-concepts-2026-11-05.md), [D110](history/decision-register.md#a-현재-채택한-결정)을 따른다. 문서 본문의 제목에서 페이지 목차를 만들고, 정적 빌드에서 Pagefind 검색 색인을 생성한다. [D108](history/decision-register.md#a-현재-채택한-결정)
 
-패키지 문서는 개요 → 작업별 사용 가이드 → 상세 API 레퍼런스 순서로 구성한다. 공개 export·타입·구현을 기준으로 시그니처, 옵션·기본값, 반환값, 오류와 수명을 한국어·영어로 제공한다. DSL은 리소스와 표현식의 필드 계약을 별도로 설명한다. Svelte UI는 전체 계열 목록에서 상세 페이지로 연결하며 지원 메타데이터에 따라 JSON 지원과 네이티브 Svelte 전용 기능을 구분한다. @viewstem/ui는 한·영 개요, 브라우저 마운트 가이드, API와 66개 계열 상세 페이지를 제공한다. 기존 Svelte UI 예제 JSON을 수정 없이 공유하고 각 패키지의 공개 렌더러로 직접 실행한다. DOM 입력·슬롯·이벤트 표는 DOM 패키지의 지원 메타데이터에서 생성하며, 각 상세 페이지에 옵션 편집과 전체 앱 연결 코드를 제공한다. [D140](history/decision-register.md#a-현재-채택한-결정) 사이트 본문에서 사용법을 설명하고 소스 링크로 설명을 대체하지 않는다. [D116](history/decision-register.md#a-현재-채택한-결정), [조사·구성·검증](handoff/docs-package-reference-2026-11-05.md)을 따른다.
+패키지 문서는 개요 → 작업별 사용 가이드 → 상세 API 레퍼런스 순서로 구성한다. 공개 export·타입·구현을 기준으로 시그니처, 옵션·기본값, 반환값, 오류와 수명을 한국어·영어로 제공한다. DSL은 리소스와 표현식의 필드 계약을 별도로 설명한다. `@viewstem/ui`는 한·영 개요, 브라우저 마운트 가이드, API와 66개 계열 상세 페이지를 제공한다. 입력·슬롯·이벤트 표는 UI 패키지의 지원 메타데이터에서 생성한다. 이전 Svelte UI 문서 주소는 대응하는 새 문서로 연결한다. [D144](history/decision-register.md#a-현재-채택한-결정)
 
-공개 문서의 상세 API 페이지는 상위 경로와 현재 메뉴 위치를 표시한다. UI의 지원 계열 66개를 좌측 컴포넌트 메뉴에 모두 나열하고, 현재 항목 표시·같은 언어의 인접 계열 이동을 제공한다. 각 계열 상세 페이지에는 실제 공개 렌더러로 실행되는 미리보기와 동일한 View JSON, 앱 등록 예제를 함께 제공한다. JSON에 직접 등록되지 않는 네이티브 문맥 부품의 경계는 상세 레퍼런스에서 유지한다. [D122](history/decision-register.md#a-현재-채택한-결정)를 따른다. 제목 크기는 h1 → h2 → h3 → h4 순서를 유지하고, 참조 표보다 목적·사용 예제를 먼저 설명한다. 일반 HTML·SVG 입력과 큰 중첩 타입은 펼침 영역으로 분리하되 지원 계약을 생략하지 않는다. 공통 헤더의 테마 선택은 밝게·어둡게·시스템 설정을 지원하며 모든 사이트 진입점에서 같은 선택을 적용한다. [D117](history/decision-register.md#a-현재-채택한-결정), [사이트 리뷰](../apps/docs/review/2026-11-05/review.md)를 따른다.
+공개 문서의 상세 API 페이지는 상위 경로와 현재 메뉴 위치를 표시한다. UI의 지원 계열 66개를 좌측 컴포넌트 메뉴에 모두 나열하고, 현재 항목 표시·같은 언어의 인접 계열 이동을 제공한다. 각 계열 상세 페이지에는 실제 공개 렌더러로 실행되는 미리보기와 동일한 View JSON, 앱 등록 예제를 함께 제공한다. [D122](history/decision-register.md#a-현재-채택한-결정)를 따른다. 제목 크기는 h1 → h2 → h3 → h4 순서를 유지하고, 참조 표보다 목적·사용 예제를 먼저 설명한다. 일반 HTML·SVG 입력과 큰 중첩 타입은 펼침 영역으로 분리하되 지원 계약을 생략하지 않는다. 공통 헤더의 테마 선택은 밝게·어둡게·시스템 설정을 지원하며 모든 사이트 진입점에서 같은 선택을 적용한다. [D117](history/decision-register.md#a-현재-채택한-결정), [사이트 리뷰](../apps/docs/review/2026-11-05/review.md)를 따른다.
 
-주요 UI 예제의 옵션 편집은 한국어·영어에서 옵션 설명, 실제 View JSON 필드, 실행 UI, 상세 레퍼런스를 연결한다. 첫 대상은 Button·Input·Checkbox·Switch·Slider·Tabs·Dialog·Sonner다. 표시·복사·실행에는 같은 선언을 사용하고, 실행 중 클릭·입력에 따른 State 변화는 선언에 역기록하지 않는다. 옵션 변경은 실행 상태를 다시 초기화하며, 현재 설정 재실행과 기본 예제 복원을 구별한다. 필드로의 스크롤은 명시적 조작에만 수행한다. [D124](history/decision-register.md#a-현재-채택한-결정), [구현·검증](../apps/docs/review/2026-11-05/controls-review/implementation.md)을 따른다.
+`@viewstem/ui`의 계열 상세 페이지는 컴포넌트 이름과 역할 설명에 이어 기본 예제, 사용법, 추가 예제, JSON 레퍼런스 순서로 제공한다. 목차는 본문 순서를 따른다. 사용법에 기본 예제의 View JSON과 짝을 이루는 실행 코드를 바로 표시하고 코드 블록 헤더에서 복사할 수 있게 한다. 추가 예제는 미리보기·JSON·실행 코드 탭에서 조작·확인·복사한다. 참조 표의 제약은 해당 타입 아래에 표시한다. 미리보기는 Vega·Neutral 스타일로 실행한다. [D142·D146·D147](history/decision-register.md#a-현재-채택한-결정), [공식 예제 조사](../apps/docs/review/2026-11-11/shadcn-example-comparison.md)를 따른다.
 
-Svelte UI 문서의 실행 미리보기는 고정된 공식 shadcn-svelte 소스의 실제 컴포넌트를 사용한다. 사이트 조작부는 아래 D130의 별도 shadcn-svelte 구성을 따른다. 사이트 브랜드 색상으로 컴포넌트를 재해석하지 않으며 기본 Neutral 색상·기본 크기를 유지한다. 본문 밖에 열리는 포털에도 같은 원칙을 적용하고 공통 헤더의 사이트 테마와 구분한다. 옵션 입력을 일반 HTML 폼과 자체 시각 스타일로 대체하지 않는다. 모든 66개 계열은 원본 부품 또는 공식 예제의 원본 부품 조합을 사용한다. 원본 Tailwind preflight 전체를 UI 범위에 적용하고 문서 reset이 원본 utility를 덮어쓰지 않도록 cascade 순서를 고정한다. 원본과의 차이는 소스 출처, 렌더링 스타일, 실제 상호작용을 구분해 검증한다. 전체 감사는 [D126](history/decision-register.md#a-현재-채택한-결정)과 [검증 기록](../apps/docs/review/2026-11-05/shadcn-full-audit.md)을 따른다. [D125](history/decision-register.md#a-현재-채택한-결정), [수정·검증](../apps/docs/review/2026-11-05/shadcn-fidelity.md)을 따른다.
+설명할 차이가 있는 변형은 기본 예제 아래에 별도 제목으로 제공하고 목차에서 바로 연결한다. 66개 계열의 한·영 상세 문서에 기본 예제에서 다루지 않는 입력·상태·조합을 보여 준다. 같은 입력의 차이는 비교 묶음으로, 구조나 조작이 달라지는 경우는 독립 예제로 제공한다. 각 묶음은 하나의 View JSON으로 실행·표시·복사하며, 하단 미리보기는 화면에 들어올 때 실행한다. [D143·D145](history/decision-register.md#a-현재-채택한-결정), [검토 결과](../apps/docs/review/2026-11-11/component-example-variants/concepts_brief.md#goldfish-검토-종합)를 따른다.
 
-사이트 자체의 기본 UI는 공식 Astro 설치 방식의 shadcn-svelte로 통일한다. 공식 CLI가 생성한 원본 부품을 사용하고 React 런타임·통합·관련 의존성은 포함하지 않는다. `apps/docs/src/components/ui`의 사이트용 컴포넌트와 Neutral 테마를 사용하고, 헤더·검색·사이드바·목차·메뉴·페이지 탐색·옵션 입력·예제 파일 탭·Playground 조작부를 포함한다. 사이트 UI를 만들기 위해 `@viewstem/svelte-ui`를 사용하지 않는다. 선언형 JSON의 실제 실행 영역만 기존 Svelte 렌더러와 라이브러리 컴포넌트를 유지한다. CodeMirror 편집기와 문서 본문은 각각 편집·읽기 역할을 유지하며 사이트 테마 토큰을 따른다. D127의 React 구현 선택을 대체하며 기존 디자인·한영·모바일·테마·사이드바 스크롤 및 D128 작업 영역의 동작은 유지한다. [D130](history/decision-register.md#a-현재-채택한-결정), [적용 범위·검증](../apps/docs/review/2026-11-06/site-svelte.md)을 따른다.
+`shadcn.Slider`의 다중 모드는 `value` 배열의 숫자마다 손잡이를 렌더링한다. 손잡이는 오름차순을 유지하고 `thumbLabels`로 각각 이름을 붙일 수 있다. `valueChange`와 `valueCommit`은 다중 모드에서 전체 배열을, 단일 모드에서 숫자를 전달한다. [D148](history/decision-register.md#a-현재-채택한-결정)을 따른다.
 
-컴포넌트 문서의 실행 예제는 하나의 작업 영역에서 제공한다. 넓은 화면에서는 미리보기·JSON 전환 영역 옆에 주요 옵션을 두고, 좁은 화면에서는 미리보기·옵션·JSON 탭을 사용한다. 옵션 설명·전체 JSON 경로·레퍼런스는 필요할 때 펼친다. 탭 전환은 미리보기의 실행 상태를 보존하며 옵션 변경·재실행·기본 예제 복원은 각 기존 의미를 유지한다. JSON 위치 이동과 옵션 딥 링크는 해당 영역을 열고 포커스를 연결한다. JavaScript 없이도 초기 JSON과 실행 설정 코드를 읽을 수 있다. [D128](history/decision-register.md#a-현재-채택한-결정), [레퍼런스·구성·검증](../apps/docs/review/2026-11-05/component-workbench.md)을 따른다.
+사이트 자체의 기본 UI는 공식 Astro 설치 방식의 shadcn-svelte로 통일한다. 공식 CLI가 생성한 원본 부품을 사용하고 React 런타임·통합·관련 의존성은 포함하지 않는다. `apps/docs/src/components/ui`의 사이트용 컴포넌트와 Neutral 테마를 사용하고, 헤더·검색·사이드바·목차·메뉴·페이지 탐색·예제 파일 탭·Playground 조작부를 포함한다. 문서·Examples·Playground에서 선언형 JSON을 실행하는 영역은 `@viewstem/ui`를 사용한다. CodeMirror 편집기와 문서 본문은 각각 편집·읽기 역할을 유지하며 사이트 테마 토큰을 따른다. D127의 React 구현 선택을 대체하며 기존 디자인·한영·모바일·테마·사이드바 스크롤 및 D142 예제 탭의 동작은 유지한다. [D130](history/decision-register.md#a-현재-채택한-결정), [적용 범위·검증](../apps/docs/review/2026-11-06/site-svelte.md)을 따른다.
+
+미리보기·JSON 탭은 같은 예제를 표시한다. 탭을 전환해도 실행 상태는 보존되고, 다시 실행하면 초기 상태로 돌아간다. JSON 탭과 복사 버튼은 초기 선언을 사용한다. JavaScript 없이도 초기 JSON과 앱 연결 코드를 읽을 수 있다. [D142](history/decision-register.md#a-현재-채택한-결정)를 따른다.
 
 
 홈·예제·Playground·문서는 동일한 공통 헤더를 사용한다. 로고, 문서·예제·Playground 탐색, GitHub, 현재 페이지를 유지하는 언어 전환을 공유하고 문서에만 검색과 모바일 문서 메뉴를 추가한다. 모바일에서는 공통 탐색 아래에 문서 도구 행을 둔다. [D111](history/decision-register.md#a-현재-채택한-결정)
@@ -126,15 +125,15 @@ Svelte UI 문서의 실행 미리보기는 고정된 공식 shadcn-svelte 소스
 
 문서와 예제의 이전·다음은 같은 방향별 탐색 표현을 사용하며 모바일 예제는 실행 결과 아래에서 다음 실습으로 이어진다. 모바일 예제 목록은 본문에서 한 번만 제공한다. Playground는 빈 상태의 첫 예제·시작 문서 연결, 수동 실행 안내와 미실행 변경 표시, 같은 탭의 언어 전환에도 보존되는 초안을 제공한다. 복원한 초안은 자동 실행하지 않는다. 한국어 문서 검색·코드 복사 UI도 한국어로 제공한다. [D115](history/decision-register.md#a-현재-채택한-결정), [검토·검증](handoff/docs-site-consistency-2026-11-05.md)을 따른다.
 
-시작하기의 문서 순서는 개요, 설치, 빠른 시작이다. 개요와 빠른 시작에서 브라우저 예제로 갈 수 있다. 설치에서 패키지 준비를 다루고, 빠른 시작에서는 Svelte 앱에서 첫 View를 실행한다. [D109](history/decision-register.md#a-현재-채택한-결정)
+시작하기의 문서 순서는 개요, 설치, 빠른 시작이다. 개요와 빠른 시작에서 브라우저 예제로 갈 수 있다. 설치에서 패키지 준비를 다루고, 빠른 시작에서는 브라우저에서 `@viewstem/ui`로 첫 View를 실행한다. [D109](history/decision-register.md#a-현재-채택한-결정)
 
 공개 문서와 Playground는 **Cloudflare Workers Static Assets**로 배포한다. 첫 버전은 정적 빌드 결과를 Cloudflare에 올리고, Playground의 Viewstem 런타임은 방문자의 브라우저에서 실행한다. 기본 주소는 별도 도메인 구매 없이 `workers.dev`를 사용한다. [D104](history/decision-register.md#a-현재-채택한-결정)
 
 실제 공개 주소와 빌드·PR 미리보기 설정은 사이트 구현 및 배포 단계에서 정한다.
 
-공개 Playground는 하나로 제공한다. 첫 버전은 `@viewstem/svelte` 렌더러와 `@viewstem/svelte-ui/shadcn` UI 세트를 사용한다. 다른 Svelte UI 세트를 지원하게 되면 같은 Playground에서 지원 세트 중 하나를 선택할 수 있게 한다. [D105](history/decision-register.md#a-현재-채택한-결정)
+공개 Playground는 하나로 제공한다. 브라우저에서 `@viewstem/ui`로 View JSON을 실행하고, 편집한 내용은 사용자가 실행할 때 적용한다. [D144](history/decision-register.md#a-현재-채택한-결정)
 
-공개 홈은 제품 소개, 고객 목록 실행 흐름, 주요 특징, Svelte 연동, 폼·대시보드 가이드, 문서 진입 순으로 구성한다. 주 버튼은 첫 View를 실행하는 Quickstart로 연결한다. [D107](history/decision-register.md#a-현재-채택한-결정)
+공개 홈은 제품 소개, 고객 목록 실행 흐름, 주요 특징, 브라우저 UI 연동, 폼·대시보드 가이드, 문서 진입 순으로 구성한다. 주 버튼은 첫 View를 실행하는 Quickstart로 연결한다. [D107](history/decision-register.md#a-현재-채택한-결정)
 
 ## 4 리소스와 런타임의 확정 구분
 

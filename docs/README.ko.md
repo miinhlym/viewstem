@@ -14,10 +14,10 @@
 |---|---|
 | 오픈소스 기여·이용 조건·문의 확인 | [MIT 라이선스](../LICENSE), [기여 안내](../CONTRIBUTING.ko.md), [지원](../SUPPORT.ko.md), [보안 제보](../SECURITY.ko.md), [행동강령](../CODE_OF_CONDUCT.ko.md) |
 | 패키지를 사용하거나 호스트에 연결하기 | [패키지 사용법](../packages/core/README.ko.md), [호스트 연결 계약](spec/07-host-integration.md) |
-| CI 검사·브라우저 분산·시간 목표 확인 | [CI 안내](ci.ko.md), [최적화 증거](handoff/ci-optimization-2026-11-03.md) |
+| CI 검사·시간 목표 확인 | [CI 안내](ci.ko.md), [최적화 증거](handoff/ci-optimization-2026-11-03.md) |
 | Svelte 앱에 렌더러 연결하기 | [Svelte 패키지 사용법](../packages/svelte/README.ko.md), [실행 예제](../packages/svelte/example/README.ko.md), [구현 인계](handoff/svelte-implementation-2026-11-02.md) |
-| Svelte shadcn UI 등록하기 | [UI 사용법](../packages/svelte-ui/README.ko.md), [U44 구현·검증 인계](handoff/svelte-ui-shadcn-implementation-2026-11-03.md), [66개 카탈로그·386개 부품 목록](handoff/shadcn-component-inventory.json) |
-| 여러 컴포넌트를 결합한 화면 만들기 | [연결 계약](spec/06-composition-examples.md), [UI 사용법](../packages/svelte-ui/README.ko.md) |
+| 브라우저 기본 UI 사용 | [UI 사용법](../packages/ui/README.ko.md), [D144](history/decision-register.md#a-현재-채택한-결정) |
+| 여러 컴포넌트를 결합한 화면 만들기 | [연결 계약](spec/06-composition-examples.md), [UI 사용법](../packages/ui/README.ko.md) |
 | 홈·문서·예제·플레이그라운드 유지보수 | [사이트 유지보수 안내](../apps/docs/README.ko.md) |
 | 사이트 패키지 가이드·API 레퍼런스 확인 | [공식 문서 조사·페이지 구성·검증](handoff/docs-package-reference-2026-11-05.md) |
 | 리소스와 실행 규칙 이해하기 | [전체 계약](VIEWSTEM-SPEC.md) → 아래 주제별 명세 |
@@ -36,7 +36,7 @@ U46에서 임시 playground와 shadcn 갤러리를 제거했다. 사용자는 �
 
 공개 API의 현재 경계와 이전 사용법 변경은 [U41 API 정리](handoff/public-api-refactor-2026-11-02.md), 이 변경 이후 재실행 결과와 해시는 [API 검증 기록](handoff/public-api-verification-results.json)을 따른다. 이전 제품·Svelte 검증 JSON은 해당 시점의 증거로 보존한다.
 
-후속 클라이언트 렌더러는 [U39–U40 Svelte 인계](handoff/svelte-implementation-2026-11-02.md)를 따른다. `@viewstem/svelte`만 import해 시작하며 core는 내부 의존성이다. 기본 UI는 자동 등록하지 않는다. UI 묶음은 [U44 Svelte UI 인계](handoff/svelte-ui-shadcn-implementation-2026-11-03.md)에 따라 별도 패키지에서 명시적으로 등록한다.
+후속 클라이언트 렌더러는 [U39–U40 Svelte 인계](handoff/svelte-implementation-2026-11-02.md)를 따른다. `@viewstem/svelte`만 import해 시작하며 core는 내부 의존성이다. 기본 UI는 자동 등록하지 않는다. 브라우저 기본 UI는 `@viewstem/ui`에서 명시적으로 등록한다.
 
 U44에서 변경한 Registry·Svelte 일괄 등록 및 폐기 후 emit 계약의 재검증, 당시 core·Svelte·playground 회귀 결과와 해시는 [U44 실행 기록](handoff/svelte-ui-shadcn-verification-results.json)에 있다. 이전 단계의 검증 파일을 덮어쓰지 않는다.
 
@@ -72,7 +72,7 @@ U44에서 변경한 Registry·Svelte 일괄 등록 및 폐기 후 emit 계약의
 | 기대값과 실제 제품 테스트의 연결 | [제품 인수 대응표](handoff/core-acceptance-coverage.json) | [build-coverage.mjs](../packages/core/scripts/build-coverage.mjs)가 원래 목록과 제품 테스트 매핑을 조합; 생성물을 별도 수기 목록으로 관리하지 않음 |
 | 실제 실행 환경·결과·해시 | [제품 검증 결과](handoff/core-verification-results.json) | 실행 보고서와 검증 증거로 갱신; `test:report`가 이 요약 JSON까지 자동 갱신하지는 않음 |
 | Svelte 렌더러·공개 타입·tarball 소비자 | [Svelte 검증 결과](handoff/svelte-verification-results.json), [구현 범위](handoff/svelte-implementation-2026-11-02.md) | `check:svelte`와 실제 예제 확인 후 갱신; core 인수 수와 별도 추적 |
-| Svelte UI 카탈로그·동작·소스/CSS·번들 | [U44 실행 기록](handoff/svelte-ui-shadcn-verification-results.json), [지원 범위](../packages/svelte-ui/README.ko.md) | `check:svelte-ui`; 전체 카탈로그와 JSON/native 전용 부품을 구분 |
+| 브라우저 UI 카탈로그와 동작 | [지원 범위](../packages/ui/README.ko.md) | `npm run check:ui` |
 | shadcn 66개별 입력·이벤트·State·중첩·키보드 | [동작 검증표](handoff/svelte-ui-audit-matrix.md), [감사 인계](handoff/svelte-ui-audit-2026-11-03.md), [실행 결과](handoff/svelte-ui-audit-verification-results.json) | 공개 패키지 브라우저 검사와 미실행 사례 검사; 기존 U44 mount/참조 수와 구분 |
 | Svelte UI 전체 branch preflight와 후속 수정 | [검토·수정 인계](handoff/svelte-ui-preflight-2026-11-03.md), [실행 결과](handoff/svelte-ui-preflight-verification-results.json) | 비교 기준·기존 증거 재사용·수정 후 회귀·미커밋 인계 상태 구분 |
 | 구현 전 독립 실험의 이력 | [검증 진행표](handoff/verification-ledger.md), [원래 인수 목록](../experiments/verification/coverage.json) | 원래 실험·실패 증거 보존; 제품 통과 증거와 구분 |
