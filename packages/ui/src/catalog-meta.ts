@@ -68,6 +68,7 @@ const inputs: Record<string, string> = {
   'Select.Root': 'type value items',
   'Select.Item': 'value label',
   'Sidebar.Provider': 'open',
+  'Sidebar.Root': 'collapsible',
   'Sidebar.MenuButton': 'isActive',
   'Sidebar.MenuSubButton': 'isActive',
   Slider: 'type value min max step',
@@ -76,8 +77,9 @@ const inputs: Record<string, string> = {
   'Tabs.Root': 'value orientation',
   'Tabs.Trigger': 'value',
   'Tabs.Content': 'value',
-  Notifications: 'notifications closeButton position',
-  Sonner: 'position',
+  Separator: 'decorative',
+  Notifications: 'notifications closeButton closeButtonAriaLabel containerAriaLabel position',
+  Sonner: 'position closeButton closeButtonAriaLabel containerAriaLabel',
   'Chart.Container': 'config',
   Chart: 'kind data x series label',
 };
@@ -131,6 +133,6 @@ export function eventNames(name: string) {
 }
 
 export function slotNames(name: string) {
-  const child = /^(?:Dialog|AlertDialog|Drawer|Sheet)\.(?:Trigger|Close|Action|Cancel)$/.test(name);
+  const child = /^(?:Dialog|AlertDialog|Drawer|Sheet)\.(?:Trigger|Close|Action|Cancel)$/.test(name) || /^(?:Collapsible|DropdownMenu|HoverCard|Popover|Tooltip)\.Trigger$/.test(name) || name === 'Popover.Close';
   return new Set(child ? ['default', 'child'] : ['default']);
 }

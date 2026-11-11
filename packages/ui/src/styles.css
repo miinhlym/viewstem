@@ -671,3 +671,11 @@
 @media (prefers-reduced-motion: reduce) {
   [data-viewstem-ui] dialog.vs-sheet, [data-viewstem-ui] dialog.vs-sheet > div, [data-viewstem-ui] dialog.vs-sheet::backdrop { transition: none; }
 }
+
+[data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar[data-collapsible="none"] {
+  position: static; visibility: visible; pointer-events: auto;
+  max-inline-size: var(--sidebar-width); background: none; backdrop-filter: none;
+}
+[data-viewstem-ui] .vs-ui-sidebar-provider > .sidebar[data-collapsible="none"] > nav {
+  width: var(--sidebar-width); max-width: none;
+}

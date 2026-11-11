@@ -535,7 +535,9 @@ function hoverCard(element: HTMLElement, send: Send, signal: AbortSignal): Behav
   return {
     sync(next) {
       inputs = next;
-      trigger = part(element, 'HoverCard.Trigger');
+      const triggerPart = part(element, 'HoverCard.Trigger');
+      trigger = triggerPart?.classList.contains('vs-ui-transparent')
+        ? triggerPart.firstElementChild as HTMLElement | null : triggerPart;
       content = part(element, 'HoverCard.Content');
       contentInputs = content ? readInputs(content) : {};
       const positionKey = JSON.stringify(positioning());

@@ -491,7 +491,8 @@ export function popup(element: Widget, kind: 'popover' | 'select', send: Send, s
   }, { signal });
   return {
     sync(inputs) {
-      const next = element.querySelector<HTMLElement>(':scope > button');
+      const childTrigger = kind === 'popover' ? element.querySelector<HTMLElement>(':scope > [data-vs-component="Popover.Trigger"].vs-ui-transparent > *') : null;
+      const next = childTrigger ?? element.querySelector<HTMLElement>(':scope > button');
       const popover = element.querySelector<HTMLElement>(':scope > [data-popover]');
       const list = popover?.querySelector<HTMLElement>('[role="listbox"]') ?? null;
       if (!next || !popover || (kind !== 'popover' && !list)) {
@@ -511,6 +512,19 @@ export function popup(element: Widget, kind: 'popover' | 'select', send: Send, s
         observedPanel = popover;
         previousOpen = undefined;
         triggerEvents = new AbortController();
+        if (childTrigger) {
+          next.setAttribute('aria-expanded', 'false');
+          popover.setAttribute('aria-hidden', 'true');
+          const setOpen = (open: boolean) => {
+            next.setAttribute('aria-expanded', String(open));
+            popover.setAttribute('aria-hidden', String(!open));
+          };
+          next.addEventListener('click', () => setOpen(next.getAttribute('aria-expanded') !== 'true'), { signal: triggerEvents.signal });
+          doc.addEventListener('click', event => { if (!element.contains(event.target as Node)) setOpen(false); }, { signal: triggerEvents.signal });
+          doc.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && next.getAttribute('aria-expanded') === 'true') { setOpen(false); next.focus(); }
+          }, { signal: triggerEvents.signal });
+        }
         if (kind === 'select') observeSelect(next, popover, triggerEvents.signal, send);
         else syncOpen = observeExpanded(next, popover, triggerEvents.signal, send, () => {
           popover.tabIndex = -1;
@@ -551,7 +565,8 @@ export function popup(element: Widget, kind: 'popover' | 'select', send: Send, s
         }
         valueSignature = value !== undefined ? encoded : undefined;
       }
-      if (control.init(kind === 'popover' ? [next, popover] : [next, popover, list])) {
+      if (childTrigger) control.dispose();
+      if (childTrigger || control.init(kind === 'popover' ? [next, popover] : [next, popover, list])) {
         element.refresh?.();
         if (inputs.open !== previousOpen && typeof inputs.open === 'boolean') syncOpen?.(inputs.open);
         previousOpen = inputs.open;
@@ -780,7 +795,7 @@ export function group(element: HTMLElement, name: string, send: Send, signal: Ab
     } else if (sidebar) {
       if (!target.closest('[data-vs-component="Sidebar.Trigger"], [data-vs-component="Sidebar.Rail"]')) return;
       const panel = element.querySelector<HTMLElement>(selector);
-      if (!panel) return;
+      if (!panel || readInputs(panel).collapsible === 'none') return;
       const value = panel.getAttribute('aria-hidden') === 'true';
       if (desktop?.matches !== true || props.open === undefined) {
         (panel as Widget & { toggle?: () => void }).toggle?.();
@@ -794,6 +809,11 @@ export function group(element: HTMLElement, name: string, send: Send, signal: Ab
       props = inputs;
       if (sidebar) {
         const panel = element.querySelector<Widget & { open?: () => void; close?: () => void }>(selector);
+        if (panel && readInputs(panel).collapsible === 'none') {
+          control?.update(null);
+          panel.setAttribute('aria-hidden', 'false');
+          return;
+        }
         control?.update(panel);
         if (desktop?.matches && typeof inputs.open === 'boolean') (inputs.open ? panel?.open : panel?.close)?.();
         return;
@@ -866,7 +886,7 @@ export function notifications(element: HTMLElement, send: Send): Behavior {
       for (const id of active.keys()) if (!ids.has(id)) remove(id, true);
       for (const item of data) {
         if (dismissed.has(item.id)) continue;
-        const signature = JSON.stringify([item, inputs.closeButton]);
+        const signature = JSON.stringify([item, inputs.closeButton, inputs.closeButtonAriaLabel]);
         if (active.get(item.id)?.signature === signature) continue;
         remove(item.id);
         finishExit(item.id);
@@ -891,7 +911,7 @@ export function notifications(element: HTMLElement, send: Send): Behavior {
           const close = doc.createElement('button');
           close.className = 'btn';
           close.type = 'button';
-          close.setAttribute('aria-label', 'Close');
+          close.setAttribute('aria-label', typeof inputs.closeButtonAriaLabel === 'string' ? inputs.closeButtonAriaLabel : 'Close');
           close.textContent = '×';
           close.addEventListener('click', () => dismiss(item.id, 'dismissed'));
           close.dataset.toastCancel = '';

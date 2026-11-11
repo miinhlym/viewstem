@@ -63,9 +63,10 @@ function setAttribute(element: HTMLElement, key: string, value: unknown, fallbac
   else if (element.hasAttribute(key)) element.removeAttribute(key);
 }
 
-function safeUrl(element: HTMLElement, value: unknown) {
+function safeUrl(element: HTMLElement, value: unknown, allowCsvDownload = false) {
   if (typeof value !== 'string') return undefined;
   try {
+    if (allowCsvDownload && /^data:text\/csv(?:;charset=utf-8)?(?:;base64)?,/i.test(value)) return value;
     const protocol = new URL(value, element.ownerDocument.baseURI).protocol;
     return ['http:', 'https:', 'mailto:', 'tel:', 'blob:'].includes(protocol) ? value : undefined;
   } catch { return undefined; }
@@ -156,8 +157,11 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
     const defaults = markup[2];
     const part = modalParts.exec(name)?.[1]?.toLowerCase();
     const childAction = !!node.slots.child?.length && !!part;
-    const control = doc.createElement(childAction ? 'span' : tag);
-    if (defaults) for (const [key, value] of Object.entries(defaults)) control.setAttribute(key, value);
+    const childTrigger = !!node.slots.child?.length && (/^(?:DropdownMenu|HoverCard|Tooltip|Popover)\.Trigger$/.test(name) || name === 'Popover.Close');
+    const control = doc.createElement(childAction || childTrigger ? 'span' : tag);
+    if (defaults) for (const [key, value] of Object.entries(defaults)) {
+      if (name !== 'Button' || tag !== 'a' || key !== 'type') control.setAttribute(key, value);
+    }
 
     let element = control;
     let host = formScrollHost(name, control) ?? control;
@@ -194,7 +198,7 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
       host.setAttribute('role', 'listbox');
       control.append(host);
     }
-    if (childAction) control.className = 'vs-ui-transparent';
+    if (childAction || childTrigger) control.className = 'vs-ui-transparent';
     control.dataset.vsComponent = name;
     control.dataset.vsPart = !definition ? 'group' : name === 'Card.Root' ? 'card' : name.startsWith('Card.') ? name.replace('Card.', 'card-').toLowerCase() : modalRoots.test(name) ? 'dialog-root' : part ? 'dialog-' + part : name.split('.').at(-1)!.toLowerCase();
     if (part === 'trigger') control.dataset.vsModalAction = 'open';
@@ -260,6 +264,15 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
         if (entry.node.inputs.indeterminate === true && !input.indeterminate) send('indeterminateChange', { value: false });
       }, { signal });
     }
+    if (name === 'Collapsible.Trigger' && node.slots.child?.length) {
+      control.addEventListener('click', event => {
+        if ((event.target as Element).closest('button, a, input, select, textarea')) {
+          event.preventDefault();
+          const details = control.closest('details');
+          if (details) details.open = !details.open;
+        }
+      }, { signal });
+    }
     if (name === 'InputGroup.Addon') {
       control.addEventListener('click', event => {
         if (!event.defaultPrevented && !(event.target as Element).closest('button, a[href]')) {
@@ -319,12 +332,12 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
 
     const [, className, defaults] = markup;
     const activeCommand = (name === 'Command.Item' || name === 'Command.LinkItem') && control.classList.contains('active');
-    const combined = [node.slots.child?.length && modalParts.test(name) ? 'vs-ui-transparent' : className,
+    const combined = [node.slots.child?.length && (modalParts.test(name) || (/^(?:DropdownMenu|HoverCard|Tooltip|Popover)\.Trigger$/.test(name) || name === 'Popover.Close')) ? 'vs-ui-transparent' : className,
       inputs.class, activeCommand && 'active'].filter(Boolean).join(' ');
     if (control.className !== combined) control.className = combined;
     for (const key of attributes) {
       if (key === 'class' || !Object.hasOwn(inputs, key)) continue;
-      const value = key === 'href' || key === 'src' ? safeUrl(control, inputs[key]) : inputs[key];
+      const value = key === 'href' || key === 'src' ? safeUrl(control, inputs[key], name === 'Attachment.Action' && key === 'href' && (inputs.download === true || typeof inputs.download === 'string')) : inputs[key];
       if (name === 'Avatar.Image' && key === 'src' && control.getAttribute('src') !== value) delete control.dataset.vsLoaded;
       setAttribute(control, key, value, defaults?.[key]);
     }
@@ -388,6 +401,11 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
       control.dataset.vsPage = String((inputs.page as { value: number }).value);
     }
     if (/^Pagination\.(Next|Prev)/.test(name)) control.dataset.vsPage ||= '1';
+    if (name === 'Separator') {
+      setAttribute(control, 'role', inputs.decorative === false ? 'separator' : 'none');
+    }
+    if (name === 'Sonner' || name === 'Notifications') setAttribute(control, 'aria-label', inputs.containerAriaLabel);
+    if (name === 'Sidebar.Root') setAttribute(control, 'data-collapsible', inputs.collapsible);
     if (name === 'Field.Separator') host.hidden = !content && !descendants.length;
     if ((name === 'Dialog.Content' || name === 'Sheet.Content') && auxiliary) auxiliary.hidden = inputs.showCloseButton === false;
     if (name === 'Sheet.Content') control.dataset.side = typeof inputs.side === 'string' ? inputs.side : 'right';
@@ -417,7 +435,7 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
       const tooltip = control.querySelector<HTMLElement>('[data-vs-component="Tooltip.Content"]');
       if (trigger && tooltip) {
         tooltip.id ||= uniqueId();
-        trigger.setAttribute('aria-describedby', tooltip.id);
+        (trigger.classList.contains('vs-ui-transparent') ? trigger.querySelector<HTMLElement>(':scope > *') ?? trigger : trigger).setAttribute('aria-describedby', tooltip.id);
       }
     }
     if (name === 'NativeSelect.Root' && inputs.value !== undefined) {

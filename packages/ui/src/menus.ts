@@ -101,8 +101,10 @@ export function menus(root: HTMLElement, family: Family, send: Send, signal: Abo
   }
 
   function owned(owner: HTMLElement, part: string) {
-    return Array.from(owner.querySelectorAll<HTMLElement>(`[data-vs-component="${family}.${part}"]`))
+    const match = Array.from(owner.querySelectorAll<HTMLElement>(`[data-vs-component="${family}.${part}"]`))
       .find(item => item.closest(container) === owner);
+    return part === 'Trigger' && match?.classList.contains('vs-ui-transparent')
+      ? match.firstElementChild as HTMLElement | null ?? undefined : match;
   }
 
   function groupOwner(item: HTMLElement, driver: Driver) {

@@ -13,6 +13,11 @@ for (const [name] of components) {
   const ports = Object.fromEntries(Object.entries(upstream.properties[entry.propertiesRef] ?? {})
     .filter(([key]) => portNames(name).has(key))
     .map(([key, { schema, required }]) => [key, { kind: 'Value', schema, ...(required && { required }) }]));
+  // The UI notifications recipe also exposes the container and dismissal labels.
+  if (name === 'Notifications') {
+    ports.closeButtonAriaLabel = { kind: 'Value', schema: { type: 'string' } };
+    ports.containerAriaLabel = { kind: 'Value', schema: { type: 'string' } };
+  }
   const callbacks = Object.values(upstream.callbacks[entry.callbacksRef] ?? {});
   const events = Object.fromEntries(callbacks.filter(callback => eventNames(name).has(callback.event)).map(callback => [
     callback.event,

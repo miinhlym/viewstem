@@ -88,7 +88,7 @@ const allowedTypographyTags = new Set<keyof HTMLElementTagNameMap>([
 ]);
 
 export function markupTag(name: string, inputs: Props): keyof HTMLElementTagNameMap | undefined {
-  if (name === 'Attachment.Action' || name === 'CodeBlock.CopyButton') return inputs.href ? 'a' : 'button';
+  if (name === 'Button' || name === 'Attachment.Action' || name === 'CodeBlock.CopyButton') return inputs.href ? 'a' : 'button';
   if (name !== 'Typography') return undefined;
   const as = inputs.as as keyof HTMLElementTagNameMap;
   if (allowedTypographyTags.has(as)) return as;
@@ -412,6 +412,10 @@ function copyButton(element: HTMLElement, signal: AbortSignal): Behavior {
 
 export function markupBehavior(name: string, element: HTMLElement, send: Send, signal: AbortSignal): Behavior | undefined {
   switch (name) {
+    case 'Button': {
+      const syncDisabled = disableAction(element, signal);
+      return { sync: syncDisabled };
+    }
     case 'AspectRatio':
       return {
         sync(inputs) {
