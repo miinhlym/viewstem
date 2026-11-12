@@ -396,7 +396,7 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
       else if (inputs['aria-disabled'] === undefined) control.removeAttribute('aria-disabled');
     }
 
-    const fieldValue = typeof inputs.value === 'number' ? String(inputs.value) : inputs.value;
+    const fieldValue = inputs.value === null ? '' : typeof inputs.value === 'number' ? String(inputs.value) : inputs.value;
     if (control.localName === 'input') {
       const input = control as HTMLInputElement;
       if (name === 'Checkbox' || name === 'Switch' || name === 'RadioGroup.Item') {
@@ -458,8 +458,11 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
     }
     if (name === 'NativeSelect.Root' && inputs.value !== undefined) {
       const select = control as HTMLSelectElement;
-      const values = Array.isArray(inputs.value) ? inputs.value : [inputs.value];
-      for (const option of select.options) option.selected = values.includes(option.value);
+      const values = (Array.isArray(inputs.value) ? inputs.value : [inputs.value])
+        .filter(value => typeof value === 'string' || typeof value === 'number').map(String);
+      if (select.multiple) {
+        for (const option of select.options) option.selected = values.includes(option.value);
+      } else select.selectedIndex = Array.from(select.options).findIndex(option => values.includes(option.value));
     }
     entry.behavior?.sync(inputs);
   }

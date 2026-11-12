@@ -895,7 +895,8 @@ export function group(element: HTMLElement, name: string, send: Send, signal: Ab
   element.addEventListener(radio ? 'change' : 'click', event => {
     const target = event.target as HTMLElement;
     if (radio) {
-      if (target.matches(selector) && (target as HTMLInputElement).checked) send('valueChange', { value: (target as HTMLInputElement).value });
+      if (target.matches(selector) && target.closest('[data-vs-component="RadioGroup.Root"]') === element &&
+          (target as HTMLInputElement).checked) send('valueChange', { value: (target as HTMLInputElement).value });
     } else if (pagination) {
       const page = target.closest<HTMLElement>(selector)?.dataset.vsPage;
       if (page) send('pageChange', { value: Number(page) });
@@ -944,7 +945,11 @@ export function group(element: HTMLElement, name: string, send: Send, signal: Ab
       }
       const values = selection(inputs.value);
       for (const input of element.querySelectorAll<HTMLInputElement>(selector)) {
-        input.name = id;
+        if (input.closest('[data-vs-component="RadioGroup.Root"]') !== element) continue;
+        const item = readInputs(input);
+        input.name = string(inputs.name, id);
+        input.disabled = inputs.disabled === true || item.disabled === true;
+        input.required = inputs.required === true || item.required === true;
         if (inputs.value !== undefined) input.checked = values.includes(input.value);
       }
     },

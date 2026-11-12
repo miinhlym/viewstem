@@ -108,6 +108,34 @@ async function mount(t, definition, host = '<main id="app"></main>') {
   return page;
 }
 
+test('P1 design-critic-1-1: Questionnaire excludes unavailable fields and keeps answers for restored questions', async t => {
+  const definition = fixture('questionnaire');
+  const items = definition.render.inputs.items;
+  definition.states.items = state(items);
+  definition.render.inputs.items = from('items');
+  const page = await mount(t, definition);
+  const formData = () => page.locator('form').evaluate(form => Object.fromEntries(new FormData(form)));
+  const unavailable = page.locator('input[value="summary"]');
+  await pointerClick(page, unavailable);
+  await page.getByRole('button', { name: 'Next' }).click();
+  await pointerClick(page, page.locator('input[value="comparison"]'));
+  await write(page, 'items', [items[1]]);
+  await page.getByRole('button', { name: 'Submit' }).click();
+  await waitState(page, 'submitted', true);
+  assert.deepEqual(await formData(), { detail: 'comparison' });
+  await write(page, 'items', items);
+  assert.deepEqual(await formData(), { format: 'summary', detail: 'comparison' });
+  await page.getByRole('button', { name: 'Previous' }).click();
+  await write(page, 'items', [{ ...items[0], choices: [{ value: 'summary', disabled: true }, { value: 'full' }] }, items[1]]);
+  assert.equal(await unavailable.isDisabled(), true);
+  await pointerClick(page, unavailable);
+  assert.deepEqual(await formData(), { detail: 'comparison' });
+  await page.getByRole('button', { name: 'Next' }).click();
+  assert.equal(await page.getByText('보고서 형식을 선택하세요').isVisible(), true);
+  await pointerClick(page, page.locator('input[value="full"]'));
+  assert.deepEqual(await formData(), { format: 'full', detail: 'comparison' });
+});
+
 test('P1 design-critic-1-2: Select Root disables its real trigger and excludes its named input from forms', async t => {
   const definition = fixture('select');
   definition.states.disabled = state(true, boolean);
@@ -248,6 +276,78 @@ test('P1 structural-1-3: Menubar skips disabled triggers and follows updated DOM
   assert.equal(await focused(), 'Help');
   await page.keyboard.press('ArrowLeft');
   assert.equal(await focused(), 'File');
+});
+
+test('P2 design-critic-1-3: RadioGroup propagates disabled, required and name to form controls', async t => {
+  const definition = fixture('radio-group');
+  definition.states.site.initial = '';
+  definition.states.disabled = state(true, boolean);
+  Object.assign(definition.render.inputs, { disabled: from('disabled'), name: 'category', required: true });
+  const page = await mount(t, definition, '<form><main id="app"></main></form>');
+  const seoul = page.locator('#radio-seoul');
+  const busan = page.locator('#radio-busan');
+  const formData = () => page.locator('form').evaluate(form => Object.fromEntries(new FormData(form)));
+  const valid = () => page.locator('form').evaluate(form => form.checkValidity());
+  assert.equal(await seoul.isDisabled(), true);
+  await pointerClick(page, busan);
+  assert.equal(await read(page, 'site'), '');
+  assert.equal(await valid(), true);
+  assert.deepEqual(await formData(), {});
+  await write(page, 'disabled', false);
+  assert.equal(await seoul.isDisabled(), false);
+  assert.equal(await page.locator('#radio-jeju').isDisabled(), true);
+  assert.equal(await valid(), false);
+  await busan.press('Space');
+  await waitState(page, 'site', 'busan');
+  assert.equal(await valid(), true);
+  assert.deepEqual(await formData(), { category: 'busan' });
+});
+
+test('P2 design-critic-1-4: NativeSelect normalizes numeric values and clears explicit null', async t => {
+  function select(id, multiple) {
+    return node(id, 'NativeSelect.Root', { value: from(id), 'aria-label': id, multiple }, [
+      node(id + 'One', 'NativeSelect.Option', { value: 1, text: 'One' }),
+      node(id + 'Zero', 'NativeSelect.Option', { value: 0, text: 'Zero' }),
+    ]);
+  }
+  const page = await mount(t, {
+    states: { single: state(0), multiple: state([0, '1']) },
+    render: group(select('single', false), select('multiple', true)),
+  });
+  const single = page.getByLabel('single', { exact: true });
+  const multiple = page.getByLabel('multiple', { exact: true });
+  assert.equal(await single.inputValue(), '0');
+  assert.deepEqual(await multiple.evaluate(el => Array.from(el.selectedOptions, option => option.value)), ['1', '0']);
+  await write(page, 'single', '0');
+  assert.equal(await single.inputValue(), '0');
+  await write(page, 'single', null);
+  await write(page, 'multiple', null);
+  assert.equal(await single.evaluate(el => el.selectedIndex), -1);
+  assert.equal(await multiple.evaluate(el => el.selectedOptions.length), 0);
+});
+
+test('P2 design-critic-1-5: Input and Textarea clear null and preserve unbound edits', async t => {
+  const page = await mount(t, {
+    states: { amount: state(42, { type: ['number', 'null'] }) },
+    render: group(
+      node('input', 'Input', { type: 'number', value: from('amount'), 'aria-label': 'Amount' }),
+      node('textarea', 'Textarea', { value: from('amount'), 'aria-label': 'Memo' }),
+      node('unbound', 'Input', { 'aria-label': 'Local edit' }),
+    ),
+  });
+  const amount = page.getByLabel('Amount');
+  const memo = page.getByLabel('Memo');
+  const unbound = page.getByLabel('Local edit');
+  assert.equal(await amount.inputValue(), '42');
+  assert.equal(await memo.inputValue(), '42');
+  await unbound.fill('draft');
+  await write(page, 'amount', null);
+  assert.equal(await amount.inputValue(), '');
+  assert.equal(await memo.inputValue(), '');
+  assert.equal(await unbound.inputValue(), 'draft');
+  await write(page, 'amount', 0);
+  assert.equal(await amount.inputValue(), '0');
+  assert.equal(await memo.inputValue(), '0');
 });
 
 function popover(id, { child = true, open, inside = [] } = {}) {

@@ -365,10 +365,12 @@ function questionnaire(form: HTMLFormElement, send: Send, signal: AbortSignal): 
     }));
     questions = definitions.filter(definition => !definition.disabled && propsOf(byName.get(definition.name) ?? form).disabled !== true)
       .map(definition => ({ name: definition.name, definition, node: byName.get(definition.name) }));
-    if (typeof inputs.item === 'string' && inputs.item !== oldControlled) activeName = inputs.item;
+    if (typeof inputs.item === 'string' && inputs.item !== oldControlled && questions.some(item => item.name === inputs.item)) activeName = inputs.item;
     else if (!questions.some(item => item.name === activeName)) activeName = questions.find(item => item.name === inputs.defaultItem)?.name ?? questions[0]?.name;
     for (const node of nodes) {
       const entry = questions.find(item => item.node === node);
+      // Keep answers on the mounted controls while excluding inactive definitions from FormData.
+      node.disabled = !entry;
       if (!entry) { node.hidden = true; node.inert = true; continue; }
       const multiple = propsOf(node).multiple === true;
       const shortcuts = inputs.shortcuts === 'numbers' ? '123456789' : inputs.shortcuts === 'letters' ? 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' : '';
@@ -379,7 +381,8 @@ function questionnaire(form: HTMLFormElement, send: Send, signal: AbortSignal): 
         input.type = multiple ? 'checkbox' : 'radio';
         input.name = entry.name;
         input.value = String(settings.value ?? '');
-        input.disabled = settings.disabled === true;
+        const defined = entry.definition.choices?.find(candidate => candidate.value === settings.value);
+        input.disabled = settings.disabled === true || defined?.disabled === true;
         choice.dataset.type = input.type;
         choice.toggleAttribute('data-disabled', input.disabled);
         if (!initialized.has(input)) {
