@@ -11,11 +11,9 @@ sidebar:
 
 ```js title="src/main.js"
 import { createHttpExecutor } from '@viewstem/core/http';
-import { createRenderer } from '@viewstem/svelte';
-import { registerComponents } from '@viewstem/svelte-ui';
-import { button } from '@viewstem/svelte-ui/shadcn/button';
-import { card } from '@viewstem/svelte-ui/shadcn/card';
-import '@viewstem/svelte-ui/shadcn/styles.css';
+import { createRegistry, createRuntime } from '@viewstem/core';
+import { attach, registerShadcn } from '@viewstem/ui';
+import '@viewstem/ui/styles.css';
 
 const requestExecutor = createHttpExecutor({
   transport: async (url) => {
@@ -29,8 +27,9 @@ const requestExecutor = createHttpExecutor({
   },
 });
 
-const renderer = createRenderer({ requestExecutor });
-registerComponents(renderer, [button, card]);
+const registry = createRegistry();
+registerShadcn(registry);
+const runtime = createRuntime({ registry, requestExecutor });
 
 const path = value => ({ '@path': value });
 const string = { type: 'string' };
@@ -49,8 +48,8 @@ const choices = [
   ['unavailable', '요청 실패 재현'],
 ];
 
-const mounted = await renderer.mount({
-  target: document.querySelector('#viewstem'),
+const target = document.querySelector('#viewstem');
+const mounted = await runtime.createView({
   view: {
     states: { period: { kind: 'State', schema: string, initial: 'week' } },
     queries: {
@@ -109,6 +108,7 @@ const mounted = await renderer.mount({
     },
   },
 });
+const attachment = attach(mounted.view, target);
 await mounted.initialComplete;
 ```
 

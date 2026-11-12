@@ -2,7 +2,7 @@
 
 - 검토 모드: BRAINSTORM. 설계 가설 검토이며 구현 승인 또는 제품 적합성 시험이 아니다.
 - 입력: 저장소 루트의 [concepts_brief.md](../../../concepts_brief.md) 전체 138줄.
-- 고정 원문: [review_input_snapshot.md](review_input_snapshot.md). 원문을 바이트 단위로 보존했다. **이 snapshot 내부의 기존 상대 링크는 이 폴더가 아니라 저장소 루트를 기준으로 해석한다.**
+- 검토 입력 발췌: [review_input_snapshot.md](review_input_snapshot.md). 내부 상대 링크는 저장소 루트를 기준으로 해석한다.
 - 원문 식별 정보: [review_input_metadata.json](review_input_metadata.json).
 - 검토 범위: 외부 소비 프로젝트의 코딩 에이전트가 Viewstem으로 앱을 구현·검증하도록 돕는 스킬 구성.
 - 격리: 각 검토자는 `fork_turns: none`인 별도 일반 에이전트다. 부모 대화 이력을 전달하지 않았으며, 파일시스템·호스트 지침·AGENTS.md 격리는 주장하지 않는다. 대화 기록과 메모리는 조회하지 않았다.

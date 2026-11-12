@@ -13,13 +13,6 @@
       "locale": "en",
       "theme": "light",
       "width": 320,
-      "name": "docs",
-      "path": "/docs/svelte-ui/components/button/"
-    },
-    {
-      "locale": "en",
-      "theme": "light",
-      "width": 320,
       "name": "examples",
       "path": "/examples/"
     },
@@ -43,13 +36,6 @@
       "width": 1440,
       "name": "home",
       "path": "/"
-    },
-    {
-      "locale": "en",
-      "theme": "light",
-      "width": 1440,
-      "name": "docs",
-      "path": "/docs/svelte-ui/components/button/"
     },
     {
       "locale": "en",
@@ -83,13 +69,6 @@
       "locale": "en",
       "theme": "dark",
       "width": 320,
-      "name": "docs",
-      "path": "/docs/svelte-ui/components/button/"
-    },
-    {
-      "locale": "en",
-      "theme": "dark",
-      "width": 320,
       "name": "examples",
       "path": "/examples/"
     },
@@ -113,13 +92,6 @@
       "width": 1440,
       "name": "home",
       "path": "/"
-    },
-    {
-      "locale": "en",
-      "theme": "dark",
-      "width": 1440,
-      "name": "docs",
-      "path": "/docs/svelte-ui/components/button/"
     },
     {
       "locale": "en",
@@ -153,13 +125,6 @@
       "locale": "ko",
       "theme": "light",
       "width": 320,
-      "name": "docs",
-      "path": "/docs/svelte-ui/components/button/"
-    },
-    {
-      "locale": "ko",
-      "theme": "light",
-      "width": 320,
       "name": "examples",
       "path": "/examples/"
     },
@@ -183,13 +148,6 @@
       "width": 1440,
       "name": "home",
       "path": "/"
-    },
-    {
-      "locale": "ko",
-      "theme": "light",
-      "width": 1440,
-      "name": "docs",
-      "path": "/docs/svelte-ui/components/button/"
     },
     {
       "locale": "ko",
@@ -223,13 +181,6 @@
       "locale": "ko",
       "theme": "dark",
       "width": 320,
-      "name": "docs",
-      "path": "/docs/svelte-ui/components/button/"
-    },
-    {
-      "locale": "ko",
-      "theme": "dark",
-      "width": 320,
       "name": "examples",
       "path": "/examples/"
     },
@@ -253,13 +204,6 @@
       "width": 1440,
       "name": "home",
       "path": "/"
-    },
-    {
-      "locale": "ko",
-      "theme": "dark",
-      "width": 1440,
-      "name": "docs",
-      "path": "/docs/svelte-ui/components/button/"
     },
     {
       "locale": "ko",

@@ -109,7 +109,7 @@ export async function check({ project, scenario, finalResponse, mode = 'check' }
         builder.onLoad({ filter: /\.svelte\.[jt]s$/ }, async ({ path }) => ({ contents: compileModule(await readFile(path, 'utf8'), { filename: path, generate: 'client' }).js.code, loader: 'js' }));
       } };
       bundled = await build({ absWorkingDir: project, entryPoints: ['bootstrap.ts'], bundle: true, write: false, metafile: true, platform: 'browser', format: 'esm', target: 'es2022', outdir: 'out', conditions: ['svelte', 'browser'], plugins: [plugin], logLevel: 'silent' });
-      const renderer = Object.keys(bundled.metafile.inputs).some(path => /node_modules\/@viewstem\/svelte\/dist\//.test(path));
+      const renderer = Object.keys(bundled.metafile.inputs).some(path => /node_modules\/@viewstem\/(?:svelte|ui)\/dist\//.test(path));
       result.build = { ok: mode === 'build' || renderer, rendererIncluded: renderer, errors: [] };
     } catch (error) { result.build = { ok: false, errors: [error.message] }; }
     if (mode === 'check' && result.build.ok) {

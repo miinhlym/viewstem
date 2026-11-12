@@ -1,12 +1,12 @@
 # 패키지 가이드와 공개 API 레퍼런스 — 2026-11-05
 
-사용자 요청에 따라 기존 학습 문서를 유지하고 DSL, Core, Svelte, Svelte UI의 한국어·영어 문서를 사이트에 추가했다. 공개 배포나 커밋은 수행하지 않았다. 완료 기준은 실제 공개 API의 문서 연결, 언어별 페이지 대응, 실행 예제 검증, 사이트 빌드·링크·검색·모바일 탐색 확인이다.
+사용자 요청에 따라 기존 학습 문서를 유지하고 DSL, Core, Svelte의 한국어·영어 문서를 사이트에 추가했다. 공개 배포나 커밋은 수행하지 않았다. 완료 기준은 실제 공개 API의 문서 연결, 언어별 페이지 대응, 실행 예제 검증, 사이트 빌드·링크·검색·모바일 탐색 확인이다.
 
 ## 공식 레퍼런스 조사와 적용
 
 | 조사 대상 | 관찰한 구성과 표현 | Viewstem에 적용한 방식 |
 |---|---|---|
-| [TanStack Table API](https://tanstack.com/table/latest/docs/reference/index) | 시작하기, 가이드, API, 예제를 분리하고 Core와 프레임워크별 API를 구분한다. | 기존 핵심 개념·복합 가이드를 유지하고 Core, Svelte, Svelte UI를 별도 메뉴로 구성한다. |
+| [TanStack Table API](https://tanstack.com/table/latest/docs/reference/index) | 시작하기, 가이드, API, 예제를 분리하고 Core와 프레임워크별 API를 구분한다. | 기존 핵심 개념·복합 가이드를 유지하고 Core와 Svelte를 별도 메뉴로 구성한다. |
 | [TanStack Query QueryClient](https://tanstack.com/query/latest/docs/framework/react/reference/classes/QueryClient) | 생성·사용 예제 다음에 메서드별 시그니처, 인자, 옵션, 반환값을 조회할 수 있다. | API 페이지는 목적·import·시그니처·옵션과 기본값·반환값·오류·수명 순서로 작성한다. 객체별 메서드를 같은 페이지에서 찾게 한다. |
 | [Svelte 문서](https://svelte.dev/docs/svelte/overview) | 문법·개념 설명과 모듈 API를 구분한다. | JSON DSL의 필드 계약을 패키지의 호스트 API와 분리한다. Svelte 어댑터 작성·마운트·수명 관리는 작업별 가이드로 제공한다. |
 | [shadcn-svelte Button](https://www.shadcn-svelte.com/docs/components/button) | 컴포넌트별 설치·사용·변형 예제를 제공한다. | UI의 각 계열에 import·등록·JSON ID·입력·이벤트·슬롯·네이티브 사용 범위를 제공한다. upstream 기능을 Viewstem JSON 지원으로 간주하지 않고 현재 support.json을 기준으로 작성한다. |
@@ -15,7 +15,7 @@
 
 ## 메뉴와 페이지별 범위
 
-시작하기 → 핵심 개념 → 가이드 → 레퍼런스 안내 → DSL → Core → Svelte → Svelte UI 순서다. 각 그룹은 접을 수 있고 현재 문서가 속한 그룹은 열린다. UI 계열 66개는 전역 메뉴를 늘리지 않고 컴포넌트 세트 목록에서 찾아간다. 문서 검색은 상세 계열 페이지도 포함한다.
+시작하기 → 핵심 개념 → 가이드 → 레퍼런스 안내 → DSL → Core → Svelte 순서다. 각 그룹은 접을 수 있고 현재 문서가 속한 그룹은 열린다. 문서 검색은 상세 계열 페이지도 포함한다.
 
 아래 경로는 `/docs/` 기준이며 한국어에는 `/ko` 접두사가 붙는다. 총 106개 페이지 쌍, 212개 신규 문서다.
 
@@ -26,7 +26,6 @@
 | Core API, 9개 | `registry`, `runtime`, `view`, `state-store`, `url`, `http`, `cel`, `utilities`, `types` | 등록·스냅샷·호스트 수명, 관찰·갱신·교체, State·트랜잭션·반응, URL 어댑터, HTTP 실행 계획, CEL 함수·제한, Grid 배치, 전체 공개 이름 색인 |
 | Svelte 개요·가이드, 4개 | `svelte/`, `guides/mount-in-svelte`, `guides/write-an-adapter`, `guides/manage-view-lifecycle` | 앱 마운트, 슬롯·이벤트가 있는 어댑터, 갱신·교체·폐기 |
 | Svelte API, 6개 | `renderer`, `mounted-view`, `adapters`, `viewstem-view`, `errors`, `types` | createRenderer·옵션·메서드, 소유/차용 연결, 어댑터 Props, 선언형 연결 컴포넌트, 진단, 타입·Core 재노출 |
-| UI 개요·가이드, 4개 | `svelte-ui/`, `guides/register-families`, `guides/compose-json`, `guides/style-and-native` | 필요한 계열 등록, 슬롯·Action 조합, 스타일과 네이티브 Svelte 사용 |
 | UI 공통 API, 4개 | `registration`, `component-sets`, `support`, `attributes` | 등록 API, 전체 계열 목록, 지원 메타데이터·CSS, 중복 HTML·ARIA·DOM 이벤트 계약 |
 | UI 계열별 API, 66개 | `components/<family>` | 실제 export, JSON 컴포넌트 ID, 입력 스키마·확인된 기본값, 이벤트 payload, 슬롯, 네이티브 전용 부품·별칭·헬퍼·타입 |
 
@@ -34,7 +33,6 @@
 
 - Core: `packages/core/src/index.d.ts`, `http.d.ts`, `cel.d.ts`의 공개 선언 83개, 진입점별 재노출을 포함한 88개 binding을 색인과 상세 페이지에 연결한다. `cel-support.json` 자산도 별도로 설명한다. 클래스처럼 보이는 타입 이름을 생성자로 안내하지 않는다.
 - Svelte: 런타임 값 3개와 고유 타입 12개를 설명하고 Core 타입 재노출 70개는 Core 색인으로 연결한다.
-- Svelte UI: package exports 70개, 66개 계열을 다룬다. upstream 부품 386개 중 351개와 JSON 조합 6개가 총 357개 JSON ID를 이룬다. 나머지 upstream 부품 35개는 네이티브 Svelte 문맥 전용으로 구분한다.
 - UI 세부 표는 `support.json`, 실제 export, wrapper 소스에서 생성한다. 임의의 기본값은 추측하지 않는다. Calendar README의 실제 export 이름도 두 언어에서 `Calendar.Calendar`로 바로잡았다.
 
 전체 이름·진입점·페이지 매핑과 문서 소스 SHA-256은 [검증 기록](docs-package-reference-verification-2026-11-05.json)에 보존한다.

@@ -116,6 +116,6 @@ npm run example:svelte
 
 지원 범위는 Svelte 5 클라이언트 렌더러입니다. Svelte 4, SSR·hydration의 runtime 전달, 다른 브라우저 엔진·실제 모바일 IME, Grid/차트 UI·기본 디자인 시스템·공개 발행은 이번 검증 범위가 아닙니다. 현재 상세 기록은 같은 소스 revision의 [구현 인계](../../docs/handoff/svelte-implementation-2026-11-02.md)와 [검증 결과](../../docs/handoff/svelte-verification-results.json)를 따릅니다. 소스 문서는 tarball에 포함하지 않으며 발행된 tarball에는 해당 소스 커밋의 공개 문서 링크가 포함됩니다.
 
-## 선택 UI 묶음
+## 브라우저 기본 컴포넌트
 
-shadcn-svelte는 별도 [@viewstem/svelte-ui](../svelte-ui/README.ko.md)에서 전체 또는 family 단위로 명시 등록합니다. renderer 자체에는 기본 UI를 넣지 않습니다. U44 등록·callback 수명 회귀의 최신 증거는 [UI 검증 기록](../../docs/handoff/svelte-ui-shadcn-verification-results.json)을 따릅니다.
+기본 JSON 컴포넌트는 [@viewstem/ui](../ui/README.ko.md)로 브라우저 컨테이너에 렌더링합니다. 이 패키지는 앱 자체의 Svelte 어댑터를 렌더링합니다.

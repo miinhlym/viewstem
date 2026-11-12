@@ -1,7 +1,8 @@
 <script lang="ts">
   import ScrollRegion from './site/ScrollRegion.svelte';
   import { onMount } from 'svelte';
-  import type { MountedView, Renderer, ViewSpec } from '@viewstem/svelte';
+  import type { ViewSpec } from '@viewstem/core';
+  import type { createPlaygroundRenderer } from './playground-renderer';
   import * as Empty from '@/components/ui/empty/index.js';
   import { Spinner } from '@/components/ui/spinner/index.js';
   import * as Alert from '@/components/ui/alert/index.js';
@@ -34,8 +35,7 @@
     media.addEventListener('change', updateOrientation);
 
     let disposed = false;
-    let renderer: Renderer | undefined;
-    let mounted: MountedView | undefined;
+    let renderer: ReturnType<typeof createPlaygroundRenderer> | undefined;
 
     async function run() {
       const input = editor.state.doc.toString();
@@ -60,16 +60,14 @@
         if (!renderer) {
           const { createPlaygroundRenderer } = await import('./playground-renderer');
           if (disposed) return;
-          renderer = createPlaygroundRenderer(({ error: diagnostic }) => {
+          renderer = createPlaygroundRenderer(previewTarget, diagnostic => {
             if (disposed) return;
-            error = diagnostic.message;
+            error = diagnostic && typeof diagnostic === 'object' && 'message' in diagnostic ? String(diagnostic.message) : String(diagnostic);
             message = '';
           });
         }
 
-        const result = mounted
-          ? await mounted.replace({ view })
-          : (mounted = await renderer.mount({ target: previewTarget, view }));
+        const result = await renderer.run(view);
         const { queryErrors } = await result.initialComplete;
         if (disposed) return;
         executedSource = input;
@@ -116,7 +114,7 @@
       disposed = true;
       media.removeEventListener('change', updateOrientation);
       editor.destroy();
-      void renderer?.dispose().catch(() => {});
+      renderer?.dispose();
     };
   });
 </script>

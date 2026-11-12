@@ -77,11 +77,7 @@ npm run preview -w @viewstem/docs -- --port 4323
   원본을 site/docs 컴포넌트에서 조합한다. 출처·해시는
   [사이트 upstream 기록](upstream/README.md)이 소유한다. 원본과 라이선스를
   보존하며, 임의로 디자인을 바꾼 vendor 파일의 해시를 승인하는 식으로 검사를 통과시키지 않는다.
-- **JSON 실행 예제:** `@viewstem/svelte`가 `@viewstem/svelte-ui`를 렌더링한다.
-  고정된 라이브러리 원본과 생성물은
-  [패키지 upstream 절차](../../packages/svelte-ui/upstream/README.md)가 소유한다.
-  미리보기 프레임은 배치를 조절할 수 있지만, 위젯을 shadcn처럼 보이도록 다시
-  디자인하지 않는다. 화면 안의 예제뿐 아니라 포털 콘텐츠도 확인한다.
+- **JSON 실행 예제:** UI 레퍼런스·예제·Playground는 `@viewstem/ui`로 렌더링한다.
 
 디자인 변경 시 홈·문서·예제 목록·예제 실습·플레이그라운드를 같은 언어·테마·화면
 크기에서 비교한다. 한영, 밝고 어두운 테마, 좁고 넓은 화면을 확인한다. 키보드 포커스,
@@ -106,32 +102,23 @@ npm run preview -w @viewstem/docs -- --port 4323
 패키지 계약을 수정한 뒤 저장소 루트에서 다시 생성한다.
 
 ```sh
+npm run build:ui
 node apps/docs/scripts/generate-ui-reference.mjs
 node apps/docs/scripts/generate-ui-reference.mjs --check
 ```
 
-생성기는 패키지 export·지원 메타데이터·래퍼 기본값·미리보기 옵션을 읽는다.
-[component-catalog.ts](src/examples/component-catalog.ts)도 생성하므로 이 매핑이나
-레퍼런스 표를 직접 수정하지 않는다. 라이브러리 계약이 바뀌면 패키지 생성 절차를
-먼저 따른다.
+생성기는 `packages/ui/dist/support.json`에서 한·영 66개 상세 페이지를 생성한다. 생성 전에 `npm run build:ui`를 실행하고, 표를 바꿀 때는 패키지 계약과 생성기를 수정한다.
 
 [MarkdownContent.astro](src/components/docs/MarkdownContent.astro)가 각 컴포넌트
 경로에 [ComponentDemo.astro](src/components/ComponentDemo.astro)를 삽입한다.
-구성·번역 안내는 [component-demos.mjs](src/examples/component-demos.mjs)와
-[component-demo-translations.mjs](src/examples/component-demo-translations.mjs),
-편집 옵션·JSON 경로·레퍼런스 연결은
-[component-demo-controls.mjs](src/examples/component-demo-controls.mjs)를 수정한다.
-화면에 표시·복사·실행하는 JSON이 같은 초기 선언을 가리키도록 함께 갱신한다.
+기본 예제와 변형의 구성·번역은 [component-reference-demos.mjs](src/examples/component-reference-demos.mjs)에서 관리한다.
+화면에 표시·복사·실행하는 JSON은 같은 초기 선언을 사용한다.
 
-[DemoWorkbench.svelte](src/components/DemoWorkbench.svelte)와
-[DemoOptions.svelte](src/components/DemoOptions.svelte)는 조작부·배치를,
-[component-demo-client.ts](src/examples/component-demo-client.ts),
-[component-demo-session.mjs](src/examples/component-demo-session.mjs),
-[component-demo-runtime.ts](src/examples/component-demo-runtime.ts)는 실행을 담당한다.
-[component-demo-setup.ts](src/examples/component-demo-setup.ts)는 소비자용 실행 코드를
-생성한다. 탭 전환 시 상태 유지, 옵션 변경 시 초기화, 재실행과 기본값 복원의 구분,
-사용자가 요청한 JSON·레퍼런스 이동을 보존한다. 실행 중 상호작용 상태는 초기 JSON에
-역기록하지 않는다.
+[DemoWorkbench.svelte](src/components/DemoWorkbench.svelte)는 탭과 조작부를,
+[component-demo-ui-runtime.ts](src/examples/component-demo-ui-runtime.ts)는 core View와
+`@viewstem/ui.attach` 연결을 담당한다. Sonner의 호스트 Action은 별도 DOM Notifications View에 연결한다.
+[component-demo-ui-setup.ts](src/examples/component-demo-ui-setup.ts)는 복사 가능한 앱 연결 코드를 생성한다.
+탭 전환 시 상태를 유지하고 다시 실행하면 초기 상태로 돌아간다.
 
 ### 실습과 플레이그라운드
 
@@ -156,14 +143,14 @@ node apps/docs/scripts/generate-ui-reference.mjs --check
 | Astro/Svelte/TypeScript | `npm run typecheck:docs`; `node apps/docs/scripts/verify-site-svelte.mjs`는 사이트 원본·React 제외·빌드된 island를 검사한다 |
 | Core·DSL·UI 사용 코드 또는 작업 가이드 | 각각 `node apps/docs/scripts/verify-core-docs.mjs`, `node apps/docs/scripts/verify-dsl-docs.mjs`, `node apps/docs/scripts/verify-ui-docs.mjs`, `node apps/docs/scripts/verify-task-guides.mjs` |
 | 컴포넌트 레퍼런스·설정 코드 | 생성기 `--check`; `node apps/docs/scripts/verify-component-setup.mjs` |
-| 미리보기 실행·옵션 | `node --test apps/docs/scripts/component-demo-session.test.mjs`; `node apps/docs/scripts/verify-component-demos.mjs`; `node apps/docs/scripts/verify-component-options.mjs` |
+| 컴포넌트 예제와 탭 | `node --test apps/docs/scripts/component-demo-session.test.mjs`; `node apps/docs/scripts/verify-component-demos.mjs` |
+| Examples와 Playground | `node apps/docs/scripts/verify-site-previews.mjs` (완성된 정적 서버의 `DOCS_ORIGIN`) |
 | 사이드바 복원·ScrollArea | `node apps/docs/scripts/verify-sidebar-scroll.mjs`; `node apps/docs/scripts/verify-sidebar-scrollarea.mjs`; 공통 구성·텍스트는 아래 실행 서버 검사 |
-| 라이브러리 미리보기 원본 스타일 | `node apps/docs/scripts/verify-shadcn-fidelity.mjs`; 소스 일치·계산 스타일·상호작용은 별도 증거로 구분한다 |
 
 코드 예제·설정 검사는 빌드된 라이브러리 export를 사용하므로 패키지를 수정했다면
-`npm run build:svelte-ui`를 먼저 실행한다. 링크·사이트 원본·컴포넌트 설정·사이드바·미리보기/옵션·
+`npm run build:ui`를 먼저 실행한다. 링크·사이트 원본·컴포넌트 설정·사이드바·컴포넌트 예제·
 스타일 일치 검사는 `apps/docs/dist`를 읽으므로 관련 변경 후 사이트를 다시 빌드한다.
-사이드바·미리보기/옵션·스타일 일치 검사는 자체 정적 서버를 띄운다.
+사이드바·컴포넌트 예제·스타일 일치 검사는 자체 정적 서버를 띄운다.
 
 실행 중인 서버를 검사할 때는 주소를 명시한다. 스크립트마다 기본 포트가 4321과
 4323으로 다르다. 예를 들어 빌드 미리보기 서버를 실행한 상태에서 다음을 사용한다.
@@ -181,12 +168,11 @@ DOCS_ORIGIN=http://127.0.0.1:4323 node apps/docs/scripts/verify-site-search.mjs
 
 ```sh
 node apps/docs/scripts/verify-preview-design.mjs --origin=http://127.0.0.1:4323 --phase=matrix --output=/tmp/viewstem-preview-review
-node apps/docs/scripts/verify-preview-design.mjs --origin=http://127.0.0.1:4323 --phase=interactions --output=/tmp/viewstem-preview-interactions
+DEMO_INTERACTIONS_ONLY=1 node apps/docs/scripts/verify-component-demos.mjs
 ```
 
 렌더링·상호작용 증거를 수집하는 명령이며 시각 검토를 대체하지 않는다.
 `--family=<slug>`로 특정 계열만 검사할 수도 있다. 표본 검사와 전체 목록 감사를
 구분한다. 임시 스크린샷·DOM 캡처는 소스 트리 밖에 둔다. 과거 발견 사항과 한계는
-[미리보기 리뷰 인수인계](../../docs/handoff/svelte-ui-preview-review-2026-11-06.md)와
 날짜가 있는 [리뷰 기록](review)을 참고한다. 실제 실행한 명령·범위·실패·미검증 영역을
 보고하며 과거 결과를 새 통과 기록으로 바꾸지 않는다.

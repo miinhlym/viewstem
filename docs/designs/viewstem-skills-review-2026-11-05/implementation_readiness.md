@@ -32,8 +32,6 @@
 - 설치 페르소나 `/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/agents/implementation_readiness.md` — 전체, BRAINSTORM 분기 적용
 - [concepts_brief.md](../../../concepts_brief.md) — 전체 138행
 - [AGENTS.md](../../../AGENTS.md), [문서 지도](../../README.md), [현재 명세](../../VIEWSTEM-SPEC.md) — 전체
-- [Core README](../../../packages/core/README.md), [Svelte README](../../../packages/svelte/README.md), [UI README](../../../packages/svelte-ui/README.md) — 전체
-- [Core manifest](../../../packages/core/package.json), [Svelte manifest](../../../packages/svelte/package.json), [UI manifest](../../../packages/svelte-ui/package.json) — 전체
 - [패키지 문서 인계](../../handoff/docs-package-reference-2026-11-05.md), [후속 범위](../../handoff/open-contracts.md) — 전체
 
 일부 결합 출력이 잘린 파일은 후속 분할 읽기로 보완했다. 별도로 제공된 공식 검토 표준은 없다.

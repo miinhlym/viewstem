@@ -10,7 +10,7 @@
 
 ## 산출물
 
-- [원문 snapshot](review_input_snapshot.md), [입력 메타데이터](review_input_metadata.json), [EGM 환경/지침 hash](review_environment.json)
+- [검토 입력 발췌](review_input_snapshot.md), [입력 메타데이터](review_input_metadata.json), [EGM 환경/지침 hash](review_environment.json)
 - [외부 근거 조사](research_report.md), [GoldfishContext](goldfish_context.md)
 - [최종 통합 보고서와 착수 판단](consolidated_review_report.md)
 - [5단계 완료·개별 보고서 hash](review_status.json), [산출물 검증](artifact_verification.json)

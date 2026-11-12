@@ -93,10 +93,6 @@ UI 117개 이름 집합은 변경 전과 정확히 같고, 66/66 family·필수 
 실행 시점의 스냅샷이다. 최종 문서 커밋에서도 동일 실행 소스의 CI를 재확인하되,
 실행마다 결과 문서를 다시 커밋하는 순환은 만들지 않는다.
 
-독립 리뷰에서 카탈로그 인수 입력인 `docs/handoff/shadcn-component-inventory.json`이
-로컬 결과 해시에서 빠진 것을 수정했다. 같은 HEAD에서 이 입력만 바꿔도 과거 결과가
-거절되는 회귀를 추가했으며, 관련 6개 검사가 Node 22·24에서 통과했다.
-
 로컬 전체 실행은 Node 24.1.0에서 117/117 통과, 실패·cancel·skip·todo 0,
 66/66 family 인수를 확인했다. 변경 전 보고서와 테스트 이름 집합이 정확히 일치한다.
 소요 시간은 327.006초였으며 macOS 개발 환경 값으로 원격 CI 목표와 직접 비교하지 않는다.
@@ -157,12 +153,6 @@ fixture를 수정했으며, 이 중간 실패도 원본에 보존했다. 제품 
 
 - Node 22.21.1·24.1.0의 CI 도구 회귀는 **각 14/14 통과**했다. 보고서 입력을 꾸민 검사와
   실제 native runner 검사를 함께 사용했다.
-- UI reporter가 바뀌어 Node 24에서 `npm run build:svelte-ui` 후
-  `npm run test -w @viewstem/svelte-ui`를 실행했다. **117/117, 66/66 family·필수 사례 68개
-  통과**, 실패·취소·skip·todo 0이며 이전 테스트 이름 집합과 정확히 일치했다.
-  현재 작업 트리의 소스 해시·scope·suite 개수로 보고서를 다시 검증했다. 로컬 소요 시간
-  223.011초는 CI 성능 수치로 사용하지 않는다. 중간 실행은 reporter 수정 확정 전에
-  시작해 의도적으로 중단했으며 통과로 계산하지 않는다.
 - `actionlint`, 변경 JS 문법, diff 공백, CI 안내 링크·영문/한국어 코드 블록이 통과했다.
 - 변경 없는 core·Svelte·playground 본문, 타입·생성 재현·tarball 검증은
   [동일 HEAD 성공 CI 41618717896](https://github.com/miinhlym/viewstem/actions/runs/41618717896)의

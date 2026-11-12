@@ -52,8 +52,8 @@ explains how contracts, acceptance mappings, and verification evidence are maint
   before the fix; passing unrelated tests is not evidence for the change.
 - Update the owning specification or usage document when approved public behavior
   changes. Preserve historical experiment and verification records.
-- Edit generated files through their source and generator. For shadcn sources,
-  use the [upstream workflow (Korean)](packages/svelte-ui/upstream/README.md); for CEL,
+- Edit generated files through their source and generator. For the site’s shadcn
+  sources, use the [upstream workflow](apps/docs/upstream/README.md). For CEL,
   use the [vendor workflow](packages/core/vendor/README.md).
 - Do not commit credentials, personal data, local conversation archives, build
   output, or unrelated changes. Use a minimal, sanitized reproduction.
@@ -76,7 +76,7 @@ their original form.
 
 Run checks that cover the changed behavior. CI checks Node compatibility on both
 configured versions and runs the full browser suite on one representative version.
-See the [CI guide](docs/ci.md) for jobs, shard reports and the time budget. The
+See the [CI guide](docs/ci.md) for jobs and the time budget. The
 commands below identify the relevant local gates.
 
 | Change | Checks |
@@ -84,10 +84,10 @@ commands below identify the relevant local gates.
 | Core behavior or contracts | `npm run check`; add `npm run test:browser` for browser behavior |
 | Core package contents, declarations, or package README | `npm run build` then `npm run test:package` |
 | Svelte renderer or its example | `npm run check:svelte` |
-| Svelte UI adapters, generated sources, styles, or browser fixtures | `npm run check:svelte-ui` |
+| Browser UI catalog, generated contracts, styles, or fixtures | `npm run check:ui` |
 | Website UI, content, navigation, or examples | Follow the [website maintenance guide](apps/docs/README.md#choose-checks-by-the-changed-boundary) for source owners and targeted checks |
-| CI configuration or browser reporting | `npm run test:ci`; validate workflow syntax and run the affected browser checks described in the [CI guide](docs/ci.md) |
-| Package metadata or license files only | Build the affected package and run its existing package consumer check: `test:package`, `test:svelte:package`, or `test:svelte-ui:package` |
+| CI configuration | `npm run test:ci`; validate workflow syntax and run the affected browser checks described in the [CI guide](docs/ci.md) |
+| Package metadata or license files only | Build the affected package and run `npm run test:package` for core or `npm run test:svelte:package` for Svelte. For UI, run `npm run check:ui` and inspect `npm pack --dry-run -w @viewstem/ui`. |
 | Community documentation or templates only | Check links, examples, JSON/YAML syntax where applicable, and `git diff --check` |
 
 Tests that render Svelte or UI components consume built package exports. Rebuild
@@ -128,4 +128,4 @@ sign-off is required. A `Signed-off-by` line is optional.
 The root `LICENSE` is the reference for Viewstem's own license. The three package
 directories carry identical copies so installed packages include the license.
 Keep those copies and the package `license` fields aligned. Existing package
-consumer tests check the installed license and third-party notices.
+consumer checks verify the installed license and third-party notices for core and Svelte. Inspect the UI package contents for the Viewstem and Basecoat licenses.

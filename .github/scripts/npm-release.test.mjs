@@ -25,13 +25,13 @@ test('only the merged Changesets PR on this commit can publish', () => {
 });
 
 test('selects only bumped packages in dependency order', () => {
-  const before = { core: '0.1.0', svelte: '0.2.0', 'svelte-ui': '0.3.0' };
-  const uiOnly = { ...before, 'svelte-ui': '0.3.1' };
+  const before = { core: '0.1.0', svelte: '0.2.0', 'ui': '0.3.0' };
+  const uiOnly = { ...before, 'ui': '0.3.1' };
   const coreAndRenderer = { ...before, core: '0.1.1', svelte: '0.2.1' };
   const targets = after => releaseTargets((directory, previous) => ({
     name: `@viewstem/${directory}`, version: (previous ? before : after)[directory],
   }));
-  assert.deepEqual(targets(uiOnly), [{ directory: 'svelte-ui', name: '@viewstem/svelte-ui', version: '0.3.1' }]);
+  assert.deepEqual(targets(uiOnly), [{ directory: 'ui', name: '@viewstem/ui', version: '0.3.1' }]);
   assert.deepEqual(targets(coreAndRenderer).map(({ name, version }) => `${name}@${version}`),
     ['@viewstem/core@0.1.1', '@viewstem/svelte@0.2.1']);
   assert.deepEqual(targets(before), []);

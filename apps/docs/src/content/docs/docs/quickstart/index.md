@@ -1,6 +1,6 @@
 ---
 title: Quick Start
-description: Run your first Viewstem view and render a shadcn button in Svelte.
+description: Run your first Viewstem View and render a button in the browser.
 ---
 
 Render a **Hello, Viewstem** button from a JSON View. Complete [Installation](../installation/) before running the example locally, or try the [same example in your browser](../../examples/first-view/).
@@ -15,20 +15,19 @@ In the Vite starter’s `index.html`, replace `<div id="app"></div>` with the el
 
 ## 2. Register the button and run the View
 
-Replace the Vite starter’s `src/main.js` with the code below. In an existing app, run it on the client once the mount target is in the document. `registerComponents` makes `shadcn.Button` available to the View’s `componentRef`.
+Replace the Vite starter’s `src/main.js` with the code below. In an existing app, run it on the client once the mount target is in the document. `registerShadcn` makes `shadcn.Button` available to the View’s `componentRef`.
 
 ```js
-import { createRenderer } from '@viewstem/svelte';
-import { registerComponents } from '@viewstem/svelte-ui';
-import { button } from '@viewstem/svelte-ui/shadcn/button';
-import '@viewstem/svelte-ui/shadcn/styles.css';
+import { createRegistry, createRuntime } from '@viewstem/core';
+import { attach, registerShadcn } from '@viewstem/ui';
+import '@viewstem/ui/styles.css';
 
 const target = document.querySelector('#viewstem');
-const renderer = createRenderer();
-registerComponents(renderer, [button]);
+const registry = createRegistry();
+registerShadcn(registry);
+const runtime = createRuntime({ registry });
 
-const mounted = await renderer.mount({
-  target,
+const mounted = await runtime.createView({
   view: {
     render: {
       id: 'hello',
@@ -37,6 +36,7 @@ const mounted = await renderer.mount({
     },
   },
 });
+const attachment = attach(mounted.view, target);
 await mounted.initialComplete;
 ```
 
@@ -46,7 +46,7 @@ await mounted.initialComplete;
 npm run dev
 ```
 
-Open the URL printed in the terminal. You should see a **Hello, Viewstem** button. Change `inputs.text` to confirm the View controls its label. Call `await renderer.dispose()` when the owning screen closes.
+Open the URL printed in the terminal. You should see a **Hello, Viewstem** button. Change `inputs.text` to confirm the View controls its label. Call `attachment.dispose()` and `runtime.dispose()` when the owning screen closes.
 
 ## Next steps
 

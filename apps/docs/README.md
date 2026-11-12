@@ -78,11 +78,7 @@ Keep these two UI sources distinct:
   composed by site/docs components. [Site upstream records](upstream/README.md)
   own source provenance and hashes. Preserve upstream code and licenses; do not
   resolve a hash failure by merely accepting locally restyled vendor files.
-- **Runnable JSON examples:** `@viewstem/svelte` renders `@viewstem/svelte-ui`.
-  Its [upstream workflow](../../packages/svelte-ui/upstream/README.md) (Korean)
-  owns the pinned library sources and generated artifacts. Preview frames may
-  arrange content, but must not restyle the widgets to imitate shadcn. Check
-  portal content as well as the inline preview.
+- **Runnable JSON examples:** UI references, examples, and the playground render Views with `@viewstem/ui`.
 
 For a design change, inspect home, docs, examples index, example lesson, and
 playground with the same language, theme, and viewport. Check Korean and English,
@@ -110,33 +106,23 @@ outputs. Change the [generator](scripts/generate-ui-reference.mjs), its bilingua
 explanations, or the owning package contract, then regenerate from the repository root:
 
 ```sh
+npm run build:ui
 node apps/docs/scripts/generate-ui-reference.mjs
 node apps/docs/scripts/generate-ui-reference.mjs --check
 ```
 
-The generator reads the package exports, support metadata, wrapper defaults and
-demo controls. It also writes [component-catalog.ts](src/examples/component-catalog.ts).
-Do not hand-edit that mapping or generated reference tables. When a library
-contract changes, follow the package generator workflow first.
+The generator reads `packages/ui/dist/support.json` and generates 66 detail pages in each locale. Run `npm run build:ui` before regenerating and make table changes in the package contract and generator.
 
 [MarkdownContent.astro](src/components/docs/MarkdownContent.astro) inserts
 [ComponentDemo.astro](src/components/ComponentDemo.astro) into each component route.
-Change [component-demos.mjs](src/examples/component-demos.mjs) and
-[component-demo-translations.mjs](src/examples/component-demo-translations.mjs)
-for the composition and localized instructions. Change
-[component-demo-controls.mjs](src/examples/component-demo-controls.mjs) for the
-editable options, JSON paths and reference links. Update those together: displayed,
-copied and executed JSON must describe the same initial definition.
+[component-reference-demos.mjs](src/examples/component-reference-demos.mjs) defines the localized
+primary and variant examples. Displayed, copied and executed JSON use the same initial definition.
 
-[DemoWorkbench.svelte](src/components/DemoWorkbench.svelte) and
-[DemoOptions.svelte](src/components/DemoOptions.svelte) own the controls/layout;
-[component-demo-client.ts](src/examples/component-demo-client.ts),
-[component-demo-session.mjs](src/examples/component-demo-session.mjs), and
-[component-demo-runtime.ts](src/examples/component-demo-runtime.ts) manage execution.
-[component-demo-setup.ts](src/examples/component-demo-setup.ts) generates the
-consumer setup code. Preserve tab state, option-change reset, rerun versus default
-reset, and user-initiated JSON/reference navigation. Runtime interaction state
-does not rewrite the initial JSON.
+[DemoWorkbench.svelte](src/components/DemoWorkbench.svelte) owns the example tabs and toolbar.
+[component-demo-ui-runtime.ts](src/examples/component-demo-ui-runtime.ts) attaches core Views
+through `@viewstem/ui`. Sonner registers its host Action against a separate DOM Notifications View.
+[component-demo-ui-setup.ts](src/examples/component-demo-ui-setup.ts) generates the consumer setup code.
+Tab changes preserve runtime state, and rerunning restores the initial state.
 
 ### Lessons and playground
 
@@ -163,14 +149,14 @@ include checks that launch installed Google Chrome.
 | Astro/Svelte/TypeScript | `npm run typecheck:docs`; `node apps/docs/scripts/verify-site-svelte.mjs` checks upstream site sources, React exclusion and built islands |
 | Core, DSL, UI usage snippets or task guides | Respectively `node apps/docs/scripts/verify-core-docs.mjs`, `node apps/docs/scripts/verify-dsl-docs.mjs`, `node apps/docs/scripts/verify-ui-docs.mjs`, `node apps/docs/scripts/verify-task-guides.mjs` |
 | Component references/setup | Generator `--check`; `node apps/docs/scripts/verify-component-setup.mjs` |
-| Demo execution/options | `node --test apps/docs/scripts/component-demo-session.test.mjs`; `node apps/docs/scripts/verify-component-demos.mjs`; `node apps/docs/scripts/verify-component-options.mjs` |
+| Component example and tabs | `node --test apps/docs/scripts/component-demo-session.test.mjs`; `node apps/docs/scripts/verify-component-demos.mjs` |
+| Examples and playground | `node apps/docs/scripts/verify-site-previews.mjs` against the built site at `DOCS_ORIGIN` |
 | Sidebar persistence/ScrollArea | `node apps/docs/scripts/verify-sidebar-scroll.mjs`; `node apps/docs/scripts/verify-sidebar-scrollarea.mjs`; live checks below for shared markup and text |
-| Original library preview styling | `node apps/docs/scripts/verify-shadcn-fidelity.mjs`; source fidelity, computed styles and interactions remain separate evidence |
 
 Snippet/setup checks consume built library exports: rebuild changed packages with
-`npm run build:svelte-ui` first. Link, site-source, component-setup, sidebar, demo/options, and
+`npm run build:ui` first. Link, site-source, component-setup, sidebar, component examples, and
 fidelity checks consume `apps/docs/dist`; rebuild the site after relevant changes.
-The sidebar, demo/options and fidelity checks start their own static servers.
+The sidebar, component examples and fidelity checks start their own static servers.
 
 For checks against a running server, set the origin explicitly; script defaults
 differ between ports 4321 and 4323. For example, with the built preview running:
@@ -188,13 +174,12 @@ For a full preview design audit, use the existing runner:
 
 ```sh
 node apps/docs/scripts/verify-preview-design.mjs --origin=http://127.0.0.1:4323 --phase=matrix --output=/tmp/viewstem-preview-review
-node apps/docs/scripts/verify-preview-design.mjs --origin=http://127.0.0.1:4323 --phase=interactions --output=/tmp/viewstem-preview-interactions
+DEMO_INTERACTIONS_ONLY=1 node apps/docs/scripts/verify-component-demos.mjs
 ```
 
 These capture render and interaction evidence; they do not replace visual review.
 The runner also supports `--family=<slug>` for a focused check. Distinguish that
 sample from a full catalog audit. Keep temporary screenshots/DOM captures outside
-the source tree. For historical findings and limitations, see the
-[preview review handoff](../../docs/handoff/svelte-ui-preview-review-2026-11-06.md)
-(Korean) and dated [review records](review). Report actual commands, coverage,
+the source tree. For historical findings and limitations, see the dated
+[review records](review). Report actual commands, coverage,
 failures and unexecuted areas; do not rewrite old results as a new pass.

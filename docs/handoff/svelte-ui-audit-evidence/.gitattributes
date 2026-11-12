@@ -1,2 +1,0 @@
-# Preserve the runner's original failure logs, including indentation on blank lines.
-*-before.log -whitespace

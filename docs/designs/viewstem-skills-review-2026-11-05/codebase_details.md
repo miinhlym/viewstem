@@ -30,7 +30,7 @@
 
    대상: [concepts_brief.md](../../../concepts_brief.md) 83, 94–96행. 차원: 계약 조회의 추적 가능성.
 
-   **확인된 사실:** 초안은 설치 패키지 기준 조회, 공유 참조 해소, 동일 버전 문자열의 revision/hash 확인, 직접 파일 탐색 대체를 이미 요구한다. 다만 조회한 계약과 그 근거를 한 결과로 남길지는 명시하지 않는다. 실제 UI 지원 계약도 `propertiesRef/callbacksRef/unsupportedRef`를 통해 공유 자료를 참조한다([UI README](../../../packages/svelte-ui/README.md) 91행).
+   **확인된 사실:** 초안은 설치 패키지를 기준으로 계약을 조회하지만 조회한 계약과 출처를 한 결과에 남길지는 명시하지 않는다.
 
    **실패 시나리오·추론:** 같은 `0.1.0`에서 내용이 다른 산출물을 사용하거나 도구 실패 후 수동 조회로 전환하면, 이후 검토자가 어떤 파일의 어느 항목을 근거로 JSON 지원 여부를 판단했는지 재현하기 어려울 수 있다.
 
@@ -48,7 +48,6 @@
 - [Core README](../../../packages/core/README.md) — 전체
 - [Core 공개 타입](../../../packages/core/src/index.d.ts) — 전체
 - [Svelte README](../../../packages/svelte/README.md) — 전체
-- [Svelte UI README](../../../packages/svelte-ui/README.md) — 전체
 - [호스트 연결 명세](../../spec/07-host-integration.md) — 전체
 - [패키지 문서 인계](../../handoff/docs-package-reference-2026-11-05.md) — 전체
 - [후속 범위](../../handoff/open-contracts.md) — 전체

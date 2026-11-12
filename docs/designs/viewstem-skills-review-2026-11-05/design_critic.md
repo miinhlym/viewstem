@@ -26,10 +26,8 @@
 
 읽기 기록은 다음과 같습니다. 저장소 상대 경로의 기준은 `/Users/minholim/dev/minh/viewstem`입니다.
 
-- **전체:** `concepts_brief.md`, `AGENTS.md`, `docs/README.md`, `docs/VIEWSTEM-SPEC.md`, `packages/svelte-ui/README.md`, `docs/handoff/docs-package-reference-2026-11-05.md`, `docs/handoff/open-contracts.md`.
 - **전체:** `/Users/minholim/.codex/plugins/cache/egm/egm/0.1.0/agents/design_critic.md`, 같은 플러그인의 `skills/egm-brainstorm/SKILL.md`, `docs/codex.md`.
 - **전체:** `/Users/minholim/.codex/skills/.system/skill-creator/SKILL.md` — 비교 근거로 읽음.
-- **부분 내용 검토·전체 기계 파싱:** `packages/svelte-ui/src/lib/shadcn/support.json`. 루트 구조, 대표 부품·참조 및 callback 구조를 확인하고 전체 392개 항목의 출력 크기를 계산했다. 모든 스키마의 의미를 전수 검토하지는 않았다. 파일 SHA-256은 `37cb7a89ab0686036bdaacc8b68e35e256f90dde00fedd7e0646de2e610d983a`.
 - **행 수만 확인·내용 미독:** `packages/core/README.md`, `packages/svelte/README.md`.
 
 한계: 실제 스킬·`inspect.mjs`가 없어 에이전트 성공률, 실제 토큰 사용량, 실행 지연은 검증하지 않았습니다. 파일 수정·빌드·워크트리 생성은 하지 않았으며 대화 기록·메모리·다른 검토 보고서는 조회하지 않았습니다.

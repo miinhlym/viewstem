@@ -33,30 +33,6 @@
       "width": 1425
     },
     {
-      "route": "docs/svelte-ui/component-sets/",
-      "scroll": 1425,
-      "theme": "light",
-      "width": 1425
-    },
-    {
-      "route": "docs/svelte-ui/components/dialog/",
-      "scroll": 1425,
-      "theme": "light",
-      "width": 1425
-    },
-    {
-      "route": "docs/svelte-ui/components/sonner/",
-      "scroll": 1425,
-      "theme": "light",
-      "width": 1425
-    },
-    {
-      "route": "docs/svelte-ui/components/spinner/",
-      "scroll": 1425,
-      "theme": "light",
-      "width": 1425
-    },
-    {
       "route": "docs/guides/query-dashboard/",
       "scroll": 1425,
       "theme": "light",
@@ -88,30 +64,6 @@
     },
     {
       "route": "ko/docs/svelte/renderer/",
-      "scroll": 1425,
-      "theme": "light",
-      "width": 1425
-    },
-    {
-      "route": "ko/docs/svelte-ui/component-sets/",
-      "scroll": 1425,
-      "theme": "light",
-      "width": 1425
-    },
-    {
-      "route": "ko/docs/svelte-ui/components/dialog/",
-      "scroll": 1425,
-      "theme": "light",
-      "width": 1425
-    },
-    {
-      "route": "ko/docs/svelte-ui/components/sonner/",
-      "scroll": 1425,
-      "theme": "light",
-      "width": 1425
-    },
-    {
-      "route": "ko/docs/svelte-ui/components/spinner/",
       "scroll": 1425,
       "theme": "light",
       "width": 1425

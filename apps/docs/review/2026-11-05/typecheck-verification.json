@@ -10,7 +10,6 @@
       "coverage": [
         "core public type tests",
         "Svelte package and example",
-        "Svelte UI package",
         "docs astro check (41 files) and tsc"
       ],
       "errors": 0,

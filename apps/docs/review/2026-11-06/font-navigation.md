@@ -8,7 +8,7 @@
 
 `site-theme.css`가 `fonts.css`를 import하여 개발 서버의 SSR 인라인 스타일에 `@font-face`를 함께 넣었다. 이후 Vite 클라이언트는 해당 CSS 모듈을 시작하면서 같은 style의 `textContent`를 다시 설정한다. 이때 이미 사용 중인 FontFace까지 제거·재등록되어 대체 글꼴이 나타난다. CSS font-family 문자열은 같아도 실제 렌더링 폰트가 달라진다. `font-display: optional`만으로는 이미 등록된 FontFace가 다시 만들어지는 경로를 막지 못한다.
 
-별도 설치 Chrome 실행에서도 같은 CSS를 그대로 다시 적용하는 실험으로 66.46875 → 69.84375 → 66.46875px 변화를 재현했다. 기존 검사는 기본 문서 몇 개의 최초 표시만 확인했으므로 컴포넌트 메뉴의 연속 이동과 늦은 CSS 모듈 재적용을 놓쳤다. [초기 15페이지 기록](font-navigation/discovery.json), [새 회귀 검사의 수정 전 실패](font-navigation/before.json).
+별도 설치 Chrome 실행에서도 같은 CSS를 그대로 다시 적용하는 실험으로 66.46875 → 69.84375 → 66.46875px 변화를 재현했다. 기존 검사는 기본 문서 몇 개의 최초 표시만 확인했으므로 컴포넌트 메뉴의 연속 이동과 늦은 CSS 모듈 재적용을 놓쳤다. [새 회귀 검사의 수정 전 실패](font-navigation/before.json).
 
 ## 수정
 

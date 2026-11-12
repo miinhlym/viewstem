@@ -93,6 +93,5 @@
     "No Firefox or WebKit execution.",
     "All UI contract names were preserved; not every component behavior was executed.",
     "BFCache observer reconnection was reviewed in source; no dedicated browser BFCache reproduction."
-  ],
-  "preview": "http://localhost:4321/ko/docs/svelte-ui/components/button/"
+  ]
 }

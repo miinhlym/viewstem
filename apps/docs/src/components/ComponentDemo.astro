@@ -1,70 +1,158 @@
 ---
 import { Code } from 'astro:components';
+import githubLight from '@shikijs/themes/github-light';
+import githubDark from '@shikijs/themes/github-dark';
+import { Button } from './ui/button/index.js';
 import ScrollRegion from './site/ScrollRegion.svelte';
 import DemoWorkbench from './DemoWorkbench.svelte';
 import '../styles/component-demo-theme.css';
 import '../styles/demo-workbench.css';
-import '../styles/demo-options-layout.css';
-import styles from '@viewstem/svelte-ui/shadcn/styles.css?url';
-import { getComponentDemo } from '../examples/component-demos.mjs';
-import { getDemoControls } from '../examples/component-demo-controls.mjs';
-import { demoSetupSource } from '../examples/component-demo-setup';
+import uiStyles from '@viewstem/ui/styles.css?url';
+import { componentSections } from '../examples/component-reference-copy.mjs';
+import { getComponentReference, type getComponentReferenceVariants } from '../examples/component-reference-demos.mjs';
+import { uiDemoSetupSource } from '../examples/component-demo-ui-setup';
 
-interface Props { family: string; locale: 'en' | 'ko'; }
-const { family, locale } = Astro.props;
+interface Props {
+  family: string;
+  locale: 'en' | 'ko';
+  variant?: ReturnType<typeof getComponentReferenceVariants>[number];
+}
+const { family, locale, variant } = Astro.props;
 const ko = locale === 'ko';
-const demo = getComponentDemo(family, locale);
-if (!demo) throw new Error(`Missing component demo: ${family}/${locale}`);
-const source = JSON.stringify(demo.view, null, 2);
-const controls = getDemoControls(family, locale, demo.view);
+const { view, width } = variant ?? getComponentReference(family, locale);
+const { preview, usage } = componentSections[locale];
+const headingId = variant?.anchor ?? preview.id;
+const jsonId = variant ? `${headingId}-json` : 'component-json';
+const copyLabel = variant && (ko ? `${variant.title} 예제 JSON 복사` : `Copy ${variant.title} example JSON`);
+const setupCopyLabel = ko ? '실행 코드 복사' : 'Copy setup code';
+const source = JSON.stringify(view, null, 2);
+const previewWidth = typeof width === 'number' ? width + 'px' : width;
 const serialized = source.replace(/</g, '\\u003c');
+const setup = uiDemoSetupSource(view, family);
+const guide = (ko ? '/ko' : '') + '/docs/ui/guides/mount-in-browser/';
 ---
-<link rel="stylesheet" href={styles} />
-<section class="component-demo" data-component-demo data-family={family} data-locale={locale} aria-labelledby="component-preview">
-  <h2 id="component-preview">{ko ? '직접 사용해 보기' : 'Try it'}</h2>
-  <p>{demo.description}</p>
-  {demo.instructions && <p class="instructions">{demo.instructions}</p>}
-  <DemoWorkbench ko={ko} controls={controls} client:load>
-    <div slot="preview"><ScrollRegion client:load><div class="preview-surface"><div class="preview-stage" data-demo-target aria-busy="true"></div></div></ScrollRegion></div>
-    <div slot="source">
-      <h3 id="component-json" class="source-heading">view.json</h3>
-      <p class="source-description">{ko ? '현재 설정의 초기 실행 정의입니다. 미리보기 안에서 바꾼 실행 상태는 포함되지 않습니다.' : 'Initial definition for the current settings. Runtime changes inside the preview are not included.'}</p>
-      <ScrollRegion class="source-scroll" label="view.json" client:load><div class="source-code"><Code code={source} lang="json" themes={{ light: 'github-light', dark: 'github-dark' }} /></div></ScrollRegion>
+{!variant && <link rel="stylesheet" href={uiStyles} />}
+<section class:list={['component-demo', { 'component-demo-variant': variant }]} data-component-demo data-demo-lazy={variant ? '' : undefined} data-family={family} data-locale={locale} aria-labelledby={headingId}>
+  {variant
+    ? <h3 class="component-doc-heading" id={headingId} tabindex="-1">{variant.title}</h3>
+    : <h2 class="component-doc-heading" id={headingId}>{preview.title}</h2>}
+  <DemoWorkbench {ko} {copyLabel} showSetup={!!variant} client:load>
+    <div slot="preview" class="preview-surface">
+      <div class="preview-stage" style={`--preview-width: ${previewWidth}`} data-demo-target aria-busy="true"></div>
     </div>
+    <div slot="source">
+      <div id={jsonId} class="source-heading" tabindex="-1">view.json</div>
+      <ScrollRegion class="source-scroll" label="view.json" client:load><div class="source-code"><Code code={source} lang="json" themes={{ light: githubLight, dark: githubDark }} /></div></ScrollRegion>
+    </div>
+    {variant && (
+      <div slot="setup" class="setup-code">
+        <div class="source-heading">setup.ts</div>
+        <ScrollRegion client:load label="setup.ts"><Code code={setup} lang="ts" themes={{ light: githubLight, dark: githubDark }} /></ScrollRegion>
+      </div>
+    )}
   </DemoWorkbench>
-  <noscript><p>{ko ? '동작하는 미리보기에는 JavaScript가 필요합니다. JSON은 그대로 읽고 복사할 수 있습니다.' : 'The interactive preview requires JavaScript. You can still read and copy the JSON.'}</p></noscript>
-  <details class="setup-code">
-    <summary>{ko ? '앱에서 실행하기 · setup.ts' : 'Run in your app · setup.ts'}</summary>
-    <p>{ko ? 'HTML에 <div id="preview"></div>를 만들고 view.json과 함께 사용하세요.' : 'Add <div id="preview"></div> to your HTML and use this with view.json.'}</p>
-    <ScrollRegion client:load label="setup.ts"><Code code={demoSetupSource(demo.view, family)} lang="ts" themes={{ light: 'github-light', dark: 'github-dark' }} /></ScrollRegion>
-  </details>
+  {!variant && <noscript><p>{ko ? '동작하는 미리보기에는 JavaScript가 필요합니다. JSON은 그대로 읽고 복사할 수 있습니다.' : 'The interactive preview requires JavaScript. You can still read and copy the JSON.'}</p></noscript>}
+  {!variant && (
+    <div class="example-usage">
+      <h2 class="component-doc-heading" id={usage.id}>{usage.title}</h2>
+      <p class="usage-intro">
+        {ko ? (
+          <>HTML에 <code>&lt;div id="preview"&gt;&lt;/div&gt;</code>를 추가한 뒤, <a href="#component-json"><code>view.json</code></a>과 아래 실행 코드를 같은 폴더에 두세요.</>
+        ) : (
+          <>Add <code>&lt;div id="preview"&gt;&lt;/div&gt;</code> to your HTML and save <a href="#component-json"><code>view.json</code></a> beside the setup file below.</>
+        )}
+      </p>
+      <div class="setup-code inline-setup">
+        <div class="source-heading inline-setup-heading">
+          <span>setup.ts</span>
+          <span class="inline-copy-status" data-inline-copy-status role="status"></span>
+          <Button variant="ghost" size="icon-sm" disabled data-demo-copy-inline-setup aria-label={setupCopyLabel} title={setupCopyLabel}>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="8" y="8" width="14" height="14" rx="2" />
+              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+            </svg>
+          </Button>
+        </div>
+        <ScrollRegion client:load label="setup.ts"><Code code={setup} lang="ts" themes={{ light: githubLight, dark: githubDark }} /></ScrollRegion>
+      </div>
+      <a class="usage-guide" href={guide}>{ko ? '브라우저 마운트 가이드' : 'Browser mount guide'}</a>
+    </div>
+  )}
   <script type="application/json" data-demo-view set:html={serialized} />
 </section>
 
 <style>
-  .component-demo { margin-block-end: 2.5rem; min-width: 0; }
-  h2 { margin: 0; scroll-margin-top: calc(var(--sl-nav-height) + 1.5rem); }
-  p { margin-block: .75rem; }
-  .instructions, .source-description { color: var(--viewstem-muted-foreground); font-size: .9rem; }
-  .source-heading { margin: 0; padding: .875rem 1rem 0; font: 500 .8125rem var(--site-mono); }
-  .source-description { margin: 0; padding: .5rem 1rem .875rem; font-size: .75rem; line-height: 1.5; border-bottom: 1px solid var(--viewstem-border); }
-  /* The frame controls demo layout only; the package owns every widget style. */
-  .preview-surface { font-size: 1rem; line-height: 1.5; display: grid; place-items: center; min-height: 20rem; padding: 2rem; background: var(--demo-background); color: var(--demo-foreground); position: relative; min-width: 0; }
-  .preview-stage { width: 100%; max-width: 24rem; min-width: 0; }
-  .component-demo:is([data-family="chart"], [data-family="data-table"], [data-family="table"], [data-family="sidebar"], [data-family="resizable"], [data-family="typography"]) .preview-stage { max-width: 36rem; }
+  .component-demo { min-width: 0; }
+  .component-demo-variant .preview-surface { min-height: 6rem; padding: 1rem; }
+  .source-heading { margin: 0; padding: .875rem 1rem; font: 500 .8125rem var(--site-mono); }
+  .preview-surface {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    place-items: center;
+    min-height: clamp(10rem, 15vw, 12rem);
+    min-width: 0;
+    padding: clamp(1rem, 3vw, 2rem);
+    border-radius: 0 0 calc(var(--radius) - 1px) calc(var(--radius) - 1px);
+    color: var(--demo-foreground);
+    background: var(--demo-background);
+    font-size: .9375rem;
+    line-height: 1.5;
+  }
+  [data-family="chart"] .preview-surface { padding: 1rem; }
+  .preview-stage { width: var(--preview-width, 100%); max-width: 100%; min-width: 0; }
+  .preview-stage :global([data-vs-component="Select.Root"]) { width: 100%; min-width: 0; }
+  .preview-stage :global([data-slot="navigation-menu-list"]),
+  .preview-stage :global([data-vs-component="NavigationMenu.List"]) { flex-wrap: wrap; }
+  [aria-labelledby="date-picker-range"] :global(.vs-date-trigger) {
+    min-height: 2.25rem;
+    height: auto;
+    text-align: start;
+    white-space: normal;
+  }
+  [aria-labelledby="date-picker-range"] :global(.vs-date-trigger)::after { flex-shrink: 0; }
+  @media (width < 40rem) {
+    [data-family="popover"] .preview-surface:not(:has([aria-expanded="true"])) { overflow-x: clip; }
+    [data-family="field"] .preview-stage :global(fieldset) { min-inline-size: 0; }
+    .preview-stage :global([data-slot="pagination-content"]),
+    .preview-stage :global(.vs-ui-pagination-list) { flex-wrap: wrap; justify-content: center; }
+    [data-family="pagination"]:not(.component-demo-variant) .preview-stage
+      :global(:is([data-vs-component="Pagination.PrevButton"], [data-vs-component="Pagination.NextButton"])) {
+      width: 2rem;
+      padding-inline: 0;
+      gap: 0;
+      font-size: 0;
+    }
+    .preview-stage :global([role="tablist"]) { flex-wrap: wrap; height: auto; max-width: 100%; }
+  }
   .source-code { background: var(--viewstem-muted); }
   .source-code :global(pre), .setup-code :global(pre) { margin: 0; padding: 1rem; font-size: var(--site-text-code); line-height: var(--site-leading-code); overflow: visible; }
   :global([data-theme="dark"]) .component-demo :global(.astro-code),
   :global([data-theme="dark"]) .component-demo :global(.astro-code span) { color: var(--shiki-dark) !important; background-color: var(--shiki-dark-bg) !important; }
-  .setup-code { margin-top: .75rem; border-bottom: 1px solid var(--viewstem-border); padding-block: .75rem; }
-  summary { cursor: pointer; font-size: .875rem; font-weight: 600; }
-  @media (width < 50rem) { .preview-surface { padding: 1rem; min-height: 16rem; } }
-  .source-code :global(.live-json) { background: var(--viewstem-card); color: var(--viewstem-foreground); }
-  .source-code :global(.json-line) { display: inline-block; min-width: 100%; }
-  .source-code :global(.json-key) { color: var(--code-key); }
-  .source-code :global(.json-string) { color: var(--code-string); }
-  .source-code :global(.json-value) { color: var(--code-value); }
-  .source-code :global(.json-changed) { background: color-mix(in srgb, var(--viewstem-primary) 14%, transparent); box-shadow: inset 2px 0 var(--viewstem-primary); animation: option-mark 1.2s ease-out; }
-  @keyframes option-mark { from { background: color-mix(in srgb, var(--viewstem-primary) 30%, transparent); } }
-  @media (prefers-reduced-motion: reduce) { .source-code :global(.json-changed) { animation: none; } }
+  .example-usage { margin-block-start: clamp(2.25rem, 4vw, 3.25rem); }
+  .usage-intro {
+    max-inline-size: 64ch;
+    margin: .75rem 0 1rem;
+    font-size: 1rem;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+  .usage-intro code { font: var(--site-text-code) var(--site-mono); background: var(--viewstem-muted); border-radius: .25rem; padding: .125rem .25rem; }
+  .usage-intro a { color: var(--viewstem-foreground); text-underline-offset: .2em; text-decoration: underline; }
+  .usage-guide {
+    display: inline-block;
+    margin-block-start: .625rem;
+    color: var(--viewstem-muted-foreground);
+    font-size: .875rem;
+    text-underline-offset: .2em;
+    text-decoration: underline;
+  }
+  .usage-guide:hover { color: var(--viewstem-foreground); }
+  .inline-setup { border: 1px solid var(--viewstem-border); border-radius: var(--radius, .625rem); }
+  .setup-code .source-heading { border-block-end: 1px solid var(--viewstem-border); }
+  .inline-setup-heading { display: flex; align-items: center; gap: .5rem; padding-block: .375rem; }
+  .inline-copy-status { flex: 1; color: var(--viewstem-muted-foreground); font: 400 .8125rem/1.4 var(--site-font); text-align: end; }
+  @media (scripting: none) {
+    .inline-setup-heading { padding-block: .875rem; }
+    .inline-setup-heading :global([data-demo-copy-inline-setup]) { display: none; }
+  }
 </style>

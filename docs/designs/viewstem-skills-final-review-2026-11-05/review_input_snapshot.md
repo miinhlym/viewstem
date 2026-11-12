@@ -1,5 +1,7 @@
 # Viewstem 소비자용 Agent Skill 설계
 
+> 검토 입력 발췌. 다른 문서의 원본 행 번호와 해시는 검토 당시 리비전 기준이다.
+
 - 작성자: miinhlym · 작성 지원: Codex
 - 날짜: 2026-11-05
 - 상태: **초기 가설에 대한 Goldfish 6개 관점 검토를 반영한 설계 제안. 실제 스킬·도구는 미구현이다.**
@@ -31,7 +33,6 @@ skills/viewstem/
     definitions.md
     data-actions.md
     svelte-host.md
-    svelte-ui.md
     troubleshooting.md
   scripts/inspect-ui.mjs
   integrations/
@@ -84,7 +85,6 @@ description: >-
 | `definitions.md` | View·Component·State·Derived·ports·표현식·when/repeat 작성 | 값과 쓰기 핸들 구분; 명시 입력; ID/key와 수명; 참조와 인라인 중 하나; 지원 CEL 목록 조회 | 등록과 실제 평가를 구분해 연결·반복·상태 변화 확인 |
 | `data-actions.md` | Query·Datasource·Variable·Action·URL 연결 | 자동 조회와 명시적 변경 요청 구분; event→Action→State; readiness·오류·취소·refresh; 서버 secret 경계 | 모의 전송으로 성공·실패·늦은 결과를 확인 |
 | `svelte-host.md` | mount/attach, 기존 앱 연결, custom adapter | 계약과 구현 등록; read-only inputs·emit·slot; mount와 borrowed View 정리; 완료 신호 구분 | 렌더·이벤트·해제·재연결의 해당 흐름 확인 |
-| `svelte-ui.md` | 제공 UI의 선택·조합·스타일 | 필요한 family 등록·CSS; JSON/native 경계; DOM/native payload 차이; controlled State 연결; host 조합 | 입력값이 State와 UI에 왕복하고 필요한 키보드 동작 확인 |
 | `troubleshooting.md` | 출력·상태·Query·취소·교체 문제 | 증상→공개 snapshot/진단→최소 재현→관련 계약 순서; 오래된 예제/API 식별 | 같은 재현에서 원인이 제거되고 관련 흐름 유지 |
 
 참조 자료는 문서 전체를 복제하지 않는다. 비자명한 제약, 작업별 판단 순서, 작고 검증된 예제, 추가 근거의 역할을 담는다. 기본 작업에 필수인 설명을 저장소 `docs/` 링크 뒤로만 숨기지 않는다. 다른 개인 스킬을 필수 의존성으로 두지 않으며, Svelte 도구가 실제 제공되는 환경에서는 해당 도구를 활용할 수 있다.
@@ -144,7 +144,6 @@ list 결과에 `total`, `offset`, `nextOffset`을 포함한다. 출력 한도는
 
 ### 4.4 해석·실패 경계
 
-소비 앱의 `package.json`을 기준으로 Node의 `createRequire(...).resolve('@viewstem/svelte-ui/shadcn/support.json')`로 공개 JSON 경로를 찾는다. JavaScript 모듈을 import하거나 소비 앱 코드를 실행하지 않는다. 패키지 버전은 해석한 파일의 패키지 경계에서 manifest의 `name`을 확인한 뒤 읽는다. `@viewstem/core/package.json` 같은 비공개 subpath import에 의존하지 않는다.
 
 현재 UI 지원 파일 `formatVersion`은 1이다. 첫 parser는 형식 1과 필요한 필드 구조를 확인한다. 알 수 없는 formatVersion·빠진 참조·잘못된 JSON·중복 ID·알 수 없는 mode는 데이터 오류로 보고 추측해 이어가지 않는다. 예상치 못한 새 의미를 조용히 현재 형식으로 처리하지 않는다.
 
@@ -175,7 +174,6 @@ list 결과에 `total`, `offset`, `nextOffset`을 포함한다. 출력 한도는
 
 설치 버전과 다른 최신 문서로 자동 이동하지 않는다. 계약과 관찰 결과가 다르면 양쪽 근거를 남기고, 현재 요청을 해결할 수 있는 공개 API의 우회 경로가 있는지 확인한다. 재현하지 않은 제한을 사실로 확정하거나 문서 전체를 무효로 취급하지 않는다.
 
-지원 JSON에 없는 실행·수명·CSS·조합 제약을 보조 도구에서 새로 추론하지 않는다. 그런 설명은 대응 버전의 참조 자료와 문서에서 읽는다. 예를 들어 `slots.child`의 자식 제한과 portal의 테마 적용 범위는 [UI README](packages/svelte-ui/README.md)의 조합·스타일 계약을 따라야 한다. 관리 원본의 상세 근거는 [명세 지도](docs/README.md), [공개 타입](packages/core/src/index.d.ts), [현재 UI 지원 데이터](packages/svelte-ui/src/lib/shadcn/support.json), [CEL 목록](packages/core/src/cel/supported-functions.json)이다. 배포 스킬은 이 저장소 상대 경로를 소비 앱의 필수 경로로 복사하지 않는다.
 
 ### 5.2 배포와 외부 소비
 

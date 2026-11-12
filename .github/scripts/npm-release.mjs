@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const registry = 'https://registry.npmjs.org';
-const packages = ['core', 'svelte', 'svelte-ui'];
+const packages = ['core', 'svelte', 'ui'];
 const stableVersion = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const run = (command, args) => execFileSync(command, args, { encoding: 'utf8' }).trim();
 

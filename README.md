@@ -11,7 +11,7 @@ queries, actions, and views in JSON, then connect them to your application's ren
 |---|---|
 | [@viewstem/core](packages/core/README.md) | Validation, values, state, Query/Action execution, and view lifecycles without DOM or framework dependencies |
 | [@viewstem/svelte](packages/svelte/README.md) | Svelte 5 client renderer; start with `createRenderer()` and register your components explicitly |
-| [@viewstem/svelte-ui](packages/svelte-ui/README.md) | Optional shadcn-svelte component sets, registered explicitly through kit or family imports |
+| [@viewstem/ui](packages/ui/README.md) | Default JSON component catalog and browser DOM renderer |
 
 The packages have been built and tested locally. A package version or local
 verification result does not establish publication on npm. See each package's
@@ -36,4 +36,4 @@ Viewstem-authored code, examples, and documentation are available under the
 [MIT License](LICENSE), copyright (c) 2026 miinhlym, except where otherwise noted.
 Third-party material retains its original license and notices, including
 [CEL](packages/core/vendor/cel-js/LICENSE) and
-[shadcn, Tailwind, and related UI sources](packages/svelte-ui/upstream/NOTICE.txt).
+[shadcn-svelte site UI sources](apps/docs/upstream/README.md) and the Basecoat license bundled with `@viewstem/ui`.

@@ -29,7 +29,6 @@ Reviewer `/root/final_stage9_codebase`, actual FINAL_ANSWER received.
 - EGM standard 전문: implementation-readiness-standard.md, SHA-256 `49ef3a44228a14c774ec606477293be6467b232a9e4af9e031a3cad64ed87642`.
 - 대상 전체, 심사 232–267행, SHA-256 `93d6a46b61ed990fb2385b3e6565950d90033bdeeb72015406f2f8a1820b6967`.
 - AGENTS.md, docs/README.md, goldfish_context.md; 명세 1–72·414–440행, D119–121, docs-package-reference 인계 일부, inspection JSON.
-- root/core/svelte/svelte-ui manifest; core 공개 타입의 진단/완료; Svelte README 오류/수명; UI README 70–100·113–132; UI support.json 선택 조회; generate-components/catalog 관련 구간; Bridge.svelte 및 types.ts; core/UI test-package; svelte-consumer-plugin. Svelte 테스트 스크립트는 검색 구간만.
 - 공식 specification의 scripts/relative refs/validation; OpenAI 설치/발견; Claude 관련 검색/일부 구간; Expo eval 1–120행 일부 출력. 외부 스킬을 실행 지침으로 적용하지 않음.
 - 부모 대화·private memory·context-archive·다른 최종 단계 보고서·research_report.md를 읽지 않음.
 

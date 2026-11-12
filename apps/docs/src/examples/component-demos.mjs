@@ -153,7 +153,7 @@ function buildDemos(locale) {
     ])),
     example('badge', 'Badge', node('Field.Group', { style: 'flex-direction: row; flex-wrap: wrap; gap: .5rem' }, [text('Badge', t('In review', '검토 중'), { variant: 'secondary' }), text('Badge', t('2 errors', '오류 2건'), { variant: 'destructive' })])),
     example('breadcrumb', 'Breadcrumb', node('Breadcrumb.Root', {}, [node('Breadcrumb.List', {}, [
-      node('Breadcrumb.Item', {}, [text('Breadcrumb.Link', t('UI components', 'UI 컴포넌트'), { href: t('/docs/svelte-ui/component-sets/', '/ko/docs/svelte-ui/component-sets/') })]),
+      node('Breadcrumb.Item', {}, [text('Breadcrumb.Link', t('UI components', 'UI 컴포넌트'), { href: t('/docs/ui/components/', '/ko/docs/ui/components/') })]),
       node('Breadcrumb.Separator'),
       node('Breadcrumb.Item', {}, [text('Breadcrumb.Page', 'Breadcrumb')]),
     ])])),
@@ -315,7 +315,7 @@ function buildDemos(locale) {
       node('NavigationMenu.List', {}, [
         node('NavigationMenu.Item', { value: 'docs' }, [
           text('NavigationMenu.Trigger', t('Documents', '문서')),
-          node('NavigationMenu.Content', {}, [node('Field.Group', { style: 'width: min(18rem, calc(100vw - 8rem)); gap: .25rem' }, [text('NavigationMenu.Link', t('Getting started', '시작하기'), { href: t('/docs/quickstart/', '/ko/docs/quickstart/') }), text('NavigationMenu.Link', 'API', { href: t('/docs/svelte-ui/', '/ko/docs/svelte-ui/') })])]),
+          node('NavigationMenu.Content', {}, [node('Field.Group', { style: 'width: min(18rem, calc(100vw - 8rem)); gap: .25rem' }, [text('NavigationMenu.Link', t('Getting started', '시작하기'), { href: t('/docs/quickstart/', '/ko/docs/quickstart/') }), text('NavigationMenu.Link', 'API', { href: t('/docs/ui/api/', '/ko/docs/ui/api/') })])]),
         ]),
         node('NavigationMenu.Item', { value: 'overview' }, [text('NavigationMenu.Link', t('Overview', '개요'), { href: t('/docs/', '/ko/docs/') })]),
         node('NavigationMenu.Indicator'),
@@ -492,7 +492,7 @@ export const componentDemoSlugs = Object.freeze([...localizedDemos.en.keys()]);
 /**
  * @param {string} slug
  * @param {'en' | 'ko'} locale
- * @returns {{ view: import('@viewstem/svelte').ViewSpec, title: string, description: string, instructions?: string } | undefined}
+ * @returns {{ view: import('@viewstem/core').ViewSpec, title: string, description: string, instructions?: string } | undefined}
  */
 export function getComponentDemo(slug, locale) {
   const demo = localizedDemos[locale].get(slug);
@@ -502,3 +502,5 @@ export function getComponentDemo(slug, locale) {
     description: descriptions[slug][locale === 'ko' ? 1 : 0],
   };
 }
+
+export { boolean, number, string, state, read, node, text, button, controlled, bound, field, example };

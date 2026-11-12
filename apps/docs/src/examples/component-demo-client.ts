@@ -1,7 +1,5 @@
-import type { ViewSpec } from '@viewstem/svelte';
-import type { DemoControl } from './component-demo-controls.mjs';
+import type { ViewSpec } from '@viewstem/core';
 import { createDemoSession } from './component-demo-session.mjs';
-import { renderDemoJson } from './component-demo-json';
 
 export function setupComponentDemo(container: HTMLElement) {
   const find = <T extends HTMLElement>(selector: string) => container.querySelector<T>(selector)!;
@@ -10,18 +8,14 @@ export function setupComponentDemo(container: HTMLElement) {
   const copy = find<HTMLButtonElement>('[data-demo-copy]');
   const status = find<HTMLElement>('[data-demo-status]');
   const copyStatus = find<HTMLElement>('[data-copy-status]');
-  const sourceElement = find<HTMLScriptElement>('[data-demo-view]');
-  const original = sourceElement.textContent!;
-  const code = find<HTMLElement>('.source-code code');
-  const codeRegion = find<HTMLElement>('.source-scroll [data-slot="scroll-area-viewport"]');
+  const source = find<HTMLScriptElement>('[data-demo-view]').textContent!;
   const ko = container.dataset.locale === 'ko';
   const listeners = new AbortController();
   const { signal } = listeners;
-  let source = original;
   const showError = (error: unknown) => {
     const message = error && typeof error === 'object' && 'message' in error ? String(error.message) : String(error);
     target.replaceChildren();
-    status.textContent = `${ko ? '미리보기를 실행하지 못했습니다. 설정을 수정하거나 다시 실행하세요.' : 'Could not run the preview. Change an option or run it again.'} ${message}`;
+    status.textContent = `${ko ? '미리보기를 실행하지 못했습니다. 다시 실행해 보세요.' : 'Could not run the preview. Try running it again.'} ${message}`;
     container.dataset.demoError = message;
     delete container.dataset.demoReady;
     status.hidden = false;
@@ -29,11 +23,11 @@ export function setupComponentDemo(container: HTMLElement) {
   };
   const session = createDemoSession({
     async mount(snapshot, version) {
-      const { mountComponentDemo } = await import('./component-demo-runtime');
       const surface = document.createElement('div');
       target.replaceChildren(surface);
-      return mountComponentDemo(surface, JSON.parse(snapshot) as ViewSpec, container.dataset.family!, diagnostic => {
-        if (session.isCurrent(version)) showError(diagnostic.error);
+      const { mountUiComponentDemo } = await import('./component-demo-ui-runtime');
+      return mountUiComponentDemo(surface, JSON.parse(snapshot) as ViewSpec, container.dataset.family!, error => {
+        if (session.isCurrent(version)) showError(error);
       });
     },
     pending(version) {
@@ -42,7 +36,7 @@ export function setupComponentDemo(container: HTMLElement) {
       delete container.dataset.demoError;
       target.setAttribute('aria-busy', 'true');
       target.inert = true;
-      status.textContent = ko ? '현재 설정을 적용하는 중입니다.' : 'Applying the current settings.';
+      status.textContent = ko ? '미리보기를 불러오는 중입니다.' : 'Loading preview.';
       status.hidden = false;
       copyStatus.textContent = '';
     },
@@ -52,73 +46,58 @@ export function setupComponentDemo(container: HTMLElement) {
       if (!container.dataset.demoError) {
         container.dataset.demoReady = 'true';
         container.dataset.demoAppliedVersion = String(version);
-        status.textContent = ko ? '현재 설정이 적용되었습니다.' : 'Current settings applied.';
+        status.hidden = true;
       }
     },
     error(error) { showError(error); },
   });
 
-  function updateSource(next: string, changed?: string[]) {
-    source = next;
-    sourceElement.textContent = next;
-    renderDemoJson(code, next, changed);
-    code.parentElement!.className = 'live-json';
-    code.parentElement!.removeAttribute('style');
+  let started = false;
+  let observer: IntersectionObserver | undefined;
+  function run() {
+    started = true;
+    observer?.disconnect();
+    session.request(source);
   }
-  function apply(control: DemoControl, value: string | number | boolean) {
-    const view = JSON.parse(source);
-    let parent: Record<string, unknown> = view;
-    for (const key of control.path.slice(0, -1)) {
-      parent[key] ??= {};
-      parent = parent[key] as Record<string, unknown>;
-    }
-    parent[control.path.at(-1)!] = value;
-    updateSource(JSON.stringify(view, null, 2), control.path);
-    session.request(source, control.kind === 'text' || control.kind === 'number' ? 180 : 0);
-  }
-  function showJson(control: DemoControl) {
-    container.dispatchEvent(new CustomEvent('demo:reveal', { detail: 'json' }));
-    updateSource(source, control.path);
-    const line = [...code.querySelectorAll<HTMLElement>('[data-json-path]')]
-      .find(element => element.dataset.jsonPath === JSON.stringify(control.path));
-    codeRegion.focus({ preventScroll: true });
-    codeRegion.scrollIntoView({ block: 'nearest' });
-    if (line) codeRegion.scrollTop += line.getBoundingClientRect().top - codeRegion.getBoundingClientRect().top - codeRegion.clientHeight / 3;
-    else copyStatus.textContent = ko ? '이 옵션은 생략되어 기본값을 사용합니다. 값을 바꾸면 JSON에 추가됩니다.' : 'This option uses its default and is omitted. Changing it adds the field to JSON.';
-  }
+
   reset.disabled = false;
-  reset.addEventListener('click', () => session.request(source), { signal });
-  copy.disabled = false;
-  copy.addEventListener('click', async () => {
-    const copied = source;
+  reset.addEventListener('click', run, { signal });
+  async function copySource(value: string | null | undefined, kind: 'setup' | 'json', feedback: HTMLElement) {
     try {
-      await navigator.clipboard.writeText(copied);
-      copyStatus.textContent = copied === source ? (ko ? 'JSON을 복사했습니다.' : 'JSON copied.')
-        : (ko ? '이전 설정을 복사했습니다. 현재 설정은 다시 복사하세요.' : 'Copied the previous settings. Copy again for the current settings.');
+      if (value == null) throw new Error('Missing code to copy');
+      await navigator.clipboard.writeText(value);
+      feedback.textContent = kind === 'setup'
+        ? (ko ? '실행 코드를 복사했습니다.' : 'Setup code copied.')
+        : (ko ? 'JSON을 복사했습니다.' : 'JSON copied.');
     } catch {
-      copyStatus.textContent = ko ? '복사하지 못했습니다. JSON을 직접 선택해 복사하세요.' : 'Could not copy. Select and copy the JSON directly.';
+      feedback.textContent = ko ? '복사하지 못했습니다. 코드를 직접 선택해 복사하세요.' : 'Could not copy. Select and copy the code directly.';
     }
+  }
+
+  copy.disabled = false;
+  copy.addEventListener('click', () => {
+    const setup = copy.closest<HTMLElement>('.demo-workbench')?.dataset.panel === 'setup';
+    const value = setup ? container.querySelector('.workbench-setup pre code')?.textContent : source;
+    void copySource(value, setup ? 'setup' : 'json', copyStatus);
   }, { signal });
-  window.addEventListener('pagehide', () => session.pause(), { signal });
-  window.addEventListener('pageshow', event => { if (event.persisted) session.request(source); }, { signal });
-  // Match API references back to the relevant option, including collapsed sections.
-  for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-demo-option-link]')) {
-    link.addEventListener('click', event => {
-      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      event.preventDefault();
-      const id = link.hash.slice(1);
-      const element = document.getElementById(id);
-      history.pushState(null, '', link.hash);
-      container.dispatchEvent(new CustomEvent('demo:reveal', { detail: 'options' }));
-      element?.scrollIntoView({ block: 'center' });
-      element?.querySelector<HTMLElement>('[data-control]')?.focus({ preventScroll: true });
+  const inlineCopy = container.querySelector<HTMLButtonElement>('[data-demo-copy-inline-setup]');
+  if (inlineCopy) {
+    const inlineCopyStatus = find<HTMLElement>('[data-inline-copy-status]');
+    inlineCopy.disabled = false;
+    inlineCopy.addEventListener('click', () => {
+      void copySource(container.querySelector('.inline-setup pre code')?.textContent, 'setup', inlineCopyStatus);
     }, { signal });
   }
-  session.request(source);
+  window.addEventListener('pagehide', () => session.pause(), { signal });
+  window.addEventListener('pageshow', event => { if (event.persisted && started) run(); }, { signal });
+  if (container.hasAttribute('data-demo-lazy') && typeof IntersectionObserver === 'function') {
+    observer = new IntersectionObserver(entries => {
+      if (!started && !signal.aborted && entries.some(entry => entry.isIntersecting)) run();
+    });
+    observer.observe(target);
+  } else run();
+
   return {
-    apply,
-    showJson,
-    restore() { updateSource(original); session.request(source); },
-    dispose() { listeners.abort(); session.pause(); },
+    dispose() { listeners.abort(); observer?.disconnect(); session.pause(); },
   };
 }

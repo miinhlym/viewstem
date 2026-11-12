@@ -6,8 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "wrangler dev",
-    "prebuild": "npm --prefix ../.. run build:svelte-ui",
-    "predev": "npm --prefix ../.. run build:svelte-ui",
+    "prebuild": "npm --prefix ../.. run build:ui",
+    "predev": "npm --prefix ../.. run build:ui",
     "typecheck": "astro check && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings"
   },
   "dependencies": {
@@ -17,9 +17,10 @@
     "@codemirror/language": "6.13.1",
     "@codemirror/view": "6.43.15",
     "@lezer/highlight": "1.2.5",
+    "@shikijs/themes": "4.6.0",
     "@tailwindcss/vite": "^4.3.3",
-    "@viewstem/svelte": "0.1.0",
-    "@viewstem/svelte-ui": "0.1.0",
+    "@viewstem/core": "0.1.0",
+    "@viewstem/ui": "0.1.0",
     "astro": "6.4.8",
     "clsx": "^2.1.1",
     "cn": "^0.5.0",

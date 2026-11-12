@@ -19,23 +19,44 @@ try {
   }, include: ['**/*.ts'] }));
   let count = 0;
   for (const locale of ['en', 'ko']) for (const family of componentDemoSlugs) {
-    const html = await readFile(join(root, 'apps/docs/dist', locale === 'ko' ? 'ko' : '', 'docs/svelte-ui/components', family, 'index.html'), 'utf8');
-    let setup;
-    let source;
-    function visit(node, insideSetup = false) {
-      const attrs = Object.fromEntries((node.attrs ?? []).map(({ name, value }) => [name, value]));
-      insideSetup ||= (attrs.class ?? '').split(' ').includes('setup-code');
-      if (node.tagName === 'code' && insideSetup) setup = text(node);
-      if (node.tagName === 'script' && 'data-demo-view' in attrs) source = text(node);
-      for (const child of node.childNodes ?? []) visit(child, insideSetup);
+    const html = await readFile(join(root, 'apps/docs/dist', locale === 'ko' ? 'ko' : '', 'docs/ui/components', family, 'index.html'), 'utf8');
+    const attrs = node => Object.fromEntries((node.attrs ?? []).map(({ name, value }) => [name, value]));
+    function* examples(node) {
+      if ('data-component-demo' in attrs(node)) yield node;
+      else for (const child of node.childNodes ?? []) yield* examples(child);
     }
-    visit(parse(html));
-    assert.ok(setup && source, `${locale}/${family} missing setup or JSON`);
-    const directory = join(temporary, `${locale}-${family}`);
-    await mkdir(directory);
-    await writeFile(join(directory, 'setup.ts'), setup);
-    await writeFile(join(directory, 'view.json'), source);
-    count++;
+    const rendered = [...examples(parse(html))];
+    assert.ok(rendered.length, `${locale}/${family} missing example`);
+    for (const example of rendered) {
+      let setup;
+      let source;
+      let setupTabs = 0;
+      let setupInTab = false;
+      function visit(node, insideSetup = false, insideSetupTab = false) {
+        const attributes = attrs(node);
+        const classes = (attributes.class ?? '').split(' ');
+        insideSetup ||= classes.includes('setup-code');
+        insideSetupTab ||= classes.includes('workbench-setup');
+        if (attributes['data-demo-tab'] === 'setup') setupTabs++;
+        if (node.tagName === 'code' && insideSetup) {
+          setup = text(node);
+          setupInTab = insideSetupTab;
+        }
+        if (node.tagName === 'script' && 'data-demo-view' in attributes) source = text(node);
+        for (const child of node.childNodes ?? []) visit(child, insideSetup, insideSetupTab);
+      }
+      visit(example);
+      const anchor = attrs(example)['aria-labelledby'];
+      assert.ok(setup && source, `${locale}/${family}#${anchor} missing setup or JSON`);
+      const isVariant = 'data-demo-lazy' in attrs(example);
+      assert.equal(setupTabs, isVariant ? 1 : 0, anchor);
+      assert.equal(setupInTab, isVariant, anchor);
+      const directory = join(temporary, `${locale}-${family}-${anchor}`);
+      await mkdir(directory);
+      await writeFile(join(directory, 'setup.ts'), setup);
+      await writeFile(join(directory, 'view.json'), source);
+      count++;
+    }
   }
   execFileSync(process.execPath, [join(root, 'node_modules/typescript/bin/tsc'), '-p', join(temporary, 'tsconfig.json')], { stdio: 'inherit' });
   console.log(`Type-checked ${count} exact rendered setup.ts / view.json pairs.`);

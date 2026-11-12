@@ -1,8 +1,28 @@
 ---
 import DefaultMarkdownContent from '@astrojs/starlight/components/MarkdownContent.astro';
 import ComponentDemo from '../ComponentDemo.astro';
+import { componentSections } from '../../examples/component-reference-copy.mjs';
+import { getComponentReferenceVariants } from '../../examples/component-reference-demos.mjs';
 const { entry, lang } = Astro.locals.starlightRoute;
-const family = entry.id.match(/(?:^|\/)docs\/svelte-ui\/components\/([^/]+)$/)?.[1];
+const component = entry.id.match(/(?:^|\/)docs\/ui\/components\/([^/]+)$/);
+const locale = lang === 'ko' ? 'ko' : 'en';
+const variants = component ? getComponentReferenceVariants(component[1], locale) : [];
+const examples = componentSections[locale].examples;
 ---
-{family && <ComponentDemo family={family} locale={lang === 'ko' ? 'ko' : 'en'} />}
-<DefaultMarkdownContent><slot /></DefaultMarkdownContent>
+{component ? (
+  <div class="component-detail">
+    <ComponentDemo family={component[1]} {locale} />
+    {variants.length > 0 && (
+      <section class="component-variants" aria-labelledby={examples.id}>
+        <h2 class="component-doc-heading" id={examples.id}>{examples.title}</h2>
+        {variants.map(variant => <ComponentDemo family={component[1]} {locale} {variant} />)}
+      </section>
+    )}
+    <DefaultMarkdownContent><slot /></DefaultMarkdownContent>
+  </div>
+) : <DefaultMarkdownContent><slot /></DefaultMarkdownContent>}
+
+<style>
+  .component-detail { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(2.25rem, 4vw, 3.25rem); min-width: 0; }
+  .component-variants { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.75rem; min-width: 0; }
+</style>

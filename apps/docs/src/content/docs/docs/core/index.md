@@ -24,7 +24,7 @@ The current package is ESM and requires Node.js 22 or later for Node consumers. 
 2. [Share State and synchronize a URL](./guides/state-and-url/): create host-owned cells and connect an explicit URL adapter.
 3. [Connect HTTP and code Actions](./guides/http-and-actions/): supply a request executor and invoke a host function through an Action contract.
 
-For a Svelte UI, start with the [Svelte renderer](../svelte/). It creates or accepts the underlying Core runtime.
+For an application using Svelte, start with the [Svelte renderer](../svelte/). It creates or accepts the underlying Core runtime.
 
 ## Find an API
 

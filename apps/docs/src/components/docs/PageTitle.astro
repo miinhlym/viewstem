@@ -6,21 +6,34 @@ const ko = lang === 'ko';
 const base = ko ? '/ko/docs/' : '/docs/';
 const path = Astro.url.pathname.slice(base.length).split('/').filter(Boolean);
 const names: Record<string, string> = {
-  core: '@viewstem/core', svelte: '@viewstem/svelte', 'svelte-ui': '@viewstem/svelte-ui',
+  core: '@viewstem/core', ui: '@viewstem/ui', svelte: '@viewstem/svelte',
   concepts: ko ? '핵심 개념' : 'Core concepts', guides: ko ? '가이드' : 'Guides',
   dsl: ko ? 'DSL 레퍼런스' : 'DSL reference', reference: ko ? '레퍼런스 안내' : 'Reference overview',
 };
 const section = path[0];
+const isComponent = section === 'ui' && path[1] === 'components' && path.length === 3;
 const links = [{ label: ko ? '문서' : 'Docs', href: base }];
 if (path.length > 1 && names[section]) {
   links.push({ label: names[section], href: section === 'concepts' ? `${base}#core-concepts` : section === 'guides' ? `${base}#task-guides` : `${base}${section}/` });
 }
-if (section === 'svelte-ui' && (path[1] === 'components' || path[1] === 'attributes')) {
-  links.push({ label: ko ? '컴포넌트 세트' : 'Component sets', href: `${base}svelte-ui/component-sets/` });
+if (isComponent) {
+  links.push({ label: ko ? '컴포넌트' : 'Components', href: `${base}ui/components/` });
 }
 ---
 {path.length > 0 && <SiteBreadcrumb links={links} title={entry.data.title} label={ko ? '문서 위치' : 'Breadcrumb'} />}
 <DefaultPageTitle />
+{isComponent && entry.data.description && <p class="component-intro">{entry.data.description}</p>}
+
+<style>
+  .component-intro {
+    max-inline-size: 62ch;
+    margin: .625rem 0 0;
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--viewstem-muted-foreground);
+    text-wrap: pretty;
+  }
+</style>
 
 
 <script>

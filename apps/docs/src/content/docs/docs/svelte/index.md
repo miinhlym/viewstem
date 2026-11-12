@@ -7,7 +7,7 @@ sidebar:
 
 `@viewstem/svelte` renders Viewstem Views on the client with Svelte `^5.57.3`. Core validates definitions, evaluates inputs, and runs State, Queries, and Actions. The Svelte renderer subscribes to the resulting View and passes the evaluated nodes to components you register as adapters.
 
-You provide the components, markup, and styling. Register your own adapters or use the [optional Svelte UI package](/docs/svelte-ui/). The renderer uses core as a dependency and re-exports shared core types for Svelte consumers. See [Installation](/docs/installation/) for the current package setup.
+You provide the components, markup, and styling. Register your own adapters. Use [Viewstem UI](/docs/ui/) to render the default JSON components in a browser container. The renderer uses core as a dependency and re-exports shared core types for Svelte consumers. See [Installation](/docs/installation/) for the current package setup.
 
 ## Choose an integration
 

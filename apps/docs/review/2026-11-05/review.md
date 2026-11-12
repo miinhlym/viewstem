@@ -102,7 +102,7 @@ node apps/docs/scripts/verify-task-guides.mjs
 
 문서 사이트에 `@astrojs/check`와 `typecheck` 명령을 추가해 Astro 진단과 TypeScript 검사를 함께 실행한다. 전체 워크스페이스 검사 중 발견한 MDX 전역 타입의 Svelte 패키지 유입은 `types: ["svelte"]`로 필요한 전역 타입을 명시해 해결했다. 기존 strict와 skipLibCheck=false를 유지했고, 명시적으로 가져오는 의존성 타입은 계속 검사한다.
 
-`npm run typecheck --workspaces --if-present`가 종료 코드 0으로 완료됐다. Core, Svelte 및 예제, Svelte UI, 문서 사이트 전체가 통과했다. Astro 진단 41개 파일은 오류·경고·힌트 모두 0개다. [실행 로그](typecheck-output.log)와 [상세 결과](typecheck-verification.json)를 보존했다. 라우팅 기본값·명시값·manual 거절 8개 시나리오, 전체 문서 빌드(패키지 선행 빌드 포함), 로컬 링크 29,146개 검사도 통과했다. 기존 빌드의 markdown 사용 중단 예정·번들 크기·sitemap site 미설정 안내는 이번 타입 오류와 별개다.
+`npm run typecheck --workspaces --if-present`가 종료 코드 0으로 완료됐다. Core, Svelte 및 예제, 문서 사이트 전체가 통과했다. Astro 진단 41개 파일은 오류·경고·힌트 모두 0개다. [실행 로그](typecheck-output.log)와 [상세 결과](typecheck-verification.json)를 보존했다. 라우팅 기본값·명시값·manual 거절 8개 시나리오, 전체 문서 빌드(패키지 선행 빌드 포함), 로컬 링크 29,146개 검사도 통과했다. 기존 빌드의 markdown 사용 중단 예정·번들 크기·sitemap site 미설정 안내는 이번 타입 오류와 별개다.
 
 ## 후속 사용자 요청: 전체 컴포넌트 메뉴
 

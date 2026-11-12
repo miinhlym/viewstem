@@ -12,16 +12,8 @@
     "sha256": "fa284d13bfed10fd19813e63219a6b0a3e5899a06a0031200c4aa8511ad2f9a8"
   },
   {
-    "path": "packages/svelte-ui/package.json",
-    "sha256": "b4cf64c4012286d016cc33edf810a009dba2fb0c41538739191410e4b7cc10b5"
-  },
-  {
     "path": "packages/core/src/index.d.ts",
     "sha256": "40e46943e6ddd3f90852444e83b50a2dc18bc7cd9855dba6946c13e996840bad"
-  },
-  {
-    "path": "packages/svelte-ui/src/lib/shadcn/support.json",
-    "sha256": "37cb7a89ab0686036bdaacc8b68e35e256f90dde00fedd7e0646de2e610d983a"
   },
   {
     "path": "packages/core/src/cel/supported-functions.json",
@@ -30,9 +22,5 @@
   {
     "path": "apps/docs/scripts/generate-ui-reference.mjs",
     "sha256": "66c43bd81a99d98baa9f89ff4ddc0effbedfcd0d6fbb50eba02536443b0e69cd"
-  },
-  {
-    "path": "packages/svelte-ui/scripts/test-package.mjs",
-    "sha256": "90a4371d81d8719c974f0b40bc85da6d4e47fb08eaff06e49fd2ae3b48acb67e"
   }
 ]

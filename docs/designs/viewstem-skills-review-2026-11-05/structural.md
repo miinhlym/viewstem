@@ -43,8 +43,6 @@
   - `docs/handoff/open-contracts.md`
   - `packages/core/README.md`
   - `packages/svelte/README.md`
-  - `packages/svelte-ui/README.md`
   - `packages/core/src/cel/supported-functions.json`
-- 부분 확인: `packages/svelte-ui/src/lib/shadcn/support.json` — 최상위 구조·개수, Input·NativeSelect.Root·Select.Root·Calendar.Root·Dialog.Trigger의 선택 속성·callback·참조 정보, Button을 포함한 펼친 출력 크기. 전체 항목을 의미 검토하지 않았다.
 
 한계: 실제 스킬·도구는 아직 없으므로 위 실패 시나리오는 확인한 자료에서 도출한 위험이며 재현된 제품 결함이 아니다. 행동 평가·빌드·설치·발행은 수행하지 않았다. 대화 원문, 다른 검토자의 결과, 형제 산출물은 읽지 않았고 파일을 변경하지 않았다.

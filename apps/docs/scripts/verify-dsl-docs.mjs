@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readdir, readFile } from 'node:fs/promises';
 import { createRegistry, createRuntime } from '@viewstem/core';
 import { createHttpExecutor } from '@viewstem/core/http';
-import support from '@viewstem/svelte-ui/shadcn/support.json' with { type: 'json' };
+import { registerShadcn } from '@viewstem/ui';
 
 const content = new URL('../src/content/docs/', import.meta.url);
 const badge = { id: 'badge', componentRef: 'shadcn.Badge' };
@@ -10,15 +10,7 @@ const render = { render: badge };
 
 function createDocsRegistry(resources = []) {
   const registry = createRegistry();
-  registry.registerComponentContracts(['shadcn.Badge', 'shadcn.Card.Root'].map(id => {
-    const component = support.components.find(entry => entry.id === id && entry.mode === 'json');
-    assert.ok(component, id);
-    const ports = Object.fromEntries(Object.entries(support.properties[component.propertiesRef]).map(
-      ([name, { schema, required }]) => [name, { kind: 'Value', schema, ...(required && { required: true }) }],
-    ));
-    const slots = Object.fromEntries(component.slots.map(name => [name, {}]));
-    return { kind: 'Component', id, spec: { ports, slots } };
-  }));
+  registerShadcn(registry);
   return registry.registerResources(resources);
 }
 

@@ -39,8 +39,6 @@
 - **전문:** [concepts_brief.md](../../../concepts_brief.md), [AGENTS.md](../../../AGENTS.md)
 - **전문:** [docs/README.md](../../README.md), [VIEWSTEM-SPEC.md](../../VIEWSTEM-SPEC.md)
 - **전문:** [open-contracts.md](../../handoff/open-contracts.md), [docs-package-reference-2026-11-05.md](../../handoff/docs-package-reference-2026-11-05.md)
-- **전문:** [Core README](../../../packages/core/README.md), [Svelte README](../../../packages/svelte/README.md), [Svelte UI README](../../../packages/svelte-ui/README.md)
 - **전문, 비교 자료로만:** `/Users/minholim/.agents/skills/pixijs/SKILL.md`, `/Users/minholim/.agents/skills/svelte-code-writer/SKILL.md`
-- **부분:** [support.json](../../../packages/svelte-ui/src/lib/shadcn/support.json)의 최상위 키·항목 수, Calendar Root/Caption 항목, Button·Input·Calendar Root·DataTable의 참조 확장 크기와 속성명 일부.
 
 한계: 실제 스킬·도구 실행, 호스트 활성화, 토큰 사용량 비교는 수행하지 않았다. 크기 수치는 제안 CLI의 실제 출력이 아닌 메타데이터 확장 모형이다. 제품 빌드·파일 수정·워크트리 생성 및 대화 원문·다른 검토자 산출물 열람은 하지 않았다.

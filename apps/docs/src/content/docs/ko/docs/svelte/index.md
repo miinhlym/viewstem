@@ -7,7 +7,7 @@ sidebar:
 
 `@viewstem/svelte`는 Svelte `^5.57.3`을 사용하는 클라이언트에서 Viewstem View를 렌더링합니다. Core는 정의를 검증하고 입력을 평가하며 State, Query, Action을 실행합니다. Svelte 렌더러는 View를 구독하고 평가된 노드를 등록된 어댑터에 전달합니다.
 
-컴포넌트, 마크업, 스타일은 앱에서 제공합니다. 자체 어댑터를 등록하거나 [선택형 Svelte UI 패키지](/ko/docs/svelte-ui/)를 사용할 수 있습니다. 렌더러는 Core에 의존하며 Svelte 앱에서 쓸 수 있도록 공용 Core 타입을 재노출합니다. 패키지 준비 방법은 [설치](/ko/docs/installation/)를 참고하세요.
+컴포넌트, 마크업, 스타일은 앱에서 제공합니다. 앱 자체 어댑터를 등록하세요. 기본 JSON 컴포넌트는 [Viewstem UI](/ko/docs/ui/)로 브라우저에 렌더링할 수 있습니다. 렌더러는 Core에 의존하며 Svelte 앱에서 쓸 수 있도록 공용 Core 타입을 재노출합니다. 패키지 준비 방법은 [설치](/ko/docs/installation/)를 참고하세요.
 
 ## 연결 방식 선택
 

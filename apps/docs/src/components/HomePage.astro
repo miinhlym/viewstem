@@ -1,6 +1,7 @@
 ---
 import SiteHead from './SiteHead.astro';
 import { Code } from 'astro:components';
+import githubDarkDimmed from '@shikijs/themes/github-dark-dimmed';
 import { Icon } from '@astrojs/starlight/components';
 import SiteHeader from './SiteHeader.astro';
 import { copy, customers } from './home-content';
@@ -32,11 +33,11 @@ const viewExcerpt = `{
   }
 }`;
 
-const integrationExcerpt = `const renderer = createRenderer();
-registerComponents(renderer, [button]);
+const integrationExcerpt = `const registry = createRegistry();
+registerShadcn(registry);
+const runtime = createRuntime({ registry });
 
-const mounted = await renderer.mount({
-  target,
+const { view, initialComplete } = await runtime.createView({
   view: {
     render: {
       id: "hello",
@@ -45,7 +46,8 @@ const mounted = await renderer.mount({
     }
   }
 });
-await mounted.initialComplete;`;
+attach(view, target);
+await initialComplete;`;
 ---
 
 <!doctype html>
@@ -94,7 +96,7 @@ await mounted.initialComplete;`;
                 <code>customers.view.json</code>
                 <span>{text.excerpt}</span>
               </figcaption>
-              <Code code={viewExcerpt} lang="json" theme="github-dark-dimmed" />
+              <Code code={viewExcerpt} lang="json" theme={githubDarkDimmed} />
             </figure>
           </div>
           <div class="workbench-caption">
@@ -146,7 +148,7 @@ await mounted.initialComplete;`;
           </div>
           <figure class="integration-code" data-motion-enter>
             <figcaption class="panel-header"><code>main.js</code><span>{text.integration.codeLabel}</span></figcaption>
-            <Code code={integrationExcerpt} lang="js" theme="github-dark-dimmed" />
+            <Code code={integrationExcerpt} lang="js" theme={githubDarkDimmed} />
           </figure>
           <dl class="integration-packages">
             {text.integration.packages.map(([name, description]) => (

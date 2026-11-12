@@ -32,13 +32,11 @@
     "test:svelte": "npm run build:svelte && npm run test -w @viewstem/svelte",
     "test:svelte:package": "node packages/svelte/scripts/test-package.mjs",
     "example:svelte": "npm run build:svelte && node packages/svelte/example/server.mjs",
-    "build:svelte-ui": "npm run build:svelte && npm run build -w @viewstem/svelte-ui",
-    "check:svelte-ui": "npm run build:svelte-ui && npm run typecheck -w @viewstem/svelte-ui && npm run check:generated -w @viewstem/svelte-ui && npm run test -w @viewstem/svelte-ui && npm run test:svelte-ui:package",
-    "test:svelte-ui": "npm run build:svelte-ui && npm run test -w @viewstem/svelte-ui",
-    "test:svelte-ui:package": "node packages/svelte-ui/scripts/test-package.mjs",
     "postinstall": "patch-package --error-on-fail",
     "typecheck:docs": "npm run typecheck -w @viewstem/docs",
-    "release:version": "changeset version && npm install --package-lock-only --ignore-scripts --no-audit --no-fund"
+    "release:version": "changeset version && npm install --package-lock-only --ignore-scripts --no-audit --no-fund",
+    "build:ui": "npm run build && npm run build -w @viewstem/ui",
+    "check:ui": "npm run build:ui && npm run test -w @viewstem/ui"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.3",

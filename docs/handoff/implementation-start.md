@@ -12,7 +12,7 @@
 
 Svelte 작업은 [U39 렌더러 인계](svelte-implementation-2026-11-02.md), [패키지 사용법](../../packages/svelte/README.md), [별도 검증 결과](svelte-verification-results.json)를 확인한다. 기존 core를 소비하는 렌더러이며 기본 Component 자동 등록이나 별도 상태 엔진을 추가하지 않는다.
 
-Svelte UI 작업은 [U44 인계](svelte-ui-shadcn-implementation-2026-11-03.md), [UI 사용법](../../packages/svelte-ui/README.md), [검증 결과](svelte-ui-shadcn-verification-results.json)를 확인한다. `npm run check:svelte-ui`는 고정 vendor·타입·카탈로그·브라우저·tarball 소비자를 검증한다.
+브라우저 UI 작업은 [패키지 사용법](../../packages/ui/README.ko.md)과 공개 `support.json`을 확인한다. `npm run check:ui`로 카탈로그와 브라우저 소비자를 검증한다.
 
 ## 새 채팅에서 시작할 때
 

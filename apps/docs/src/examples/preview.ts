@@ -1,22 +1,19 @@
-import { createRenderer, type HttpResponse, type RendererErrorListener } from '@viewstem/svelte';
-import { registerComponents } from '@viewstem/svelte-ui';
-import { badge } from '@viewstem/svelte-ui/shadcn/badge';
-import { button } from '@viewstem/svelte-ui/shadcn/button';
-import { card } from '@viewstem/svelte-ui/shadcn/card';
-import { input } from '@viewstem/svelte-ui/shadcn/input';
-import { label } from '@viewstem/svelte-ui/shadcn/label';
-import { switchSet } from '@viewstem/svelte-ui/shadcn/switch';
+import { createRegistry, createRuntime, type HttpResponse } from '@viewstem/core';
+import { attach, registerShadcn, type Attachment, type AttachOptions } from '@viewstem/ui';
 import { projectsEndpoint, type ExampleDefinition, type Locale } from './definitions';
 
 export function createExamplePreview(
   target: HTMLElement,
   definition: ExampleDefinition,
   locale: Locale,
-  onError: RendererErrorListener,
+  onError: NonNullable<AttachOptions['onError']>,
 ) {
   let requestCount = 0;
-  const renderer = createRenderer({
-    onError,
+  const registry = createRegistry();
+  registerShadcn(registry);
+  if (definition.resources) registry.registerResources(definition.resources);
+  const runtime = createRuntime({
+    registry,
     requestExecutor: ({ datasource, request }): HttpResponse => {
       const method = definition.fixture === 'project-write' ? 'POST' : projectsEndpoint.request.method;
       if (!definition.fixture) throw new Error('No example response is configured.');
@@ -36,15 +33,15 @@ export function createExamplePreview(
     },
   });
 
+  let attachment: Attachment | undefined;
   return {
     async run() {
-      registerComponents(renderer, [badge, button, card, input, label, switchSet]);
-      if (definition.resources) renderer.registry.registerResources(definition.resources);
-      const mounted = await renderer.mount({ target, view: definition.view, inputs: definition.inputs });
+      const mounted = await runtime.createView({ view: definition.view, inputs: definition.inputs });
+      attachment = attach(mounted.view, target, { onError });
       const report = await mounted.initialComplete;
       const failure = report.queryErrors[0]?.error ?? mounted.view.getSnapshot().errors[0];
       if (failure) throw new Error(failure.message);
     },
-    dispose: () => renderer.dispose(),
+    async dispose() { attachment?.dispose(); runtime.dispose(); },
   };
 }

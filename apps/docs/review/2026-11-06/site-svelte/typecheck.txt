@@ -15,14 +15,6 @@ Getting Svelte diagnostics...
 
 svelte-check found 0 errors and 0 warnings
 
-> @viewstem/svelte-ui@0.1.0 typecheck
-> svelte-check --tsconfig ./tsconfig.json --fail-on-warnings
-
-Loading svelte-check in workspace: /Users/minholim/dev/minh/viewstem/packages/svelte-ui
-Getting Svelte diagnostics...
-
-svelte-check found 0 errors and 0 warnings
-
 > typecheck
 > astro check && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings
 

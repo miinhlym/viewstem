@@ -10,20 +10,19 @@ sidebar:
 ## 입력과 검증 메시지 연결하기
 
 ```js title="src/main.js"
-import { createRenderer } from '@viewstem/svelte';
-import { registerComponents } from '@viewstem/svelte-ui';
-import { field } from '@viewstem/svelte-ui/shadcn/field';
-import { input } from '@viewstem/svelte-ui/shadcn/input';
-import '@viewstem/svelte-ui/shadcn/styles.css';
+import { createRegistry, createRuntime } from '@viewstem/core';
+import { attach, registerShadcn } from '@viewstem/ui';
+import '@viewstem/ui/styles.css';
 
-const renderer = createRenderer();
-registerComponents(renderer, [field, input]);
+const registry = createRegistry();
+registerShadcn(registry);
+const runtime = createRuntime({ registry });
 
 const string = { type: 'string' };
 const name = { '@path': '/states/name' };
 
-const mounted = await renderer.mount({
-  target: document.querySelector('#viewstem'),
+const target = document.querySelector('#viewstem');
+const mounted = await runtime.createView({
   view: {
     states: {
       name: { kind: 'State', schema: string, initial: '' },
@@ -87,6 +86,7 @@ const mounted = await renderer.mount({
     },
   },
 });
+const attachment = attach(mounted.view, target);
 await mounted.initialComplete;
 ```
 

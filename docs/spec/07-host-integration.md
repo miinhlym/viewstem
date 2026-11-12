@@ -90,10 +90,8 @@ code는 INVALID_DEFINITION, REFERENCE_NOT_FOUND, TYPE_MISMATCH, TYPE_CONTRACT_MI
 
 U42에서 Registry/Runtime의 정의 추출 이름을 `exportResource`로 통일했다. View의 `exportDefinition`은 ViewSpec을 반환하므로 유지한다. Store는 `writeBatch`, `registerReaction`, `getDiagnostics`, URL 연결은 `getDiagnostics`를 제공한다. Svelte `whenRendered()`는 현재 projection의 DOM 반영을 기다리며 Query 완료·paint를 보장하지 않는다. State JSON의 `initial`은 완료 Promise인 `initialComplete`와 다른 필드다. [전체 이름 이행표](../handoff/public-api-naming-2026-11-02.md)를 따른다.
 
-## Svelte UI 묶음 등록 · U44
+## 컴포넌트 등록
 
-`@viewstem/svelte-ui`의 `registerComponents(renderer, sets)`는 `ComponentSet[]`을 받는다. 전체 shadcn은 `/shadcn`의 `shadcn`, 선택 사용은 `/shadcn/button` 등의 family 묶음을 전달한다. 등록은 import의 부작용이 아니며 실패한 묶음의 일부 계약·구현을 남기지 않는다. 이를 위해 core Registry에 `registerComponentContracts(contracts[])`, Svelte Renderer에 `registerComponents({contract, component}[])`와 `ComponentRegistration` 타입을 추가했다. 단일 등록과 같은 중복·유효성·수명 검사를 적용한다.
+브라우저 기본 UI의 계약은 `@viewstem/ui`의 `registerShadcn(registry)`로 등록한다. 실제 입력·이벤트·슬롯의 범위는 [UI 사용법](../../packages/ui/README.ko.md)과 패키지의 `support.json`을 따른다.
 
-UI 입력은 core의 Value, 변경은 기존 `on` → Action → State 경로를 사용한다. native callback 스택에서 즉시 core projection을 발행하면 Svelte effect 초기화와 재진입할 수 있어, UI 패키지의 native 이벤트는 한 microtask 뒤 core `emit`으로 연결한다. DOM submit의 `preventDefault`는 동기적으로 적용한다. core의 직접 `View.emit`과 Action 실행 계약을 비동기 큐로 바꾸는 것은 아니다. View 폐기 뒤 남은 renderer emit은 동기 예외 대신 CANCELLED Promise로 거절한다.
-
-`child` 합성은 실제 DOM props/attachment를 하나의 UI 부품에 연결하며, 일반 슬롯에 scoped 값을 추가하지 않는다. Calendar/RangeCalendar 내부 34개 부품과 Chart.Tooltip은 공개 native namespace로 조합한다. 정확한 지원 입력·이벤트·슬롯과 한계는 [UI 사용법](../../packages/svelte-ui/README.md), 실행 결과는 [U44 기록](../handoff/svelte-ui-shadcn-verification-results.json)을 따른다.
+호스트는 core Registry의 `registerComponentContracts(contracts)`로 여러 계약을 등록할 수 있다. Svelte 렌더러는 `registerComponents(entries)`로 계약과 구현을 함께 등록한다. 일괄 등록에 실패하면 해당 묶음의 일부 계약이나 구현을 남기지 않는다. [Svelte 등록 API](../../apps/docs/src/content/docs/ko/docs/svelte/renderer.md)를 참고한다.

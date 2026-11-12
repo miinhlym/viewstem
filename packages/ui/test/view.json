@@ -1,0 +1,380 @@
+{
+  "states": {
+    "name": {
+      "kind": "State",
+      "schema": {
+        "type": "string"
+      },
+      "initial": ""
+    },
+    "enabled": {
+      "kind": "State",
+      "schema": {
+        "type": "boolean"
+      },
+      "initial": false
+    },
+    "open": {
+      "kind": "State",
+      "schema": {
+        "type": "boolean"
+      },
+      "initial": false
+    },
+    "saved": {
+      "kind": "State",
+      "schema": {
+        "type": "boolean"
+      },
+      "initial": false
+    },
+    "rows": {
+      "kind": "State",
+      "schema": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "initial": [
+        "Alpha",
+        "Bravo"
+      ]
+    }
+  },
+  "render": {
+    "id": "card",
+    "componentRef": "shadcn.Card.Root",
+    "slots": {
+      "default": [
+        {
+          "id": "header",
+          "componentRef": "shadcn.Card.Header",
+          "slots": {
+            "default": [
+              {
+                "id": "title",
+                "componentRef": "shadcn.Card.Title",
+                "inputs": {
+                  "text": "Profile"
+                }
+              },
+              {
+                "id": "description",
+                "componentRef": "shadcn.Card.Description",
+                "inputs": {
+                  "text": {
+                    "@path": "/states/name"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "fields",
+          "componentRef": "shadcn.Card.Content",
+          "slots": {
+            "default": [
+              {
+                "id": "name",
+                "componentRef": "shadcn.Input",
+                "inputs": {
+                  "aria-label": "Name",
+                  "value": {
+                    "@path": "/states/name"
+                  },
+                  "placeholder": "Your name"
+                },
+                "on": {
+                  "input": {
+                    "action": {
+                      "ports": {
+                        "target": {
+                          "kind": "State",
+                          "schema": {
+                            "type": "string"
+                          },
+                          "required": true
+                        },
+                        "next": {
+                          "kind": "Value",
+                          "schema": {
+                            "type": "string"
+                          },
+                          "required": true
+                        }
+                      },
+                      "steps": [
+                        {
+                          "kind": "SetState",
+                          "target": {
+                            "@path": "/ports/target"
+                          },
+                          "value": {
+                            "@path": "/ports/next"
+                          }
+                        }
+                      ]
+                    },
+                    "inputs": {
+                      "target": {
+                        "@path": "/states/name"
+                      },
+                      "next": {
+                        "@path": "/event/value"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "id": "enabled",
+                "componentRef": "shadcn.Checkbox",
+                "inputs": {
+                  "aria-label": "Enable profile",
+                  "checked": {
+                    "@path": "/states/enabled"
+                  }
+                },
+                "on": {
+                  "checkedChange": {
+                    "action": {
+                      "ports": {
+                        "target": {
+                          "kind": "State",
+                          "schema": {
+                            "type": "boolean"
+                          },
+                          "required": true
+                        },
+                        "next": {
+                          "kind": "Value",
+                          "schema": {
+                            "type": "boolean"
+                          },
+                          "required": true
+                        }
+                      },
+                      "steps": [
+                        {
+                          "kind": "SetState",
+                          "target": {
+                            "@path": "/ports/target"
+                          },
+                          "value": {
+                            "@path": "/ports/next"
+                          }
+                        }
+                      ]
+                    },
+                    "inputs": {
+                      "target": {
+                        "@path": "/states/enabled"
+                      },
+                      "next": {
+                        "@path": "/event/value"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "id": "row",
+                "componentRef": "shadcn.Input",
+                "inputs": {
+                  "aria-label": {
+                    "@path": "/repeat/item"
+                  },
+                  "placeholder": {
+                    "@path": "/repeat/item"
+                  }
+                },
+                "repeat": {
+                  "items": {
+                    "@path": "/states/rows"
+                  },
+                  "as": "item",
+                  "key": {
+                    "@path": "/repeat/item"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "footer",
+          "componentRef": "shadcn.Card.Footer",
+          "slots": {
+            "default": [
+              {
+                "id": "save",
+                "componentRef": "shadcn.Button",
+                "inputs": {
+                  "text": "Save profile",
+                  "variant": "outline"
+                },
+                "on": {
+                  "click": {
+                    "action": {
+                      "ports": {
+                        "target": {
+                          "kind": "State",
+                          "schema": {
+                            "type": "boolean"
+                          },
+                          "required": true
+                        },
+                        "next": {
+                          "kind": "Value",
+                          "schema": {
+                            "type": "boolean"
+                          },
+                          "required": true
+                        }
+                      },
+                      "steps": [
+                        {
+                          "kind": "SetState",
+                          "target": {
+                            "@path": "/ports/target"
+                          },
+                          "value": {
+                            "@path": "/ports/next"
+                          }
+                        }
+                      ]
+                    },
+                    "inputs": {
+                      "target": {
+                        "@path": "/states/saved"
+                      },
+                      "next": true
+                    }
+                  }
+                }
+              },
+              {
+                "id": "saved",
+                "componentRef": "shadcn.Card.Description",
+                "inputs": {
+                  "text": "Saved"
+                },
+                "when": {
+                  "@path": "/states/saved"
+                }
+              },
+              {
+                "id": "dialog",
+                "componentRef": "shadcn.Dialog.Root",
+                "inputs": {
+                  "open": {
+                    "@path": "/states/open"
+                  }
+                },
+                "slots": {
+                  "default": [
+                    {
+                      "id": "trigger",
+                      "componentRef": "shadcn.Dialog.Trigger",
+                      "inputs": {
+                        "text": "Open settings"
+                      }
+                    },
+                    {
+                      "id": "content",
+                      "componentRef": "shadcn.Dialog.Content",
+                      "slots": {
+                        "default": [
+                          {
+                            "id": "dialog-header",
+                            "componentRef": "shadcn.Dialog.Header",
+                            "slots": {
+                              "default": [
+                                {
+                                  "id": "dialog-title",
+                                  "componentRef": "shadcn.Dialog.Title",
+                                  "inputs": {
+                                    "text": "Profile settings"
+                                  }
+                                },
+                                {
+                                  "id": "dialog-description",
+                                  "componentRef": "shadcn.Dialog.Description",
+                                  "inputs": {
+                                    "text": "Change profile preferences."
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "id": "dialog-footer",
+                            "componentRef": "shadcn.Dialog.Footer",
+                            "slots": {
+                              "default": [
+                                {
+                                  "id": "close",
+                                  "componentRef": "shadcn.Dialog.Close",
+                                  "inputs": {
+                                    "text": "Close settings"
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "on": {
+                  "openChange": {
+                    "action": {
+                      "ports": {
+                        "target": {
+                          "kind": "State",
+                          "schema": {
+                            "type": "boolean"
+                          },
+                          "required": true
+                        },
+                        "next": {
+                          "kind": "Value",
+                          "schema": {
+                            "type": "boolean"
+                          },
+                          "required": true
+                        }
+                      },
+                      "steps": [
+                        {
+                          "kind": "SetState",
+                          "target": {
+                            "@path": "/ports/target"
+                          },
+                          "value": {
+                            "@path": "/ports/next"
+                          }
+                        }
+                      ]
+                    },
+                    "inputs": {
+                      "target": {
+                        "@path": "/states/open"
+                      },
+                      "next": {
+                        "@path": "/event/value"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

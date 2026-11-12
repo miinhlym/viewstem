@@ -13,12 +13,12 @@ try {
   const page=await context.newPage(); const errors=[];
   page.on('pageerror', e=>errors.push(e.message));
   const prefix=locale==='ko'?'/ko':'';
-  for(const path of ['/','/examples/','/examples/first-view/','/playground/','/docs/quickstart/','/docs/svelte-ui/components/button/']) {
+  for(const path of ['/','/examples/','/examples/first-view/','/playground/','/docs/quickstart/','/docs/ui/components/button/']) {
    try {
     await page.goto(origin+prefix+path);
     await page.waitForFunction(()=>!document.querySelector('astro-island[client="load"][ssr]'));
     if(path.includes('first-view')) await page.locator('[data-example-target] button').waitFor();
-    if(path.includes('/components/')) await page.locator('[data-demo-ready="true"]').waitFor();
+    if(path.includes('/components/')) await page.locator('[aria-labelledby="component-preview"][data-demo-ready="true"]').waitFor();
     const observation=await page.evaluate(()=>({
       width:document.documentElement.scrollWidth, client:document.documentElement.clientWidth,
       native:[...document.querySelectorAll('body *')].filter(e=>{

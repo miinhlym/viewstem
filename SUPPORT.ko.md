@@ -30,7 +30,7 @@ Viewstem은 개인이 가능한 범위에서 유지보수합니다. 응답 시�
 
 - [Core](packages/core/README.ko.md): 프레임워크 독립 런타임과 CEL 지원.
 - [Svelte](packages/svelte/README.ko.md): Svelte 5 클라이언트 렌더러와 명시적 등록.
-- [Svelte UI](packages/svelte-ui/README.ko.md): shadcn JSON 어댑터, native 전용 부품, 지원 조합.
+- [UI](packages/ui/README.ko.md): 브라우저 렌더러와 기본 JSON 컴포넌트 카탈로그.
 
 검사하는 Node 버전 행렬은 [CI workflow](.github/workflows/core.yml)가 정의합니다.
 현재 브라우저 실행 증거는 Chromium에 해당합니다. Firefox, WebKit,

@@ -8,17 +8,16 @@ sidebar:
 프로젝트 목록을 하나의 행 템플릿으로 표시합니다. [시작 가이드](../../quickstart/)에서 워크스페이스와 `<div id="viewstem"></div>`를 준비한 뒤 클라이언트 진입 코드를 아래 코드로 교체하세요.
 
 ```js
-import { createRenderer } from '@viewstem/svelte';
-import { registerComponents } from '@viewstem/svelte-ui';
-import { card } from '@viewstem/svelte-ui/shadcn/card';
-import { typography } from '@viewstem/svelte-ui/shadcn/typography';
-import '@viewstem/svelte-ui/shadcn/styles.css';
+import { createRegistry, createRuntime } from '@viewstem/core';
+import { attach, registerShadcn } from '@viewstem/ui';
+import '@viewstem/ui/styles.css';
 
-const renderer = createRenderer();
-registerComponents(renderer, [card, typography]);
+const registry = createRegistry();
+registerShadcn(registry);
+const runtime = createRuntime({ registry });
 
-const mounted = await renderer.mount({
-  target: document.querySelector('#viewstem'),
+const target = document.querySelector('#viewstem');
+const mounted = await runtime.createView({
   view: {
     render: {
       id: 'projects',
@@ -50,6 +49,7 @@ const mounted = await renderer.mount({
     },
   },
 });
+const attachment = attach(mounted.view, target);
 await mounted.initialComplete;
 ```
 

@@ -1,0 +1,267 @@
+[data-viewstem-ui] .vs-carousel { position: relative; }
+[data-viewstem-ui] .vs-carousel.max-w-xs { max-width: 20rem; }
+[data-viewstem-ui] .vs-carousel.mx-auto { margin-inline: auto; }
+[data-viewstem-ui] .vs-carousel-viewport { overflow: hidden; touch-action: pan-y pinch-zoom; }
+[data-viewstem-ui] .vs-carousel-track { display: flex; margin-inline-start: -1rem; }
+[data-viewstem-ui] .vs-carousel-slide {
+  min-width: 0;
+  flex: 0 0 100%;
+  padding-inline-start: 1rem;
+}
+[data-viewstem-ui] .vs-carousel :is(.vs-carousel-next, .vs-carousel-previous) {
+  position: absolute;
+  inset-block: 0;
+  margin-block: auto;
+  border-radius: 50%;
+  touch-action: manipulation;
+}
+[data-viewstem-ui] .vs-carousel-next { inset-inline-end: -3rem; }
+[data-viewstem-ui] .vs-carousel-previous { inset-inline-start: -3rem; }
+[data-viewstem-ui] .vs-carousel :is(.vs-carousel-next, .vs-carousel-previous)::before {
+  content: "";
+  width: 1rem;
+  height: 1rem;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+[data-viewstem-ui] .vs-carousel-previous::before,
+[data-viewstem-ui] .vs-carousel-next:dir(rtl)::before { rotate: 180deg; }
+[data-viewstem-ui] .vs-carousel-previous:dir(rtl)::before { rotate: 0deg; }
+[data-viewstem-ui] .vs-carousel[data-vs-axis=y] .vs-carousel-viewport { touch-action: pan-x pinch-zoom; }
+[data-viewstem-ui] .vs-carousel[data-vs-axis=y] .vs-carousel-track {
+  flex-direction: column;
+  margin-inline-start: 0;
+  margin-block-start: -1rem;
+}
+[data-viewstem-ui] .vs-carousel[data-vs-axis=y] .vs-carousel-slide { padding: 1rem 0 0; }
+[data-viewstem-ui] .vs-carousel[data-vs-axis=y] :is(.vs-carousel-next, .vs-carousel-previous) {
+  inset-inline-start: 50%;
+  inset-inline-end: auto;
+  translate: -50%;
+  rotate: 90deg;
+}
+[data-viewstem-ui] .vs-carousel[data-vs-axis=y] .vs-carousel-next { inset-block: auto -3rem; }
+[data-viewstem-ui] .vs-carousel[data-vs-axis=y] .vs-carousel-previous { inset-block: -3rem auto; }
+
+[data-viewstem-ui] .vs-resizable { display: flex; height: 100%; width: 100%; overflow: hidden; }
+[data-viewstem-ui] .vs-resizable[data-orientation=vertical] { flex-direction: column; }
+[data-viewstem-ui] .vs-resizable.min-h-32 { min-height: 8rem; }
+[data-viewstem-ui] .vs-resizable-pane { min-width: 0; min-height: 0; }
+[data-viewstem-ui] .vs-resizable-handle {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 1px;
+  align-items: center;
+  justify-content: center;
+  background: var(--border);
+}
+[data-viewstem-ui] .vs-resizable-handle::after { content: ""; position: absolute; inset: 0 -4px; }
+[data-viewstem-ui] .vs-resizable-handle[data-orientation=vertical] { width: 100%; height: 1px; }
+[data-viewstem-ui] .vs-resizable-handle[data-orientation=vertical]::after { inset: -4px 0; }
+[data-viewstem-ui] .vs-resizable-handle[data-vs-with-handle]::before {
+  content: "";
+  width: .25rem;
+  height: 1.5rem;
+  flex: none;
+  border-radius: .5rem;
+  background: var(--border);
+}
+[data-viewstem-ui] .vs-resizable-handle[data-orientation=vertical]::before { rotate: 90deg; }
+[data-viewstem-ui] .vs-resizable-handle:focus-visible { outline: 1px solid var(--ring); outline-offset: 1px; }
+
+[data-viewstem-ui] .vs-otp {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+}
+[data-viewstem-ui] .vs-otp:has(.vs-otp-input:disabled) { opacity: .5; }
+[data-viewstem-ui] .vs-otp-input {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  opacity: 0;
+  color: transparent;
+  caret-color: transparent;
+}
+[data-viewstem-ui] .vs-otp-input:disabled { cursor: not-allowed; }
+[data-viewstem-ui] .vs-otp-group { display: flex; align-items: center; border-radius: var(--radius-md); }
+[data-viewstem-ui] .vs-otp-cell {
+  display: grid;
+  place-items: center;
+  position: relative;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--input);
+  border-inline-start: 0;
+  font-size: .875rem;
+  line-height: 1.25rem;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .05);
+  transition: border-color .15s, box-shadow .15s;
+}
+[data-viewstem-ui] .vs-otp-cell:first-child {
+  border-inline-start: 1px solid var(--input);
+  border-start-start-radius: var(--radius-md);
+  border-end-start-radius: var(--radius-md);
+}
+[data-viewstem-ui] .vs-otp-cell:last-child { border-start-end-radius: var(--radius-md); border-end-end-radius: var(--radius-md); }
+[data-viewstem-ui] .vs-otp-cell:empty::before { content: attr(data-vs-otp-char); }
+[data-viewstem-ui] .vs-otp-cell[data-active=true] {
+  z-index: 10;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent), 0 1px 2px rgb(0 0 0 / .05);
+}
+[data-viewstem-ui] :is(.vs-otp[aria-invalid=true] .vs-otp-cell, .vs-otp-cell[aria-invalid=true]) { border-color: var(--destructive); }
+[data-viewstem-ui] .vs-otp-cell[data-vs-caret]::after {
+  content: "";
+  position: absolute;
+  width: 1px;
+  height: 1rem;
+  background: var(--foreground);
+  animation: vs-otp-caret 1.25s ease-out infinite;
+}
+@keyframes vs-otp-caret { 0%, 70%, 100% { opacity: 1; } 20%, 50% { opacity: 0; } }
+[data-viewstem-ui] .vs-otp-separator { display: flex; align-items: center; }
+[data-viewstem-ui] .vs-otp-separator:empty { justify-content: center; width: 1rem; height: 1rem; }
+[data-viewstem-ui] .vs-otp-separator:empty::before {
+  content: "";
+  width: .65rem;
+  height: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+[data-viewstem-ui] .vs-hover-card { display: contents; }
+[data-viewstem-ui] .vs-hover-positioner { z-index: 50; }
+[data-viewstem-ui] .vs-hover-content {
+  width: min(16rem, calc(100vw - 1rem));
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  background: var(--popover);
+  color: var(--popover-foreground);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -2px rgb(0 0 0 / 10%), 0 0 0 1px color-mix(in oklab, var(--foreground) 10%, transparent);
+  font-size: .875rem;
+  line-height: 1.25rem;
+  outline: none;
+  transform-origin: var(--transform-origin);
+}
+[data-viewstem-ui] .vs-hover-content[data-state=open] { animation: vs-hover-enter .1s ease both; }
+[data-viewstem-ui] .vs-hover-content[data-state=closed]:not([hidden]) { animation: vs-hover-exit .1s ease both; pointer-events: none; }
+[data-viewstem-ui] .vs-hover-content[data-side=bottom] { --vs-enter-y: -.5rem; }
+[data-viewstem-ui] .vs-hover-content[data-side=top] { --vs-enter-y: .5rem; }
+[data-viewstem-ui] .vs-hover-content[data-side=left] { --vs-enter-x: .5rem; }
+[data-viewstem-ui] .vs-hover-content[data-side=right] { --vs-enter-x: -.5rem; }
+@keyframes vs-hover-enter {
+  from { opacity: 0; transform: translate(var(--vs-enter-x, 0), var(--vs-enter-y, 0)) scale(.95); }
+}
+@keyframes vs-hover-exit { to { opacity: 0; transform: scale(.95); } }
+
+[data-viewstem-ui] .vs-navigation {
+  position: relative;
+  display: flex;
+  width: max-content;
+  max-width: 100%;
+  align-items: center;
+}
+[data-viewstem-ui] .vs-navigation-list { display: flex; align-items: center; list-style: none; margin: 0; padding: 0; }
+[data-viewstem-ui] .vs-navigation[data-orientation=vertical] .vs-navigation-list { flex-direction: column; align-items: stretch; }
+[data-viewstem-ui] .vs-navigation-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  height: 2.25rem;
+  padding: .5rem 1rem;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: inherit;
+  font-size: .875rem;
+  font-weight: 500;
+}
+[data-viewstem-ui] .vs-navigation-trigger::after {
+  content: "";
+  position: relative;
+  top: 1px;
+  width: .75rem;
+  height: .75rem;
+  margin-inline-start: .25rem;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: rotate .3s;
+}
+[data-viewstem-ui] .vs-navigation-trigger[data-state=open]::after { rotate: 180deg; }
+[data-viewstem-ui] .vs-navigation-trigger[data-state=open],
+[data-viewstem-ui] .vs-navigation-link[data-current] { background: color-mix(in oklab, var(--muted) 50%, transparent); }
+[data-viewstem-ui] :is(.vs-navigation-trigger, .vs-navigation-link):is(:hover, :focus) { background: var(--muted); }
+[data-viewstem-ui] :is(.vs-navigation-trigger, .vs-navigation-link):focus-visible {
+  outline: 1px solid var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
+}
+[data-viewstem-ui] .vs-navigation-trigger:disabled { opacity: .5; pointer-events: none; }
+[data-viewstem-ui] .vs-navigation-link {
+  display: flex;
+  align-items: center;
+  gap: .375rem;
+  padding: .5rem;
+  border-radius: var(--radius-md);
+  color: inherit;
+  text-decoration: none;
+  font-size: .875rem;
+  line-height: 1.25rem;
+  white-space: nowrap;
+}
+[data-viewstem-ui] .vs-navigation-content {
+  position: absolute;
+  z-index: 50;
+  inset-block-start: calc(100% + .375rem);
+  inset-inline-start: 0;
+  min-width: max-content;
+  padding: .25rem;
+  border-radius: var(--radius-lg);
+  background: var(--popover);
+  color: var(--popover-foreground);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 10%), 0 0 0 1px color-mix(in oklab, var(--foreground) 10%, transparent);
+  transform-origin: top center;
+}
+[data-viewstem-ui] .vs-navigation-content[data-state=open] { animation: vs-navigation-enter .1s ease both; }
+[data-viewstem-ui] .vs-navigation-content[data-state=closed]:not([data-vs-closing]) { display: none; }
+[data-viewstem-ui] .vs-navigation-content[data-vs-closing] { animation: vs-navigation-exit .1s ease both; pointer-events: none; }
+[data-viewstem-ui] .vs-navigation[data-vs-viewport=false] .vs-navigation-content { animation-duration: .3s; }
+[data-viewstem-ui] .vs-navigation-content .vs-navigation-link { border-radius: var(--radius-sm); }
+[data-viewstem-ui] .vs-navigation-viewport { position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none; }
+[data-viewstem-ui] .vs-navigation-indicator {
+  inset-block-start: 100%;
+  inset-inline-start: var(--trigger-x, 0);
+  width: var(--trigger-width, 2rem);
+  height: .375rem;
+  overflow: hidden;
+}
+[data-viewstem-ui] .vs-navigation-indicator[data-state="open"] { animation: vs-navigation-indicator-enter 150ms ease both; }
+[data-viewstem-ui] .vs-navigation-indicator[data-vs-closing] { animation: vs-navigation-indicator-exit 150ms ease both; }
+@keyframes vs-navigation-indicator-enter { from { opacity: 0; } }
+@keyframes vs-navigation-indicator-exit { to { opacity: 0; } }
+[data-viewstem-ui] .vs-navigation-indicator::after {
+  content: "";
+  position: absolute;
+  width: .5rem;
+  height: .5rem;
+  inset-block-start: .2rem;
+  inset-inline-start: calc(50% - .25rem);
+  rotate: 45deg;
+  border-radius: 2px;
+  background: var(--border);
+}
+[data-viewstem-ui] .vs-navigation :is(.vs-navigation-content, .vs-navigation-viewport, .vs-navigation-indicator)[hidden],
+[data-viewstem-ui] :is(.vs-hover-content, .vs-hover-positioner)[hidden] { display: none; }
+@keyframes vs-navigation-enter { from { opacity: 0; scale: .9; } }
+@keyframes vs-navigation-exit { to { opacity: 0; scale: .9; } }
+@media (prefers-reduced-motion: reduce) {
+  [data-viewstem-ui] :is(.vs-hover-content, .vs-navigation-content, .vs-otp-cell)::after,
+  [data-viewstem-ui] :is(.vs-hover-content, .vs-navigation-content, .vs-navigation-indicator) { animation: none; }
+}

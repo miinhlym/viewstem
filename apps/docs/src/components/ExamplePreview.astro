@@ -3,6 +3,7 @@ import * as Alert from './ui/alert/index.js';
 import { Spinner } from './ui/spinner/index.js';
 import ScrollRegion from './site/ScrollRegion.svelte';
 import { Code } from 'astro:components';
+import githubLight from '@shikijs/themes/github-light';
 import Button from './site/Button.svelte';
 import ExampleFileTabs from './site/ExampleFileTabs.svelte';
 import { exampleCopy } from '../examples/catalog';
@@ -46,7 +47,7 @@ const files = [
       <div id={"source-" + file.key} data-source-key={file.key} data-source-name={file.name} hidden={index !== 0}>
         <ScrollRegion class="editor-scroll" client:load><div data-editor-host hidden></div>
         <div data-editor-fallback>
-          <Code code={file.source} lang="json" theme="github-light" />
+          <Code code={file.source} lang="json" theme={githubLight} />
         </div></ScrollRegion>
         <textarea data-source-original hidden readonly aria-hidden="true" tabindex="-1">{file.source}</textarea>
       </div>
@@ -65,7 +66,7 @@ const files = [
 </section>
 
 <script>
-  import type { JsonValue, ViewSpec, AnyResource } from '@viewstem/svelte';
+  import type { JsonValue, ViewSpec, AnyResource } from '@viewstem/core';
   import type { ExampleDefinition, Locale } from '../examples/definitions';
   import type { createJsonEditor } from '../lib/json-editor';
   import type { createExamplePreview } from '../examples/preview';
@@ -130,8 +131,8 @@ const files = [
         const { createExamplePreview } = await import('../examples/preview');
         surface.hidden = true;
         target.append(surface);
-        next = createExamplePreview(surface, source, locale as Locale, ({ error: diagnostic }) => {
-          if (preview === next && !runFailed) showError(diagnostic.message);
+        next = createExamplePreview(surface, source, locale as Locale, diagnostic => {
+          if (preview === next && !runFailed) showError(diagnostic && typeof diagnostic === 'object' && 'message' in diagnostic ? String(diagnostic.message) : String(diagnostic));
         });
         await next.run();
         await preview?.dispose();

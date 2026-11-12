@@ -52,13 +52,13 @@ export const copy = {
       ],
     },
     integration: {
-      title: 'Run your first view in Svelte.',
-      description: 'Create a renderer, register a component, then mount a view that references it. Quick Start walks through the complete example.',
+      title: 'Run your first View in the browser.',
+      description: 'Register the default catalog and attach a View to a DOM container. Quick Start walks through the complete example.',
       codeLabel: 'Client entry excerpt',
       packages: [
         ['@viewstem/core', 'Validates definitions and executes state, queries, and actions.'],
         ['@viewstem/svelte', 'Connects Viewstem views to Svelte components.'],
-        ['@viewstem/svelte-ui', 'Provides optional UI sets such as shadcn.'],
+        ['@viewstem/ui', 'Renders the built-in component catalog in any browser app.'],
       ],
     },
     examples: {
@@ -118,13 +118,13 @@ export const copy = {
       ],
     },
     integration: {
-      title: 'Svelte 앱에서 첫 View를 실행하세요.',
-      description: '렌더러를 만들고 컴포넌트를 등록한 뒤, 그 컴포넌트를 참조하는 View를 실행합니다. 빠른 시작에서 전체 코드를 따라 실행해 볼 수 있습니다.',
+      title: '브라우저에서 첫 View를 실행하세요.',
+      description: '기본 컴포넌트를 등록하고 View를 DOM 컨테이너에 연결합니다. 빠른 시작에서 전체 코드를 실행해 볼 수 있습니다.',
       codeLabel: '클라이언트 진입 코드 일부',
       packages: [
         ['@viewstem/core', '선언을 검증하고 상태·조회·동작을 실행합니다.'],
         ['@viewstem/svelte', 'Viewstem의 View를 Svelte 컴포넌트에 연결합니다.'],
-        ['@viewstem/svelte-ui', 'shadcn처럼 선택해서 쓸 수 있는 UI 세트를 제공합니다.'],
+        ['@viewstem/ui', '브라우저에서 기본 컴포넌트를 렌더링합니다.'],
       ],
     },
     examples: {

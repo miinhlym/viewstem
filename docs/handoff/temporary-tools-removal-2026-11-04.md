@@ -7,8 +7,7 @@ core·Svelte renderer·shadcn UI 패키지는 유지하며, 통합 방법은 패
 ## 제거와 유지의 경계
 
 - `playground/`의 실행 앱·바닐라 DOM 어댑터·HTTP mock 서버·편집기·안내와 도구 테스트를 제거한다.
-- `packages/svelte-ui/example/`의 갤러리 앱·종류별 편집기·스타일·서버·실행 안내를 제거한다.
-- `playground`, `test:playground`, `example:svelte-ui` npm 명령과 CI의 playground 단계를 제거한다.
+- `playground`, `test:playground` npm 명령과 CI의 playground 단계를 제거한다.
 - 공개 README·기여 안내·이슈 재현 안내·문서 지도에서 두 도구의 사용을 권하지 않는다.
 - shadcn 카탈로그·키보드·State/Query/Action·IME 검사는 실제 빌드 패키지를 직접 마운트하는
   테스트 fixture로 옮긴다. 화면 선택·편집·공유 URL·inspector용 DOM은 테스트에 복제하지 않는다.
@@ -46,11 +45,6 @@ SHA-256 일치를 확인했다. 제거할 앱 디렉터리의 untracked 파일�
 현재 제거 후 검증 수로 읽지 않는다.
 
 ## 실행 검증
-
-Node 24.1.0·macOS arm64에서 `npm run check:svelte-ui`를 실행했다. 세 패키지 빌드,
-UI 타입 검사, 생성 소스·CSS·동작 행렬 재현, 브라우저 108개, 격리 tarball 소비자 검사가
-통과했다. 실패·취소·skip·todo는 없고 66개 family·필수 동작 68개에 누락이 없다.
-실행 보고서의 source hash와 최종 작업 트리의 hash 일치도 검사했다.
 
 `npm run test:ci`는 Node 22.21.1과 24.1.0에서 각각 14개 통과했다.
 `npm run test:svelte:package`도 통과해 갱신한 README를 포함한 설치 패키지의

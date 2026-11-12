@@ -89,7 +89,7 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm install --global npm@11.21.2 --ignore-scripts --no-audit --no-fund
       - run: npm ci --ignore-scripts
-      - run: npm run build:svelte-ui
+      - run: npm run build:svelte && npm run build -w @viewstem/ui
       - env:
           RELEASE_TARGETS: ${{ needs.plan.outputs.targets }}
         run: node .github/scripts/npm-release.mjs publish
