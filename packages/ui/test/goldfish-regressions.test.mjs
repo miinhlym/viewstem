@@ -428,6 +428,25 @@ test('closing a controlled parent Popover removes nested content from Tab and Es
   assert.equal(await page.getByRole('button', { name: 'Inner', exact: true }).getAttribute('aria-expanded'), 'false');
 });
 
+test('Escape closes a visible controlled child Popover before its parent', async t => {
+  const inner = popover('Inner', { open: from('inner') });
+  inner.on = setState('inner', boolean, 'openChange');
+  const outer = popover('Outer', { open: from('outer'), inside: [inner] });
+  outer.on = setState('outer', boolean, 'openChange');
+  const page = await mount(t, {
+    states: { outer: state(false, boolean), inner: state(true, boolean) }, render: outer,
+  });
+  await write(page, 'outer', true);
+  await page.getByRole('button', { name: 'Close Inner', exact: true }).focus();
+  await page.keyboard.press('Escape');
+  assert.deepEqual(await payloads(page, 'Inner', 'openChange'), [false]);
+  assert.deepEqual(await payloads(page, 'Outer', 'openChange'), []);
+  await waitState(page, 'inner', false);
+  assert.equal(await read(page, 'outer'), true);
+  await page.keyboard.press('Escape');
+  await waitState(page, 'outer', false);
+});
+
 test('a disabled Popover child trigger cannot open the panel or run the child Action', async t => {
   const render = popover('Settings');
   const trigger = render.slots.default[0];

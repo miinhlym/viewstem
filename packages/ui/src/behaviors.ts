@@ -483,9 +483,17 @@ export function popover(element: HTMLElement, send: Send, signal: AbortSignal): 
     if (source && !element.closest('[inert]') && !element.contains(source) && !source.contains(element)) request(false);
   }, { signal });
   doc.addEventListener('keydown', event => {
-    if (event.key !== 'Escape' || event.defaultPrevented || layers.filter(item => !item.element.closest('[inert]')).at(-1) !== layer) return;
-    const modal = event.composedPath().find(target => target instanceof view.HTMLDialogElement && target.matches(':modal'));
-    if (modal instanceof view.HTMLDialogElement && !modal.contains(element)) return;
+    if (event.key !== 'Escape' || event.defaultPrevented) return;
+    const modal = event.composedPath().find((target): target is HTMLDialogElement =>
+      target instanceof view.HTMLDialogElement && target.matches(':modal'));
+    let top: PopoverLayer | undefined;
+    for (let index = layers.length - 1; index >= 0; index--) {
+      const candidate = layers[index]!;
+      if (candidate.element.closest('[inert]') || (modal && !modal.contains(candidate.element))) continue;
+      // A controlled child can open before its parent becomes visible.
+      if (!top || top.element.contains(candidate.element)) top = candidate;
+    }
+    if (top !== layer) return;
     event.preventDefault();
     request(false);
   }, { signal });
