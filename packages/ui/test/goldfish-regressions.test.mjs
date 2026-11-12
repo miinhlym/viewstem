@@ -574,6 +574,36 @@ test('P2 codebase-details-1-1: discrete Slider stops work by mouse and keyboard 
   assert.equal(await maximum.getAttribute('aria-valuenow'), '80');
 });
 
+test('discrete Sliders with no stops in bounds cannot change by pointer or keyboard', async t => {
+  const page = await mount(t, {
+    states: { steps: state([0, 100]) },
+    render: group(
+      node('single', 'Slider', { type: 'single', min: 10, max: 90, step: from('steps'), value: 20, 'aria-label': 'Single' }),
+      node('multi', 'Slider', { type: 'multiple', min: 10, max: 90, step: from('steps'), value: [20, 80], thumbLabels: ['Minimum', 'Maximum'] }),
+    ),
+  });
+  const single = page.getByRole('slider', { name: 'Single' });
+  const minimum = page.getByRole('slider', { name: 'Minimum' });
+  await single.press('ArrowRight');
+  assert.equal(await single.inputValue(), '20');
+  await minimum.press('ArrowRight');
+  assert.equal(await minimum.getAttribute('aria-valuenow'), '20');
+  await pointerClick(page, single);
+  await pointerClick(page, page.locator('[data-vs-component="Slider"] [data-part="track"]'));
+  await frame(page);
+  assert.equal(await single.isDisabled(), true);
+  assert.equal(await minimum.getAttribute('aria-disabled'), 'true');
+  for (const id of ['single', 'multi']) {
+    assert.deepEqual(await payloads(page, id, 'valueChange'), []);
+    assert.deepEqual(await payloads(page, id, 'valueCommit'), []);
+  }
+  await write(page, 'steps', [20, 50, 80]);
+  await single.press('ArrowRight');
+  await minimum.press('ArrowRight');
+  assert.deepEqual(await payloads(page, 'single', 'valueCommit'), [50]);
+  assert.deepEqual(await payloads(page, 'multi', 'valueCommit'), [[50, 80]]);
+});
+
 test('P2 codebase-details-1-2: multiple Calendar protects selected days for pointer and keyboard', async t => {
   const dates = ['2026-11-09', '2026-11-12'];
   const page = await mount(t, {

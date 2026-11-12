@@ -845,6 +845,7 @@ export function range(element: HTMLInputElement, send: Send, signal: AbortSignal
     element.dispatchEvent(new Event('change', { bubbles: true }));
   }, { signal });
   element.addEventListener('input', () => {
+    if (element.disabled) return;
     if (steps.length) {
       element.valueAsNumber = snapSliderValue(element.valueAsNumber, steps);
       if (element.valueAsNumber === current) return;
@@ -854,14 +855,16 @@ export function range(element: HTMLInputElement, send: Send, signal: AbortSignal
     send('valueChange', read());
   }, { capture: true, signal });
   element.addEventListener('change', () => {
-    if (!steps.length || changed) send('valueCommit', read());
+    if (!element.disabled && (!steps.length || changed)) send('valueCommit', read());
     changed = false;
   }, { signal });
   return {
     sync(inputs) {
       const value = Array.isArray(inputs.value) ? inputs.value[0] : inputs.value;
-      const { min, max, step, steps: nextSteps } = sliderScale(inputs);
+      const { min, max, step, steps: nextSteps, noStops } = sliderScale(inputs);
       steps = nextSteps;
+      element.disabled = inputs.disabled === true || noStops;
+      if (element.disabled) changed = false;
       element.min = String(min);
       element.max = String(max);
       element.step = steps.length ? 'any' : String(step);

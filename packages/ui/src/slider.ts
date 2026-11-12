@@ -34,7 +34,7 @@ export function multiSlider(element: HTMLElement, send: Send, signal: AbortSigna
     },
     thumbAlignment: 'center',
     onValueChange({ value }) {
-      if (signal.aborted) return;
+      if (signal.aborted || disabled) return;
       const next = value.map(item => snapSliderValue(item, steps));
       if (next.length === values.length && next.every((item, index) => item === values[index])) return;
       values = next;
@@ -43,7 +43,7 @@ export function multiSlider(element: HTMLElement, send: Send, signal: AbortSigna
       send('valueChange', { value: [...values] });
     },
     onValueChangeEnd() {
-      if (signal.aborted || !changed) return;
+      if (signal.aborted || disabled || !changed) return;
       changed = false;
       send('valueCommit', { value: [...values] });
     },
@@ -101,7 +101,7 @@ export function multiSlider(element: HTMLElement, send: Send, signal: AbortSigna
   let unsubscribe: (() => void) | undefined;
   return {
     sync(inputs) {
-      const { min, max: configuredMax, step, steps: nextSteps } = sliderScale(inputs);
+      const { min, max: configuredMax, step, steps: nextSteps, noStops } = sliderScale(inputs);
       steps = nextSteps;
       const locked = configuredMax <= min;
       const max = locked ? min + 1 : configuredMax;
@@ -121,7 +121,8 @@ export function multiSlider(element: HTMLElement, send: Send, signal: AbortSigna
       });
       description = typeof inputs['aria-describedby'] === 'string' ? inputs['aria-describedby'] : undefined;
       rtl = inputs.dir === 'rtl' || (inputs.dir !== 'ltr' && element.matches(':dir(rtl)'));
-      disabled = locked || inputs.disabled === true || !values.length;
+      disabled = locked || inputs.disabled === true || !values.length || noStops;
+      if (disabled) changed = false;
       // Zag handles the drag on a fine linear scale. Only the published values snap to the discrete stops.
       const machineStep = steps.length ? (max - min) / 1e9 : step;
       service.updateProps({ min, max, step: machineStep, value: values, disabled, dir: rtl ? 'rtl' : 'ltr' });

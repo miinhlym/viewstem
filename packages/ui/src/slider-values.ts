@@ -7,8 +7,9 @@ export function sliderScale(inputs: Readonly<Record<string, unknown>>) {
   const min = finite(inputs.min, candidates[0] ?? 0);
   const max = finite(inputs.max, candidates.at(-1) ?? 100);
   const steps = candidates.filter(value => min <= value && value <= max);
+  const noStops = candidates.length > 0 && steps.length === 0;
   const step = finite(inputs.step, 1);
-  return { min, max, step: step > 0 ? step : 1, steps };
+  return { min, max, step: step > 0 ? step : 1, steps, noStops };
 }
 
 export function snapSliderValue(value: number, steps: readonly number[]) {

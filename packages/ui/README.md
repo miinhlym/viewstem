@@ -43,7 +43,7 @@ The DOM adapters support documented JSON input and event subsets. Portal slots a
 
 Slider uses a native range input for `type: "single"` and Zag Vanilla for `type: "multiple"`. In multiple mode, each number in `value` creates a thumb. The thumbs stay in ascending order, and `thumbLabels` can give them distinct accessible names. `valueChange` carries the current values during interaction, and `valueCommit` carries the final values when the drag ends or a keyboard adjustment takes effect. The payload is `{ value: number[] }` in multiple mode and `{ value: number }` in single mode.
 
-A numeric Slider `step` sets a regular interval. A non-empty array defines discrete values for pointer and keyboard input. When `min` or `max` is omitted, its default comes from the lowest or highest stop. An explicit `value: []` in multiple mode removes all thumbs.
+A numeric Slider `step` sets a regular interval. A non-empty array defines discrete values for pointer and keyboard input. When `min` or `max` is omitted, its default comes from the lowest or highest stop. If every stop falls outside the bounds, the slider is disabled until a stop becomes available. An explicit `value: []` in multiple mode removes all thumbs.
 
 `Command.Dialog` emits `openChange` with `{ value: false }` when dismissed with Escape. Use the event to update a bound `open` State. An existing view without this handler can still dismiss the dialog. It reopens when the supplied `open` value changes to `true` again. `Popover.Root` and `Tooltip.Root` emit `openChange` to request a transition when `open` is supplied. They emit `openChangeComplete` after the supplied value is reflected and the transition finishes.
 
