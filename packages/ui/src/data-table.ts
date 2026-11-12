@@ -15,6 +15,7 @@ const features = tableFeatures({
   sortFns: { alphanumeric: sortFn_alphanumeric, basic: sortFn_basic },
 });
 type Row = Record<string, unknown>;
+const rowKey = (value: unknown) => typeof value === 'string' || typeof value === 'number' ? String(value) : '';
 type Column = { id: string; accessorKey: string; label: string; sortable?: boolean; filterable?: boolean };
 type Labels = Partial<Record<'filter' | 'select' | 'selectRow' | 'noRows' | 'previous' | 'next' | 'page' | 'rowsPerPage', string>>;
 
@@ -79,8 +80,8 @@ export function dataTable(element: HTMLElement, send: Send, signal: AbortSignal)
     const seenRows = new Set<string>();
     const safeRows = data.filter(row => {
       if (!row || !Object.hasOwn(row, rowId)) return false;
-      const id = row[rowId];
-      if (typeof id !== 'string' || id === '' || seenRows.has(id)) return false;
+      const id = rowKey(row[rowId]);
+      if (id === '' || seenRows.has(id)) return false;
       seenRows.add(id);
       return true;
     });
@@ -127,7 +128,11 @@ export function dataTable(element: HTMLElement, send: Send, signal: AbortSignal)
     if (filter.value !== filterValue) filter.value = filterValue;
     setFilter = value => table.setGlobalFilter(value);
     setPage = offset => table.setPageIndex(displayedPage + offset);
-    setSize = value => table.setPageSize(value);
+    setSize = value => {
+      const lastPage = Math.max(0, Math.ceil(table.getPrePaginatedRowModel().rows.length / value) - 1);
+      const firstRow = displayedPage * pageSize;
+      table.setPagination({ pageSize: value, pageIndex: Math.min(lastPage, Math.floor(firstRow / value)) });
+    };
     const active = doc.activeElement;
     const focusedSort = Array.from(head.querySelectorAll('button')).indexOf(active as HTMLButtonElement);
     const focusedRow = active instanceof doc.defaultView!.HTMLInputElement && body.contains(active)

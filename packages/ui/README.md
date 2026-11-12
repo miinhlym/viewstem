@@ -45,9 +45,9 @@ Slider uses a native range input for `type: "single"` and Zag Vanilla for `type:
 
 `Command.Dialog` emits `openChange` with `{ value: false }` when dismissed with Escape. Use the event to update a bound `open` State. An existing view without this handler can still dismiss the dialog. It reopens when the supplied `open` value changes to `true` again. `Popover.Root` and `Tooltip.Root` emit `openChange` to request a transition when `open` is supplied. They emit `openChangeComplete` after the supplied value is reflected and the transition finishes.
 
-Calendar, Range Calendar, and Date Picker use Zag Vanilla for date navigation and selection. Their JSON contracts use date-only strings and range objects. Calendar and Range Calendar render complete grids through their Root IDs.
+Calendar, Range Calendar, and Date Picker use Zag Vanilla for date navigation and selection. Their JSON contracts use date-only strings and range objects. Calendar and Range Calendar render complete grids through their Root IDs. Date Picker clamps the date shown in its trigger and grid to `min` and `max` while keeping the caller's State value.
 
-Data Table uses TanStack Table Core. The JSON recipe keeps caller-owned sorting, filtering, pagination, and selection state. A page outside the available range is clamped for display, and selected IDs outside the current data remain in the selection state.
+Data Table uses TanStack Table Core. The JSON recipe keeps caller-owned sorting, filtering, pagination, and selection state. A page outside the available range is clamped for display, and a page size change starts from the first displayed row. Row IDs may be strings or numbers and must be unique after conversion to strings. `selectedIds` and `selectedIdsChange` use the string form. Selected IDs outside the current data remain in the selection state.
 
 Basecoat styles are scoped to the renderer subtree. Set `.dark` or `data-theme="dark"` on an ancestor to switch themes. Basecoat controllers are registered locally and attached to individual DOM nodes. Their teardown is part of attachment disposal. The build includes the Basecoat license in `dist/BASECOAT-LICENSE.md`.
 

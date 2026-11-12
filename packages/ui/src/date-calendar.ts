@@ -182,7 +182,11 @@ export function dateCalendar(element: HTMLElement, kind: Kind, send: Send, signa
     const count = Number(inputs.numberOfMonths ?? 1);
     return {
       id,
-      getRootNode: () => element.getRootNode() as Document | ShadowRoot,
+      getRootNode: () => {
+        const owner = element.getRootNode();
+        // Zag can finish a queued focus or dismissable task after the element is detached.
+        return owner instanceof view.ShadowRoot ? owner : doc;
+      },
       selectionMode: mode,
       value: current,
       min,
@@ -261,6 +265,10 @@ export function dateCalendar(element: HTMLElement, kind: Kind, send: Send, signa
     return true;
   }
 
+  function keepSelection(value: DateValue) {
+    return mode === 'multiple' && inputs.preventDeselect === true && current.some(item => item.compare(value) === 0);
+  }
+
   function render() {
     if (!service || closed || signal.aborted) return;
     const api = getApi(service);
@@ -333,7 +341,7 @@ export function dateCalendar(element: HTMLElement, kind: Kind, send: Send, signa
       bind(grid.table, { ...tableProps,
         ...(inputs['aria-label'] || inputs.calendarLabel ? { 'aria-label': inputs['aria-label'] ?? inputs.calendarLabel } : {}),
         onkeydown(event: KeyboardEvent) {
-          if ((event.key === 'Enter' || event.key === ' ') && deselect(api, api.focusedValue)) event.preventDefault();
+          if ((event.key === 'Enter' || event.key === ' ') && (keepSelection(api.focusedValue) || deselect(api, api.focusedValue))) event.preventDefault();
           else tableProps.onkeydown?.(event);
         },
       });
@@ -410,7 +418,7 @@ export function dateCalendar(element: HTMLElement, kind: Kind, send: Send, signa
               activeApi.setFocusedValue(value);
             }
           },
-          onclick(event: MouseEvent) { if (!deselect(api, value)) props.onclick?.(event); },
+          onclick(event: MouseEvent) { if (!keepSelection(value) && !deselect(api, value)) props.onclick?.(event); },
         });
         button.textContent = String(value.day);
         if (!duplicate && iso(value) === iso(api.focusedValue)) focusTarget = button;
@@ -427,8 +435,16 @@ export function dateCalendar(element: HTMLElement, kind: Kind, send: Send, signa
       inputs = next;
       const selectionMode = getMode(kind, inputs);
       const value = picker && selectionMode === 'range' ? inputs.range : inputs.value;
-      const nextValues = dates(inputs, kind, selectionMode);
-      const signature = value === undefined ? undefined : keyOf(nextValues);
+      const suppliedDates = dates(inputs, kind, selectionMode);
+      const min = picker ? date(inputs.min) : undefined;
+      const max = picker ? date(inputs.max) : undefined;
+      const constrain = (value: DateValue) => {
+        const lower = min && value.compare(min) < 0 ? min : value;
+        return max && lower.compare(max) > 0 ? max : lower;
+      };
+      const nextValues = picker ? suppliedDates.map(constrain) : suppliedDates;
+      const signature = value === undefined ? undefined : picker
+        ? JSON.stringify([keyOf(suppliedDates), keyOf(nextValues)]) : keyOf(suppliedDates);
       const placeholder = picker ? null : iso(date(inputs.placeholder));
       if (!service || mode !== selectionMode) {
         unsubscribe?.();
@@ -447,13 +463,14 @@ export function dateCalendar(element: HTMLElement, kind: Kind, send: Send, signa
         if (mode === 'range' && current.length === 1) service.service.context.set('activeIndex', 1);
       } else {
         const changed = signature !== previousExternal && signature !== undefined;
-        const externalSelection = changed && keyOf(current) !== keyOf(nextValues);
-        if (changed) current = nextValues;
+        const projected = changed ? nextValues : picker ? current.map(constrain) : current;
+        const externalSelection = keyOf(current) !== keyOf(projected);
+        current = projected;
         const nextFocus = placeholder !== previousPlaceholder ? date(placeholder) : externalSelection ? selectionFocus(nextValues) : undefined;
         previousExternal = signature;
         previousPlaceholder = placeholder;
         service.updateProps({});
-        if (changed && mode === 'range') service.service.context.set('activeIndex', current.length === 1 ? 1 : 0);
+        if ((changed || externalSelection) && mode === 'range') service.service.context.set('activeIndex', current.length === 1 ? 1 : 0);
         if (nextFocus) {
           silentFocus = publishedPlaceholder = iso(nextFocus);
           getApi(service).setFocusedValue(nextFocus);

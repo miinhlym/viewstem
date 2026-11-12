@@ -278,6 +278,22 @@ test('P1 structural-1-3: Menubar skips disabled triggers and follows updated DOM
   assert.equal(await focused(), 'File');
 });
 
+test('P1 codebase-details-1-5: disposing an open original DatePicker leaves no queued browser exception', async t => {
+  const page = await mount(t, fixture('date-picker'));
+  await page.getByRole('button').first().click();
+  await page.getByRole('dialog').waitFor();
+  await page.evaluate(() => window.dispose());
+  await frame(page);
+  assert.equal(await page.locator('#app').count(), 1);
+  assert.equal(await page.locator('[data-viewstem-ui]').count(), 0);
+  await page.evaluate(async definition => {
+    await window.mount(definition);
+    document.querySelector('.vs-date-trigger').click();
+    window.dispose();
+  }, fixture('date-picker'));
+  await frame(page);
+});
+
 test('P2 design-critic-1-3: RadioGroup propagates disabled, required and name to form controls', async t => {
   const definition = fixture('radio-group');
   definition.states.site.initial = '';
@@ -468,4 +484,87 @@ test('P2 structural-1-7: disabling Tooltip.Provider cancels an already scheduled
   await trigger.hover();
   await tip.waitFor();
   assert.deepEqual(await payloads(page, 'tip', 'openChange'), [true]);
+});
+
+test('P2 codebase-details-1-2: multiple Calendar protects selected days for pointer and keyboard', async t => {
+  const dates = ['2026-11-09', '2026-11-12'];
+  const page = await mount(t, {
+    states: { dates: state(dates) },
+    render: node('calendar', 'Calendar.Root', {
+      type: 'multiple', value: from('dates'), preventDeselect: true, placeholder: '2026-11-09',
+    }, [], setState('dates', true, 'valueChange')),
+  });
+  const ninth = page.locator('[data-date="2026-11-09"]').first();
+  await ninth.click();
+  await ninth.press('Enter');
+  await ninth.press('Space');
+  await frame(page);
+  assert.deepEqual(await read(page, 'dates'), dates);
+  assert.deepEqual(await payloads(page, 'calendar', 'valueChange'), []);
+  await page.locator('[data-date="2026-11-15"]').first().click();
+  await waitState(page, 'dates', [...dates, '2026-11-15']);
+  assert.deepEqual(await payloads(page, 'calendar', 'valueChange'), [[...dates, '2026-11-15']]);
+});
+
+test('P2 codebase-details-1-3: DatePicker uses the same bounded date for its trigger and grid', async t => {
+  const definition = fixture('date-picker');
+  definition.states.date.initial = '2026-11-05';
+  definition.states.min = state('2026-11-09', string);
+  Object.assign(definition.render.inputs, { min: from('min'), locale: 'en-US' });
+  const page = await mount(t, definition);
+  const trigger = page.locator('.vs-date-trigger');
+  const selected = date => page.locator(`[data-date="${date}"]`).first().evaluate(day => day.closest('td').getAttribute('aria-selected'));
+  assert.equal(await trigger.textContent(), 'November 9, 2026');
+  await trigger.click();
+  await page.getByRole('dialog').waitFor();
+  assert.equal(await selected('2026-11-09'), 'true');
+  await write(page, 'date', '2026-11-20');
+  assert.equal(await trigger.textContent(), 'November 20, 2026');
+  assert.equal(await selected('2026-11-20'), 'true');
+  await write(page, 'date', '2026-11-05');
+  assert.equal(await trigger.textContent(), 'November 9, 2026');
+  assert.equal(await selected('2026-11-09'), 'true');
+  assert.equal(await read(page, 'date'), '2026-11-05');
+  await write(page, 'min', '2026-11-01');
+  assert.equal(await trigger.textContent(), 'November 5, 2026');
+  assert.equal(await selected('2026-11-05'), 'true');
+  assert.deepEqual(await payloads(page, definition.render.id, 'valueChange'), []);
+});
+
+const column = { id: 'label', accessorKey: 'label', label: 'Label' };
+
+test('P2 codebase-details-1-4: DataTable renders numeric row IDs and emits stable string selections', async t => {
+  const page = await mount(t, {
+    states: { selected: state([], { type: 'array', items: string }) },
+    render: node('table', 'DataTable', {
+      columns: [column], selectedIds: from('selected'),
+      data: [{ id: 1, label: 'alpha' }, { id: '2', label: 'beta' }, { id: 0, label: 'gamma' }],
+    }, [], setState('selected', { type: 'array', items: string }, 'selectedIdsChange')),
+  });
+  assert.deepEqual(await page.getByRole('cell').filter({ hasText: /alpha|beta|gamma/ }).allTextContents(), ['alpha', 'beta', 'gamma']);
+  await page.getByRole('checkbox', { name: 'Select row 0' }).check();
+  await waitState(page, 'selected', ['0']);
+  assert.deepEqual(await payloads(page, 'table', 'selectedIdsChange'), [['0']]);
+});
+
+test('P2 codebase-details-1-6: DataTable resizes from the displayed page and publishes a valid index', async t => {
+  const number = { type: 'number' };
+  const page = await mount(t, {
+    states: { index: state(5, number), size: state(50, number) },
+    render: node('table', 'DataTable', {
+      columns: [column], pageIndex: from('index'), pageSize: from('size'),
+      data: Array.from({ length: 22 }, (_, index) => ({ id: String(index), label: 'row' + index })),
+    }, [], { ...setState('index', number, 'pageIndexChange'), ...setState('size', number, 'pageSizeChange') }),
+  });
+  const first = () => page.getByRole('cell').filter({ hasText: /^row\d+$/ }).first().textContent();
+  assert.equal(await first(), 'row0');
+  await page.getByRole('combobox', { name: 'Rows per page' }).selectOption('10');
+  await waitState(page, 'size', 10);
+  await waitState(page, 'index', 0);
+  assert.equal(await first(), 'row0');
+  assert.deepEqual(await payloads(page, 'table', 'pageSizeChange'), [10]);
+  assert.deepEqual(await payloads(page, 'table', 'pageIndexChange'), [0]);
+  await page.getByRole('button', { name: 'Next', exact: true }).click();
+  await waitState(page, 'index', 1);
+  assert.equal(await first(), 'row10');
 });
