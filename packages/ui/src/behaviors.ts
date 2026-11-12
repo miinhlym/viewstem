@@ -396,7 +396,8 @@ export function tabs(element: Widget, send: Send, signal: AbortSignal): Behavior
   };
 }
 
-const openPopovers = new WeakMap<Document, HTMLElement[]>();
+type PopoverLayer = { element: HTMLElement; request: (open: boolean) => void };
+const openPopovers = new WeakMap<Document, PopoverLayer[]>();
 
 function centerPopup(root: HTMLElement, trigger: HTMLElement, panel: HTMLElement) {
   const anchor = trigger.getBoundingClientRect();
@@ -418,13 +419,14 @@ export function popover(element: HTMLElement, send: Send, signal: AbortSignal): 
   let open = false;
   let pendingRequest: boolean | undefined;
   let transition = 0;
+  const layer: PopoverLayer = { element, request };
 
   function position() {
     if (open && trigger && panel) centerPopup(element, trigger, panel);
   }
 
   function forgetLayer() {
-    const index = layers.indexOf(element);
+    const index = layers.indexOf(layer);
     if (index !== -1) layers.splice(index, 1);
   }
 
@@ -434,17 +436,20 @@ export function popover(element: HTMLElement, send: Send, signal: AbortSignal): 
     const content = panel;
     open = value;
     forgetLayer();
-    if (value) layers.push(element);
+    if (value) layers.push(layer);
     anchor.setAttribute('aria-expanded', String(value));
     content.setAttribute('aria-hidden', String(!value));
+    content.inert = !value || readInputs(content).inert === true;
     if (value) {
       doc.dispatchEvent(new view.CustomEvent('basecoat:popover', { detail: { source: element } }));
       position();
       content.tabIndex = -1;
       const focusable = Array.from(content.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]'))
-        .find(item => item.tabIndex >= 0 && !item.matches(':disabled,[aria-disabled="true"]') &&
+        .find(item => item.tabIndex >= 0 && !item.matches(':disabled,[aria-disabled="true"]') && !item.closest('[inert]') &&
           item.getClientRects().length > 0 && view.getComputedStyle(item).visibility === 'visible');
       (focusable ?? content).focus({ preventScroll: true });
+    } else {
+      for (const child of layers.filter(child => content.contains(child.element))) child.request(false);
     }
     const restoreFocus = () => {
       if (!value && (doc.activeElement === doc.body || content.contains(doc.activeElement))) anchor.focus({ preventScroll: true });
@@ -471,14 +476,14 @@ export function popover(element: HTMLElement, send: Send, signal: AbortSignal): 
     if (close?.closest('.popover') === element && !event.defaultPrevented) request(false);
   }, { signal });
   doc.addEventListener('click', event => {
-    if (!event.composedPath().includes(element)) request(false);
+    if (!element.closest('[inert]') && !event.composedPath().includes(element)) request(false);
   }, { signal });
   doc.addEventListener('basecoat:popover', event => {
     const source = (event as CustomEvent<{ source: HTMLElement }>).detail?.source;
-    if (source && !element.contains(source)) request(false);
+    if (source && !element.closest('[inert]') && !element.contains(source) && !source.contains(element)) request(false);
   }, { signal });
   doc.addEventListener('keydown', event => {
-    if (event.key !== 'Escape' || event.defaultPrevented || layers.at(-1) !== element) return;
+    if (event.key !== 'Escape' || event.defaultPrevented || layers.filter(item => !item.element.closest('[inert]')).at(-1) !== layer) return;
     const modal = event.composedPath().find(target => target instanceof view.HTMLDialogElement && target.matches(':modal'));
     if (modal instanceof view.HTMLDialogElement && !modal.contains(element)) return;
     event.preventDefault();
@@ -492,6 +497,7 @@ export function popover(element: HTMLElement, send: Send, signal: AbortSignal): 
     trigger?.removeAttribute('aria-controls');
     trigger?.setAttribute('aria-expanded', 'false');
     panel?.setAttribute('aria-hidden', 'true');
+    if (panel) panel.inert = true;
     trigger = panel = undefined;
     open = false;
     transition++;
@@ -506,6 +512,7 @@ export function popover(element: HTMLElement, send: Send, signal: AbortSignal): 
       const content = element.querySelector<HTMLElement>(':scope > [data-popover]') ?? undefined;
       if (anchor === trigger && content === panel) {
         if (controlledChange && typeof next.open === 'boolean') setOpen(next.open);
+        if (content) content.inert = !open || readInputs(content).inert === true;
         position();
         return;
       }
@@ -518,6 +525,7 @@ export function popover(element: HTMLElement, send: Send, signal: AbortSignal): 
       anchor.setAttribute('aria-haspopup', 'dialog');
       anchor.setAttribute('aria-expanded', 'false');
       content.setAttribute('aria-hidden', 'true');
+      content.inert = true;
       triggerEvents = new AbortController();
       anchor.addEventListener('click', event => {
         if (!event.defaultPrevented) request(!open);

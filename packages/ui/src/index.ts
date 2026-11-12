@@ -247,7 +247,7 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
       });
     };
     bindComponent(control, () => entry.node.inputs, send);
-    if (childAction) control.addEventListener('click', event => {
+    if (childAction || (childTrigger && name === 'Popover.Trigger')) control.addEventListener('click', event => {
       if (entry.node.inputs.disabled !== true) return;
       event.preventDefault();
       event.stopImmediatePropagation();
@@ -390,7 +390,7 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
     if (typeof inputs.disabled === 'boolean' && ['summary', 'details', 'div'].includes(control.localName)) {
       control.setAttribute('aria-disabled', String(inputs.disabled));
     }
-    if (control.localName === 'span' && control.dataset.vsModalAction) {
+    if (control.localName === 'span' && (control.dataset.vsModalAction || name === 'Popover.Trigger')) {
       control.inert = inputs.disabled === true || inputs.inert === true;
       if (inputs.disabled === true) control.setAttribute('aria-disabled', 'true');
       else if (inputs['aria-disabled'] === undefined) control.removeAttribute('aria-disabled');

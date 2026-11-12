@@ -403,6 +403,54 @@ test('P2 structural-1-4: Escape dismisses only the top nested Popover and restor
   assert.equal(await outer.evaluate(el => el === document.activeElement), true);
 });
 
+test('closing a controlled parent Popover removes nested content from Tab and Escape handling', async t => {
+  const page = await mount(t, {
+    states: { open: state(true, boolean) },
+    render: group(popover('Outer', { open: from('open'), inside: [popover('Inner')] }),
+      node('outside', 'Button', { text: 'Outside' })),
+  });
+  const outer = page.getByRole('button', { name: 'Outer', exact: true });
+  const outside = page.getByRole('button', { name: 'Outside', exact: true });
+  await page.getByRole('button', { name: 'Inner', exact: true }).click();
+  await page.getByRole('button', { name: 'Close Inner' }).waitFor();
+  await write(page, 'open', false);
+  await waitEvent(page, 'Outer', 'openChangeComplete', false);
+  await outer.focus();
+  await page.keyboard.press('Tab');
+  assert.equal(await page.evaluate(() => document.activeElement.textContent), 'Outside');
+  await outside.evaluate(button => document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && event.target === button) button.dataset.escapePrevented = String(event.defaultPrevented);
+  }));
+  await page.keyboard.press('Escape');
+  assert.equal(await outside.getAttribute('data-escape-prevented'), 'false');
+  assert.deepEqual(await payloads(page, 'Inner', 'openChange'), [true, false]);
+  await write(page, 'open', true);
+  assert.equal(await page.getByRole('button', { name: 'Inner', exact: true }).getAttribute('aria-expanded'), 'false');
+});
+
+test('a disabled Popover child trigger cannot open the panel or run the child Action', async t => {
+  const render = popover('Settings');
+  const trigger = render.slots.default[0];
+  trigger.inputs.disabled = from('disabled');
+  trigger.slots.child[0].on = setState('clicked', boolean, 'click', true);
+  const page = await mount(t, {
+    states: { disabled: state(true, boolean), clicked: state(false, boolean) }, render,
+  });
+  const button = page.locator('[data-vs-component="Button"]');
+  await pointerClick(page, button);
+  assert.equal(await button.getAttribute('aria-expanded'), 'false');
+  await button.evaluate(el => el.focus());
+  await page.keyboard.press('Enter');
+  assert.equal(await button.getAttribute('aria-expanded'), 'false');
+  assert.equal(await read(page, 'clicked'), false);
+  assert.deepEqual(await payloads(page, 'Settings', 'openChange'), []);
+  await write(page, 'disabled', false);
+  await button.press('Enter');
+  assert.equal(await button.getAttribute('aria-expanded'), 'true');
+  await waitState(page, 'clicked', true);
+  assert.deepEqual(await payloads(page, 'Settings', 'openChange'), [true]);
+});
+
 function tooltip(inputs = {}, providerInputs = {}) {
   return node('provider', 'Tooltip.Provider', providerInputs, [
     node('tip', 'Tooltip.Root', inputs, [
