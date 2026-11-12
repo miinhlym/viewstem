@@ -88,8 +88,9 @@ let browser;
 test.before(async () => { browser = await chromium.launch({ headless: true }); });
 test.after(async () => { await browser?.close(); });
 
-async function mount(t, definition, host = '<main id="app"></main>') {
+async function mount(t, definition, host = '<main id="app"></main>', fixedTime) {
   const page = await browser.newPage({ reducedMotion: 'reduce' });
+  if (fixedTime) await page.clock.setFixedTime(fixedTime);
   page.setDefaultTimeout(4000);
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
@@ -666,6 +667,44 @@ test('P2 codebase-details-1-3: DatePicker uses the same bounded date for its tri
   assert.equal(await trigger.textContent(), 'November 5, 2026');
   assert.equal(await selected('2026-11-05'), 'true');
   assert.deepEqual(await payloads(page, definition.render.id, 'valueChange'), []);
+});
+
+test('an open DatePicker follows changed bounds for its local selection and focus', async t => {
+  const page = await mount(t, {
+    states: { max: state('2027-12-31', string) },
+    render: node('picker', 'DatePicker', { min: '2026-01-01', max: from('max'), locale: 'en-US' }),
+  }, undefined, new Date('2026-11-12T12:00:00Z'));
+  const trigger = page.locator('.vs-date-trigger');
+  await trigger.click();
+  await page.locator('[data-date="2026-11-20"]').first().click();
+  await trigger.click();
+  const grid = page.getByRole('grid');
+  await grid.waitFor();
+  await write(page, 'max', '2026-10-31');
+  await frame(page);
+  assert.equal(await trigger.textContent(), 'October 31, 2026');
+  assert.equal(await grid.getAttribute('aria-label'), 'October 2026');
+  const selected = grid.locator('[data-date="2026-10-31"][data-selected]');
+  assert.equal(await selected.evaluate(el => el === document.activeElement), true);
+  assert.deepEqual(await payloads(page, 'picker', 'valueChange'), ['2026-11-20']);
+});
+
+test('an open DatePicker without a selection keeps focus in the updated bounds', async t => {
+  const page = await mount(t, {
+    states: { max: state('2027-12-31', string) },
+    render: node('picker', 'DatePicker', { min: '2026-01-01', max: from('max'), locale: 'en-US' }),
+  }, undefined, new Date('2026-11-12T12:00:00Z'));
+  const trigger = page.locator('.vs-date-trigger');
+  await trigger.click();
+  const grid = page.getByRole('grid');
+  await grid.waitFor();
+  await write(page, 'max', '2026-10-31');
+  await frame(page);
+  assert.equal(await grid.getAttribute('aria-label'), 'October 2026');
+  assert.equal(await grid.locator('[data-date="2026-10-31"]').evaluate(el => el === document.activeElement), true);
+  assert.equal(await grid.locator('[data-selected]').count(), 0);
+  assert.equal(await trigger.textContent(), 'Pick a date');
+  assert.deepEqual(await payloads(page, 'picker', 'valueChange'), []);
 });
 
 const column = { id: 'label', accessorKey: 'label', label: 'Label' };

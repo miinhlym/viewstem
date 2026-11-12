@@ -466,14 +466,19 @@ export function dateCalendar(element: HTMLElement, kind: Kind, send: Send, signa
         const projected = changed ? nextValues : picker ? current.map(constrain) : current;
         const externalSelection = keyOf(current) !== keyOf(projected);
         current = projected;
-        const nextFocus = placeholder !== previousPlaceholder ? date(placeholder) : externalSelection ? selectionFocus(nextValues) : undefined;
+        let nextFocus = placeholder !== previousPlaceholder ? date(placeholder) : externalSelection ? selectionFocus(projected) : undefined;
         previousExternal = signature;
         previousPlaceholder = placeholder;
         service.updateProps({});
+        const api = getApi(service);
+        if (picker && !nextFocus) {
+          const boundedFocus = constrain(api.focusedValue);
+          if (boundedFocus.compare(api.focusedValue) !== 0) nextFocus = boundedFocus;
+        }
         if ((changed || externalSelection) && mode === 'range') service.service.context.set('activeIndex', current.length === 1 ? 1 : 0);
         if (nextFocus) {
           silentFocus = publishedPlaceholder = iso(nextFocus);
-          getApi(service).setFocusedValue(nextFocus);
+          api.setFocusedValue(nextFocus);
         }
         render();
       }
