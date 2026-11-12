@@ -43,6 +43,8 @@ The DOM adapters support documented JSON input and event subsets. Portal slots a
 
 Slider uses a native range input for `type: "single"` and Zag Vanilla for `type: "multiple"`. In multiple mode, each number in `value` creates a thumb. The thumbs stay in ascending order, and `thumbLabels` can give them distinct accessible names. `valueChange` carries the current values during interaction, and `valueCommit` carries the final values when the drag ends or a keyboard adjustment takes effect. The payload is `{ value: number[] }` in multiple mode and `{ value: number }` in single mode.
 
+`Command.Dialog` emits `openChange` with `{ value: false }` when dismissed with Escape. Use the event to update a bound `open` State. An existing view without this handler can still dismiss the dialog. It reopens when the supplied `open` value changes to `true` again. `Popover.Root` and `Tooltip.Root` emit `openChange` to request a transition when `open` is supplied. They emit `openChangeComplete` after the supplied value is reflected and the transition finishes.
+
 Calendar, Range Calendar, and Date Picker use Zag Vanilla for date navigation and selection. Their JSON contracts use date-only strings and range objects. Calendar and Range Calendar render complete grids through their Root IDs.
 
 Data Table uses TanStack Table Core. The JSON recipe keeps caller-owned sorting, filtering, pagination, and selection state. A page outside the available range is clamped for display, and selected IDs outside the current data remain in the selection state.

@@ -1,6 +1,6 @@
 import type { NodeSnapshot, View } from '@viewstem/core';
 import { attributes, components, domEvents, support } from './shadcn.js';
-import { chart, combobox, command, disclosure, group, modal, notifications, popup, range, tabs, tooltip, uniqueId, type Behavior, type Send } from './behaviors.js';
+import { chart, combobox, command, commandDialog, disclosure, group, modal, notifications, popover, range, select, tabs, tooltip, uniqueId, type Behavior, type Send } from './behaviors.js';
 
 import { dateCalendar } from './date-calendar.js';
 import { multiSlider } from './slider.js';
@@ -96,8 +96,8 @@ function behavior(name: string, element: HTMLElement, send: Send, signal: AbortS
   if (modalRoots.test(name)) return modal(element, send, signal);
   if (name === 'Accordion.Root' || name === 'Collapsible.Root') return disclosure(element, name, send, signal);
   if (name === 'Tabs.Root') return tabs(element, send, signal);
-  if (name === 'Select.Root') return popup(element, 'select', send, signal);
-  if (name === 'Popover.Root') return popup(element, 'popover', send, signal);
+  if (name === 'Select.Root') return select(element, send, signal);
+  if (name === 'Popover.Root') return popover(element, send, signal);
   if (name === 'DropdownMenu.Root' || name === 'ContextMenu.Root' || name === 'Menubar.Root') {
     const family = name.slice(0, -5) as 'DropdownMenu' | 'ContextMenu' | 'Menubar';
     return menus(element, family, send, signal);
@@ -247,6 +247,11 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
       });
     };
     bindComponent(control, () => entry.node.inputs, send);
+    if (childAction) control.addEventListener('click', event => {
+      if (entry.node.inputs.disabled !== true) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }, { capture: true, signal });
     for (const [eventName, nativeName] of Object.entries(domEvents)) {
       if (!Object.hasOwn(events, eventName)) continue;
       control.addEventListener(nativeName, event => {
@@ -317,7 +322,7 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
       host.append(handle);
     }
     const enhancement = name === 'Command.Dialog'
-      ? command(host, send, signal)
+      ? commandDialog(control as HTMLDialogElement, host, send, signal)
       : behavior(name, control, send, signal);
     if (enhancement) entry.behavior = enhancement;
     return entry;
@@ -385,6 +390,11 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
     if (typeof inputs.disabled === 'boolean' && ['summary', 'details', 'div'].includes(control.localName)) {
       control.setAttribute('aria-disabled', String(inputs.disabled));
     }
+    if (control.localName === 'span' && control.dataset.vsModalAction) {
+      control.inert = inputs.disabled === true || inputs.inert === true;
+      if (inputs.disabled === true) control.setAttribute('aria-disabled', 'true');
+      else if (inputs['aria-disabled'] === undefined) control.removeAttribute('aria-disabled');
+    }
 
     const fieldValue = typeof inputs.value === 'number' ? String(inputs.value) : inputs.value;
     if (control.localName === 'input') {
@@ -438,10 +448,6 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
       }
     }
     renderList(host, children, descendants, active);
-    if (name === 'Tooltip.Provider') {
-      setAttribute(control, 'data-tooltip-delay', inputs.delayDuration);
-      setAttribute(control, 'data-tooltip-disabled', inputs.disabled);
-    }
     if (name === 'Tooltip.Root') {
       const trigger = control.querySelector<HTMLElement>('[data-vs-component="Tooltip.Trigger"]');
       const tooltip = control.querySelector<HTMLElement>('[data-vs-component="Tooltip.Content"]');
@@ -454,13 +460,6 @@ export function attach(view: View, target: HTMLElement, { onError }: AttachOptio
       const select = control as HTMLSelectElement;
       const values = Array.isArray(inputs.value) ? inputs.value : [inputs.value];
       for (const option of select.options) option.selected = values.includes(option.value);
-    }
-    if (name === 'Command.Dialog') {
-      const dialog = control as HTMLDialogElement;
-      if (inputs.open === true && !dialog.open) dialog.showModal();
-      else if (inputs.open === false && dialog.open) dialog.close();
-      setAttribute(dialog, 'aria-label', inputs.title);
-      setAttribute(dialog, 'aria-description', inputs.description);
     }
     entry.behavior?.sync(inputs);
   }

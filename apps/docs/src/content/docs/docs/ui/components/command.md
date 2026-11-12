@@ -118,6 +118,7 @@ Inputs, slots, and events come from `@viewstem/ui/support.json`. Omitted inputs 
 | Events | JSON payload |
 | --- | --- |
 | `beforeInput`, `blur`, `change`, `click`, `error`, `focus`, `focusIn`, `focusOut`, `input`, `keyDown`, `keyUp`, `load`, `mouseEnter`, `mouseLeave`, `reset`, `scroll`, `select`, `submit` | `{ type?: string, value?: string, checked?: boolean, key?: string, code?: string, button?: number, buttons?: number, altKey?: boolean, ctrlKey?: boolean, metaKey?: boolean, shiftKey?: boolean }` <span class="reference-constraints">no extra fields</span> |
+| `openChange` | `{ value: boolean }` <span class="reference-constraints">no extra fields</span> |
 
 ### `shadcn.Command.Input`
 

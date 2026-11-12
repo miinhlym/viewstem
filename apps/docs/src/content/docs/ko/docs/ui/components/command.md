@@ -118,6 +118,7 @@ sidebar:
 | 이벤트 | JSON 페이로드 |
 | --- | --- |
 | `beforeInput`, `blur`, `change`, `click`, `error`, `focus`, `focusIn`, `focusOut`, `input`, `keyDown`, `keyUp`, `load`, `mouseEnter`, `mouseLeave`, `reset`, `scroll`, `select`, `submit` | `{ type?: string, value?: string, checked?: boolean, key?: string, code?: string, button?: number, buttons?: number, altKey?: boolean, ctrlKey?: boolean, metaKey?: boolean, shiftKey?: boolean }` <span class="reference-constraints">추가 필드 금지</span> |
+| `openChange` | `{ value: boolean }` <span class="reference-constraints">추가 필드 금지</span> |
 
 ### `shadcn.Command.Input`
 

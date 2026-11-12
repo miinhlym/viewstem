@@ -8,8 +8,8 @@ export function bindComponent(element: HTMLElement, inputs: () => Inputs, send: 
   entries.set(element, { inputs, send });
 }
 
-export function readInputs(element: HTMLElement): Inputs {
-  return entries.get(element)?.inputs() ?? {};
+export function readInputs(element: HTMLElement | null): Inputs {
+  return (element && entries.get(element)?.inputs()) || {};
 }
 
 export function emitFrom(element: HTMLElement, event: string, payload: unknown): void {

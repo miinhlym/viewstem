@@ -3,7 +3,7 @@ import type { NodeSnapshot } from '@viewstem/core';
 import { registerControllers, type Controller } from './basecoat-controllers.js';
 import { emitFrom, readInputs } from './component-context.js';
 
-type Widget = HTMLElement & { _destroy?: () => void; refresh?: () => void; select?: (target: HTMLElement, focus?: boolean) => void };
+type Widget = HTMLElement & { _destroy?: () => void; refresh?: () => void; select?: (target: HTMLElement, focus?: boolean) => void; close?: (focus: boolean) => void };
 type Props = NodeSnapshot['inputs'];
 export type Send = (event: string, payload: unknown) => void;
 export type Behavior = { sync(inputs: Props): void; dispose?(): void };
@@ -69,6 +69,7 @@ export function tooltip(element: HTMLElement, send: Send, signal: AbortSignal): 
   let inputs: Props = {};
   let timer: number | undefined;
   let open = false;
+  let delayedRequest = false;
   let transition = 0;
   const view = element.ownerDocument.defaultView!;
   const position = () => {
@@ -84,26 +85,32 @@ export function tooltip(element: HTMLElement, send: Send, signal: AbortSignal): 
     content.style.top = `${above ? -box.height - 10 : root.height + 10}px`;
     content.style.setProperty('--vs-tooltip-arrow', `${root.left + root.width / 2 - left}px`);
   };
-  function setOpen(value: boolean, notify: boolean, delayed = false) {
+  const provider = () => element.closest<HTMLElement>('[data-vs-component="Tooltip.Provider"]');
+  const disabled = () => inputs.disabled === true || readInputs(provider()).disabled === true;
+  function setOpen(value: boolean, delayed = false) {
     if (open === value) return;
     open = value;
     if (value) position();
     element.toggleAttribute('data-tooltip-delayed', value && delayed);
     element.toggleAttribute('data-tooltip-open', value);
-    if (notify) send('openChange', { value });
     const content = element.querySelector('[role="tooltip"]');
     const current = ++transition;
     afterMotion(content ? [content] : [], () => {
       if (!signal.aborted && current === transition) send('openChangeComplete', { value });
     });
   }
-  const hide = () => { view.clearTimeout(timer); setOpen(false, true); };
+  function request(value: boolean, delayed = false) {
+    if (value === open || disabled()) return;
+    delayedRequest = delayed;
+    send('openChange', { value });
+    if (typeof inputs.open !== 'boolean') setOpen(value, delayed);
+  }
+  const hide = () => { view.clearTimeout(timer); request(false); };
   const show = (delayed: boolean) => {
     view.clearTimeout(timer);
-    const provider = element.closest<HTMLElement>('[data-vs-component="Tooltip.Provider"]');
-    if (inputs.disabled === true || provider?.dataset.tooltipDisabled === 'true') return;
-    const delay = typeof inputs.delayDuration === 'number' ? inputs.delayDuration : Number(provider?.dataset.tooltipDelay ?? 700);
-    timer = view.setTimeout(() => setOpen(true, true, delayed), delayed ? Math.max(0, delay) : 0);
+    if (disabled()) return;
+    const delay = typeof inputs.delayDuration === 'number' ? inputs.delayDuration : Number(readInputs(provider()).delayDuration ?? 700);
+    timer = view.setTimeout(() => request(true, delayed), delayed ? Math.max(0, delay) : 0);
   };
   element.addEventListener('pointerenter', () => show(true), { signal });
   element.addEventListener('pointerleave', hide, { signal });
@@ -114,10 +121,16 @@ export function tooltip(element: HTMLElement, send: Send, signal: AbortSignal): 
   element.ownerDocument.addEventListener('scroll', position, { signal, capture: true });
   return {
     sync(next) {
-      const controlledChange = next.open !== inputs.open;
       inputs = next;
-      if (next.disabled === true) hide();
-      else if (controlledChange && typeof next.open === 'boolean') setOpen(next.open, false);
+      if (disabled()) {
+        view.clearTimeout(timer);
+        delayedRequest = false;
+        setOpen(false);
+      } else if (typeof next.open === 'boolean' && next.open !== open) {
+        view.clearTimeout(timer);
+        setOpen(next.open, delayedRequest);
+        delayedRequest = false;
+      }
     },
     dispose() { view.clearTimeout(timer); },
   };
@@ -382,40 +395,135 @@ export function tabs(element: Widget, send: Send, signal: AbortSignal): Behavior
   };
 }
 
-function observeExpanded(trigger: HTMLElement, panel: HTMLElement, signal: AbortSignal, send: Send, onOpen: () => void) {
-  let open = trigger.getAttribute('aria-expanded') === 'true';
+const openPopovers = new WeakMap<Document, HTMLElement[]>();
+
+function centerPopup(root: HTMLElement, trigger: HTMLElement, panel: HTMLElement) {
+  const anchor = trigger.getBoundingClientRect();
+  const viewportWidth = root.ownerDocument.defaultView!.innerWidth;
+  const left = Math.max(0, Math.min(anchor.left + (anchor.width - panel.offsetWidth) / 2, viewportWidth - panel.offsetWidth));
+  panel.style.left = `${left - root.getBoundingClientRect().left}px`;
+}
+
+export function popover(element: HTMLElement, send: Send, signal: AbortSignal): Behavior {
+  const doc = element.ownerDocument;
+  const view = doc.defaultView!;
+  let stack = openPopovers.get(doc);
+  if (!stack) openPopovers.set(doc, stack = []);
+  const layers = stack;
+  let inputs: Props = {};
+  let trigger: HTMLElement | undefined;
+  let panel: HTMLElement | undefined;
+  let triggerEvents: AbortController | undefined;
+  let open = false;
+  let pendingRequest: boolean | undefined;
   let transition = 0;
-  const doc = trigger.ownerDocument;
-  function restoreFocus() {
-    if (!open && !signal.aborted && (doc.activeElement === doc.body || panel.contains(doc.activeElement))) {
-      trigger.focus({ preventScroll: true });
-    }
+
+  function position() {
+    if (open && trigger && panel) centerPopup(element, trigger, panel);
   }
-  function change(next: boolean, notify: boolean) {
-    if (next === open) return;
-    open = next;
-    if (notify) send('openChange', { value: next });
-    if (next) onOpen();
-    else {
-      restoreFocus();
-      queueMicrotask(restoreFocus);
+
+  function forgetLayer() {
+    const index = layers.indexOf(element);
+    if (index !== -1) layers.splice(index, 1);
+  }
+
+  function setOpen(value: boolean) {
+    if (value === open || !trigger || !panel) return;
+    const anchor = trigger;
+    const content = panel;
+    open = value;
+    forgetLayer();
+    if (value) layers.push(element);
+    anchor.setAttribute('aria-expanded', String(value));
+    content.setAttribute('aria-hidden', String(!value));
+    if (value) {
+      doc.dispatchEvent(new view.CustomEvent('basecoat:popover', { detail: { source: element } }));
+      position();
+      content.tabIndex = -1;
+      const focusable = Array.from(content.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]'))
+        .find(item => item.tabIndex >= 0 && !item.matches(':disabled,[aria-disabled="true"]') &&
+          item.getClientRects().length > 0 && view.getComputedStyle(item).visibility === 'visible');
+      (focusable ?? content).focus({ preventScroll: true });
     }
+    const restoreFocus = () => {
+      if (!value && (doc.activeElement === doc.body || content.contains(doc.activeElement))) anchor.focus({ preventScroll: true });
+    };
+    restoreFocus();
     const current = ++transition;
-    afterMotion([panel], () => {
+    afterMotion([content], () => {
       if (signal.aborted || current !== transition) return;
-      if (!next) restoreFocus();
-      send('openChangeComplete', { value: next });
+      restoreFocus();
+      send('openChangeComplete', { value });
     });
   }
-  const observer = new trigger.ownerDocument.defaultView!.MutationObserver(() => {
-    change(trigger.getAttribute('aria-expanded') === 'true', true);
-  });
-  observer.observe(trigger, { attributes: true, attributeFilter: ['aria-expanded'] });
-  signal.addEventListener('abort', () => observer.disconnect(), { once: true });
-  return (next: boolean) => {
-    trigger.setAttribute('aria-expanded', String(next));
-    panel.setAttribute('aria-hidden', String(!next));
-    change(next, false);
+
+  function request(value: boolean) {
+    if (!panel || value === open || pendingRequest === value) return;
+    pendingRequest = value;
+    queueMicrotask(() => { pendingRequest = undefined; });
+    send('openChange', { value });
+    if (typeof inputs.open !== 'boolean') setOpen(value);
+  }
+
+  element.addEventListener('click', event => {
+    const close = (event.target as Element).closest('[data-vs-component="Popover.Close"]');
+    if (close?.closest('.popover') === element && !event.defaultPrevented) request(false);
+  }, { signal });
+  doc.addEventListener('click', event => {
+    if (!event.composedPath().includes(element)) request(false);
+  }, { signal });
+  doc.addEventListener('basecoat:popover', event => {
+    const source = (event as CustomEvent<{ source: HTMLElement }>).detail?.source;
+    if (source && !element.contains(source)) request(false);
+  }, { signal });
+  doc.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || event.defaultPrevented || layers.at(-1) !== element) return;
+    const modal = event.composedPath().find(target => target instanceof view.HTMLDialogElement && target.matches(':modal'));
+    if (modal instanceof view.HTMLDialogElement && !modal.contains(element)) return;
+    event.preventDefault();
+    request(false);
+  }, { signal });
+  view.addEventListener('resize', position, { signal });
+  doc.addEventListener('scroll', position, { signal, capture: true });
+
+  function unbind() {
+    triggerEvents?.abort();
+    trigger?.removeAttribute('aria-controls');
+    trigger?.setAttribute('aria-expanded', 'false');
+    panel?.setAttribute('aria-hidden', 'true');
+    trigger = panel = undefined;
+    open = false;
+    transition++;
+    forgetLayer();
+  }
+
+  return {
+    sync(next) {
+      const controlledChange = next.open !== inputs.open;
+      inputs = next;
+      const anchor = element.querySelector<HTMLElement>(':scope > [data-vs-component="Popover.Trigger"].vs-ui-transparent > *, :scope > button[data-vs-component="Popover.Trigger"]') ?? undefined;
+      const content = element.querySelector<HTMLElement>(':scope > [data-popover]') ?? undefined;
+      if (anchor === trigger && content === panel) {
+        if (controlledChange && typeof next.open === 'boolean') setOpen(next.open);
+        position();
+        return;
+      }
+      unbind();
+      if (!anchor || !content) return;
+      trigger = anchor;
+      panel = content;
+      content.id ||= uniqueId();
+      anchor.setAttribute('aria-controls', content.id);
+      anchor.setAttribute('aria-haspopup', 'dialog');
+      anchor.setAttribute('aria-expanded', 'false');
+      content.setAttribute('aria-hidden', 'true');
+      triggerEvents = new AbortController();
+      anchor.addEventListener('click', event => {
+        if (!event.defaultPrevented) request(!open);
+      }, { signal: triggerEvents.signal });
+      if (next.open === true) setOpen(true);
+    },
+    dispose: unbind,
   };
 }
 
@@ -449,131 +557,92 @@ function observeSelect(trigger: HTMLElement, panel: HTMLElement, signal: AbortSi
   signal.addEventListener('abort', () => observer.disconnect(), { once: true });
 }
 
-export function popup(element: Widget, kind: 'popover' | 'select', send: Send, signal: AbortSignal): Behavior {
-  const control = manage(element, kind);
+export function select(element: Widget, send: Send, signal: AbortSignal): Behavior {
+  const control = manage(element, 'select');
   const doc = element.ownerDocument;
   const hidden = doc.createElement('input');
   hidden.type = 'hidden';
-  if (kind === 'select') element.append(hidden);
-  let trigger: HTMLElement | null = null;
+  element.append(hidden);
+  let trigger: HTMLButtonElement | null = null;
   let observedPanel: HTMLElement | null = null;
   let triggerEvents: AbortController | undefined;
-  let syncOpen: ((open: boolean) => void) | undefined;
-  let previousOpen: unknown;
   let valueSignature: string | undefined;
   let itemsSignature: string | undefined;
   let previousList: HTMLElement | undefined;
-  const positionCentered = () => {
-    const panel = element.querySelector<HTMLElement>(':scope > [data-popover]');
-    if (!trigger || !panel || trigger.getAttribute('aria-expanded') !== 'true') return;
-    const root = element.getBoundingClientRect();
-    const anchor = trigger.getBoundingClientRect();
-    const viewport = doc.defaultView!;
-    const left = Math.max(0, Math.min(anchor.left + (anchor.width - panel.offsetWidth) / 2, viewport.innerWidth - panel.offsetWidth));
-    panel.style.left = `${left - root.left}px`;
+  const view = doc.defaultView!;
+  const position = () => {
+    if (trigger && observedPanel && trigger.getAttribute('aria-expanded') === 'true') centerPopup(element, trigger, observedPanel);
   };
-  const schedulePosition = () => doc.defaultView!.requestAnimationFrame(positionCentered);
+  const schedulePosition = () => view.requestAnimationFrame(position);
   element.addEventListener('click', schedulePosition, { signal });
   element.addEventListener('keydown', schedulePosition, { signal });
-  doc.defaultView!.addEventListener('resize', positionCentered, { signal });
-  doc.addEventListener('scroll', positionCentered, { signal, capture: true });
-  if (kind === 'popover') {
-    element.addEventListener('click', event => {
-      const close = (event.target as Element).closest('[data-vs-component="Popover.Close"]');
-      if (close?.closest('.popover') === element && trigger?.getAttribute('aria-expanded') === 'true') trigger.click();
-    }, { signal });
-  }
+  view.addEventListener('resize', position, { signal });
+  doc.addEventListener('scroll', position, { signal, capture: true });
   element.addEventListener('change', event => {
-    if (kind === 'select' && event.target === element) {
+    if (event.target === element) {
       const detail = (event as CustomEvent).detail;
       if (detail) send('valueChange', { value: detail.value });
     }
   }, { signal });
   return {
     sync(inputs) {
-      const childTrigger = kind === 'popover' ? element.querySelector<HTMLElement>(':scope > [data-vs-component="Popover.Trigger"].vs-ui-transparent > *') : null;
-      const next = childTrigger ?? element.querySelector<HTMLElement>(':scope > button');
-      const popover = element.querySelector<HTMLElement>(':scope > [data-popover]');
-      const list = popover?.querySelector<HTMLElement>('[role="listbox"]') ?? null;
-      if (!next || !popover || (kind !== 'popover' && !list)) {
-        if (kind === 'select') {
-          triggerEvents?.abort();
-          trigger = observedPanel = null;
-        }
-        control.init([null]);
+      const next = element.querySelector<HTMLButtonElement>(':scope > button');
+      const panel = element.querySelector<HTMLElement>(':scope > [data-popover]');
+      const list = panel?.querySelector<HTMLElement>('[role="listbox"]');
+      hidden.name = string(inputs.name);
+      hidden.disabled = inputs.disabled === true;
+      if (!next || !panel || !list) {
+        triggerEvents?.abort();
+        trigger = observedPanel = null;
+        control.dispose();
         return;
       }
-      popover.id ||= uniqueId();
-      next.setAttribute('aria-controls', popover.id);
-      if (kind === 'popover') next.setAttribute('aria-haspopup', 'dialog');
-      if (next !== trigger || popover !== observedPanel) {
+      if (next !== trigger || panel !== observedPanel) {
         triggerEvents?.abort();
         trigger = next;
-        observedPanel = popover;
-        previousOpen = undefined;
+        observedPanel = panel;
         triggerEvents = new AbortController();
-        if (childTrigger) {
-          next.setAttribute('aria-expanded', 'false');
-          popover.setAttribute('aria-hidden', 'true');
-          const setOpen = (open: boolean) => {
-            next.setAttribute('aria-expanded', String(open));
-            popover.setAttribute('aria-hidden', String(!open));
-          };
-          next.addEventListener('click', () => setOpen(next.getAttribute('aria-expanded') !== 'true'), { signal: triggerEvents.signal });
-          doc.addEventListener('click', event => { if (!element.contains(event.target as Node)) setOpen(false); }, { signal: triggerEvents.signal });
-          doc.addEventListener('keydown', event => {
-            if (event.key === 'Escape' && next.getAttribute('aria-expanded') === 'true') { setOpen(false); next.focus(); }
-          }, { signal: triggerEvents.signal });
-        }
-        if (kind === 'select') observeSelect(next, popover, triggerEvents.signal, send);
-        else syncOpen = observeExpanded(next, popover, triggerEvents.signal, send, () => {
-          popover.tabIndex = -1;
-          const focusable = Array.from(popover.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]'))
-            .find(item => item.tabIndex >= 0 && !item.matches(':disabled,[aria-disabled="true"]') && item.getClientRects().length > 0 && getComputedStyle(item).visibility === 'visible');
-          (focusable ?? popover).focus({ preventScroll: true });
-        });
+        observeSelect(next, panel, triggerEvents.signal, send);
       }
-      if (kind === 'select' && list) {
-        const selectedLabel = next.querySelector<HTMLElement>('[data-vs-component="Select.Value"]');
-        const placeholder = selectedLabel && readInputs(selectedLabel).placeholder;
-        if (typeof placeholder === 'string') element.dataset.placeholder = placeholder;
-        else delete element.dataset.placeholder;
-        list.id ||= uniqueId();
-        next.setAttribute('aria-controls', list.id);
-        list.setAttribute('aria-multiselectable', String(inputs.type === 'multiple'));
-        const explicit = new Set(Array.from(list.querySelectorAll<HTMLElement>('[role="option"]:not([data-vs-generated])'), item => item.dataset.value));
-        const items = JSON.stringify([inputs.items, [...explicit]]);
-        if (itemsSignature !== items || previousList !== list) {
-          list.querySelectorAll('[data-vs-generated]').forEach(item => item.remove());
-          for (const item of (inputs.items ?? []) as { value: string; label: string; disabled?: boolean }[]) {
-            if (explicit.has(item.value)) continue;
-            explicit.add(item.value);
-            const option = doc.createElement('div');
-            option.setAttribute('role', 'option');
-            option.setAttribute('aria-disabled', String(item.disabled === true));
-            option.dataset.value = item.value;
-            option.dataset.label = item.label;
-            option.dataset.vsGenerated = '';
-            option.textContent = item.label;
-            list.append(option);
-          }
+      next.disabled = inputs.disabled === true || readInputs(next).disabled === true;
+      if (next.disabled) element.close?.(false);
+      panel.inert = next.disabled || readInputs(panel).inert === true;
+      const selectedLabel = next.querySelector<HTMLElement>('[data-vs-component="Select.Value"]');
+      const placeholder = selectedLabel && readInputs(selectedLabel).placeholder;
+      if (typeof placeholder === 'string') element.dataset.placeholder = placeholder;
+      else delete element.dataset.placeholder;
+      list.id ||= uniqueId();
+      next.setAttribute('aria-controls', list.id);
+      list.setAttribute('aria-multiselectable', String(inputs.type === 'multiple'));
+      const explicit = new Set(Array.from(list.querySelectorAll<HTMLElement>('[role="option"]:not([data-vs-generated])'), item => item.dataset.value));
+      const items = JSON.stringify([inputs.items, [...explicit]]);
+      if (itemsSignature !== items || previousList !== list) {
+        list.querySelectorAll('[data-vs-generated]').forEach(item => item.remove());
+        for (const item of (inputs.items ?? []) as { value: string; label: string; disabled?: boolean }[]) {
+          if (explicit.has(item.value)) continue;
+          explicit.add(item.value);
+          const option = doc.createElement('div');
+          option.setAttribute('role', 'option');
+          option.setAttribute('aria-disabled', String(item.disabled === true));
+          option.dataset.value = item.value;
+          option.dataset.label = item.label;
+          option.dataset.vsGenerated = '';
+          option.textContent = item.label;
+          list.append(option);
         }
-        itemsSignature = items;
-        previousList = list;
-        for (const option of list.querySelectorAll<HTMLElement>('[role="option"]')) option.id ||= uniqueId();
-        const value = inputs.value;
-        const encoded = Array.isArray(value) ? JSON.stringify(value) : string(value);
-        if (value !== undefined && encoded !== valueSignature) {
-          hidden.value = encoded;
-          for (const option of list.querySelectorAll('[role="option"]')) option.removeAttribute('aria-selected');
-        }
-        valueSignature = value !== undefined ? encoded : undefined;
       }
-      if (childTrigger) control.dispose();
-      if (childTrigger || control.init(kind === 'popover' ? [next, popover] : [next, popover, list])) {
+      itemsSignature = items;
+      previousList = list;
+      for (const option of list.querySelectorAll<HTMLElement>('[role="option"]')) option.id ||= uniqueId();
+      const value = inputs.value;
+      const encoded = Array.isArray(value) ? JSON.stringify(value) : string(value);
+      if (value !== undefined && encoded !== valueSignature) {
+        hidden.value = encoded;
+        for (const option of list.querySelectorAll('[role="option"]')) option.removeAttribute('aria-selected');
+      }
+      valueSignature = value !== undefined ? encoded : undefined;
+      if (control.init([next, panel, list])) {
         element.refresh?.();
-        if (inputs.open !== previousOpen && typeof inputs.open === 'boolean') syncOpen?.(inputs.open);
-        previousOpen = inputs.open;
         schedulePosition();
       }
     },
@@ -718,6 +787,34 @@ export function command(element: Widget, send: Send, signal: AbortSignal): Behav
       publish();
     },
     dispose() { observer.disconnect(); control.dispose(); },
+  };
+}
+
+export function commandDialog(dialog: HTMLDialogElement, host: HTMLElement, send: Send, signal: AbortSignal): Behavior {
+  const commands = command(host, send, signal);
+  let requestedOpen: unknown;
+  dialog.addEventListener('cancel', event => {
+    event.preventDefault();
+    dialog.close();
+    send('openChange', { value: false });
+  }, { signal });
+  return {
+    sync(inputs) {
+      if (requestedOpen !== inputs.open) {
+        requestedOpen = inputs.open;
+        if (inputs.open === true && !dialog.open) dialog.showModal();
+        else if (inputs.open === false && dialog.open) dialog.close();
+      }
+      if (typeof inputs.title === 'string') dialog.setAttribute('aria-label', inputs.title);
+      else if (inputs['aria-label'] === undefined) dialog.removeAttribute('aria-label');
+      if (typeof inputs.description === 'string') dialog.setAttribute('aria-description', inputs.description);
+      else dialog.removeAttribute('aria-description');
+      commands.sync(inputs);
+    },
+    dispose() {
+      if (dialog.open) dialog.close();
+      commands.dispose?.();
+    },
   };
 }
 

@@ -92,6 +92,11 @@ export function menus(root: HTMLElement, family: Family, send: Send, signal: Abo
   let queued = false;
   let disposed = false;
 
+  function enabledTopMenus() {
+    return Array.from(root.querySelectorAll<HTMLElement>(container), host => drivers.get(host))
+      .filter((driver): driver is Driver => !!driver && !driver.parent && readInputs(driver.trigger).disabled !== true && !driver.trigger.matches(':disabled'));
+  }
+
   function getValue(item: HTMLElement) {
     const explicit = readInputs(item).value;
     if (typeof explicit === 'string') return explicit;
@@ -222,6 +227,8 @@ export function menus(root: HTMLElement, family: Family, send: Send, signal: Abo
   }
 
   function paint() {
+    const top = menubar ? enabledTopMenus() : [];
+    const tabStop = rovingTop && top.includes(rovingTop) ? rovingTop : activeTop && top.includes(activeTop) ? activeTop : top[0];
     for (const driver of drivers.values()) {
       const api = apiOf(driver);
       const bound = new Set<HTMLElement>();
@@ -250,7 +257,7 @@ export function menus(root: HTMLElement, family: Family, send: Send, signal: Abo
         } : {}),
         ...(menubar && !driver.parent ? {
           role: 'menuitem',
-          tabIndex: (rovingTop ?? activeTop ?? Array.from(drivers.values()).find(item => !item.parent)) === driver ? 0 : -1,
+          tabIndex: tabStop === driver ? 0 : -1,
         } : {}),
       });
 
@@ -338,7 +345,7 @@ export function menus(root: HTMLElement, family: Family, send: Send, signal: Abo
 
   root.addEventListener('keydown', event => {
     if (!menubar) return;
-    const top = Array.from(drivers.values()).filter(driver => !driver.parent);
+    const top = enabledTopMenus();
     const origin = top.find(driver => driver.trigger.contains(event.target as Node) || driver.panel.contains(event.target as Node));
     if (!origin || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
     // Within a submenu, Zag owns horizontal navigation.

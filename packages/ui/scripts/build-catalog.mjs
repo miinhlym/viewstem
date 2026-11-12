@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path';
 
 const require = createRequire(import.meta.url);
 const basecoat = dirname(require.resolve('basecoat-css/package.json'));
-const names = ['accordion', 'combobox', 'command', 'drawer', 'popover', 'range', 'select', 'sidebar', 'tabs'];
+const names = ['accordion', 'combobox', 'command', 'drawer', 'range', 'select', 'sidebar', 'tabs'];
 const scripts = await Promise.all(names.map(async name => {
   const source = await readFile(join(basecoat, 'dist/js', name + '.js'), 'utf8');
   if (name === 'combobox') {
@@ -114,6 +114,9 @@ for (const [name] of components) {
       type: 'object', properties: { value: callback.schema }, required: ['value'], additionalProperties: false,
     } },
   ]));
+  if (name === 'Command.Dialog') events.openChange = {
+    schema: { type: 'object', properties: { value: { type: 'boolean' } }, required: ['value'], additionalProperties: false },
+  };
   const slots = Object.fromEntries(entry.slots.filter(key => slotNames(name).has(key)).map(key => [key, {}]));
   support.push({ id, family: entry.family, ports, slots, events });
 }
