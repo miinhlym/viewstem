@@ -2,6 +2,7 @@ import { scaleBand, scaleLinear, scalePoint } from 'd3-scale';
 import type { NodeSnapshot } from '@viewstem/core';
 import { registerControllers, type Controller } from './basecoat-controllers.js';
 import { emitFrom, readInputs } from './component-context.js';
+import { sliderKeyValue, sliderScale, snapSliderValue } from './slider-values.js';
 
 type Widget = HTMLElement & { _destroy?: () => void; refresh?: () => void; select?: (target: HTMLElement, focus?: boolean) => void; close?: (focus: boolean) => void };
 type Props = NodeSnapshot['inputs'];
@@ -821,20 +822,46 @@ export function commandDialog(dialog: HTMLDialogElement, host: HTMLElement, send
 export function range(element: HTMLInputElement, send: Send, signal: AbortSignal): Behavior {
   const control = manage(element, 'range');
   const read = () => ({ value: element.valueAsNumber });
-  element.addEventListener('input', () => send('valueChange', read()), { signal });
-  element.addEventListener('change', () => send('valueCommit', read()), { signal });
+  let steps: readonly number[] = [];
+  let current: number;
+  let changed = false;
+  element.addEventListener('keydown', event => {
+    if (!steps.length || event.defaultPrevented || element.disabled) return;
+    const next = sliderKeyValue(event, current, steps, element.matches(':dir(rtl)'));
+    if (next === undefined) return;
+    event.preventDefault();
+    if (next === current) return;
+    element.valueAsNumber = next;
+    const Event = element.ownerDocument.defaultView!.Event;
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+    element.dispatchEvent(new Event('change', { bubbles: true }));
+  }, { signal });
+  element.addEventListener('input', () => {
+    if (steps.length) {
+      element.valueAsNumber = snapSliderValue(element.valueAsNumber, steps);
+      if (element.valueAsNumber === current) return;
+      current = element.valueAsNumber;
+      changed = true;
+    }
+    send('valueChange', read());
+  }, { capture: true, signal });
+  element.addEventListener('change', () => {
+    if (!steps.length || changed) send('valueCommit', read());
+    changed = false;
+  }, { signal });
   return {
     sync(inputs) {
       const value = Array.isArray(inputs.value) ? inputs.value[0] : inputs.value;
-      for (const key of ['min', 'max', 'step'] as const) {
-        if (typeof inputs[key] === 'number') element[key] = String(inputs[key]);
-        else element.removeAttribute(key);
-      }
-      if (typeof value === 'number') element.valueAsNumber = value;
+      const { min, max, step, steps: nextSteps } = sliderScale(inputs);
+      steps = nextSteps;
+      element.min = String(min);
+      element.max = String(max);
+      element.step = steps.length ? 'any' : String(step);
+      if (steps.length) element.valueAsNumber = snapSliderValue(typeof value === 'number' ? value : element.valueAsNumber, steps);
+      else if (typeof value === 'number') element.valueAsNumber = value;
+      current = element.valueAsNumber;
       control.init([element]);
-      const min = Number(element.min || 0);
-      const max = Number(element.max || 100);
-      element.style.setProperty('--slider-value', `${(element.valueAsNumber - min) / (max - min || 1) * 100}%`);
+      element.style.setProperty('--slider-value', `${(current - min) / (max - min || 1) * 100}%`);
     },
     dispose: control.dispose,
   };

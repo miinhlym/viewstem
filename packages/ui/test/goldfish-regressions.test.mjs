@@ -486,6 +486,46 @@ test('P2 structural-1-7: disabling Tooltip.Provider cancels an already scheduled
   assert.deepEqual(await payloads(page, 'tip', 'openChange'), [true]);
 });
 
+test('P2 codebase-details-1-1: discrete Slider stops work by mouse and keyboard and [] removes all thumbs', async t => {
+  const steps = [5, 10, 35, 80, 100];
+  const page = await mount(t, {
+    states: { multi: state([10, 80]) },
+    render: group(
+      node('single', 'Slider', { type: 'single', value: 10, step: steps, 'aria-label': 'Single' }),
+      node('multi', 'Slider', { type: 'multiple', value: from('multi'), step: steps, thumbLabels: ['Minimum', 'Maximum'] }),
+    ),
+  });
+  const single = page.getByRole('slider', { name: 'Single' });
+  const minimum = page.getByRole('slider', { name: 'Minimum' });
+  const maximum = page.getByRole('slider', { name: 'Maximum' });
+  await single.press('ArrowRight');
+  assert.deepEqual(await payloads(page, 'single', 'valueChange'), [35]);
+  assert.deepEqual(await payloads(page, 'single', 'valueCommit'), [35]);
+  const native = await single.boundingBox();
+  await page.mouse.click(native.x + native.width * .94, native.y + native.height / 2);
+  assert.equal(await single.inputValue(), '100');
+  assert.deepEqual(await payloads(page, 'single', 'valueCommit'), [35, 100]);
+  await minimum.press('ArrowRight');
+  assert.equal(await minimum.getAttribute('aria-valuenow'), '35');
+  assert.deepEqual(await payloads(page, 'multi', 'valueCommit'), [[35, 80]]);
+  const high = await maximum.boundingBox();
+  const track = await page.locator('[data-vs-component="Slider"] [data-part="track"]').boundingBox();
+  await page.mouse.move(high.x + high.width / 2, high.y + high.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(track.x + track.width * .97, high.y + high.height / 2, { steps: 4 });
+  await page.mouse.up();
+  await page.waitForFunction(() => window.events.some(event => event[0] === 'multi' && event[1] === 'valueCommit' && event[2][1] === 100));
+  assert.equal(await maximum.getAttribute('aria-valuenow'), '100');
+  assert.deepEqual(await payloads(page, 'multi', 'valueChange'), [[35, 80], [35, 100]]);
+  assert.deepEqual(await payloads(page, 'multi', 'valueCommit'), [[35, 80], [35, 100]]);
+  await write(page, 'multi', []);
+  assert.equal(await minimum.count(), 0);
+  assert.equal(await maximum.count(), 0);
+  await write(page, 'multi', [5, 80]);
+  assert.equal(await minimum.getAttribute('aria-valuenow'), '5');
+  assert.equal(await maximum.getAttribute('aria-valuenow'), '80');
+});
+
 test('P2 codebase-details-1-2: multiple Calendar protects selected days for pointer and keyboard', async t => {
   const dates = ['2026-11-09', '2026-11-12'];
   const page = await mount(t, {

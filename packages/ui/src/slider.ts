@@ -1,10 +1,7 @@
 import { connect, machine } from '@zag-js/slider';
 import { normalizeProps, spreadProps, VanillaMachine } from '@zag-js/vanilla';
 import { uniqueId, type Behavior, type Send } from './behaviors.js';
-
-function finite(value: unknown, fallback: number) {
-  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
-}
+import { sliderKeyValue, sliderScale, snapSliderValue } from './slider-values.js';
 
 export function multiSlider(element: HTMLElement, send: Send, signal: AbortSignal): Behavior {
   const doc = element.ownerDocument;
@@ -24,23 +21,31 @@ export function multiSlider(element: HTMLElement, send: Send, signal: AbortSigna
   let external: string | undefined;
   let labels: string[] = [];
   let description: string | undefined;
+  let steps: readonly number[] = [];
+  let rtl = false;
+  let disabled = false;
   let changed = false;
 
   const service = new VanillaMachine(machine, {
     id,
-    getRootNode: () => element.getRootNode() as Document | ShadowRoot,
+    getRootNode: () => {
+      const scope = element.getRootNode();
+      return scope instanceof doc.defaultView!.ShadowRoot ? scope : doc;
+    },
     thumbAlignment: 'center',
     onValueChange({ value }) {
       if (signal.aborted) return;
-      values = [...value];
+      const next = value.map(item => snapSliderValue(item, steps));
+      if (next.length === values.length && next.every((item, index) => item === values[index])) return;
+      values = next;
       changed = true;
       service.updateProps({ value: values });
       send('valueChange', { value: [...values] });
     },
-    onValueChangeEnd({ value }) {
+    onValueChangeEnd() {
       if (signal.aborted || !changed) return;
       changed = false;
-      send('valueCommit', { value: [...value] });
+      send('valueCommit', { value: [...values] });
     },
   });
 
@@ -53,6 +58,7 @@ export function multiSlider(element: HTMLElement, send: Send, signal: AbortSigna
     apply(control, api.getControlProps());
     apply(track, api.getTrackProps());
     apply(range, api.getRangeProps());
+    range.hidden = api.value.length === 0;
     while (thumbs.length > api.value.length) {
       const thumb = thumbs.pop()!;
       cleanups.get(thumb)?.();
@@ -66,30 +72,47 @@ export function multiSlider(element: HTMLElement, send: Send, signal: AbortSigna
         thumbs.push(thumb);
         control.append(thumb);
       }
+      const props = api.getThumbProps({ index });
       apply(thumb, {
-        ...api.getThumbProps({ index }),
+        ...props,
         'aria-label': labels[index],
         'aria-labelledby': undefined,
         'aria-describedby': description,
+        ...(steps.length && {
+          'aria-valuenow': values[index],
+          'aria-valuemin': values[index - 1] ?? steps[0],
+          'aria-valuemax': values[index + 1] ?? steps.at(-1),
+          onkeydown(event: KeyboardEvent) {
+            if (event.defaultPrevented || disabled) return;
+            const allowed = steps.filter(step => step >= (values[index - 1] ?? -Infinity) && step <= (values[index + 1] ?? Infinity));
+            const next = sliderKeyValue(event, values[index]!, allowed, rtl);
+            if (next === undefined) return;
+            event.preventDefault();
+            if (next === values[index]) return;
+            values = values.map((value, at) => index === at ? next : value);
+            service.updateProps({ value: values });
+            send('valueChange', { value: [...values] });
+            send('valueCommit', { value: [...values] });
+          },
+        }),
       });
     });
   }
   let unsubscribe: (() => void) | undefined;
   return {
     sync(inputs) {
-      const min = finite(inputs.min, 0);
-      const configuredMax = finite(inputs.max, 100);
+      const { min, max: configuredMax, step, steps: nextSteps } = sliderScale(inputs);
+      steps = nextSteps;
       const locked = configuredMax <= min;
       const max = locked ? min + 1 : configuredMax;
-      const step = finite(inputs.step, 1);
       const signature = JSON.stringify(inputs.value);
-      if (!values.length || signature !== external) {
+      if (!unsubscribe || signature !== external) {
         const initial = Array.isArray(inputs.value) ? inputs.value : [inputs.value];
         values = initial.filter((item): item is number => typeof item === 'number' && Number.isFinite(item));
-        if (!values.length) values = [min, locked ? min : max];
+        if (inputs.value === undefined) values = [min, locked ? min : max];
         external = signature;
       }
-      values = values.map(value => Math.min(locked ? min : max, Math.max(min, value))).sort((a, b) => a - b);
+      values = values.map(value => snapSliderValue(Math.min(locked ? min : max, Math.max(min, value)), steps)).sort((a, b) => a - b);
       const label = typeof inputs['aria-label'] === 'string' ? inputs['aria-label'] : '';
       const thumbLabels = Array.isArray(inputs.thumbLabels) ? inputs.thumbLabels : [];
       labels = values.map((_, index) => {
@@ -97,8 +120,11 @@ export function multiSlider(element: HTMLElement, send: Send, signal: AbortSigna
         return typeof name === 'string' && name.trim() ? name : label ? `${label} ${index + 1}` : String(index + 1);
       });
       description = typeof inputs['aria-describedby'] === 'string' ? inputs['aria-describedby'] : undefined;
-      const dir = inputs.dir === 'rtl' || (inputs.dir !== 'ltr' && element.matches(':dir(rtl)')) ? 'rtl' : 'ltr';
-      service.updateProps({ min, max, step: step > 0 ? step : 1, value: values, disabled: locked || inputs.disabled === true, dir });
+      rtl = inputs.dir === 'rtl' || (inputs.dir !== 'ltr' && element.matches(':dir(rtl)'));
+      disabled = locked || inputs.disabled === true || !values.length;
+      // Zag handles the drag on a fine linear scale. Only the published values snap to the discrete stops.
+      const machineStep = steps.length ? (max - min) / 1e9 : step;
+      service.updateProps({ min, max, step: machineStep, value: values, disabled, dir: rtl ? 'rtl' : 'ltr' });
       if (!unsubscribe) {
         render();
         unsubscribe = service.subscribe(render);

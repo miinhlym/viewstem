@@ -33,6 +33,8 @@ runtime.dispose();
 
 Slider의 `type: "multiple"`은 `value`의 숫자마다 손잡이를 만들고, `thumbLabels`로 각 손잡이의 접근성 이름을 지정할 수 있습니다. `valueChange`는 조작 중 값, `valueCommit`은 드래그를 마치거나 키보드로 값을 조절한 뒤의 확정 값을 전달합니다. 이벤트의 `value`는 다중 모드에서 숫자 배열이고 단일 모드에서 숫자입니다.
 
+Slider의 숫자 `step`은 일정한 간격을 지정합니다. 비어 있지 않은 배열은 마우스와 키보드로 선택할 수 있는 값 목록입니다. `min`이나 `max`를 생략하면 각각 목록의 최솟값과 최댓값을 사용합니다. 다중 모드의 `value: []`는 손잡이를 모두 제거합니다.
+
 `Command.Dialog`는 Escape로 닫으면 `openChange`에 `{ value: false }`를 전달합니다. `open`을 State에 연결했다면 이 이벤트에서 State를 갱신할 수 있습니다. 핸들러가 없는 기존 View도 Escape로 닫히며 이후 `open` 값이 `true`로 바뀌면 다시 열립니다. `Popover.Root`와 `Tooltip.Root`에 `open`을 제공하면 사용자 조작은 `openChange`로 전환을 요청합니다. 입력값이 실제 화면에 반영되고 전환이 끝나면 `openChangeComplete`가 발생합니다.
 
 Date Picker는 `min`과 `max` 범위에 맞춰 트리거와 그리드에 같은 날짜를 표시합니다. State 값은 호출자가 관리합니다. Data Table은 문자열과 숫자 행 ID를 지원하며, 문자열로 변환한 ID가 고유해야 합니다. `selectedIds`와 `selectedIdsChange`는 문자열 ID를 사용합니다. 페이지 크기를 바꾸면 현재 화면의 첫 행을 기준으로 새 페이지를 계산합니다.
