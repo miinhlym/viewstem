@@ -31,6 +31,28 @@ test('L07/M05 actual View replacement removes old owned keys and uses new initia
   const url = new URL(f.read()); assert.equal(url.searchParams.has('owned'), false); assert.equal(url.searchParams.get('external'), '/'); assert.equal(url.pathname, '/path'); assert.equal(url.hash, '#hash'); assert.equal(f.commits.length, 1); assert.equal(f.commits[0].mode, 'replace');
   view.getState('value').write(4); await tick(); assert.equal(JSON.parse(new URL(f.read()).searchParams.get('owned')), 4); f.runtime.dispose();
 });
+
+test('L07 replacement adding URL sync publishes State written during the commit notification', async t => {
+  const store = createStateStore();
+  const f = fixture(memoryUrl('https://example.test/path?owned=8&external=%2f#hash'), store);
+  const { view, initialComplete } = await f.runtime.createView({ view: f.spec(1) });
+  await initialComplete;
+  const stop = store.subscribe(null, ({ changes }) => {
+    if (changes.some(change => change.kind === 'added' && change.target.name === 'value')) {
+      view.getState('value').write(9);
+    }
+  });
+  t.after(() => { stop(); f.runtime.dispose(); store.dispose(); });
+
+  const url = { ...f.url, bindings: [{ state: 'value', key: 'owned', history: 'push' }] };
+  const replacement = await view.replace({ view: f.spec(3), url });
+  await replacement.initialComplete;
+
+  assert.equal(view.getState('value').read(), 9);
+  assert.equal(f.read(), 'https://example.test/path?external=%2f&owned=9#hash');
+  assert.deepEqual(f.attempts.map(({ patch, options }) => [patch, options.mode]), [[{ owned: '9' }, 'push']]);
+});
+
 test('L07 URL connection sees an initial State settled during old URL cleanup', async t => {
   const store = createStateStore(), seed = store.createScope().registerState('seed', { schema: integer });
   const f = fixture(memoryUrl(link({ owned: 8 }), { delayed: true }), store);

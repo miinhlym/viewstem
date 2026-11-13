@@ -697,9 +697,11 @@ export class View {
     const writes = new Map();
     let stop = () => {};
     try {
-      if (previous) {
-        stop = store.subscribe(reservation.next?.prepared.map(binding => binding.target.address) ?? [], () => {
-          for (const binding of reservation.next?.prepared ?? []) {
+      const next = reservation.next;
+      if (!restore && next) {
+        // The first subscription callback also sees writes queued during commit publication.
+        stop = store.subscribe(next.prepared.map(binding => binding.target.address), () => {
+          for (const binding of next.prepared) {
             if (!store.hasWritten(binding.target)) continue;
             const snapshot = binding.target.getSnapshot();
             const value = snapshot.status === 'ready' ? snapshot.value : undefined;
@@ -708,6 +710,8 @@ export class View {
               count: Array.isArray(data) ? data.length : 0, history: binding.history });
           }
         });
+      }
+      if (previous) {
         const outcome = await previous.cleanupOwned(reservation, this.host.urlCleanupTimeoutMs, this.host.clock);
         if (outcome && this.alive) this.reportUrl(outcome, 'replace-cleanup');
       }
