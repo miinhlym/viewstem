@@ -8,11 +8,11 @@
   import { contracts, viewDefinition } from './definition.js';
 
   const renderer = createRenderer({ onError: ({ error }) => { issue = error.message; } });
-  for (const contract of contracts) renderer.registry.registerComponentContract(contract);
-  renderer.registerComponent('Stack', Stack);
-  renderer.registerComponent('Label', Label);
-  renderer.registerComponent('Input', Input);
-  renderer.registerComponent('Button', Button);
+  for (const contract of contracts) renderer.runtime.registry.registerComponentContract(contract);
+  renderer.bindComponent('Stack', Stack);
+  renderer.bindComponent('Label', Label);
+  renderer.bindComponent('Input', Input);
+  renderer.bindComponent('Button', Button);
 
   let view = $state.raw<View | null>(null);
   let issue = $state('');
@@ -21,9 +21,9 @@
   onMount(() => {
     void (async () => {
       try {
-        const mounted = await renderer.runtime.createView({ view: viewDefinition });
-        if (!destroyed) view = mounted.view;
-        await mounted.initialComplete;
+        const created = await renderer.runtime.createView(viewDefinition);
+        if (!destroyed) view = created;
+        await created.whenSettled(created.initial);
       } catch (error) {
         if (!destroyed) issue = error && typeof error === 'object' && 'message' in error ? String(error.message) : String(error);
       }

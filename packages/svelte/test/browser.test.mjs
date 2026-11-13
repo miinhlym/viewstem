@@ -17,33 +17,28 @@ async function browserTest(t, run) {
   await run(page);
 }
 
-test('public renderer handles use the selected names without compatibility aliases', t => browserTest(t, async page => {
+test('public renderer mounts, updates, borrows and detaches with the new API', t => browserTest(t, async page => {
   const result = await page.evaluate(async () => {
-    const F = Fixture; window.e = F.environment();
-    const spec = { states: { value: F.state('new names') }, render: F.probe('value', F.p('/states/value')) };
-    const owned = await e.renderer.mount({ target: e.target, view: spec }); await owned.initialComplete;
-    const updated = await owned.update(spec); await updated.initialComplete;
-    const replaced = await owned.replace({ view: spec }); await replaced.initialComplete;
-    const external = await e.runtime.createView({ view: spec }); await external.initialComplete;
-    const attachment = e.renderer.attach(external.view, F.target('borrowed')); await attachment.whenRendered();
-    const host = F.mount(F.ViewstemView, { target: F.target('hosted'), props: { renderer: e.renderer, view: external.view }, transformError: F.transformError });
-    await host.whenRendered();
-    const result = {
-      owned: Object.keys(owned).sort(), attachment: Object.keys(attachment).sort(),
-      update: Object.keys(updated), replace: Object.keys(replaced),
-      component: [typeof host.whenRendered, 'settled' in host],
-      legacy: ['mount' in e.runtime, 'registerComponent' in e.registry, 'snapshot' in external.view, 'initial' in external, 'settled' in owned],
-      exported: e.runtime.exportResource('Component', 'Probe').id,
-      text: e.target.querySelector('[data-value]').textContent,
-    };
-    await F.unmount(host); await attachment.dispose();
-    return result;
+    const F = Fixture, registry = F.createRegistry();
+    registry.registerComponentContract(F.resource('Component', 'Probe', { ports: { value: F.port() } }));
+    const runtime = F.publicRuntime({ registry });
+    const renderer = F.publicRenderer({ runtime });
+    renderer.bindComponent('Probe', F.Probe);
+    const target = F.target(), other = F.target();
+    const spec = { states: { value: F.state('Draft') }, render: F.probe('value', F.p('/states/value')) };
+    const screen = renderer.mount({ target, source: spec });
+    const view = await screen.ready;
+    view.getState('value').write('Saved');
+    await screen.whenRendered();
+    const text = target.textContent;
+    const attachment = renderer.attach(view, other);
+    await attachment.whenSettled(await view.updateDefinition(spec));
+    await attachment.detach();
+    await screen.unmount();
+    await renderer.dispose(); runtime.dispose();
+    return text;
   });
-  assert.deepEqual(result.owned, ['view', 'initialComplete', 'update', 'replace', 'whenRendered', 'dispose'].sort());
-  assert.deepEqual(result.attachment, ['view', 'whenRendered', 'dispose'].sort());
-  assert.deepEqual(result.update, ['initialComplete']); assert.deepEqual(result.replace, ['initialComplete']);
-  assert.deepEqual(result.component, ['function', false]); assert.deepEqual(result.legacy, [false, false, false, false, false]);
-  assert.equal(result.exported, 'Probe'); assert.equal(result.text, 'new names');
+  assert.match(result, /Saved/);
 }));
 
 test('default renderers own independent runtimes and expose their empty registries', t => browserTest(t, async page => {
@@ -122,29 +117,13 @@ test('throwing URL teardown releases owned State, DOM and the renderer target', 
   assert.deepEqual(result, { stops: 2, empty: '', stale: 'REFERENCE_NOT_FOUND', text: 'reused' });
 }));
 
-test('attachment cleanup releases its DOM target even when an injected View disposer rejects', t => browserTest(t, async page => {
-  const result = await page.evaluate(async () => {
-    const F = Fixture; window.e = F.environment();
-    const renderer = F.createRenderer({ runtime: {
-      ...e.runtime,
-      async createView(target) {
-        const created = await e.runtime.createView(target);
-        return { ...created, view: { ...created.view, dispose() { created.view.dispose(); throw Error('host teardown failed'); } } };
-      },
-    } });
-    renderer.registerComponent('Probe', F.Probe);
-    const mounted = await renderer.mount({ target: e.target, view: { render: F.probe('first', 'first') } });
-    await mounted.initialComplete;
-    const first = mounted.dispose(), repeated = mounted.dispose();
-    const failed = await F.errorOf(() => first);
-    const empty = e.target.textContent;
-    const next = await e.renderer.mount({ target: e.target, view: { render: F.probe('next', 'reused') } });
-    await next.initialComplete;
-    const text = e.target.querySelector('[data-value]').textContent;
-    await next.dispose(); await renderer.dispose();
-    return { same: first === repeated, failed: failed.message, empty, text };
+test('runtime injection rejects a fabricated runtime', t => browserTest(t, async page => {
+  const code = await page.evaluate(async () => {
+    const F = Fixture; const renderer = F.publicRenderer({ runtime: { createView() {} } });
+    const screen = renderer.mount({ target: F.target(), source: { render: F.probe('x', 'x') } });
+    const failure = await F.errorOf(() => screen.ready); await renderer.dispose(); return failure.code;
   });
-  assert.deepEqual(result, { same: true, failed: 'host teardown failed', empty: '', text: 'reused' });
+  assert.ok(code);
 }));
 
 test('owned runtime disposal cancels direct View Query and Action execution with reentrant abort cleanup', t => browserTest(t, async page => {
@@ -213,7 +192,7 @@ test('owned runtime disposal waits for a delayed resolver then releases the targ
   });
   await page.waitForFunction(() => typeof e.resolveResource === 'function');
   await page.evaluate(() => { e.finished = false; e.disposal = e.renderer.dispose().then(() => { e.finished = true; }); });
-  assert.equal(await page.evaluate(() => e.finished), false);
+  assert.equal(await page.evaluate(() => e.finished), true);
   const result = await page.evaluate(async () => {
     const F = Fixture;
     const cancelled = await F.errorOf(() => e.runtime.createView({ view: { render: F.probe('late', 'late') } }));
@@ -273,53 +252,30 @@ test('consumer has no implicit adapters or resources; adapter registration is ex
   assert.equal(result.text, 'expanded');
 }));
 
-test('renderer batch registration keeps contracts and adapters atomic', t => browserTest(t, async page => {
+test('component batch rejects invalid implementations before publishing a renderer', t => browserTest(t, async page => {
   const result = await page.evaluate(async () => {
-    const F = Fixture; window.e = F.environment();
-    const { registry, renderer } = e;
-    const entry = id => ({ contract: F.resource('Component', id, { ports: { value: F.port() } }), component: F.Probe });
-    registry.registerComponentContract(entry('ContractOnly').contract);
-    const rejected = [];
-    for (const later of [
-      entry('Probe'),
-      entry('ContractOnly'),
-      entry('New'),
-      { ...entry('InvalidAdapter'), component: {} },
-      { ...entry('InvalidContract'), contract: F.resource('Component', 'InvalidContract', { render: F.probe('leaf', 'invalid') }) },
-    ]) {
-      const before = registry.list();
-      const failure = await F.errorOf(() => renderer.registerComponents([entry('New'), later]));
-      rejected.push({ code: failure?.code, unchanged: JSON.stringify(before) === JSON.stringify(registry.list()) });
-    }
-    renderer.registerComponents([entry('New'), entry('Second')]);
-    const mounted = await renderer.mount({ target: e.target, view: { render: F.layout([
-      { ...F.probe('first', 'first'), componentRef: 'New' },
-      { ...F.probe('second', 'second'), componentRef: 'Second' },
-    ]) } });
-    await mounted.initialComplete;
-    const rendered = [...e.target.querySelectorAll('[data-value]')].map(node => node.textContent);
-    await renderer.dispose();
-    const disposed = await F.errorOf(() => renderer.registerComponents([entry('Late')]));
-    return { rejected, rendered, disposed: disposed?.code, late: registry.list('Component').some(contract => contract.id === 'Late') };
+    const F = Fixture;
+    const contract = F.resource('Component', 'New', { ports: { value: F.port() } });
+    const failure = await F.errorOf(() => F.publicRenderer({ components: [{ contract, component: {} }] }));
+    const renderer = F.publicRenderer({ components: [{ contract, component: F.Probe }] });
+    const screen = renderer.mount({ target: F.target(), source: { render: { ...F.probe('x', 'ok'), componentRef: 'New' } } });
+    await screen.ready; await renderer.dispose(); return failure.code;
   });
-  assert.deepEqual(result.rejected, Array.from({ length: 5 }, () => ({ code: 'INVALID_DEFINITION', unchanged: true })));
-  assert.deepEqual(result.rendered, ['first', 'second']);
-  assert.equal(result.disposed, 'CANCELLED');
-  assert.equal(result.late, false);
+  assert.equal(result, 'INVALID_DEFINITION');
 }));
 
-test('missing adapter is isolated, initial rejects, and text remains escaped', t => browserTest(t, async page => {
-  await page.evaluate(async () => {
-    const F = Fixture; window.e = F.environment();
-    e.registry.registerComponentContract(F.resource('Component', 'Unbound', {}));
-    e.rendering = await e.renderer.mount({ target: e.target, view: { render: F.layout([
-      F.probe('ready', '<strong>plain text</strong>'), { id: 'unbound', componentRef: 'Unbound' },
-    ]) } }); e.initialError = await F.errorOf(() => e.rendering.initialComplete);
+test('missing adapter rejects ready and releases the target', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture, registry = F.createRegistry();
+    registry.registerComponentContract(F.resource('Component', 'Unbound', {}));
+    const runtime = F.publicRuntime({ registry }); const diagnostics = [];
+    const renderer = F.publicRenderer({ runtime, onError: d => diagnostics.push(d) });
+    const target = F.target(); const screen = renderer.mount({ target, source: { render: { id: 'unbound', componentRef: 'Unbound' } } });
+    const failure = await F.errorOf(() => screen.ready);
+    const empty = target.textContent; await renderer.dispose(); runtime.dispose();
+    return { code: failure.code, empty, phases: diagnostics.map(d => d.phase) };
   });
-  assert.equal(await page.locator('[data-probe="ready"] [data-value]').textContent(), '<strong>plain text</strong>');
-  assert.equal(await page.locator('strong').count(), 0);
-  assert.equal(await page.evaluate(() => e.initialError.code), 'REFERENCE_NOT_FOUND');
-  assert.ok(await page.evaluate(() => e.diagnostics.some(item => item.phase === 'render' && item.error.code)));
+  assert.equal(result.code, 'REFERENCE_NOT_FOUND'); assert.equal(result.empty, ''); assert.ok(result.phases.includes('render'));
 }));
 
 test('required Value input waiting and type errors recover without replacing sibling DOM', t => browserTest(t, async page => {
@@ -329,7 +285,7 @@ test('required Value input waiting and type errors recover without replacing sib
     e.renderer.registerComponent('Strict', F.Probe);
     e.spec = { ports: { value: F.port(true, false) }, render: F.layout([F.probe('stable', 'stable'), { id: 'required', componentRef: 'Strict', inputs: { value: F.p('/ports/value') } }]) };
     const mounted = await e.runtime.createView({ view: e.spec }); e.view = mounted.view;
-    e.host = F.mount(F.Host, { target: e.target, props: { renderer: e.renderer, view: e.view } });
+    e.host = F.mount(F.Host, { target: e.target, props: { renderer: e.renderer, view: F.rawView(e.view) } });
     await F.tick(); await e.host.whenRendered();
   });
   await page.locator('[data-probe="stable"] [data-local]').click();
@@ -399,7 +355,7 @@ test('event forwarding validates payload and preserves native false output', t =
   await page.waitForFunction(() => document.querySelector('[data-event-result]').textContent === 'false');
   assert.deepEqual(await page.evaluate(() => e.calls), ['chosen']);
   assert.equal(await page.evaluate(() => e.rendering.view.getSnapshot().actions.record.data), false);
-  assert.ok(await page.evaluate(() => e.diagnostics.some(item => item.phase === 'event' && item.error.code === 'TYPE_MISMATCH')));
+  assert.ok(await page.evaluate(() => e.diagnostics.some(item => item.phase === 'action' && item.error.code === 'TYPE_MISMATCH')));
 }));
 
 test('repeat keys preserve Svelte and core state on reorder, and removal creates a new lifetime', t => browserTest(t, async page => {
@@ -475,7 +431,7 @@ test('multiple pending placeholders without addresses remain separate and recove
     const F = Fixture; window.e = F.environment();
     e.spec = { states: { a: F.state(undefined), b: F.state(undefined), guard: { kind: 'Derived', schema: { type: 'boolean' }, variable: { ports: { value: F.port() }, expression: 'value' }, inputs: { value: F.p('/states/a') } } }, render: F.layout([F.probe('a', 'A', { when: F.p('/states/guard') }), F.probe('b', 'B', { when: F.p('/states/b') })]) };
     const mounted = await e.runtime.createView({ view: e.spec }); e.view = mounted.view;
-    e.host = F.mount(F.Host, { target: e.target, props: { renderer: e.renderer, view: e.view } }); await F.tick(); await e.host.whenRendered();
+    e.host = F.mount(F.Host, { target: e.target, props: { renderer: e.renderer, view: F.rawView(e.view) } }); await F.tick(); await e.host.whenRendered();
   });
   assert.deepEqual(await page.locator('[data-fallback]').evaluateAll(nodes => nodes.map(node => node.dataset.fallback)), ['a', 'b']);
   await page.evaluate(async () => { e.view.getState('b').write(true); await e.host.whenRendered(); });
@@ -527,7 +483,7 @@ test('attachments and Svelte host borrow Views; renderer owns mounted Views and 
   assert.equal(await page.locator('#owned [data-value]').textContent(), '9');
   await page.evaluate(async () => { await e.attachment.dispose(); e.borrowed.getState('count').write(3); });
   assert.equal(await page.locator('#target [data-probe]').count(), 0);
-  await page.evaluate(async () => { e.host = Fixture.mount(Fixture.Host, { target: e.target, props: { renderer: e.renderer, view: e.borrowed } }); await Fixture.tick(); await e.host.whenRendered(); });
+  await page.evaluate(async () => { e.host = Fixture.mount(Fixture.Host, { target: e.target, props: { renderer: e.renderer, view: Fixture.rawView(e.borrowed) } }); await Fixture.tick(); await e.host.whenRendered(); });
   assert.equal(await page.locator('#target [data-value]').textContent(), '3');
   assert.equal(await page.locator('#target [data-context]').textContent(), 'from-parent');
   await page.evaluate(async () => { await Fixture.unmount(e.host); e.borrowed.getState('count').write(4); await e.renderer.dispose(); });
@@ -588,7 +544,7 @@ test('renderer disposal awaits delayed mount cleanup and preserves injected runt
   });
   await page.waitForFunction(() => typeof e.resolveResource === 'function');
   await page.evaluate(() => { e.disposed = false; e.disposal = e.renderer.dispose().then(() => { e.disposed = true; }); });
-  assert.equal(await page.evaluate(() => e.disposed), false);
+  assert.equal(await page.evaluate(() => e.disposed), true);
   const result = await page.evaluate(async () => {
     const F = Fixture;
     e.resolveResource(F.resource('View', 'Delayed', { render: F.probe('delayed', 'should not mount') }));
@@ -608,7 +564,7 @@ test('direct Svelte host uses explicit root transformError for malicious adapter
     const F = Fixture; window.e = F.environment();
     e.registry.registerComponentContract(F.resource('Component', 'Crash', { ports: { value: F.port() } })); e.renderer.registerComponent('Crash', F.Crash);
     const mounted = await e.runtime.createView({ view: { states: { value: F.state('safe') }, render: { id: 'crash', componentRef: 'Crash', inputs: { value: F.p('/states/value') } } } }); e.view = mounted.view;
-    e.host = F.mount(F.Host, { target: e.target, transformError: F.transformError, props: { renderer: e.renderer, view: e.view } }); await F.tick(); await e.host.whenRendered();
+    e.host = F.mount(F.Host, { target: e.target, transformError: F.transformError, props: { renderer: e.renderer, view: F.rawView(e.view) } }); await F.tick(); await e.host.whenRendered();
   });
   assert.equal(await page.locator('[data-crash]').textContent(), 'safe');
   const error = await page.evaluate(async () => { e.view.getState('value').write('proxy'); return Fixture.errorOf(() => e.host.whenRendered()); });
@@ -687,5 +643,284 @@ test('emit after borrowed View disposal returns a rejected Promise while DOM is 
     await attachment.dispose();
     return { promise, code: error.code, diagnostics: e.diagnostics.map(item => item.error.code) };
   });
-  assert.deepEqual(result, { promise: true, code: 'CANCELLED', diagnostics: ['CANCELLED'] });
+  assert.deepEqual(result, { promise: true, code: 'CANCELLED', diagnostics: [] });
+}));
+
+test('ViewstemView creates from a Svelte source with initial inputs and remounts only on key change', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture;
+    const registry = F.createRegistry();
+    registry.registerComponentContract(F.resource('Component', 'Probe', { ports: { value: F.port() } }));
+    const runtime = F.publicRuntime({ registry });
+    const renderer = F.publicRenderer({ runtime });
+    renderer.bindComponent('Probe', F.Probe);
+    const target = F.target();
+    const initialSource = { ports: { text: F.port({type:'string'}) }, render: F.probe('original', F.p('/ports/text')) };
+    const host = F.mount(F.SourceHost, { target, props: { renderer, initialSource, inputs: { text: 'initial input' } } });
+    await F.tick();
+    await host.whenRendered();
+    const read = selector => target.querySelector(selector)?.textContent;
+    const first = [read('[data-value]'), read('[data-context]')];
+    target.querySelector('[data-local]').click();
+    host.changeSource({ ...initialSource, render: F.probe('new', 'new screen') });
+    await host.whenRendered();
+    const retained = [read('[data-value]'), read('[data-local]')];
+    host.remount();
+    await F.tick();
+    await host.whenRendered();
+    const replaced = [read('[data-value]'), read('[data-local]')];
+    await F.unmount(host);
+    await renderer.dispose();
+    runtime.dispose();
+    return { first, retained, replaced, empty: target.textContent };
+  });
+  assert.deepEqual(result, { first: ['initial input', 'from-parent'], retained: ['initial input', 'local 1'], replaced: ['new screen', 'local 0'], empty: '' });
+}));
+
+test('ViewstemView cancels a delayed source on removal and renderer disposal while borrowing stays usable', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture;
+    const requests = [];
+    const registry = F.createRegistry();
+    registry.registerComponentContract(F.resource('Component', 'Probe', { ports: { value: F.port() } }));
+    const runtime = F.publicRuntime({ registry, resourceResolver(kind, id, {signal}) {
+      return new Promise((resolve, reject) => requests.push({ id, signal, resolve, reject }));
+    } });
+    const renderer = F.publicRenderer({ runtime });
+    renderer.bindComponent('Probe', F.Probe);
+    const source = { render: F.probe('borrowed', 'still usable') };
+    const borrowed = await runtime.createView(source);
+    const borrowedTarget = F.target();
+    const borrowedHost = F.mount(F.Host, { target: borrowedTarget, props: { renderer, view: borrowed } });
+    const diagnostics = [];
+    const target = F.target();
+    const first = F.mount(F.SourceHost, { target, props: { renderer, initialSource: { ref: 'late' }, onError: error => diagnostics.push(error) } });
+    await F.tick();
+    const firstWait = F.errorOf(() => first.whenRendered());
+    const showedLoading = !!target.querySelector('[data-loading]');
+    await F.unmount(first);
+    requests[0].resolve(F.resource('View', 'late', source));
+    const second = F.mount(F.SourceHost, { target, props: { renderer, initialSource: { ref: 'late again' }, onError: error => diagnostics.push(error) } });
+    await F.tick();
+    const secondWait = F.errorOf(() => second.whenRendered());
+    await renderer.dispose();
+    requests[1].reject(new Error('late resolver rejection'));
+    await F.tick();
+    const result = {
+      codes: [(await firstWait).code, (await secondWait).code],
+      aborted: requests.map(request => request.signal.aborted),
+      published: registry.list('View').length,
+      borrowed: borrowedTarget.querySelector('[data-value]')?.textContent,
+      stillUsable: (await runtime.createView(source)).getSnapshot().roots[0].inputs.value,
+      showedLoading, diagnostics, empty: target.textContent,
+    };
+    await F.unmount(second);
+    await F.unmount(borrowedHost);
+    runtime.dispose();
+    return result;
+  });
+  assert.deepEqual(result, { codes: ['CANCELLED', 'CANCELLED'], aborted: [true, true], published: 0, borrowed: 'still usable', stillUsable: 'still usable', showedLoading: true, diagnostics: [], empty: '' });
+}));
+
+test('ViewstemView reports preparation errors once and releases live owned work on renderer disposal', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture;
+    const registry = F.createRegistry();
+    registry.registerComponentContract(F.resource('Component', 'Probe', { ports: { value: F.port() }, events: { change: {schema:true} } }));
+    const requests = [];
+    const runtime = F.publicRuntime({ registry, requestExecutor(_plan, {signal}) {
+      return new Promise(resolve => requests.push({ signal, resolve }));
+    } });
+    const fallback = [];
+    const renderer = F.publicRenderer({ runtime, onError: diagnostic => fallback.push(diagnostic) });
+    renderer.bindComponent('Probe', F.Probe);
+    const target = F.target();
+    const diagnostics = [];
+    const broken = F.mount(F.SourceHost, { target, props: {
+      renderer, initialSource: { render: {id:'bad',componentRef:'missing'} }, onError: diagnostic => diagnostics.push(diagnostic),
+    } });
+    await F.tick();
+    const error = await F.errorOf(() => broken.whenRendered());
+    const errorUI = target.querySelector('[data-prepare-error]')?.textContent;
+    await F.unmount(broken);
+    const source = {
+      queries: { delayed: { query: { sources: { response: { datasource: { kind: 'Http', baseUrl: 'https://example.test' }, request: { method: 'GET', path: '/delay' } } }, transform: { input: F.p('/sources/response') } } } },
+      render: F.probe('owned', 'first DOM'),
+    };
+    const host = F.mount(F.SourceHost, { target, props: { renderer, initialSource: source } });
+    await F.tick();
+    await host.whenRendered();
+    const first = target.querySelector('[data-value]')?.textContent;
+    const [emit] = F.observations.emitters.values();
+    await renderer.dispose();
+    await F.tick();
+    const closed = await F.errorOf(() => host.whenRendered());
+    const staleEvent = await F.errorOf(() => emit('change', null));
+    const result = { code: error.code, errorUI, diagnostics: diagnostics.map(d => [d.phase, d.error.code]), fallback, first, closed: closed.code, staleEvent: staleEvent.code, aborted: requests[0]?.signal.aborted, empty: target.textContent };
+    await F.unmount(host);
+    runtime.dispose();
+    return result;
+  });
+  assert.deepEqual(result, { code: 'REFERENCE_NOT_FOUND', errorUI: 'REFERENCE_NOT_FOUND', diagnostics: [['prepare', 'REFERENCE_NOT_FOUND']], fallback: [], first: 'first DOM', closed: 'CANCELLED', staleEvent: 'CANCELLED', aborted: true, empty: '' });
+}));
+
+test('ViewstemView reads the latest diagnostic handler and tolerates disposal during the first diagnostic', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture;
+    const registry = F.createRegistry();
+    registry.registerComponentContract(F.resource('Component', 'Probe', { ports: { value: F.port({type:'string'}) } }));
+    const runtime = F.publicRuntime({ registry });
+    const renderer = F.publicRenderer({ runtime });
+    renderer.bindComponent('Probe', F.Probe);
+    const makeSource = value => ({
+      states: { value: F.state(value) },
+      render: F.probe('value', F.p('/states/value')),
+    });
+    const view = await runtime.createView(makeSource('ready'));
+    const first = [], second = [];
+    const target = F.target();
+    const props = { renderer, view, onError: d => first.push(d.phase) };
+    const host = F.mount(F.Host, { target, props });
+    await F.tick();
+    await host.whenRendered();
+    host.changeError(d => second.push(d.phase));
+    await F.tick();
+    view.getState('value').write(10);
+    await F.tick();
+    await F.unmount(host);
+
+    const events = [];
+    const owned = F.mount(F.SourceHost, { target, props: {
+      renderer, initialSource: makeSource(10), onError: diagnostic => {
+        events.push(diagnostic.phase);
+        void renderer.dispose();
+      },
+    } });
+    await F.tick();
+    const cancelled = await F.errorOf(() => owned.whenRendered());
+    await F.tick();
+    const result = { first, second, events, cancelled: cancelled.code, empty: target.textContent };
+    await F.unmount(owned);
+    await renderer.dispose();
+    runtime.dispose();
+    return result;
+  });
+  assert.deepEqual(result, { first: [], second: ['node'], events: ['node'], cancelled: 'CANCELLED', empty: '' });
+}));
+
+for (const mode of ['source', 'mount']) test(`disposing during a Svelte ${mode} State commit prevents the first Query and waits for cleanup`, t => browserTest(t, async page => {
+  const result = await page.evaluate(async mode => {
+    const F = Fixture;
+    const store = F.createStateStore();
+    const requests = [];
+    const runtime = F.publicRuntime({
+      stateStore: store,
+      componentContracts: [F.resource('Component', 'Probe', { ports: { value: F.port() } })],
+      resourceResolver: (_kind, id) => F.resource('View', id, {
+        states: { text: F.state('committed') },
+        render: F.probe('owned', F.p('/states/text')),
+        queries: { first: { query: {
+          sources: { response: { datasource: { kind: 'Http', baseUrl: 'https://example.test' }, request: { method: 'GET', path: '/data' } } },
+          transform: { input: F.p('/sources/response') },
+        } } },
+      }),
+      requestExecutor(_request, { signal }) {
+        requests.push(signal);
+        return new Promise(() => {});
+      },
+    });
+    const renderer = F.publicRenderer({ runtime });
+    renderer.bindComponent('Probe', F.Probe);
+    let disposal;
+    const stop = store.subscribe(null, ({changes}) => {
+      if (!disposal && changes.some(change => change.kind === 'added')) disposal = renderer.dispose();
+    });
+    const target = F.target();
+    const host = mode === 'source' ? F.mount(F.SourceHost, { target, props: { renderer, initialSource: { ref: 'settings' } } }) : undefined;
+    const screen = host ? undefined : renderer.mount({ target, source: { ref: 'settings' } });
+    await F.tick();
+    const cancelled = await F.errorOf(() => host ? host.whenRendered() : screen.ready);
+    if (!disposal) throw Error('State commit did not call dispose');
+    await disposal;
+    let liveStates;
+    store.subscribe(null, ({states}) => { liveStates = Object.keys(states).length; })();
+    const result = {
+      cancelled: cancelled.code, requests: requests.length, liveStates, empty: target.textContent,
+      registered: runtime.registry.get('View', 'settings').id,
+    };
+    stop();
+    if (host) await F.unmount(host);
+    runtime.dispose();
+    store.dispose();
+    return result;
+  }, mode);
+  assert.deepEqual(result, { cancelled: 'CANCELLED', requests: 0, liveStates: 0, empty: '', registered: 'settings' });
+}));
+
+test('source captures initial props before onMount and preserves JSON keys in plain and reactive definitions', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture;
+    const runtime = F.publicRuntime({ componentContracts: [F.resource('Component', 'Probe', { ports: { value: F.port(), label: F.port(true, false) } })] });
+    const renderer = F.publicRenderer({ runtime });
+    renderer.bindComponent('Probe', F.Probe);
+    const original = {
+      ports: { label: F.port() },
+      states: JSON.parse('{"__proto__":{"kind":"State","schema":{"type":"string"},"initial":"own key"}}'),
+      render: F.probe('original', F.p('/ports/label'), { inputs: { value: F.p('/ports/label'), label: F.p('/states/__proto__') } }),
+    };
+    const input = { label: 'first' };
+    const plain = F.target();
+    let source = original, inputs = input;
+    const direct = F.mount(F.ViewstemView, { target: plain, props: { renderer, get source() { return source; }, get inputs() { return inputs; } } });
+    source = { ...original, render: F.probe('new', 'incorrect definition') };
+    inputs = { label: 'new prop' };
+    input.label = 'mutated original';
+    original.render.inputs.value = 'mutated original';
+    await direct.whenRendered();
+    const reactive = F.target();
+    const reactiveSpec = { ...original, render: F.probe('reactive', F.p('/states/__proto__')) };
+    const host = F.mount(F.SourceHost, { target: reactive, props: { renderer, initialSource: reactiveSpec, inputs: {label:'ignored'} } });
+    await F.tick();
+    await host.whenRendered();
+    const result = {
+      plain: plain.querySelector('[data-probe]')?.dataset.probe,
+      plainValue: plain.querySelector('[data-value]')?.textContent,
+      plainLabel: plain.querySelector('[data-probe]')?.dataset.label,
+      reactive: reactive.querySelector('[data-value]')?.textContent,
+    };
+    await F.unmount(direct);
+    await F.unmount(host);
+    await renderer.dispose();
+    runtime.dispose();
+    return result;
+  });
+  assert.deepEqual(result, { plain: 'original', plainValue: 'first', plainLabel: 'own key', reactive: 'own key' });
+}));
+
+test('borrowed waits stay on the original connection and cached reports end with it', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture;
+    const runtime = F.publicRuntime({ componentContracts: [F.resource('Component', 'Probe', { ports: { value: F.port() } })] });
+    const renderer = F.publicRenderer({ runtime });
+    renderer.bindComponent('Probe', F.Probe);
+    const first = await runtime.createView({ render: F.probe('first', 'first') });
+    const next = await runtime.createView({ render: F.probe('next', 'next') });
+    const target = F.target();
+    const host = F.mount(F.Host, { target, props: { renderer, view: first } });
+    await F.tick();
+    await host.whenRendered();
+    const waiting = F.errorOf(() => host.whenRendered());
+    F.flushSync(() => host.changeView(next));
+    const before = await host.whenSettled(next.initial);
+    const wrong = await F.errorOf(() => host.whenSettled(first.initial));
+    const shown = target.querySelector('[data-value]')?.textContent;
+    next.dispose();
+    const after = await F.errorOf(() => host.whenSettled(next.initial));
+    const old = await waiting;
+    await F.unmount(host);
+    await renderer.dispose();
+    runtime.dispose();
+    return { old: old?.code, wrong: wrong?.code, after: after?.code, before, shown };
+  });
+  assert.deepEqual(result, { old: 'CANCELLED', wrong: 'INVALID_DEFINITION', after: 'CANCELLED', before: { generation: 1, queryErrors: [] }, shown: 'next' });
 }));

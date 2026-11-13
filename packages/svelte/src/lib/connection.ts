@@ -2,10 +2,13 @@ import { tick } from 'svelte';
 import { writable } from 'svelte/store';
 import type { Subscriber, Unsubscriber } from 'svelte/store';
 import type { NodeSnapshot, PublicError, View, ViewSnapshot } from '@viewstem/core';
-import type { RendererErrorListener, ComponentAdapter, Renderer } from './types.js';
+import type { RendererDiagnostic, RendererErrorListener, ComponentAdapter, Renderer } from './types.js';
 
 export const failure = (code: string, message: string): PublicError => Object.freeze({ code, message });
 export const cancelled = () => failure('CANCELLED', 'The renderer attachment is disposed.');
+export function notifyDiagnostic(listener: RendererErrorListener | undefined, diagnostic: RendererDiagnostic): void {
+  try { void Promise.resolve(listener?.(diagnostic)).catch(() => {}); } catch { /* Observers are isolated from rendering and event dispatch. */ }
+}
 const missingAdapter = failure('REFERENCE_NOT_FOUND', 'No Svelte implementation is registered for this Component.');
 const renderFailure = failure('INTERNAL_ERROR', 'The Svelte component could not be rendered.');
 /** Pass as Svelte mount/hydrate transformError when hosting ViewstemView yourself. */
@@ -19,6 +22,7 @@ export interface RendererState {
   alive: boolean;
   adapters: Map<string, ComponentAdapter>;
   connections: Set<Connection>;
+  ownedViews: Set<() => Promise<void>>;
   onError?: RendererErrorListener;
 }
 export const rendererStates = new WeakMap<Renderer, RendererState>();
@@ -77,10 +81,8 @@ export class Connection {
     return error;
   }
   clearRenderFailure(node: NodeSnapshot): void { this.errors.delete(nodeKey(node)); }
-  private notify(phase: 'render' | 'event', error: PublicError, node: NodeSnapshot): void {
-    for (const listener of new Set([this.state.onError, this.onError])) {
-      try { listener?.({ phase, error, node }); } catch { /* A diagnostic observer cannot break rendering or event rejection. */ }
-    }
+  private notify(phase: 'render', error: PublicError, node: NodeSnapshot): void {
+    notifyDiagnostic(this.onError ?? this.state.onError, { phase, error, nodeId: node.instanceId });
   }
   emit(node: NodeSnapshot, event: string, payload: unknown): Promise<unknown> {
     // DOM updates are batched. A retained callback must consult core's current
@@ -102,7 +104,7 @@ export class Connection {
       ? Promise.reject(failure('INPUT_NOT_READY', 'The Component inputs are not ready.'))
       : this.view.emit(node, event, payload);
     // Observe ignored DOM-handler promises without turning rejection into success.
-    result.catch(error => { if (this.alive) this.notify('event', error, node); });
+    result.catch(() => {});
     return result;
   }
   async whenRendered(): Promise<void> {
