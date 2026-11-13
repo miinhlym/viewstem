@@ -80,12 +80,12 @@ store.connectUrl({ adapter: { read: () => 'https://example.test', subscribe: () 
 // @ts-expect-error standalone Store has no registry for resolving Type resources.
 scope.registerState<string>('unsupported-host-ref', { typeRef: 'string' });
 const runtime = createRuntime({ registry, stateStore: store });
-const mounted = await runtime.createView({ view: { render: { id: 'text', componentRef: 'Text' } } });
-const state = mounted.view.getState('count'); const unknown: unknown = state.read(); void unknown;
-const query: QueryHandle = mounted.view.getQuery('data'); await query.refresh();
-mounted.view.subscribe(snapshot => { const generation: number = snapshot.generation; void generation; });
-await mounted.view.emit({ address: 'address', generation: 1 }, 'change', null);
-await mounted.view.update(mounted.view.exportDefinition(), { states: { count: 2 } });
+const mounted = await runtime.createView({ render: { id: 'text', componentRef: 'Text' } });
+const state = mounted.getState('count'); const unknown: unknown = state.read(); void unknown;
+const query: QueryHandle = mounted.getQuery('data'); await query.refresh();
+mounted.subscribe(snapshot => { const generation: number = snapshot.generation; void generation; });
+await mounted.emit({ address: 'address', generation: 1 }, 'change', null);
+await mounted.updateDefinition(mounted.exportDefinition(), { states: { count: 2 } });
 const cel = compileCel('size(items)', { inputs: { items: { type: 'array' } } }); const computed: unknown = cel({ items: [] }); void computed;
 const requestExecutor = createHttpExecutor({ authorize: () => true }); fromHttp({ transport: fetch });
 const href: string = mergeOwnedUrl('https://example.test?a=1', { a: null }); void href;

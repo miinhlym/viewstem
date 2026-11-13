@@ -1,5 +1,5 @@
 import { Registry } from './registry.mjs';
-import { prepareStateUrl } from './url.mjs';
+import { reserveStateUrl } from './url.mjs';
 import { StateStore, createStateStore } from './state.mjs';
 import { compilePorts, expression, createQueryHandle, sameContract, stateRoot } from './ports.mjs';
 import { compileSchema, equal } from './schema.mjs';
@@ -9,19 +9,40 @@ import { compileCel } from './cel/index.mjs';
 import { createQueryEngine } from './query/index.mjs';
 import { createHttpExecutor } from './http/index.mjs';
 import { ActionEngine } from './action.mjs';
-import { fail, error, safeError, at } from './errors.mjs';
+import { fail, error, safeError } from './errors.mjs';
 const own=(object,key)=>Object.hasOwn(object,key);
 const tuple=JSON.stringify;
 let nextLifetime=0,nextInstance=0;
 const idle=Object.freeze({status:'idle',running:false,data:null,error:null});
-const deferred=()=>{let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});promise.catch(()=>{});return{promise,resolve,reject};};
+const deferred = () => {
+  let resolve, reject;
+  const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
+  promise.catch(() => {});
+  return { promise, resolve, reject };
+};
 
-export function createRuntime(options) { return new Runtime(options); }
+function abortable(value, signal) {
+  return new Promise((resolve, reject) => {
+    const finish = (callback, result) => {
+      signal.removeEventListener('abort', abort);
+      callback(result);
+    };
+    const abort = () => finish(reject, error('CANCELLED'));
+    signal.addEventListener('abort', abort, { once: true });
+    if (signal.aborted) abort();
+    Promise.resolve(value).then(result => finish(resolve, result), cause => finish(reject, cause));
+  });
+}
+const applications = new WeakMap();
+
 export class Runtime {
-  constructor({registry,stateStore,requestExecutor,resourceResolver,authorize,functions,requestTimeoutMs,clock}={}) {
+  constructor({registry,stateStore,requestExecutor,resourceResolver,authorize,functions,requestTimeoutMs,clock,urlCleanupTimeoutMs=30000}={}) {
     if(!(registry instanceof Registry) || (stateStore!==undefined && !(stateStore instanceof StateStore)))fail('INVALID_DEFINITION');
-    Object.assign(this,{registry,stateStore:stateStore??createStateStore(),resourceResolver,authorize,functions,clock});
-    this.functions=functions??registry.functions;this.ownsStore=stateStore===undefined;this.views=new Set();this.variables=new WeakMap();this.alive=true;
+    if (!Number.isSafeInteger(urlCleanupTimeoutMs) || urlCleanupTimeoutMs <= 0) fail('INVALID_DEFINITION');
+    Object.assign(this,{registry,stateStore:stateStore??createStateStore(),resourceResolver,authorize,functions,clock,urlCleanupTimeoutMs});
+    this.functions=(functions??registry.functions).map(definition => ({ ...definition,
+      run: (...args) => this.stateStore.runPureCallback(() => definition.run(...args)),
+    }));this.ownsStore=stateStore===undefined;this.views=new Set();this.variables=new WeakMap();this.alive=true;
     this.requestExecutor=requestExecutor??createHttpExecutor({requestTimeoutMs});this.requestTimeoutMs=requestTimeoutMs;
     this.configureExecution();
   }
@@ -29,7 +50,7 @@ export class Runtime {
     const {registry,stateStore,authorize,clock,requestTimeoutMs}=this;
     this.query=createQueryEngine({registry,functions:this.functions,requestExecutor:this.requestExecutor,...(requestTimeoutMs===undefined?{}:{requestTimeoutMs}),clock});
     this.actions=new ActionEngine({registry,store:this.stateStore,authorize:authorize?({owner,definition})=>authorize({operation:'invoke',owner,definition}):undefined,
-      query:({reference,spec,inputs,signal})=>this.query.execute(reference??{query:spec},{inputs,signal}),
+      query:({reference,spec,inputs,signal,isOpen,onCleanupError})=>this.query.execute(reference??{query:spec},{inputs,signal,isOpen,onCleanupError}),
       variable:({reference,spec,inputs})=>this.variable(reference??spec,inputs),
       onChange:()=>{for(const view of this.views)view.refresh();}});
   }
@@ -45,43 +66,172 @@ export class Runtime {
     const prepared=compilePorts({resourceKind:'Variable',ports:spec.ports,types:this.registry.types()}).prepare(inputs);
     return this.variables.get(spec)(prepared.ports);
   }
-  async resolve(target) {
-    if(own(target,'viewRef')===own(target,'view'))fail('INVALID_DEFINITION');
-    const queued=[],seen=new Set();
-    const resolve=async(kind,id)=>{
-      const key=tuple([kind,id]);if(seen.has(key))return;seen.add(key);
-      let resource;try{resource=this.registry.get(kind,id);}catch(caught){
-        if(!this.resourceResolver)throw caught;
-        resource=await this.resourceResolver(kind,id);
-        if(resource?.kind!==kind||resource?.id!==id)fail('REFERENCE_NOT_FOUND');queued.push(resource);
+  async resolve(target, signal, fetched) {
+    const check = () => { if (signal.aborted) fail('CANCELLED'); };
+    for (;;) {
+      check();
+      const revision = this.registry.revision;
+      const candidate = this.registry.fork();
+      const seen = new Set();
+      const needed = [];
+      for (const [key, definition] of fetched) {
+        const [kind, id] = JSON.parse(key);
+        const existing = candidate.list({ kind, id })[0];
+        if (existing && (candidate.isCode(kind, id) || !equal(existing, definition))) fail('INVALID_DEFINITION');
       }
-      for(const [childKind,childId] of this.registry.references(kind,resource.spec))await resolve(childKind,childId);
-    };
-    let spec=target.view;
-    if(own(target,'viewRef')) {await resolve('View',target.viewRef);spec=(queued.find(r=>r.kind==='View'&&r.id===target.viewRef)??this.registry.get('View',target.viewRef)).spec;}
-    else for(const [kind,id] of this.registry.references('View',spec))await resolve(kind,id);
-    if(queued.length)this.registry.registerResources(queued);
-    this.registry.validateDefinition('View',spec);return structuredClone(spec);
+      const visit = async (kind, id) => {
+        check();
+        const key = tuple([kind, id]);
+        if (seen.has(key)) return;
+        seen.add(key);
+        let definition;
+        try { definition = candidate.get(kind, id); }
+        catch (caught) {
+          if (!this.resourceResolver) throw caught;
+          if (!fetched.has(key)) {
+            const result = await abortable(this.resourceResolver(kind, id, { signal }), signal);
+            check();
+            if (result?.kind !== kind || result?.id !== id) fail('REFERENCE_NOT_FOUND');
+            fetched.set(key, structuredClone(result));
+          }
+          definition = fetched.get(key);
+          needed.push(definition);
+        }
+        for (const [childKind, childId] of candidate.references(kind, definition.spec)) await visit(childKind, childId);
+        return definition;
+      };
+      const spec = target.viewRef !== undefined
+        ? (await visit('View', target.viewRef)).spec : target.view;
+      if (target.viewRef === undefined) {
+        for (const [kind, id] of candidate.references('View', spec)) await visit(kind, id);
+      }
+      check();
+      if (revision !== this.registry.revision) continue;
+      if (needed.length) candidate.registerResources(needed);
+      candidate.validateDefinition('View', spec);
+      return { spec, candidate, revision, additions: needed };
+    }
   }
-  async createView(target) {
-    if(!this.alive)fail('CANCELLED');
-    const view=new View(this);this.views.add(view);
-    try{return {view,...await view.replace(target)};}catch(caught){view.dispose();throw safeError(caught);}
+  async createView(target, signal, beforeCommit, owner) {
+    if (!this.alive) fail('CANCELLED');
+    const view = new View(this, undefined, owner);
+    this.views.add(view);
+    const close = () => view.dispose();
+    view.disposeOnAbort = close;
+    try {
+      owner?.signal.addEventListener('abort', close, { once: true });
+      owner?.onCreate?.(close);
+      if (!view.alive) fail('CANCELLED');
+      await view.replace(target, signal, beforeCommit);
+      if (!view.alive) fail('CANCELLED');
+      return view;
+    } catch (caught) {
+      await view.dispose().catch(() => {});
+      throw safeError(caught);
+    }
   }
   invokeAction({owner,actionRef,action,inputs={}}) {
     if(!this.alive || !(owner instanceof View) || !this.views.has(owner) || !owner.alive) return Promise.reject(error('CANCELLED'));
     if((actionRef!==undefined)===(action!==undefined))return Promise.reject(error('INVALID_DEFINITION'));
     try{return owner.runtime.actions.invoke(owner.root.actionOwner,actionRef,inputs,action);}catch(caught){return Promise.reject(safeError(caught));}
   }
-  listResources(kind) { return this.registry.list(kind); }
-  exportResource(kind,id) { return this.registry.exportResource(kind,id); }
-  dispose(){if(!this.alive)return;this.alive=false;for(const view of [...this.views])view.dispose();if(this.ownsStore)this.stateStore.dispose();}
+  dispose() {
+    if (this.disposal) return this.disposal.promise;
+    this.alive = false;
+    const completion = this.disposal = deferred();
+    const views = [...this.views].map(view => view.dispose());
+    if (this.ownsStore) {
+      const release = () => this.stateStore.dispose();
+      // Preserve synchronous cleanup on the ordinary path.
+      if (!this.stateStore.isBusy) {
+        try { release(); } catch (cause) { views.push(Promise.reject(safeError(cause))); }
+      } else views.push(Promise.resolve().then(release));
+    }
+    finishCleanup(views, completion);
+    return completion.promise;
+  }
+}
+
+function finishCleanup(tasks, completion) {
+  void Promise.allSettled(tasks).then(results => {
+    const failed = results.find(result => result.status === 'rejected');
+    if (failed) completion.reject(failed.reason);
+    else completion.resolve();
+  });
 }
 
 export class View {
-  constructor(host,execution=host.execution(host.registry.fork())) {
-    const runtime=execution;this.host=host;this.runtime=runtime;this.alive=true;this.operation=0;this.application=0;this.generation=0;this.instances=new Map();this.owners=new Map();this.connections=new Map();this.listeners=new Set();this.diagnostics=[];this.planning=false;this.queued=false;
-    this.unsubscribe=runtime.stateStore.observe(()=>this.refresh());
+  constructor(host,execution=host.execution(host.registry.fork()),owner) {
+    const runtime=execution;this.host=host;this.runtime=runtime;this.owner=owner;this.generation=0;this.instances=new Map();this.owners=new Map();this.connections=new Map();this.listeners=new Set();this.diagnostics=[];this.planning=false;this.queued=false;
+    this.lifetime = new AbortController();
+    this.queryUses = new Set();
+    this.renderWaiters = new Set();
+    this.closeListeners = new Set();
+    this.diagnosticListeners = new Set();
+    this.requested = 0;
+    this.published = 0;
+    this.projectionWaiters = new Set();
+    this.unsubscribe = runtime.stateStore.observe(() => this.refresh());
+  }
+  get alive() { return !this.disposal && this.host.alive && !this.owner?.signal.aborted && (this.owner?.isOpen?.() ?? true); }
+  newApplication() {
+    for (const cancel of this.renderWaiters) cancel(error('CANCELLED'));
+    this.renderWaiters.clear();
+    this.initial?.reject(error('CANCELLED'));
+    const token = Object.freeze(Object.create(null));
+    const report = deferred();
+    const record = { ...report, view: this, token, generation: this.generation };
+    applications.set(token, record);
+    this.initial = record;
+    this.firstApplication ??= token;
+    return token;
+  }
+  applicationRecord(token) {
+    const record = applications.get(token);
+    if (record?.view !== this) fail('INVALID_DEFINITION');
+    return record;
+  }
+  whenSettled(token) {
+    try { return this.applicationRecord(token).promise; }
+    catch (cause) { return Promise.reject(cause); }
+  }
+  onClose(listener) {
+    if (!this.alive) fail('CANCELLED');
+    this.closeListeners.add(listener);
+    return () => this.closeListeners.delete(listener);
+  }
+  onDiagnostic(listener) {
+    this.diagnosticListeners.add(listener);
+    return () => this.diagnosticListeners.delete(listener);
+  }
+  diagnostic(phase, cause, nodeId) {
+    if (!this.alive) return;
+    const value = Object.freeze({ phase, error: safeError(cause),
+      ...(this.initial ? { application: this.initial.token } : {}),
+      ...(nodeId === undefined ? {} : { nodeId }) });
+    if (phase === 'url') (this.urlDiagnostics ??= []).push(value);
+    for (const listener of this.diagnosticListeners) {
+      if (!this.alive) break;
+      try { listener(value); } catch {}
+    }
+  }
+  projection() {
+    return { generation: this.generation, requested: this.requested, published: this.published };
+  }
+  async whenProjected(generation, sequence) {
+    if (!this.alive || generation !== this.generation) fail('CANCELLED');
+    if (this.published >= sequence) return;
+    const waiter = { generation, sequence, ...deferred() };
+    this.projectionWaiters.add(waiter);
+    return waiter.promise;
+  }
+  flushProjectionWaiters() {
+    for (const waiter of this.projectionWaiters) {
+      if (!this.alive || waiter.generation !== this.generation) waiter.reject(error('CANCELLED'));
+      else if (this.published >= waiter.sequence) waiter.resolve();
+      else continue;
+      this.projectionWaiters.delete(waiter);
+    }
   }
   context(owner,extra={}) {
     const resolve=(keys,target)=>{
@@ -131,7 +281,11 @@ export class View {
   }
   makeOwner(spec,ports,id,previous,created) {
     const store=this.runtime.stateStore,registry=this.runtime.registry;
-    const owner={id,spec,ports,scope:previous?.scope??store.createScope(),actionOwner:previous?.actionOwner??this.runtime.actions.owner(),states:new Map(previous?.states),computations:new Map(),queries:new Map(),reactions:previous?.reactions??[],slots:previous?.slots??{},instance:null};
+    const actionOwner = previous?.actionOwner ?? this.runtime.actions.owner(
+      () => this.alive && this.owners.has(id), this.lifetime.signal,
+      cause => this.diagnostics.push(safeError(cause)),
+    );
+    const owner={id,spec,ports,scope:previous?.scope??store.createScope(),actionOwner,states:new Map(previous?.states),computations:new Map(),queries:new Map(),reactions:previous?.reactions??[],slots:previous?.slots??{},instance:null};
     if(!previous)created.push(owner);
     for(const [name,declaration] of Object.entries(spec.states??{})) {
       const schema=registry.schema(declaration),existing=owner.states.get(name);
@@ -142,7 +296,10 @@ export class View {
     for(const [name,use] of Object.entries(spec.queries??{})) {
       const old=previous?.queries.get(name),identity=use.queryRef?`Query:${use.queryRef}`:tuple(use.query);
       const item=old?.identity===identity?{...old,use,owner}: {use,owner,identity,usage:null,handle:null};
-      if(!item.handle)item.handle=createQueryHandle({getSnapshot:()=>item.usage?.getSnapshot()??{status:'waiting',data:undefined,error:null,dataInputs:undefined,stale:false,waitingReason:'INPUT_NOT_READY'},refresh:signal=>item.usage?item.usage.refresh(signal):Promise.reject(error('INPUT_NOT_READY')),retry:signal=>item.usage?item.usage.retry(signal):Promise.reject(error('INVALID_RETRY_STATE'))});
+      if(!item.handle)item.handle=createQueryHandle({
+        getSnapshot:()=>item.usage?.getSnapshot()??{status:'waiting',data:undefined,error:null,dataInputs:undefined,stale:false,waitingReason:'INPUT_NOT_READY'},
+        refresh:signal=>this.requestQuery(item,'refresh',signal),retry:signal=>this.requestQuery(item,'retry',signal),
+      });
       // Preserve the object referenced by the handle; owner/use are assigned after commit.
       owner.queries.set(name,old?.identity===identity?old:item);
     }
@@ -185,8 +342,8 @@ export class View {
     }
     return owner;
   }
-  build(spec,inputs,replace=false,stateWrites) {
-    const runtime=this.runtime,registry=runtime.registry,store=runtime.stateStore,application=this.application,operation=this.operation;
+  build(spec,inputs,replace=false,stateWrites,commit) {
+    const runtime=this.runtime,registry=runtime.registry,store=runtime.stateStore;
     const created=[],newConnections=[],next=new Map(),owners=new Map(),connections=new Map(),aliases=new Set();
     const oldOwners=this.owners;let oldInstances=replace?new Map():this.instances,availableConnections=replace?new Map():this.connections;
     this.planConnections=connections;
@@ -234,7 +391,10 @@ export class View {
           for(const [event,handler] of Object.entries(node.on??{}))if(!handler.emit) {
             if(handler.id){const alias=tuple([author.id,handler.id]);if(aliases.has(alias))fail('INVALID_DEFINITION');aliases.add(alias);}
             const key=tuple([address,generation,event]),prior=availableConnections.get(key);
-            const connection=prior&&equal(prior.handler,handler)?prior.connection:runtime.actions.connect(author.actionOwner,{actionRef:handler.actionRef,spec:handler.action});
+            const connection=prior&&equal(prior.handler,handler)?prior.connection:runtime.actions.connect(author.actionOwner,{
+              actionRef:handler.actionRef,spec:handler.action,
+              isOpen: () => this.connections.get(key)?.connection === connection,
+            });
             if(connection!==prior?.connection)newConnections.push(connection);
             connections.set(key,{connection,handler,owner:author});
           }
@@ -282,45 +442,81 @@ export class View {
           roots=expand(spec.render,root);reconcileReactions(stagedOwners);
         }
         for(const owner of new Set([...oldOwners.values(),...created]))if(!owners.has(owner.id))owner.scope.dispose();
+      }, () => {
+        if (!this.alive) fail('CANCELLED');
+        commit?.({ root, roots, owners });
+        const oldConnections = this.connections;
+        this.root = root;
+        this.roots = roots;
+        this.instances = next;
+        this.owners = owners;
+        this.connections = connections;
+        this.queryUses = new Set([...owners.values()].flatMap(owner => [...owner.queries.values()]));
+        this.planConnections = null;
+        return () => {
+          const retained = new Set([...connections.values()].map(entry => entry.connection));
+          const cleanup = run => { try { run(); } catch (cause) { this.diagnostics.push(safeError(cause)); } };
+          for (const connection of newConnections) if (!retained.has(connection)) cleanup(() => connection.dispose());
+          for (const [key, entry] of oldConnections) if (connections.get(key)?.connection !== entry.connection) cleanup(() => entry.connection.dispose());
+          for (const [id, owner] of oldOwners) if (!owners.has(id)) {
+            cleanup(() => owner.actionOwner.dispose());
+            for (const item of owner.queries.values()) cleanup(() => item.usage?.dispose());
+          }
+          for (const owner of owners.values()) {
+            const old = oldOwners.get(owner.id);
+            for (const [name, item] of old?.queries ?? []) if (owner.queries.get(name) !== item) cleanup(() => item.usage?.dispose());
+            for (const [name, item] of owner.queries) {
+              item.owner = owner;
+              item.use = owner.spec.queries[name];
+            }
+          }
+        };
       });
-    } catch(caught){for(const connection of newConnections)connection.dispose();for(const owner of created)owner.actionOwner.dispose();throw caught;}
-    if(!this.alive||application!==this.application||operation!==this.operation) {
-      for(const connection of newConnections)connection.dispose();
-      for(const owner of created){owner.actionOwner.dispose();owner.scope.dispose();}
-      fail('CANCELLED');
+    } catch (caught) {
+      this.planConnections = null;
+      for (const connection of newConnections) connection.dispose();
+      for (const owner of created) owner.actionOwner.dispose();
+      throw caught;
     }
-    const retainedConnections=new Set([...connections.values()].map(entry=>entry.connection));
-    for(const connection of newConnections)if(!retainedConnections.has(connection))connection.dispose();
-    for(const [key,entry] of this.connections)if(connections.get(key)?.connection!==entry.connection)entry.connection.dispose();
-    for(const [id,owner] of oldOwners)if(!owners.has(id)){owner.actionOwner.dispose();for(const item of owner.queries.values())item.usage?.dispose();}
-    for(const owner of owners.values()) {
-      const old=oldOwners.get(owner.id);
-      for(const [name,item] of old?.queries??[])if(owner.queries.get(name)!==item)item.usage?.dispose();
-      for(const [name,item] of owner.queries){item.owner=owner;item.use=owner.spec.queries[name];}
-    }
-    this.root=root;this.roots=roots;this.instances=next;this.owners=owners;this.connections=connections;this.planConnections=null;
+  }
+  async requestQuery(item, kind, signal) {
+    // A Store observer can see the new application before its usages are configured.
+    if (!this.alive || !this.queryUses.has(item)) fail('CANCELLED');
+    if (this.committing) await this.committing.promise;
+    if (!this.alive || !this.queryUses.has(item)) fail('CANCELLED');
+    if (!item.usage) fail(kind === 'retry' ? 'INVALID_RETRY_STATE' : 'INPUT_NOT_READY');
+    return item.usage[kind](signal);
   }
   configureQueries() {
-    const application=this.application,operation=this.operation;
-    const current=()=>this.alive&&application===this.application&&operation===this.operation;
+    const generation = this.generation;
+    const current = () => this.alive && generation === this.generation;
     for(const owner of this.owners.values())for(const [name,item] of owner.queries) {
       if(!current())return;
       const use=item.use,spec=use.query??this.runtime.registry.get('Query',use.queryRef).spec,context=this.context(owner);
       let inputs={},ready=true,executeWhen=true,autoRefreshWhen=true,inputError;
       try {
-        const prepared=this.prepareInputs(spec,use.inputs??{},context,'automatic',false,'Query');inputs=prepared.ports;ready=!owner.suspended&&prepared.status==='ready'&&(!this.url||this.url.isReady());
+        const prepared=this.prepareInputs(spec,use.inputs??{},context,'automatic',false,'Query');inputs=prepared.ports;ready=!owner.suspended&&prepared.status==='ready'&&!this.urlTransition&&(!this.url||this.url.isReady());
         for(const key of ['executeWhen','autoRefreshWhen'])if(own(use,key)) {
           const value=evaluate(use[key],context);if(typeof value!=='boolean')fail('TYPE_MISMATCH');if(key==='executeWhen')executeWhen=value;else autoRefreshWhen=value;
         }
       }catch(caught){inputError=safeError(caught);ready=false;}
+      if(!current())return;
       const settings={...owner.queryDefaults,...use,inputs,ready,executeWhen,autoRefreshWhen,inputError,owner:item};
-      if(!item.usage)item.usage=this.runtime.query.createUsage(use,{...settings,onChange:()=>this.schedule(),clock:this.runtime.clock});
+      if(!item.usage){
+        item.usage=this.runtime.query.createUsage(use,{
+          ...settings,onChange:()=>this.schedule(),clock:this.runtime.clock,
+          onCleanupError:cause=>this.diagnostics.push(safeError(cause)),
+          isOpen:()=>this.alive && this.queryUses.has(item),ownerSignal:this.lifetime.signal,
+          start:false,
+        });
+        item.usage.start();
+      }
       else item.usage.update(settings);
-      if(!current()){item.usage.dispose();return;}
     }
   }
   refresh() {
     if(!this.alive||!this.root)return;
+    this.requested++;
     // A subscriber can commit State while project() is publishing this plan.
     // Preserve that invalidation without recursively rebuilding or delivering
     // a newer snapshot to listeners still receiving the current one.
@@ -328,71 +524,243 @@ export class View {
     this.planning=true;
     try{this.build(this.spec,this.inputs);this.configureQueries();this.project();}catch(caught){this.planConnections=null;this.diagnostics.push(safeError(caught));this.project();}finally{this.planning=false;}
   }
-  schedule(){if(this.queued||!this.alive)return;this.queued=true;queueMicrotask(()=>{this.queued=false;this.refresh();});}
+  schedule(){if(!this.alive)return;this.requested++;if(this.queued)return;this.queued=true;queueMicrotask(()=>{this.queued=false;this.refresh();});}
   project() {
     if(!this.alive)return;
-    const application=this.application,snapshot=this.getSnapshot();for(const listener of this.listeners){if(!this.alive||application!==this.application)return;try{listener(snapshot);}catch(caught){this.diagnostics.push(safeError(caught));}}
-    if(!this.alive||application!==this.application)return;
-    if(this.initial && !this.queued && [...this.owners.values()].every(owner=>[...owner.queries.values()].every(item=>item.usage?.getSnapshot().status!=='running'))) {
-      const queryErrors=[];for(const owner of this.owners.values())for(const [query,item] of owner.queries)if(item.usage?.getSnapshot().status==='error')queryErrors.push({instanceId:owner.id,query,error:item.usage.getSnapshot().error});
-      this.initial.resolve({generation:this.generation,queryErrors});
+    const generation = this.generation, snapshot = this.getSnapshot();
+    this.published = this.requested;for(const listener of this.listeners){if(!this.alive||generation!==this.generation)return;try{listener(snapshot);}catch(caught){this.diagnostics.push(safeError(caught));}}
+    if(!this.alive||generation!==this.generation)return;
+    this.flushProjectionWaiters();
+    this.observeErrors(snapshot);
+    if(this.initial && !this.initial.settled && !this.urlTransition && !this.queued && [...this.owners.values()].every(owner=>[...owner.queries.values()].every(item=>item.usage?.getSnapshot().status!=='running'))) {
+      const queryErrors=[];for(const owner of this.owners.values())for(const [query,item] of owner.queries)if(item.usage?.getSnapshot().status==='error')queryErrors.push(Object.freeze({instanceId:owner.id,query,error:item.usage.getSnapshot().error}));
+      this.initial.settled = true;
+      this.initial.sequence = this.published;
+      this.initial.resolve(Object.freeze({generation:this.generation,queryErrors:Object.freeze(queryErrors)}));
     }
   }
-  async apply(spec,inputs,replace,stateWrites,urlOptions,restoreUrl=true,execution=this.runtime) {
-    if(!this.alive)fail('CANCELLED');
-    const previousExecution=this.runtime;this.runtime=execution;
-    const application=++this.application,operation=this.operation;
-    const check=()=>{if(!this.alive||application!==this.application||operation!==this.operation)fail('CANCELLED');};
-    this.planning=true;
-    try{
-      this.runtime.registry.validateDefinition('View',spec);
-      const prepared=this.prepareInputs(spec,inputs,{},'automatic',true,'View');
-      inputs=Object.freeze(Object.fromEntries(Object.keys(inputs).map(name=>[name,spec.ports[name].kind==='Value'?prepared.ports[name]:inputs[name]])));
-      this.build(spec,inputs,replace,stateWrites);check();
-      if(urlOptions) {
-        this.url=this.runtime.stateStore.connectUrl({...urlOptions,restore:restoreUrl,bindings:urlOptions.bindings.map(({state,...binding})=>({...binding,target:this.getState(state)})),onError:diagnostic=>this.diagnostics.push(diagnostic)});
-        this.url.ready.then(()=>this.schedule());
-        check();this.build(spec,inputs);check();
+  observeErrors(snapshot) {
+    const next = new Map();
+    const report = (key, phase, failure, nodeId) => {
+      if (!failure) return;
+      next.set(key, { phase, failure, nodeId });
+      const prior = this.observedErrors?.get(key);
+      if (!prior || !equal(prior.failure, failure)) this.diagnostic(phase, failure, nodeId);
+    };
+    const visit = (nodes, parent) => {
+      for (const [index, node] of nodes.entries()) {
+        const key = node.address ?? tuple([parent, node.id, index]);
+        report(key, 'node', node.error, node.id);
+        if (Object.keys(node.slots).length) {
+          for (const children of Object.values(node.slots)) visit(children, key);
+        } else visit(node.children, key);
       }
-      this.spec=spec;this.inputs=inputs;this.generation++;this.initial?.reject(error('CANCELLED'));this.initial=deferred();this.configureQueries();check();this.project();check();}
-    catch(caught){if(application===this.application)this.runtime=previousExecution;this.planConnections=null;throw safeError(caught);}finally{this.planning=false;}
-    this.schedule();return {initialComplete:this.initial.promise};
-  }
-  async update(spec,{inputs=this.inputs,states}={}) {
-    const next=structuredClone(spec);this.runtime.registry.validateDefinition('View',next);
-    // Validate every explicit State value before any structural reconciliation.
-    if(this.runtime.authorize && this.runtime.authorize({operation:'update',owner:this,definition:next})!==true)fail('EXECUTION_BLOCKED');
-    if(states)for(const [name,value] of Object.entries(states)){const declaration=next.states?.[name];if(!declaration||declaration.kind!=='State')fail('REFERENCE_NOT_FOUND');try{this.runtime.registry.validator(declaration).accept(value);}catch(caught){throw safeError(caught,'TYPE_MISMATCH');}}
-    return this.apply(next,inputs,false,states);
-  }
-  async replace(target) {
-    const operation=++this.operation,spec=await this.host.resolve(target);
-    if(this.root&&this.host.authorize&&this.host.authorize({operation:'update',owner:this,definition:spec})!==true)fail('EXECUTION_BLOCKED');
-    const execution=this.host.execution(this.host.registry.fork());
-    if(!this.alive||operation!==this.operation)fail('CANCELLED');
-    const urlOptions=target.url;
-    if(this.url||urlOptions) {
-      // Prepare on the same Store transaction machinery, then discard the plan.
-      // No requests or URL writes occur during this validation pass.
-      const candidate=new View(this.host,execution);candidate.planning=true;
-      try {this.runtime.stateStore.preview(()=>{
-        for(const owner of this.owners.values())for(const stop of owner.reactions)stop();
-        candidate.build(spec,target.inputs??{},true);
-        if(urlOptions) {
-          if(this.runtime.stateStore.urlConnection && this.runtime.stateStore.urlConnection!==this.url)fail('INVALID_DEFINITION');
-          prepareStateUrl(this.runtime.stateStore,{...urlOptions,bindings:urlOptions.bindings?.map(({state,...binding})=>({...binding,target:candidate.getState(state)}))},this.url);
-        }
-      });}finally{candidate.dispose();}
+    };
+    visit(snapshot.roots);
+    for (const owner of this.owners.values()) for (const [name, item] of owner.queries) {
+      const query = item.usage?.getSnapshot();
+      report(tuple([owner.id, name]), 'query', query?.status === 'error' ? query.error : null);
     }
-    const replacing=!!this.root;
-    if(this.url) {const old=this.url;await old.removeOwned();if(!this.alive||operation!==this.operation)fail('CANCELLED');old.dispose();this.url=null;}
-    if(!this.alive||operation!==this.operation)fail('CANCELLED');
-    return this.apply(spec,target.inputs??{},true,undefined,urlOptions,!replacing,execution);
+    this.observedErrors = next;
+  }
+  async apply(spec, inputs, replace, stateWrites, target, execution, resolved, job) {
+    const check = () => {
+      if (!this.alive || job.cancelled || job.signal?.aborted) fail('CANCELLED');
+      if (resolved && this.host.registry.revision !== resolved.revision) fail('INVALID_DEFINITION');
+    };
+    const previousExecution = this.runtime;
+    const oldUrl = this.url;
+    const replacing = this.root !== undefined;
+    const store = execution.stateStore;
+    let application, reservation;
+    job.phase = 'commit';
+    const committing = this.committing = deferred();
+    const committedSnapshot = this.root ? this.getSnapshot() : undefined;
+    this.runtime = execution;
+    this.planning = true;
+    try {
+      check();
+      const prepared = execution.registry.validateDefinition('View', spec);
+      const { ports } = this.prepareInputs(prepared, inputs, {}, 'automatic', true, 'View');
+      inputs = Object.freeze(Object.fromEntries(Object.keys(inputs).map(name =>
+        [name, spec.ports[name].kind === 'Value' ? ports[name] : inputs[name]])));
+      if (stateWrites) for (const [name, value] of Object.entries(stateWrites)) {
+        const declaration = spec.states?.[name];
+        if (!declaration || declaration.kind !== 'State') fail('REFERENCE_NOT_FOUND');
+        try { execution.registry.validator(declaration).accept(value); }
+        catch (caught) { throw safeError(caught, 'TYPE_MISMATCH'); }
+      }
+      this.stagingSnapshot = committedSnapshot;
+      this.build(spec, inputs, replace, stateWrites, ({ root }) => {
+        let urlOptions;
+        if (replace && (target.url || oldUrl)) {
+          if (store.urlConnection && store.urlConnection !== oldUrl) fail('INVALID_DEFINITION');
+          if (target.url) {
+            if (!Array.isArray(target.url.bindings)) fail('INVALID_DEFINITION');
+            urlOptions = { ...target.url, bindings: target.url.bindings.map(({ state, ...binding }) =>
+              ({ ...binding, target: root.states.get(state) ?? fail('REFERENCE_NOT_FOUND') })) };
+          }
+          reservation = reserveStateUrl(store, urlOptions, oldUrl, () => this.alive);
+        } else if (oldUrl && this.urlBindings?.some(binding => root.states.get(binding.state) !== binding.target)) {
+          fail('INVALID_DEFINITION');
+        }
+        job.beforeCommit?.();
+        check();
+        if (resolved?.additions.length) this.host.registry.commitCandidate(resolved.candidate);
+        this.stagingSnapshot = undefined;
+        this.spec = spec;
+        this.inputs = inputs;
+        this.generation++;
+        this.urlDiagnostics = [];
+        this.requested++;
+        application = this.newApplication();
+        if (reservation) {
+          reservation.commit();
+          this.url = null;
+          this.urlTransition = reservation;
+          this.urlBindings = target.url?.bindings.map(({ state }) => ({ state, target: root.states.get(state) }));
+          oldUrl?.pause();
+
+        }
+      });
+    } catch (caught) {
+      this.runtime = previousExecution;
+      committing.resolve();
+      this.committing = undefined;
+      throw safeError(caught);
+    } finally {
+      this.stagingSnapshot = undefined;
+      this.planning = false;
+    }
+    try {
+      if (oldUrl && reservation) oldUrl.suspend();
+      if (this.alive) {
+        if (reservation) void this.finishUrl(reservation, oldUrl, !replacing);
+        this.refreshAfterCommit();
+      }
+    } finally {
+      this.committing = undefined;
+      committing.resolve();
+    }
+    return application;
+  }
+  refreshAfterCommit() {
+    if (!this.alive) return;
+    this.planning = true;
+    try { this.configureQueries(); this.project(); }
+    finally { this.planning = false; }
+    this.schedule();
+  }
+  async finishUrl(reservation, previous, restore) {
+    const store = this.runtime.stateStore;
+    const writes = new Map();
+    let stop = () => {};
+    try {
+      if (previous) {
+        stop = store.subscribe(reservation.next?.prepared.map(binding => binding.target.address) ?? [], () => {
+          for (const binding of reservation.next?.prepared ?? []) {
+            if (!store.hasWritten(binding.target)) continue;
+            const snapshot = binding.target.getSnapshot();
+            const value = snapshot.status === 'ready' ? snapshot.value : undefined;
+            const data = value instanceof Set ? [...value] : value;
+            writes.set(binding.key, { value: data === undefined ? null : JSON.stringify(data),
+              count: Array.isArray(data) ? data.length : 0, history: binding.history });
+          }
+        });
+        const outcome = await previous.cleanupOwned(reservation, this.host.urlCleanupTimeoutMs, this.host.clock);
+        if (outcome && this.alive) this.reportUrl(outcome, 'replace-cleanup');
+      }
+      if (!this.alive || this.urlTransition !== reservation) return;
+      if (reservation.options) {
+        const connection = store.connectUrl({ ...reservation.options, restore, pendingWrites: writes, onError: diagnostic => {
+          this.reportUrl(diagnostic);
+          if (diagnostic.kind === 'connect') { this.url = null; this.urlBindings = undefined; this.schedule(); }
+        } }, reservation);
+        if (this.alive && this.urlTransition === reservation) this.url = connection;
+        else connection.dispose();
+      }
+    } catch (caught) {
+      if (this.alive) this.reportUrl(caught, 'connect');
+      this.url = null;
+      this.urlBindings = undefined;
+    } finally {
+      stop();
+      reservation.dispose();
+      if (this.urlTransition === reservation) this.urlTransition = null;
+      if (this.alive) {
+        this.schedule();
+        this.runNext();
+      }
+    }
+  }
+  reportUrl(cause, kind) {
+    const failure = kind ? error(safeError(cause).code, { kind }) : cause;
+    this.diagnostics.push(failure);
+    this.diagnostic('url', failure);
+  }
+  enqueue(run, signal, beforeCommit) {
+    if (!this.alive || signal?.aborted) return Promise.reject(error('CANCELLED'));
+    const job = { ...deferred(), run, signal, beforeCommit, phase: 'prepare', controller: new AbortController(), cancelled: false };
+    const cancel = () => {
+      if (job.phase !== 'prepare' || job.cancelled) return;
+      job.cancelled = true;
+      job.reject(error('CANCELLED'));
+      job.release();
+      if (this.runtime.stateStore.isRunningPureCallback) queueMicrotask(() => job.controller.abort());
+      else job.controller.abort();
+    };
+    job.cancel = cancel;
+    job.release = () => signal?.removeEventListener('abort', cancel);
+    signal?.addEventListener('abort', cancel, { once: true });
+    const previous = this.nextJob;
+    this.nextJob = job;
+    if (this.running?.phase === 'prepare') this.running.cancel();
+    previous?.cancel();
+    this.runNext();
+    return job.promise;
+  }
+  runNext() {
+    if (this.running || this.urlTransition || !this.alive || !this.nextJob) return;
+    const job = this.nextJob;
+    this.nextJob = null;
+    this.running = job;
+    queueMicrotask(async () => {
+      try {
+        if (!this.alive || job.cancelled) fail('CANCELLED');
+        job.resolve(await job.run(job));
+      } catch (caught) {
+        job.reject(safeError(caught));
+      } finally {
+        job.release();
+        this.running = null;
+        this.runNext();
+      }
+    });
+  }
+  update(spec, { inputs, states } = {}) {
+    const next = spec === undefined ? undefined : structuredClone(spec);
+    return this.enqueue(job => {
+      const definition = next ?? this.spec;
+      this.runtime.registry.validateDefinition('View', definition);
+      if (this.runtime.authorize && this.runtime.authorize({ operation: 'update', owner: this, definition: structuredClone(definition) }) !== true) fail('EXECUTION_BLOCKED');
+      return this.apply(definition, inputs ?? this.inputs, false, states, {}, this.runtime, null, job);
+    });
+  }
+  replace(target, signal, beforeCommit) {
+    return this.enqueue(async job => {
+      let resolved;
+      const fetched = new Map();
+      do { resolved = await this.host.resolve(target, job.controller.signal, fetched); }
+      while (resolved.revision !== this.host.registry.revision);
+      if (this.root && this.host.authorize && this.host.authorize({ operation: 'update', owner: this, definition: structuredClone(resolved.spec) }) !== true) fail('EXECUTION_BLOCKED');
+      return this.apply(resolved.spec, target.inputs ?? {}, true, undefined, target, this.host.execution(resolved.candidate), resolved, job);
+    }, signal, beforeCommit);
   }
   exportDefinition(){return structuredClone(this.spec);}
   getState(name,instanceId){const owner=instanceId?this.owners.get(instanceId):this.root;return owner?.states.get(name)??fail('REFERENCE_NOT_FOUND');}
   getQuery(name,instanceId){const owner=instanceId?this.owners.get(instanceId):this.root;return owner?.queries.get(name)?.handle??fail('REFERENCE_NOT_FOUND');}
   getSnapshot() {
+    if (this.stagingSnapshot) return this.stagingSnapshot;
     const serialize=instance=>Object.freeze({id:instance.id,instanceId:instance.owner?.id,address:instance.address,generation:instance.generation,componentRef:instance.source?.componentRef,status:instance.status,error:instance.error??null,inputs:instance.inputs,children:Object.freeze(instance.children.map(serialize)),slots:Object.freeze(Object.fromEntries(Object.entries(instance.slots??{}).map(([name,nodes])=>[name,Object.freeze(nodes.map(serialize))])))});
     const states=Object.create(null),queries=Object.create(null),actions=Object.create(null);
     for(const [name,handle] of this.root?.states??[])states[name]=handle.getSnapshot();
@@ -412,8 +780,54 @@ export class View {
       if(handler.emit){const receiver=instance.author.instance;if(!receiver)fail('REFERENCE_NOT_FOUND');return this.emit(receiver,handler.emit,evaluate(handler.payload,context));}
       const key=tuple([instance.address,instance.generation,event]),connection=this.connections.get(key)?.connection;if(!connection)fail('CANCELLED');
       const spec=handler.action??this.runtime.registry.get('Action',handler.actionRef).spec;
-      return connection.invoke(()=>this.prepareInputs(spec,handler.inputs??{},context,'explicit',false,'Action').ports);
-    }catch(caught){return Promise.reject(safeError(caught));}
+      return connection.invoke(() => this.prepareInputs(spec, handler.inputs ?? {}, context, 'explicit', false, 'Action').ports)
+        .catch(caught => { if (this.alive && caught.code !== 'CANCELLED') this.diagnostic('action', caught, instance.id); throw caught; });
+    } catch (caught) {
+      const failure = safeError(caught);
+      if (this.alive && failure.code !== 'CANCELLED') this.diagnostic('action', failure,
+        typeof target === 'string' ? target : target?.id);
+      return Promise.reject(failure);
+    }
   }
-  dispose(){if(!this.alive)return;this.alive=false;++this.operation;this.initial?.reject(error('CANCELLED'));this.unsubscribe();this.url?.dispose();for(const entry of this.connections.values())entry.connection.dispose();for(const owner of this.owners.values()){owner.actionOwner.dispose();for(const item of owner.queries.values())item.usage?.dispose();owner.scope.dispose();}this.listeners.clear();this.host.views.delete(this);}
+  dispose() {
+    if (this.disposal) return this.disposal.promise;
+    const completion = this.disposal = deferred();
+    const store = this.runtime.stateStore;
+    this.initial?.reject(error('CANCELLED'));
+    this.flushProjectionWaiters();
+    for (const cancel of this.renderWaiters) cancel(error('CANCELLED'));
+    this.renderWaiters.clear();
+    this.listeners.clear();
+    this.diagnosticListeners.clear();
+    let failure;
+    const cleanup = run => { try { run(); } catch (cause) { failure ??= safeError(cause); } };
+    const cancel = () => {
+      this.lifetime.abort();
+      this.running?.cancel();
+      this.nextJob?.cancel();
+      this.nextJob = null;
+      this.unsubscribe();
+      this.owner?.signal.removeEventListener('abort', this.disposeOnAbort);
+      cleanup(() => this.urlTransition?.dispose());
+      cleanup(() => this.url?.dispose());
+      for (const listener of this.closeListeners) try { listener(); } catch {}
+      this.closeListeners.clear();
+    };
+    const release = () => {
+      for (const entry of this.connections.values()) cleanup(() => entry.connection.dispose());
+      for (const owner of this.owners.values()) {
+        cleanup(() => owner.actionOwner.dispose());
+        for (const item of owner.queries.values()) cleanup(() => item.usage?.dispose());
+        cleanup(() => owner.scope.dispose());
+      }
+      this.host.views.delete(this);
+      if (failure) completion.reject(failure);
+      else completion.resolve();
+    };
+    if (store.isRunningPureCallback) queueMicrotask(cancel);
+    else cancel();
+    if (this.planning || store.isBusy) queueMicrotask(release);
+    else release();
+    return completion.promise;
+  }
 }

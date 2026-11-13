@@ -15,11 +15,11 @@ registry.registerComponentContract({
   spec: { ports: { text: { kind: 'Value', schema: { type: 'string' }, required: true } } },
 });
 const runtime = createRuntime({ registry });
-const { view, initialComplete } = await runtime.createView({ view: {
+const view = await runtime.createView({
   states: { title: { kind: 'State', schema: { type: 'string' }, initial: 'Hello' } },
   render: { id: 'label', componentRef: 'Label', inputs: { text: { '@path': '/states/title' } } },
-} });
-await initialComplete;
+});
+await view.whenSettled(view.initial);
 const stop = view.subscribe(snapshot => {
   console.log(snapshot.roots[0]?.inputs.text);
 });
@@ -28,13 +28,13 @@ stop();
 runtime.dispose();
 ```
 
-`initialComplete`은 이번 적용에서 실행 가능한 첫 Query들의 성공/오류가 확정된 완료 신호입니다. UI는 준비된 부분부터 관찰할 수 있습니다. 입력 미준비·gate 차단은 완료를 막지 않으며 Query 오류는 `(await initialComplete).queryErrors`에 포함됩니다. DOM paint 완료 신호는 아닙니다.
+`view.whenSettled(application)`은 이번 적용에서 실행 가능한 첫 Query들의 성공/오류가 확정된 완료 신호입니다. UI는 준비된 부분부터 관찰할 수 있습니다. 입력 미준비·gate 차단은 완료를 막지 않으며 Query 오류는 `(await view.whenSettled(view.initial)).queryErrors`에 포함됩니다. DOM paint 완료 신호는 아닙니다.
 
 ## API 경계
 
 - `createRegistry`: `(kind, id)` 등록·검증, 코드형 Component/Action 등록, 목록·설명·정의 추출·명시적 정의 교체.
 - `createStateStore`: scope, State, `writeBatch`/동기 `transaction`, 안정적인 읽기 snapshot, `registerReaction`, Clock·URL 연결. Derived는 View/Component의 `states`에 선언합니다. 외부에서 주입한 Store는 runtime 폐기로 제거하지 않습니다.
-- `createRuntime`: `createView`, `invokeAction`, `listResources`, `exportResource`, `dispose`. `view`는 `update`, `replace`, `emit`, `getSnapshot`, `subscribe`, `getState`, `getQuery`, `exportDefinition`을 제공합니다.
+- `createRuntime()`은 기본 Registry를 생성합니다. Runtime은 `createView(source, options?)`, `registry`, `stateStore`, `dispose`를 제공합니다. View는 `setInputs`, `updateDefinition`, `replace`, `invokeAction`, `whenSettled`, `emit`, `getSnapshot`, `subscribe`, `getState`, `getQuery`, `exportDefinition`을 제공합니다.
 - `mergeOwnedUrl`: 호스트 URL adapter에서 소유 키만 병합합니다.
 - `computeGridLayout`: 12열 배치 계산만 제공하며 Grid UI를 자동 등록하지 않습니다.
 
@@ -53,15 +53,15 @@ import { compileCel, evaluateCel, defaultCelLimits } from '@viewstem/core/cel';
 
 렌더러는 `view.getSnapshot()` 또는 `subscribe()`의 `roots`를 그립니다. 각 노드는 `instanceId`, `generation`, `status`, `inputs`, `children`, 이름별 `slots`를 포함합니다. 이벤트는 선언된 payload만 `view.emit(node, event, payload)`로 전달합니다. DOM 이벤트 객체를 전달하지 않습니다. `when:false`/실제 제거는 수명을 끝내지만 일시적인 입력 대기는 기존 상태·실행 연결을 유지합니다.
 
-기존 화면은 주입 시점의 리소스 정의를 유지합니다. `registry.updateResource`는 공용 정의를 변경하고 `view.replace`나 새 createView에서 이를 주입합니다. `view.update`는 현재 화면 구성만 바꿉니다. 유지하는 셀의 State↔Derived 변경은 쓰기 계약 불일치로 거절합니다. State·현재 화면·공용 정의의 변경/추출은 DB 저장과 별개입니다.
+기존 화면은 주입 시점의 리소스 정의를 유지합니다. `registry.updateResource`는 공용 정의를 변경하고 `view.replace`나 새 createView에서 이를 주입합니다. `view.updateDefinition`는 현재 화면 구성만 바꿉니다. 유지하는 셀의 State↔Derived 변경은 쓰기 계약 불일치로 거절합니다. State·현재 화면·공용 정의의 변경/추출은 DB 저장과 별개입니다.
 
 View가 투영을 계산하거나 발행하는 중 구독자가 State를 쓰면, runtime은 후속 투영을 예약합니다. 현재의 불변 snapshot 통지를 마친 뒤 새 투영을 발행하며, 그동안 발생한 여러 쓰기는 한 번의 후속 투영으로 합칩니다. 같은 값을 다시 쓰면 새 State 변경을 만들지 않습니다. 변경된 노드 입력은 다음 snapshot에서 확인하고 DOM 반영은 렌더러의 완료 수단으로 확인합니다.
 
-`authorize({operation, owner, definition})`는 Action 실행과 `view.update`/기존 화면 `replace`의 변경 권한을 검사합니다. 반환값이 `true`일 때만 허용합니다. 목록 노출 필터, 사용자 신원, 저장 권한은 호스트가 구성합니다. 목록에서 발견했다는 사실이 실행 권한을 주지 않습니다.
+`authorize({operation, owner, definition})`는 Action 실행과 `view.updateDefinition`/기존 화면 `replace`의 변경 권한을 검사합니다. 반환값이 `true`일 때만 허용합니다. 목록 노출 필터, 사용자 신원, 저장 권한은 호스트가 구성합니다. 목록에서 발견했다는 사실이 실행 권한을 주지 않습니다.
 
 `update`의 owner는 createView가 반환한 공개 View와 같은 객체입니다. `invoke`의 owner는 수명별 비교에만 쓰는 불투명 식별 객체이며 실행 메서드가 없습니다. 권한 콜백에는 등록된 코드 Action의 구현 함수를 전달하지 않습니다.
 
-등록 코드 Action의 `context.invokeAction`은 부모 취소·재귀 스택을 상속합니다. 부모 종료 시 미완료 하위 호출도 취소됩니다. `runtime.invokeAction({owner:view,...})`은 해당 View 소유의 독립 실행입니다. 취소된 호출의 State 쓰기·Query refresh는 거절하며 이미 성공한 효과는 되돌리지 않습니다.
+등록 코드 Action의 `context.invokeAction`은 부모 취소·재귀 스택을 상속합니다. 부모 종료 시 미완료 하위 호출도 취소됩니다. `view.invokeAction(request)`은 해당 View 소유의 독립 실행입니다. 취소된 호출의 State 쓰기·Query refresh는 거절하며 이미 성공한 효과는 되돌리지 않습니다.
 
 ## HTTP와 URL
 

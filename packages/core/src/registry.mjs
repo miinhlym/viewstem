@@ -81,6 +81,7 @@ export class Registry {
   #implementations = new Map();
   #code = new Set();
   #functions = Object.freeze([]);
+  revision = 0;
   constructor(options = {}) {
     const functions = Array.isArray(options) ? [] : options?.functions ?? [];
     if (!Array.isArray(functions)) invalid();
@@ -91,8 +92,9 @@ export class Registry {
     }));
     if (this.#functions.length) { try { compileCel('true', { functions: this.#functions }); } catch (error) { throw safeError(error, 'INVALID_DEFINITION'); } }
     const resources = Array.isArray(options) ? options : options?.resources ?? [];
-    if (!Array.isArray(resources)) invalid();
-    if (resources.length) this.registerResources(resources);
+    const contracts = Array.isArray(options) ? [] : options?.componentContracts ?? [];
+    if (!Array.isArray(resources) || !Array.isArray(contracts)) invalid();
+    if (resources.length || contracts.length) this.#register(resources, undefined, undefined, contracts);
   }
   get functions() { return this.#functions; }
   get(kind, id) { return this.#definitions.get(key(kind, id)) ?? fail('REFERENCE_NOT_FOUND'); }
@@ -123,11 +125,12 @@ export class Registry {
   registerComponentContracts(contracts) {
     return this.#register(contracts, 'Component');
   }
-  #register(resources, codeKind, implementation) {
+  #register(resources, codeKind, implementation, contracts = []) {
     if (!Array.isArray(resources)) invalid();
-    const definitions = Array.from(resources, copy);
+    const definitions = [...Array.from(resources, definition => [copy(definition), codeKind]),
+      ...Array.from(contracts, definition => [copy(definition), 'Component'])];
     const candidate = this.fork();
-    for (const definition of definitions) {
+    for (const [definition, codeKind] of definitions) {
       fields(definition, ['kind', 'id', 'name', 'spec']);
       if (!kinds.has(definition.kind) || !own(definition, 'spec')) invalid();
       if (codeKind !== undefined && definition.kind !== codeKind) invalid();
@@ -140,7 +143,7 @@ export class Registry {
       if (implementation !== undefined) candidate.#implementations.set(address, implementation);
     }
     try { candidate.#validateAll(); } catch (error) { throw safeError(error, 'INVALID_DEFINITION'); }
-    this.#definitions = candidate.#definitions; this.#code = candidate.#code; this.#implementations = candidate.#implementations;
+    this.commitCandidate(candidate);
     return this;
   }
   updateResource(resource) {
@@ -153,8 +156,14 @@ export class Registry {
     const candidate = this.fork();
     candidate.#definitions.set(key(definition.kind, definition.id), freeze(definition));
     try { candidate.#validateAll(); } catch (error) { throw safeError(error, 'INVALID_DEFINITION'); }
-    this.#definitions = candidate.#definitions;
+    this.commitCandidate(candidate);
     return this;
+  }
+  commitCandidate(candidate) {
+    this.#definitions = candidate.#definitions;
+    this.#code = candidate.#code;
+    this.#implementations = candidate.#implementations;
+    this.revision++;
   }
   #validateAll() {
     const context = { active: new Set(), done: new WeakMap() };
@@ -181,14 +190,20 @@ export class Registry {
   }
   #expression(value,roots,declarations){return expression(value,roots,declarations,this.#functions);}
   #contract(contract, allowed = []) { fields(contract, ['schema', 'typeRef', ...allowed]); this.validator(contract); }
-  #inputs(inputs, target, roots, declarations, checkNames = true) {
+  #inputs(inputs, target, roots, declarations, checkNames = true, resource) {
     object(inputs); this.#expression(inputs, roots, checkNames ? declarations : undefined);
     if (!dynamic(inputs)) {
       const supplied = Object.fromEntries(decodedEntries(inputs));
       for (const input of Object.keys(supplied)) if (!own(target.ports ?? {}, input)) invalid();
       for (const [input, port] of Object.entries(target.ports ?? {})) {
         if (port.required && !own(supplied, input)) invalid();
-        if (port.kind === 'Value' && own(supplied, input) && !hasExpression(supplied[input])) this.validator(port).accept(literal(supplied[input]));
+        if (port.kind === 'Value' && own(supplied, input) && !hasExpression(supplied[input])) {
+          const validator = this.validator(port);
+          try { validator.accept(literal(supplied[input])); }
+          catch {
+            fail('INVALID_DEFINITION', { message: 'The literal input does not match its port schema.', input, ...(resource && { resource }) });
+          }
+        }
         if (['State', 'Query'].includes(port.kind) && own(supplied, input)) {
           const value = supplied[input]; fields(value, ['@path']); if (!own(value, '@path')) invalid();
           const parts = pointerKeys(value['@path']);
@@ -403,7 +418,8 @@ export class Registry {
       }
       const local = { ...declarations, repeat: Object.fromEntries(nested.map(alias => [alias, true])) };
       if (own(value, 'when')) { this.#expression(value.when, roots); if (!hasExpression(value.when) && typeof value.when !== 'boolean') invalid(); }
-      this.#inputs(optional(value, 'inputs'), child, roots, local, false);
+      const resource = own(value, 'componentRef') ? { kind: 'Component', id: value.componentRef } : undefined;
+      this.#inputs(optional(value, 'inputs'), child, roots, local, false, resource);
       const contents = map(value.slots);
       for (const [slot, contract] of Object.entries(child.slots ?? {})) if (contract.required && !own(contents, slot)) invalid();
       for (const [slot, content] of Object.entries(contents)) {

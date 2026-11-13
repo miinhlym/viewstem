@@ -25,13 +25,17 @@ export class QueryUsage {
     this.engine = engine; this.use = use;
     this.owner = options.owner ?? this;
     this.clock = options.clock ?? nativeClock;
+    this.isOpen = options.isOpen ?? (() => true);
+    this.ownerSignal = options.ownerSignal;
     this.onChange = options.onChange;
+    this.onCleanupError = options.onCleanupError;
     this.initial = deferred(); this.initialSettled = this.initial.promise;
     this.settings = { inputs: {}, ready: true, executeWhen: true, refresh: true, autoRefreshWhen: true, ...options };
     this.validateSettings(this.settings);
     this.prepare();
-    this.changed();
+    if (options.start !== false) this.start();
   }
+  start() { this.changed(); }
   validateSettings(settings) {
     for (const key of ['ready', 'executeWhen', 'refresh', 'autoRefreshWhen']) {
       if (typeof settings[key] !== 'boolean') throw failure('TYPE_MISMATCH');
@@ -46,7 +50,7 @@ export class QueryUsage {
   }
   getSnapshot() { return this.state; }
   publish(patch) {
-    if (!this.alive) return;
+    if (!this.alive || !this.isOpen()) return;
     this.state = Object.freeze({ ...this.state, ...patch });
     if (this.state.status !== 'running' && this.state.status !== 'idle') this.initial.resolve(this.state);
     // An observer must not be able to corrupt the scheduler through its exception.
@@ -103,7 +107,7 @@ export class QueryUsage {
     // Accept both AbortSignal and the conventional {signal} options shape.
     signal = signal?.signal ?? signal;
     let code;
-    if (!this.alive || signal?.aborted) code = 'CANCELLED';
+    if (!this.alive || !this.isOpen() || signal?.aborted) code = 'CANCELLED';
     else if (this.settings.inputError && !['INPUT_NOT_READY', 'VALUE_PENDING'].includes(this.settings.inputError.code)) return Promise.reject(safeError(this.settings.inputError));
     else if (!this.settings.executeWhen) code = 'EXECUTION_BLOCKED';
     else if (!this.ready) code = 'INPUT_NOT_READY';
@@ -132,22 +136,25 @@ export class QueryUsage {
     if (this.active) this.active.tickets = [];
   }
   drain(stale = this.state.stale) {
-    if (!this.alive || this.active || !this.pending || !this.settings.executeWhen || !this.ready) return;
+    if (!this.alive || !this.isOpen() || this.active || !this.pending || !this.settings.executeWhen || !this.ready) return;
     const pending = this.pending; this.pending = null;
     const run = { controller: new AbortController(), generation: this.generation, inputs: this.inputs,
       tickets: pending.tickets, fresh: pending.fresh === true || pending.periodic === true, done: false };
     this.active = run; this.clearTimer();
     this.publish({ status: 'running', error: null, waitingReason: null, stale });
+    const signal = this.ownerSignal ? AbortSignal.any([run.controller.signal, this.ownerSignal]) : run.controller.signal;
     this.engine.execute(this.use, { inputs: run.inputs, owner: this.owner,
-      fresh: run.fresh, signal: run.controller.signal,
-      isCurrent: () => this.alive && this.settings.executeWhen && this.ready && run.generation === this.generation,
+      fresh: run.fresh, signal,
+      onCleanupError: this.onCleanupError,
+      isOpen: () => this.alive && this.isOpen(),
+      isCurrent: () => this.alive && this.isOpen() && this.settings.executeWhen && this.ready && run.generation === this.generation,
     }).then(value => this.finish(run, value), error => this.finish(run, undefined, safeError(error, 'HTTP_ERROR')));
   }
   finish(run, value, error) {
     if (run.done) return;
     run.done = true;
     if (this.active === run) this.active = null;
-    const valid = this.alive && this.settings.executeWhen && this.ready && run.generation === this.generation;
+    const valid = this.alive && this.isOpen() && this.settings.executeWhen && this.ready && run.generation === this.generation;
     if (valid) {
       if (error) this.publish({ status: 'error', error: protect(error), stale: this.state.data !== undefined, waitingReason: null });
       else this.publish({ status: 'success', data: value, dataInputs: protect(run.inputs), error: null, stale: false, waitingReason: null });
@@ -160,12 +167,16 @@ export class QueryUsage {
     this.arm();
   }
   pollAllowed() {
-    return this.alive && this.settings.intervalMs !== undefined && this.settings.executeWhen && this.ready && this.settings.refresh && this.settings.autoRefreshWhen;
+    return this.alive && this.isOpen() && this.settings.intervalMs !== undefined && this.settings.executeWhen && this.ready && this.settings.refresh && this.settings.autoRefreshWhen;
   }
-  clearTimer() {
+  clearTimer(report = this.onCleanupError) {
     ++this.timerEpoch;
-    if (this.timer !== null) this.clock.clearTimeout(this.timer);
+    const timer = this.timer;
     this.timer = null;
+    if (timer !== null) {
+      try { this.clock.clearTimeout(timer); }
+      catch (cause) { if (report) report(cause); else throw cause; }
+    }
   }
   cancelPeriodic() {
     if (!this.pending?.periodic) return;
@@ -185,17 +196,25 @@ export class QueryUsage {
     const schedule = () => {
       if (epoch !== this.timerEpoch || !this.pollAllowed()) return;
       const remaining = Math.max(0, deadline - this.now());
-      this.timer = this.clock.setTimeout(() => {
+      if (epoch !== this.timerEpoch || !this.pollAllowed()) return;
+      const timer = this.clock.setTimeout(() => {
         if (epoch !== this.timerEpoch || !this.pollAllowed()) return;
         this.timer = null;
         if (this.now() < deadline) schedule(); else this.periodic();
       }, Math.min(remaining, 2_147_483_647));
+      if (epoch === this.timerEpoch && this.pollAllowed()) this.timer = timer;
+      else {
+        try { this.clock.clearTimeout(timer); }
+        catch (cause) { this.onCleanupError?.(cause); }
+      }
     };
     schedule();
   }
   dispose() {
     if (!this.alive) return;
-    this.alive = false; this.clearTimer(); this.rejectAll('CANCELLED'); this.pending = null;
+    this.alive = false;
+    this.rejectAll('CANCELLED'); this.pending = null;
     this.active?.controller.abort(); this.engine.forget(this.owner); this.initial.resolve(this.state);
+    this.clearTimer(null);
   }
 }

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createRegistry, createRuntime, createStateStore } from '@viewstem/core';
+import { createRegistry, createStateStore } from '@viewstem/core';
+import { createRuntime } from './fixtures/runtime-operations.mjs';
 import { compilePorts, stateValue } from '../src/ports.mjs';
 import { compileCel } from '@viewstem/core/cel';
 const integer = { type: 'integer' }, string = { type: 'string' }, date = { 'x-viewstem-type': 'date' };

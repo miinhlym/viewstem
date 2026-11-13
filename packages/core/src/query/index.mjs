@@ -63,36 +63,57 @@ export function createQueryEngine({ registry, requestExecutor, requestTimeoutMs 
     return compilePorts({ resourceKind: 'Query', ports: spec.ports ?? {}, types: registry.types?.() ?? {} }).prepare(inputs, { mode });
   };
   // Timeouts belong to each request plan, never to an entire composite execution.
-  const executePlan = (plan, signal) => new Promise((resolve, reject) => {
+  const executePlan = (plan, signal, isOpen, onCleanupError) => new Promise((resolve, reject) => {
     const controller = new AbortController();
-    const deadline = (typeof clock.now === 'function' ? clock.now() : clock.now) + requestTimeoutMs;
     let done = false, timer;
+    const clear = handle => {
+      if (handle === undefined) return;
+      try { clock.clearTimeout(handle); }
+      catch (cause) { onCleanupError?.(safeError(cause)); }
+    };
     const finish = (value, error) => {
       if (done) return;
-      done = true; clock.clearTimeout(timer); signal?.removeEventListener('abort', abort); controller.abort();
+      done = true;
+      signal?.removeEventListener('abort', abort);
+      controller.abort();
+      clear(timer);
       if (error) reject(error); else resolve(value);
     };
     const abort = () => finish(undefined, { code: 'CANCELLED', message: 'CANCELLED' });
+    const open = () => !done && !signal?.aborted && isOpen();
+    const now = () => typeof clock.now === 'function' ? clock.now() : clock.now;
+    let deadline;
     const arm = () => {
-      const remaining = deadline - (typeof clock.now === 'function' ? clock.now() : clock.now);
-      if (remaining <= 0) finish(undefined, { code: 'TIMEOUT', message: 'TIMEOUT' });
-      else timer = clock.setTimeout(arm, Math.min(remaining, 2_147_483_647));
+      try {
+        if (!open()) { abort(); return; }
+        const remaining = deadline - now();
+        if (!open()) { abort(); return; }
+        if (remaining <= 0) finish(undefined, { code: 'TIMEOUT', message: 'TIMEOUT' });
+        else {
+          const handle = clock.setTimeout(arm, Math.min(remaining, 2_147_483_647));
+          if (!open()) { clear(handle); abort(); }
+          else timer = handle;
+        }
+      } catch (cause) { finish(undefined, safeError(cause, 'HTTP_ERROR')); }
     };
-    if (signal?.aborted) { abort(); return; }
-    signal?.addEventListener('abort', abort, { once: true }); arm();
+    if (!open()) { abort(); return; }
+    signal?.addEventListener('abort', abort, { once: true });
     try {
+      deadline = now() + requestTimeoutMs;
+      arm();
+      if (!open()) { abort(); return; }
       Promise.resolve(requestExecutor(plan, { signal: controller.signal })).then(
         value => finish(value), error => finish(undefined, safeError(error, 'HTTP_ERROR')),
       );
     } catch (error) { finish(undefined, safeError(error, 'HTTP_ERROR')); }
   });
-  async function execute(use, { inputs = {}, signal: parentSignal, owner, fresh = true, isCurrent = () => true } = {}) {
+  async function execute(use, { inputs = {}, signal: parentSignal, owner, fresh = true, isCurrent = () => true, isOpen = () => true, onCleanupError } = {}) {
     const root = resolve(use), controller = new AbortController();
     const abort = () => controller.abort();
     if (parentSignal?.aborted) abort(); else parentSignal?.addEventListener('abort', abort, { once: true });
     const signal = controller.signal, staged = new Map();
     const committed = owner === undefined ? new Map() : caches.get(owner) ?? new Map();
-    const check = () => { if (signal.aborted) fail('CANCELLED'); };
+    const check = () => { if (signal.aborted || !isOpen()) fail('CANCELLED'); };
     const evaluate = createValueEvaluator(check, functions);
     const node = async (definition, originalValues, path, location, resource, cacheable, lineage = []) => {
       check();
@@ -129,7 +150,7 @@ export function createQueryEngine({ registry, requestExecutor, requestTimeoutMs 
             record(source.request);
             const datasource = objectSpec(own(source, 'datasourceRef') ? get('Datasource', source.datasourceRef) : source.datasource);
             const response = await executePlan({ version: 1, requestId: `viewstem-${++nextRequest}`,
-              datasource: normalize(datasource), request: normalize(source.request), inputs: encodeBoundary(values) }, signal);
+              datasource: normalize(datasource), request: normalize(source.request), inputs: encodeBoundary(values) }, signal, isOpen, onCleanupError);
             check(); output[alias] = normalize(response.body);
           }
         } catch (error) { throw wrap(error, sourceLocation, resource); }

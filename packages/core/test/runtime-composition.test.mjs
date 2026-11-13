@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createRegistry,createRuntime} from '@viewstem/core';
+import { createRegistry } from '@viewstem/core';
+import { createRuntime } from './fixtures/runtime-operations.mjs';
 const p=path=>({'@path':path}),integer={type:'integer'},value={kind:'Value',schema:integer,required:true};
 const base=()=>{const r=createRegistry();r.registerComponentContract({kind:'Component',id:'Row',spec:{slots:{default:{}}}});r.registerComponentContract({kind:'Component',id:'Label',spec:{ports:{n:value}}});return r;};
 test('K01 ref and inline Component Query Derived use the same declared inputs and never capture surrounding values',async t=>{

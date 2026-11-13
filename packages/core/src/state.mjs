@@ -10,6 +10,8 @@ const pending = Object.freeze({ status: 'pending' });
 const errorState = error => Object.freeze({ status: 'error', error: safeError(error) });
 const same = (a, b) => a.status === b.status && (a.status === 'ready' ? equal(a.value, b.value) : a.status !== 'error' || a.error.code === b.error.code);
 const changedValue = (before, after) => after.status === 'ready' && (before.status !== 'ready' || !equal(before.value, after.value));
+const stateHandles = new WeakSet();
+export const isStateHandle = value => stateHandles.has(value);
 let nextScope = 0, nextGeneration = 0;
 
 export class StateStore {
@@ -19,6 +21,7 @@ export class StateStore {
   #baselineListeners = new Set();
   #reactions = new Map();
   #notifying = false;
+  #publishing = false;
   #queued = [];
   #diagnostics = [];
   #transaction = null;
@@ -26,8 +29,21 @@ export class StateStore {
   #scopes = new Set();
   #scopeLifetimes = new WeakMap();
   #url = null;
+  #runningPureCallback = false;
 
-  transaction(run) {
+  get isRunningPureCallback() { return this.#runningPureCallback; }
+  get isBusy() { return this.#runningPureCallback || this.#notifying || this.#publishing || this.#transaction !== null; }
+  assertCanWrite() {
+    if (this.#runningPureCallback) fail('INVALID_DEFINITION');
+  }
+  runPureCallback(run) {
+    const previous = this.#runningPureCallback;
+    this.#runningPureCallback = true;
+    try { return run(); }
+    finally { this.#runningPureCallback = previous; }
+  }
+  transaction(run, beforeNotify) {
+    this.assertCanWrite();
     if (this.#transaction) return run();
     const cells = new Map(this.#cells), reactions = new Map(this.#reactions), scopes = new Set(this.#scopes);
     const previous = new Map([...cells.values()].map(cell => [cell, {...cell}]));
@@ -35,7 +51,12 @@ export class StateStore {
     const pending = []; pending.createdScopes = new Set(); pending.cleanup = [];
     this.#transaction = pending;
     let result;
-    try { result = run(); if (result?.then) fail('INVALID_DEFINITION'); }
+    let afterCommit;
+    try {
+      result = run();
+      if (result?.then) fail('INVALID_DEFINITION');
+      afterCommit = beforeNotify?.();
+    }
     catch (caught) {
       for (const scope of pending.createdScopes) {
         const lifetime = this.#scopeLifetimes.get(scope); lifetime.alive = false;
@@ -46,7 +67,12 @@ export class StateStore {
       for (const [cell, fields] of previous) Object.assign(cell, fields);
       throw caught;
     } finally { this.#transaction = null; }
-    for (const cleanup of pending.cleanup) cleanup();
+    const wasNotifying = this.#notifying;
+    this.#notifying = true;
+    try {
+      afterCommit?.();
+      for (const cleanup of pending.cleanup) cleanup();
+    } finally { this.#notifying = wasNotifying; }
     const changes = new Map();
     for (const change of pending) {
       const key = keyOf(change.target), first = changes.get(key);
@@ -60,7 +86,12 @@ export class StateStore {
         if(change.kind==='updated')changes.delete(key);
       }
     }
-    this.#notify([...changes.values()]);
+    const wasPublishing = this.#publishing;
+    this.#publishing = true;
+    try {
+      this.#notify([...changes.values()]);
+      if (pending.baseline) for (const listener of this.#baselineListeners) listener();
+    } finally { this.#publishing = wasPublishing; }
     this.#perform(() => {});
     return result;
   }
@@ -80,7 +111,8 @@ export class StateStore {
     if (snapshot.status !== 'pending' && snapshot.status !== 'missing') cell.initialSettled = true;
     cell.baseline = accepted;
     if (!cell.writes) this.#commit(new Map([[cell,accepted]]),new Set(),'initial');
-    for(const listener of this.#baselineListeners)listener();
+    if (this.#transaction) this.#transaction.baseline = true;
+    else for (const listener of this.#baselineListeners) listener();
   }
 
   computed(handle, dependencies, compute, { recompute = true } = {}) {
@@ -95,23 +127,37 @@ export class StateStore {
   baseline(handle) { return this.#cellFor(handle).baseline; }
   hasWritten(handle) { return this.#cellFor(handle).writes > 0; }
   observeBaseline(listener) { this.#baselineListeners.add(listener);return ()=>this.#baselineListeners.delete(listener); }
-  restore(entries) {
+  restore(entries, isCurrent = () => true) {
     const prepared = new Map(entries.map(([handle,snapshot]) => {
       const cell=this.#cellFor(handle);if(cell.derived)fail('TYPE_MISMATCH');
       return [cell,snapshot.status === 'ready' ? this.#accept(cell,snapshot.value) : snapshot.status === 'error' ? errorState(snapshot.error) : snapshot.status === 'pending' ? pending : missing];
     }));
-    this.#perform(()=>this.#commit(prepared,new Set(prepared.keys()),'url'));
+    this.#perform(() => { if (isCurrent()) this.#commit(prepared,new Set(prepared.keys()),'url'); });
   }
   get urlConnection() { return this.#url; }
-  connectUrl(options) {
-    if(this.#url)fail('INVALID_DEFINITION');
-    const connection = connectStateUrl(this,options,()=>{if(this.#url===connection)this.#url=null;});
-    this.#url = connection;return connection;
+  reserveUrl(reservation) { this.#url = reservation; }
+  releaseUrl(reservation) { if (this.#url === reservation) this.#url = null; }
+  connectUrl(options, reservation) {
+    this.assertCanWrite();
+    if (this.#url && this.#url !== reservation) fail('INVALID_DEFINITION');
+    let connection;
+    const placeholder = reservation ?? { dispose: () => this.releaseUrl(placeholder) };
+    this.#url = placeholder;
+    try {
+      connection = connectStateUrl(this, options, () => this.releaseUrl(connection ?? placeholder), reservation);
+      if (this.#url !== placeholder) connection.dispose();
+      else this.#url = connection;
+      return connection;
+    } catch (error) {
+      this.releaseUrl(placeholder);
+      throw error;
+    }
   }
-  dispose() { this.#url?.dispose(); for(const scope of this.#scopes)scope.dispose();this.#subscribers.clear();this.#settledListeners.clear();this.#baselineListeners.clear(); }
+  dispose() { this.assertCanWrite(); this.#url?.dispose(); for(const scope of this.#scopes)scope.dispose();this.#subscribers.clear();this.#settledListeners.clear();this.#baselineListeners.clear(); }
 
 
   createScope() {
+    this.assertCanWrite();
     const store = this, scopeId = `scope-${++nextScope}`;
     const lifetime = { alive: true, clockSubscriptions: new Set() }, { clockSubscriptions } = lifetime;
     const current = () => { if (!lifetime.alive) fail('CANCELLED'); };
@@ -136,6 +182,7 @@ export class StateStore {
       getState(name) { current(); return store.#lookup({ scopeId, name }).handle; },
       removeState(name) { current(); store.#remove(store.#lookup({ scopeId, name })); },
       dispose() {
+        store.assertCanWrite();
         if (!lifetime.alive) return;
         lifetime.alive = false;
         store.#scopes.delete(scope);
@@ -159,6 +206,7 @@ export class StateStore {
     catch (error) { throw safeError(error, 'TYPE_MISMATCH'); }
   }
   #register(scopeId, name, declaration, replace = false) {
+    this.assertCanWrite();
     const address = Object.freeze({ scopeId, name }), key = keyOf(address), previous = this.#cells.get(key);
     if (replace ? !previous : previous) fail(replace ? 'REFERENCE_NOT_FOUND' : 'DUPLICATE_STATE');
     if (!declaration || typeof declaration !== 'object' || !Object.hasOwn(declaration, 'schema')) fail('INVALID_DEFINITION');
@@ -178,6 +226,7 @@ export class StateStore {
       getSnapshot() { store.#current(cell); return store.#readingStage?.get(cell) ?? cell.state; },
       write(value) { store.writeBatch([[cell.handle, value]]); },
       reset() {
+        store.assertCanWrite();
         store.#current(cell); if (cell.derived) fail('READ_ONLY');
         if (cell.baseline.status === 'pending') fail('VALUE_PENDING');
         if (cell.baseline.status === 'error') throw cell.baseline.error;
@@ -192,6 +241,7 @@ export class StateStore {
       if (previous) for (const [target, reaction] of this.#reactions) if (target === previous || reaction.watch.includes(previous)) this.#reactions.delete(target);
       this.#structuralCommit([this.#change(cell, previous ? 'replaced' : 'added')]);
     });
+    stateHandles.add(cell.handle);
     return cell.handle;
   }
   #cellFor(handle) {
@@ -213,6 +263,7 @@ export class StateStore {
     });
   }
   #remove(cell) {
+    this.assertCanWrite();
     this.#perform(() => {
       this.#current(cell); this.#cells.delete(keyOf(cell.address));
       for (const [target, reaction] of this.#reactions) if (target === cell || reaction.watch.includes(cell)) this.#reactions.delete(target);
@@ -221,6 +272,7 @@ export class StateStore {
   }
 
   writeBatch(changes, { origin = 'explicit' } = {}) {
+    this.assertCanWrite();
     const prepared = new Map();
     for (const [handle, value] of changes) {
       const cell = this.#cellFor(handle);
@@ -241,6 +293,7 @@ export class StateStore {
     return ()=>this.#commit(new Map(),explicit,'explicit',before);
   }
   registerReaction(owner, { watch, target, value }) {
+    this.assertCanWrite();
     const lifetime = this.#scopeLifetimes.get(owner);
     if (!lifetime) fail('INVALID_DEFINITION');
     if (!lifetime.alive) fail('CANCELLED');
@@ -330,7 +383,11 @@ export class StateStore {
         try { subscriber.listener(payload); } catch (error) { this.#diagnostics.push(errorState(error).error); }
       }
     } finally { this.#notifying = false; }
-    for(const listener of this.#settledListeners)try{listener();}catch(caught){this.#diagnostics.push(safeError(caught));}
+    const wasPublishing = this.#publishing;
+    this.#publishing = true;
+    try {
+      for(const listener of this.#settledListeners)try{listener();}catch(caught){this.#diagnostics.push(safeError(caught));}
+    } finally { this.#publishing = wasPublishing; }
   }
   observe(listener) { this.#settledListeners.add(listener);return ()=>this.#settledListeners.delete(listener); }
   subscribe(selector, listener) {

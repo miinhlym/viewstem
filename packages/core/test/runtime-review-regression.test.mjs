@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createRegistry,createRuntime,createStateStore,mergeOwnedUrl} from '@viewstem/core';
+import { createRegistry, createStateStore, mergeOwnedUrl } from '@viewstem/core';
+import { createRuntime } from './fixtures/runtime-operations.mjs';
 const p=path=>({'@path':path}),number={type:'number'},state=initial=>({kind:'State',schema:number,initial});
 const registry=()=>{const r=createRegistry();r.registerComponentContract({kind:'Component',id:'Row',spec:{slots:{default:{}}}});r.registerComponentContract({kind:'Component',id:'Leaf',spec:{ports:{value:{kind:'Value',schema:true}}}});r.registerComponentContract({kind:'Component',id:'Button',spec:{events:{click:{schema:true}}}});return r;};
 const flush=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};

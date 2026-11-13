@@ -147,32 +147,49 @@ export interface Registry {
   exportResource<K extends ResourceKind>(kind: K, id: string): Extract<RegisteredResource, { kind: K }>;
   isCode(kind: ResourceKind, id: string): boolean;
 }
-export function createRegistry(options?: readonly AnyResource[] | { readonly resources?: readonly AnyResource[]; readonly functions?: readonly CelFunction[] }): Registry;
-export type ViewTarget = ReferenceOrInline<'viewRef', 'view', ViewSpec> & { readonly inputs?: Readonly<Record<string, unknown>>; readonly url?: { readonly adapter: UrlAdapter; readonly bindings: readonly { readonly state: string; readonly key?: string; readonly history?: 'push' | 'replace' }[]; readonly limits?: Partial<{ readonly maxOwnedBytes: number; readonly maxValueBytes: number; readonly maxItems: number; readonly maxKeys: number }> } };
+export interface RegistryOptions { readonly resources?: readonly AnyResource[]; readonly componentContracts?: readonly ComponentContract[]; readonly functions?: readonly CelFunction[] }
+export function createRegistry(options?: readonly AnyResource[] | RegistryOptions): Registry;
+export type ViewSource = (ViewSpec & { readonly ref?: never }) | { readonly ref: string; readonly render?: never };
+export interface ViewOptions {
+  readonly inputs?: Readonly<Record<string, unknown>>;
+  readonly url?: { readonly adapter: UrlAdapter; readonly bindings: readonly { readonly state: string; readonly key?: string; readonly history?: 'push' | 'replace' }[]; readonly limits?: Partial<{ readonly maxOwnedBytes: number; readonly maxValueBytes: number; readonly maxItems: number; readonly maxKeys: number }> };
+  readonly signal?: AbortSignal;
+}
 export interface InitialReport { readonly generation: number; readonly queryErrors: readonly { readonly instanceId: string; readonly query: string; readonly error: PublicError }[] }
-/** Initial executable Queries have completed (including individual errors); pending inputs/gates do not block. */
-export interface ApplicationResult { readonly initialComplete: Promise<InitialReport> }
+declare const applicationBrand: unique symbol;
+export interface ViewApplication { readonly [applicationBrand]: true }
 export interface NodeSnapshot { readonly id: string; readonly instanceId?: string | undefined; readonly address?: string | undefined; readonly generation?: number | undefined; readonly componentRef?: string | undefined; readonly status: 'ready' | 'pending' | 'error' | 'missing'; readonly error: PublicError | null; readonly inputs: DeepReadonly<Record<string, unknown>>; readonly children: readonly NodeSnapshot[]; readonly slots: Readonly<Record<string, readonly NodeSnapshot[]>> }
 export interface ViewSnapshot { readonly generation: number; readonly lifetime?: string | undefined; readonly roots: readonly NodeSnapshot[]; readonly states: Readonly<Record<string, ValueSnapshot<unknown>>>; readonly queries: Readonly<Record<string, QuerySnapshot<unknown>>>; readonly actions: Readonly<Record<string, ActionSnapshot>>; readonly errors: readonly PublicError[] }
-export interface RuntimeOptions {
-  readonly registry: Registry; readonly stateStore?: StateStore; readonly requestExecutor?: RequestExecutor;
-  readonly resourceResolver?: (kind: ResourceKind, id: string) => Awaitable<AnyResource>;
+export interface RuntimeSettings {
+  readonly stateStore?: StateStore;
+  readonly requestExecutor?: RequestExecutor;
+  readonly resourceResolver?: (kind: ResourceKind, id: string, context: { readonly signal: AbortSignal }) => Awaitable<AnyResource>;
   readonly authorize?: (context: { readonly operation: 'invoke'; readonly owner: unknown; readonly definition: unknown } | { readonly operation: 'update'; readonly owner: View; readonly definition: ViewSpec }) => boolean;
-  readonly functions?: readonly CelFunction[]; readonly requestTimeoutMs?: number; readonly clock?: TimerClock;
+  readonly requestTimeoutMs?: number;
+  readonly urlCleanupTimeoutMs?: number;
+  readonly clock?: TimerClock;
 }
+export type RuntimeOptions = RuntimeSettings & (
+  | ({ readonly registry?: never } & RegistryOptions)
+  | ({ readonly registry: Registry } & { readonly [K in keyof RegistryOptions]?: never })
+);
 export interface Runtime {
   readonly [runtimeBrand]: true;
   readonly registry: Registry; readonly stateStore: StateStore;
-  createView(target: ViewTarget): Promise<{ readonly view: View; readonly initialComplete: Promise<InitialReport> }>;
-  invokeAction(request: ReferenceOrInline<'actionRef', 'action', ActionSpec> & { readonly inputs?: Readonly<Record<string, unknown>>; readonly owner: View }): Promise<unknown>;
-  listResources(kind?: ResourceKind): RegisteredResource[]; exportResource<K extends ResourceKind>(kind: K, id: string): Extract<RegisteredResource, { kind: K }>;
+  createView(source: ViewSource, options?: ViewOptions): Promise<View>;
   dispose(): void;
 }
-export function createRuntime(options: RuntimeOptions): Runtime;
+export function createRuntime(options?: RuntimeOptions): Runtime;
+export type ActionRequest = ReferenceOrInline<'actionRef', 'action', ActionSpec> & { readonly inputs?: Readonly<Record<string, unknown>> };
 export interface View {
   readonly [viewBrand]: true;
-  update(spec: ViewSpec, options?: { readonly inputs?: Readonly<Record<string, unknown>>; readonly states?: Readonly<Record<string, unknown>> }): Promise<ApplicationResult>;
-  replace(target: ViewTarget): Promise<ApplicationResult>; exportDefinition(): ViewSpec;
+  readonly initial: ViewApplication;
+  setInputs(inputs: Readonly<Record<string, unknown>>): Promise<ViewApplication>;
+  updateDefinition(spec: ViewSpec, options?: { readonly inputs?: Readonly<Record<string, unknown>>; readonly states?: Readonly<Record<string, unknown>> }): Promise<ViewApplication>;
+  replace(source: ViewSource, options?: ViewOptions): Promise<ViewApplication>;
+  whenSettled(application: ViewApplication): Promise<InitialReport>;
+  invokeAction(request: ActionRequest): Promise<unknown>;
+  exportDefinition(): ViewSpec;
   getState(name: string, instanceId?: string): StateHandle<unknown>; getQuery(name: string, instanceId?: string): QueryHandle<unknown>;
   getSnapshot(): ViewSnapshot;
   /** State writes during an active projection queue a follow-up; the delivered snapshot stays unchanged. */

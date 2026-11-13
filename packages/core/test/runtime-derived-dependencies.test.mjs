@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createRegistry, createRuntime, createStateStore } from '@viewstem/core';
+import { createRegistry, createStateStore } from '@viewstem/core';
+import { createRuntime } from './fixtures/runtime-operations.mjs';
 
 const integer = { type: 'integer' }, value = { kind: 'Value', schema: integer, required: true }, state = { kind: 'State', schema: integer, required: true };
 const path = value => ({ '@path': value });

@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 // Exercise the built package consumer surface; run npm run build first.
-import { createRegistry, createRuntime, createStateStore } from '@viewstem/core';
+import { createRegistry, createStateStore } from '@viewstem/core';
+import { createRuntime } from './fixtures/runtime-operations.mjs';
 const integer = { type: 'integer' }, string = { type: 'string' }, boolean = { type: 'boolean' }, object = { type: 'object' };
 const path = value => ({ '@path': value }), call = name => ({ '@call': name, args: [] });
 const value = (schema = true, required = true) => ({ kind: 'Value', schema, required });

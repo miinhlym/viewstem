@@ -16,11 +16,11 @@ registry.registerComponentContract({
   spec: { ports: { text: { kind: 'Value', schema: { type: 'string' }, required: true } } },
 });
 const runtime = createRuntime({ registry });
-const { view, initialComplete } = await runtime.createView({ view: {
+const view = await runtime.createView({
   states: { title: { kind: 'State', schema: { type: 'string' }, initial: 'Hello' } },
   render: { id: 'label', componentRef: 'Label', inputs: { text: { '@path': '/states/title' } } },
-} });
-await initialComplete;
+});
+await view.whenSettled(view.initial);
 const stop = view.subscribe(snapshot => {
   console.log(snapshot.roots[0]?.inputs.text);
 });
@@ -29,13 +29,13 @@ stop();
 runtime.dispose();
 ```
 
-`initialComplete` settles once the initial queries eligible to run for this application of the view have succeeded or failed. The UI can observe parts of the view as they become ready. Unready inputs and closed gates do not delay completion, and query errors appear in `(await initialComplete).queryErrors`. DOM paint is outside the scope of this signal.
+`view.whenSettled(application)` settles once the initial queries eligible to run for this application of the view have succeeded or failed. The UI can observe parts of the view as they become ready. Unready inputs and closed gates do not delay completion, and query errors appear in `(await view.whenSettled(view.initial)).queryErrors`. DOM paint is outside the scope of this signal.
 
 ## Public API
 
 - `createRegistry` registers and validates resources by `(kind, id)`, registers code-backed Components and Actions, lists and describes resources, and exports and explicitly replaces definitions.
 - `createStateStore` manages scopes and State, provides `writeBatch` and synchronous `transaction`, exposes stable read snapshots, and supports `registerReaction` and clock and URL integration. Declare Derived values in the `states` of a View or Component. Disposing the runtime preserves an injected store.
-- `createRuntime` exposes `createView`, `invokeAction`, `listResources`, `exportResource`, and `dispose`. A `view` exposes `update`, `replace`, `emit`, `getSnapshot`, `subscribe`, `getState`, `getQuery`, and `exportDefinition`.
+- `createRuntime()` creates a Registry by default. The Runtime exposes `createView(source, options?)`, `registry`, `stateStore`, and `dispose`. A View exposes `setInputs`, `updateDefinition`, `replace`, `invokeAction`, `whenSettled`, `emit`, `getSnapshot`, `subscribe`, `getState`, `getQuery`, and `exportDefinition`.
 - `mergeOwnedUrl` lets a host URL adapter merge only the keys it owns.
 - `computeGridLayout` calculates a 12-column layout. Grid UI requires separate registration.
 
@@ -54,15 +54,15 @@ For exact types and fields, see `dist/index.d.ts`, `dist/http.d.ts`, and `dist/c
 
 Render the `roots` from `view.getSnapshot()` or `subscribe()`. Each node includes `instanceId`, `generation`, `status`, `inputs`, `children`, and named `slots`. Pass only the declared payload to `view.emit(node, event, payload)`. Keep DOM event objects in the host. Setting `when:false` or removing a node ends its lifetime. A temporary wait for inputs preserves existing state and execution connections.
 
-An existing view keeps the resource definitions it received when it was applied. `registry.updateResource` changes the shared definition, which `view.replace` or a new `createView` call can then apply. `view.update` changes only the current view configuration. An update that changes a retained cell between State and Derived fails because the write contracts differ. Changing or exporting State, the current view, and shared definitions is separate from database persistence.
+An existing view keeps the resource definitions it received when it was applied. `registry.updateResource` changes the shared definition, which `view.replace` or a new `createView` call can then apply. `view.updateDefinition` changes only the current view configuration. An update that changes a retained cell between State and Derived fails because the write contracts differ. Changing or exporting State, the current view, and shared definitions is separate from database persistence.
 
 If a subscriber writes State while the View is computing or publishing a projection, the runtime queues a follow-up projection. Listeners finish receiving the current immutable snapshot before the new projection is published. Several writes in that interval are combined into one follow-up; writing the same value does not create another State change. Inspect a subsequent snapshot for the resulting node inputs and use the renderer's completion mechanism for DOM updates.
 
-`authorize({operation, owner, definition})` checks permission to execute Actions or modify an existing view through `view.update` or `replace`. It grants permission only when it returns `true`. The host configures resource-list visibility, user identity, and persistence permissions. Execution requires its own authorization even when a resource appears in a list.
+`authorize({operation, owner, definition})` checks permission to execute Actions or modify an existing view through `view.updateDefinition` or `replace`. It grants permission only when it returns `true`. The host configures resource-list visibility, user identity, and persistence permissions. Execution requires its own authorization even when a resource appears in a list.
 
 For `update`, the owner is the same public View object returned by `createView`. For `invoke`, the owner is an opaque identity object used only for comparisons within a lifetime. It exposes no execution methods. Authorization callbacks receive definitions without the implementation functions of registered code-backed Actions.
 
-`context.invokeAction` in a registered code-backed Action inherits the parent's cancellation and recursion stack. Ending the parent also cancels unfinished child invocations. `runtime.invokeAction({owner:view,...})` starts an independent invocation owned by that View. A cancelled invocation cannot write State or refresh a Query. Effects that already succeeded persist.
+`context.invokeAction` in a registered code-backed Action inherits the parent's cancellation and recursion stack. Ending the parent also cancels unfinished child invocations. `view.invokeAction(request)` starts an independent invocation owned by that View. A cancelled invocation cannot write State or refresh a Query. Effects that already succeeded persist.
 
 ## HTTP and URLs
 
