@@ -150,6 +150,41 @@ test('code Action defaults distinguish omitted inputs from missing View event bi
   assert.equal(calls, 4);
 });
 
+test('rejected Action contract updates leave calls intact and new IDs can be applied explicitly', async t => {
+  const r = registry();
+  r.registerComponentContract({ ...leaf, id: 'Button', spec: { events: { click: { schema: true } } } });
+  const type = (id, schema) => ({ kind: 'Type', id, spec: { schema } });
+  const action = (id, typeRef) => ({ kind: 'Action', id, spec: { output: { typeRef } } });
+  const source = actionRef => ({ render: { id: 'button', componentRef: 'Button', on: { click: { actionRef } } } });
+  const pending = Promise.withResolvers();
+  let calls = 0;
+  r.registerResources([type('answer', integer)]);
+  r.registerAction(action('answer', 'answer'), () => ++calls === 1 ? pending.promise : 42);
+  const runtime = core.createRuntime({ registry: r });
+  t.after(() => runtime.dispose());
+  const view = await runtime.createView(source('answer'));
+  const click = current => current.emit(current.getSnapshot().roots[0], 'click', null);
+  const running = click(view);
+  const string = { type: 'string' };
+  assert.throws(() => r.updateResource(type('answer', string)), {
+    code: 'TYPE_CONTRACT_MISMATCH', resource: { kind: 'Action', id: 'answer' }, location: '/output',
+  });
+  assert.deepEqual(r.get('Type', 'answer').spec.schema, integer);
+  pending.resolve(7);
+  assert.equal(await running, 7);
+  const afterRejectedUpdate = await runtime.createView(source('answer'));
+  assert.equal(await click(afterRejectedUpdate), 42);
+
+  r.registerResources([type('answer-v2', string)]);
+  r.registerAction(action('answer-v2', 'answer-v2'), () => 'new');
+  await assert.rejects(view.updateDefinition(source('answer-v2')), { code: 'REFERENCE_NOT_FOUND' });
+  assert.equal(await click(view), 42);
+  const future = await runtime.createView(source('answer-v2'));
+  assert.equal(await click(future), 'new');
+  await view.replace(source('answer-v2'));
+  assert.equal(await click(view), 'new');
+});
+
 test('createView, update and replace expose application handles and retain initial State fields', async t => {
   const runtime = core.createRuntime({ registry: registry() }); t.after(() => runtime.dispose());
   const spec = { ...definition, states: { count: { kind: 'State', schema: integer, initial: 2 } } };

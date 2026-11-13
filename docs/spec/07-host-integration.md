@@ -64,6 +64,7 @@ await serviceApi.saveDefinition(view.exportDefinition());
 |---|---|
 | createRegistry() | 등록 집합 생성. registerResources(resources)는 묶음 전체 구조·참조·순환 검증 후 원자 등록 |
 | registry.registerAction(definition, implementation) | 코드형 Action의 공개 정의와 실행 함수 등록. 같은 종류 ID 중복 거절. 타입에서 필수인 입력에는 해당 포트와 required:true를 요구 |
+| registry.updateResource(definition) | 의존 정의까지 검증한 뒤 기존 정의를 교체. 등록된 코드 Action의 실행 계약이 직접 또는 Type 갱신으로 바뀌면 원자적으로 거절. 새 계약은 새 Action ID로 등록 |
 | registry.registerComponentContract(contract) | 코드 Component 공개 계약 등록. 실제 렌더러 구현은 같은 ID에 별도 연결 |
 | createStateStore() | 서비스가 소유할 core Store 생성. createScope()로 격리된 소유 범위 생성 |
 | createRuntime(options?) | Registry 생략 시 생성, stateStore·requestExecutor·resourceResolver 선택. Store 생략 시 core가 생성·소유하며 주입 Store의 수명은 서비스가 유지. 실제 필요한 의존성이 없을 때만 오류 |
@@ -76,6 +77,8 @@ await serviceApi.saveDefinition(view.exportDefinition());
 | context.invokeAction({actionRef 또는 action, inputs}) | 코드 Action의 부모에 연결된 하위 호출. 부모 owner·스택·취소를 상속하며 변경 불가. 명시 입력·대상·권한·출력 검증 후 결과/오류 Promise 반환 [U35] |
 
 변경은 `ViewApplication`을 반환한다. `view.whenSettled(application)`은 `{generation, queryErrors}`를 반환하며 실행 가능한 최초 Query의 개별 오류를 보고에 모은다. 입력 대기는 완료를 막지 않는다. 폐기 또는 다른 적용으로 대체된 미완료 보고는 `CANCELLED`다. 화면과 연결의 `whenSettled(application)`은 동일 적용의 DOM 반영까지 기다린다.
+
+View는 적용 시점의 Registry 정의와 코드 핸들러를 보관한다. 새 View와 `view.replace()`는 최신 Registry를 사용하고 `view.updateDefinition()`은 현재 수명에 주입된 Registry를 사용한다. 코드 Action 갱신의 비교 기준과 이전 절차는 [코드 Action 등록과 갱신](04-action.md#코드-action-등록과-갱신)을 따른다.
 
 View가 투영을 계산·발행하는 중 구독자가 State를 변경하면 재계산 요청을 버리지 않고 기존 microtask 큐에 합친다. 현재 전달 중인 snapshot은 유지하며, 통지를 마친 뒤 후속 투영에서 변경된 입력을 발행한다. 예약된 투영이 남아 있으면 해당 적용의 초기 완료를 먼저 확정하지 않는다. View 폐기 뒤에는 예약 작업이 발행하지 않으며, 교체 뒤에는 현재 정의와 수명으로 계산한다. 일반적인 State 쓰기나 core 이벤트 전체를 별도 비동기 실행 엔진으로 바꾸는 것은 아니다. [D131 구현·회귀 검증](../handoff/view-subscription-projection-fix-2026-11-06.md)을 따른다.
 

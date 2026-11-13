@@ -24,7 +24,7 @@ import type { Registry, AnyResource, ComponentContract, CodeActionDefinition } f
 | `registerComponentContract(contract)` | `ComponentContract`; 현재 Registry 반환 | 코드 Component의 포트·슬롯·이벤트 계약을 등록합니다. 화면 구현을 제공하거나 `render` 트리를 받는 API가 아닙니다. |
 | `registerComponentContracts(contracts)` | 읽기 전용 `ComponentContract[]`; 현재 Registry 반환 | 원자적인 배치 등록입니다. 기존 식별자를 덮어쓰지 않습니다. |
 | `registerAction(definition, implementation)` | 코드 Action 계약과 `ActionHandler`; 현재 Registry 반환 | Action ID에 호스트 함수를 등록합니다. 아래에서 설명합니다. |
-| `updateResource(definition)` | `RegisteredResource`; 현재 Registry 반환 | 기존 정의를 교체하고 의존 정의까지 검증한 뒤 반영합니다. 등록된 구현 함수를 교체하지는 않습니다. |
+| `updateResource(definition)` | `RegisteredResource`; 현재 Registry 반환 | 교체할 정의와 의존 정의를 검증한 뒤 반영합니다. 코드 Action의 등록된 입력·출력 계약을 보존합니다. |
 
 잘못된 필드·미지원 스키마·유효하지 않은 참조는 등록을 거절합니다. 오류는 `INVALID_DEFINITION`, `REFERENCE_NOT_FOUND`, `TYPE_CONTRACT_MISMATCH` 등의 공개 진단입니다. `message`를 파싱하지 말고 `code`를 확인하세요. 갱신 실패 시 기존 레지스트리를 유지합니다. 입력 정의는 복사하므로 등록 후 원본 객체를 변경해도 영향을 주지 않습니다.
 
@@ -67,3 +67,9 @@ TypeScript는 포트 선언에서 입력을, 결과 스키마에서 출력을 �
 State·Query 포트는 발급된 핸들을 받습니다. 일반 값 입력은 격리된 깊은 읽기 전용 값입니다. 하위 호출도 권한 검사를 수행합니다. 반환값은 스키마로 검증하며 부모 종료·취소 시 미완료 하위 호출을 취소합니다. 이미 완료된 효과는 되돌리지 않습니다.
 
 전체 실행 예제는 [HTTP와 코드 Action 연결하기](../guides/http-and-actions/)에 있습니다. 리소스 외피와 선언형 Action은 [DSL 리소스](../../dsl/resources/), [DSL Action](../../dsl/actions/)에서 설명합니다.
+
+### 코드 Action 갱신하기
+
+표시 이름은 Action ID를 유지한 채 바꿀 수 있습니다. 포트, 포트 순서와 기본값, 해석된 입출력 스키마를 바꾸면 `TYPE_CONTRACT_MISMATCH`가 발생합니다. 코드 Action에서 쓰는 `Type`을 갱신할 때도 같은 규칙을 적용합니다. `error.resource`로 영향받는 Action을, `error.location`으로 변경 위치를 확인하세요.
+
+계약을 바꾸려면 새 Action ID에 핸들러를 함께 등록하세요. 공유 Type의 스키마를 바꿔야 하면 새 Type ID를 먼저 등록합니다. 호출 입력과 `actionRef`를 바꾼 다음 새 View를 만들거나 `view.replace()`로 적용하세요. 이전 ID를 직접 호출하는 코드 Action도 바뀐 구현을 새 ID로 등록하고 그 참조를 옮겨야 합니다.

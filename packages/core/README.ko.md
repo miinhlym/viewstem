@@ -55,7 +55,7 @@ import { compileCel, evaluateCel, defaultCelLimits } from '@viewstem/core/cel';
 
 기존 화면은 주입 시점의 리소스 정의를 유지합니다. `registry.updateResource`는 공용 정의를 변경하고 `view.replace`나 새 createView에서 이를 주입합니다. `view.updateDefinition`는 현재 화면 구성만 바꿉니다. 유지하는 셀의 State↔Derived 변경은 쓰기 계약 불일치로 거절합니다. State·현재 화면·공용 정의의 변경/추출은 DB 저장과 별개입니다.
 
-코드 Action의 필수 입력은 포트에 `required: true`로 선언합니다. 기본값이 있는 Value 포트도 연결된 값이 없을 수 있으므로 핸들러에서는 선택 입력입니다.
+코드 Action의 필수 입력은 포트에 `required: true`로 선언합니다. 기본값이 있는 Value 포트도 연결된 값이 없을 수 있으므로 핸들러에서는 선택 입력입니다. `updateResource`는 참조 Type을 포함한 코드 Action의 입출력 계약을 보존합니다. 계약을 바꿀 때는 새 Action ID로 핸들러를 함께 등록하고 호출 위치의 참조를 옮깁니다.
 
 View가 투영을 계산하거나 발행하는 중 구독자가 State를 쓰면, runtime은 후속 투영을 예약합니다. 현재의 불변 snapshot 통지를 마친 뒤 새 투영을 발행하며, 그동안 발생한 여러 쓰기는 한 번의 후속 투영으로 합칩니다. 같은 값을 다시 쓰면 새 State 변경을 만들지 않습니다. 변경된 노드 입력은 다음 snapshot에서 확인하고 DOM 반영은 렌더러의 완료 수단으로 확인합니다.
 

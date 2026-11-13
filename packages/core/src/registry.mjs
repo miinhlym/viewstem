@@ -1,4 +1,4 @@
-import { compileSchema } from './schema.mjs';
+import { compileSchema, equal } from './schema.mjs';
 import { compilePorts, sameContract } from './ports.mjs';
 import { validateTemplate, pointerKeys } from './expressions.mjs';
 import { compileCel } from './cel/index.mjs';
@@ -38,6 +38,18 @@ const syntax = value => validateTemplate(value);
 const optional = (value, field, fallback = {}) => own(value, field) ? value[field] : fallback;
 const hasExpression = value => dynamic(value) || (Array.isArray(value) ? value.some(hasExpression) : record(value) && Object.values(value).some(hasExpression));
 const literal = value => Array.isArray(value) ? value.map(literal) : record(value) ? Object.fromEntries(decodedEntries(value).map(([key, item]) => [key, literal(item)])) : value;
+const pointerToken = name => name.replaceAll('~', '~0').replaceAll('/', '~1');
+
+// Handlers can observe the order of keys in the input record and its defaults.
+function sameDefault(left, right) {
+  if (Object.is(left, right)) return true;
+  if (!left || !right || typeof left !== 'object' || typeof right !== 'object'
+    || Array.isArray(left) !== Array.isArray(right)) return false;
+  const keys = Object.keys(left), rightKeys = Object.keys(right);
+  return keys.length === rightKeys.length
+    && keys.every((key, index) => key === rightKeys[index] && sameDefault(left[key], right[key]));
+}
+
 function paths(value, output = []) {
   if (Array.isArray(value)) { value.forEach(item => paths(item, output)); return output; }
   if (!record(value)) return output;
@@ -156,8 +168,48 @@ export class Registry {
     const candidate = this.fork();
     candidate.#definitions.set(key(definition.kind, definition.id), freeze(definition));
     try { candidate.#validateAll(); } catch (error) { throw safeError(error, 'INVALID_DEFINITION'); }
+    if (definition.kind === 'Action' && this.isCode('Action', definition.id)) {
+      this.#checkActionContract(candidate, definition.id);
+    } else if (definition.kind === 'Type') {
+      for (const action of this.#definitions.values()) {
+        if (action.kind !== 'Action' || !this.isCode('Action', action.id)) continue;
+        const { ports = {}, output } = action.spec;
+        if (output?.typeRef === definition.id || Object.values(ports).some(port => port.typeRef === definition.id)) {
+          this.#checkActionContract(candidate, action.id);
+        }
+      }
+    }
     this.commitCandidate(candidate);
     return this;
+  }
+  #checkActionContract(candidate, id) {
+    const before = this.get('Action', id).spec;
+    const after = candidate.get('Action', id).spec;
+    const oldPorts = before.ports ?? {}, newPorts = after.ports ?? {};
+    const oldNames = Object.keys(oldPorts), newNames = Object.keys(newPorts);
+    const mismatch = (location, input) => fail('TYPE_CONTRACT_MISMATCH', {
+      message: 'A registered code Action must keep its input and output contract.',
+      resource: { kind: 'Action', id },
+      location,
+      ...(input === undefined ? {} : { input }),
+    });
+    // Compare resolved schema structure without rewriting local refs or dropping keywords.
+    const sameSchema = (left, right) => equal(this.schema(left), candidate.schema(right));
+    for (const name of oldNames) {
+      const left = oldPorts[name], right = newPorts[name];
+      if (!own(newPorts, name) || left.kind !== right.kind
+        || (left.required === true) !== (right.required === true)
+        || !sameDefault(left.default, right.default)
+        || (left.kind !== 'Query' && !sameSchema(left, right))) {
+        mismatch('/ports/' + pointerToken(name), name);
+      }
+    }
+    for (const name of newNames) {
+      if (!own(oldPorts, name)) mismatch('/ports/' + pointerToken(name), name);
+    }
+    if (oldNames.some((name, index) => name !== newNames[index])) mismatch('/ports');
+    if (Boolean(before.output) !== Boolean(after.output)
+      || (before.output && !sameSchema(before.output, after.output))) mismatch('/output');
   }
   commitCandidate(candidate) {
     this.#definitions = candidate.#definitions;
