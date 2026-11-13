@@ -542,6 +542,10 @@ export class View {
         item.usage=this.runtime.query.createUsage(use,{
           ...settings,onChange:(snapshot, failedRun)=>this.queryChanged(item, snapshot, failedRun),clock:this.runtime.clock,
           onCleanupError:cause=>this.diagnostics.push(safeError(cause)),
+          onPollingError:cause=>{
+            this.diagnostics.push(cause);
+            this.diagnostic('query', cause);
+          },
           isOpen:()=>this.alive && this.queryUses.has(item),ownerSignal:this.lifetime.signal,
           start:false,
         });

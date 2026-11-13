@@ -29,6 +29,7 @@ export class QueryUsage {
     this.ownerSignal = options.ownerSignal;
     this.onChange = options.onChange;
     this.onCleanupError = options.onCleanupError;
+    this.onPollingError = options.onPollingError;
     this.initial = deferred(); this.initialSettled = this.initial.promise;
     this.settings = { inputs: {}, ready: true, executeWhen: true, refresh: true, autoRefreshWhen: true, ...options };
     this.validateSettings(this.settings);
@@ -193,21 +194,35 @@ export class QueryUsage {
   now() { return typeof this.clock.now === 'function' ? this.clock.now() : this.clock.now; }
   arm() {
     if (!this.pollAllowed() || this.active || this.pending || this.timer !== null) return;
-    const deadline = this.now() + this.settings.intervalMs, epoch = this.timerEpoch;
+    const epoch = this.timerEpoch;
+    const failed = cause => {
+      if (epoch !== this.timerEpoch || !this.pollAllowed()) return;
+      this.timerEpoch++;
+      this.timer = null;
+      this.onPollingError?.(safeError(cause));
+    };
+    let deadline;
+    try { deadline = this.now() + this.settings.intervalMs; }
+    catch (cause) { failed(cause); return; }
     const schedule = () => {
       if (epoch !== this.timerEpoch || !this.pollAllowed()) return;
-      const remaining = Math.max(0, deadline - this.now());
-      if (epoch !== this.timerEpoch || !this.pollAllowed()) return;
-      const timer = this.clock.setTimeout(() => {
+      try {
+        const remaining = Math.max(0, deadline - this.now());
         if (epoch !== this.timerEpoch || !this.pollAllowed()) return;
-        this.timer = null;
-        if (this.now() < deadline) schedule(); else this.periodic();
-      }, Math.min(remaining, 2_147_483_647));
-      if (epoch === this.timerEpoch && this.pollAllowed()) this.timer = timer;
-      else {
-        try { this.clock.clearTimeout(timer); }
-        catch (cause) { this.onCleanupError?.(cause); }
-      }
+        const timer = this.clock.setTimeout(() => {
+          if (epoch !== this.timerEpoch || !this.pollAllowed()) return;
+          this.timer = null;
+          let early;
+          try { early = this.now() < deadline; }
+          catch (cause) { failed(cause); return; }
+          if (early) schedule(); else this.periodic();
+        }, Math.min(remaining, 2_147_483_647));
+        if (epoch === this.timerEpoch && this.pollAllowed()) this.timer = timer;
+        else {
+          try { this.clock.clearTimeout(timer); }
+          catch (cause) { this.onCleanupError?.(cause); }
+        }
+      } catch (cause) { failed(cause); }
     };
     schedule();
   }

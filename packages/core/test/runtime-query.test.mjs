@@ -78,6 +78,23 @@ test('a missing bound Query input stays absent through automatic execution and r
   assert.deepEqual({ ...f.requests[2].plan.inputs }, {});
 });
 
+test('poll timer failures leave committed View updates and Query results available', async t => {
+  const r = registry();
+  const runtime = createRuntime({ registry: r, clock: {
+    now: 0, setTimeout() { throw Error('poll clock unavailable'); }, clearTimeout() {},
+  } });
+  t.after(() => runtime.dispose());
+  const use = { query: { sources: {}, transform: { input: 'ready' } } };
+  const source = { queries: { rows: use }, render: display() };
+  const { view, initialComplete } = await runtime.createView({ view: source });
+  await initialComplete;
+  const update = await view.update({ ...source, queries: { rows: { ...use, intervalMs: 50 } } });
+  assert.deepEqual((await update.initialComplete).queryErrors, []);
+  assert.equal(view.getQuery('rows').getSnapshot().data, 'ready');
+  assert.equal(view.exportDefinition().queries.rows.intervalMs, 50);
+  assert.ok(view.getSnapshot().errors.some(error => error.code === 'INTERNAL_ERROR'));
+});
+
 test('N04/K23 first Query errors report through initial; blocked and missing-input Queries do not prevent completion', async t => {
   const f = controlled(t);
   const spec = baseView({ states: { a: valueState(1), b: valueState(1), missing: { kind: 'State', schema: number } },
