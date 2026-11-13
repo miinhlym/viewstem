@@ -47,4 +47,22 @@ Install both tarballs from your app. These paths assume it is next to `viewstem-
 npm install ../viewstem-packages/viewstem-core-0.1.0.tgz ../viewstem-packages/viewstem-ui-0.1.0.tgz
 ```
 
-The [Quick Start](../quickstart/) runs in a vanilla Vite app or in a connected container in your existing browser app. To use your own Svelte components, run `npm run build:svelte`, pack `@viewstem/svelte` with `npm pack -w @viewstem/svelte --pack-destination ../viewstem-packages`, and follow [Mount in Svelte](../svelte/guides/mount-in-svelte/).
+The [Quick Start](../quickstart/) runs in a vanilla Vite app or a connected container in your existing browser app.
+
+## Build and install the Svelte packages
+
+From the repository root after `npm ci`, run:
+
+```sh
+npm run build:svelte
+mkdir -p ../viewstem-packages
+npm pack -w @viewstem/core -w @viewstem/svelte --pack-destination ../viewstem-packages
+```
+
+From your Svelte app directory, install both tarballs together.
+
+```sh
+npm install ../viewstem-packages/viewstem-core-0.1.0.tgz ../viewstem-packages/viewstem-svelte-0.1.0.tgz
+```
+
+Continue with the [Svelte integration guide](../svelte/guides/mount-in-svelte/).

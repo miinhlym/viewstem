@@ -3,6 +3,7 @@ import test from 'node:test';
 import * as core from '@viewstem/core';
 import * as http from '@viewstem/core/http';
 import * as cel from '@viewstem/core/cel';
+import * as renderer from '@viewstem/core/renderer';
 
 const integer = { type: 'integer' };
 const path = value => ({ '@path': value });
@@ -19,6 +20,7 @@ function surface(value, names) {
 
 test('public package exports only the selected root and optional subpath APIs', async () => {
   assert.deepEqual(Object.keys(core).sort(), ['createRegistry', 'createRuntime', 'createStateStore', "computeGridLayout", 'mergeOwnedUrl'].sort());
+  assert.deepEqual(Object.keys(renderer).sort(), ['createDiagnostic', 'createPreparationError', 'createRenderError', 'createRenderWaiter', 'createRendererHost', 'notifyDiagnostic', 'prepareOwnedView']);
   assert.deepEqual(Object.keys(http), ['createHttpExecutor']);
   assert.deepEqual(Object.keys(cel).sort(), ['compileCel', 'evaluateCel', "defaultCelLimits"].sort());
   assert.equal(cel.compileCel('n + 1', { inputs: { n: integer } })({ n: 1 }), 2);
@@ -41,11 +43,12 @@ test('actual handles expose only public methods and preserve chains and injected
   const r = registry(), store = core.createStateStore();
   const runtime = core.createRuntime({ registry: r, stateStore: store });
   t.after(() => { runtime.dispose(); store.dispose(); });
-  const { view, initialComplete: initial } = await runtime.createView({ view: { ...definition, queries: { rows: { query: { sources: {}, transform: { input: [] } } } } } }); await initial;
+  const view = await runtime.createView({ ...definition, queries: { rows: { query: { sources: {}, transform: { input: [] } } } } });
+  await view.whenSettled(view.initial);
   surface(r, ['registerResources', 'registerComponentContract', 'registerComponentContracts', 'registerAction', 'updateResource', 'get', 'list', 'exportResource', 'isCode']);
   surface(store, ['createScope', 'transaction', 'subscribe', "writeBatch", "registerReaction", 'connectUrl', "getDiagnostics", 'dispose']);
-  surface(runtime, ['registry', 'stateStore', 'createView', 'invokeAction', 'listResources', "exportResource", 'dispose']);
-  surface(view, ['update', 'replace', 'exportDefinition', 'getState', 'getQuery', "getSnapshot", 'subscribe', 'emit', 'dispose']);
+  surface(runtime, ['registry', 'stateStore', 'createView', 'dispose']);
+  surface(view, ['initial', 'setInputs', 'updateDefinition', 'replace', 'whenSettled', 'invokeAction', 'exportDefinition', 'getState', 'getQuery', 'getSnapshot', 'subscribe', 'emit', 'dispose']);
   assert.deepEqual(Reflect.ownKeys(view.getQuery('rows')).sort(), ['getSnapshot', 'refresh', 'retry']);
   const scope = store.createScope(), cell = scope.registerState('count', { schema: integer, initial: 1 });
   assert.deepEqual(Reflect.ownKeys(cell).sort(), ['address', 'generation', 'getSnapshot', 'read', 'reset', 'write']);
@@ -63,9 +66,9 @@ test('actual handles expose only public methods and preserve chains and injected
   assert.equal(r.updateResource({ kind: 'Type', id: 'Int', spec: { schema: { type: 'number' } } }), r);
   assert.equal(r.isCode('Action', 'answer'), true);
   assert.equal(runtime.registry.get('Type', 'Int').spec.schema.type, 'number');
-  assert.deepEqual(runtime.exportResource('Type', 'Int'), r.exportResource('Type', 'Int'));
-  assert.equal(runtime.listResources('Component').length, 2);
-  const exported = runtime.exportResource('Type', 'Int'); exported.spec.schema.type = 'string';
+  assert.deepEqual(runtime.registry.exportResource('Type', 'Int'), r.exportResource('Type', 'Int'));
+  assert.equal(runtime.registry.list('Component').length, 2);
+  const exported = runtime.registry.exportResource('Type', 'Int'); exported.spec.schema.type = 'string';
   assert.equal(r.get('Type', 'Int').spec.schema.type, 'number');
   assert.throws(() => { runtime.registry = {}; }, TypeError);
   assert.throws(() => { view.runtime = runtime; }, TypeError);
@@ -90,29 +93,134 @@ test('Component contract batches roll back completely and retain existing Regist
   assert.equal(r.isCode('Component', typed.id), true);
   assert.equal(r.isCode('Component', other.id), true);
   const runtime = core.createRuntime({ registry: r }); t.after(() => runtime.dispose());
-  const created = await runtime.createView({ view: {
+  const created = await runtime.createView({
     states: { result: { kind: 'Derived', typeRef: 'Int', variableRef: 'answer' } },
     render: { id: 'typed', componentRef: typed.id, inputs: { value: path('/states/result') } },
-  } });
-  await created.initialComplete;
-  assert.equal(created.view.getSnapshot().roots[0].inputs.value, 6);
+  });
+  await created.whenSettled(created.initial);
+  assert.equal(created.getSnapshot().roots[0].inputs.value, 6);
 });
 
-test('createView, update and replace expose initialComplete and retain initial State fields', async t => {
+test('code Action defaults distinguish omitted inputs from missing View event bindings', async t => {
+  const r = registry();
+  r.registerComponentContract({ ...leaf, id: 'Button', spec: { events: { click: { schema: true } } } });
+  const string = { type: 'string' };
+  const optional = { kind: 'Value', schema: string, default: 'fallback' };
+  let calls = 0;
+  r.registerAction({ kind: 'Action', id: 'optional', spec: { ports: { label: optional }, output: { schema: string } } },
+    ({ inputs }) => { calls++; return Object.hasOwn(inputs, 'label') ? inputs.label : 'missing'; });
+  r.registerAction({ kind: 'Action', id: 'required', spec: { ports: { label: { kind: 'Value', schema: string, required: true } } } },
+    () => { calls++; });
+  const runtime = core.createRuntime({ registry: r });
+  t.after(() => runtime.dispose());
+  const source = (actionRef, inputs) => ({
+    states: {
+      value: { kind: 'State', schema: string },
+      pending: {
+        kind: 'Derived', schema: string,
+        variable: { ports: { value: { kind: 'Value', schema: string, required: true } }, expression: 'value' },
+        inputs: { value: path('/states/value') },
+      },
+    },
+    render: { id: 'button', componentRef: 'Button', on: { click: { actionRef, inputs } } },
+  });
+  const view = await runtime.createView(source('optional', {}));
+  assert.equal(await view.invokeAction({ actionRef: 'optional' }), 'fallback');
+  const click = () => view.emit(view.getSnapshot().roots[0], 'click', {});
+  assert.equal(await click(), 'fallback');
+  await view.updateDefinition(source('optional', { label: path('/states/value') }));
+  assert.equal(await click(), 'missing');
+  view.getState('value').write('ready');
+  assert.equal(await click(), 'ready');
+  view.getState('value').reset();
+  await view.updateDefinition(source('required', { label: path('/states/value') }));
+  await assert.rejects(click(), { code: 'INPUT_NOT_READY', input: 'label', location: '/inputs' });
+  for (const [inputs, code] of [
+    [{ label: path('/states/pending') }, 'INPUT_NOT_READY'],
+    [{ label: path('/event/value/deep') }, 'TYPE_MISMATCH'],
+  ]) {
+    await view.updateDefinition(source('optional', inputs));
+    await assert.rejects(view.emit(view.getSnapshot().roots[0], 'click', { value: 1 }), { code, input: 'label' });
+  }
+  for (const label of [null, 1]) {
+    await assert.rejects(view.invokeAction({ actionRef: 'optional', inputs: { label } }), { code: 'TYPE_MISMATCH', input: 'label' });
+    await view.updateDefinition(source('optional', { label: path('/event/value') }));
+    await assert.rejects(view.emit(view.getSnapshot().roots[0], 'click', { value: label }), { code: 'TYPE_MISMATCH', input: 'label' });
+  }
+  assert.equal(calls, 4);
+});
+
+test('running observers cannot change the event Action input already captured', async t => {
+  const r = registry();
+  r.registerComponentContract({ ...leaf, id: 'Button', spec: { events: { click: { schema: true } } } });
+  r.registerAction({ kind: 'Action', id: 'read', spec: {
+    ports: { n: { kind: 'Value', required: true, schema: integer } }, output: { schema: integer },
+  } }, ({ inputs }) => inputs.n);
+  const runtime = core.createRuntime({ registry: r });
+  t.after(() => runtime.dispose());
+  const view = await runtime.createView({
+    states: { n: { kind: 'State', schema: integer, initial: 1 } },
+    render: { id: 'button', componentRef: 'Button',
+      on: { click: { id: 'reading', actionRef: 'read', inputs: { n: path('/states/n') } } } },
+  });
+  const cell = view.getState('n');
+  const off = view.subscribe(snapshot => {
+    if (snapshot.actions.reading.status === 'running') cell.write(2);
+  });
+  t.after(off);
+  assert.equal(await view.emit(view.getSnapshot().roots[0], 'click', null), 1);
+  assert.equal(cell.read(), 2);
+});
+
+test('rejected Action contract updates leave calls intact and new IDs can be applied explicitly', async t => {
+  const r = registry();
+  r.registerComponentContract({ ...leaf, id: 'Button', spec: { events: { click: { schema: true } } } });
+  const type = (id, schema) => ({ kind: 'Type', id, spec: { schema } });
+  const action = (id, typeRef) => ({ kind: 'Action', id, spec: { output: { typeRef } } });
+  const source = actionRef => ({ render: { id: 'button', componentRef: 'Button', on: { click: { actionRef } } } });
+  const pending = Promise.withResolvers();
+  let calls = 0;
+  r.registerResources([type('answer', integer)]);
+  r.registerAction(action('answer', 'answer'), () => ++calls === 1 ? pending.promise : 42);
+  const runtime = core.createRuntime({ registry: r });
+  t.after(() => runtime.dispose());
+  const view = await runtime.createView(source('answer'));
+  const click = current => current.emit(current.getSnapshot().roots[0], 'click', null);
+  const running = click(view);
+  const string = { type: 'string' };
+  assert.throws(() => r.updateResource(type('answer', string)), {
+    code: 'TYPE_CONTRACT_MISMATCH', resource: { kind: 'Action', id: 'answer' }, location: '/output',
+  });
+  assert.deepEqual(r.get('Type', 'answer').spec.schema, integer);
+  pending.resolve(7);
+  assert.equal(await running, 7);
+  const afterRejectedUpdate = await runtime.createView(source('answer'));
+  assert.equal(await click(afterRejectedUpdate), 42);
+
+  r.registerResources([type('answer-v2', string)]);
+  r.registerAction(action('answer-v2', 'answer-v2'), () => 'new');
+  await assert.rejects(view.updateDefinition(source('answer-v2')), { code: 'REFERENCE_NOT_FOUND' });
+  assert.equal(await click(view), 42);
+  const future = await runtime.createView(source('answer-v2'));
+  assert.equal(await click(future), 'new');
+  await view.replace(source('answer-v2'));
+  assert.equal(await click(view), 'new');
+});
+
+test('createView, update and replace expose application handles and retain initial State fields', async t => {
   const runtime = core.createRuntime({ registry: registry() }); t.after(() => runtime.dispose());
   const spec = { ...definition, states: { count: { kind: 'State', schema: integer, initial: 2 } } };
-  const created = await runtime.createView({ view: spec });
-  assert.deepEqual(Object.keys(created).sort(), ['initialComplete', 'view']);
-  const { view } = created;
-  assert.deepEqual(await created.initialComplete, { generation: 1, queryErrors: [] });
+  const view = await runtime.createView(spec);
+  assert.deepEqual(await view.whenSettled(view.initial), { generation: 1, queryErrors: [] });
   view.getState('count').write(3);
-  const update = await view.update(spec);
-  assert.deepEqual(Object.keys(update), ['initialComplete']);
-  assert.deepEqual(await update.initialComplete, { generation: 2, queryErrors: [] });
+  const update = await view.updateDefinition(spec);
+  assert.deepEqual(await view.whenSettled(update), { generation: 2, queryErrors: [] });
   assert.equal(view.getState('count').read(), 3);
-  const replace = await view.replace({ view: spec });
-  assert.deepEqual(Object.keys(replace), ['initialComplete']);
-  assert.deepEqual(await replace.initialComplete, { generation: 3, queryErrors: [] });
+  const replace = await view.replace(spec);
+  assert.deepEqual(await view.whenSettled(replace), { generation: 3, queryErrors: [] });
+  await rejectsCode(view.whenSettled({}), 'INVALID_DEFINITION');
+  const other = await runtime.createView(spec);
+  await rejectsCode(other.whenSettled(replace), 'INVALID_DEFINITION');
   assert.equal(view.getState('count').read(), 2);
   assert.equal(view.exportDefinition().states.count.initial, 2);
   assert.equal(Object.isFrozen(cel.defaultCelLimits), true);
@@ -130,12 +238,12 @@ test('copied and fabricated handles cannot enter Registry, Store, Scope, View or
   }
   const runtime = core.createRuntime({ registry: r, stateStore: store });
   t.after(() => { runtime.dispose(); store.dispose(); });
-  const { view, initialComplete: initial } = await runtime.createView({ view: definition }); await initial;
-  for (const owner of [{}, { ...view }, Object.create(view)]) await rejectsCode(runtime.invokeAction({ owner, action: { steps: [] } }), 'CANCELLED');
+  const view = await runtime.createView(definition); await view.whenSettled(view.initial);
+  await rejectsCode(runtime.createView({ view: definition }), 'INVALID_DEFINITION');
   for (const target of [{ ...count }, Object.create(count)]) throwsCode(() => store.writeBatch([[target, 9]]), 'CANCELLED');
   assert.equal(count.read(), 1); assert.equal(other.read(), 2);
   const otherRuntime = core.createRuntime({ registry: r, stateStore: store }); t.after(() => otherRuntime.dispose());
-  await rejectsCode(otherRuntime.invokeAction({ owner: view, action: { steps: [] } }), 'CANCELLED');
+  await rejectsCode((await otherRuntime.createView(definition)).whenSettled(view.initial), 'INVALID_DEFINITION');
 });
 
 test('public Scope declarations and batch writes cannot enable internal initialization or derived policies', t => {
@@ -162,13 +270,13 @@ test('authorization sees the public View and stable opaque invoke owners without
   r.registerAction({ kind: 'Action', id: 'parent', spec: { output: { schema: integer } } }, ({ invokeAction }) => invokeAction({ actionRef: 'answer' }));
   const runtime = core.createRuntime({ registry: r, authorize: context => { contexts.push(context); return true; } });
   t.after(() => runtime.dispose());
-  const { view, initialComplete: initial } = await runtime.createView({ view: definition }); await initial;
-  await (await view.update(definition)).initialComplete;
-  await (await view.replace({ view: definition })).initialComplete;
+  const view = await runtime.createView(definition); await view.whenSettled(view.initial);
+  await view.whenSettled(await view.updateDefinition(definition));
+  await view.whenSettled(await view.replace(definition));
   for (const context of contexts) { assert.equal(context.operation, 'update'); assert.equal(context.owner, view); assert.deepEqual(context.definition, definition); }
   assert.equal(contexts.length, 2); contexts.length = 0;
-  assert.equal(await runtime.invokeAction({ owner: view, actionRef: 'parent' }), 7);
-  assert.equal(await runtime.invokeAction({ owner: view, actionRef: 'answer' }), 7);
+  assert.equal(await view.invokeAction({ actionRef: 'parent' }), 7);
+  assert.equal(await view.invokeAction({ actionRef: 'answer' }), 7);
   assert.equal(executed, 2); assert.equal(contexts.length, 3);
   const owner = contexts[0].owner;
   surface(owner, []);
@@ -180,7 +288,7 @@ test('authorization sees the public View and stable opaque invoke owners without
     assert.equal('native' in context.definition, false);
     assert.equal(Object.values(context.definition).some(value => typeof value === 'function'), false);
   }
-  await rejectsCode(runtime.invokeAction({ owner, actionRef: 'answer' }), 'CANCELLED');
+  view.dispose(); await rejectsCode(view.invokeAction({ actionRef: 'answer' }), 'CANCELLED');
 });
 
 test('shared external State remains reactive across public runtimes while owned calls and scopes cancel', { timeout: 2000 }, async t => {
@@ -195,13 +303,13 @@ test('shared external State remains reactive across public runtimes while owned 
   const first = core.createRuntime({ registry: r, stateStore: store }), second = core.createRuntime({ registry: r, stateStore: store });
   t.after(() => { first.dispose(); second.dispose(); store.dispose(); });
   const sharedView = { ports: { shared: sharedPort }, states: { local: { kind: 'State', schema: integer, initial: 0 } }, render: { id: 'leaf', componentRef: 'Leaf', inputs: { value: path('/ports/shared') } } };
-  const a = await first.createView({ view: sharedView, inputs: { shared } }), b = await second.createView({ view: sharedView, inputs: { shared } });
-  await Promise.all([a.initialComplete, b.initialComplete]);
-  await first.invokeAction({ owner: a.view, actionRef: 'set', inputs: { target: shared } });
+  const a = await first.createView(sharedView, { inputs: { shared } }), b = await second.createView(sharedView, { inputs: { shared } });
+  await Promise.all([a.whenSettled(a.initial), b.whenSettled(b.initial)]);
+  await a.invokeAction({ actionRef: 'set', inputs: { target: shared } });
   assert.equal(shared.read(), 3);
-  assert.equal(a.view.getSnapshot().roots[0].inputs.value, 3); assert.equal(b.view.getSnapshot().roots[0].inputs.value, 3);
-  const local = a.view.getState('local');
-  const pending = first.invokeAction({ owner: a.view, actionRef: 'wait', inputs: { target: shared } });
+  assert.equal(a.getSnapshot().roots[0].inputs.value, 3); assert.equal(b.getSnapshot().roots[0].inputs.value, 3);
+  const local = a.getState('local');
+  const pending = a.invokeAction({ actionRef: 'wait', inputs: { target: shared } });
   const cancelled = rejectsCode(pending, 'CANCELLED');
   assert.equal(captured.signal.aborted, false);
   first.dispose();
@@ -209,7 +317,132 @@ test('shared external State remains reactive across public runtimes while owned 
   throwsCode(() => captured.inputs.target.write(99), 'CANCELLED');
   throwsCode(() => local.read(), 'CANCELLED');
   resolveLate(99); await Promise.resolve();
-  shared.write(4); assert.equal(b.view.getSnapshot().roots[0].inputs.value, 4);
+  shared.write(4); assert.equal(b.getSnapshot().roots[0].inputs.value, 4);
   assert.equal(shared.read(), 4);
   scope.dispose(); throwsCode(() => shared.read(), 'CANCELLED');
+});
+
+test('concurrent resolution publishes one identical definition, and cancelled preparation publishes none', async t => {
+  const r = registry();
+  const requests = [];
+  const runtime = core.createRuntime({ registry: r, resourceResolver(kind, id, { signal }) {
+    return new Promise(resolve => requests.push({ kind, id, signal, resolve }));
+  } });
+  t.after(() => runtime.dispose());
+  const tick = () => new Promise(resolve => setImmediate(resolve));
+  const one = runtime.createView({ ref: 'shared' });
+  const two = runtime.createView({ ref: 'shared' });
+  await tick();
+  assert.equal(requests.length, 2);
+  const resource = { kind: 'View', id: 'shared', spec: definition };
+  requests[0].resolve(resource);
+  requests[1].resolve(structuredClone(resource));
+  const [first, second] = await Promise.all([one, two]);
+  assert.notEqual(first, second);
+  assert.equal(r.list('View').length, 1);
+
+  const controller = new AbortController();
+  const pending = runtime.createView({ ref: 'cancelled' }, { signal: controller.signal });
+  await tick();
+  controller.abort();
+  await rejectsCode(pending, 'CANCELLED');
+  assert.equal(requests[2].signal.aborted, true);
+  requests[2].resolve({ ...resource, id: 'cancelled' });
+  await tick();
+  assert.equal(r.list('View').length, 1);
+});
+
+test('replacement preparation cannot overwrite a later update or publish a rejected definition', async t => {
+  const r = registry();
+  const requests = [];
+  let authorized = true;
+  const runtime = core.createRuntime({ registry: r, authorize: () => authorized,
+    resourceResolver: (_kind, id) => new Promise(resolve => requests.push(() => resolve({
+      kind: 'View', id, spec: definition,
+    }))) });
+  t.after(() => runtime.dispose());
+  const view = await runtime.createView(definition);
+  const pending = view.replace({ ref: 'late' });
+  await new Promise(resolve => setImmediate(resolve));
+  const newer = { render: { ...definition.render, id: 'newer' } };
+  await view.updateDefinition(newer);
+  await rejectsCode(pending, 'CANCELLED');
+  requests[0]();
+  authorized = false;
+  const denied = view.replace({ ref: 'denied' });
+  await new Promise(resolve => setImmediate(resolve));
+  requests[1]();
+  await rejectsCode(denied, 'EXECUTION_BLOCKED');
+  assert.equal(view.exportDefinition().render.id, 'newer');
+  assert.deepEqual(r.list('View'), []);
+});
+
+test('Store observers read the committed View, and failed URL subscribe preserves the new application', async t => {
+  const r = registry();
+  const store = core.createStateStore();
+  const runtime = core.createRuntime({ registry: r, stateStore: store });
+  t.after(() => { runtime.dispose(); store.dispose(); });
+  const spec = value => ({ ...definition, states: { count: { kind: 'State', schema: integer, initial: value } } });
+  const view = await runtime.createView(spec(1));
+  const observations = [];
+  const unsubscribe = store.subscribe(null, ({ changes }) => {
+    if (changes.length) observations.push([view.exportDefinition().states.count.initial,
+      view.getSnapshot().generation, view.getState('count').read()]);
+  });
+  t.after(unsubscribe);
+  const application = await view.replace(spec(2), { url: {
+    adapter: { read: () => 'https://example.test/', subscribe() { throw new Error('adapter failed'); }, writeOwned() {} },
+    bindings: [{ state: 'count' }],
+  } });
+  assert.deepEqual(await view.whenSettled(application), { generation: 2, queryErrors: [] });
+  assert.deepEqual(observations, [[2, 2, 2]]);
+  assert.equal(view.getSnapshot().errors.some(error => error.kind === 'connect'), true);
+});
+
+test('mixed component contracts and resource definitions validate together', async t => {
+  const runtime = core.createRuntime({
+    componentContracts: [{ kind: 'Component', id: 'Typed', spec: { ports: { value: { kind: 'Value', typeRef: 'Integer' } } } }],
+    resources: [
+      { kind: 'View', id: 'example', spec: { render: { id: 'typed', componentRef: 'Typed', inputs: { value: 7 } } } },
+      { kind: 'Type', id: 'Integer', spec: { schema: integer } },
+    ],
+  });
+  t.after(() => runtime.dispose());
+  const view = await runtime.createView({ ref: 'example' });
+  assert.equal(view.getSnapshot().roots[0].inputs.value, 7);
+});
+
+test('a renderer can unmount pending work and reuse its target before an uncooperative resolver finishes', async t => {
+  let finish;
+  const runtime = core.createRuntime({
+    registry: registry(),
+    resourceResolver: () => new Promise(resolve => { finish = resolve; }),
+  });
+  t.after(() => runtime.dispose());
+  const rendered = [];
+  const host = renderer.createRendererHost(runtime, {
+    ownsRuntime: false,
+    validateTarget: () => true,
+    connect(view) {
+      rendered.push(view.exportDefinition().render.id);
+      return { whenRendered() {}, dispose() { rendered.push('unmounted'); } };
+    },
+  });
+  t.after(() => host.dispose());
+  const target = {};
+  const pending = host.mount({ target, source: { ref: 'delayed' } });
+  await new Promise(resolve => setImmediate(resolve));
+  const ready = rejectsCode(pending.ready, 'CANCELLED');
+  await pending.unmount();
+  const next = host.mount({ target, source: definition });
+  const view = await next.ready;
+  await next.whenSettled(view.initial);
+  finish({ kind: 'View', id: 'delayed', spec: { render: { ...definition.render, id: 'stale' } } });
+  await ready;
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(rendered, ['leaf']);
+  assert.deepEqual(runtime.registry.list('View'), []);
+  await host.dispose();
+  assert.deepEqual(rendered, ['leaf', 'unmounted']);
+  assert.equal((await runtime.createView(definition)).getSnapshot().roots[0].id, 'leaf');
 });

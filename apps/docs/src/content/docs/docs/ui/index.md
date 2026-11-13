@@ -9,9 +9,9 @@ The browser guide shows how to build and install the packages from local tarball
 
 ## Guides
 
-- [Mount a View in the browser](guides/mount-in-browser/) to install the packages, render a button, and dispose of the attachment.
+- [Mount a View in the browser](guides/mount-in-browser/) to install the packages, render a button, and unmount the screen.
 - [Browse the component catalog](components/) to find examples and check which inputs, slots, and events the DOM renderer supports.
 
 ## Reference
 
-- [Browser UI API](api/) covers `registerShadcn()`, `attach()`, the stylesheet, and the support metadata.
+- [Browser UI API](api/) covers `mount()`, `attach()`, diagnostics, the stylesheet, and support metadata.

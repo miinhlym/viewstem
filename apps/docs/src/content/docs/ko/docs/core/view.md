@@ -20,20 +20,20 @@ View는 State·Query·이벤트 수명을 가진 실행 중 화면 하나입니�
 선언 노드의 `id`, 런타임 `address`, 소유자의 `instanceId`, `generation`은 서로 다릅니다. 반복 노드는 같은 선언 ID를 공유할 수 있습니다. 이벤트에는 실제 스냅샷을, State/Query 조회에는 소유자 instanceId를 사용하세요. 선언 이름을 전역 실행 ID로 간주하지 마세요.
 
 <a id="update"></a>
-## update(spec, options?)
+## updateDefinition(spec, options?)
 
-`update(spec: ViewSpec, options?: { inputs?: Record<string, unknown>, states?: Record<string, unknown> }): Promise<ApplicationResult>`는 JSON 패치가 아닌 완전한 다음 정의를 적용합니다. `inputs`를 생략하면 기존 입력을 유지합니다. `states`는 정의 적용과 함께 이름별 루트 State를 원자적으로 설정합니다. 없는 State나 Derived 대상은 거절합니다.
+`updateDefinition(spec: ViewSpec, options?): Promise<ViewApplication>`는 JSON 패치가 아닌 완전한 다음 정의를 적용합니다. `inputs`를 생략하면 기존 입력을 유지합니다. `states`는 정의 적용과 함께 이름별 루트 State를 원자적으로 설정합니다. 없는 State나 Derived 대상은 거절합니다.
 
 호환되는 유지 노드는 State와 수명을 보존합니다. 노드를 제거하거나 정체성을 변경하거나 `when`을 false로 만들면 해당 수명이 끝납니다. 유지하는 셀의 State↔Derived 변경은 거절합니다. 현재 수명의 리소스 스냅샷은 유지하며, 바뀐 등록 정의를 주입하려면 replace를 사용합니다.
 
-현재 구현에서 유지되는 Query use는 `update`에서 생략한 `refresh`·`intervalMs` 설정도 보존합니다. 생략으로 기본값을 복원하지 마세요. `refresh`는 값을 명시하고, 새 Query 수명과 기본 설정이 필요하면 `replace`를 사용하세요. [Query 설정](../../dsl/queries/)을 참고하세요.
+현재 구현에서 유지되는 Query use는 `updateDefinition`에서 생략한 `refresh`·`intervalMs` 설정도 보존합니다. 생략으로 기본값을 복원하지 마세요. `refresh`는 값을 명시하고, 새 Query 수명과 기본 설정이 필요하면 `replace`를 사용하세요. [Query 설정](../../dsl/queries/)을 참고하세요.
 
 <a id="replace"></a>
-## replace(target)
+## replace(source, options?)
 
-`replace(target: ViewTarget): Promise<ApplicationResult>`는 대상을 검증하고 최신 레지스트리 정의를 주입한 뒤 초기 State를 가진 새 수명을 시작합니다. 입력의 기본값은 `{}`입니다. 이전 이벤트 대상·소유 Query 작업·하위 Action은 유효하지 않게 됩니다. URL 교체는 이전 소유 키도 제거합니다. 기존 View를 교체할 때 권한 검사를 적용합니다.
+`replace(source: ViewSource, options?): Promise<ViewApplication>`는 대상을 검증하고 최신 레지스트리 정의를 주입한 뒤 초기 State를 가진 새 수명을 시작합니다. 입력의 기본값은 `{}`입니다. 이전 이벤트 대상·소유 Query 작업·하위 Action은 유효하지 않게 됩니다. URL 교체는 이전 소유 키도 제거합니다. 기존 View를 교체할 때 권한 검사를 적용합니다.
 
-두 메서드는 `{ initialComplete: Promise<InitialReport> }`를 반환합니다. 메서드의 완료는 적용을, 이후 `initialComplete`는 처음 실행 가능한 Query들의 완료를 나타냅니다. 완료가 Query 성공을 보장하지 않으므로 `queryErrors`를 확인하세요. 새 적용이나 폐기는 이전 완료 약속을 취소할 수 있습니다.
+두 메서드는 `ViewApplication`을 반환합니다. `view.whenSettled(application)`으로 처음 실행 가능한 Query들의 완료를 기다립니다. 완료가 Query 성공을 보장하지 않으므로 `queryErrors`를 확인하세요. 새 적용이나 폐기는 이전 완료 약속을 취소할 수 있습니다.
 
 ## emit(target, event, payload)
 

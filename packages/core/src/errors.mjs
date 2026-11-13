@@ -2,7 +2,11 @@
 const trusted = new WeakSet();
 export const errorCodes = Object.freeze('INVALID_DEFINITION REFERENCE_NOT_FOUND TYPE_MISMATCH TYPE_CONTRACT_MISMATCH INVALID_EXPRESSION INPUT_NOT_READY VALUE_PENDING EXECUTION_BLOCKED QUERY_REFRESH_DISABLED INVALID_RETRY_STATE ACTION_RECURSION ASSERTION_FAILED HTTP_ERROR TIMEOUT CANCELLED LIMIT_EXCEEDED INTERNAL_ERROR'.split(' '));
 export function error(code, fields = {}) {
-  const result = Object.freeze({ code, message: code, ...fields });
+  const result = Object.freeze({
+    code, message: code, ...fields,
+    ...(fields.resource ? { resource: Object.freeze({ ...fields.resource }) } : {}),
+    ...(fields.cause ? { cause: safeError(fields.cause) } : {}),
+  });
   trusted.add(result);
   return result;
 }

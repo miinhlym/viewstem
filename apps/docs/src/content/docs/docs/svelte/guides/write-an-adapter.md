@@ -55,8 +55,7 @@ import { label } from './label.js';
 const target = document.getElementById('app');
 if (!target) throw new Error('Missing #app element.');
 
-const renderer = createRenderer();
-renderer.registerComponents([
+const renderer = createRenderer({ components: [
   label,
   {
     contract: {
@@ -69,11 +68,11 @@ renderer.registerComponents([
     },
     component: Panel,
   },
-]);
+] });
 
-const mounted = await renderer.mount({
+const mounted = renderer.mount({
   target,
-  view: {
+  source: {
     states: {
       showDetails: { kind: 'State', schema: { type: 'boolean' }, initial: false },
     },
@@ -102,7 +101,8 @@ const mounted = await renderer.mount({
     },
   },
 });
-await mounted.initialComplete;
+const view = await mounted.ready;
+await mounted.whenSettled(view.initial);
 ```
 
 The button is visible on load. Click **Show details** to display **These details come from the View.** The adapter forwards `reveal`; core validates the payload, dispatches the Action, and reevaluates the slot after the State write. The slot's `when` reads the View's State because the View authored that content.

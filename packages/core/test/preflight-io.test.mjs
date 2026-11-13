@@ -2,7 +2,9 @@ import { createHttpExecutor } from '@viewstem/core/http';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 // Exercise the public entry points directly from source; the build owner updates dist.
-import { createRuntime, createRegistry } from '../src/index.mjs';
+import { createRuntime as publicRuntime, createRegistry } from '../src/index.mjs';
+import { runtimeFixture as adaptRuntime } from './fixtures/runtime-operations.mjs';
+const createRuntime = adaptRuntime(publicRuntime);
 // Pending-initialization probes below target the internal Store; the View flows
 // above them continue to exercise the public Runtime and its URL integration.
 import { createStateStore } from '../src/state.mjs';

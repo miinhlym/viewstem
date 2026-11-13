@@ -192,7 +192,85 @@ test('resource updates validate atomically, preserve implementations and existin
   assert.equal(registry.get('Component', 'panel').spec.render.id, 'new');
   const implementation = () => undefined;
   registry.registerAction(resource('Action', 'code', {}), implementation);
-  registry.updateResource(resource('Action', 'code', { ports: { n: value({ type: 'number' }) } }));
+  registry.updateResource({ ...resource('Action', 'code', { ports: {} }), name: 'New display name' });
   assert.equal(registry.implementation('Action', 'code'), implementation);
   assert.equal(registry.isCode('Action', 'code'), true);
+  assert.equal(registry.get('Action', 'code').name, 'New display name');
+});
+
+test('code Action updates preserve port shape, order, defaults and output atomically', () => {
+  const registry = createRegistry();
+  const name = 'a/b~c';
+  const schema = { type: 'object', properties: { x: true, y: true } };
+  const port = value(schema, { default: { x: -0, y: 1 } });
+  const spec = { ports: { [name]: port, list: { kind: 'Query' } } };
+  const handler = () => assert.fail('updating must not execute the handler');
+  registry.registerAction(resource('Action', 'code', spec), handler);
+  const initial = registry.get('Action', 'code'), revision = registry.revision;
+  const withPort = changed => ({ ports: { ...spec.ports, [name]: changed } });
+  for (const [changed, location, input] of [
+    [{ ports: { ...spec.ports, new: value(true) } }, '/ports/new', 'new'],
+    [{ ports: { list: spec.ports.list } }, '/ports/a~1b~0c', name],
+    [{ ports: { list: spec.ports.list, [name]: port } }, '/ports', undefined],
+    [withPort({ kind: 'State', schema }), '/ports/a~1b~0c', name],
+    [withPort(value(schema, { required: true })), '/ports/a~1b~0c', name],
+    [withPort(value(schema)), '/ports/a~1b~0c', name],
+    [withPort(value(schema, { default: { y: 1, x: -0 } })), '/ports/a~1b~0c', name],
+    [withPort(value(schema, { default: { x: 0, y: 1 } })), '/ports/a~1b~0c', name],
+    [{ ...spec, output: { schema: true } }, '/output', undefined],
+  ]) {
+    assert.throws(() => registry.updateResource(resource('Action', 'code', changed)), {
+      code: 'TYPE_CONTRACT_MISMATCH', resource: { kind: 'Action', id: 'code' }, location,
+      ...(input === undefined ? {} : { input }),
+    });
+    assert.equal(registry.get('Action', 'code'), initial);
+    assert.equal(registry.implementation('Action', 'code'), handler);
+    assert.equal(registry.revision, revision);
+  }
+  registry.registerResources([resource('Type', 'input', { schema: { properties: { y: true, x: true }, type: 'object' } })]);
+  registry.updateResource(resource('Action', 'code', withPort({
+    kind: 'Value', typeRef: 'input', required: false, default: { x: -0, y: 1 },
+  })));
+  assert.equal(registry.get('Action', 'code').spec.ports[name].typeRef, 'input');
+  assert.equal(registry.implementation('Action', 'code'), handler);
+});
+
+test('Type updates protect every code Action reference, including newly redirected references', () => {
+  const registry = createRegistry();
+  const schema = { type: 'number' };
+  registry.registerResources(['original', 'value', 'state', 'result'].map(id => resource('Type', id, { schema })));
+  const ref = (kind, typeRef) => ({ ports: { input: { kind, typeRef } } });
+  registry.registerAction(resource('Action', 'first', ref('Value', 'original')), () => {});
+  registry.registerAction(resource('Action', 'second', ref('State', 'state')), () => {});
+  registry.registerAction(resource('Action', 'third', { output: { typeRef: 'result' } }), () => 1);
+  registry.registerAction(resource('Action', 'fourth', { output: { typeRef: 'result' } }), () => 2);
+  registry.updateResource(resource('Action', 'first', ref('Value', 'value')));
+  registry.updateResource(resource('Type', 'original', { schema: false }));
+  registry.updateResource({ ...resource('Type', 'result', { schema }), name: 'New result label' });
+  const revision = registry.revision;
+  for (const [typeId, actionId, location] of [
+    ['value', 'first', '/ports/input'], ['state', 'second', '/ports/input'], ['result', 'third', '/output'],
+  ]) {
+    assert.throws(() => registry.updateResource(resource('Type', typeId, { schema: { type: 'string' } })), {
+      code: 'TYPE_CONTRACT_MISMATCH', resource: { kind: 'Action', id: actionId }, location,
+    });
+    assert.deepEqual(registry.get('Type', typeId).spec.schema, schema);
+    assert.equal(registry.revision, revision);
+  }
+});
+
+test('code Action updates do not equate a local ref with flattened sibling constraints', () => {
+  const registry = createRegistry();
+  const output = schema => resource('Action', 'code', { output: { schema } });
+  registry.registerAction(output({
+    $defs: { base: { type: 'object', properties: { x: true } } },
+    $ref: '#/$defs/base',
+    additionalProperties: false,
+  }), () => ({}));
+  assert.throws(() => registry.updateResource(output({
+    type: 'object', properties: { x: true }, additionalProperties: false,
+  })), { code: 'TYPE_CONTRACT_MISMATCH', location: '/output' });
+  assert.throws(() => registry.updateResource(resource('Action', 'code', { output: { typeRef: 'unknown' } })), {
+    code: 'REFERENCE_NOT_FOUND',
+  });
 });

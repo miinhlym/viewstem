@@ -13,7 +13,8 @@ You provide the components, markup, and styling. Register your own adapters. Use
 
 | If you want to | Use | View owner |
 | --- | --- | --- |
-| Include a View inside your Svelte component tree | [`<ViewstemView>`](./viewstem-view/) | The host that created the View |
+| Create a View inside your Svelte component tree | [`<ViewstemView {source}>`](./viewstem-view/) | The component |
+| Include an existing View inside your Svelte component tree | [`<ViewstemView>`](./viewstem-view/) | The host that created the View |
 | Render into a DOM element and let the renderer create the View | [`renderer.mount`](./renderer/#mount) | The renderer attachment |
 | Render an existing View into a DOM element | [`renderer.attach`](./renderer/#attach) | The host that created the View |
 

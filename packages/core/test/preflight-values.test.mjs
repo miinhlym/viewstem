@@ -2,7 +2,8 @@ import { evaluate } from '../src/expressions.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { createRegistry, createRuntime, createStateStore, computeGridLayout } from '@viewstem/core';
+import { createRegistry, createStateStore, computeGridLayout } from '@viewstem/core';
+import { createRuntime } from './fixtures/runtime-operations.mjs';
 
 const max = Number.MAX_SAFE_INTEGER;
 const nodes = (...ids) => ids.map(id => ({ id }));

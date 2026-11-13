@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createRegistry, createRuntime, createStateStore, mergeOwnedUrl } from '@viewstem/core';
+import { createRegistry, createStateStore, mergeOwnedUrl } from '@viewstem/core';
+import { createRuntime } from './fixtures/runtime-operations.mjs';
 
 const path = value => ({ '@path': value });
 const resource = (kind, id, spec) => ({ kind, id, spec });

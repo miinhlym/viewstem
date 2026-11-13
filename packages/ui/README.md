@@ -5,15 +5,13 @@ English | [한국어](README.ko.md)
 Default browser UI for rendering Viewstem JSON into a DOM container. The package depends on `@viewstem/core`. Its renderer uses Basecoat 1.1.0 Vega styles and selected Vanilla JS controllers without a React, Vue, or Svelte runtime. The host supplies a connected element.
 
 ```js
-import { createRegistry, createRuntime } from '@viewstem/core';
-import { attach, registerShadcn } from '@viewstem/ui';
+import { createRenderer } from '@viewstem/ui';
 import '@viewstem/ui/styles.css';
 
-const registry = createRegistry();
-registerShadcn(registry);
-const runtime = createRuntime({ registry });
-const { view, initialComplete } = await runtime.createView({
-  view: {
+const renderer = createRenderer();
+const screen = renderer.mount({
+  target: document.querySelector('#app'),
+  source: {
     render: {
       id: 'save',
       componentRef: 'shadcn.Button',
@@ -21,17 +19,12 @@ const { view, initialComplete } = await runtime.createView({
     },
   },
 });
-const attachment = attach(view, document.querySelector('#app'));
-await initialComplete;
-
-// On host unmount
-attachment.dispose();
-runtime.dispose();
+await screen.ready;
 ```
 
-`registerShadcn` registers the shared catalog contracts as a batch.
+Call `await screen.unmount()` when the screen closes and `await renderer.dispose()` when the app is done with the renderer. If you need the initial Query report, use `await screen.whenSettled(view.initial)` with the View returned by `screen.ready`.
 
-`attach` subscribes to an existing View and applies each received projection synchronously. The attachment owns its DOM subtree, subscriptions, and listeners. The caller owns the View and Runtime. Dispose the attachment before removing its container. A container can hold one active attachment and can be reused after disposal. Pass `{ onError }` as the third argument to observe rendering and event errors after attachment. Pending or failed nodes are omitted from the DOM.
+`createRenderer()` owns a Runtime initialized with the catalog contracts. To supply an existing Runtime, register the catalog first with `registerShadcn(runtime.registry)`, then pass `{ runtime }`. `renderer.attach(view, target)` borrows a View; call `await attachment.detach()` to release the connection. `whenRendered()` waits for the requested DOM projection. Targets must be connected HTMLElements and can be reused after cleanup completes. `onError` receives `{ phase, error }` diagnostics. Pending or failed nodes are omitted from the DOM.
 
 ## Shared JSON catalog
 

@@ -1,4 +1,4 @@
-import { compileSchema } from './schema.mjs';
+import { compileSchema, equal } from './schema.mjs';
 import { compilePorts, sameContract } from './ports.mjs';
 import { validateTemplate, pointerKeys } from './expressions.mjs';
 import { compileCel } from './cel/index.mjs';
@@ -38,6 +38,18 @@ const syntax = value => validateTemplate(value);
 const optional = (value, field, fallback = {}) => own(value, field) ? value[field] : fallback;
 const hasExpression = value => dynamic(value) || (Array.isArray(value) ? value.some(hasExpression) : record(value) && Object.values(value).some(hasExpression));
 const literal = value => Array.isArray(value) ? value.map(literal) : record(value) ? Object.fromEntries(decodedEntries(value).map(([key, item]) => [key, literal(item)])) : value;
+const pointerToken = name => name.replaceAll('~', '~0').replaceAll('/', '~1');
+
+// Handlers can observe the order of keys in the input record and its defaults.
+function sameDefault(left, right) {
+  if (Object.is(left, right)) return true;
+  if (!left || !right || typeof left !== 'object' || typeof right !== 'object'
+    || Array.isArray(left) !== Array.isArray(right)) return false;
+  const keys = Object.keys(left), rightKeys = Object.keys(right);
+  return keys.length === rightKeys.length
+    && keys.every((key, index) => key === rightKeys[index] && sameDefault(left[key], right[key]));
+}
+
 function paths(value, output = []) {
   if (Array.isArray(value)) { value.forEach(item => paths(item, output)); return output; }
   if (!record(value)) return output;
@@ -81,6 +93,7 @@ export class Registry {
   #implementations = new Map();
   #code = new Set();
   #functions = Object.freeze([]);
+  revision = 0;
   constructor(options = {}) {
     const functions = Array.isArray(options) ? [] : options?.functions ?? [];
     if (!Array.isArray(functions)) invalid();
@@ -91,8 +104,9 @@ export class Registry {
     }));
     if (this.#functions.length) { try { compileCel('true', { functions: this.#functions }); } catch (error) { throw safeError(error, 'INVALID_DEFINITION'); } }
     const resources = Array.isArray(options) ? options : options?.resources ?? [];
-    if (!Array.isArray(resources)) invalid();
-    if (resources.length) this.registerResources(resources);
+    const contracts = Array.isArray(options) ? [] : options?.componentContracts ?? [];
+    if (!Array.isArray(resources) || !Array.isArray(contracts)) invalid();
+    if (resources.length || contracts.length) this.#register(resources, undefined, undefined, contracts);
   }
   get functions() { return this.#functions; }
   get(kind, id) { return this.#definitions.get(key(kind, id)) ?? fail('REFERENCE_NOT_FOUND'); }
@@ -123,11 +137,12 @@ export class Registry {
   registerComponentContracts(contracts) {
     return this.#register(contracts, 'Component');
   }
-  #register(resources, codeKind, implementation) {
+  #register(resources, codeKind, implementation, contracts = []) {
     if (!Array.isArray(resources)) invalid();
-    const definitions = Array.from(resources, copy);
+    const definitions = [...Array.from(resources, definition => [copy(definition), codeKind]),
+      ...Array.from(contracts, definition => [copy(definition), 'Component'])];
     const candidate = this.fork();
-    for (const definition of definitions) {
+    for (const [definition, codeKind] of definitions) {
       fields(definition, ['kind', 'id', 'name', 'spec']);
       if (!kinds.has(definition.kind) || !own(definition, 'spec')) invalid();
       if (codeKind !== undefined && definition.kind !== codeKind) invalid();
@@ -140,7 +155,7 @@ export class Registry {
       if (implementation !== undefined) candidate.#implementations.set(address, implementation);
     }
     try { candidate.#validateAll(); } catch (error) { throw safeError(error, 'INVALID_DEFINITION'); }
-    this.#definitions = candidate.#definitions; this.#code = candidate.#code; this.#implementations = candidate.#implementations;
+    this.commitCandidate(candidate);
     return this;
   }
   updateResource(resource) {
@@ -153,8 +168,54 @@ export class Registry {
     const candidate = this.fork();
     candidate.#definitions.set(key(definition.kind, definition.id), freeze(definition));
     try { candidate.#validateAll(); } catch (error) { throw safeError(error, 'INVALID_DEFINITION'); }
-    this.#definitions = candidate.#definitions;
+    if (definition.kind === 'Action' && this.isCode('Action', definition.id)) {
+      this.#checkActionContract(candidate, definition.id);
+    } else if (definition.kind === 'Type') {
+      for (const action of this.#definitions.values()) {
+        if (action.kind !== 'Action' || !this.isCode('Action', action.id)) continue;
+        const { ports = {}, output } = action.spec;
+        if (output?.typeRef === definition.id || Object.values(ports).some(port => port.typeRef === definition.id)) {
+          this.#checkActionContract(candidate, action.id);
+        }
+      }
+    }
+    this.commitCandidate(candidate);
     return this;
+  }
+  #checkActionContract(candidate, id) {
+    const before = this.get('Action', id).spec;
+    const after = candidate.get('Action', id).spec;
+    const oldPorts = before.ports ?? {}, newPorts = after.ports ?? {};
+    const oldNames = Object.keys(oldPorts), newNames = Object.keys(newPorts);
+    const mismatch = (location, input) => fail('TYPE_CONTRACT_MISMATCH', {
+      message: 'A registered code Action must keep its input and output contract.',
+      resource: { kind: 'Action', id },
+      location,
+      ...(input === undefined ? {} : { input }),
+    });
+    // Compare resolved schema structure without rewriting local refs or dropping keywords.
+    const sameSchema = (left, right) => equal(this.schema(left), candidate.schema(right));
+    for (const name of oldNames) {
+      const left = oldPorts[name], right = newPorts[name];
+      if (!own(newPorts, name) || left.kind !== right.kind
+        || (left.required === true) !== (right.required === true)
+        || !sameDefault(left.default, right.default)
+        || (left.kind !== 'Query' && !sameSchema(left, right))) {
+        mismatch('/ports/' + pointerToken(name), name);
+      }
+    }
+    for (const name of newNames) {
+      if (!own(oldPorts, name)) mismatch('/ports/' + pointerToken(name), name);
+    }
+    if (oldNames.some((name, index) => name !== newNames[index])) mismatch('/ports');
+    if (Boolean(before.output) !== Boolean(after.output)
+      || (before.output && !sameSchema(before.output, after.output))) mismatch('/output');
+  }
+  commitCandidate(candidate) {
+    this.#definitions = candidate.#definitions;
+    this.#code = candidate.#code;
+    this.#implementations = candidate.#implementations;
+    this.revision++;
   }
   #validateAll() {
     const context = { active: new Set(), done: new WeakMap() };
@@ -181,14 +242,20 @@ export class Registry {
   }
   #expression(value,roots,declarations){return expression(value,roots,declarations,this.#functions);}
   #contract(contract, allowed = []) { fields(contract, ['schema', 'typeRef', ...allowed]); this.validator(contract); }
-  #inputs(inputs, target, roots, declarations, checkNames = true) {
+  #inputs(inputs, target, roots, declarations, checkNames = true, resource) {
     object(inputs); this.#expression(inputs, roots, checkNames ? declarations : undefined);
     if (!dynamic(inputs)) {
       const supplied = Object.fromEntries(decodedEntries(inputs));
       for (const input of Object.keys(supplied)) if (!own(target.ports ?? {}, input)) invalid();
       for (const [input, port] of Object.entries(target.ports ?? {})) {
         if (port.required && !own(supplied, input)) invalid();
-        if (port.kind === 'Value' && own(supplied, input) && !hasExpression(supplied[input])) this.validator(port).accept(literal(supplied[input]));
+        if (port.kind === 'Value' && own(supplied, input) && !hasExpression(supplied[input])) {
+          const validator = this.validator(port);
+          try { validator.accept(literal(supplied[input])); }
+          catch {
+            fail('INVALID_DEFINITION', { message: 'The literal input does not match its port schema.', input, ...(resource && { resource }) });
+          }
+        }
         if (['State', 'Query'].includes(port.kind) && own(supplied, input)) {
           const value = supplied[input]; fields(value, ['@path']); if (!own(value, '@path')) invalid();
           const parts = pointerKeys(value['@path']);
@@ -403,7 +470,8 @@ export class Registry {
       }
       const local = { ...declarations, repeat: Object.fromEntries(nested.map(alias => [alias, true])) };
       if (own(value, 'when')) { this.#expression(value.when, roots); if (!hasExpression(value.when) && typeof value.when !== 'boolean') invalid(); }
-      this.#inputs(optional(value, 'inputs'), child, roots, local, false);
+      const resource = own(value, 'componentRef') ? { kind: 'Component', id: value.componentRef } : undefined;
+      this.#inputs(optional(value, 'inputs'), child, roots, local, false, resource);
       const contents = map(value.slots);
       for (const [slot, contract] of Object.entries(child.slots ?? {})) if (contract.required && !own(contents, slot)) invalid();
       for (const [slot, content] of Object.entries(contents)) {

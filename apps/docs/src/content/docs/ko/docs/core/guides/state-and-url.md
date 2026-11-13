@@ -50,7 +50,7 @@ store.dispose();
 
 ## View에 State 전달하기
 
-`kind: 'State'` 포트를 선언하고 `createView({ inputs: { filter } })`에 발급받은 핸들을 전달합니다. View는 핸들을 사용하며 주입한 Store의 수명은 호스트가 책임집니다. 호스트 수명이 끝나면 URL 연결과 Store를 정리하세요. View 자체 State를 URL과 연결하려면 같은 Store에 두 번째 연결을 추가하지 말고 [ViewTarget](../../runtime/#viewtarget)의 `url` 편의 옵션을 사용합니다.
+`kind: 'State'` 포트를 선언하고 `createView(source, { inputs: { filter } })`에 발급받은 핸들을 전달합니다. View는 핸들을 사용하며 주입한 Store의 수명은 호스트가 책임집니다. 호스트 수명이 끝나면 URL 연결과 Store를 정리하세요. View 자체 State를 URL과 연결하려면 같은 Store에 두 번째 연결을 추가하지 말고 [ViewOptions](../../runtime/#viewsource-and-viewoptions)의 `url` 편의 옵션을 사용합니다.
 
 ## 문제 해결
 

@@ -1,11 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createRegistry, createRuntime, createStateStore } from '@viewstem/core';
+import { createRegistry, createStateStore } from '@viewstem/core';
+import { createRuntime } from './fixtures/runtime-operations.mjs';
+import { FakeClock } from './query-fixtures.mjs';
 import { memoryUrl, link, tick } from './fixtures/state/url-adapter.mjs';
 const integer = { type: 'integer' }, path = value => ({ '@path': value });
-function fixture(endpoint = memoryUrl(), stateStore) {
+function fixture(endpoint = memoryUrl(), stateStore, options) {
   const registry = createRegistry(); registry.registerComponentContract({ kind: 'Component', id: 'Text', spec: { ports: { value: { kind: 'Value', schema: true } } } });
-  const requests = [], runtime = createRuntime({ registry, ...(stateStore ? { stateStore } : {}), requestExecutor: async plan => { requests.push(plan); return { status: 200, headers: {}, body: requests.length }; } });
+  const requests = [], runtime = createRuntime({ registry, ...(stateStore ? { stateStore } : {}), ...options, requestExecutor: async plan => { requests.push(plan); return { status: 200, headers: {}, body: requests.length }; } });
   const view = (initial = 1, extra = {}) => ({ states: { value: { kind: 'State', schema: integer, initial }, ...extra.states }, ...extra,
     render: { id: 'text', componentRef: 'Text', inputs: { value: path('/states/value') } } });
   const url = { adapter: endpoint.adapter, bindings: [{ state: 'value', key: 'owned' }] };
@@ -29,6 +31,48 @@ test('L07/M05 actual View replacement removes old owned keys and uses new initia
   const url = new URL(f.read()); assert.equal(url.searchParams.has('owned'), false); assert.equal(url.searchParams.get('external'), '/'); assert.equal(url.pathname, '/path'); assert.equal(url.hash, '#hash'); assert.equal(f.commits.length, 1); assert.equal(f.commits[0].mode, 'replace');
   view.getState('value').write(4); await tick(); assert.equal(JSON.parse(new URL(f.read()).searchParams.get('owned')), 4); f.runtime.dispose();
 });
+
+test('L07 replacement adding URL sync publishes State written during the commit notification', async t => {
+  const store = createStateStore();
+  const f = fixture(memoryUrl('https://example.test/path?owned=8&external=%2f#hash'), store);
+  const { view, initialComplete } = await f.runtime.createView({ view: f.spec(1) });
+  await initialComplete;
+  const stop = store.subscribe(null, ({ changes }) => {
+    if (changes.some(change => change.kind === 'added' && change.target.name === 'value')) {
+      view.getState('value').write(9);
+    }
+  });
+  t.after(() => { stop(); f.runtime.dispose(); store.dispose(); });
+
+  const url = { ...f.url, bindings: [{ state: 'value', key: 'owned', history: 'push' }] };
+  const replacement = await view.replace({ view: f.spec(3), url });
+  await replacement.initialComplete;
+
+  assert.equal(view.getState('value').read(), 9);
+  assert.equal(f.read(), 'https://example.test/path?external=%2f&owned=9#hash');
+  assert.deepEqual(f.attempts.map(({ patch, options }) => [patch, options.mode]), [[{ owned: '9' }, 'push']]);
+});
+
+test('L07 URL connection sees an initial State settled during old URL cleanup', async t => {
+  const store = createStateStore(), seed = store.createScope().registerState('seed', { schema: integer });
+  const f = fixture(memoryUrl(link({ owned: 8 }), { delayed: true }), store);
+  t.after(() => { f.runtime.dispose(); store.dispose(); });
+  const { view, initialComplete } = await f.runtime.createView({ view: f.spec(1), url: f.url });
+  await initialComplete;
+  const replacement = await view.replace({ view: f.spec(undefined, {
+    ports: { seed: { kind: 'State', schema: integer, required: true } },
+    states: { value: { kind: 'State', schema: integer, initial: path('/ports/seed') } },
+    queries: { rows: { query: { sources: {}, transform: { input: 1 } } } },
+  }), url: f.url, inputs: { seed } });
+  assert.equal(f.pending.length, 1);
+  seed.write(3);
+  assert.equal(view.getState('value').read(), 3);
+  f.release();
+  await replacement.initialComplete;
+  assert.equal(view.getQuery('rows').getSnapshot().status, 'success');
+  assert.equal(f.attempts.length, 1);
+});
+
 test('L07 cleanup failure still completes new View, preserves new baseline and reports error', async () => {
   const f = fixture(memoryUrl('https://example.test/view?owned=8'));
   const { view, initialComplete: initial } = await f.runtime.createView({ view: f.spec(1), url: f.url }); await initial; f.failNext();
@@ -59,15 +103,32 @@ for (const [name, invalid] of invalidUrlConfigurations) test(`L07/M05 URL replac
 test('L09/K20 superseded cleanup checks currentness immediately before actual commit', async () => {
   const f = fixture(memoryUrl('https://example.test/view?owned=8', { delayed: true }));
   const { view, initialComplete: initial } = await f.runtime.createView({ view: f.spec(1), url: f.url }); await initial;
-  const first = view.replace({ view: f.spec(2), url: f.url }); const firstResult = first.then(value => ({ value }), error => ({ error })); await tick(); assert.equal(f.pending.length, 1);
-  const second = view.replace({ view: f.spec(3), url: f.url }); await tick(); assert.equal(f.pending.length, 2); assert.equal(f.pending[0].options.isCurrent(), false);
-  f.release(0); const stale = await firstResult; assert.equal(stale.error?.code, 'CANCELLED'); assert.equal(f.commits.length, 0);
-  f.release(0); const latest = await second; await latest.initialComplete; assert.equal(view.getState('value').read(), 3); assert.equal(f.commits.length, 1); f.runtime.dispose();
+  const first = await view.replace({ view: f.spec(2), url: f.url });
+  const second = view.replace({ view: f.spec(3), url: f.url });
+  await tick();
+  assert.equal(f.pending.length, 1);
+  assert.equal(view.getState('value').read(), 2);
+  assert.equal(f.pending[0].options.isCurrent(), true);
+  f.release(0);
+  const latest = await second;
+  await tick();
+  assert.equal(f.pending.length, 1);
+  assert.equal(f.pending[0].options.isCurrent(), true);
+  f.release(0);
+  await latest.initialComplete;
+  await first.initialComplete.catch(() => {});
+  assert.equal(view.getState('value').read(), 3);
+  assert.equal(f.attempts.length, 2);
+  assert.equal(f.commits.length, 1);
+  f.runtime.dispose();
 });
+
 test('L09/K20 disposing View invalidates in-flight cleanup and preserves old URL', async () => {
   const f = fixture(memoryUrl('https://example.test/view?owned=8', { delayed: true }));
   const { view, initialComplete: initial } = await f.runtime.createView({ view: f.spec(1), url: f.url }); await initial;
-  const replacement = view.replace({ view: f.spec(2), url: f.url }); const rejected = assert.rejects(replacement, { code: 'CANCELLED' }); await tick(); assert.equal(f.pending.length, 1); view.dispose(); assert.equal(f.pending[0].options.isCurrent(), false);
+  const replacement = await view.replace({ view: f.spec(2), url: f.url });
+  const rejected = assert.rejects(replacement.initialComplete, { code: 'CANCELLED' });
+  await tick(); assert.equal(f.pending.length, 1); view.dispose(); assert.equal(f.pending[0].options.isCurrent(), false);
   f.release(); await rejected; assert.equal(f.commits.length, 0); assert.equal(new URL(f.read()).searchParams.get('owned'), '8'); f.runtime.dispose();
 });
 test('L10/M05 service Store connection rejects View convenience URL before old screen changes', async () => {
@@ -76,4 +137,27 @@ test('L10/M05 service Store connection rejects View convenience URL before old s
   await assert.rejects(view.replace({ view: f.spec(3), url: f.url }), { code: 'INVALID_DEFINITION' });
   assert.equal(view.getState('value'), old); assert.equal(old.read(), 7); assert.equal(selected.read(), 1); assert.equal(f.attempts.length, 0);
   view.dispose(); selected.write(2); await tick(); assert.equal(new URL(f.read()).searchParams.get('p.selected'), '2'); shared.dispose(); service.dispose(); f.runtime.dispose();
+});
+
+test('timed-out URL cleanup invalidates late writes and releases the queued update', async t => {
+  const clock = new FakeClock();
+  const f = fixture(memoryUrl('https://example.test/view?owned=8&keep=%2f', { delayed: true }), undefined,
+    { clock, urlCleanupTimeoutMs: 10 });
+  t.after(() => f.runtime.dispose());
+  const { view, initialComplete } = await f.runtime.createView({ view: f.spec(1), url: f.url });
+  await initialComplete;
+  const replacement = await view.replace({ view: f.spec(2), url: f.url });
+  const update = view.update(f.spec(3), { states: { value: 5 } });
+  await tick();
+  assert.equal(f.pending[0].options.isCurrent(), true);
+  await clock.advance(10);
+  assert.equal(f.pending[0].options.isCurrent(), false);
+  f.release();
+  const applied = await update;
+  await applied.initialComplete;
+  await replacement.initialComplete.catch(() => {});
+  assert.equal(view.getState('value').read(), 5);
+  assert.ok(view.getSnapshot().errors.some(error => error.kind === 'replace-cleanup' && error.code === 'TIMEOUT'));
+  assert.equal(new URL(f.read()).searchParams.get('owned'), '8');
+  assert.equal(new URL(f.read()).searchParams.get('keep'), '/');
 });

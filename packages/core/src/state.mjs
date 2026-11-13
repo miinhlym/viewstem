@@ -10,6 +10,8 @@ const pending = Object.freeze({ status: 'pending' });
 const errorState = error => Object.freeze({ status: 'error', error: safeError(error) });
 const same = (a, b) => a.status === b.status && (a.status === 'ready' ? equal(a.value, b.value) : a.status !== 'error' || a.error.code === b.error.code);
 const changedValue = (before, after) => after.status === 'ready' && (before.status !== 'ready' || !equal(before.value, after.value));
+const stateHandles = new WeakSet();
+export const isStateHandle = value => stateHandles.has(value);
 let nextScope = 0, nextGeneration = 0;
 
 export class StateStore {
@@ -19,34 +21,81 @@ export class StateStore {
   #baselineListeners = new Set();
   #reactions = new Map();
   #notifying = false;
+  #publishing = false;
   #queued = [];
+  #draining = false;
   #diagnostics = [];
   #transaction = null;
   #readingStage = null;
   #scopes = new Set();
   #scopeLifetimes = new WeakMap();
   #url = null;
+  #runningPureCallback = false;
 
-  transaction(run) {
+  get isRunningPureCallback() { return this.#runningPureCallback; }
+  get isBusy() { return this.#runningPureCallback || this.#notifying || this.#publishing || this.#transaction !== null; }
+  assertCanWrite() {
+    if (this.#runningPureCallback) fail('INVALID_DEFINITION');
+  }
+  runPureCallback(run) {
+    const previous = this.#runningPureCallback;
+    this.#runningPureCallback = true;
+    try { return run(); }
+    finally { this.#runningPureCallback = previous; }
+  }
+  transaction(run, beforeNotify) {
+    this.assertCanWrite();
     if (this.#transaction) return run();
+    if (this.#notifying && !beforeNotify) return this.#runTransaction(run, undefined, []);
+    return this.#runTransaction(run, beforeNotify);
+  }
+  #runTransaction(run, beforeNotify, deferredMutations) {
     const cells = new Map(this.#cells), reactions = new Map(this.#reactions), scopes = new Set(this.#scopes);
     const previous = new Map([...cells.values()].map(cell => [cell, {...cell}]));
     const lifetimes = new Map([...scopes].map(scope => [this.#scopeLifetimes.get(scope), this.#scopeLifetimes.get(scope).alive]));
-    const pending = []; pending.createdScopes = new Set(); pending.cleanup = [];
-    this.#transaction = pending;
-    let result;
-    try { result = run(); if (result?.then) fail('INVALID_DEFINITION'); }
-    catch (caught) {
-      for (const scope of pending.createdScopes) {
-        const lifetime = this.#scopeLifetimes.get(scope); lifetime.alive = false;
-        for (const stop of lifetime.clockSubscriptions) stop();
-      }
+    const pending = [];
+    pending.createdScopes = new Set();
+    pending.cleanup = [];
+    pending.rollback = [];
+    pending.deferredMutations = deferredMutations;
+    const restore = () => {
       this.#cells = cells; this.#reactions = reactions; this.#scopes = scopes;
       for (const [lifetime, alive] of lifetimes) lifetime.alive = alive;
       for (const [cell, fields] of previous) Object.assign(cell, fields);
+    };
+    this.#transaction = pending;
+    let result;
+    let afterCommit;
+    try {
+      result = run();
+      if (result?.then) fail('INVALID_DEFINITION');
+      afterCommit = beforeNotify?.();
+    }
+    catch (caught) {
+      for (const scope of pending.createdScopes) this.#scopeLifetimes.get(scope).alive = false;
+      for (const undo of pending.rollback) undo();
+      restore();
       throw caught;
     } finally { this.#transaction = null; }
-    for (const cleanup of pending.cleanup) cleanup();
+    if (deferredMutations) {
+      // The callback read its own writes. Restore the snapshot that the other
+      // subscribers are still observing, then commit the mutations in FIFO order.
+      for (const scope of pending.createdScopes) this.#scopeLifetimes.get(scope).alive = false;
+      restore();
+      if (deferredMutations.length || pending.rollback.length) {
+        this.#queued.push(() => this.transaction(() => {
+          this.#transaction.rollback.push(...pending.rollback);
+          for (const mutate of deferredMutations) mutate();
+        }));
+      }
+      return result;
+    }
+    const wasNotifying = this.#notifying;
+    this.#notifying = true;
+    try {
+      afterCommit?.();
+      for (const cleanup of pending.cleanup) cleanup();
+    } finally { this.#notifying = wasNotifying; }
     const changes = new Map();
     for (const change of pending) {
       const key = keyOf(change.target), first = changes.get(key);
@@ -60,8 +109,13 @@ export class StateStore {
         if(change.kind==='updated')changes.delete(key);
       }
     }
-    this.#notify([...changes.values()]);
-    this.#perform(() => {});
+    const wasPublishing = this.#publishing;
+    this.#publishing = true;
+    try {
+      this.#notify([...changes.values()]);
+      if (pending.baseline) for (const listener of this.#baselineListeners) listener();
+    } finally { this.#publishing = wasPublishing; }
+    this.#drain();
     return result;
   }
 
@@ -80,7 +134,8 @@ export class StateStore {
     if (snapshot.status !== 'pending' && snapshot.status !== 'missing') cell.initialSettled = true;
     cell.baseline = accepted;
     if (!cell.writes) this.#commit(new Map([[cell,accepted]]),new Set(),'initial');
-    for(const listener of this.#baselineListeners)listener();
+    if (this.#transaction) this.#transaction.baseline = true;
+    else for (const listener of this.#baselineListeners) listener();
   }
 
   computed(handle, dependencies, compute, { recompute = true } = {}) {
@@ -95,23 +150,37 @@ export class StateStore {
   baseline(handle) { return this.#cellFor(handle).baseline; }
   hasWritten(handle) { return this.#cellFor(handle).writes > 0; }
   observeBaseline(listener) { this.#baselineListeners.add(listener);return ()=>this.#baselineListeners.delete(listener); }
-  restore(entries) {
+  restore(entries, isCurrent = () => true) {
     const prepared = new Map(entries.map(([handle,snapshot]) => {
       const cell=this.#cellFor(handle);if(cell.derived)fail('TYPE_MISMATCH');
       return [cell,snapshot.status === 'ready' ? this.#accept(cell,snapshot.value) : snapshot.status === 'error' ? errorState(snapshot.error) : snapshot.status === 'pending' ? pending : missing];
     }));
-    this.#perform(()=>this.#commit(prepared,new Set(prepared.keys()),'url'));
+    this.#perform(() => { if (isCurrent()) this.#commit(prepared,new Set(prepared.keys()),'url'); });
   }
   get urlConnection() { return this.#url; }
-  connectUrl(options) {
-    if(this.#url)fail('INVALID_DEFINITION');
-    const connection = connectStateUrl(this,options,()=>{if(this.#url===connection)this.#url=null;});
-    this.#url = connection;return connection;
+  reserveUrl(reservation) { this.#url = reservation; }
+  releaseUrl(reservation) { if (this.#url === reservation) this.#url = null; }
+  connectUrl(options, reservation) {
+    this.assertCanWrite();
+    if (this.#url && this.#url !== reservation) fail('INVALID_DEFINITION');
+    let connection;
+    const placeholder = reservation ?? { dispose: () => this.releaseUrl(placeholder) };
+    this.#url = placeholder;
+    try {
+      connection = connectStateUrl(this, options, () => this.releaseUrl(connection ?? placeholder), reservation);
+      if (this.#url !== placeholder) connection.dispose();
+      else this.#url = connection;
+      return connection;
+    } catch (error) {
+      this.releaseUrl(placeholder);
+      throw error;
+    }
   }
-  dispose() { this.#url?.dispose(); for(const scope of this.#scopes)scope.dispose();this.#subscribers.clear();this.#settledListeners.clear();this.#baselineListeners.clear(); }
+  dispose() { this.assertCanWrite(); this.#url?.dispose(); for(const scope of this.#scopes)scope.dispose();this.#subscribers.clear();this.#settledListeners.clear();this.#baselineListeners.clear(); }
 
 
   createScope() {
+    this.assertCanWrite();
     const store = this, scopeId = `scope-${++nextScope}`;
     const lifetime = { alive: true, clockSubscriptions: new Set() }, { clockSubscriptions } = lifetime;
     const current = () => { if (!lifetime.alive) fail('CANCELLED'); };
@@ -129,27 +198,41 @@ export class StateStore {
           clockSubscriptions.delete(unsubscribe);
           try { stop(); } catch (caught) { store.#diagnostics.push(safeError(caught)); }
         };
-        clockSubscriptions.add(unsubscribe);return unsubscribe;
+        clockSubscriptions.add(unsubscribe);
+        store.#transaction?.rollback.push(unsubscribe);
+        return unsubscribe;
       },
-      registerState(name, declaration) { current(); return store.#register(scopeId, name, declaration); },
-      replaceState(name, declaration) { current(); return store.#register(scopeId, name, declaration, true); },
+      registerState(name, declaration) { current(); return store.#register(scopeId, name, declaration, false, current); },
+      replaceState(name, declaration) { current(); return store.#register(scopeId, name, declaration, true, current); },
       getState(name) { current(); return store.#lookup({ scopeId, name }).handle; },
       removeState(name) { current(); store.#remove(store.#lookup({ scopeId, name })); },
       dispose() {
+        store.assertCanWrite();
         if (!lifetime.alive) return;
-        lifetime.alive = false;
-        store.#scopes.delete(scope);
-        const cleanup = () => { if (!lifetime.alive) for(const stop of clockSubscriptions)stop(); };
-        if (store.#transaction) store.#transaction.cleanup.push(cleanup); else cleanup();
-        store.#perform(() => {
+        const close = () => {
+          if (!lifetime.alive) return;
+          lifetime.alive = false;
+          store.#scopes.delete(scope);
+          const cleanup = () => { if (!lifetime.alive) for (const stop of clockSubscriptions) stop(); };
+          if (store.#transaction) store.#transaction.cleanup.push(cleanup); else cleanup();
+        };
+        const remove = () => {
           const removed = [...store.#cells.values()].filter(cell => cell.address.scopeId === scopeId);
           for (const cell of removed) store.#cells.delete(keyOf(cell.address));
           for (const [target, reaction] of store.#reactions) if (reaction.owner === scopeId || removed.includes(target) || reaction.watch.some(cell => removed.includes(cell))) store.#reactions.delete(target);
           store.#structuralCommit(removed.map(cell => store.#change(cell, 'removed')));
-        });
+        };
+        if (store.#transaction) store.#perform(() => { close(); remove(); });
+        else { close(); store.#perform(remove); }
       },
     });
-    this.#scopeLifetimes.set(scope,lifetime);this.#scopes.add(scope);this.#transaction?.createdScopes.add(scope);return scope;
+    this.#scopeLifetimes.set(scope, lifetime);
+    this.#mutate(() => {
+      lifetime.alive = true;
+      this.#scopes.add(scope);
+      this.#transaction?.createdScopes.add(scope);
+    });
+    return scope;
   }
 
   #lookup(address) { return this.#cells.get(keyOf(address)) ?? fail('REFERENCE_NOT_FOUND'); }
@@ -158,7 +241,8 @@ export class StateStore {
     try { return Object.freeze({ status: 'ready', value: protect(cell.validator.accept(value, trustedCopies(value))) }); }
     catch (error) { throw safeError(error, 'TYPE_MISMATCH'); }
   }
-  #register(scopeId, name, declaration, replace = false) {
+  #register(scopeId, name, declaration, replace, checkScope) {
+    this.assertCanWrite();
     const address = Object.freeze({ scopeId, name }), key = keyOf(address), previous = this.#cells.get(key);
     if (replace ? !previous : previous) fail(replace ? 'REFERENCE_NOT_FOUND' : 'DUPLICATE_STATE');
     if (!declaration || typeof declaration !== 'object' || !Object.hasOwn(declaration, 'schema')) fail('INVALID_DEFINITION');
@@ -178,6 +262,7 @@ export class StateStore {
       getSnapshot() { store.#current(cell); return store.#readingStage?.get(cell) ?? cell.state; },
       write(value) { store.writeBatch([[cell.handle, value]]); },
       reset() {
+        store.assertCanWrite();
         store.#current(cell); if (cell.derived) fail('READ_ONLY');
         if (cell.baseline.status === 'pending') fail('VALUE_PENDING');
         if (cell.baseline.status === 'error') throw cell.baseline.error;
@@ -186,12 +271,17 @@ export class StateStore {
     });
     // Structural preparation occurs before replacing the old generation.
     if (cell.derived) cell.state = this.#calculate(cell, new Map([...this.#cells.values()].map(item => [item, item.state])));
+    const initial = this.#transaction?.deferredMutations ? { ...cell } : undefined;
     this.#perform(() => {
+      checkScope();
       if (this.#cells.get(key) !== previous) fail('CANCELLED');
+      // Later mutations in the candidate may already have touched this cell.
+      if (initial) Object.assign(cell, initial);
       this.#cells.set(key, cell);
       if (previous) for (const [target, reaction] of this.#reactions) if (target === previous || reaction.watch.includes(previous)) this.#reactions.delete(target);
       this.#structuralCommit([this.#change(cell, previous ? 'replaced' : 'added')]);
     });
+    stateHandles.add(cell.handle);
     return cell.handle;
   }
   #cellFor(handle) {
@@ -213,6 +303,7 @@ export class StateStore {
     });
   }
   #remove(cell) {
+    this.assertCanWrite();
     this.#perform(() => {
       this.#current(cell); this.#cells.delete(keyOf(cell.address));
       for (const [target, reaction] of this.#reactions) if (target === cell || reaction.watch.includes(cell)) this.#reactions.delete(target);
@@ -221,6 +312,7 @@ export class StateStore {
   }
 
   writeBatch(changes, { origin = 'explicit' } = {}) {
+    this.assertCanWrite();
     const prepared = new Map();
     for (const [handle, value] of changes) {
       const cell = this.#cellFor(handle);
@@ -241,6 +333,7 @@ export class StateStore {
     return ()=>this.#commit(new Map(),explicit,'explicit',before);
   }
   registerReaction(owner, { watch, target, value }) {
+    this.assertCanWrite();
     const lifetime = this.#scopeLifetimes.get(owner);
     if (!lifetime) fail('INVALID_DEFINITION');
     if (!lifetime.alive) fail('CANCELLED');
@@ -249,9 +342,15 @@ export class StateStore {
     if (cell.derived) fail('READ_ONLY');
     if (this.#reactions.has(cell)) fail('DUPLICATE_REACTION');
     const reaction = { owner: owner.scopeId, watch: watched, value: this.#accept(cell, value) };
-    this.#reactions.set(cell, reaction);
-    try { this.#order(); } catch (error) { this.#reactions.delete(cell); throw error; }
-    return () => { if (this.#reactions.get(cell) === reaction) this.#reactions.delete(cell); };
+    this.#mutate(() => {
+      if (!lifetime.alive) fail('CANCELLED');
+      this.#current(cell);
+      for (const dependency of watched) this.#current(dependency);
+      if (this.#reactions.has(cell)) fail('DUPLICATE_REACTION');
+      this.#reactions.set(cell, reaction);
+      try { this.#order(); } catch (error) { this.#reactions.delete(cell); throw error; }
+    });
+    return () => this.#mutate(() => { if (this.#reactions.get(cell) === reaction) this.#reactions.delete(cell); });
   }
   #order() {
     const result = [], active = new Set(), done = new Set();
@@ -305,12 +404,25 @@ export class StateStore {
     this.#notify(changes);
   }
   #change(cell, kind) { return Object.freeze({ kind, target: cell.address, generation: cell.generation }); }
+  #mutate(run) {
+    const result = run();
+    this.#transaction?.deferredMutations?.push(run);
+    return result;
+  }
   #perform(run) {
+    if (this.#transaction) return this.#mutate(run);
     if (this.#notifying) { this.#queued.push(run); return; }
     run();
-    while (this.#queued.length) {
-      try { this.#queued.shift()(); } catch (error) { this.#diagnostics.push(errorState(error).error); }
-    }
+    this.#drain();
+  }
+  #drain() {
+    if (this.#draining || this.#notifying || this.#transaction) return;
+    this.#draining = true;
+    try {
+      while (this.#queued.length) {
+        try { this.#queued.shift()(); } catch (error) { this.#diagnostics.push(errorState(error).error); }
+      }
+    } finally { this.#draining = false; }
   }
   #payload(selector, changes) {
     const includes = cell => selector === null || selector.has(keyOf(cell.address));
@@ -330,7 +442,11 @@ export class StateStore {
         try { subscriber.listener(payload); } catch (error) { this.#diagnostics.push(errorState(error).error); }
       }
     } finally { this.#notifying = false; }
-    for(const listener of this.#settledListeners)try{listener();}catch(caught){this.#diagnostics.push(safeError(caught));}
+    const wasPublishing = this.#publishing;
+    this.#publishing = true;
+    try {
+      for(const listener of this.#settledListeners)try{listener();}catch(caught){this.#diagnostics.push(safeError(caught));}
+    } finally { this.#publishing = wasPublishing; }
   }
   observe(listener) { this.#settledListeners.add(listener);return ()=>this.#settledListeners.delete(listener); }
   subscribe(selector, listener) {
@@ -340,7 +456,7 @@ export class StateStore {
     this.#notifying = true;
     try { listener(this.#payload(selected, [])); } catch (error) { this.#diagnostics.push(safeError(error)); }
     finally { this.#notifying = wasNotifying; }
-    if (!wasNotifying) this.#perform(() => {});
+    if (!wasNotifying) this.#drain();
     return () => this.#subscribers.delete(subscriber);
   }
   getDiagnostics() { return [...this.#diagnostics]; }

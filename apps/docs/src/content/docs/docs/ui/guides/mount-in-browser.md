@@ -32,19 +32,16 @@ Use a browser build that resolves package imports and handles CSS imports. Add t
 Put this code in `main.js`. A button labeled **Save** appears in the container.
 
 ```js
-import { createRegistry, createRuntime } from '@viewstem/core';
-import { attach, registerShadcn } from '@viewstem/ui';
+import { createRenderer } from '@viewstem/ui';
 import '@viewstem/ui/styles.css';
 
-const target = document.querySelector('#app');
-if (!(target instanceof HTMLElement)) throw new Error('Missing Viewstem container');
+const target = document.getElementById('app');
+if (!target) throw new Error('Missing #app element');
 
-const registry = createRegistry();
-registerShadcn(registry);
-const runtime = createRuntime({ registry });
-
-const { view, initialComplete } = await runtime.createView({
-  view: {
+const renderer = createRenderer();
+const screen = renderer.mount({
+  target,
+  source: {
     render: {
       id: 'save',
       componentRef: 'shadcn.Button',
@@ -52,18 +49,16 @@ const { view, initialComplete } = await runtime.createView({
     },
   },
 });
+await screen.ready;
 
-const attachment = attach(view, target, { onError: console.error });
-await initialComplete;
-
-export function unmount() {
-  attachment.dispose();
-  runtime.dispose();
+export async function unmount() {
+  await screen.unmount();
+  await renderer.dispose();
 }
 ```
 
 ## Connect to your host's lifecycle
 
-In a framework app, attach the View in the client mount lifecycle after the framework has inserted the container. Give Viewstem ownership of the rendered subtree and call the returned attachment's `dispose()` during cleanup. The example's `unmount()` also disposes the runtime it created. With a shared runtime, dispose the View when its owner is finished and leave runtime disposal to the runtime owner.
+In a framework app, call `mount()` after the target is connected and call `screen.unmount()` when the screen closes. Viewstem manages the rendered subtree. This example's cleanup also disposes the renderer and its Runtime. When screens share the renderer, call `renderer.dispose()` when the app is done with it.
 
-See the [browser UI API](../../api/) for attachment errors and the [component catalog](../../components/) for supported JSON.
+To display an existing View, use [a borrowed attachment](../../api/#attach). See the [browser UI API](../../api/) for attachment errors and the [component catalog](../../components/) for supported JSON.

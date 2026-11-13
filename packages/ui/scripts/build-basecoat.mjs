@@ -71,4 +71,5 @@ mkdirSync(outputDir, { recursive: true });
 const styles = ['styles.css', 'menus.css', 'markup-families.css', 'widget-families.css', 'form-scroll-families.css']
   .map(file => readFileSync(new URL('../src/' + file, import.meta.url), 'utf8'));
 writeFileSync(join(outputDir, 'styles.css'), `/* Basecoat CSS ${packageInfo.version}, Vega; scoped for Viewstem. */\n${output}\n${styles.join('\n')}`);
+writeFileSync(join(outputDir, 'styles.css.d.ts'), 'export {};\n');
 copyFileSync(join(packageRoot, 'LICENSE.md'), join(outputDir, 'BASECOAT-LICENSE.md'));

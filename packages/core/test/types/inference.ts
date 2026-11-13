@@ -17,7 +17,7 @@ registry.registerAction({ kind: 'Action', id: 'inferred-void', spec: {
 } } as const, async ({ inputs, invokeAction }) => {
   const title: string = inputs.title;
   const optional: number | undefined = inputs.optional;
-  const defaulted: string = inputs.defaulted;
+  const defaulted: string | undefined = inputs.defaulted;
   const structuredTitle: string = inputs.structured.title;
   const structuredCount: number | undefined = inputs.structured.count;
   inputs.count.write(title.length);
@@ -30,6 +30,8 @@ registry.registerAction({ kind: 'Action', id: 'inferred-void', spec: {
   const bad: number = inputs.title;
   // @ts-expect-error optional Value needs preparation/narrowing before use.
   const absent: number = inputs.optional;
+  // @ts-expect-error a default applies only when the caller omits the input.
+  const present: string = inputs.defaulted;
   // @ts-expect-error Query handle exposes no write capability.
   inputs.rows.write([]);
   // @ts-expect-error captured nested object is readonly.
@@ -80,12 +82,12 @@ store.connectUrl({ adapter: { read: () => 'https://example.test', subscribe: () 
 // @ts-expect-error standalone Store has no registry for resolving Type resources.
 scope.registerState<string>('unsupported-host-ref', { typeRef: 'string' });
 const runtime = createRuntime({ registry, stateStore: store });
-const mounted = await runtime.createView({ view: { render: { id: 'text', componentRef: 'Text' } } });
-const state = mounted.view.getState('count'); const unknown: unknown = state.read(); void unknown;
-const query: QueryHandle = mounted.view.getQuery('data'); await query.refresh();
-mounted.view.subscribe(snapshot => { const generation: number = snapshot.generation; void generation; });
-await mounted.view.emit({ address: 'address', generation: 1 }, 'change', null);
-await mounted.view.update(mounted.view.exportDefinition(), { states: { count: 2 } });
+const mounted = await runtime.createView({ render: { id: 'text', componentRef: 'Text' } });
+const state = mounted.getState('count'); const unknown: unknown = state.read(); void unknown;
+const query: QueryHandle = mounted.getQuery('data'); await query.refresh();
+mounted.subscribe(snapshot => { const generation: number = snapshot.generation; void generation; });
+await mounted.emit({ address: 'address', generation: 1 }, 'change', null);
+await mounted.updateDefinition(mounted.exportDefinition(), { states: { count: 2 } });
 const cel = compileCel('size(items)', { inputs: { items: { type: 'array' } } }); const computed: unknown = cel({ items: [] }); void computed;
 const requestExecutor = createHttpExecutor({ authorize: () => true }); fromHttp({ transport: fetch });
 const href: string = mergeOwnedUrl('https://example.test?a=1', { a: null }); void href;

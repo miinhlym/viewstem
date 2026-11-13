@@ -1,13 +1,73 @@
 <script lang="ts">
   import { onDestroy, untrack } from 'svelte';
   import type { ViewstemViewProps } from './types.js';
-  import { Connection } from './connection.js';
+  import { createRenderWaiter, notifyDiagnostic, type RendererDiagnostic } from '@viewstem/core/renderer';
+  import type { View, ViewApplication } from '@viewstem/core';
+  import type { Renderer } from './types.js';
+  import { cancelled, Connection, rendererState } from './connection.js';
   import NodeList from './NodeList.svelte';
-  let { renderer, view, onError, fallback }: ViewstemViewProps = $props();
+  let { renderer, view, onError, fallback, forwardRenderError, emitFromHost, isOpen = () => true }: ViewstemViewProps & {
+    forwardRenderError?: ((error: unknown, nodeId?: string) => void) | undefined;
+    emitFromHost?: View['emit'] | undefined;
+    isOpen?: () => boolean;
+  } = $props();
   // The parent keys this component by renderer and View; this connection owns only a subscription.
-  const connection = untrack(() => new Connection(renderer, view, diagnostic => onError?.(diagnostic)));
-  onDestroy(() => connection.dispose());
-  export function whenRendered(): Promise<void> { return connection.whenRendered(); }
+  const { connection, waiter } = untrack(() => {
+    const state = rendererState(renderer);
+    const open = () => connection.isOpen();
+    const deliver = (diagnostic: RendererDiagnostic) => untrack(() => {
+      notifyDiagnostic(diagnostic,
+        { listener: state.onError, isOpen: () => open() && state.alive },
+        { listener: onError, isOpen: open },
+      );
+    });
+    let dispatch: View['emit'] | undefined = emitFromHost;
+    const connection = new Connection(renderer, view, {
+      isOpen: () => isOpen(),
+      emit: (target, event, payload) => dispatch
+        ? dispatch(target, event, payload) : Promise.reject(cancelled()),
+      onError: forwardRenderError
+        ? diagnostic => forwardRenderError?.(diagnostic.error, diagnostic.nodeId)
+        : deliver,
+    });
+    try {
+      const waiter = createRenderWaiter(view, () => connection.whenRendered(), {
+        ...(forwardRenderError ? {} : { deliverDiagnostic: deliver }),
+        isOpen: open, onClose: () => connection.dispose(),
+      });
+      dispatch ??= waiter.emit;
+      return { connection, waiter };
+    } catch (cause) {
+      connection.dispose();
+      throw cause;
+    }
+  });
+  onDestroy(() => { waiter.dispose(); connection.dispose(); });
+  let failedProjection: ReturnType<typeof view.getSnapshot> | null;
+  let resetBoundary: (() => void) | undefined;
+  function handleBoundaryFailure(_error: unknown, reset: () => void) {
+    failedProjection = $connection;
+    resetBoundary = reset;
+    connection.failBoundary();
+  }
+  $effect(() => {
+    const projection = $connection;
+    untrack(() => {
+      if (resetBoundary && projection && projection !== failedProjection) {
+        const reset = resetBoundary;
+        resetBoundary = undefined;
+        reset();
+      }
+    });
+  });
+  export function matches(renderer: Renderer, view: View | undefined) {
+    return connection.renderer === renderer && connection.view === view;
+  }
+  export function whenRendered(): Promise<void> { return waiter.whenRendered(); }
+  export function whenSettled(application: ViewApplication) { return waiter.whenSettled(application); }
 </script>
 
-<NodeList nodes={$connection?.roots ?? []} {connection} {fallback} />
+<svelte:boundary onerror={handleBoundaryFailure}>
+  <NodeList nodes={$connection?.roots ?? []} {connection} {fallback} />
+  {#snippet failed()}{/snippet}
+</svelte:boundary>

@@ -10,7 +10,7 @@ sidebar:
 
 ```ts
 import { createRuntime } from '@viewstem/core';
-import type { Runtime, RuntimeOptions, ViewTarget, InitialReport } from '@viewstem/core';
+import type { Runtime, RuntimeOptions, ViewSource, ViewOptions, InitialReport } from '@viewstem/core';
 ```
 
 ## createRuntime(options)
@@ -19,7 +19,7 @@ import type { Runtime, RuntimeOptions, ViewTarget, InitialReport } from '@viewst
 
 | RuntimeOptions 필드 | 타입 / 기본값 | 의미 |
 |---|---|---|
-| `registry` | `Registry`, 필수 | 검증된 정의를 제공하는 공용 레지스트리입니다. |
+| `registry` | `Registry`, 선택 | 검증된 정의를 제공하는 공용 레지스트리입니다. |
 | `stateStore` | `StateStore`, 생략하면 새 Store | 호스트 State를 주입합니다. 주입한 Store의 정리는 호출자 책임입니다. |
 | `requestExecutor` | `RequestExecutor`, fetch 기반 HTTP 실행기 | 버전이 있는 계획과 AbortSignal을 받아 `HttpResponse`를 반환합니다. |
 | `resourceResolver` | `(kind, id) => Awaitable<AnyResource>`, 없음 | View 준비 중 없는 참조를 해결합니다. 요청한 종류·ID를 반환해야 하며 해결한 정의는 배치로 등록합니다. |
@@ -28,18 +28,19 @@ import type { Runtime, RuntimeOptions, ViewTarget, InitialReport } from '@viewst
 | `requestTimeoutMs` | 양의 안전 정수, 30000ms | Query/HTTP 요청 제한 시간입니다. 사용자 실행기도 취소를 따라야 합니다. |
 | `clock` | `TimerClock`, 시스템 스케줄러 | Query 스케줄링용 `now` 숫자 또는 함수, `setTimeout(callback, milliseconds)`, `clearTimeout(token)`입니다. 앱 State용 시계와 다릅니다. |
 
-## createView(target)
+## createView(source, options?)
 
-`await runtime.createView(target)`은 `{ view, initialComplete }`를 반환합니다. 준비·검증 실패는 이 호출을 거절합니다. 별도 `initialComplete: Promise<InitialReport>`는 처음 실행 가능한 Query들이 개별 실패를 포함해 확정될 때까지 기다립니다. gate나 입력 미준비는 완료를 막지 않습니다. 폐기하거나 새 적용으로 대체하면 `CANCELLED`로 거절될 수 있습니다.
+`await runtime.createView(source, options)`는 준비와 검증 후 View를 반환합니다. 최초 Query 보고는 `view.whenSettled(view.initial)`로 기다립니다. 교체 또는 폐기 시 `CANCELLED`로 거절될 수 있습니다.
 
 `InitialReport`는 `generation: number`와 `queryErrors: { instanceId, query, error: PublicError }[]`를 가집니다. `queryErrors`가 있는 정상 완료는 모든 Query의 성공이 아닙니다. DOM 표시 완료 신호도 아닙니다.
 
-## ViewTarget
+## ViewSource and ViewOptions
 
 | 필드 | 의미 |
 |---|---|
-| `viewRef` 또는 `view` | 등록된 View ID와 인라인 `ViewSpec` 중 정확히 하나입니다. 인라인에는 리소스 외피를 넣지 않습니다. |
+| `source` | 인라인 `ViewSpec` 또는 등록된 View의 `{ ref: id }`입니다. |
 | `inputs` | 네이티브 값과 발급된 State/Query 핸들의 선택적 읽기 전용 레코드입니다. 기본값은 `{}`이며 이 호스트 경계에서 JSON 표현식을 평가하지 않습니다. |
+| `signal` | 동기 커밋 직전까지 준비를 취소하는 선택적 AbortSignal입니다. 커밋된 View는 `view.dispose()`로 닫습니다. |
 | `url.adapter` | 명시적인 `UrlAdapter`입니다. |
 | `url.bindings` | View 소유 State를 선택하는 `{ state: string, key?: string, history?: 'push' \| 'replace' }` 배열입니다. |
 | `url.limits` | 선택적 바이트·항목·키 제한입니다. [URL](../url/)을 참고하세요. |
@@ -48,15 +49,15 @@ import type { Runtime, RuntimeOptions, ViewTarget, InitialReport } from '@viewst
 
 ## invokeAction(request)
 
-`runtime.invokeAction({ owner, actionRef?, action?, inputs? }): Promise<unknown>`는 이 런타임이 소유하는 살아 있는 `View`와 Action 참조·인라인 spec 중 하나를 받습니다. `inputs`는 기본 `{}`입니다. 선언된 출력으로 완료하고 void Action이면 `undefined`를 반환하며, 실패 시 공개 오류로 거절합니다. 없거나 다른 런타임 소유이거나 폐기된 owner는 `CANCELLED`입니다.
+`view.invokeAction({ actionRef?, action?, inputs? }): Promise<unknown>`는 이 런타임이 소유하는 살아 있는 `View`와 Action 참조·인라인 spec 중 하나를 받습니다. `inputs`는 기본 `{}`입니다. 선언된 출력으로 완료하고 void Action이면 `undefined`를 반환하며, 실패 시 공개 오류로 거절합니다. 없거나 다른 런타임 소유이거나 폐기된 owner는 `CANCELLED`입니다.
 
 이 호출은 독립적인 View 소유 실행입니다. 실행 중 코드 Action의 하위 호출이어야 한다면 `ActionContext.invokeAction()`을 사용하세요.
 
 ## 조회와 폐기
 
 - `runtime.registry`, `runtime.stateStore`: 공개 핸들의 읽기 전용 참조입니다.
-- `listResources(kind?)`: 분리된 리소스 선언 목록이며 `ResourceKind`로 제한할 수 있습니다.
-- `exportResource(kind, id)`: 한 리소스의 분리된 선언입니다. 실행 중 State나 구현 함수는 추출하지 않습니다.
+- `runtime.registry.list(filter?)`: 분리된 리소스 선언 목록이며 `ResourceKind`로 제한할 수 있습니다.
+- `runtime.registry.exportResource(kind, id)`: 한 리소스의 분리된 선언입니다. 실행 중 State나 구현 함수는 추출하지 않습니다.
 - `dispose(): void`: 모든 View와 소유 작업을 정리합니다. 내부에서 만든 Store는 폐기하고 주입한 Store는 호출자가 정리합니다. 반복 호출해도 안전합니다.
 
 <a id="authorization"></a>

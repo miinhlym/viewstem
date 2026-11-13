@@ -47,4 +47,22 @@ npm pack -w @viewstem/core -w @viewstem/ui --pack-destination ../viewstem-packag
 npm install ../viewstem-packages/viewstem-core-0.1.0.tgz ../viewstem-packages/viewstem-ui-0.1.0.tgz
 ```
 
-[빠른 시작](../quickstart/)은 순수 JS Vite 앱이나 기존 브라우저 앱의 DOM 컨테이너에서 실행할 수 있습니다. 앱의 Svelte 컴포넌트를 연결하려면 `npm run build:svelte`를 실행하고 `npm pack -w @viewstem/svelte --pack-destination ../viewstem-packages`로 패키지를 만든 뒤 [Svelte에서 마운트](../svelte/guides/mount-in-svelte/) 가이드를 따르세요.
+[빠른 시작](../quickstart/)은 순수 JS Vite 앱이나 기존 앱의 브라우저 컨테이너에서 실행할 수 있습니다.
+
+## Svelte 패키지 빌드 및 설치
+
+저장소 루트에서 `npm ci`를 실행한 뒤 다음 명령을 실행하세요.
+
+```sh
+npm run build:svelte
+mkdir -p ../viewstem-packages
+npm pack -w @viewstem/core -w @viewstem/svelte --pack-destination ../viewstem-packages
+```
+
+Svelte 앱 폴더에서 두 tarball을 함께 설치하세요.
+
+```sh
+npm install ../viewstem-packages/viewstem-core-0.1.0.tgz ../viewstem-packages/viewstem-svelte-0.1.0.tgz
+```
+
+[Svelte 연결 가이드](../svelte/guides/mount-in-svelte/)로 이어가세요.

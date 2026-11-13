@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { setImmediate } from 'node:timers/promises';
 import { createServer } from 'node:http';
-import { createRegistry, createRuntime } from '@viewstem/core';
+import { createRegistry } from '@viewstem/core';
+import { createRuntime } from './fixtures/runtime-operations.mjs';
 const p = path => ({ '@path': path });
 const number = { type: 'number' }, boolean = { type: 'boolean' };
 const port = (schema = true) => ({ kind: 'Value', schema, required: true });
@@ -56,6 +57,42 @@ test('N03 initial waits for every executable first Query while ready UI appears 
   assert.equal(first.status, 'ready'); assert.equal(first.inputs.value, 'first-ready'); assert.equal(second.status, 'pending');
   assert.equal(settled, false); await f.reply(2, 'second-ready');
   assert.deepEqual(await bounded(initial), { generation: 1, queryErrors: [] }); assert.equal(view.getSnapshot().roots[0].children[1].inputs.value, 'second-ready');
+});
+
+test('a missing bound Query input stays absent through automatic execution and refresh', async t => {
+  const q = queryResource();
+  q.spec.ports = { filter: { kind: 'Value', schema: { type: 'string' }, default: 'all' } };
+  const f = controlled(t, [q]);
+  const { view, initialComplete } = await f.runtime.createView({ view: {
+    states: { filter: { kind: 'State', schema: { type: 'string' } } },
+    queries: { bound: { queryRef: 'q', inputs: { filter: p('/states/filter') } }, omitted: { queryRef: 'q' } },
+    render: display(),
+  } });
+  await flush();
+  await Promise.all([f.reply(1, []), f.reply(2, [])]);
+  await initialComplete;
+  assert.deepEqual(f.requests.map(({ plan }) => ({ ...plan.inputs })), [{}, { filter: 'all' }]);
+  const refresh = view.getQuery('bound').refresh();
+  await f.reply(3, []);
+  await refresh;
+  assert.deepEqual({ ...f.requests[2].plan.inputs }, {});
+});
+
+test('poll timer failures leave committed View updates and Query results available', async t => {
+  const r = registry();
+  const runtime = createRuntime({ registry: r, clock: {
+    now: 0, setTimeout() { throw Error('poll clock unavailable'); }, clearTimeout() {},
+  } });
+  t.after(() => runtime.dispose());
+  const use = { query: { sources: {}, transform: { input: 'ready' } } };
+  const source = { queries: { rows: use }, render: display() };
+  const { view, initialComplete } = await runtime.createView({ view: source });
+  await initialComplete;
+  const update = await view.update({ ...source, queries: { rows: { ...use, intervalMs: 50 } } });
+  assert.deepEqual((await update.initialComplete).queryErrors, []);
+  assert.equal(view.getQuery('rows').getSnapshot().data, 'ready');
+  assert.equal(view.exportDefinition().queries.rows.intervalMs, 50);
+  assert.ok(view.getSnapshot().errors.some(error => error.code === 'INTERNAL_ERROR'));
 });
 
 test('N04/K23 first Query errors report through initial; blocked and missing-input Queries do not prevent completion', async t => {

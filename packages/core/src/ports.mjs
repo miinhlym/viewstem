@@ -77,6 +77,9 @@ export function stateRoot(handle, store) {
   }
   return current;
 }
+export const isQueryHandle = value => queries.has(value);
+export const isWrappedStateHandle = value => stateWrappers.has(value);
+
 export function boundedState(baseHandle, guard) {
   if (!record(baseHandle) || typeof guard !== 'function'
     || ['read', "getSnapshot", 'write', 'reset'].some(method => typeof baseHandle[method] !== 'function')) fail('TYPE_CONTRACT_MISMATCH');

@@ -42,7 +42,7 @@ description: View에 값을 보관하고 명시적인 쓰기로 변경합니다.
 
 
 ```js
-mounted.view.getState('title').write('Saved');
+view.getState('title').write('Saved');
 ```
 
 

@@ -5,31 +5,26 @@
 `@viewstem/ui`는 `@viewstem/core`의 View를 브라우저 DOM에 연결합니다. 기본 컴포넌트는 66개 계열, 357개 JSON Component ID를 제공하며 Basecoat Vega와 Neutral 팔레트를 사용합니다. 순수 JS·React·Vue·Svelte에서 같은 JSON을 실행할 수 있습니다.
 
 ```js
-import { createRegistry, createRuntime } from '@viewstem/core';
-import { attach, registerShadcn } from '@viewstem/ui';
+import { createRenderer } from '@viewstem/ui';
 import '@viewstem/ui/styles.css';
 
-const registry = createRegistry();
-registerShadcn(registry);
-const runtime = createRuntime({ registry });
-const { view, initialComplete } = await runtime.createView({
-  view: {
+const renderer = createRenderer();
+const screen = renderer.mount({
+  target: document.querySelector('#app'),
+  source: {
     render: {
       id: 'save',
       componentRef: 'shadcn.Button',
-      inputs: { text: '저장' },
+      inputs: { text: 'Save', variant: 'outline' },
     },
   },
 });
-const attachment = attach(view, document.querySelector('#app'));
-await initialComplete;
-
-// 화면을 제거할 때
-attachment.dispose();
-runtime.dispose();
+await screen.ready;
 ```
 
-호스트 앱은 연결된 DOM 컨테이너와 View·Runtime의 수명을 관리합니다. 지원하는 입력·슬롯·이벤트는 `@viewstem/ui/support.json`에서 확인하세요. 앱 자체의 Svelte 컴포넌트를 연결할 때는 별도 `@viewstem/svelte` 어댑터를 사용할 수 있습니다.
+화면이 닫히면 `await screen.unmount()`를, 앱에서 렌더러 사용을 마치면 `await renderer.dispose()`를 호출하세요. 최초 Query 보고까지 필요하면 `await screen.whenSettled(view.initial)`을 사용하세요. 여기서 `view`는 `screen.ready`가 반환한 View입니다.
+
+`createRenderer()`는 카탈로그 계약을 포함한 Runtime을 소유합니다. 기존 Runtime을 `{ runtime }`으로 주입하려면 먼저 `registerShadcn(runtime.registry)`로 계약을 등록하세요. `renderer.attach(view, target)`은 기존 View를 빌리며 `await attachment.detach()`로 연결을 정리합니다. 화면과 연결의 `whenRendered()`는 요청된 DOM 반영을 기다립니다. 대상은 문서에 연결된 HTMLElement여야 하며 정리가 끝난 뒤 재사용할 수 있습니다. `onError`는 `{ phase, error }` 진단을 받습니다.
 
 Slider의 `type: "multiple"`은 `value`의 숫자마다 손잡이를 만들고, `thumbLabels`로 각 손잡이의 접근성 이름을 지정할 수 있습니다. `valueChange`는 조작 중 값, `valueCommit`은 드래그를 마치거나 키보드로 값을 조절한 뒤의 확정 값을 전달합니다. 이벤트의 `value`는 다중 모드에서 숫자 배열이고 단일 모드에서 숫자입니다.
 

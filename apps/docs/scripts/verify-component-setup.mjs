@@ -13,7 +13,7 @@ const text = node => node.nodeName === '#text' ? node.value : (node.childNodes ?
 try {
   await symlink(join(root, 'node_modules'), join(temporary, 'node_modules'), 'dir');
   await writeFile(join(temporary, 'tsconfig.json'), JSON.stringify({ compilerOptions: {
-    strict: true, noEmit: true, skipLibCheck: true, target: 'ES2022', module: 'ESNext',
+    strict: true, noEmit: true, noUncheckedSideEffectImports: true, target: 'ES2022', module: 'ESNext',
     moduleResolution: 'Bundler', resolveJsonModule: true, allowSyntheticDefaultImports: true,
     types: [], lib: ['ES2022', 'DOM', 'DOM.Iterable'],
   }, include: ['**/*.ts'] }));

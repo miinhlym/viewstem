@@ -13,7 +13,8 @@ sidebar:
 
 | 원하는 작업 | 사용할 API | View 소유자 |
 | --- | --- | --- |
-| Svelte 컴포넌트 트리에 View 포함 | [`<ViewstemView>`](./viewstem-view/) | View를 만든 호스트 |
+| Svelte 트리에서 새 View 생성 | [`<ViewstemView {source}>`](./viewstem-view/) | 컴포넌트 |
+| Svelte 트리에 기존 View 포함 | [`<ViewstemView>`](./viewstem-view/) | View를 만든 호스트 |
 | 렌더러가 View를 생성해 DOM 요소에 표시 | [`renderer.mount`](./renderer/#mount) | 렌더러 연결 |
 | 기존 View를 DOM 요소에 표시 | [`renderer.attach`](./renderer/#attach) | View를 만든 호스트 |
 

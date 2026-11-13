@@ -10,84 +10,78 @@ sidebar:
 ## 입력과 검증 메시지 연결하기
 
 ```js title="src/main.js"
-import { createRegistry, createRuntime } from '@viewstem/core';
-import { attach, registerShadcn } from '@viewstem/ui';
+import { createRenderer } from '@viewstem/ui';
 import '@viewstem/ui/styles.css';
-
-const registry = createRegistry();
-registerShadcn(registry);
-const runtime = createRuntime({ registry });
 
 const string = { type: 'string' };
 const name = { '@path': '/states/name' };
 
 const target = document.querySelector('#viewstem');
-const mounted = await runtime.createView({
-  view: {
-    states: {
-      name: { kind: 'State', schema: string, initial: '' },
-      nameMessage: {
-        kind: 'Derived',
-        schema: string,
-        variable: {
-          ports: { name: { kind: 'Value', schema: string, required: true } },
-          expression: 'name.trim() == "" ? "이름을 입력하세요." : ""',
-        },
-        inputs: { name },
+const renderer = createRenderer();
+const source = {
+  states: {
+    name: { kind: 'State', schema: string, initial: '' },
+    nameMessage: {
+      kind: 'Derived',
+      schema: string,
+      variable: {
+        ports: { name: { kind: 'Value', schema: string, required: true } },
+        expression: 'name.trim() == "" ? "이름을 입력하세요." : ""',
       },
-    },
-    render: {
-      id: 'name-field',
-      componentRef: 'shadcn.Field.Field',
-      slots: {
-        default: [
-          {
-            id: 'label',
-            componentRef: 'shadcn.Field.Label',
-            inputs: { for: 'project-name', text: '프로젝트 이름' },
-          },
-          {
-            id: 'name-input',
-            componentRef: 'shadcn.Input',
-            inputs: {
-              id: 'project-name',
-              value: name,
-              required: true,
-              'aria-describedby': 'name-message',
-            },
-            on: {
-              input: {
-                action: {
-                  ports: {
-                    target: { kind: 'State', schema: string, required: true },
-                    next: { kind: 'Value', schema: string, required: true },
-                  },
-                  steps: [{
-                    kind: 'SetState',
-                    target: { '@path': '/ports/target' },
-                    value: { '@path': '/ports/next' },
-                  }],
-                },
-                inputs: { target: name, next: { '@path': '/event/value' } },
-              },
-            },
-          },
-          {
-            id: 'validation',
-            componentRef: 'shadcn.Field.Description',
-            inputs: {
-              id: 'name-message',
-              text: { '@path': '/states/nameMessage' },
-              'aria-live': 'polite',
-            },
-          },
-        ],
-      },
+      inputs: { name },
     },
   },
-});
-const attachment = attach(mounted.view, target);
-await mounted.initialComplete;
+  render: {
+    id: 'name-field',
+    componentRef: 'shadcn.Field.Field',
+    slots: {
+      default: [
+        {
+          id: 'label',
+          componentRef: 'shadcn.Field.Label',
+          inputs: { for: 'project-name', text: '프로젝트 이름' },
+        },
+        {
+          id: 'name-input',
+          componentRef: 'shadcn.Input',
+          inputs: {
+            id: 'project-name',
+            value: name,
+            required: true,
+            'aria-describedby': 'name-message',
+          },
+          on: {
+            input: {
+              action: {
+                ports: {
+                  target: { kind: 'State', schema: string, required: true },
+                  next: { kind: 'Value', schema: string, required: true },
+                },
+                steps: [{
+                  kind: 'SetState',
+                  target: { '@path': '/ports/target' },
+                  value: { '@path': '/ports/next' },
+                }],
+              },
+              inputs: { target: name, next: { '@path': '/event/value' } },
+            },
+          },
+        },
+        {
+          id: 'validation',
+          componentRef: 'shadcn.Field.Description',
+          inputs: {
+            id: 'name-message',
+            text: { '@path': '/states/nameMessage' },
+            'aria-live': 'polite',
+          },
+        },
+      ],
+    },
+  },
+};
+const screen = renderer.mount({ target, source });
+await screen.ready;
 ```
 
 1. **입력값을 저장합니다.** 텍스트 상자는 `/states/name`을 읽습니다. `input` 이벤트는 `/event/value`로 편집된 문자열을 Action에 전달합니다. `target` State 포트가 쓰기 가능한 셀에 연결되므로 `SetState`는 텍스트 상자가 읽는 값을 갱신합니다.
