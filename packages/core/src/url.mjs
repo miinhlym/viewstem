@@ -197,6 +197,7 @@ export function connectStateUrl(store,{adapter,bindings,limits:custom={},restore
     stopStore = store.subscribe(prepared.map(binding => binding.target.address), observeStore);
     check();
     if(initialized){if(restore)applyRestore();else{firstRestore=false;readyResolve();}writeDirty();}
+    else initialize();
   } catch (caught) {
     cleanup();
     throw caught;

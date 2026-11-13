@@ -31,6 +31,26 @@ test('L07/M05 actual View replacement removes old owned keys and uses new initia
   const url = new URL(f.read()); assert.equal(url.searchParams.has('owned'), false); assert.equal(url.searchParams.get('external'), '/'); assert.equal(url.pathname, '/path'); assert.equal(url.hash, '#hash'); assert.equal(f.commits.length, 1); assert.equal(f.commits[0].mode, 'replace');
   view.getState('value').write(4); await tick(); assert.equal(JSON.parse(new URL(f.read()).searchParams.get('owned')), 4); f.runtime.dispose();
 });
+test('L07 URL connection sees an initial State settled during old URL cleanup', async t => {
+  const store = createStateStore(), seed = store.createScope().registerState('seed', { schema: integer });
+  const f = fixture(memoryUrl(link({ owned: 8 }), { delayed: true }), store);
+  t.after(() => { f.runtime.dispose(); store.dispose(); });
+  const { view, initialComplete } = await f.runtime.createView({ view: f.spec(1), url: f.url });
+  await initialComplete;
+  const replacement = await view.replace({ view: f.spec(undefined, {
+    ports: { seed: { kind: 'State', schema: integer, required: true } },
+    states: { value: { kind: 'State', schema: integer, initial: path('/ports/seed') } },
+    queries: { rows: { query: { sources: {}, transform: { input: 1 } } } },
+  }), url: f.url, inputs: { seed } });
+  assert.equal(f.pending.length, 1);
+  seed.write(3);
+  assert.equal(view.getState('value').read(), 3);
+  f.release();
+  await replacement.initialComplete;
+  assert.equal(view.getQuery('rows').getSnapshot().status, 'success');
+  assert.equal(f.attempts.length, 1);
+});
+
 test('L07 cleanup failure still completes new View, preserves new baseline and reports error', async () => {
   const f = fixture(memoryUrl('https://example.test/view?owned=8'));
   const { view, initialComplete: initial } = await f.runtime.createView({ view: f.spec(1), url: f.url }); await initial; f.failNext();
