@@ -49,6 +49,72 @@ test('S02 transaction with no net value change emits no extra snapshot', () => {
   store.transaction(() => { value.write(2); value.write(1); });
   assert.equal(snapshots.length, 1); assert.equal(value.getSnapshot(), before);
 });
+
+test('S03 subscriber transactions roll back or publish once after earlier queued writes', () => {
+  for (const fail of [true, false]) {
+    const store = createStateStore(), scope = store.createScope();
+    const a = scope.registerState('a', { schema: integer, initial: 0 });
+    const b = scope.registerState('b', { schema: integer, initial: 0 });
+    const c = scope.registerState('c', { schema: integer, initial: 0 });
+    const abort = Error('rollback');
+    let created, transactionError, staged;
+    const observations = [];
+    store.subscribe(a.address, ({ changes }) => {
+      if (!changes.length) return;
+      b.write(1);
+      try {
+        store.transaction(() => {
+          b.write(9);
+          scope.removeState('c');
+          const next = store.createScope();
+          created = next.registerState('d', { schema: integer, initial: 3 });
+          created.write(2);
+          staged = [b.read(), created.read()];
+          if (fail) throw abort;
+        });
+      } catch (error) { transactionError = error; }
+    });
+    store.subscribe(null, ({ changes, states }) => {
+      if (changes.length) observations.push([changes.map(change => change.target.name), b.read(),
+        Object.hasOwn(states, JSON.stringify([scope.scopeId, 'c'])) ? c.read() : null]);
+    });
+    a.write(1);
+    assert.deepEqual(staged, [9, 2]);
+    assert.equal(transactionError, fail ? abort : undefined);
+    assert.deepEqual(observations, [
+      [['a'], 0, 0],
+      [['b'], 1, 0],
+      ...(fail ? [] : [[['b', 'c', 'd'], 9, null]]),
+    ]);
+    if (fail) {
+      assert.equal(scope.getState('c'), c);
+      assert.throws(() => created.read(), error => ['CANCELLED', 'REFERENCE_NOT_FOUND'].includes(error.code));
+    } else {
+      assert.equal(created.read(), 2);
+      created.reset();
+      assert.equal(created.read(), 3);
+    }
+    assert.deepEqual(store.getDiagnostics(), []);
+    store.dispose();
+  }
+});
+
+test('S03 subscriber transaction cannot partially apply after a queued cell replacement', () => {
+  const store = createStateStore(), scope = store.createScope();
+  const trigger = scope.registerState('trigger', { schema: integer, initial: 0 });
+  const old = scope.registerState('old', { schema: integer, initial: 0 });
+  const other = scope.registerState('other', { schema: integer, initial: 0 });
+  store.subscribe(trigger.address, ({ changes }) => {
+    if (!changes.length) return;
+    scope.replaceState('old', { schema: integer, initial: 1 });
+    store.transaction(() => { other.write(9); old.write(9); });
+  });
+  trigger.write(1);
+  assert.equal(scope.getState('old').read(), 1);
+  assert.equal(other.read(), 0);
+  assert.deepEqual(store.getDiagnostics().map(error => error.code), ['CANCELLED']);
+  store.dispose();
+});
 test('V57 registered async Action is executable while function/Promise data remain rejected', async () => {
   const registry = createRegistry(), store = createStateStore(); let executions = 0;
   const run = async () => { executions++; return 7; };

@@ -86,6 +86,8 @@
 
 changes의 각 항목은 `{kind, target:{scopeId,name}, generation}`이다. kind는 기존 added/updated/removed/replaced이며 generation은 변경된 셀 수명을 식별한다. 초기 통지는 현재 values/states와 빈 changes다. 제거된 주소는 values/states에서 빠지고 changes에 removed로 남는다. 관찰자의 재진입 쓰기는 현재 통지 중인 snapshot을 바꾸지 않고 다음 원자 변경 묶음으로 처리한다. 대상 제거 뒤 같은 이름의 재등록은 동일 scope의 이름 구독으로 계속 관찰하지만 옛 셀 핸들이 되살아나지는 않는다.
 
+Store 구독 콜백에서 시작한 `transaction()`은 동기로 실행되며, 그 안에서는 자신이 변경한 값·구조를 읽을 수 있다. 같은 알림을 받는 다른 구독자는 이전에 확정된 값을 읽는다. 콜백이 실패하면 후보와 예약된 변경을 함께 버린다. 성공한 변경은 앞서 큐에 들어간 작업 뒤에서 한 묶음으로 확정한다. 앞선 작업이 변경 대상의 세대를 무효화하면 그 묶음 전체를 버리고 Store 진단에 기록한다.
+
 View/Component의 `spec.reactions`는 `{watch:[상태 @path, ...], target:상태 @path, value:고정 JSON 값}` 배열이다. watch는 비어 있지 않으며 읽기 가능한 State/Derived에 명시 연결한다. target은 같은 Store의 쓰기 가능한 State다. value는 대상 스키마로 등록 시 검증하고 표현식으로 실행하지 않는다. 현재 owner의 수명에 묶어 등록·해제하며, 해석된 실제 target 셀 기준으로 중복 reaction을 거절한다.
 
 watch의 실제 값 변경으로만 작동하며 초기화·URL 복원은 reaction 실행을 만들지 않는다. 같은 원자 변경 묶음의 명시적 쓰기가 target에 있으면 그 값을 우선한다. reaction 연쇄와 Derived 의존을 함께 검증해 순환을 거절하고, 값 확정 뒤 Query 실행 판단으로 넘어간다. 일반적인 Action 오류 복구나 이벤트 버스로 이 구조를 확대하지 않는다.
