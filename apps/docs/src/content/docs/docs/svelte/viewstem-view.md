@@ -18,7 +18,7 @@ Import from `@viewstem/svelte` and pass a `renderer` with either a `source` or a
 
 `ViewstemViewProps` remains the interface for borrowed Views. `ViewstemSourceProps` describes creation. `ViewstemViewComponentProps` and `ComponentProps<typeof ViewstemView>` cover both forms.
 
-Passing both `view` and `source`, or neither, produces `INVALID_DEFINITION`. In either form, `onError` overrides the renderer default and `fallback` displays an individual failed node.
+Passing both `view` and `source`, or neither, produces `INVALID_DEFINITION`. In either form, `onError` adds a screen observer alongside the renderer observer, and `fallback` displays an individual failed node.
 
 ## Create from a source
 

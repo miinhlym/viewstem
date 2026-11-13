@@ -1,7 +1,7 @@
 import { mount, unmount } from 'svelte';
 import { createRuntime } from '@viewstem/core';
 import { createRendererHost } from '@viewstem/core/renderer';
-import ViewstemView from './ViewstemView.svelte';
+import ConnectedView from './ConnectedView.svelte';
 import { failure, rendererStates, transformError, type RendererState } from './connection.js';
 import type { ComponentAdapter, RenderOptions, Renderer, RendererOptions } from './types.js';
 
@@ -29,7 +29,9 @@ export function createRenderer({ runtime: injectedRuntime, onError, components =
       return !!constructor && target instanceof constructor && target.isConnected;
     },
     connect(view, target, options, onRenderError) {
-      const instance = mount(ViewstemView, { target, context: options.context, transformError, props: { view, renderer, diagnostics: false, onError: diagnostic => onRenderError(diagnostic.error, diagnostic.nodeId), fallback: options.fallback } });
+      const instance = mount(ConnectedView, { target, context: options.context, transformError, props: {
+        view, renderer, forwardRenderError: onRenderError, fallback: options.fallback,
+      } });
       return { whenRendered: () => instance.whenRendered(), dispose: () => unmount(instance) };
     },
   });

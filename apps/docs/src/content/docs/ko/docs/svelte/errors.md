@@ -28,7 +28,9 @@ sidebar:
 
 **타입** · `(diagnostic: RendererDiagnostic) => void`
 
-`mount`와 `attach`에서는 렌더러와 연결의 `onError`가 같은 진단을 받을 수 있습니다. 직접 호스팅하는 `ViewstemView`에서는 prop으로 전달한 `onError`가 렌더러 기본 콜백을 대체합니다. 관찰자가 던진 동기 예외는 렌더링과 이벤트 전달에서 격리됩니다.
+`mount`, `attach`, `ViewstemView`는 렌더러의 `onError`를 먼저 호출하고 화면의 `onError`를 호출합니다. 여러 연결이 같은 View를 표시하더라도 같은 함수는 한 발생을 한 번 받습니다. 새 연결은 현재 활성 노드·Query 오류와 현재 적용의 URL 진단을 기존 관찰자와 같은 발생으로 받습니다. 같은 코드로 실패한 재시도도 새 실행의 진단으로 전달됩니다.
+
+관찰자가 연결을 닫으면 그 연결의 남은 콜백은 호출되지 않습니다. 렌더러를 폐기하면 렌더러 관찰은 끝납니다. 직접 호스팅한 대여 View는 View와 Svelte 연결이 살아 있는 동안 화면 콜백에 계속 전달할 수 있습니다. 콜백의 예외와 Promise 거절은 격리합니다. 정상 취소는 진단을 만들지 않습니다.
 
 ## RenderFallback
 

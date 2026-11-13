@@ -37,7 +37,8 @@ assert.equal(typeof createHttpExecutor(),'function');assert.ok(support);store.di
  // must resolve only shipped exports, never workspace source or an alias.
  await writeFile(join(directory,'public-api.test.mjs'),await readFile(join(pkg,'test/public-api.test.mjs')));
  await writeFile(join(directory,'owned-lifetime.test.mjs'),await readFile(join(pkg,'test/owned-lifetime.test.mjs')));
- const boundaryTests = execute(process.execPath,['--test','public-api.test.mjs','owned-lifetime.test.mjs']);
+ await writeFile(join(directory,'renderer-diagnostics.test.mjs'),await readFile(join(pkg,'test/renderer-diagnostics.test.mjs')));
+ const boundaryTests = execute(process.execPath,['--test','public-api.test.mjs','owned-lifetime.test.mjs','renderer-diagnostics.test.mjs']);
  await writeFile(join(directory,'public-api.ts'),await readFile(join(pkg,'test/types/public-api.ts')));
  await writeFile(join(directory,'consumer.ts'),`import {createRegistry,createRuntime,createStateStore,type View} from '@viewstem/core';
 import {createHttpExecutor} from '@viewstem/core/http';

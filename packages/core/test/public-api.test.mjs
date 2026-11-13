@@ -20,7 +20,7 @@ function surface(value, names) {
 
 test('public package exports only the selected root and optional subpath APIs', async () => {
   assert.deepEqual(Object.keys(core).sort(), ['createRegistry', 'createRuntime', 'createStateStore', "computeGridLayout", 'mergeOwnedUrl'].sort());
-  assert.deepEqual(Object.keys(renderer).sort(), ['createRenderWaiter', 'createRendererHost', 'prepareOwnedView']);
+  assert.deepEqual(Object.keys(renderer).sort(), ['createDiagnostic', 'createPreparationError', 'createRenderError', 'createRenderWaiter', 'createRendererHost', 'notifyDiagnostic', 'prepareOwnedView']);
   assert.deepEqual(Object.keys(http), ['createHttpExecutor']);
   assert.deepEqual(Object.keys(cel).sort(), ['compileCel', 'evaluateCel', "defaultCelLimits"].sort());
   assert.equal(cel.compileCel('n + 1', { inputs: { n: integer } })({ n: 1 }), 2);

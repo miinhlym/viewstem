@@ -1,20 +1,13 @@
 import { disposeRendererRuntime, prepareOwnedView, rendererView } from './api.mjs';
 export { prepareOwnedView } from './api.mjs';
 import { error, fail, safeError } from './errors.mjs';
+import { createDiagnostic, notifyDiagnostic } from './diagnostics.mjs';
+export { createDiagnostic, createPreparationError, createRenderError, notifyDiagnostic } from './diagnostics.mjs';
 
 const targets = new WeakMap();
-const reportedDiagnostics = new WeakMap();
-
-function notify(diagnostic, ...listeners) {
-  let reported = reportedDiagnostics.get(diagnostic);
-  if (!reported) reportedDiagnostics.set(diagnostic, reported = new Set());
-  for (const listener of listeners) if (listener && !reported.has(listener)) {
-    reported.add(listener);
-    try { void Promise.resolve(listener(diagnostic)).catch(() => {}); } catch {}
-  }
-}
-
-export function createRenderWaiter(view, render, { onError, getErrorListener, onClose, isOpen = () => true } = {}) {
+export function createRenderWaiter(view, render, {
+  onError, getErrorListener, deliverDiagnostic, onClose, isOpen = () => true, onRenderFailure,
+} = {}) {
   const engine = rendererView(view);
   const settled = new WeakMap();
   let alive = true;
@@ -31,7 +24,9 @@ export function createRenderWaiter(view, render, { onError, getErrorListener, on
       result.then(value => { remove(); resolve(value); }, cause => { remove(); reject(cause); });
     });
   }
-  const diagnosticListener = getErrorListener ? diagnostic => notify(diagnostic, getErrorListener()) : onError;
+  const diagnosticListener = deliverDiagnostic ?? (getErrorListener || onError
+    ? diagnostic => notifyDiagnostic(diagnostic, { listener: getErrorListener ? getErrorListener() : onError, isOpen: open })
+    : undefined);
   const stopDiagnostic = diagnosticListener ? engine.onDiagnostic(diagnostic => {
     if (open()) diagnosticListener(diagnostic);
   }) : () => {};
@@ -46,13 +41,9 @@ export function createRenderWaiter(view, render, { onError, getErrorListener, on
     throw cause;
   }
   if (diagnosticListener) {
-    for (const { phase, failure, nodeId } of engine.observedErrors?.values() ?? []) {
+    for (const diagnostic of [...engine.activeDiagnostics()]) {
       if (!open()) break;
-      notify({ phase, error: failure, nodeId, application: engine.initial?.token }, diagnosticListener);
-    }
-    for (const diagnostic of engine.urlDiagnostics ?? []) {
-      if (!open()) break;
-      notify(diagnostic, diagnosticListener);
+      diagnosticListener(diagnostic);
     }
   }
   function dispose() {
@@ -76,6 +67,7 @@ export function createRenderWaiter(view, render, { onError, getErrorListener, on
     }
     catch (cause) {
       if (!open() || engine.generation !== generation) fail('CANCELLED');
+      onRenderFailure?.(cause);
       throw safeError(cause);
     }
     if (!open() || engine.generation !== generation) fail('CANCELLED');
@@ -113,18 +105,20 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
     const token = {};
     targets.set(target, token);
     const controller = new AbortController();
-    let adapter, waiter, closeView, stopped, preparing, connecting = false;
+    let adapter, waiter, closeView, stopped, preparing, connecting = false, explicitlyClosed = false;
+    let initialRenderReported = false;
     let finishConnecting;
     const connected = new Promise(resolve => { finishConnecting = resolve; });
     const isOpen = () => !closing && !stopped && targets.get(target) === token;
-    const diagnostics = diagnostic => {
-      if (isOpen()) notify(diagnostic, onError);
-      if (isOpen()) notify(diagnostic, options.onError);
-    };
-    let lastRenderError;
+    const diagnostics = (diagnostic, open = isOpen) => notifyDiagnostic(diagnostic,
+      { listener: onError, isOpen: open }, { listener: options.onError, isOpen: open });
+    // Key by the failure value that the adapter reports and later throws.
+    const reportedRenderFailures = new WeakSet();
+    const isObject = value => value !== null && (typeof value === 'object' || typeof value === 'function');
     const renderError = (cause, nodeId) => {
-      lastRenderError = safeError(cause);
-      diagnostics({ phase: 'render', error: lastRenderError, nodeId });
+      const diagnostic = createDiagnostic('render', cause, { nodeId });
+      if (isObject(cause)) reportedRenderFailures.add(cause);
+      diagnostics(diagnostic);
     };
     function check() {
       if (!isOpen()) fail('CANCELLED');
@@ -137,7 +131,9 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
       connecting = true;
       try {
         waiter = createRenderWaiter(view, () => adapter.whenRendered(), {
-          onError: diagnostics, isOpen, onClose: () => { void stop().catch(() => {}); },
+          deliverDiagnostic: diagnostic => diagnostics(diagnostic),
+          onRenderFailure(cause) { initialRenderReported = isObject(cause) && reportedRenderFailures.has(cause); },
+          isOpen, onClose: () => { void stop().catch(() => {}); },
         });
         check();
         adapter = connect(view, target, options, renderError);
@@ -146,6 +142,10 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
         connecting = false;
         finishConnecting();
       }
+    }
+    function close() {
+      explicitlyClosed = true;
+      return stop();
     }
     function stop() {
       if (stopped) return stopped;
@@ -165,16 +165,16 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
           if (failed) reject(safeError(failed.reason)); else resolve();
         } catch (cause) { reject(safeError(cause)); }
         finally {
-          entries.delete(stop);
+          entries.delete(close);
           if (targets.get(target) === token) targets.delete(target);
         }
       })();
       return stopped;
     }
-    entries.add(stop);
+    entries.add(close);
     return {
-      start, stop, isOpen,
-      reportedRenderFailure: failure => lastRenderError?.code === failure.code,
+      start, stop, close, isOpen,
+      reportedRenderFailure: failure => initialRenderReported || (isObject(failure) && reportedRenderFailures.has(failure)),
       prepare(source, options) {
         // Publish the internal preparation before reading any host-provided data.
         let resolve, reject;
@@ -186,7 +186,7 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
         } catch (cause) { reject(cause); }
         return preparing;
       },
-      reportFailure(diagnostic) { if (!closing) notify(diagnostic, onError, options.onError); },
+      reportFailure(diagnostic) { diagnostics(diagnostic, () => !closing && !explicitlyClosed); },
       whenRendered: () => waiter.whenRendered(),
       whenSettled: application => waiter.whenSettled(application),
     };
@@ -209,13 +209,15 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
         } catch (cause) {
           const failure = task.isOpen() ? safeError(cause) : error('CANCELLED');
           await task.stop().catch(() => {});
-          if (failure.code !== 'CANCELLED' && (phase === 'prepare' || !task.reportedRenderFailure(failure))) task.reportFailure({ phase, error: failure });
+          if (failure.code !== 'CANCELLED' && (phase === 'prepare' || !task.reportedRenderFailure(cause))) {
+            task.reportFailure(createDiagnostic(phase, failure));
+          }
           throw failure;
         }
       })();
       ready.catch(() => {});
       return {
-        ready, unmount: task.stop,
+        ready, unmount: task.close,
         async whenRendered() {
           if (rendered) await task.whenRendered();
           else await ready;
@@ -228,7 +230,7 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
       const task = entry(target, options);
       try { task.start(view); }
       catch (cause) { void task.stop().catch(() => {}); throw safeError(cause); }
-      return { detach: task.stop, whenRendered: task.whenRendered, whenSettled: task.whenSettled };
+      return { detach: task.close, whenRendered: task.whenRendered, whenSettled: task.whenSettled };
     },
     dispose() {
       if (disposed) return disposed;

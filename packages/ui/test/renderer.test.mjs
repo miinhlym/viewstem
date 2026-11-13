@@ -69,16 +69,20 @@ test('DOM renderer owns mounted views and borrows attachments', async t => {
     await attachment.detach();
     const after = [left.textContent, right.textContent];
     await screen.unmount();
-    const diagnostics = [];
-    const invalid = renderer.mount({ target: left, onError: diagnostic => diagnostics.push(diagnostic), source: {
+    const diagnostics = [], central = [];
+    const observer = createRendererForTest({ runtime: renderer.runtime, onError: diagnostic => central.push(diagnostic) });
+    const invalid = observer.mount({ target: left, onError: diagnostic => diagnostics.push(diagnostic), source: {
       render: { id: 'invalid', componentRef: 'shadcn.Button', inputs: { text: 12 } },
     } });
     const invalidInput = await invalid.ready.catch(error => error);
+    await observer.dispose();
     const remount = renderer.mount({ target: left, source });
     await remount.ready;
     await renderer.dispose();
     const publication = await mountDuringPublication(left);
-    return { conflict, duplicate, disconnected, before, after, invalidInput, diagnostics, publication, empty: left.textContent };
+    return { conflict, duplicate, disconnected, before, after, invalidInput, diagnostics, publication,
+      sharedDiagnostic: central.length === 1 && central[0] === diagnostics[0], empty: left.textContent,
+    };
   });
   assert.equal(result.conflict, 'INVALID_DEFINITION');
   assert.equal(result.duplicate.code, 'INVALID_DEFINITION');
@@ -91,6 +95,7 @@ test('DOM renderer owns mounted views and borrows attachments', async t => {
   assert.equal(result.invalidInput.input, 'text');
   assert.deepEqual(result.invalidInput.resource, { kind: 'Component', id: 'shadcn.Button' });
   assert.deepEqual(result.diagnostics, [{ phase: 'prepare', error: result.invalidInput }]);
+  assert.equal(result.sharedDiagnostic, true);
   assert.deepEqual(result.publication, { code: 'CANCELLED', requests: 0, liveStates: 0, empty: '' });
   assert.equal(result.empty, '');
 });

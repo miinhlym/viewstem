@@ -36,7 +36,7 @@ description: 카탈로그 등록, 기존 View 연결, 스타일과 지원 메타
 | 직접 실행한 `view.invokeAction()` 또는 View 변경 실패 | 해당 호출의 Promise 거절 |
 | 정리나 새 적용으로 완료 대기가 취소됨 | 대기 Promise가 `CANCELLED`로 거절 |
 
-`onError`는 `{ phase, error, nodeId?, application? }`을 받습니다. `phase`는 `prepare`, `node`, `query`, `action`, `url`, `render` 중 하나입니다. 리터럴 Component 입력이 스키마 검증에 실패하면 `error.input`에 포트 이름이, Component 참조가 있으면 `error.resource`에 해당 Component가 기록됩니다. 렌더러와 화면 또는 연결에 각각 콜백을 지정할 수 있습니다.
+`onError`는 `{ phase, error, nodeId?, application? }`을 받습니다. `phase`는 `prepare`, `node`, `query`, `action`, `url`, `render` 중 하나입니다. 리터럴 Component 입력이 스키마 검증에 실패하면 `error.input`에 포트 이름이, Component 참조가 있으면 `error.resource`에 해당 Component가 기록됩니다. 렌더러 콜백이 화면 또는 연결 콜백보다 먼저 호출됩니다. 여러 연결이 같은 View를 관찰하더라도 같은 함수는 한 진단 발생을 한 번 받습니다.
 
 ## 스타일과 메타데이터
 

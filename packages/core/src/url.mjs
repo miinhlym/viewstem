@@ -82,7 +82,13 @@ export function connectStateUrl(store,{adapter,bindings,limits:custom={},restore
   const initialPending=new Set(prepared.filter(binding=>binding.baseline.status==='pending').map(binding=>binding.target));
   let restoreSnapshots=new Map();
   const dirty=new Map(pendingWrites),diagnostics=[];
-  const report=(caught,kind,key)=>{if (!(reservation?.isOpen?.() ?? true)) return;const item=Object.freeze({...safeError(caught,'TYPE_MISMATCH'),kind,...(key===undefined?{}:{key})});diagnostics.push(item);try{onError(item);}catch{}};
+  const report = (caught, kind, key) => {
+    if (!(reservation?.isOpen?.() ?? true)) return;
+    const failure = safeError(caught, 'TYPE_MISMATCH');
+    const item = error(failure.code, { ...failure, kind, ...(key === undefined ? {} : { key }) });
+    diagnostics.push(item);
+    try { onError(item); } catch {}
+  };
   const limitOutput=patch=>{
     const owned=parts(mergeOwnedUrl(adapter.read(),patch)).filter(part=>keys.has(part.key));
     if(bytes(owned.map(part=>part.raw).join('&'))>limits.maxOwnedBytes || owned.some(part=>bytes(part.encodedValue)>limits.maxValueBytes))fail('LIMIT_EXCEEDED');

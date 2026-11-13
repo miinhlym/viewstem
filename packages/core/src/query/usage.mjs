@@ -49,12 +49,12 @@ export class QueryUsage {
     this.ready = this.settings.ready && prepared.status === 'ready';
   }
   getSnapshot() { return this.state; }
-  publish(patch) {
+  publish(patch, failedRun = false) {
     if (!this.alive || !this.isOpen()) return;
     this.state = Object.freeze({ ...this.state, ...patch });
     if (this.state.status !== 'running' && this.state.status !== 'idle') this.initial.resolve(this.state);
     // An observer must not be able to corrupt the scheduler through its exception.
-    try { this.onChange?.(this.state); } catch { /* Observation does not own execution. */ }
+    try { this.onChange?.(this.state, failedRun); } catch { /* Observation does not own execution. */ }
   }
   update(options = {}) {
     if (!this.alive) throw failure('CANCELLED');
@@ -156,7 +156,7 @@ export class QueryUsage {
     if (this.active === run) this.active = null;
     const valid = this.alive && this.isOpen() && this.settings.executeWhen && this.ready && run.generation === this.generation;
     if (valid) {
-      if (error) this.publish({ status: 'error', error: protect(error), stale: this.state.data !== undefined, waitingReason: null });
+      if (error) this.publish({ status: 'error', error, stale: this.state.data !== undefined, waitingReason: null }, true);
       else this.publish({ status: 'success', data: value, dataInputs: protect(run.inputs), error: null, stale: false, waitingReason: null });
       for (const ticket of run.tickets) this.settle(ticket, error);
     } else if (this.alive && this.settings.executeWhen && run.tickets.some(ticket => !ticket.done)) {

@@ -28,7 +28,9 @@ See [PublicError](/docs/core/runtime/#authorization) for error fields and [NodeS
 
 **Type** · `(diagnostic: RendererDiagnostic) => void`
 
-For `mount` and `attach`, both the renderer-level and connection-level `onError` can receive the same diagnostic. When you host `ViewstemView` directly, its `onError` prop overrides the renderer default. Synchronous exceptions from observers are isolated from rendering and event dispatch.
+`mount`, `attach`, and `ViewstemView` call the renderer's `onError` before the screen's `onError`. The same function receives a diagnostic occurrence once, even when multiple connections observe the same View. A new connection receives active node and Query errors and URL diagnostics for the current application. It shares those diagnostic occurrences with existing observers. Each failed Query execution can produce a new occurrence, including a retry with the same error code.
+
+If an observer closes the connection, the remaining callbacks for that connection are skipped. Disposing a renderer stops its observer. A directly hosted borrowed View can continue delivering to its screen callback while its View and Svelte connection are alive. Observer exceptions and rejected promises are isolated. Normal cancellation produces no diagnostic.
 
 ## RenderFallback
 

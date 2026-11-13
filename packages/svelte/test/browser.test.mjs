@@ -270,12 +270,43 @@ test('missing adapter rejects ready and releases the target', t => browserTest(t
     registry.registerComponentContract(F.resource('Component', 'Unbound', {}));
     const runtime = F.publicRuntime({ registry }); const diagnostics = [];
     const renderer = F.publicRenderer({ runtime, onError: d => diagnostics.push(d) });
-    const target = F.target(); const screen = renderer.mount({ target, source: { render: { id: 'unbound', componentRef: 'Unbound' } } });
+    const target = F.target(), local = [];
+    const screen = renderer.mount({ target, source: { render: { id: 'unbound', componentRef: 'Unbound' } },
+      onError: diagnostic => local.push(diagnostic),
+    });
     const failure = await F.errorOf(() => screen.ready);
     const empty = target.textContent; await renderer.dispose(); runtime.dispose();
-    return { code: failure.code, empty, phases: diagnostics.map(d => d.phase) };
+    return { code: failure.code, empty, phases: diagnostics.map(d => d.phase), count: local.length,
+      shared: diagnostics[0] === local[0], resource: diagnostics[0]?.error.resource,
+    };
   });
-  assert.equal(result.code, 'REFERENCE_NOT_FOUND'); assert.equal(result.empty, ''); assert.ok(result.phases.includes('render'));
+  assert.deepEqual(result, { code: 'REFERENCE_NOT_FOUND', empty: '', phases: ['render'], count: 1,
+    shared: true, resource: { kind: 'Component', id: 'Unbound' },
+  });
+}));
+
+test('a throwing fallback reports a separate render failure and rejects the first mount', t => browserTest(t, async page => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  const result = await page.evaluate(async () => {
+    const F = Fixture;
+    const diagnostics = [];
+    const renderer = F.publicRenderer({
+      components: [{ contract: F.resource('Component', 'Crash', { ports: { value: F.port() } }), component: F.Crash }],
+      onError: diagnostic => diagnostics.push(diagnostic),
+    });
+    const target = F.target();
+    const screen = renderer.mount({ target, source: {
+      render: { id: 'crash', componentRef: 'Crash', inputs: { value: 'crash' } },
+    }, fallback() { throw Error('private fallback details'); } });
+    const failure = await F.errorOf(() => screen.ready);
+    await renderer.dispose();
+    return { failure: failure.code, phases: diagnostics.map(d => [d.phase, d.error.code]), empty: target.textContent };
+  });
+  assert.deepEqual(result, { failure: 'INTERNAL_ERROR', phases: [
+    ['render', 'INTERNAL_ERROR'], ['render', 'INTERNAL_ERROR'],
+  ], empty: '' });
+  assert.deepEqual(errors, []);
 }));
 
 test('required Value input waiting and type errors recover without replacing sibling DOM', t => browserTest(t, async page => {
@@ -756,12 +787,12 @@ test('ViewstemView reports preparation errors once and releases live owned work 
     await F.tick();
     const closed = await F.errorOf(() => host.whenRendered());
     const staleEvent = await F.errorOf(() => emit('change', null));
-    const result = { code: error.code, errorUI, diagnostics: diagnostics.map(d => [d.phase, d.error.code]), fallback, first, closed: closed.code, staleEvent: staleEvent.code, aborted: requests[0]?.signal.aborted, empty: target.textContent };
+    const result = { code: error.code, errorUI, diagnostics: diagnostics.map(d => [d.phase, d.error.code]), fallback: fallback.map(d => [d.phase, d.error.code]), first, closed: closed.code, staleEvent: staleEvent.code, aborted: requests[0]?.signal.aborted, empty: target.textContent };
     await F.unmount(host);
     runtime.dispose();
     return result;
   });
-  assert.deepEqual(result, { code: 'REFERENCE_NOT_FOUND', errorUI: 'REFERENCE_NOT_FOUND', diagnostics: [['prepare', 'REFERENCE_NOT_FOUND']], fallback: [], first: 'first DOM', closed: 'CANCELLED', staleEvent: 'CANCELLED', aborted: true, empty: '' });
+  assert.deepEqual(result, { code: 'REFERENCE_NOT_FOUND', errorUI: 'REFERENCE_NOT_FOUND', diagnostics: [['prepare', 'REFERENCE_NOT_FOUND']], fallback: [['prepare', 'REFERENCE_NOT_FOUND']], first: 'first DOM', closed: 'CANCELLED', staleEvent: 'CANCELLED', aborted: true, empty: '' });
 }));
 
 test('ViewstemView reads the latest diagnostic handler and tolerates disposal during the first diagnostic', t => browserTest(t, async page => {
@@ -806,6 +837,43 @@ test('ViewstemView reads the latest diagnostic handler and tolerates disposal du
     return result;
   });
   assert.deepEqual(result, { first: [], second: ['node'], events: ['node'], cancelled: 'CANCELLED', empty: '' });
+}));
+
+test('direct and imperative Svelte connections share diagnostic delivery without repeating a callback', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture;
+    const runtime = F.publicRuntime({
+      componentContracts: [F.resource('Component', 'Probe', { ports: { value: F.port({ type: 'string' }) } })],
+    });
+    const order = [], central = [], local = [];
+    const log = diagnostic => { order.push('central'); central.push(diagnostic); };
+    const renderer = F.publicRenderer({ runtime, onError: log });
+    renderer.bindComponent('Probe', F.Probe);
+    const view = await runtime.createView({
+      states: { value: F.state('initial') }, render: F.probe('leaf', F.p('/states/value')),
+    });
+    const display = F.mount(F.Host, { target: F.target(), props: {
+      renderer, view, onError: diagnostic => { order.push('screen'); local.push(diagnostic); },
+    } });
+    const attached = renderer.attach(view, F.target(), { onError: log });
+    await F.tick();
+    await display.whenRendered();
+    const cell = view.getState('value');
+    cell.write(3);
+    await F.tick();
+    const first = [central.length, local.length, central[0] === local[0]];
+    await renderer.dispose();
+    cell.write('recovered');
+    await F.tick();
+    cell.write(4);
+    await F.tick();
+    const outcome = { order, first, phases: local.map(diagnostic => diagnostic.phase), central: central.length };
+    await attached.detach();
+    await F.unmount(display);
+    runtime.dispose();
+    return outcome;
+  });
+  assert.deepEqual(result, { order: ['central', 'screen', 'screen'], first: [1, 1, true], phases: ['node', 'node'], central: 1 });
 }));
 
 for (const mode of ['source', 'mount']) test(`disposing during a Svelte ${mode} State commit prevents the first Query and waits for cleanup`, t => browserTest(t, async page => {

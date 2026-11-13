@@ -36,7 +36,7 @@ Both paths require a connected, unreserved HTML element. Wait for cleanup before
 | A direct `view.invokeAction()` or View change fails | The call's promise rejects |
 | A wait is cancelled by cleanup or a new application | The waiting promise rejects with `CANCELLED` |
 
-`onError` receives `{ phase, error, nodeId?, application? }`. The phases are `prepare`, `node`, `query`, `action`, `url`, and `render`. When a literal Component input fails schema validation, `error.input` identifies the port and `error.resource` identifies the referenced Component when present. You can provide a callback on the renderer and another on a screen or attachment.
+`onError` receives `{ phase, error, nodeId?, application? }`. The phases are `prepare`, `node`, `query`, `action`, `url`, and `render`. When a literal Component input fails schema validation, `error.input` identifies the port and `error.resource` identifies the referenced Component when present. The renderer callback runs before the screen or attachment callback. The same function receives a diagnostic occurrence once, even when multiple attachments observe the same View.
 
 ## Styles and metadata
 

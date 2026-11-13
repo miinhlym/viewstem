@@ -18,7 +18,7 @@ sidebar:
 
 `ViewstemViewProps`는 기존 대여 prop 인터페이스입니다. `ViewstemSourceProps`는 생성 prop을 제공하며 `ViewstemViewComponentProps`와 `ComponentProps<typeof ViewstemView>`는 두 형태를 모두 포함합니다.
 
-`view`와 `source`를 함께 전달하거나 둘 다 생략하면 `INVALID_DEFINITION`입니다. 두 경로에서 `onError`는 렌더러의 기본 콜백을 대체하고, `fallback`은 개별 노드 오류를 표시합니다.
+`view`와 `source`를 함께 전달하거나 둘 다 생략하면 `INVALID_DEFINITION`입니다. 두 경로에서 `onError`는 렌더러 관찰자에 화면 관찰자를 추가하며, `fallback`은 개별 노드 오류를 표시합니다.
 
 ## source로 View 만들기
 

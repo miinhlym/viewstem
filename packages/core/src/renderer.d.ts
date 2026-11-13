@@ -8,6 +8,21 @@ export interface RendererDiagnostic {
 }
 export type RendererErrorListener = (diagnostic: RendererDiagnostic) => void;
 
+/** Shared diagnostics for renderer implementations. */
+export function createDiagnostic(phase: RendererDiagnostic['phase'], cause: unknown, details?: {
+  application?: ViewApplication;
+  nodeId?: string | undefined;
+}): RendererDiagnostic;
+export function notifyDiagnostic(diagnostic: RendererDiagnostic, ...observers: {
+  listener: RendererErrorListener | undefined;
+  isOpen?: () => boolean;
+}[]): void;
+export function createRenderError(missing: boolean, details?: {
+  componentId?: string | undefined;
+  instanceId?: string | undefined;
+}): PublicError;
+export function createPreparationError(message: string): PublicError;
+
 export interface RenderAttachment {
   whenRendered(): Promise<void>;
   whenSettled(application: ViewApplication): Promise<InitialReport>;
@@ -53,5 +68,7 @@ export function prepareOwnedView(runtime: Runtime, source: ViewSource, options?:
 export function createRenderWaiter(view: View, render: () => void | Promise<void>, options?: {
   onError?: RendererErrorListener;
   getErrorListener?: () => RendererErrorListener | undefined;
+  deliverDiagnostic?: (diagnostic: RendererDiagnostic) => void;
   onClose?: () => void;
+  isOpen?: () => boolean;
 }): Pick<RenderAttachment, 'whenRendered' | 'whenSettled'> & { dispose(): void };

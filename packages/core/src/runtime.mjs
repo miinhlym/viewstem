@@ -10,6 +10,7 @@ import { createQueryEngine } from './query/index.mjs';
 import { createHttpExecutor } from './http/index.mjs';
 import { ActionEngine } from './action.mjs';
 import { fail, error, safeError } from './errors.mjs';
+import { createDiagnostic } from './diagnostics.mjs';
 const own=(object,key)=>Object.hasOwn(object,key);
 const tuple=JSON.stringify;
 let nextLifetime=0,nextInstance=0;
@@ -168,6 +169,8 @@ export class View {
     this.renderWaiters = new Set();
     this.closeListeners = new Set();
     this.diagnosticListeners = new Set();
+    this.nodeDiagnostics = new Map();
+    this.publishedNodeDiagnostics = new WeakSet();
     this.requested = 0;
     this.published = 0;
     this.projectionWaiters = new Set();
@@ -204,16 +207,44 @@ export class View {
     this.diagnosticListeners.add(listener);
     return () => this.diagnosticListeners.delete(listener);
   }
+  newDiagnostic(phase, cause, nodeId) {
+    return createDiagnostic(phase, cause, { application: this.initial?.token, nodeId });
+  }
   diagnostic(phase, cause, nodeId) {
     if (!this.alive) return;
-    const value = Object.freeze({ phase, error: safeError(cause),
-      ...(this.initial ? { application: this.initial.token } : {}),
-      ...(nodeId === undefined ? {} : { nodeId }) });
+    const value = this.newDiagnostic(phase, cause, nodeId);
+    if (value.error.code === 'CANCELLED') return;
     if (phase === 'url') (this.urlDiagnostics ??= []).push(value);
-    for (const listener of this.diagnosticListeners) {
+    this.publishDiagnostic(value);
+  }
+  publishDiagnostic(value, listeners = [...this.diagnosticListeners]) {
+    for (const listener of listeners) {
       if (!this.alive) break;
-      try { listener(value); } catch {}
+      if (this.diagnosticListeners.has(listener)) {
+        try { listener(value); } catch {}
+      }
     }
+  }
+  *activeDiagnostics() {
+    yield* this.nodeDiagnostics.values();
+    for (const item of this.queryUses) if (item.diagnostic) yield item.diagnostic;
+    yield* this.urlDiagnostics ?? [];
+  }
+  queryChanged(item, snapshot, failedRun) {
+    this.schedule();
+    if (!this.alive || !this.queryUses.has(item)) return;
+    const failure = snapshot.error;
+    if (snapshot.status !== 'error' || !failure || failure.code === 'CANCELLED') {
+      item.diagnostic = undefined;
+      return;
+    }
+    if (!failedRun && item.diagnostic && equal(item.diagnostic.error, failure)) return;
+    const diagnostic = item.diagnostic = this.newDiagnostic('query', failure);
+    const listeners = [...this.diagnosticListeners];
+    // Let the usage settle tickets and start pending work before calling observers.
+    queueMicrotask(() => {
+      if (this.queryUses.has(item)) this.publishDiagnostic(diagnostic, listeners);
+    });
   }
   projection() {
     return { generation: this.generation, requested: this.requested, published: this.published };
@@ -504,7 +535,7 @@ export class View {
       const settings={...owner.queryDefaults,...use,inputs,ready,executeWhen,autoRefreshWhen,inputError,owner:item};
       if(!item.usage){
         item.usage=this.runtime.query.createUsage(use,{
-          ...settings,onChange:()=>this.schedule(),clock:this.runtime.clock,
+          ...settings,onChange:(snapshot, failedRun)=>this.queryChanged(item, snapshot, failedRun),clock:this.runtime.clock,
           onCleanupError:cause=>this.diagnostics.push(safeError(cause)),
           isOpen:()=>this.alive && this.queryUses.has(item),ownerSignal:this.lifetime.signal,
           start:false,
@@ -528,10 +559,16 @@ export class View {
   project() {
     if(!this.alive)return;
     const generation = this.generation, snapshot = this.getSnapshot();
+    this.updateNodeDiagnostics(snapshot);
+    const diagnosticListeners = [...this.diagnosticListeners];
     this.published = this.requested;for(const listener of this.listeners){if(!this.alive||generation!==this.generation)return;try{listener(snapshot);}catch(caught){this.diagnostics.push(safeError(caught));}}
     if(!this.alive||generation!==this.generation)return;
     this.flushProjectionWaiters();
-    this.observeErrors(snapshot);
+    for (const diagnostic of this.nodeDiagnostics.values()) {
+      if (this.publishedNodeDiagnostics.has(diagnostic)) continue;
+      this.publishedNodeDiagnostics.add(diagnostic);
+      this.publishDiagnostic(diagnostic, diagnosticListeners);
+    }
     if(this.initial && !this.initial.settled && !this.urlTransition && !this.queued && [...this.owners.values()].every(owner=>[...owner.queries.values()].every(item=>item.usage?.getSnapshot().status!=='running'))) {
       const queryErrors=[];for(const owner of this.owners.values())for(const [query,item] of owner.queries)if(item.usage?.getSnapshot().status==='error')queryErrors.push(Object.freeze({instanceId:owner.id,query,error:item.usage.getSnapshot().error}));
       this.initial.settled = true;
@@ -539,29 +576,24 @@ export class View {
       this.initial.resolve(Object.freeze({generation:this.generation,queryErrors:Object.freeze(queryErrors)}));
     }
   }
-  observeErrors(snapshot) {
+  updateNodeDiagnostics(snapshot) {
     const next = new Map();
-    const report = (key, phase, failure, nodeId) => {
-      if (!failure) return;
-      next.set(key, { phase, failure, nodeId });
-      const prior = this.observedErrors?.get(key);
-      if (!prior || !equal(prior.failure, failure)) this.diagnostic(phase, failure, nodeId);
-    };
     const visit = (nodes, parent) => {
       for (const [index, node] of nodes.entries()) {
-        const key = node.address ?? tuple([parent, node.id, index]);
-        report(key, 'node', node.error, node.id);
+        const key = node.address ? tuple([node.address, node.generation]) : tuple([parent, node.id, index]);
+        if (node.error && node.error.code !== 'CANCELLED') {
+          const prior = this.nodeDiagnostics.get(key);
+          const diagnostic = prior && equal(prior.error, node.error)
+            ? prior : this.newDiagnostic('node', node.error, node.id);
+          next.set(key, diagnostic);
+        }
         if (Object.keys(node.slots).length) {
           for (const children of Object.values(node.slots)) visit(children, key);
         } else visit(node.children, key);
       }
     };
     visit(snapshot.roots);
-    for (const owner of this.owners.values()) for (const [name, item] of owner.queries) {
-      const query = item.usage?.getSnapshot();
-      report(tuple([owner.id, name]), 'query', query?.status === 'error' ? query.error : null);
-    }
-    this.observedErrors = next;
+    this.nodeDiagnostics = next;
   }
   async apply(spec, inputs, replace, stateWrites, target, execution, resolved, job) {
     const check = () => {

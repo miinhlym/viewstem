@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { onMount, tick, untrack } from 'svelte';
-  import { prepareOwnedView } from '@viewstem/core/renderer';
+  import { onDestroy, onMount, tick, untrack } from 'svelte';
+  import { createDiagnostic, createPreparationError, notifyDiagnostic, prepareOwnedView } from '@viewstem/core/renderer';
   import type { PublicError, View, ViewApplication, ViewSource } from '@viewstem/core';
   import type { ViewstemViewComponentProps } from './types.js';
-  import { cancelled, failure, notifyDiagnostic, rendererStates } from './connection.js';
+  import { cancelled, failure, rendererStates } from './connection.js';
   import { snapshotSource } from './source.js';
   import ConnectedView from './ConnectedView.svelte';
 
-  let { renderer, view, source, inputs, onError, fallback, pending, prepareError, diagnostics = true }: ViewstemViewComponentProps & { diagnostics?: boolean } = $props();
+  let { renderer, view, source, inputs, onError, fallback, pending, prepareError }: ViewstemViewComponentProps = $props();
 
   const initial = untrack(() => {
     if ((view === undefined) === (source === undefined)) {
@@ -16,7 +16,7 @@
     if (source === undefined) return { owned: false as const, renderer };
     let definition: ViewSource;
     try { definition = snapshotSource(source) as ViewSource; }
-    catch { return { owned: true as const, renderer, error: failure('INVALID_DEFINITION', 'Could not snapshot the ViewstemView source.') }; }
+    catch { return { owned: true as const, renderer, error: createPreparationError('Could not snapshot the ViewstemView source.') }; }
     try { return { owned: true as const, renderer, start: prepareOwnedView(renderer.runtime, definition, { inputs }) }; }
     catch (error) { return { owned: true as const, renderer, error: error as PublicError }; }
   });
@@ -29,10 +29,15 @@
   let prepare: Promise<View> | undefined;
   let stop: (() => Promise<void>) | undefined;
   let closed = false;
+  let destroyed = false;
+  onDestroy(() => { destroyed = true; });
 
-  function report(error: PublicError) {
+  function report(error: PublicError, invalidProps = false) {
     const activeRenderer = initial.owned ? initial.renderer : renderer;
-    notifyDiagnostic(onError ?? rendererStates.get(activeRenderer)?.onError, { phase: 'prepare', error });
+    const state = rendererStates.get(activeRenderer);
+    const open = () => !destroyed && (invalidProps || !closed) && !!state?.alive;
+    notifyDiagnostic(createDiagnostic('prepare', error),
+      { listener: state?.onError, isOpen: open }, { listener: onError, isOpen: open });
   }
 
   onMount(() => {
@@ -43,12 +48,6 @@
       closed = true;
       return;
     }
-    if (!initial.start) {
-      preparationError = initial.error;
-      report(initial.error);
-      return;
-    }
-
     const controller = new AbortController();
     let closeView: (() => Promise<void>) | undefined;
     let cleanup: Promise<void> | undefined;
@@ -71,6 +70,11 @@
     };
     stop = close;
     state.ownedViews.add(close);
+    if (!initial.start) {
+      preparationError = initial.error;
+      report(initial.error);
+      return () => { void close().catch(() => {}); };
+    }
     loading = true;
     prepare = initial.start(controller.signal, {
       isOpen: () => !closed && state.alive,
@@ -102,10 +106,10 @@
     if (!incompatible) return;
     untrack(() => {
       if (closed || propError) return;
-      const error = failure('INVALID_DEFINITION', 'Remount ViewstemView to change its ownership mode or owned renderer.');
+      const error = createPreparationError('Remount ViewstemView to change its ownership mode or owned renderer.');
       void stop?.().catch(() => {});
       propError = error;
-      report(error);
+      report(error, true);
     });
   });
 
@@ -137,7 +141,7 @@
   {@render prepareError?.(propError)}
 {:else if initial.owned}
   {#if ownedView}
-    <ConnectedView renderer={initial.renderer} view={ownedView} {onError} {fallback} bind:this={attached} />
+    <ConnectedView renderer={initial.renderer} view={ownedView} {onError} {fallback} isOpen={() => !closed && !destroyed} bind:this={attached} />
   {:else if preparationError}
     {@render prepareError?.(preparationError)}
   {:else if loading}
@@ -146,7 +150,7 @@
 {:else if view !== undefined && source === undefined}
   {#key renderer}
     {#key view}
-      <ConnectedView {renderer} {view} {onError} {fallback} {diagnostics} bind:this={attached} />
+      <ConnectedView {renderer} {view} {onError} {fallback} isOpen={() => !destroyed} bind:this={attached} />
     {/key}
   {/key}
 {/if}
