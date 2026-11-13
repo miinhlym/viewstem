@@ -21,7 +21,7 @@ State and Derived belong to running View or Component instances. They are not ad
 
 ## Register a shared Type
 
-A standalone resource has `kind`, `id`, and `spec`. Register this Type using `renderer.registry.registerResources([definition])` before mounting:
+A standalone resource has `kind`, `id`, and `spec`. Register this Type using `renderer.runtime.registry.registerResources([definition])` before mounting:
 
 
 ```json

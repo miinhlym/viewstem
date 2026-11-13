@@ -36,8 +36,6 @@ Call `whenRendered()` on the instance obtained through `bind:this` to wait for t
 
 For initial Query reports or direct View control, create and pass a View from the host. Call `whenSettled(view.initial)` on the instance to wait for the Query report and its DOM update. A pending wait on the old connection rejects with `CANCELLED` when the connection changes or closes. After changing `view`, pass the new View’s application token. A token from a different View produces `INVALID_DEFINITION`. A closed connection also rejects attempts to read a previously successful report.
 
-<a id="borrowing-a-view"></a>
-
 ## Borrowing a View
 
 Changing a borrowed `view` or its `renderer` replaces the connection. Removing the component releases the connection and subscription. The host disposes the View and injected Runtime.

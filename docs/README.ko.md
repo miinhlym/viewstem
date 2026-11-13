@@ -4,7 +4,7 @@
 
 상세 명세·인계·이력은 한국어로 제공한다. [문서 언어 정책](../CONTRIBUTING.ko.md#문서-언어)을 따른다.
 
-기존 공개 API 이름은 [U42 네이밍 적용](handoff/public-api-naming-2026-11-02.md)을 따른다. [U42 검증 기록](handoff/public-api-naming-verification-results.json)과 이전 API 이름·해시는 당시 증거로 보존한다.
+현재 공개 API는 [호스트 연결 계약](spec/07-host-integration.md)과 아래 패키지 사용법에서 확인한다. [U42 네이밍 적용](handoff/public-api-naming-2026-11-02.md)과 [검증 기록](handoff/public-api-naming-verification-results.json)은 당시의 API 이름과 검증 근거를 보존한다.
 
 이 문서는 독자의 작업을 현재 기준 문서로 연결한다. 언어 독립 계약은 `VIEWSTEM-SPEC.md`와 `spec/`, JS/TS 사용법은 패키지 README, 실행 결과는 제품 검증 기록을 따른다. 이전 채팅이나 비공개 원문은 필수 읽기 자료가 아니다.
 
@@ -21,7 +21,7 @@
 | 홈·문서·예제·플레이그라운드 유지보수 | [사이트 유지보수 안내](../apps/docs/README.ko.md) |
 | 사이트 패키지 가이드·API 레퍼런스 확인 | [공식 문서 조사·페이지 구성·검증](handoff/docs-package-reference-2026-11-05.md) |
 | 리소스와 실행 규칙 이해하기 | [전체 계약](VIEWSTEM-SPEC.md) → 아래 주제별 명세 |
-| 차기 DOM·Svelte 호스트 API 이행 | [호스트 API 구현 계획](designs/viewstem-host-api-implementation-2026-11-13.md) |
+| DOM·Svelte 호스트 API 설계 이해하기 | [호스트 API 구현 계획](designs/viewstem-host-api-implementation-2026-11-13.md) |
 | 기존 core를 수정하고 검증하기 | [현재 작업 시작 절차](handoff/implementation-start.md#새-채팅에서-시작할-때) |
 | 지원 범위와 제한 확인하기 | [구현 인수인계](handoff/core-implementation-2026-11-02.md), [CEL 지원 범위](handoff/core-cel-support.md) |
 | 다음 구현 범위 확인하기 | [실제 남은 작업](handoff/open-contracts.md#실제-남은-작업) |

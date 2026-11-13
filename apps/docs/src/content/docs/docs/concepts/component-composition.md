@@ -7,7 +7,7 @@ A reusable **Component** packages a render tree with the ports it needs. It can 
 
 ## Define a Component
 
-Register this resource with `renderer.registry.registerResources([definition])` before mounting the View. It also requires the `badge` UI family to be registered.
+Register this resource with `renderer.runtime.registry.registerResources([definition])` before mounting the View. The default browser renderer includes the badge catalog.
 
 
 ```json

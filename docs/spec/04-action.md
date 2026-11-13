@@ -206,7 +206,7 @@ Value의 `default`는 키가 생략된 경우에만 적용하므로 TypeScript�
 
 코드 Action은 검증·격리된 inputs와 호출 수명에 묶인 State/Query 핸들, AbortSignal을 받는다. 취소 뒤 새로운 write/refresh/retry는 CANCELLED이며, 늦은 반환값을 수용하지 않는다. 함수가 signal을 무시해 이미 시작한 외부 효과를 끝내는 것은 자동 롤백 대상이 아니다. 코드 반환 Promise의 reject와 결과 검증 실패는 기존 Action 오류 경로로 전파한다.
 
-**코드 하위 호출(U35):** 실행 문맥의 `invokeAction({actionRef 또는 action, inputs})`은 현재 실행의 하위 Action을 시작한다. owner·취소·스택은 부모에서 전달하고 호출자가 바꾸지 못한다. inputs는 명시 전달하며 부모 inputs를 자동 캡처하지 않는다. 대상·권한·입력·출력을 동일한 Action 경로에서 검증하며 결과/오류를 Promise로 돌려준다. 부모 취소는 진행 중인 자손 호출에 전파되고 완료된 State/API 효과는 유지한다. 외부 `runtime.invokeAction`은 독립 호출이며 같은 owner·Action이라는 이유로 부모의 하위 호출로 추측하지 않는다. 코드 Action에서도 내부 작업은 문맥의 함수를 사용해야 한다. 신뢰 코드가 클로저로 확보한 외부 runtime/서비스 기능을 강제 격리한다는 보장은 아니다.
+**코드 하위 호출(U35):** 실행 문맥의 `invokeAction({actionRef 또는 action, inputs})`은 현재 실행의 하위 Action을 시작한다. owner·취소·스택은 부모에서 전달하고 호출자가 바꾸지 못한다. inputs는 명시 전달하며 부모 inputs를 자동 캡처하지 않는다. 대상·권한·입력·출력을 동일한 Action 경로에서 검증하며 결과/오류를 Promise로 돌려준다. 부모 취소는 진행 중인 자손 호출에 전파되고 완료된 State/API 효과는 유지한다. 외부 `view.invokeAction`은 독립 호출이며 같은 owner·Action이라는 이유로 부모의 하위 호출로 추측하지 않는다. 코드 Action에서도 내부 작업은 문맥의 함수를 사용해야 한다. 신뢰 코드가 클로저로 확보한 외부 runtime/서비스 기능을 강제 격리한다는 보장은 아니다.
 
 하위 결과와 오류를 부모 결과에 연결하려면 반환 Promise를 await/return한다. 병렬 작업은 Promise.all 등으로 명시 대기할 수 있다. 부모가 성공·실패·취소로 끝나면 남은 하위 실행을 취소하고 보관한 호출 함수로 새 작업을 시작하는 것도 CANCELLED다. await하지 않은 작업을 암묵적으로 독립 실행으로 전환하거나 부모 완료를 무기한 미루지 않는다. 이는 수명 누수를 막기 위한 기술 세부이며, 일반 코드 Action의 명시 try/catch 복구 계약은 유지한다.
 
