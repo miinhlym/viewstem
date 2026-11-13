@@ -163,6 +163,7 @@
 | D154 | 코드 Action의 필수 포트와 등록 계약 보존 | 타입의 필수 입력에 포트와 `required: true`를 요구하고 생략 기본값은 선택으로 추론한다. `updateResource()`는 참조 Type까지 포함한 실행 계약을 검사한다. 계약을 변경할 때 새 Action ID에 핸들러와 함께 등록한다. [Action 명세](../spec/04-action.md#코드-action-등록과-갱신) | 사용자가 EGM 설계 검토에 따라 수정 요청 |
 | D155 | 구독 중 트랜잭션의 원자 공개 | 구독 콜백에서 동기로 후보를 읽고 변경한다. 실패한 후보는 폐기한다. 성공한 후보의 변경만 다음 트랜잭션 하나로 공개한다. [Store 명세](../spec/09-preserved-contracts.md#store-주소관찰reaction의-현행-매핑) | 사용자가 EGM 최종 검토의 세 가지 수정안을 승인 |
 | D156 | 연결 종료와 이벤트 시작 권한 | 공통 호스트 연결이 이벤트 시작을 허가한다. 종료는 즉시 시작 권한을 닫고 DOM·구독 정리와 분리한다. [호스트 명세](../spec/07-host-integration.md#jsts-호스트-api--d150) | 같은 요청 |
+| D157 | 한 스냅샷에서 슬롯 노드 공유 | 동일 인스턴스의 불변 NodeSnapshot을 한 번 만들고 slots와 children이 함께 참조한다. [호스트 명세](../spec/07-host-integration.md) | 같은 요청 |
 
 ## B. 대체·기각된 방향
 

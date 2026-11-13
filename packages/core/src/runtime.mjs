@@ -797,7 +797,19 @@ export class View {
   getQuery(name,instanceId){const owner=instanceId?this.owners.get(instanceId):this.root;return owner?.queries.get(name)?.handle??fail('REFERENCE_NOT_FOUND');}
   getSnapshot() {
     if (this.stagingSnapshot) return this.stagingSnapshot;
-    const serialize=instance=>Object.freeze({id:instance.id,instanceId:instance.owner?.id,address:instance.address,generation:instance.generation,componentRef:instance.source?.componentRef,status:instance.status,error:instance.error??null,inputs:instance.inputs,children:Object.freeze(instance.children.map(serialize)),slots:Object.freeze(Object.fromEntries(Object.entries(instance.slots??{}).map(([name,nodes])=>[name,Object.freeze(nodes.map(serialize))])))});
+    const serialize = instance => {
+      const entries = Object.entries(instance.slots ?? {});
+      const slots = Object.freeze(Object.fromEntries(entries.map(([name, nodes]) =>
+        [name, Object.freeze(nodes.map(serialize))])));
+      // Code Components expose the same slot children in two forms.
+      const children = entries.length ? Object.values(slots).flat() : instance.children.map(serialize);
+      return Object.freeze({
+        id: instance.id, instanceId: instance.owner?.id, address: instance.address,
+        generation: instance.generation, componentRef: instance.source?.componentRef,
+        status: instance.status, error: instance.error ?? null, inputs: instance.inputs,
+        children: Object.freeze(children), slots,
+      });
+    };
     const states=Object.create(null),queries=Object.create(null),actions=Object.create(null);
     for(const [name,handle] of this.root?.states??[])states[name]=handle.getSnapshot();
     for(const [name,item] of this.root?.queries??[])queries[name]=item.handle.getSnapshot();

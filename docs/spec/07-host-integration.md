@@ -4,6 +4,8 @@ U41 API 정리: JS/TS 루트는 세 팩토리와 URL/Grid 유틸리티만 공개
 
 U37 구현: 실제 JS/TS API는 [core README](../../packages/core/README.md)와 [공개 타입](../../packages/core/src/index.d.ts)에 구체화했다. `NodeSnapshot`은 이름별 `slots`와 평탄한 `children`을 함께 제공한다. 기존 화면은 주입한 정의를 유지하고 `replace`/새 createView에서 새 Registry 정의를 주입한다. 아래 예제·SDK 표와 공개 선언은 같은 이름을 사용하며 최소 계약·권한·초기 완료 의미는 그대로 따른다.
 
+한 View 스냅샷 안에서 `slots`와 `children`에 나타나는 같은 인스턴스는 하나의 불변 `NodeSnapshot`을 공유한다. 각 배열의 순서는 그대로이며 객체 정체성은 서로 다른 스냅샷을 가로질러 보장하지 않는다.
+
 U39–U40에서 Svelte 클라이언트 렌더러와 실행 중인 View를 빌리는 `ViewstemView`를 도입했다. 그때의 공개 호출은 [Svelte 구현 인계](../handoff/svelte-implementation-2026-11-02.md)에 기록했다. 현재 호출은 아래 D150을 따른다.
 
 
