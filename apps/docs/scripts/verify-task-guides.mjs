@@ -1,26 +1,32 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { chromium } from 'playwright';
 
 const content = new URL('../src/content/docs/', import.meta.url);
 const root = fileURLToPath(new URL('../../../', import.meta.url));
+const consumer = process.env.VIEWSTEM_DOCS_CONSUMER_DIR;
+const resolveDir = consumer ? resolve(consumer) : root;
 const origin = 'http://task-guides.test';
 
 async function openExample(page, locale, guide) {
   const markdown = await readFile(new URL(`${locale}/guides/${guide}.md`, content), 'utf8');
-  const [, source] = markdown.match(/^\x60{3}js title="src\/main\.js"\n([\s\S]*?)^\x60{3}$/m) ?? [];
+  const [, source] = markdown.match(/^\x60{3}js(?: title="src\/main\.js")?\n([\s\S]*?)^\x60{3}$/m) ?? [];
   assert.ok(source, `${locale}/${guide} is missing its runnable example`);
 
-  const { outputFiles } = await build({
-    stdin: { contents: source + '\nwindow.mountedGuide = mounted;', resolveDir: root },
+  const { outputFiles, metafile } = await build({
+    absWorkingDir: resolveDir,
+    stdin: { contents: source + '\nwindow.mountedGuide = { view: await screen.ready, screen };', resolveDir },
     outdir: '.',
     bundle: true,
     write: false,
     format: 'esm',
     platform: 'browser',
+    metafile: true,
   });
+  if (consumer) assert.ok(Object.hasOwn(metafile.inputs, 'node_modules/@viewstem/ui/dist/index.js'));
   const assets = {
     '/': {
       contentType: 'text/html',
@@ -47,7 +53,7 @@ async function openExample(page, locale, guide) {
   });
   await page.goto(origin);
   await page.waitForFunction(() => Boolean(window.mountedGuide));
-  assert.deepEqual(await page.evaluate(async () => (await window.mountedGuide.initialComplete).queryErrors), []);
+  assert.deepEqual(await page.evaluate(async () => (await window.mountedGuide.screen.whenSettled(window.mountedGuide.view.initial)).queryErrors), []);
   return unexpectedRequests;
 }
 
@@ -104,25 +110,44 @@ async function verifyDashboard(page, labels) {
   assert.equal((await snapshot()).stale, false);
 }
 
+async function verifyConditionalSettings(page, labels) {
+  const toggle = page.getByRole('switch', { name: labels.email, exact: true });
+  const detail = page.getByText(labels.digest, { exact: true });
+  assert.equal(await detail.count(), 0);
+  await toggle.click();
+  await detail.waitFor();
+  await toggle.click();
+  await detail.waitFor({ state: 'hidden' });
+}
+
+async function verifyKeyedList(page, labels) {
+  for (const project of labels.projects) await page.getByText(project, { exact: true }).waitFor();
+}
+
 const cases = {
   docs: {
     name: 'Project name', validation: 'Enter a name.', typed: '  Onboarding  ',
     week: 'Last 7 days', month: 'Last 30 days', fail: 'Simulate a failed request',
     weekResult: 'Last 7 days: 12 visits', monthResult: 'Last 30 days: 46 visits',
     status: 'Report status: ', stale: 'Showing the last successful result.',
+    email: 'Email notifications', digest: 'Weekly digest: every Monday', projects: ['Onboarding', 'Billing'],
   },
   'ko/docs': {
     name: '프로젝트 이름', validation: '이름을 입력하세요.', typed: '  온보딩  ',
     week: '최근 7일', month: '최근 30일', fail: '요청 실패 재현',
     weekResult: '최근 7일 방문 12회', monthResult: '최근 30일 방문 46회',
     status: '조회 상태: ', stale: '마지막으로 성공한 결과를 표시합니다.',
+    email: '이메일 알림', digest: '주간 요약: 매주 월요일', projects: ['온보딩', '결제'],
   },
 };
 
 const browser = await chromium.launch();
 try {
   for (const [locale, labels] of Object.entries(cases)) {
-    for (const [guide, verify] of [['form-validation', verifyForm], ['query-dashboard', verifyDashboard]]) {
+    for (const [guide, verify] of [
+      ['form-validation', verifyForm], ['query-dashboard', verifyDashboard],
+      ['conditional-settings', verifyConditionalSettings], ['keyed-list', verifyKeyedList],
+    ]) {
       const page = await browser.newPage();
       page.setDefaultTimeout(10_000);
       const errors = [];

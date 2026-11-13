@@ -72,4 +72,4 @@ const result = mergeOwnedUrl('https://example.test/?campaign=a%20b&filter=all#li
 console.log(result); // https://example.test/?campaign=a%20b&filter=active#list
 ```
 
-[State와 URL 가이드](../guides/state-and-url/), [ViewTarget URL 편의 옵션](../runtime/#viewtarget)을 함께 참고하세요.
+[State와 URL 가이드](../guides/state-and-url/), [ViewOptions URL 편의 옵션](../runtime/#viewsource-and-viewoptions)을 함께 참고하세요.

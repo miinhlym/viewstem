@@ -42,7 +42,7 @@ After mounting this View as `mounted`, the host can write through its State hand
 
 
 ```js
-mounted.view.getState('title').write('Saved');
+view.getState('title').write('Saved');
 ```
 
 

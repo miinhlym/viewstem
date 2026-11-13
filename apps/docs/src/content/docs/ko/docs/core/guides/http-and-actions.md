@@ -31,7 +31,7 @@ const execute = createHttpExecutor({
   }),
 });
 const runtime = createRuntime({ registry, requestExecutor: execute });
-const { view, initialComplete } = await runtime.createView({ view: {
+const view = await runtime.createView({
   queries: { project: { query: {
     sources: { main: {
       datasource: { kind: 'Http', baseUrl: 'https://api.example.test' },
@@ -40,11 +40,11 @@ const { view, initialComplete } = await runtime.createView({ view: {
     transform: { input: { '@path': '/sources/main/title' } },
   } } },
   render: { id: 'empty', componentRef: 'Empty' },
-} });
-const report = await initialComplete;
+});
+const report = await view.whenSettled(view.initial);
 console.log(report.queryErrors.length); // 0
 console.log(view.getQuery('project').getSnapshot().data); // Project
-console.log(await runtime.invokeAction({ owner: view, actionRef: 'label', inputs: { name: 'Viewstem' } }));
+console.log(await view.invokeAction({ actionRef: 'label', inputs: { name: 'Viewstem' } }));
 // Hello, Viewstem
 runtime.dispose();
 ```
@@ -57,8 +57,8 @@ Query는 응답 본문을 `Project`로 변환합니다. 코드 Action은 준비�
 
 ## 취소와 오류 처리하기
 
-취소 가능한 작업에는 Action 핸들러의 `signal`을 전달합니다. `context.invokeAction()`은 부모의 취소·재귀 문맥을 상속하는 하위 호출을 만듭니다. 별도 `runtime.invokeAction({ owner: view, ... })`은 해당 View가 소유하는 독립 실행입니다. 취소 뒤 State 쓰기와 Query 갱신은 거절하지만 이미 완료된 외부 효과까지 되돌리지는 않습니다.
+취소 가능한 작업에는 Action 핸들러의 `signal`을 전달합니다. `context.invokeAction()`은 부모의 취소·재귀 문맥을 상속하는 하위 호출을 만듭니다. 별도 `view.invokeAction({ ... })`은 해당 View가 소유하는 독립 실행입니다. 취소 뒤 State 쓰기와 Query 갱신은 거절하지만 이미 완료된 외부 효과까지 되돌리지는 않습니다.
 
-초기 Query 실패는 `initialComplete.queryErrors`에서, Action 실패는 `invokeAction`이 반환하는 Promise의 거절에서 확인합니다. 결과 스키마가 맞지 않으면 `TYPE_MISMATCH`, 목적지 권한이 거절되면 `EXECUTION_BLOCKED`입니다.
+초기 Query 실패는 `report.queryErrors`에서, Action 실패는 `invokeAction`이 반환하는 Promise의 거절에서 확인합니다. 결과 스키마가 맞지 않으면 `TYPE_MISMATCH`, 목적지 권한이 거절되면 `EXECUTION_BLOCKED`입니다.
 
 [Registry의 코드 Action](../../registry/#code-actions), [Runtime](../../runtime/), [HTTP](../../http/)에서 세부 계약을 확인하세요.

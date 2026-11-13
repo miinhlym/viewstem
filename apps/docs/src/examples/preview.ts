@@ -1,19 +1,16 @@
-import { createRegistry, createRuntime, type HttpResponse } from '@viewstem/core';
-import { attach, registerShadcn, type Attachment, type AttachOptions } from '@viewstem/ui';
+import type { HttpResponse } from '@viewstem/core';
+import { createRenderer } from '@viewstem/ui';
 import { projectsEndpoint, type ExampleDefinition, type Locale } from './definitions';
 
 export function createExamplePreview(
   target: HTMLElement,
   definition: ExampleDefinition,
   locale: Locale,
-  onError: NonNullable<AttachOptions['onError']>,
+  onError: NonNullable<Parameters<ReturnType<typeof createRenderer>['attach']>[2]>['onError'],
 ) {
   let requestCount = 0;
-  const registry = createRegistry();
-  registerShadcn(registry);
-  if (definition.resources) registry.registerResources(definition.resources);
-  const runtime = createRuntime({
-    registry,
+  const renderer = createRenderer({
+    resources: definition.resources,
     requestExecutor: ({ datasource, request }): HttpResponse => {
       const method = definition.fixture === 'project-write' ? 'POST' : projectsEndpoint.request.method;
       if (!definition.fixture) throw new Error('No example response is configured.');
@@ -33,15 +30,14 @@ export function createExamplePreview(
     },
   });
 
-  let attachment: Attachment | undefined;
   return {
     async run() {
-      const mounted = await runtime.createView({ view: definition.view, inputs: definition.inputs });
-      attachment = attach(mounted.view, target, { onError });
-      const report = await mounted.initialComplete;
-      const failure = report.queryErrors[0]?.error ?? mounted.view.getSnapshot().errors[0];
+      const screen = renderer.mount({ target, source: definition.view, inputs: definition.inputs, onError });
+      const view = await screen.ready;
+      const report = await screen.whenSettled(view.initial);
+      const failure = report.queryErrors[0]?.error ?? view.getSnapshot().errors[0];
       if (failure) throw new Error(failure.message);
     },
-    async dispose() { attachment?.dispose(); runtime.dispose(); },
+    dispose: () => renderer.dispose(),
   };
 }

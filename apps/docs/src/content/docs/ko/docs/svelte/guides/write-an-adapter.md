@@ -55,8 +55,7 @@ import { label } from './label.js';
 const target = document.getElementById('app');
 if (!target) throw new Error('#app 요소가 필요합니다.');
 
-const renderer = createRenderer();
-renderer.registerComponents([
+const renderer = createRenderer({ components: [
   label,
   {
     contract: {
@@ -69,11 +68,11 @@ renderer.registerComponents([
     },
     component: Panel,
   },
-]);
+] });
 
-const mounted = await renderer.mount({
+const mounted = renderer.mount({
   target,
-  view: {
+  source: {
     states: {
       showDetails: { kind: 'State', schema: { type: 'boolean' }, initial: false },
     },
@@ -102,7 +101,8 @@ const mounted = await renderer.mount({
     },
   },
 });
-await mounted.initialComplete;
+const view = await mounted.ready;
+await mounted.whenSettled(view.initial);
 ```
 
 처음에는 버튼이 보입니다. **상세 보기**를 누르면 **이 상세 내용은 View에서 전달했습니다.**가 나타납니다. 어댑터가 `reveal`을 전달하면 Core가 페이로드를 검증하고 Action을 실행한 뒤 State 쓰기를 반영해 슬롯을 다시 평가합니다. 슬롯 내용을 작성한 주체가 View이므로 슬롯의 `when`은 View의 State를 읽습니다.

@@ -1137,7 +1137,7 @@ function build(locale) {
   ]), { open: state(true, boolean) });
   variant('typography', 'inline-styles', t('Lead, inline code and muted text', '소개 문장·인라인 코드·보조 문구'), 448, stack([
     paragraph(t('Render a View in the browser', '브라우저에서 View를 렌더링하세요'), { variant: 'lead' }),
-    row([paragraph(t('Call', '호출할 함수'), { as: 'span', variant: 'small' }), paragraph('attach(view, target)', { variant: 'code' })]),
+    row([paragraph(t('Call', '호출할 함수'), { as: 'span', variant: 'small' }), paragraph('renderer.attach(view, target)', { variant: 'code' })]),
     paragraph(t('Pass a connected DOM element as the target.', 'DOM에 연결된 요소를 대상으로 전달하세요.'), { variant: 'muted' }),
   ], 'gap: .75rem'));
 

@@ -14,7 +14,7 @@ import type { Registry, AnyResource, ComponentContract, CodeActionDefinition } f
 
 ## createRegistry
 
-`createRegistry(options?) → Registry` accepts either an `AnyResource[]` or `{ resources?: AnyResource[], functions?: CelFunction[] }`. Both lists default to empty. Resources are JSON declarations; custom CEL functions are trusted synchronous functions registered separately. Resource identity is the pair `(kind, id)`, so different kinds can share an ID. IDs must be nonempty strings.
+`createRegistry(options?) → Registry` accepts either an `AnyResource[]` or `{ resources?: AnyResource[], componentContracts?: ComponentContract[], functions?: CelFunction[] }`. Both lists default to empty. Resources are JSON declarations; custom CEL functions are trusted synchronous functions registered separately. Resource identity is the pair `(kind, id)`, so different kinds can share an ID. IDs must be nonempty strings.
 
 ## Registration methods
 
@@ -37,7 +37,7 @@ Registration rejects malformed fields, unsupported schemas and invalid reference
 | `exportResource(kind, id)` | Detached resource declaration | Suitable for editing or serialization. Does not include host implementation functions or live State. |
 | `isCode(kind, id)` | `boolean` | Whether the identity was registered as a code Component or Action. |
 
-An existing View uses the definitions injected into its current lifetime. Registering or updating a shared definition does not hot-swap it into that View. Use a new View or [View.replace](../view/#replace) to inject the current registry. Use `view.update()` to change one executing View's own definition.
+An existing View uses the definitions injected into its current lifetime. Registering or updating a shared definition does not hot-swap it into that View. Use a new View or [View.replace](../view/#replace) to inject the current registry. Use `view.updateDefinition()` to change one executing View's own definition.
 
 ## Code Actions
 

@@ -20,8 +20,7 @@ import { label } from './label.js';
 const target = document.getElementById('app');
 if (!target) throw new Error('Missing #app element.');
 
-const renderer = createRenderer();
-renderer.registerComponents([label]);
+const renderer = createRenderer({ components: [label] });
 
 const spec: ViewSpec = {
   states: {
@@ -33,16 +32,16 @@ const spec: ViewSpec = {
     inputs: { text: { '@path': '/states/message' } },
   },
 };
-const mounted = await renderer.mount({ target, view: spec });
-await mounted.initialComplete;
+const mounted = renderer.mount({ target, source: spec });
+const view = await mounted.ready;
 console.log(target.textContent?.trim()); // New draft
 
-mounted.view.getState('message').write('Saved draft');
+view.getState('message').write('Saved draft');
 await mounted.whenRendered();
 console.log(target.textContent?.trim()); // Saved draft
 ```
 
-`initialComplete` on the mounted handle waits for eligible initial Queries and the Svelte DOM update. After a State write, `whenRendered()` waits for the DOM update. Query execution and browser paint run independently of that DOM wait.
+`ready` returns the View after the first DOM update. Use `whenSettled(view.initial)` if you also need the eligible initial Query report and its DOM update. After a State write, `whenRendered()` waits for the DOM update. Query execution and browser paint run independently of that DOM wait.
 
 ## 2. Update the current View, then replace its lifetime
 
@@ -54,23 +53,23 @@ const editedSpec: ViewSpec = {
   },
 };
 
-const updated = await mounted.update(editedSpec);
-await updated.initialComplete;
+const updated = await view.updateDefinition(editedSpec);
+await mounted.whenSettled(updated);
 console.log(target.textContent?.trim()); // Saved draft
 
-const replaced = await mounted.replace({ view: editedSpec });
-await replaced.initialComplete;
+const replaced = await view.replace(editedSpec);
+await mounted.whenSettled(replaced);
 console.log(target.textContent?.trim()); // Fresh draft
 ```
 
-Here `update` retains the compatible existing State. `replace` starts a new lifetime and initializes `message` from the new definition. After replacement, obtain State or Query handles again from `mounted.view`.
+Here `update` retains the compatible existing State. `replace` starts a new lifetime and initializes `message` from the new definition. After replacement, obtain State or Query handles again from `view`.
 
-An invalid update or replacement rejects before core applies it. If the definition applies and a Svelte adapter then fails to render, the returned `initialComplete` can reject after the core change. Handle these two awaits separately when your UI needs to distinguish these outcomes.
+An invalid update or replacement rejects before core applies it. If the definition applies and a Svelte adapter then fails to render, the `whenSettled(application)` can reject after the core change. Handle these two awaits separately when your UI needs to distinguish these outcomes.
 
 ## 3. Release the DOM and the owned View
 
 ```ts
-await mounted.dispose();
+await mounted.unmount();
 console.log(target.textContent?.trim()); // Empty string
 await renderer.dispose();
 ```

@@ -17,9 +17,10 @@ The function maps arbitrary thrown values to a fixed `INTERNAL_ERROR` DTO withou
 
 | Field | Type | Meaning |
 | --- | --- | --- |
-| `readonly phase` | `'render' \| 'event'` | Distinguishes a render failure from an adapter `emit` rejection. |
-| `readonly error` | `PublicError` | The public error DTO. A render diagnostic can include the Component reference and instance ID. |
-| `readonly node?` | `NodeSnapshot` | The projection associated with the failure when available. |
+| `readonly phase` | `'prepare' \| 'node' \| 'query' \| 'action' \| 'url' \| 'render'` | The phase that reported the failure. |
+| `readonly error` | `PublicError` | The public error. A render error can include the Component reference and instance ID. |
+| `readonly nodeId?` | `string` | Identifies the affected node when available. |
+| `readonly application?` | `ViewApplication` | The associated application handle when available. |
 
 See [PublicError](/docs/core/runtime/#authorization) for error fields and [NodeSnapshot](/docs/core/view/#viewsnapshot) for rendered node data.
 
@@ -27,7 +28,7 @@ See [PublicError](/docs/core/runtime/#authorization) for error fields and [NodeS
 
 **Type** · `(diagnostic: RendererDiagnostic) => void`
 
-Provide an `onError` callback when creating a renderer, setting up `mount` or `attach`, or rendering `ViewstemView`. Renderer-level and connection-level callbacks can both observe a failure. Synchronous exceptions from these observers are isolated from rendering and event dispatch.
+For `mount` and `attach`, both the renderer-level and connection-level `onError` can receive the same diagnostic. When you host `ViewstemView` directly, its `onError` prop overrides the renderer default. Synchronous exceptions from observers are isolated from rendering and event dispatch.
 
 ## RenderFallback
 
@@ -39,11 +40,13 @@ Supply a fallback snippet through `RenderOptions` or `ViewstemViewProps`. It rec
 
 | Failure | Where it appears |
 | --- | --- |
-| Invalid options, registration, target, or View definition | The setup call throws or the mount or application promise rejects. |
-| Eligible initial Query fails | The initial report contains an entry in `queryErrors`. |
-| A code-backed Component has no registered Svelte implementation | Its render boundary reports `REFERENCE_NOT_FOUND`. |
-| Adapter throws while Svelte renders the node | Its boundary reports a sanitized `INTERNAL_ERROR` and can render fallback content. Siblings remain rendered. A new core projection can retry the failed boundary. |
-| Adapter `emit` fails | The original event promise rejects. Live connections also report an `event` diagnostic. |
-| Renderer wait is cancelled by teardown or an obsolete generation | The affected wait rejects with `CANCELLED`. |
+| Invalid options, registration, or target | The relevant setup call throws synchronously. |
+| View preparation or first render fails during mount | `screen.ready` rejects and the target reservation is released. Fix the issue before mounting again. |
+| `ViewstemView` source preparation fails | `prepareError` receives the public error and `onError` receives one `prepare` diagnostic. `whenRendered()` rejects with the same error. |
+| Eligible initial Query fails | The completion report contains an entry in `queryErrors`. |
+| Svelte implementation is missing or an adapter render fails | The boundary reports `REFERENCE_NOT_FOUND` or `INTERNAL_ERROR`, respectively. A live connection can show a fallback and retry on the next projection. |
+| Adapter `emit()` fails | The call's promise rejects. Action failures from events handled by Core also produce an `action` diagnostic. Handle adapter readiness failures (`INPUT_NOT_READY`) and stale connections (`CANCELLED`) through the `emit()` rejection. |
+| A direct `view.invokeAction()` or View change fails | The call's promise rejects. |
+| A wait is cancelled by teardown or a new application | The waiting promise rejects with `CANCELLED`. |
 
-An active adapter render failure can reject both `whenRendered()` and renderer-aware `initialComplete` even if a fallback is visible. Core changes that completed before the failure remain applied.
+An active render failure can reject `whenRendered()` and renderer-aware `whenSettled(application)` even if a fallback is visible. Core changes that completed before the failure remain applied.

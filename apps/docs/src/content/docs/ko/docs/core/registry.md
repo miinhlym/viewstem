@@ -14,7 +14,7 @@ import type { Registry, AnyResource, ComponentContract, CodeActionDefinition } f
 
 ## createRegistry
 
-`createRegistry(options?) → Registry`는 `AnyResource[]` 또는 `{ resources?: AnyResource[], functions?: CelFunction[] }`를 받습니다. 두 목록의 기본값은 빈 배열입니다. 리소스는 JSON 선언이며 사용자 CEL 함수는 신뢰하는 동기 함수로 별도 등록합니다. 리소스는 `(kind, id)` 쌍으로 식별하므로 종류가 다르면 같은 ID를 사용할 수 있습니다. ID는 비어 있지 않은 문자열이어야 합니다.
+`createRegistry(options?) → Registry`는 `AnyResource[]` 또는 `{ resources?: AnyResource[], componentContracts?: ComponentContract[], functions?: CelFunction[] }`를 받습니다. 두 목록의 기본값은 빈 배열입니다. 리소스는 JSON 선언이며 사용자 CEL 함수는 신뢰하는 동기 함수로 별도 등록합니다. 리소스는 `(kind, id)` 쌍으로 식별하므로 종류가 다르면 같은 ID를 사용할 수 있습니다. ID는 비어 있지 않은 문자열이어야 합니다.
 
 ## 등록 메서드
 
@@ -37,7 +37,7 @@ import type { Registry, AnyResource, ComponentContract, CodeActionDefinition } f
 | `exportResource(kind, id)` | 분리된 리소스 선언 | 편집·직렬화에 사용할 수 있습니다. 구현 함수나 실행 중 State는 포함하지 않습니다. |
 | `isCode(kind, id)` | `boolean` | 코드 Component 또는 Action으로 등록된 식별자인지 확인합니다. |
 
-실행 중 View는 현재 수명에 주입된 정의를 사용합니다. 공용 정의를 등록·교체해도 기존 View에 자동으로 바뀐 정의를 주입하지 않습니다. 새 View나 [View.replace](../view/#replace)로 최신 레지스트리를 주입하세요. 현재 View 자체 정의만 바꾸려면 `view.update()`를 사용합니다.
+실행 중 View는 현재 수명에 주입된 정의를 사용합니다. 공용 정의를 등록·교체해도 기존 View에 자동으로 바뀐 정의를 주입하지 않습니다. 새 View나 [View.replace](../view/#replace)로 최신 레지스트리를 주입하세요. 현재 View 자체 정의만 바꾸려면 `view.updateDefinition()`를 사용합니다.
 
 <a id="code-actions"></a>
 ## 코드 Action

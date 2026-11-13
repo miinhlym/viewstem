@@ -3,35 +3,40 @@ title: Browser UI API
 description: Register the catalog, attach an existing View, and import styles and support metadata.
 ---
 
-The root package exports `registerShadcn`, `attach`, and the TypeScript types `Attachment` and `AttachOptions`.
+`@viewstem/ui` exports `createRenderer`, `registerShadcn`, and the public types `RendererOptions`, `Renderer`, `MountedView`, `RenderAttachment`, `RendererDiagnostic`, and `RendererErrorListener`.
 
-## Register the catalog
+## Create a renderer
 
-```ts
-registerShadcn(registry: Registry): void
-```
+`createRenderer()` creates and owns a Runtime with the default catalog. To configure that Runtime, pass options such as `createRenderer({ requestExecutor, onError })`. To borrow a Runtime, call `createRenderer({ runtime, onError })`.
 
-Pass a [Core Registry](../../core/registry/) before creating a View that uses the catalog. Registration adds all 357 Component contracts as one batch. A duplicate Component ID fails registration and leaves the Registry as it was. Call this once per Registry. Use separate Registries to run the browser and Svelte catalogs together because they share Component IDs.
+If the injected Runtime needs the catalog, call `registerShadcn(runtime.registry)` once before creating the View. It registers 357 Component contracts as a batch. A duplicate ID leaves the Registry as it was.
 
-## Attach a View
+## Mount a new View
 
-```ts
-interface AttachOptions {
-  onError?: (error: unknown) => void;
-}
+`renderer.mount({ target, source, inputs?, url?, onError? })` returns a screen immediately. `await screen.ready` returns the View after the first DOM update. Use `await screen.whenRendered()` to inspect the DOM after a State write. To wait for the initial Query report and its DOM update, call `await screen.whenSettled(view.initial)` and inspect `queryErrors`. You can also pass the application handle returned by `setInputs()`, `updateDefinition()`, or `replace()` to `whenSettled()`. `setInputs()` replaces the entire input map. See [View operations](../../core/view/).
 
-interface Attachment {
-  dispose(): void;
-}
+`await screen.unmount()` cancels pending work and waits for the owned View and DOM to be cleaned up. Closing before a Query reaches the request executor prevents that request. If the request has started, the executor receives an abort signal and its late result is discarded.
 
-attach(view: View, target: HTMLElement, options?: AttachOptions): Attachment
-```
+<a id="attach"></a>
 
-Pass an existing [Core View](../../core/view/) and a connected element. Only one active attachment is allowed per element. The attachment subscribes to the View and applies each projection synchronously. Nodes that are pending or failed are omitted until they are ready.
+## Attach an existing View
 
-`attach()` throws if the element is disconnected, already attached, or initial attachment fails. Pass `onError` to observe later rendering and event errors. Await the `initialComplete` promise returned by `runtime.createView()` to observe initial execution and its Query diagnostics.
+`renderer.attach(view, target, { onError }?)` returns an attachment with `whenRendered()`, `whenSettled(application)`, and `detach()`. `await attachment.detach()` releases the DOM and subscription. The original owner disposes the borrowed View.
 
-`attachment.dispose()` unsubscribes the attachment and removes the DOM subtree and listeners it owns. Call it before removing the container. The element can be attached again. The host manages the lifetime of the View and Runtime separately.
+Both paths require a connected, unreserved HTML element. Wait for cleanup before reusing it. `await renderer.dispose()` releases the renderer's screens, attachments, and internally created Runtime. The host manages an injected Runtime.
+
+## Errors and diagnostics
+
+| Situation | Where to handle it |
+| --- | --- |
+| Target is missing, disconnected, or already reserved | Synchronous exception from `mount()` or `attach()` |
+| View preparation or first render fails | `screen.ready` rejects after automatic cleanup. `onError` receives a `prepare` or `render` diagnostic |
+| Initial render of a borrowed View fails during `attach()` | `attach()` throws synchronously |
+| Later node, Query, UI event Action, URL, or render error | `onError` diagnostics. Initial Query failures also appear in the `whenSettled()` report's `queryErrors` |
+| A direct `view.invokeAction()` or View change fails | The call's promise rejects |
+| A wait is cancelled by cleanup or a new application | The waiting promise rejects with `CANCELLED` |
+
+`onError` receives `{ phase, error, nodeId?, application? }`. The phases are `prepare`, `node`, `query`, `action`, `url`, and `render`. When a literal Component input fails schema validation, `error.input` identifies the port and `error.resource` identifies the referenced Component when present. You can provide a callback on the renderer and another on a screen or attachment.
 
 ## Styles and metadata
 

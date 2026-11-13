@@ -24,8 +24,8 @@ async function withRuntime(resources, run, options = {}) {
 }
 
 async function readQuery(query, runtime) {
-  const { view, initialComplete } = await runtime.createView({ view: { ...render, queries: { project: { query } } } });
-  assert.deepEqual((await initialComplete).queryErrors, []);
+  const view = await runtime.createView({ ...render, queries: { project: { query } } });
+  assert.deepEqual((await view.whenSettled(view.initial)).queryErrors, []);
   const result = view.getQuery('project').getSnapshot();
   assert.equal(result.status, 'success');
   return result.data;
@@ -33,8 +33,8 @@ async function readQuery(query, runtime) {
 
 const checks = {
   'resources.json': async resources => withRuntime(resources, async runtime => {
-    const { view } = await runtime.createView({ view: render });
-    assert.equal(await runtime.invokeAction({ owner: view, actionRef: 'status' }), 'draft');
+    const view = await runtime.createView(render);
+    assert.equal(await view.invokeAction({ actionRef: 'status' }), 'draft');
     assert.equal(runtime.registry.get('Type', 'status').kind, 'Type');
   }),
   'format-title.json': async value => withRuntime([], async runtime => {
@@ -45,21 +45,21 @@ const checks = {
       },
       render: { ...badge, inputs: { text: value } },
     };
-    const { view } = await runtime.createView({ view: viewSpec, inputs: { title: 'A', cost: 12 } });
+    const view = await runtime.createView(viewSpec, { inputs: { title: 'A', cost: 12 } });
     assert.equal(view.getSnapshot().roots[0].inputs.text, 'Project A costs $12');
   }),
   'repeated-view.json': async viewSpec => withRuntime([], async runtime => {
-    const { view } = await runtime.createView({ view: viewSpec });
+    const view = await runtime.createView(viewSpec);
     const first = view.getSnapshot().roots[0].slots.default;
     assert.deepEqual(first.map(node => node.inputs.text), ['Open']);
     const template = viewSpec.render.slots.default[0];
     template.repeat.items.reverse();
-    await view.update(viewSpec);
+    await view.updateDefinition(viewSpec);
     const reordered = view.getSnapshot().roots[0].slots.default;
     assert.equal(reordered[0].generation, first[0].generation);
   }),
   'derived-view.json': async viewSpec => withRuntime([], async runtime => {
-    const { view } = await runtime.createView({ view: viewSpec });
+    const view = await runtime.createView(viewSpec);
     assert.equal(view.getSnapshot().roots[0].inputs.text, 'Selected');
     view.getState('items').write([]);
     assert.deepEqual(view.getSnapshot().roots, []);
@@ -92,14 +92,14 @@ const checks = {
     assert.deepEqual(calls, expected);
   },
   'label-action.json': async action => withRuntime([action], async runtime => {
-    const { view } = await runtime.createView({ view: render });
-    const invoke = project => runtime.invokeAction({ owner: view, actionRef: action.id, inputs: { project } });
+    const view = await runtime.createView(render);
+    const invoke = project => view.invokeAction({ actionRef: action.id, inputs: { project } });
     assert.equal(await invoke('A'), 'Project A');
     await assert.rejects(invoke(''), { code: 'ASSERTION_FAILED', message: 'Project is required' });
   }),
   'project-type.json': async type => withRuntime([type], async runtime => {
     const viewSpec = { ...render, ports: { project: { kind: 'Value', required: true, typeRef: type.id } } };
-    const apply = project => runtime.createView({ view: viewSpec, inputs: { project } });
+    const apply = project => runtime.createView(viewSpec, { inputs: { project } });
     await apply({ name: 'Plan', due: '2026-11-05' });
     await assert.rejects(apply({ name: 'Plan', due: '2026-02-30' }), { code: 'TYPE_MISMATCH' });
   }),
