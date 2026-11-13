@@ -40,6 +40,7 @@ assert.equal(typeof createHttpExecutor(),'function');assert.ok(support);store.di
  await writeFile(join(directory,'renderer-diagnostics.test.mjs'),await readFile(join(pkg,'test/renderer-diagnostics.test.mjs')));
  const boundaryTests = execute(process.execPath,['--test','public-api.test.mjs','owned-lifetime.test.mjs','renderer-diagnostics.test.mjs']);
  await writeFile(join(directory,'public-api.ts'),await readFile(join(pkg,'test/types/public-api.ts')));
+ await writeFile(join(directory,'code-action-ports.ts'),await readFile(join(pkg,'test/types/code-action-ports.ts')));
  await writeFile(join(directory,'consumer.ts'),`import {createRegistry,createRuntime,createStateStore,type View} from '@viewstem/core';
 import {createHttpExecutor} from '@viewstem/core/http';
 import {compileCel} from '@viewstem/core/cel';
@@ -51,6 +52,8 @@ declare const view:View;const node=view.getSnapshot().roots[0];if(node)await vie
 cell.write('wrong');
 const runtime=createRuntime({registry,stateStore:store,requestExecutor:createHttpExecutor()});runtime.dispose();
 `);
- execute(process.execPath,[join(root,'node_modules/typescript/bin/tsc'),'--strict','--exactOptionalPropertyTypes','--noUncheckedIndexedAccess','--noEmit','--target','ES2022','--module','NodeNext','--moduleResolution','NodeNext','--lib','ES2022,DOM','consumer.ts','public-api.ts']);
+ const typecheck = [join(root,'node_modules/typescript/bin/tsc'),'--strict','--noUncheckedIndexedAccess','--noEmit','--target','ES2022','--module','NodeNext','--moduleResolution','NodeNext','--lib','ES2022,DOM','consumer.ts','public-api.ts','code-action-ports.ts'];
+ execute(process.execPath,[...typecheck,'--exactOptionalPropertyTypes']);
+ execute(process.execPath,typecheck);
  console.log(JSON.stringify({nodeVersion:process.version,package:packed.name,version:packed.version,files:packed.files.map(file=>file.path),integrity:packed.integrity,bytes:packed.size,unpackedBytes:packed.unpackedSize,license:'MIT; installed text and vendored CEL notice verified',runtime:'passed',publicBoundaryTests:Number(/^# tests (\d+)$/m.exec(boundaryTests)?.[1]),types:'passed'},null,2));
 }finally{await rm(directory,{recursive:true,force:true});}

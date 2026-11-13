@@ -52,12 +52,14 @@ registry.registerAction({
 }, ({ inputs, signal }) => `Hello, ${inputs.name}`);
 ```
 
-첫 오버로드는 리터럴 포트 계약에서 입력을, 결과 스키마에서 출력을 추론합니다. 앱 타입을 직접 지정하려면 `registerAction<Inputs, Output>(definition, implementation)`를 사용하세요. `typeRef`만으로 런타임 레지스트리의 타입을 TypeScript가 추론하지는 못하므로 필요한 곳에 타입을 명시합니다. 타입 추론이 런타임 검증을 대체하지는 않습니다.
+TypeScript는 포트 선언에서 입력을, 결과 스키마에서 출력을 추론합니다. 핸들러에서 항상 사용하는 입력은 `required: true`로 선언하세요. `default`가 있어도 선택 포트는 `inputs`에 없을 수 있습니다. 기본값은 호출에서 키를 생략했을 때 적용합니다. 선택 입력에 연결한 표현식의 값이 missing이면 해당 키 없이 핸들러를 호출합니다.
+
+참조 `Type`이나 Query 결과처럼 앱 타입이 필요한 경우 `registerAction<Inputs, Output>(definition, implementation)`를 사용하세요. `Inputs`의 필수 키마다 포트 종류를 맞추고 `required: true`를 설정해야 합니다. 포트에는 고정된 이름을 사용하고 동적 키는 Value 포트 안에 넣으세요. 값 타입을 직접 지정한다면 실제 스키마와 일치시켜야 합니다. 런타임 검증에는 등록된 스키마를 사용합니다.
 
 | 공개 타입 | 계약 |
 |---|---|
 | `CodeActionDefinition<I, O = void>` | `kind: 'Action'`과 `CodeActionSpec<I, O>`를 가진 리소스 외피입니다. |
-| `CodeActionSpec<I, O>` | `I`에서 결정한 선택적 포트를 가집니다. `steps`는 금지합니다. void가 아닌 결과는 `value` 없이 `schema` 또는 `typeRef`를 선언하고 void는 `output`을 생략합니다. |
+| `CodeActionSpec<I, O>` | `I`에 필수 키가 있으면 포트 맵을 선언하고 해당 포트에 `required: true`를 설정합니다. 값을 반환하는 경우 출력에 `schema` 또는 `typeRef`를 선언합니다. |
 | `ActionHandler<I, O = void>` | `ActionContext<I>`를 받아 `O` 또는 `Promise<O>`, void 계약이면 `void`/`Promise<void>`를 반환합니다. |
 | `ActionContext<I>` | 읽기 전용 `inputs`, 취소 `signal: AbortSignal`, `invokeAction(request): Promise<unknown>`를 제공합니다. |
 | `ChildActionRequest` | `actionRef`와 인라인 `action` 중 하나, 선택적인 네이티브 `inputs`를 받습니다. `owner`, `id`는 받지 않고 부모 수명·재귀 문맥을 상속합니다. |

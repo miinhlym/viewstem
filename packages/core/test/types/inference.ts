@@ -17,7 +17,7 @@ registry.registerAction({ kind: 'Action', id: 'inferred-void', spec: {
 } } as const, async ({ inputs, invokeAction }) => {
   const title: string = inputs.title;
   const optional: number | undefined = inputs.optional;
-  const defaulted: string = inputs.defaulted;
+  const defaulted: string | undefined = inputs.defaulted;
   const structuredTitle: string = inputs.structured.title;
   const structuredCount: number | undefined = inputs.structured.count;
   inputs.count.write(title.length);
@@ -30,6 +30,8 @@ registry.registerAction({ kind: 'Action', id: 'inferred-void', spec: {
   const bad: number = inputs.title;
   // @ts-expect-error optional Value needs preparation/narrowing before use.
   const absent: number = inputs.optional;
+  // @ts-expect-error a default applies only when the caller omits the input.
+  const present: string = inputs.defaulted;
   // @ts-expect-error Query handle exposes no write capability.
   inputs.rows.write([]);
   // @ts-expect-error captured nested object is readonly.

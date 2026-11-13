@@ -56,6 +56,8 @@ Render the `roots` from `view.getSnapshot()` or `subscribe()`. Each node include
 
 An existing view keeps the resource definitions it received when it was applied. `registry.updateResource` changes the shared definition, which `view.replace` or a new `createView` call can then apply. `view.updateDefinition` changes only the current view configuration. An update that changes a retained cell between State and Derived fails because the write contracts differ. Changing or exporting State, the current view, and shared definitions is separate from database persistence.
 
+For code Actions, declare every required input with `required: true`. A Value port with a default is optional in the handler because the caller may bind a missing value.
+
 If a subscriber writes State while the View is computing or publishing a projection, the runtime queues a follow-up projection. Listeners finish receiving the current immutable snapshot before the new projection is published. Several writes in that interval are combined into one follow-up; writing the same value does not create another State change. Inspect a subsequent snapshot for the resulting node inputs and use the renderer's completion mechanism for DOM updates.
 
 `authorize({operation, owner, definition})` checks permission to execute Actions or modify an existing view through `view.updateDefinition` or `replace`. It grants permission only when it returns `true`. The host configures resource-list visibility, user identity, and persistence permissions. Execution requires its own authorization even when a resource appears in a list.

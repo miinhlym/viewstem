@@ -190,6 +190,12 @@ Assert.condition은 strict boolean이다. true이면 다음 단계로 가고 fal
 
 SetState·RefreshQuery·Assert·If 단계는 결과값이 없는 void 단계다. 단계 id가 있어도 그 결과를 /steps/id에서 읽으면 참조 오류이며, 마지막 단계 값을 Action output으로 암묵 반환하지 않는다. [U13]
 
+### 코드 Action 등록과 갱신
+
+**확정(D154).** TypeScript는 포트 선언에서 핸들러 입력을 추론한다. 포트 맵과 이름이 있는 포트가 선언에 항상 존재하고 `required: true`면 핸들러에서 필수 입력으로 읽는다. 명시 `registerAction<Inputs, Output>`에서 필수인 키마다 올바른 종류의 포트와 `required: true`가 필요하다. `T | undefined`인 필수 키도 이에 해당한다. 포트 이름은 고정된 목록으로 선언하며 동적 키는 Value 포트의 값으로 전달한다. 명시 제네릭과 실제 값 스키마를 맞추는 책임은 호스트에 있다.
+
+Value의 `default`는 키가 생략된 경우에만 적용하므로 TypeScript에서 선택 입력으로 추론한다. View 이벤트도 입력을 한 번 검증한다. 선택 포트에 연결된 표현식이 missing이면 해당 키 없이 호출한다. 필수 포트의 연결값이 missing이거나 어느 포트든 pending이면 `INPUT_NOT_READY`로 실행 전에 실패한다. 평가 오류는 전파한다.
+
 ### 재귀·확장 실행의 경계
 
 **확정(U13, U35):** 선언형 Action의 직접·상호 호출 순환은 조건부 분기 안의 참조까지 등록 검증에서 거절한다. 인라인 Action도 같은 그래프 검사에 포함한다. 코드 Action의 `context.invokeAction`으로 시작한 하위 호출은 부모 호출 스택을 이어받으며, await 뒤 호출이나 선언형/코드형 혼합에서도 동일 정의가 현재 스택에 있으면 ACTION_RECURSION으로 거절한다. 순환이 없는 순차·병렬 하위 호출은 허용한다. 등록된 신뢰 코드 함수 내부의 임의 재귀를 정적으로 분석하거나 강제로 종료한다는 보장은 아니다.

@@ -51,12 +51,14 @@ registry.registerAction({
 }, ({ inputs, signal }) => `Hello, ${inputs.name}`);
 ```
 
-The first overload infers inputs from literal port contracts and output from its schema. For an explicit application type, use `registerAction<Inputs, Output>(definition, implementation)`. A `typeRef` cannot infer a TypeScript value type from a runtime registry; use an explicit type where appropriate. Compile-time inference does not replace runtime validation.
+TypeScript infers inputs from literal port declarations and the output from its schema. Declare `required: true` for inputs the handler expects on every call. Optional ports, including ports with a `default`, can be absent from `inputs`. The default applies only when the caller omits the key. A binding with a missing value leaves an optional input absent.
+
+Use `registerAction<Inputs, Output>(definition, implementation)` for application types such as a referenced `Type` or a Query result. Each required property of `Inputs` must have a port of the right kind with `required: true`. Use named properties for the port list. Put dynamic keys inside a Value port. When specifying value types explicitly, make sure they match the actual schemas. The runtime validates against the registered schemas.
 
 | Public type | Contract |
 |---|---|
 | `CodeActionDefinition<I, O = void>` | Resource envelope with `kind: 'Action'` and `CodeActionSpec<I, O>`. |
-| `CodeActionSpec<I, O>` | Optional ports inferred from `I`; no `steps`. Non-void output requires `schema` or `typeRef` with no `value`; void output omits `output`. |
+| `CodeActionSpec<I, O>` | A port map is required when `I` has required properties. Each of those ports must set `required: true`. Non-void output requires `schema` or `typeRef`. |
 | `ActionHandler<I, O = void>` | Receives `ActionContext<I>`; returns `O` or `Promise<O>`, or `void`/`Promise<void>` for a void contract. |
 | `ActionContext<I>` | Readonly `inputs`, cancellation `signal: AbortSignal`, and `invokeAction(request): Promise<unknown>`. |
 | `ChildActionRequest` | Exactly one of `actionRef` and inline `action`, optional native `inputs`. Does not accept `owner` or `id`; inherits the parent's lifetime and recursion context. |

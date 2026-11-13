@@ -101,6 +101,55 @@ test('Component contract batches roll back completely and retain existing Regist
   assert.equal(created.getSnapshot().roots[0].inputs.value, 6);
 });
 
+test('code Action defaults distinguish omitted inputs from missing View event bindings', async t => {
+  const r = registry();
+  r.registerComponentContract({ ...leaf, id: 'Button', spec: { events: { click: { schema: true } } } });
+  const string = { type: 'string' };
+  const optional = { kind: 'Value', schema: string, default: 'fallback' };
+  let calls = 0;
+  r.registerAction({ kind: 'Action', id: 'optional', spec: { ports: { label: optional }, output: { schema: string } } },
+    ({ inputs }) => { calls++; return Object.hasOwn(inputs, 'label') ? inputs.label : 'missing'; });
+  r.registerAction({ kind: 'Action', id: 'required', spec: { ports: { label: { kind: 'Value', schema: string, required: true } } } },
+    () => { calls++; });
+  const runtime = core.createRuntime({ registry: r });
+  t.after(() => runtime.dispose());
+  const source = (actionRef, inputs) => ({
+    states: {
+      value: { kind: 'State', schema: string },
+      pending: {
+        kind: 'Derived', schema: string,
+        variable: { ports: { value: { kind: 'Value', schema: string, required: true } }, expression: 'value' },
+        inputs: { value: path('/states/value') },
+      },
+    },
+    render: { id: 'button', componentRef: 'Button', on: { click: { actionRef, inputs } } },
+  });
+  const view = await runtime.createView(source('optional', {}));
+  assert.equal(await view.invokeAction({ actionRef: 'optional' }), 'fallback');
+  const click = () => view.emit(view.getSnapshot().roots[0], 'click', {});
+  assert.equal(await click(), 'fallback');
+  await view.updateDefinition(source('optional', { label: path('/states/value') }));
+  assert.equal(await click(), 'missing');
+  view.getState('value').write('ready');
+  assert.equal(await click(), 'ready');
+  view.getState('value').reset();
+  await view.updateDefinition(source('required', { label: path('/states/value') }));
+  await assert.rejects(click(), { code: 'INPUT_NOT_READY', input: 'label', location: '/inputs' });
+  for (const [inputs, code] of [
+    [{ label: path('/states/pending') }, 'INPUT_NOT_READY'],
+    [{ label: path('/event/value/deep') }, 'TYPE_MISMATCH'],
+  ]) {
+    await view.updateDefinition(source('optional', inputs));
+    await assert.rejects(view.emit(view.getSnapshot().roots[0], 'click', { value: 1 }), { code, input: 'label' });
+  }
+  for (const label of [null, 1]) {
+    await assert.rejects(view.invokeAction({ actionRef: 'optional', inputs: { label } }), { code: 'TYPE_MISMATCH', input: 'label' });
+    await view.updateDefinition(source('optional', { label: path('/event/value') }));
+    await assert.rejects(view.emit(view.getSnapshot().roots[0], 'click', { value: label }), { code: 'TYPE_MISMATCH', input: 'label' });
+  }
+  assert.equal(calls, 4);
+});
+
 test('createView, update and replace expose application handles and retain initial State fields', async t => {
   const runtime = core.createRuntime({ registry: registry() }); t.after(() => runtime.dispose());
   const spec = { ...definition, states: { count: { kind: 'State', schema: integer, initial: 2 } } };

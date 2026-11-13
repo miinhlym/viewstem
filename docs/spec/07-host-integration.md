@@ -63,7 +63,7 @@ await serviceApi.saveDefinition(view.exportDefinition());
 | 표면 | 계약 |
 |---|---|
 | createRegistry() | 등록 집합 생성. registerResources(resources)는 묶음 전체 구조·참조·순환 검증 후 원자 등록 |
-| registry.registerAction(definition, implementation) | 코드형 Action의 공개 정의와 실행 함수 등록. 같은 종류 ID 중복 거절 |
+| registry.registerAction(definition, implementation) | 코드형 Action의 공개 정의와 실행 함수 등록. 같은 종류 ID 중복 거절. 타입에서 필수인 입력에는 해당 포트와 required:true를 요구 |
 | registry.registerComponentContract(contract) | 코드 Component 공개 계약 등록. 실제 렌더러 구현은 같은 ID에 별도 연결 |
 | createStateStore() | 서비스가 소유할 core Store 생성. createScope()로 격리된 소유 범위 생성 |
 | createRuntime(options?) | Registry 생략 시 생성, stateStore·requestExecutor·resourceResolver 선택. Store 생략 시 core가 생성·소유하며 주입 Store의 수명은 서비스가 유지. 실제 필요한 의존성이 없을 때만 오류 |

@@ -298,7 +298,7 @@ export class View {
   }
   actionDeclarations(spec) {const declarations=new Map();const walk=node=>{for(const handler of Object.values(node.on??{}))if(handler.id)declarations.set(handler.id,handler);for(const content of Object.values(node.slots??{}))if(Array.isArray(content))content.forEach(walk);};if(spec.render)walk(spec.render);return declarations;}
   actionNames(spec) {const names=new Set();const walk=node=>{for(const h of Object.values(node.on??{}))if(h.id)names.add(h.id);for(const content of Object.values(node.slots??{}))if(Array.isArray(content))content.forEach(walk);};if(spec.render)walk(spec.render);return names;}
-  prepareInputs(spec,templates,context,mode='automatic',literal=false,kind='Component') {
+  bindInputs(spec, templates, context, literal = false) {
     const inputs=Object.create(null);
     if(literal)Object.assign(inputs,templates??{});
     else if(isRecord(templates??{})&&!expressionKind(templates??{},this.runtime.registry.functions)) {
@@ -308,6 +308,10 @@ export class View {
         else inputs[name]=expression(()=>evaluateSnapshot(value,context));
       }
     } else Object.assign(inputs,evaluate(templates,context));
+    return inputs;
+  }
+  prepareInputs(spec, templates, context, mode = 'automatic', literal = false, kind = 'Component') {
+    const inputs = this.bindInputs(spec, templates, context, literal);
     return compilePorts({resourceKind:kind,ports:spec.ports,types:this.runtime.registry.types(),store:this.runtime.stateStore}).prepare(inputs,{mode});
   }
   makeOwner(spec,ports,id,previous,created) {
@@ -812,7 +816,7 @@ export class View {
       if(handler.emit){const receiver=instance.author.instance;if(!receiver)fail('REFERENCE_NOT_FOUND');return this.emit(receiver,handler.emit,evaluate(handler.payload,context));}
       const key=tuple([instance.address,instance.generation,event]),connection=this.connections.get(key)?.connection;if(!connection)fail('CANCELLED');
       const spec=handler.action??this.runtime.registry.get('Action',handler.actionRef).spec;
-      return connection.invoke(() => this.prepareInputs(spec, handler.inputs ?? {}, context, 'explicit', false, 'Action').ports)
+      return connection.invoke(() => this.bindInputs(spec, handler.inputs ?? {}, context))
         .catch(caught => { if (this.alive && caught.code !== 'CANCELLED') this.diagnostic('action', caught, instance.id); throw caught; });
     } catch (caught) {
       const failure = safeError(caught);
