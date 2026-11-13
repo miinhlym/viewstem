@@ -528,15 +528,16 @@ export class View {
     for(const owner of this.owners.values())for(const [name,item] of owner.queries) {
       if(!current())return;
       const use=item.use,spec=use.query??this.runtime.registry.get('Query',use.queryRef).spec,context=this.context(owner);
-      let inputs={},ready=true,executeWhen=true,autoRefreshWhen=true,inputError;
+      let preparedInputs,ready=true,executeWhen=true,autoRefreshWhen=true,inputError;
       try {
-        const prepared=this.prepareInputs(spec,use.inputs??{},context,'automatic',false,'Query');inputs=prepared.ports;ready=!owner.suspended&&prepared.status==='ready'&&!this.urlTransition&&(!this.url||this.url.isReady());
+        preparedInputs=this.prepareInputs(spec,use.inputs??{},context,'automatic',false,'Query');
+        ready=!owner.suspended&&preparedInputs.status==='ready'&&!this.urlTransition&&(!this.url||this.url.isReady());
         for(const key of ['executeWhen','autoRefreshWhen'])if(own(use,key)) {
           const value=evaluate(use[key],context);if(typeof value!=='boolean')fail('TYPE_MISMATCH');if(key==='executeWhen')executeWhen=value;else autoRefreshWhen=value;
         }
       }catch(caught){inputError=safeError(caught);ready=false;}
       if(!current())return;
-      const settings={...owner.queryDefaults,...use,inputs,ready,executeWhen,autoRefreshWhen,inputError,owner:item};
+      const settings={...owner.queryDefaults,...use,inputs:preparedInputs?.ports??{},preparedInputs,ready,executeWhen,autoRefreshWhen,inputError,owner:item};
       if(!item.usage){
         item.usage=this.runtime.query.createUsage(use,{
           ...settings,onChange:(snapshot, failedRun)=>this.queryChanged(item, snapshot, failedRun),clock:this.runtime.clock,

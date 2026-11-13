@@ -43,8 +43,9 @@ export class QueryUsage {
     if (settings.intervalMs !== undefined && (!Number.isSafeInteger(settings.intervalMs) || settings.intervalMs <= 0)) throw failure('INVALID_DEFINITION');
   }
   prepare() {
+    this.preparedInputs = undefined;
     if (!this.settings.ready || this.settings.inputError) { this.inputs = protect(this.settings.inputs); this.ready = false; return; }
-    const prepared = this.engine.prepare(this.use, this.settings.inputs, 'automatic');
+    const prepared = this.preparedInputs = this.settings.preparedInputs ?? this.engine.prepare(this.use, this.settings.inputs, 'automatic');
     this.inputs = prepared.ports;
     this.ready = this.settings.ready && prepared.status === 'ready';
   }
@@ -138,12 +139,12 @@ export class QueryUsage {
   drain(stale = this.state.stale) {
     if (!this.alive || !this.isOpen() || this.active || !this.pending || !this.settings.executeWhen || !this.ready) return;
     const pending = this.pending; this.pending = null;
-    const run = { controller: new AbortController(), generation: this.generation, inputs: this.inputs,
+    const run = { controller: new AbortController(), generation: this.generation, inputs: this.inputs, preparedInputs: this.preparedInputs,
       tickets: pending.tickets, fresh: pending.fresh === true || pending.periodic === true, done: false };
     this.active = run; this.clearTimer();
     this.publish({ status: 'running', error: null, waitingReason: null, stale });
     const signal = this.ownerSignal ? AbortSignal.any([run.controller.signal, this.ownerSignal]) : run.controller.signal;
-    this.engine.execute(this.use, { inputs: run.inputs, owner: this.owner,
+    this.engine.execute(this.use, { inputs: run.inputs, preparedInputs: run.preparedInputs, owner: this.owner,
       fresh: run.fresh, signal,
       onCleanupError: this.onCleanupError,
       isOpen: () => this.alive && this.isOpen(),

@@ -59,6 +59,25 @@ test('N03 initial waits for every executable first Query while ready UI appears 
   assert.deepEqual(await bounded(initial), { generation: 1, queryErrors: [] }); assert.equal(view.getSnapshot().roots[0].children[1].inputs.value, 'second-ready');
 });
 
+test('a missing bound Query input stays absent through automatic execution and refresh', async t => {
+  const q = queryResource();
+  q.spec.ports = { filter: { kind: 'Value', schema: { type: 'string' }, default: 'all' } };
+  const f = controlled(t, [q]);
+  const { view, initialComplete } = await f.runtime.createView({ view: {
+    states: { filter: { kind: 'State', schema: { type: 'string' } } },
+    queries: { bound: { queryRef: 'q', inputs: { filter: p('/states/filter') } }, omitted: { queryRef: 'q' } },
+    render: display(),
+  } });
+  await flush();
+  await Promise.all([f.reply(1, []), f.reply(2, [])]);
+  await initialComplete;
+  assert.deepEqual(f.requests.map(({ plan }) => ({ ...plan.inputs })), [{}, { filter: 'all' }]);
+  const refresh = view.getQuery('bound').refresh();
+  await f.reply(3, []);
+  await refresh;
+  assert.deepEqual({ ...f.requests[2].plan.inputs }, {});
+});
+
 test('N04/K23 first Query errors report through initial; blocked and missing-input Queries do not prevent completion', async t => {
   const f = controlled(t);
   const spec = baseView({ states: { a: valueState(1), b: valueState(1), missing: { kind: 'State', schema: number } },

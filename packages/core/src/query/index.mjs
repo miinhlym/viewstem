@@ -107,7 +107,7 @@ export function createQueryEngine({ registry, requestExecutor, requestTimeoutMs 
       );
     } catch (error) { finish(undefined, safeError(error, 'HTTP_ERROR')); }
   });
-  async function execute(use, { inputs = {}, signal: parentSignal, owner, fresh = true, isCurrent = () => true, isOpen = () => true, onCleanupError } = {}) {
+  async function execute(use, { inputs = {}, preparedInputs, signal: parentSignal, owner, fresh = true, isCurrent = () => true, isOpen = () => true, onCleanupError } = {}) {
     const root = resolve(use), controller = new AbortController();
     const abort = () => controller.abort();
     if (parentSignal?.aborted) abort(); else parentSignal?.addEventListener('abort', abort, { once: true });
@@ -124,7 +124,8 @@ export function createQueryEngine({ registry, requestExecutor, requestTimeoutMs 
         if (port.required && (!own(originalValues, name) || originalValues[name] === undefined))
           throw publicError('INPUT_NOT_READY', { location: `${location}/ports/${escape(name)}`, ...(resource ? { resource } : {}) });
       }
-      const prepared = compilePorts({ resourceKind: 'Query', ports: spec.ports ?? {}, types: registry.types?.() ?? {} }).prepare(originalValues, { mode: 'explicit' });
+      const prepared = (lineage.length ? undefined : preparedInputs)
+        ?? compilePorts({ resourceKind: 'Query', ports: spec.ports ?? {}, types: registry.types?.() ?? {} }).prepare(originalValues, { mode: 'explicit' });
       const values = prepared.ports;
       if (prepared.status !== 'ready') fail('INPUT_NOT_READY');
       const key = JSON.stringify(path), cached = committed.get(key);
