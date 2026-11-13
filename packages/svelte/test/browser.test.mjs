@@ -41,6 +41,37 @@ test('public renderer mounts, updates, borrows and detaches with the new API', t
   assert.match(result, /Saved/);
 }));
 
+test('detaching a borrowed View rejects retained Svelte emitters before teardown', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture;
+    const renderer = F.publicRenderer({
+      components: [{ contract: F.resource('Component', 'Probe', {
+        ports: { value: F.port() }, events: { change: { schema: true } },
+      }), component: F.Probe }],
+    });
+    let calls = 0;
+    renderer.runtime.registry.registerAction(F.resource('Action', 'record', {}), () => { calls++; });
+    const view = await renderer.runtime.createView({
+      render: F.probe('probe', 'ready', { on: { change: { actionRef: 'record' } } }),
+    });
+    const address = view.getSnapshot().roots[0].address;
+    const left = renderer.attach(view, F.target('left'));
+    await left.whenRendered();
+    const emitLeft = F.observations.emitters.get(address);
+    const right = renderer.attach(view, F.target('right'));
+    await right.whenRendered();
+    const emitRight = F.observations.emitters.get(address);
+    const detached = left.detach();
+    const result = await F.errorOf(() => emitLeft('change', null));
+    await detached;
+    const afterDetach = calls;
+    await emitRight('change', null);
+    await renderer.dispose();
+    return { error: result?.code, afterDetach, calls };
+  });
+  assert.deepEqual(result, { error: 'CANCELLED', afterDetach: 0, calls: 1 });
+}));
+
 test('default renderers own independent runtimes and expose their empty registries', t => browserTest(t, async page => {
   const result = await page.evaluate(async () => {
     const F = Fixture, first = F.createRenderer(), second = F.createRenderer({});

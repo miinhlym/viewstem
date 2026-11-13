@@ -50,18 +50,27 @@ export class ActionEngine {
     if (spec !== undefined) definition = this.definition(undefined,spec);
     let alive = true, snapshot = idle(), active = null;
     const connection = Object.freeze({ getSnapshot: () => snapshot,
-      invoke: supplied => {
-        if (!alive || !state.alive || !state.isOpen() || !isOpen()) return Promise.reject(failure('CANCELLED'));
+      invoke: (supplied, canStart = () => true) => {
+        if (!alive || !state.alive || !state.isOpen() || !isOpen() || !canStart()) return Promise.reject(failure('CANCELLED'));
         if (active) return Promise.resolve(undefined); // Ignore, without queue or join.
         const controller = new AbortController(); state.calls.add(controller);
         const call = { controller }; active = call;
+        const previous = snapshot;
+        let cancelledBeforeStart = false;
         snapshot = inert; this.#onChange();
-        const promise = this.#invoke(definition, supplied ?? inputs, owner, controller, [], isOpen);
+        const promise = this.#invoke(definition, supplied ?? inputs, owner, controller, [], isOpen, () => {
+          if (canStart()) return true;
+          cancelledBeforeStart = true;
+          return false;
+        });
         return promise.then(value => {
           if (alive && state.isOpen() && isOpen() && active === call) { snapshot = ready(value === undefined ? null : value); this.#onChange(); }
           return value;
         }, error => {
-          if (alive && state.isOpen() && isOpen() && active === call) { snapshot = Object.freeze({ status: 'error', running: false, data: null, error: publicError(error) }); this.#onChange(); }
+          if (alive && state.isOpen() && isOpen() && active === call) {
+            snapshot = cancelledBeforeStart ? previous : Object.freeze({ status: 'error', running: false, data: null, error: publicError(error) });
+            this.#onChange();
+          }
           throw publicError(error);
         }).finally(() => { state.calls.delete(controller); if (active === call) active = null; });
       },
@@ -77,14 +86,16 @@ export class ActionEngine {
     const controller = new AbortController(); state.calls.add(controller);
     return this.#invoke(definition, inputs, owner, controller, []).catch(error => { throw publicError(error); }).finally(() => state.calls.delete(controller));
   }
-  async #invoke(definition, supplied, owner, controller, stack, connectionOpen = () => true) {
+  async #invoke(definition, supplied, owner, controller, stack, connectionOpen = () => true, canStart = () => true) {
     const state = this.#owners.get(owner);
     const signal = state?.signal ? AbortSignal.any([controller.signal, state.signal]) : controller.signal;
     const isOpen = () => !signal.aborted && state?.alive && state.isOpen() && connectionOpen();
     const check = () => { if (!isOpen()) die('CANCELLED'); };
-    check(); if (stack.includes(definition)) die('ACTION_RECURSION');
-    if (this.#authorize({ owner, definition }) !== true) die('EXECUTION_BLOCKED');
-    check();
+    const checkStart = () => { check(); if (!canStart()) die('CANCELLED'); };
+    checkStart(); if (stack.includes(definition)) die('ACTION_RECURSION');
+    const authorized = this.#authorize({ owner, definition });
+    checkStart();
+    if (authorized !== true) die('EXECUTION_BLOCKED');
     let acceptingChildren = true;
     const childController = new AbortController();
     const abortChildren = () => childController.abort();
@@ -203,7 +214,7 @@ export class ActionEngine {
         return completed;
       };
       let output;
-      check();
+      checkStart();
       if (definition.native) output = await awaitCurrent(definition.native(Object.freeze({ inputs: bounded, signal, invokeAction })));
       else {
         const steps = await execute(definition.steps);

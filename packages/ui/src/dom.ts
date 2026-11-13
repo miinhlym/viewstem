@@ -123,7 +123,8 @@ function place(parent: HTMLElement, element: HTMLElement, before: Element | null
   }
 }
 
-export function connect(view: View, target: HTMLElement, onRenderError: (error: unknown) => void) {
+export function connect(view: View, target: HTMLElement, onRenderError: (error: unknown) => void,
+  connection: { isOpen: () => boolean; emit: View['emit'] } = { isOpen: () => true, emit: view.emit }) {
   const doc = target.ownerDocument;
   const scope = doc.createElement('div');
   scope.setAttribute('data-viewstem-ui', '');
@@ -227,7 +228,8 @@ export function connect(view: View, target: HTMLElement, onRenderError: (error: 
       const source = entry.node;
       // Controllers finish their native event stack before an Action can replace the DOM.
       queueMicrotask(() => {
-        if (alive && !signal.aborted && currentNodes.has(entry.node) && source.generation === entry.node.generation) void view.emit(entry.node, event, payload).catch(() => {});
+        if (alive && connection.isOpen() && !signal.aborted && currentNodes.has(entry.node)
+          && source.generation === entry.node.generation) void connection.emit(entry.node, event, payload).catch(() => {});
       });
     };
     bindComponent(control, () => entry.node.inputs, send);
@@ -496,6 +498,7 @@ export function connect(view: View, target: HTMLElement, onRenderError: (error: 
     target.append(scope);
     let initialFailure: { error: unknown } | undefined;
     unsubscribe = view.subscribe(snapshot => {
+      if (!connection.isOpen()) return;
       const nextNodes = new Set<NodeSnapshot>();
       currentNodes = nextNodes;
       try {

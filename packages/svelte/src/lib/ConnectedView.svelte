@@ -4,30 +4,38 @@
   import { createRenderWaiter, notifyDiagnostic, type RendererDiagnostic } from '@viewstem/core/renderer';
   import type { View, ViewApplication } from '@viewstem/core';
   import type { Renderer } from './types.js';
-  import { Connection, rendererState } from './connection.js';
+  import { cancelled, Connection, rendererState } from './connection.js';
   import NodeList from './NodeList.svelte';
-  let { renderer, view, onError, fallback, forwardRenderError, isOpen = () => true }: ViewstemViewProps & {
+  let { renderer, view, onError, fallback, forwardRenderError, emitFromHost, isOpen = () => true }: ViewstemViewProps & {
     forwardRenderError?: ((error: unknown, nodeId?: string) => void) | undefined;
+    emitFromHost?: View['emit'] | undefined;
     isOpen?: () => boolean;
   } = $props();
   // The parent keys this component by renderer and View; this connection owns only a subscription.
   const { connection, waiter } = untrack(() => {
     const state = rendererState(renderer);
-    const open = () => isOpen() && connection.isOpen();
+    const open = () => connection.isOpen();
     const deliver = (diagnostic: RendererDiagnostic) => untrack(() => {
       notifyDiagnostic(diagnostic,
         { listener: state.onError, isOpen: () => open() && state.alive },
         { listener: onError, isOpen: open },
       );
     });
-    const connection = new Connection(renderer, view, forwardRenderError
-      ? diagnostic => forwardRenderError?.(diagnostic.error, diagnostic.nodeId)
-      : deliver);
+    let dispatch: View['emit'] | undefined = emitFromHost;
+    const connection = new Connection(renderer, view, {
+      isOpen: () => isOpen(),
+      emit: (target, event, payload) => dispatch
+        ? dispatch(target, event, payload) : Promise.reject(cancelled()),
+      onError: forwardRenderError
+        ? diagnostic => forwardRenderError?.(diagnostic.error, diagnostic.nodeId)
+        : deliver,
+    });
     try {
       const waiter = createRenderWaiter(view, () => connection.whenRendered(), {
         ...(forwardRenderError ? {} : { deliverDiagnostic: deliver }),
         isOpen: open, onClose: () => connection.dispose(),
       });
+      dispatch ??= waiter.emit;
       return { connection, waiter };
     } catch (cause) {
       connection.dispose();

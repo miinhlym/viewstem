@@ -73,6 +73,7 @@ export function createRenderWaiter(view, render, {
     if (!open() || engine.generation !== generation) fail('CANCELLED');
   }
   return {
+    emit: (target, event, payload) => engine.emit(target, event, payload, open),
     async whenRendered() {
       const { generation, requested } = engine.projection();
       await wait(generation, requested);
@@ -136,7 +137,7 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
           isOpen, onClose: () => { void stop().catch(() => {}); },
         });
         check();
-        adapter = connect(view, target, options, renderError);
+        adapter = connect(view, target, options, renderError, { isOpen, emit: waiter.emit });
         check();
       } finally {
         connecting = false;

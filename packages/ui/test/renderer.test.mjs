@@ -19,6 +19,27 @@ test('DOM renderer owns mounted views and borrows attachments', async t => {
         states: { label: { kind: 'State', schema: { type: 'string' }, initial: 'Draft' } },
         render: { id: 'label', componentRef: 'shadcn.Badge', inputs: { text: { '@path': '/states/label' } } },
       };
+      window.clickAndDetach = async (left, right) => {
+        const renderer = createRenderer();
+        let calls = 0;
+        renderer.runtime.registry.registerAction({ kind: 'Action', id: 'record', spec: {} }, () => { calls++; });
+        const view = await renderer.runtime.createView({
+          render: { id: 'button', componentRef: 'shadcn.Button', inputs: { text: 'Record' },
+            on: { click: { actionRef: 'record' } } },
+        });
+        const first = renderer.attach(view, left);
+        const second = renderer.attach(view, right);
+        left.querySelector('button').click();
+        await first.detach();
+        const afterDetach = calls;
+        await new Promise(resolve => setTimeout(resolve, 0));
+        right.querySelector('button').click();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        const result = { afterDetach, calls, empty: !left.hasChildNodes() };
+        await second.detach();
+        await renderer.dispose();
+        return result;
+      };
       window.mountDuringPublication = async target => {
         const store = createStateStore();
         let requests = 0, disposal, liveStates;
@@ -80,7 +101,8 @@ test('DOM renderer owns mounted views and borrows attachments', async t => {
     await remount.ready;
     await renderer.dispose();
     const publication = await mountDuringPublication(left);
-    return { conflict, duplicate, disconnected, before, after, invalidInput, diagnostics, publication,
+    const detachedClick = await clickAndDetach(left, right);
+    return { conflict, duplicate, disconnected, before, after, invalidInput, diagnostics, publication, detachedClick,
       sharedDiagnostic: central.length === 1 && central[0] === diagnostics[0], empty: left.textContent,
     };
   });
@@ -97,6 +119,7 @@ test('DOM renderer owns mounted views and borrows attachments', async t => {
   assert.deepEqual(result.diagnostics, [{ phase: 'prepare', error: result.invalidInput }]);
   assert.equal(result.sharedDiagnostic, true);
   assert.deepEqual(result.publication, { code: 'CANCELLED', requests: 0, liveStates: 0, empty: '' });
+  assert.deepEqual(result.detachedClick, { afterDetach: 0, calls: 1, empty: true });
   assert.equal(result.empty, '');
 });
 

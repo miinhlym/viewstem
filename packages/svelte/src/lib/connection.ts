@@ -40,7 +40,9 @@ export class Connection {
   private readonly errors = new Map<ReturnType<typeof nodeKey>, PublicError>();
   private boundaryError: PublicError | undefined;
   private readonly state;
-  constructor(readonly renderer: Renderer, readonly view: View, private readonly onError: RendererErrorListener) {
+  constructor(readonly renderer: Renderer, readonly view: View, private readonly host: {
+    isOpen: () => boolean; emit: View['emit']; onError: RendererErrorListener;
+  }) {
     this.state = rendererState(renderer);
     this.adapters = new Map(this.state.adapters);
     this.codeIds = new Set(renderer.runtime.registry.list('Component').filter(item => renderer.runtime.registry.isCode('Component', item.id)).map(item => item.id));
@@ -48,7 +50,7 @@ export class Connection {
     let lifetime = initial.lifetime;
     this.value = writable<ViewSnapshot | null>(initial);
     this.unsubscribe = view.subscribe(snapshot => {
-      if (!this.alive) return;
+      if (!this.isOpen()) return;
       this.boundaryError = undefined;
       // replace injects the current registry into a new View lifetime; update retains it.
       if (snapshot.lifetime !== lifetime) {
@@ -61,7 +63,7 @@ export class Connection {
     this.state.connections.add(this);
   }
   subscribe(listener: Subscriber<ViewSnapshot | null>): Unsubscriber { return this.value.subscribe(listener); }
-  isOpen(): boolean { return this.alive; }
+  isOpen(): boolean { return this.alive && this.host.isOpen(); }
   adapter(node: NodeSnapshot): ComponentAdapter | undefined {
     if (!node.componentRef || !this.codeIds.has(node.componentRef)) return undefined;
     const adapter = this.adapters.get(node.componentRef);
@@ -72,13 +74,13 @@ export class Connection {
     // Component code is host-owned. Do not expose arbitrary exceptions or input data.
     const error = createRenderError(caught === missingAdapter, { componentId: node.componentRef, instanceId: node.instanceId });
     this.errors.set(nodeKey(node), error);
-    if (this.alive) this.onError(createDiagnostic('render', error, { nodeId: node.instanceId }));
+    if (this.isOpen()) this.host.onError(createDiagnostic('render', error, { nodeId: node.instanceId }));
     return error;
   }
   failBoundary(): void {
-    if (!this.alive) return;
+    if (!this.isOpen()) return;
     this.boundaryError = createRenderError(false);
-    this.onError(createDiagnostic('render', this.boundaryError));
+    this.host.onError(createDiagnostic('render', this.boundaryError));
   }
   clearRenderFailure(node: NodeSnapshot): void { this.errors.delete(nodeKey(node)); }
   emit(node: NodeSnapshot, event: string, payload: unknown): Promise<unknown> {
@@ -86,7 +88,7 @@ export class Connection {
     // readiness, including writes made before this attachment receives its next projection.
     let current: NodeSnapshot | undefined;
     let disposed = false;
-    if (this.alive && node.address !== undefined) {
+    if (this.isOpen() && node.address !== undefined) {
       let roots: readonly NodeSnapshot[] = [];
       try { roots = this.view.getSnapshot().roots; }
       catch { disposed = true; } // A borrowed View may be disposed before its DOM is detached.
@@ -97,16 +99,16 @@ export class Connection {
         nodes.push(...candidate.children);
       }
     }
-    const result = !this.alive || disposed || !current ? Promise.reject(cancelled()) : current.status !== 'ready'
+    const result = !this.isOpen() || disposed || !current ? Promise.reject(cancelled()) : current.status !== 'ready'
       ? Promise.reject(failure('INPUT_NOT_READY', 'The Component inputs are not ready.'))
-      : this.view.emit(node, event, payload);
+      : this.host.emit(node, event, payload);
     // Observe ignored DOM-handler promises without turning rejection into success.
     result.catch(() => {});
     return result;
   }
   async whenRendered(): Promise<void> {
     await tick();
-    if (!this.alive) throw cancelled();
+    if (!this.isOpen()) throw cancelled();
     const error = this.boundaryError ?? this.errors.values().next().value;
     if (error) throw error;
   }

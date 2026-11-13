@@ -28,6 +28,69 @@ const stateCount = store => {
   return count;
 };
 
+test('a borrowed connection closed during authorization or running notification cannot start an Action', async t => {
+  for (const phase of ['authorize', 'running']) await t.test(phase, async t => {
+    let calls = 0, closing, close;
+    const runtime = createRuntime({
+      componentContracts: [{ ...componentContracts[0], spec: { events: { click: { schema: true } } } }],
+      authorize({ operation }) {
+        if (operation === 'invoke' && phase === 'authorize') close?.();
+        return true;
+      },
+    });
+    const dispatchers = new Map();
+    const host = createHost(runtime, { connect(_view, target, _options, _report, connection) {
+      dispatchers.set(target, connection.emit);
+      return { whenRendered() {}, dispose() {} };
+    } });
+    t.after(async () => { await host.dispose(); runtime.dispose(); });
+    runtime.registry.registerAction({ kind: 'Action', id: 'record', spec: {} }, () => { calls++; });
+    const view = await runtime.createView({ render: { ...render, on: { click: { id: 'recorded', actionRef: 'record' } } } });
+    const left = {}, right = {};
+    const attachment = host.attach(view, left);
+    host.attach(view, right);
+    close = () => { closing = attachment.detach(); };
+    const off = view.subscribe(snapshot => {
+      if (phase === 'running' && snapshot.actions.recorded.status === 'running') close?.();
+    });
+    const node = view.getSnapshot().roots[0];
+    await assert.rejects(dispatchers.get(left)(node, 'click', null), cancelled);
+    await closing;
+    close = undefined;
+    off();
+    assert.equal(calls, 0);
+    assert.equal(view.getSnapshot().actions.recorded.status, 'idle');
+    await dispatchers.get(right)(node, 'click', null);
+    assert.equal(calls, 1);
+  });
+});
+
+test('detaching a borrowed connection leaves its already-started Action owned by the View', async t => {
+  const runtime = createRuntime({
+    componentContracts: [{ ...componentContracts[0], spec: { events: { click: { schema: true } } } }],
+  });
+  let emit, signal;
+  const result = Promise.withResolvers();
+  const host = createHost(runtime, { connect(_view, _target, _options, _report, connection) {
+    emit = connection.emit;
+    return { whenRendered() {}, dispose() {} };
+  } });
+  t.after(async () => { await host.dispose(); runtime.dispose(); });
+  runtime.registry.registerAction({ kind: 'Action', id: 'record', spec: { output: { schema: true } } }, context => {
+    signal = context.signal;
+    return result.promise;
+  });
+  const view = await runtime.createView({ render: { ...render, on: { click: { actionRef: 'record' } } } });
+  const attachment = host.attach(view, {});
+  const node = view.getSnapshot().roots[0];
+  const running = emit(node, 'click', null);
+  await attachment.detach();
+  assert.equal(signal.aborted, false);
+  await assert.rejects(emit(node, 'click', null), cancelled);
+  result.resolve('complete');
+  assert.equal(await running, 'complete');
+});
+
 test('closing during Store publication preserves the Registry and skips the initial Query', { timeout: 2000 }, async t => {
   for (const mode of ['mount', 'source', 'public preparation']) await t.test(mode, async t => {
     const store = createStateStore();

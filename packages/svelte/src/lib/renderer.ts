@@ -28,9 +28,10 @@ export function createRenderer({ runtime: injectedRuntime, onError, components =
       const constructor = target?.ownerDocument?.defaultView?.HTMLElement;
       return !!constructor && target instanceof constructor && target.isConnected;
     },
-    connect(view, target, options, onRenderError) {
+    connect(view, target, options, onRenderError, connection) {
       const instance = mount(ConnectedView, { target, context: options.context, transformError, props: {
         view, renderer, forwardRenderError: onRenderError, fallback: options.fallback,
+        isOpen: connection.isOpen, emitFromHost: connection.emit,
       } });
       return { whenRendered: () => instance.whenRendered(), dispose: () => unmount(instance) };
     },

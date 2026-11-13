@@ -805,18 +805,18 @@ export class View {
     return Object.freeze({generation:this.generation,lifetime:this.root?.id,roots:Object.freeze((this.roots??[]).map(serialize)),states:Object.freeze(states),queries:Object.freeze(queries),actions:Object.freeze(actions),errors:Object.freeze([...this.diagnostics])});
   }
   subscribe(listener){this.listeners.add(listener);listener(this.getSnapshot());return()=>this.listeners.delete(listener);}
-  emit(target,event,payload) {
+  emit(target,event,payload,canStart=()=>true) {
     try {
-      if(!this.alive)fail('CANCELLED');
+      if(!this.alive || !canStart())fail('CANCELLED');
       const instance=typeof target==='string'?this.instances.get(target)??[...this.instances.values()].find(item=>item.owner?.id===target):this.instances.get(target.address);
       if(!instance || (typeof target!=='string' && target.generation!==instance.generation))fail('CANCELLED');
       const contract=instance.spec.events?.[event];if(!contract)fail('REFERENCE_NOT_FOUND');let data;try{data=protect(this.runtime.registry.validator(contract).accept(payload));}catch(caught){throw safeError(caught,'TYPE_MISMATCH');}
       const handler=instance.source.on?.[event];if(!handler)return Promise.resolve();
       const context=this.context(instance.author,{...instance.extra,event:data});
-      if(handler.emit){const receiver=instance.author.instance;if(!receiver)fail('REFERENCE_NOT_FOUND');return this.emit(receiver,handler.emit,evaluate(handler.payload,context));}
+      if(handler.emit){const receiver=instance.author.instance;if(!receiver)fail('REFERENCE_NOT_FOUND');return this.emit(receiver,handler.emit,evaluate(handler.payload,context),canStart);}
       const key=tuple([instance.address,instance.generation,event]),connection=this.connections.get(key)?.connection;if(!connection)fail('CANCELLED');
       const spec=handler.action??this.runtime.registry.get('Action',handler.actionRef).spec;
-      return connection.invoke(() => this.bindInputs(spec, handler.inputs ?? {}, context))
+      return connection.invoke(() => this.bindInputs(spec, handler.inputs ?? {}, context), canStart)
         .catch(caught => { if (this.alive && caught.code !== 'CANCELLED') this.diagnostic('action', caught, instance.id); throw caught; });
     } catch (caught) {
       const failure = safeError(caught);

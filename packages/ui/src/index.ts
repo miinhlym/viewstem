@@ -31,6 +31,6 @@ export function createRenderer(options: RendererOptions = {}): Renderer {
       const HTMLElementClass = element?.ownerDocument?.defaultView?.HTMLElement;
       return !!HTMLElementClass && element instanceof HTMLElementClass && element.isConnected;
     },
-    connect: (view, target, _options, onRenderError) => connect(view, target as HTMLElement, onRenderError),
+    connect: (view, target, _options, onRenderError, connection) => connect(view, target, onRenderError, connection),
   });
 }

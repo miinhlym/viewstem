@@ -50,7 +50,8 @@ export interface RendererHostOptions<Options extends object> {
   /** Clean up framework-owned views after the host has stopped accepting new work. */
   readonly disposeOwned?: () => Promise<void>;
   readonly connect: (view: View, target: HTMLElement, options: OptionsWithDiagnostics<Options>,
-    onRenderError: (error: unknown, nodeId?: string) => void) => {
+    onRenderError: (error: unknown, nodeId?: string) => void,
+    connection: { readonly isOpen: () => boolean; readonly emit: View['emit'] }) => {
       dispose(): void | Promise<void>;
       whenRendered(): void | Promise<void>;
     };
@@ -71,4 +72,4 @@ export function createRenderWaiter(view: View, render: () => void | Promise<void
   deliverDiagnostic?: (diagnostic: RendererDiagnostic) => void;
   onClose?: () => void;
   isOpen?: () => boolean;
-}): Pick<RenderAttachment, 'whenRendered' | 'whenSettled'> & { dispose(): void };
+}): Pick<RenderAttachment, 'whenRendered' | 'whenSettled'> & { emit: View['emit']; dispose(): void };
