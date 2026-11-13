@@ -340,6 +340,31 @@ test('a throwing fallback reports a separate render failure and rejects the firs
   assert.deepEqual(errors, []);
 }));
 
+test('a directly hosted View contains a throwing fallback and reports both render failures', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture, phases = [];
+    const renderer = F.publicRenderer({
+      components: [{ contract: F.resource('Component', 'Crash', { ports: { value: F.port() } }), component: F.Crash }],
+      onError: diagnostic => phases.push(diagnostic.phase),
+    });
+    const view = await renderer.runtime.createView({
+      render: { id: 'crash', componentRef: 'Crash', inputs: { value: 'crash' } },
+    });
+    const host = F.mount(F.ViewstemView, { target: F.target(), props: {
+      renderer, view, fallback() { throw Error('private fallback details'); },
+    } });
+    try {
+      await F.tick();
+      const failure = await F.errorOf(() => host.whenRendered());
+      return { phases, code: failure?.code };
+    } finally {
+      await F.unmount(host);
+      await renderer.dispose();
+    }
+  });
+  assert.deepEqual(result, { phases: ['render', 'render'], code: 'INTERNAL_ERROR' });
+}));
+
 test('required Value input waiting and type errors recover without replacing sibling DOM', t => browserTest(t, async page => {
   await page.evaluate(async () => {
     const F = Fixture; window.e = F.environment();

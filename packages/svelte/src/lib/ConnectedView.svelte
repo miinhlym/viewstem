@@ -67,11 +67,7 @@
   export function whenSettled(application: ViewApplication) { return waiter.whenSettled(application); }
 </script>
 
-{#if forwardRenderError}
-  <svelte:boundary onerror={handleBoundaryFailure}>
-    <NodeList nodes={$connection?.roots ?? []} {connection} {fallback} />
-    {#snippet failed()}{/snippet}
-  </svelte:boundary>
-{:else}
+<svelte:boundary onerror={handleBoundaryFailure}>
   <NodeList nodes={$connection?.roots ?? []} {connection} {fallback} />
-{/if}
+  {#snippet failed()}{/snippet}
+</svelte:boundary>
