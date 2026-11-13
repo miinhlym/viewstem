@@ -150,6 +150,28 @@ test('code Action defaults distinguish omitted inputs from missing View event bi
   assert.equal(calls, 4);
 });
 
+test('running observers cannot change the event Action input already captured', async t => {
+  const r = registry();
+  r.registerComponentContract({ ...leaf, id: 'Button', spec: { events: { click: { schema: true } } } });
+  r.registerAction({ kind: 'Action', id: 'read', spec: {
+    ports: { n: { kind: 'Value', required: true, schema: integer } }, output: { schema: integer },
+  } }, ({ inputs }) => inputs.n);
+  const runtime = core.createRuntime({ registry: r });
+  t.after(() => runtime.dispose());
+  const view = await runtime.createView({
+    states: { n: { kind: 'State', schema: integer, initial: 1 } },
+    render: { id: 'button', componentRef: 'Button',
+      on: { click: { id: 'reading', actionRef: 'read', inputs: { n: path('/states/n') } } } },
+  });
+  const cell = view.getState('n');
+  const off = view.subscribe(snapshot => {
+    if (snapshot.actions.reading.status === 'running') cell.write(2);
+  });
+  t.after(off);
+  assert.equal(await view.emit(view.getSnapshot().roots[0], 'click', null), 1);
+  assert.equal(cell.read(), 2);
+});
+
 test('rejected Action contract updates leave calls intact and new IDs can be applied explicitly', async t => {
   const r = registry();
   r.registerComponentContract({ ...leaf, id: 'Button', spec: { events: { click: { schema: true } } } });

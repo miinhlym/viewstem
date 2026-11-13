@@ -57,11 +57,13 @@ export class ActionEngine {
         const call = { controller }; active = call;
         const previous = snapshot;
         let cancelledBeforeStart = false;
-        snapshot = inert; this.#onChange();
         const promise = this.#invoke(definition, supplied ?? inputs, owner, controller, [], isOpen, () => {
           if (canStart()) return true;
           cancelledBeforeStart = true;
           return false;
+        }, () => {
+          snapshot = inert;
+          this.#onChange();
         });
         return promise.then(value => {
           if (alive && state.isOpen() && isOpen() && active === call) { snapshot = ready(value === undefined ? null : value); this.#onChange(); }
@@ -86,7 +88,7 @@ export class ActionEngine {
     const controller = new AbortController(); state.calls.add(controller);
     return this.#invoke(definition, inputs, owner, controller, []).catch(error => { throw publicError(error); }).finally(() => state.calls.delete(controller));
   }
-  async #invoke(definition, supplied, owner, controller, stack, connectionOpen = () => true, canStart = () => true) {
+  async #invoke(definition, supplied, owner, controller, stack, connectionOpen = () => true, canStart = () => true, onStart) {
     const state = this.#owners.get(owner);
     const signal = state?.signal ? AbortSignal.any([controller.signal, state.signal]) : controller.signal;
     const isOpen = () => !signal.aborted && state?.alive && state.isOpen() && connectionOpen();
@@ -214,6 +216,8 @@ export class ActionEngine {
         return completed;
       };
       let output;
+      checkStart();
+      onStart?.();
       checkStart();
       if (definition.native) output = await awaitCurrent(definition.native(Object.freeze({ inputs: bounded, signal, invokeAction })));
       else {
