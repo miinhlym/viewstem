@@ -69,6 +69,6 @@ For a complete runnable example, see [Connect HTTP and code Actions](../guides/h
 
 ### Updating a code Action
 
-You can update the display name while keeping the Action ID. Changes to the ports, their order or defaults, or the resolved input or output schemas fail with `TYPE_CONTRACT_MISMATCH`. This also applies when updating a `Type` used by a code Action. Check `error.resource` for the affected Action and `error.location` for the path to the changed field.
+You can update the display name while keeping the Action ID. `updateResource()` validates the candidate and its dependents first. If validation passes, changes to the ports, their order or defaults, or the resolved input or output schemas fail with `TYPE_CONTRACT_MISMATCH`. This also applies when updating a `Type` used by a code Action. For that error, check `error.resource` for the affected Action and `error.location` for the path to the changed field.
 
 To change the contract, register a new Action ID with its handler. If a shared Type needs a different schema, register it under a new Type ID first. Update the call inputs and `actionRef`, then create a new View or apply the configuration with `view.replace()`. If a code Action calls the old ID directly, register the updated caller under a new ID and update its references too.

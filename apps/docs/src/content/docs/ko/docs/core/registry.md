@@ -70,6 +70,6 @@ State·Query 포트는 발급된 핸들을 받습니다. 일반 값 입력은 �
 
 ### 코드 Action 갱신하기
 
-표시 이름은 Action ID를 유지한 채 바꿀 수 있습니다. 포트, 포트 순서와 기본값, 해석된 입출력 스키마를 바꾸면 `TYPE_CONTRACT_MISMATCH`가 발생합니다. 코드 Action에서 쓰는 `Type`을 갱신할 때도 같은 규칙을 적용합니다. `error.resource`로 영향받는 Action을, `error.location`으로 변경 위치를 확인하세요.
+표시 이름은 Action ID를 유지한 채 바꿀 수 있습니다. `updateResource()`는 먼저 갱신 후보와 그 후보에 의존하는 리소스를 검증합니다. 검증을 통과한 뒤에도 포트, 포트 순서와 기본값, 해석된 입출력 스키마가 달라지면 `TYPE_CONTRACT_MISMATCH`로 거절합니다. 코드 Action에서 쓰는 `Type`을 갱신할 때도 같은 규칙을 적용합니다. 이 오류의 `error.resource`로 영향받는 Action을, `error.location`으로 변경 위치를 확인하세요.
 
 계약을 바꾸려면 새 Action ID에 핸들러를 함께 등록하세요. 공유 Type의 스키마를 바꿔야 하면 새 Type ID를 먼저 등록합니다. 호출 입력과 `actionRef`를 바꾼 다음 새 View를 만들거나 `view.replace()`로 적용하세요. 이전 ID를 직접 호출하는 코드 Action도 바뀐 구현을 새 ID로 등록하고 그 참조를 옮겨야 합니다.
