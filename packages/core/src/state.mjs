@@ -1,7 +1,7 @@
 import { compileSchema, equal } from './schema.mjs';
 import { protect, trustedCopies } from './immutable.mjs';
 import { safeError, error as coreError } from './errors.mjs';
-import { connectStateUrl } from './url.mjs';
+import { prepareUrlConnection } from './url.mjs';
 
 const fail = code => { throw coreError(({READ_ONLY:'TYPE_MISMATCH',DUPLICATE_STATE:'INVALID_DEFINITION',DUPLICATE_TARGET:'INVALID_DEFINITION',DUPLICATE_REACTION:'INVALID_DEFINITION',DEPENDENCY_CYCLE:'INVALID_DEFINITION'})[code] ?? code); };
 export const keyOf = address => JSON.stringify([address.scopeId, address.name]);
@@ -30,6 +30,7 @@ export class StateStore {
   #scopes = new Set();
   #scopeLifetimes = new WeakMap();
   #url = null;
+  #urlChanges = new WeakSet();
   #runningPureCallback = false;
 
   get isRunningPureCallback() { return this.#runningPureCallback; }
@@ -100,7 +101,11 @@ export class StateStore {
     for (const change of pending) {
       const key = keyOf(change.target), first = changes.get(key);
       if (first?.kind === 'added' && change.kind === 'removed') changes.delete(key);
-      else changes.set(key, first?.kind === 'added' ? {...change,kind:'added'} : first?.kind === 'removed' && change.kind === 'added' ? {...change,kind:'replaced'} : change);
+      else {
+        const merged = first?.kind === 'added' ? {...change,kind:'added'} : first?.kind === 'removed' && change.kind === 'added' ? {...change,kind:'replaced'} : change;
+        if (merged !== change && this.#urlChanges.has(change)) this.#urlChanges.add(merged);
+        changes.set(key, merged);
+      }
     }
     for(const [key,change] of changes) {
       const before=cells.get(key),after=this.#cells.get(key);
@@ -158,23 +163,18 @@ export class StateStore {
     this.#perform(() => { if (isCurrent()) this.#commit(prepared,new Set(prepared.keys()),'url'); });
   }
   get urlConnection() { return this.#url; }
-  reserveUrl(reservation) { this.#url = reservation; }
-  releaseUrl(reservation) { if (this.#url === reservation) this.#url = null; }
-  connectUrl(options, reservation) {
+  reserveUrl(connection, previous) {
+    if (this.#url !== previous) fail('INVALID_DEFINITION');
+    this.#url = connection;
+  }
+  releaseUrl(connection) { if (this.#url === connection) this.#url = null; }
+  connectUrl(options) {
     this.assertCanWrite();
-    if (this.#url && this.#url !== reservation) fail('INVALID_DEFINITION');
-    let connection;
-    const placeholder = reservation ?? { dispose: () => this.releaseUrl(placeholder) };
-    this.#url = placeholder;
-    try {
-      connection = connectStateUrl(this, options, () => this.releaseUrl(connection ?? placeholder), reservation);
-      if (this.#url !== placeholder) connection.dispose();
-      else this.#url = connection;
-      return connection;
-    } catch (error) {
-      this.releaseUrl(placeholder);
-      throw error;
-    }
+    if (this.#url) fail('INVALID_DEFINITION');
+    const connection = prepareUrlConnection(this, options);
+    connection.commit();
+    if (!connection.start()) fail('CANCELLED');
+    return connection;
   }
   dispose() { this.assertCanWrite(); this.#url?.dispose(); for(const scope of this.#scopes)scope.dispose();this.#subscribers.clear();this.#settledListeners.clear();this.#baselineListeners.clear(); }
 
@@ -400,7 +400,12 @@ export class StateStore {
         && reaction.watch.some(item => changedValue(before.get(item) ?? missing, staged.get(item) ?? missing))) staged.set(cell, reaction.value);
     }
     const changes = [];
-    for (const [cell, snapshot] of staged) if (!same(cell.state, snapshot)) { cell.state = snapshot; changes.push(this.#change(cell, 'updated')); }
+    for (const [cell, snapshot] of staged) if (!same(cell.state, snapshot)) {
+      cell.state = snapshot;
+      const change = this.#change(cell, 'updated');
+      if (origin === 'explicit' || origin === 'stage') this.#urlChanges.add(change);
+      changes.push(change);
+    }
     this.#notify(changes);
   }
   #change(cell, kind) { return Object.freeze({ kind, target: cell.address, generation: cell.generation }); }
@@ -435,7 +440,9 @@ export class StateStore {
   #notify(changes) {
     if (!changes.length) return;
     if (this.#transaction) { this.#transaction.push(...changes); return; }
-    const notifications = [...this.#subscribers].map(subscriber => [subscriber, this.#payload(subscriber.selector, changes)]).filter(([, payload]) => payload.changes.length);
+    let urlChanges;
+    const notifications = [...this.#subscribers].map(subscriber => [subscriber, this.#payload(subscriber.selector,
+      subscriber.url ? (urlChanges ??= changes.filter(change => this.#urlChanges.has(change))) : changes)]).filter(([, payload]) => payload.changes.length);
     this.#notifying = true;
     try {
       for (const [subscriber, payload] of notifications) if (this.#subscribers.has(subscriber)) {
@@ -449,6 +456,11 @@ export class StateStore {
     } finally { this.#publishing = wasPublishing; }
   }
   observe(listener) { this.#settledListeners.add(listener);return ()=>this.#settledListeners.delete(listener); }
+  observeUrlChanges(addresses, listener) {
+    const subscriber = { selector: new Set(addresses.map(keyOf)), listener, url: true };
+    this.#subscribers.add(subscriber);
+    return () => this.#subscribers.delete(subscriber);
+  }
   subscribe(selector, listener) {
     const selected = selector == null ? null : new Set((Array.isArray(selector) ? selector : [selector]).map(keyOf));
     const subscriber = { selector: selected, listener }; this.#subscribers.add(subscriber);

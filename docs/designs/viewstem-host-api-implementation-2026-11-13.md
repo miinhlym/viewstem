@@ -55,12 +55,14 @@ DOM 자체 Runtime은 `registerShadcn`과 같은 카탈로그 계약을 사용�
 | 같은 View의 정의·입력 갱신 | URL 연결과 복원 기준을 유지. 기존 연결이 가리키는 셀을 제거·교체하는 정의는 구조 검사에서 거절 |
 | 이전 View의 URL이 있는 교체 | 구 연결의 일반 쓰기와 구독을 중지하되 옛 key 점유는 정리용 토큰으로 보관 → 정확히 옛 소유 key만 `replace`로 제거 → 구 점유 해제 → 새 연결을 새 baseline에서 시작. 교체 시 이전 URL을 복원하지 않음. 새 View의 연결 대기 중 명시한 State 쓰기는 새 연결이 시작된 뒤 반영 |
 | 옛 URL 제거 실패 | adapter의 throw·reject·`{ applied: false }`와 제한 시간 만료를 실패로 처리. 실패한 키를 자동으로 다시 쓰지 않음. `URL/replace-cleanup` 진단을 내고 새 화면과 baseline을 유지하며 새 연결·Query를 진행 |
-| 새 adapter의 subscribe 또는 초기 read가 예외 | 등록한 구독·점유를 해제하고 `URL/connect` 진단. 최초 baseline이 나중에 준비되어 처음 읽을 때 발생한 예외에도 같은 정책을 적용한다. URL 연결 없이 현재 State로 Query를 진행. 호스트가 adapter를 복구한 뒤 명시 `replace`로 새 연결을 시작 |
+| 새 adapter의 subscribe 또는 최초 복원용 read가 예외 | 등록한 구독·점유를 해제하고 `URL/connect` 진단. 최초 baseline이 나중에 준비되어 처음 복원할 때 발생한 읽기 예외에도 같은 정책을 적용한다. URL 연결 없이 현재 State로 Query를 진행한다. 쓰기 한도 확인용 read 실패는 `URL/write`로 보고하며 연결을 유지한다. |
 | View/renderer 종료 | 소유 URL 작업 토큰을 즉시 무효화하고 점유를 해제. URL을 지우는 새 작업을 만들지 않음. 서비스가 소유한 Store·URL 연결은 유지 |
 
 교체의 URL 후처리 중에는 **새 Query 요청과 후속 적용**을 시작하지 않는다. Store 알림과 준비된 영역의 첫 DOM은 진행할 수 있다. 이 구간에 들어온 후속 적용은 최신 하나를 남기고 URL 제거가 끝난 뒤 실행한다. 같은 Store의 다른 View는 계속 동작한다. 새 바인딩의 명시 쓰기는 커밋에 설치한 내부 Store 관찰에서 최신 값과 push 여부를 모아 새 연결에 넘긴다. 초기값과 복원은 수집에서 제외한다. 교체가 끝나기 전에 화면이 닫히면 이 버퍼도 폐기한다. 정상 종료된 제거는 어댑터 결과를 확인하고, 종료·만료된 제거는 늦게 도착한 결과나 오류를 소비한다. URL 제거의 기본 제한 시간은 30초다. Runtime의 `urlCleanupTimeoutMs`로 양의 안전 정수를 지정해 바꿀 수 있으며 HTTP 요청 제한 시간과 독립이다. 제한 시간과 타이머는 Runtime의 기존 `TimerClock`을 사용한다. 만료 시 정리 실패를 진단하고 토큰을 무효화한 뒤 진행한다. 적용을 닫으면 이 타이머도 제거하며 adapter의 완료를 기다리지 않는다. 어댑터는 실제 브라우저 URL 변경 직전에 `isCurrent()`를 확인해야 한다. 이미 반영된 URL 효과는 해당 적용의 효과다. 서비스의 별도 URL 연결과 View 연결을 한 Store에 동시에 예약하는 시도는 커밋 전에 거절한다.
 
 신규 View 최초 입력 대기의 경우 기존 E61 규칙을 유지한다. URL 이전 화면 정리 자체가 진행 중인 경우 초기 Query 분류는 유한한 정리 완료·실패까지 기다린다. 이후 입력 대기는 오류 없이 초기 보고 대상에서 빠지며 입력이 준비되면 Query를 시작한다. [URL 보존 계약](../spec/09-preserved-contracts.md#url-동기화의-확정-의미)
+
+URL 연결 객체는 최종 소유권 검사 후 커밋에서 Store 구독을 설치하고, 새 어댑터의 구독 등록을 마칠 때까지 실제로 확정된 변경을 모은다. 이 구간은 이전 URL 연결이 없는 교체에도 적용한다. 활성화 뒤에도 같은 구독을 사용한다. Store의 공개 구독 데이터와 URL 어댑터 시그니처를 유지한다. 연결을 닫으면 Store 슬롯과 키를 먼저 풀고 어댑터 구독을 해제한다. [D158 URL 계약](../spec/09-preserved-contracts.md#쓰기실패정리)
 
 ## 3. DOM 대상 소유와 완료
 
@@ -233,6 +235,7 @@ await renderer.dispose();
 | R4 교체 경쟁 | A의 resolver 정지 → B의 갱신 성공 또는 거절 → A 이행. A 취소, B 성공 시 B 유지, B 거절 시 기존 화면 유지. 첫 Query의 대기는 다른 적용을 막지 않음 | `packages/core/test/runtime-management.test.mjs`, `packages/core/test/runtime-query.test.mjs` |
 | U1 URL 후처리 | A 교체의 URL 쓰기 정지 → 잘못된 B 대기 → A 쓰기 해제. A의 새 State·정의 유지, A 소유 key만 정리, B만 거절. 구독자 쓰기는 새 연결로 전달. 어댑터 거절·타임아웃·구독/read 예외에서 새 State·Query와 URL 진단 확인 | `packages/core/test/url-runtime.test.mjs` |
 | U2 URL 수명 | URL 쓰기 대기 중 dispose → adapter의 실제 변경 직전 검사 false. 서비스 연결을 주입한 경우 두 View가 제거돼도 공용 URL·State 생존. 최초 복원은 첫 요청 입력에 포함 | `packages/core/test/url-runtime.test.mjs`, `packages/core/test/browser.mjs` |
+| U3 URL 연결 활성화 | 이전 연결 유무 각각에서 커밋 알림 9 → 새 구독 10 → URL에 10만 한 번 기록하고 첫 Query도 10 사용. 같은 값은 기록에서 제외하고 reaction 변경을 같은 history 묶음에 포함. 새 구독 중 종료하면 후속 효과 없이 같은 키를 즉시 재획득하고 해제 함수를 한 번 호출 | `packages/core/test/url-runtime.test.mjs`, `packages/core/test/preflight-cleanup.test.mjs` |
 | D1 양쪽 대상 점유 | 같은 대상에서 DOM→Svelte, Svelte→DOM, mount→attach 및 역순. 후발 호출에서 resolver 0회. 다른 document에서 연결된 HTMLElement도 허용하며 detached·SVG·위조 객체는 거절. 실패·정리 후 재연결. 동일 View를 두 별도 대상에 붙여 한쪽만 닫아도 다른 쪽 유지 | `packages/ui/test/consumers.test.mjs`, `packages/svelte/test/browser.test.mjs` |
 | D2 지연 마운트 | 화면 준비 중 unmount → 같은 대상 재마운트 → 첫 resolver 이행. 새 DOM만 표시. 늦은 거절과 초기화 중 재진입 dispose에서도 브라우저의 unhandled rejection 0건. ready 거절 직후 재마운트 및 연결된 View의 소유자 dispose 후 타깃 회수 | `packages/ui/test/consumers.test.mjs`, `packages/svelte/test/browser.test.mjs` |
 | D3 표시 완료와 진단 | State 쓰기 직후 `whenRendered`는 새 문자열 확인. 대기 중 교체되면 옛 적용의 대기는 취소. 503의 Query 보고와 정적 영역 표시, 재시도 후 최신 데이터. Svelte의 구현 미등록·어댑터 오류·fallback 오류와 DOM의 잘못된 입력을 구분 | `packages/ui/test/consumers.test.mjs`, `packages/svelte/test/browser.test.mjs` |

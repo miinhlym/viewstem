@@ -1,5 +1,5 @@
 import { Registry } from './registry.mjs';
-import { reserveStateUrl } from './url.mjs';
+import { prepareUrlConnection } from './url.mjs';
 import { StateStore, createStateStore } from './state.mjs';
 import { compilePorts, expression, createQueryHandle, sameContract, stateRoot } from './ports.mjs';
 import { compileSchema, equal } from './schema.mjs';
@@ -613,7 +613,7 @@ export class View {
     const oldUrl = this.url;
     const replacing = this.root !== undefined;
     const store = execution.stateStore;
-    let application, reservation;
+    let application, urlConnection;
     job.phase = 'commit';
     const committing = this.committing = deferred();
     const committedSnapshot = this.root ? this.getSnapshot() : undefined;
@@ -641,12 +641,24 @@ export class View {
             urlOptions = { ...target.url, bindings: target.url.bindings.map(({ state, ...binding }) =>
               ({ ...binding, target: root.states.get(state) ?? fail('REFERENCE_NOT_FOUND') })) };
           }
-          reservation = reserveStateUrl(store, urlOptions, oldUrl, () => this.alive);
+          if (urlOptions) {
+            urlOptions.restore = !replacing;
+            urlOptions.onError = diagnostic => {
+              if (diagnostic.kind === 'connect' && this.url === urlConnection) {
+                this.url = null;
+                this.urlBindings = undefined;
+                this.schedule();
+              }
+              this.reportUrl(diagnostic);
+            };
+          }
+          urlConnection = prepareUrlConnection(store, urlOptions, { previous: oldUrl ?? null, isOpen: () => this.alive, viewOwned: true });
         } else if (oldUrl && this.urlBindings?.some(binding => root.states.get(binding.state) !== binding.target)) {
           fail('INVALID_DEFINITION');
         }
         job.beforeCommit?.();
         check();
+        urlConnection?.commit();
         if (resolved?.additions.length) this.host.registry.commitCandidate(resolved.candidate);
         this.stagingSnapshot = undefined;
         this.spec = spec;
@@ -655,13 +667,10 @@ export class View {
         this.urlDiagnostics = [];
         this.requested++;
         application = this.newApplication();
-        if (reservation) {
-          reservation.commit();
+        if (urlConnection) {
           this.url = null;
-          this.urlTransition = reservation;
+          this.urlTransition = urlConnection;
           this.urlBindings = target.url?.bindings.map(({ state }) => ({ state, target: root.states.get(state) }));
-          oldUrl?.pause();
-
         }
       });
     } catch (caught) {
@@ -674,9 +683,9 @@ export class View {
       this.planning = false;
     }
     try {
-      if (oldUrl && reservation) oldUrl.suspend();
+      if (urlConnection) oldUrl?.dispose();
       if (this.alive) {
-        if (reservation) void this.finishUrl(reservation, oldUrl, !replacing);
+        if (urlConnection) void this.finishUrl(urlConnection, oldUrl);
         this.refreshAfterCommit();
       }
     } finally {
@@ -692,46 +701,25 @@ export class View {
     finally { this.planning = false; }
     this.schedule();
   }
-  async finishUrl(reservation, previous, restore) {
-    const store = this.runtime.stateStore;
-    const writes = new Map();
-    let stop = () => {};
+  async finishUrl(connection, previous) {
     try {
-      const next = reservation.next;
-      if (!restore && next) {
-        // The first subscription callback also sees writes queued during commit publication.
-        stop = store.subscribe(next.prepared.map(binding => binding.target.address), () => {
-          for (const binding of next.prepared) {
-            if (!store.hasWritten(binding.target)) continue;
-            const snapshot = binding.target.getSnapshot();
-            const value = snapshot.status === 'ready' ? snapshot.value : undefined;
-            const data = value instanceof Set ? [...value] : value;
-            writes.set(binding.key, { value: data === undefined ? null : JSON.stringify(data),
-              count: Array.isArray(data) ? data.length : 0, history: binding.history });
-          }
-        });
-      }
       if (previous) {
-        const outcome = await previous.cleanupOwned(reservation, this.host.urlCleanupTimeoutMs, this.host.clock);
+        const outcome = await connection.cleanupPrevious(this.host.urlCleanupTimeoutMs, this.host.clock);
         if (outcome && this.alive) this.reportUrl(outcome, 'replace-cleanup');
       }
-      if (!this.alive || this.urlTransition !== reservation) return;
-      if (reservation.options) {
-        const connection = store.connectUrl({ ...reservation.options, restore, pendingWrites: writes, onError: diagnostic => {
-          this.reportUrl(diagnostic);
-          if (diagnostic.kind === 'connect') { this.url = null; this.urlBindings = undefined; this.schedule(); }
-        } }, reservation);
-        if (this.alive && this.urlTransition === reservation) this.url = connection;
-        else connection.dispose();
+      if (!this.alive || this.urlTransition !== connection) return;
+      if (!connection.start()) {
+        if (this.alive) void this.dispose();
+        return;
       }
+      if (this.urlBindings) this.url = connection;
     } catch (caught) {
+      connection.dispose();
       if (this.alive) this.reportUrl(caught, 'connect');
       this.url = null;
       this.urlBindings = undefined;
     } finally {
-      stop();
-      reservation.dispose();
-      if (this.urlTransition === reservation) this.urlTransition = null;
+      if (this.urlTransition === connection) this.urlTransition = null;
       if (this.alive) {
         this.schedule();
         this.runNext();

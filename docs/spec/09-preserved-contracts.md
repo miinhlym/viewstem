@@ -120,6 +120,7 @@ URL은 전체 화면 상태의 snapshot이 아니라 초기 상태에 덮어쓸 
 
 D150의 호스트 API는 Store와 View를 먼저 커밋한다. 이전 소유 키 정리와 새 URL 연결은 그 적용의 후처리로 실행된다. 새 Query는 URL 후처리와 입력 준비 순서를 지킨다. 후속 적용은 이전 키 정리가 끝난 뒤 평가한다. 적용 순서와 검증 기준은 [구현 계획](../designs/viewstem-host-api-implementation-2026-11-13.md#c-url-후처리와-첫-query)에서 확인한다.
 
+- **D158:** 새 URL 연결은 커밋부터 키 예약, Store 관찰, 대기 변경과 취소를 소유한다. 이전 연결 유무와 관계없이 View 교체 중 커밋 알림이나 새 어댑터의 구독 등록에서 발생한 실제 State 변경을 모은다. 활성화 때 키별 최신 값을 한 번에 기록한다. reaction으로 바뀐 값도 포함하며 초기화·URL 복원·값이 같은 쓰기는 기록을 만들지 않는다. 시작 중 폐기하면 소유 키와 쓰기 자격을 즉시 해제하고, 어댑터가 뒤늦게 반환한 구독 해제 함수는 한 번 호출한다.
 - 쓰기는 **최신 URL에 정확한 소유 key 변경분만** 적용한다. 오래된 전체 URL snapshot으로 다른 연결의 변경을 덮지 않는다.
 - **값이 기본값 또는 baseline과 같다는 이유로 URL 값을 자동 생략하지 않는다.** 예를 들어 URL의 날짜를 현재 baseline 날짜로 변경해 기록할 때, 기본값과 같다는 이유만으로 그 날짜 key를 삭제하지 않는다. 이는 모든 초기 기본값을 최초 연결 때 반드시 URL에 기록하라는 요구가 아니다. key가 없는 링크의 baseline 복원과 URL 복원 자체의 재push 금지도 그대로 유지한다. [E46]
 - 기본 기록 방식은 replace이며 상태별 push를 허용한다. 한 변경 묶음은 URL 한 번으로 반영하고, 실제 변경한 항목 중 push가 있으면 push한다. 같은 URL을 추가 기록하거나 URL 복원을 다시 push하지 않는다.
@@ -137,6 +138,8 @@ D150의 호스트 API는 Store와 View를 먼저 커밋한다. 이전 소유 키
 **확정(U13):** `store.connectUrl({adapter, bindings, limits})`로 연결한다. bindings는 `{target:StateHandle, key?, history?}` 배열이며 기본 key는 p. + 로컬 이름, history 기본값은 replace다. 서로 다른 scope라도 최종 key 중복은 오류다. 반환 핸들의 dispose는 연결만 해제하고 URL을 지우지 않는다.
 
 adapter는 read()로 현재 URL, subscribe(listener)로 URL 변화 구독/해제, writeOwned(patch, {mode, isCurrent})로 정확한 소유 key 변경분의 쓰기를 제공한다. patch 값은 인코딩 전 JSON 문자열이며 null은 key 삭제다. 문자열 "null"과 삭제를 혼동하지 않는다. 어댑터가 최신 URL의 소유 key만 변경하고 percent encoding은 한 번만 적용한다.
+
+구독 등록이 실패하면 어댑터가 자신이 등록한 리스너를 정리한다. 최초 baseline 복원에 필요한 읽기의 실패는 연결 실패로 처리한다. URL 쓰기 한도를 확인하기 위한 읽기의 실패는 쓰기 실패로 보고하며 연결은 유지한다.
 
 writeOwned는 실제 URL 반영 직전에 isCurrent()를 검사하고 검사와 최종 변경 사이에 비동기 대기를 끼우지 않는다. 새 쓰기·URL 복원·교체·폐기는 이전 쓰기의 유효성을 폐기한다. 단순 Promise 완료 무시만 제공하는 어댑터는 부적합하다.
 

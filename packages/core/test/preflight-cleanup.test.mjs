@@ -132,3 +132,20 @@ test('URL startup failures release claims and installed subscriptions', () => {
   connection.dispose();
   assert.equal(stops, 2);
 });
+
+test('disposing the Store from URL subscription stops startup before reading', () => {
+  const store = createStateStore();
+  const target = store.createScope().registerState('value', { schema, initial: 1 });
+  const events = [];
+  const adapter = {
+    subscribe() {
+      events.push('subscribe');
+      store.dispose();
+      return () => events.push('unsubscribe');
+    },
+    read() { events.push('read'); return 'https://example.test/'; },
+    writeOwned() { events.push('write'); },
+  };
+  assert.throws(() => store.connectUrl({ adapter, bindings: [{ target }] }), { code: 'CANCELLED' });
+  assert.deepEqual(events, ['subscribe', 'unsubscribe']);
+});
