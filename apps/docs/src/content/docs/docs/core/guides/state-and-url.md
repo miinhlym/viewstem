@@ -50,7 +50,7 @@ In a browser adapter, implement `read` with `location.href`, subscribe to `popst
 
 ## Pass State to a View
 
-Declare a `kind: 'State'` port and pass the issued handle in `createView({ inputs: { filter } })`. The View uses the handle; the host remains responsible for the injected store. Stop the URL connection and dispose the store when that host lifetime ends. For View-owned State, use the convenience `url` option on [ViewTarget](../../runtime/#viewtarget) instead of attaching a second connection to the same store.
+Declare a `kind: 'State'` port and pass the issued handle in `createView(source, { inputs: { filter } })`. The View uses the handle; the host remains responsible for the injected store. Stop the URL connection and dispose the store when that host lifetime ends. For View-owned State, use the convenience `url` option on [ViewOptions](../../runtime/#viewsource-and-viewoptions) instead of attaching a second connection to the same store.
 
 ## Troubleshooting
 

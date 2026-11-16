@@ -47,4 +47,4 @@ Call the snippet with the contract's slot name, for example `{@render renderSlot
 | `readonly contract` | `ComponentContract` | A core resource with `kind: 'Component'`, an `id`, and a public `spec` declaring ports, slots, and events. |
 | `readonly component` | `ComponentAdapter` | The Svelte implementation associated with the same ID. |
 
-Pass entries to [`renderer.registerComponents`](../renderer/#registercomponents) to add contracts and adapters together. For a pre-registered contract, bind an adapter by ID with [`renderer.registerComponent`](../renderer/#registercomponent). Declarative Components use the subviews expanded by core. See [core's types](/docs/core/types/) for `ComponentContract`, `NodeSnapshot`, and the State and Query handles.
+Pass entries in `createRenderer({ components })` or use `renderer.bindComponent(id, component)` for a registered contract.

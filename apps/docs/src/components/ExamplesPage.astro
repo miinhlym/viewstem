@@ -92,11 +92,11 @@ const navigation = { label: text.stages, title: text.title, home: `${home}exampl
                   <summary>{text.setup}</summary>
                   <p>
                     {locale === 'ko'
-                      ? ' 시작 가이드의 renderer에 필요한 shadcn 컴포넌트를 등록하고 view.json을 mount의 view로 전달하세요.'
-                      : ' Register the shadcn components you need with the Quickstart renderer and pass view.json as the mount view.'}
+                      ? ' 시작 가이드의 renderer에 view.json을 mount의 source로 전달하세요. 기본 shadcn 컴포넌트는 포함되어 있습니다.'
+                      : ' Pass view.json as the mount source in the Quick Start. The renderer includes the default shadcn catalog.'}
                     {definition.resources && (locale === 'ko'
-                      ? ' 마운트 전에 renderer.registry.registerResources에 resources.json을 전달하세요.'
-                      : ' Pass resources.json to renderer.registry.registerResources before mounting.')}
+                      ? ' 마운트 전에 renderer.runtime.registry.registerResources에 resources.json을 전달하세요.'
+                      : ' Pass resources.json to renderer.runtime.registry.registerResources before mounting.')}
                     {definition.inputs && (locale === 'ko'
                       ? ' inputs.json은 mount의 inputs로 전달하세요.'
                       : ' Pass inputs.json as the mount inputs.')}

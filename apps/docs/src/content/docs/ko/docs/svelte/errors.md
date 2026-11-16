@@ -17,9 +17,10 @@ sidebar:
 
 | 필드 | 타입 | 의미 |
 | --- | --- | --- |
-| `readonly phase` | `'render' \| 'event'` | 렌더링 실패와 어댑터 `emit` 거절을 구분합니다. |
-| `readonly error` | `PublicError` | 공개 오류 DTO입니다. 렌더링 진단에는 Component 참조와 인스턴스 ID가 포함될 수 있습니다. |
-| `readonly node?` | `NodeSnapshot` | 실패와 관련된 노드가 있을 때 전달합니다. |
+| `readonly phase` | `'prepare' \| 'node' \| 'query' \| 'action' \| 'url' \| 'render'` | 오류가 발생한 단계입니다. |
+| `readonly error` | `PublicError` | 공개 오류입니다. 렌더링 오류에 Component 참조와 인스턴스 ID가 포함될 수 있습니다. |
+| `readonly nodeId?` | `string` | 관련 노드를 식별할 수 있을 때 제공됩니다. |
+| `readonly application?` | `ViewApplication` | 관련 적용 핸들이 있을 때 제공됩니다. |
 
 오류 구조는 [PublicError](/ko/docs/core/runtime/#authorization), 노드 관찰값은 [NodeSnapshot](/ko/docs/core/view/#viewsnapshot)을 참고하세요.
 
@@ -27,7 +28,9 @@ sidebar:
 
 **타입** · `(diagnostic: RendererDiagnostic) => void`
 
-렌더러를 만들 때, `mount`나 `attach`를 설정할 때, 또는 `ViewstemView`를 표시할 때 `onError` 콜백을 지정할 수 있습니다. 렌더러와 연결 수준의 콜백이 같은 오류를 관찰할 수 있습니다. 관찰자가 동기적으로 예외를 던져도 렌더링과 이벤트 전달에는 영향이 없습니다.
+`mount`, `attach`, `ViewstemView`는 렌더러의 `onError`를 먼저 호출하고 화면의 `onError`를 호출합니다. 여러 연결이 같은 View를 표시하더라도 같은 함수는 한 발생을 한 번 받습니다. 새 연결은 현재 활성 노드·Query 오류와 현재 적용의 URL 진단을 기존 관찰자와 같은 발생으로 받습니다. 같은 코드로 실패한 재시도도 새 실행의 진단으로 전달됩니다.
+
+관찰자가 연결을 닫으면 그 연결의 남은 콜백은 호출되지 않습니다. 렌더러를 폐기하면 렌더러 관찰은 끝납니다. 직접 호스팅한 대여 View는 View와 Svelte 연결이 살아 있는 동안 화면 콜백에 계속 전달할 수 있습니다. 콜백의 예외와 Promise 거절은 격리합니다. 정상 취소는 진단을 만들지 않습니다.
 
 ## RenderFallback
 
@@ -41,11 +44,13 @@ sidebar:
 
 | 실패 | 확인할 위치 |
 | --- | --- |
-| 잘못된 옵션, 등록, 타깃, View 정의 | 설정 호출에서 예외가 발생하거나 마운트 또는 적용 Promise가 거절됩니다. |
-| 실행 가능한 최초 Query 실패 | 최초 완료 보고서의 `queryErrors`에 기록됩니다. |
-| 코드형 Component에 등록된 Svelte 구현이 없음 | 렌더링 경계가 `REFERENCE_NOT_FOUND`를 보고합니다. |
-| 노드 렌더링 도중 어댑터가 예외를 던짐 | 해당 경계가 정제된 `INTERNAL_ERROR`를 보고하며 폴백을 표시할 수 있습니다. 형제 노드는 렌더링을 유지합니다. Core가 새 렌더링 스냅샷을 내보내면 실패한 경계를 다시 렌더링할 수 있습니다. |
-| 어댑터 `emit` 실패 | 원래 이벤트 Promise가 거절됩니다. 연결이 유효하면 `event` 진단도 보고합니다. |
-| 정리 또는 이후 세대 적용으로 렌더러 대기가 취소됨 | 해당 대기가 `CANCELLED`로 거절됩니다. |
+| 잘못된 옵션·등록·대상 | 해당 설정 호출이 동기 예외를 던집니다. |
+| 마운트 중 정의 준비 또는 첫 렌더 실패 | `screen.ready`가 거절되고 대상 예약이 풀립니다. 문제를 고친 뒤 다시 마운트할 수 있습니다. |
+| `ViewstemView`의 `source` 준비 실패 | `prepareError`에 공개 오류를 전달하고 `onError`에 `prepare` 진단을 한 번 보냅니다. `whenRendered()`도 그 오류로 거절됩니다. |
+| 실행 가능한 최초 Query 실패 | 완료 보고의 `queryErrors`에 기록됩니다. |
+| Svelte 구현 누락 또는 어댑터 렌더 실패 | 경계에서 각각 `REFERENCE_NOT_FOUND` 또는 `INTERNAL_ERROR`를 보고합니다. 살아 있는 연결은 폴백을 표시하고 새 투영에서 다시 시도할 수 있습니다. |
+| 어댑터 `emit()` 실패 | 호출 Promise가 거절됩니다. Core가 처리한 이벤트의 Action 오류는 `action` 진단에도 전달됩니다. 어댑터의 입력 미준비(`INPUT_NOT_READY`)와 오래된 연결(`CANCELLED`)은 `emit()`의 거절로 처리합니다. |
+| 직접 호출한 `view.invokeAction()` 또는 View 변경 실패 | 해당 호출의 Promise가 거절됩니다. |
+| 정리 또는 새 적용으로 완료 대기 취소 | 대기 Promise가 `CANCELLED`로 거절됩니다. |
 
-현재 렌더링에 실패가 남아 있으면 폴백이 보이더라도 `whenRendered()`와 렌더러의 `initialComplete`가 거절될 수 있습니다. 실패 전에 완료된 Core 변경은 적용된 상태로 유지됩니다.
+활성 렌더 오류가 있으면 폴백이 표시되어도 `whenRendered()`와 렌더러의 `whenSettled(application)`가 거절될 수 있습니다. 이미 완료된 Core 변경은 적용된 상태로 유지됩니다.

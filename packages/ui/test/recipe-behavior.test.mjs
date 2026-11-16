@@ -10,7 +10,8 @@ import { sampleBySlug } from './fixtures/samples.mjs';
 const workspace = fileURLToPath(new URL('../../../', import.meta.url));
 const bundle = await build({ stdin: { contents: `
   import { createRegistry, createRuntime } from '@viewstem/core';
-  import { attach, registerShadcn } from '@viewstem/ui';
+  import { registerShadcn } from '@viewstem/ui';
+  import { connect } from './packages/ui/dist/dom.js';
   window.mountRecipe = async definition => {
     window.errors = [];
     window.calendarEvents = [];
@@ -30,11 +31,11 @@ const bundle = await build({ stdin: { contents: `
     });
     const registry = createRegistry(); registerShadcn(registry);
     const runtime = createRuntime({ registry });
-    const mounted = await runtime.createView({ view: definition });
-    const attachment = attach(observe(mounted.view), document.querySelector('#app'), { onError: e => errors.push(String(e.code ?? e)) });
-    await mounted.initialComplete;
-    window.view = mounted.view;
-    window.disposeRecipe = () => { attachment.dispose(); runtime.dispose(); };
+    const view = await runtime.createView(definition);
+    const attachment = connect(observe(view), document.querySelector('#app'), e => errors.push(String(e.code ?? e)));
+    await view.whenSettled(view.initial);
+    window.view = view;
+    window.disposeRecipe = () => { attachment.dispose(); view.dispose(); runtime.dispose(); };
   };
 `, resolveDir: workspace }, bundle: true, write: false, platform: 'browser', format: 'iife' });
 

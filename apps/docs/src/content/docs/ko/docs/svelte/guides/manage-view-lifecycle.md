@@ -20,8 +20,7 @@ import { label } from './label.js';
 const target = document.getElementById('app');
 if (!target) throw new Error('#app 요소가 필요합니다.');
 
-const renderer = createRenderer();
-renderer.registerComponents([label]);
+const renderer = createRenderer({ components: [label] });
 
 const spec: ViewSpec = {
   states: {
@@ -33,16 +32,16 @@ const spec: ViewSpec = {
     inputs: { text: { '@path': '/states/message' } },
   },
 };
-const mounted = await renderer.mount({ target, view: spec });
-await mounted.initialComplete;
+const mounted = renderer.mount({ target, source: spec });
+const view = await mounted.ready;
 console.log(target.textContent?.trim()); // 새 초안
 
-mounted.view.getState('message').write('저장한 초안');
+view.getState('message').write('저장한 초안');
 await mounted.whenRendered();
 console.log(target.textContent?.trim()); // 저장한 초안
 ```
 
-마운트한 핸들의 `initialComplete`는 실행 가능한 최초 Query와 Svelte의 DOM 반영을 기다립니다. State에 쓴 뒤에는 `whenRendered()`로 DOM 반영을 기다립니다. Query 실행과 브라우저 페인트는 이 DOM 대기와 별개입니다.
+`ready`는 첫 DOM 반영 뒤 View를 반환합니다. 실행 가능한 최초 Query의 보고와 DOM 반영도 필요하면 `whenSettled(view.initial)`을 호출하세요. State에 쓴 뒤에는 `whenRendered()`로 DOM 반영을 기다립니다. Query 실행과 브라우저 페인트는 이 DOM 대기와 별개입니다.
 
 ## 2. 현재 View를 갱신하고 수명 교체하기
 
@@ -54,23 +53,23 @@ const editedSpec: ViewSpec = {
   },
 };
 
-const updated = await mounted.update(editedSpec);
-await updated.initialComplete;
+const updated = await view.updateDefinition(editedSpec);
+await mounted.whenSettled(updated);
 console.log(target.textContent?.trim()); // 저장한 초안
 
-const replaced = await mounted.replace({ view: editedSpec });
-await replaced.initialComplete;
+const replaced = await view.replace(editedSpec);
+await mounted.whenSettled(replaced);
 console.log(target.textContent?.trim()); // 다시 시작한 초안
 ```
 
-이 예제에서 `update`는 호환되는 기존 State를 유지합니다. `replace`는 새 수명을 시작하고 새 정의로 `message`를 초기화합니다. 교체 후에는 `mounted.view`에서 State나 Query 핸들을 다시 얻으세요.
+이 예제에서 `updateDefinition`은 호환되는 기존 State를 유지합니다. `replace`는 새 수명을 시작하고 새 정의로 `message`를 초기화합니다. 교체 후에는 `view`에서 State나 Query 핸들을 다시 얻으세요.
 
-Core 검증에 실패한 갱신이나 교체는 적용 전에 거절됩니다. 정의를 적용한 뒤 Svelte 어댑터가 렌더링에 실패하면 Core 변경은 적용된 상태에서 `initialComplete`가 거절될 수 있습니다. UI에서 두 결과를 구분해야 한다면 적용과 완료를 별도로 기다리세요.
+Core 검증에 실패한 갱신이나 교체는 적용 전에 거절됩니다. 정의를 적용한 뒤 Svelte 어댑터가 렌더링에 실패하면 Core 변경은 적용된 상태에서 `whenSettled(application)`이 거절될 수 있습니다. UI에서 두 결과를 구분해야 한다면 적용과 완료를 별도로 기다리세요.
 
 ## 3. DOM과 소유 View 정리하기
 
 ```ts
-await mounted.dispose();
+await mounted.unmount();
 console.log(target.textContent?.trim()); // 빈 문자열
 await renderer.dispose();
 ```

@@ -31,7 +31,7 @@ const execute = createHttpExecutor({
   }),
 });
 const runtime = createRuntime({ registry, requestExecutor: execute });
-const { view, initialComplete } = await runtime.createView({ view: {
+const view = await runtime.createView({
   queries: { project: { query: {
     sources: { main: {
       datasource: { kind: 'Http', baseUrl: 'https://api.example.test' },
@@ -40,11 +40,11 @@ const { view, initialComplete } = await runtime.createView({ view: {
     transform: { input: { '@path': '/sources/main/title' } },
   } } },
   render: { id: 'empty', componentRef: 'Empty' },
-} });
-const report = await initialComplete;
+});
+const report = await view.whenSettled(view.initial);
 console.log(report.queryErrors.length); // 0
 console.log(view.getQuery('project').getSnapshot().data); // Project
-console.log(await runtime.invokeAction({ owner: view, actionRef: 'label', inputs: { name: 'Viewstem' } }));
+console.log(await view.invokeAction({ actionRef: 'label', inputs: { name: 'Viewstem' } }));
 // Hello, Viewstem
 runtime.dispose();
 ```
@@ -57,8 +57,8 @@ Omit `transport` to use `fetch`. For authenticated requests, run secret resoluti
 
 ## Handle cancellation and errors
 
-Use the Action handler's `signal` for cancellable work. `context.invokeAction()` creates a child call with the parent's cancellation and recursion context. A separate `runtime.invokeAction({ owner: view, ... })` is an independent call owned by that View. Cancellation prevents later State writes and Query refreshes but does not undo external effects already completed.
+Use the Action handler's `signal` for cancellable work. `context.invokeAction()` creates a child call with the parent's cancellation and recursion context. A separate `view.invokeAction({ ... })` is an independent call owned by that View. Cancellation prevents later State writes and Query refreshes but does not undo external effects already completed.
 
-Inspect `initialComplete.queryErrors` for initial Query failures; catch the promise returned by `invokeAction` for Action failures. An invalid result schema fails with `TYPE_MISMATCH`; a denied destination fails with `EXECUTION_BLOCKED`.
+Inspect `report.queryErrors` for initial Query failures; catch the promise returned by `invokeAction` for Action failures. An invalid result schema fails with `TYPE_MISMATCH`; a denied destination fails with `EXECUTION_BLOCKED`.
 
 See [Registry code Actions](../../registry/#code-actions), [Runtime](../../runtime/) and [HTTP](../../http/).

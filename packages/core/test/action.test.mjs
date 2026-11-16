@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createRegistry,createRuntime,createStateStore } from '@viewstem/core';
+import { createRegistry, createStateStore } from '@viewstem/core';
+import { createRuntime } from './fixtures/runtime-operations.mjs';
 const p=path=>({'@path':path}),i={type:'integer'},b={type:'boolean'},s={type:'string'};
 const value=(schema,required=true)=>({kind:'Value',schema,required}),state=schema=>({kind:'State',schema,required:true});
 const set=value=>({kind:'SetState',target:p('/ports/cell'),value});

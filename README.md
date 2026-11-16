@@ -17,6 +17,22 @@ The packages have been built and tested locally. A package version or local
 verification result does not establish publication on npm. See each package's
 README for its public API, supported behavior, and limitations.
 
+## Mount a View in the browser
+
+```ts
+import { createRenderer } from '@viewstem/ui';
+import '@viewstem/ui/styles.css';
+
+const target = document.querySelector<HTMLElement>('#panel')!;
+const renderer = createRenderer();
+const screen = renderer.mount({
+  target,
+  source: { render: { id: 'hello', componentRef: 'shadcn.Badge', inputs: { text: 'Hello' } } },
+});
+await screen.ready;
+// On route exit, call screen.unmount(). On application shutdown, call renderer.dispose().
+```
+
 ## Documentation
 
 - [Documentation guide](docs/README.md): usage, contracts, and verification records.

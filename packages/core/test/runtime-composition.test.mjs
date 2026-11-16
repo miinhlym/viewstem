@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createRegistry,createRuntime} from '@viewstem/core';
+import { createRegistry } from '@viewstem/core';
+import { createRuntime } from './fixtures/runtime-operations.mjs';
 const p=path=>({'@path':path}),integer={type:'integer'},value={kind:'Value',schema:integer,required:true};
 const base=()=>{const r=createRegistry();r.registerComponentContract({kind:'Component',id:'Row',spec:{slots:{default:{}}}});r.registerComponentContract({kind:'Component',id:'Label',spec:{ports:{n:value}}});return r;};
 test('K01 ref and inline Component Query Derived use the same declared inputs and never capture surrounding values',async t=>{
@@ -37,4 +38,34 @@ test('U03 renderer snapshot preserves named slot boundaries and multiple authore
  const registry=base();registry.registerComponentContract({kind:'Component',id:'Layout',spec:{slots:{header:{},body:{}}}});
  const runtime=createRuntime({registry});t.after(()=>runtime.dispose());const {view}=await runtime.createView({view:{render:{id:'layout',componentRef:'Layout',slots:{header:[{id:'a',componentRef:'Label',inputs:{n:1}},{id:'b',componentRef:'Label',inputs:{n:2}}],body:[{id:'c',componentRef:'Label',inputs:{n:3}}]}}}});
  const root=view.getSnapshot().roots[0];assert.deepEqual(root.slots.header.map(node=>node.id),['a','b']);assert.deepEqual(root.slots.body.map(node=>node.id),['c']);assert.deepEqual(root.children.map(node=>node.id),['a','b','c']);assert.ok(Object.isFrozen(root.slots.header));
+});
+
+test('U03 nested slots serialize each logical node once per immutable snapshot', async t => {
+  const registry = base(), runtime = createRuntime({ registry });
+  t.after(() => runtime.dispose());
+  let render = { id: 'leaf', componentRef: 'Label', inputs: { n: p('/states/n') } };
+  for (let index = 0; index < 12; index++) {
+    render = { id: 'row-' + index, componentRef: 'Row', slots: { default: [render] } };
+  }
+  const { view, initialComplete } = await runtime.createView({ view: {
+    states: { n: { kind: 'State', schema: integer, initial: 1 } }, render,
+  } });
+  await initialComplete;
+  function leafOf(snapshot) {
+    let node = snapshot.roots[0], count = 1;
+    while (node.children.length) {
+      assert.ok(Object.isFrozen(node) && Object.isFrozen(node.children) && Object.isFrozen(node.slots.default));
+      assert.equal(node.children[0], node.slots.default[0]);
+      node = node.children[0];
+      count++;
+    }
+    assert.equal(count, 13);
+    return node;
+  }
+  const first = view.getSnapshot(), leaf = leafOf(first);
+  view.getState('n').write(2);
+  const second = leafOf(view.getSnapshot());
+  assert.equal(leaf.inputs.n, 1);
+  assert.equal(second.inputs.n, 2);
+  assert.notEqual(second, leaf);
 });

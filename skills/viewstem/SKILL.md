@@ -29,7 +29,7 @@ user's requested scope and response language.
 - Use public factories such as `createRegistry`, `createRuntime`, and
   `createRenderer`; `Registry`, `Runtime`, and `View` are types, not constructors.
 - For the default catalog, call `registerShadcn(registry)` once, import
-  `@viewstem/ui/styles.css`, and attach a core View to a connected DOM container.
+  `@viewstem/ui/styles.css`, and use `createRenderer().mount({ target, source })` with a connected DOM container.
   Use the Svelte renderer to register and render app-owned adapters.
 - For an unknown JSON input, slot or event, find the component by `id` in the
   installed support file and inspect the required entries in `ports`, `slots`
@@ -51,7 +51,7 @@ user's requested scope and response language.
   error channel and the actual rendered result rather than treating resolution
   alone as success.
 - Release resources according to ownership. `renderer.mount` owns its View;
-  `@viewstem/ui.attach` and `ViewstemView` borrow one. Dispose resources created by the app
+  `renderer.attach(view, target)` and `<ViewstemView {renderer} {view} />` borrow one. In a Svelte tree, `<ViewstemView {renderer} {source} />` creates and owns a View for the component lifetime. Await `screen.ready`, `screen.whenSettled(view.initial)` or `attachment.whenSettled(view.initial)` as appropriate; await `unmount()`, `detach()`, and `renderer.dispose()` for cleanup. Dispose resources created by the app
   while preserving resources borrowed from its host.
 
 ## Verify the requested outcome

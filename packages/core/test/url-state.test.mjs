@@ -113,6 +113,23 @@ test('L09/K20 delayed newest write carries unapplied keys and invalidates old co
   a.write(1); b.write(2); assert.equal(f.pending.length, 2); assert.equal(f.pending[0].options.isCurrent(), false); assert.equal(f.pending[1].options.isCurrent(), true);
   f.release(1); await tick(); f.release(0); await tick(); assert.equal(JSON.parse(new URL(f.read()).searchParams.get('p.a')), 1); assert.equal(JSON.parse(new URL(f.read()).searchParams.get('p.b')), 2); assert.equal(f.commits.length, 1); connection.dispose();
 });
+test('an unrelated State baseline settling does not restart an active URL write', async () => {
+  const f = fixture(undefined, { delayed: true });
+  const bound = f.scope.registerState('value', { schema: integer, initial: 0 });
+  const initial = Promise.withResolvers();
+  f.scope.registerState('unrelated', { schema: integer, pendingInitial: initial.promise });
+  const connection = bind(f, bound);
+
+  bound.write(9);
+  initial.resolve(1);
+  await tick();
+
+  assert.equal(f.attempts.length, 1);
+  assert.equal(f.pending[0].options.isCurrent(), true);
+  f.release();
+  assert.equal(valueAt(f), 9);
+  connection.dispose();
+});
 test('L09/K20 delayed writes are checked again after restore/dispose/ABA', async () => {
   for (const event of ['restore', 'dispose', 'ABA']) {
     const f = fixture(undefined, { delayed: true }), cell = f.scope.registerState('value', { schema: integer, initial: 0 }), connection = bind(f, cell);

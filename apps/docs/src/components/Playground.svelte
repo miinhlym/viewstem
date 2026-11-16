@@ -62,13 +62,12 @@
           if (disposed) return;
           renderer = createPlaygroundRenderer(previewTarget, diagnostic => {
             if (disposed) return;
-            error = diagnostic && typeof diagnostic === 'object' && 'message' in diagnostic ? String(diagnostic.message) : String(diagnostic);
+            error = diagnostic.error.message;
             message = '';
           });
         }
 
-        const result = await renderer.run(view);
-        const { queryErrors } = await result.initialComplete;
+        const { queryErrors } = await renderer.run(view);
         if (disposed) return;
         executedSource = input;
         if (queryErrors.length) error = queryErrors.map(({ query, error }) => `${query} · ${error.message}`).join('\n');
@@ -114,7 +113,7 @@
       disposed = true;
       media.removeEventListener('change', updateOrientation);
       editor.destroy();
-      renderer?.dispose();
+      if (renderer) void renderer.dispose().catch(console.error);
     };
   });
 </script>

@@ -47,4 +47,4 @@ Svelte가 DOM을 갱신하는 중에도 호출 시점의 Core 준비 상태를 �
 | `readonly contract` | `ComponentContract` | `kind: 'Component'`, `id`, 포트·슬롯·이벤트를 선언한 공개 `spec`을 가진 Core 리소스입니다. |
 | `readonly component` | `ComponentAdapter` | 같은 ID에 연결하는 Svelte 구현입니다. |
 
-[`renderer.registerComponents`](../renderer/#registercomponents)에 항목을 전달해 계약과 어댑터를 함께 추가합니다. 계약을 이미 등록했다면 [`renderer.registerComponent`](../renderer/#registercomponent)로 ID에 어댑터를 연결하세요. 선언형 Component는 Core가 펼친 하위 View를 사용합니다. `ComponentContract`, `NodeSnapshot`, State와 Query 핸들은 [Core 타입](/ko/docs/core/types/)을 참고하세요.
+`createRenderer({ components })`에 계약과 어댑터를 전달하거나 기존 계약에 `renderer.bindComponent(id, component)`를 사용하세요.

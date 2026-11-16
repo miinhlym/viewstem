@@ -33,12 +33,10 @@ const viewExcerpt = `{
   }
 }`;
 
-const integrationExcerpt = `const registry = createRegistry();
-registerShadcn(registry);
-const runtime = createRuntime({ registry });
-
-const { view, initialComplete } = await runtime.createView({
-  view: {
+const integrationExcerpt = `const renderer = createRenderer();
+const screen = renderer.mount({
+  target,
+  source: {
     render: {
       id: "hello",
       componentRef: "shadcn.Button",
@@ -46,8 +44,7 @@ const { view, initialComplete } = await runtime.createView({
     }
   }
 });
-attach(view, target);
-await initialComplete;`;
+await screen.ready;`;
 ---
 
 <!doctype html>

@@ -17,6 +17,22 @@
 npm 공개 발행을 뜻하지는 않습니다. 공개 API, 지원 동작, 제한은 각 패키지의
 README에서 확인하세요.
 
+## 브라우저에 View 연결하기
+
+```ts
+import { createRenderer } from '@viewstem/ui';
+import '@viewstem/ui/styles.css';
+
+const target = document.querySelector<HTMLElement>('#panel')!;
+const renderer = createRenderer();
+const screen = renderer.mount({
+  target,
+  source: { render: { id: 'hello', componentRef: 'shadcn.Badge', inputs: { text: '안녕하세요' } } },
+});
+await screen.ready;
+// 라우트가 닫히면 screen.unmount(), 앱이 끝나면 renderer.dispose()를 호출합니다.
+```
+
 ## 문서
 
 - [문서 안내](docs/README.ko.md): 사용법, 계약, 검증 기록.

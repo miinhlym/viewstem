@@ -72,4 +72,4 @@ const result = mergeOwnedUrl('https://example.test/?campaign=a%20b&filter=all#li
 console.log(result); // https://example.test/?campaign=a%20b&filter=active#list
 ```
 
-See [State and URL guide](../guides/state-and-url/) and [ViewTarget URL convenience options](../runtime/#viewtarget).
+See [State and URL guide](../guides/state-and-url/) and [ViewOptions URL convenience options](../runtime/#viewsource-and-viewoptions).

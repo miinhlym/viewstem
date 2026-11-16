@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createRegistry, createRuntime, createStateStore } from '../src/index.mjs';
+import { createRegistry, createRuntime as publicRuntime, createStateStore } from '../src/index.mjs';
+import { runtimeFixture } from './fixtures/runtime-operations.mjs';
+const createRuntime = runtimeFixture(publicRuntime);
 import { createQueryHandle } from '../src/ports.mjs';
 
 const number = { type: 'number' };
@@ -28,7 +30,8 @@ test('preflight: disposing View from commit observer prevents new Query work and
   const updated = { ...spec, queries: { q: { query: { sources: { a: {
     datasource: { kind: 'Http', baseUrl: 'https://example.test' }, request: { method: 'GET', path: '/' },
   } }, transform: { input: path('/sources/a') } } } } };
-  await assert.rejects(view.update(updated, { states: { x: 2 } }), { code: 'CANCELLED' });
+  const applied = await view.update(updated, { states: { x: 2 } });
+  await assert.rejects(applied.initialComplete, { code: 'CANCELLED' });
   await flush();
   assert.equal(requests.length, 0);
   let remaining;

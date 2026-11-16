@@ -32,19 +32,16 @@ npm install ../viewstem-packages/viewstem-core-0.1.0.tgz ../viewstem-packages/vi
 아래 코드를 `main.js`에 넣으면 컨테이너에 **저장** 버튼이 표시됩니다.
 
 ```js
-import { createRegistry, createRuntime } from '@viewstem/core';
-import { attach, registerShadcn } from '@viewstem/ui';
+import { createRenderer } from '@viewstem/ui';
 import '@viewstem/ui/styles.css';
 
-const target = document.querySelector('#app');
-if (!(target instanceof HTMLElement)) throw new Error('Missing Viewstem container');
+const target = document.getElementById('app');
+if (!target) throw new Error('Missing #app element');
 
-const registry = createRegistry();
-registerShadcn(registry);
-const runtime = createRuntime({ registry });
-
-const { view, initialComplete } = await runtime.createView({
-  view: {
+const renderer = createRenderer();
+const screen = renderer.mount({
+  target,
+  source: {
     render: {
       id: 'save',
       componentRef: 'shadcn.Button',
@@ -52,18 +49,16 @@ const { view, initialComplete } = await runtime.createView({
     },
   },
 });
+await screen.ready;
 
-const attachment = attach(view, target, { onError: console.error });
-await initialComplete;
-
-export function unmount() {
-  attachment.dispose();
-  runtime.dispose();
+export async function unmount() {
+  await screen.unmount();
+  await renderer.dispose();
 }
 ```
 
 ## 호스트 수명에 연결하기
 
-프레임워크 앱에서는 클라이언트의 마운트 단계에서 컨테이너가 문서에 추가된 뒤 View를 연결하세요. 렌더링된 DOM 하위 트리는 Viewstem이 관리하게 두고, 정리 단계에서 연결 객체의 `dispose()`를 호출하세요. 예제의 `unmount()`는 직접 만든 Runtime도 해제합니다. Runtime을 공유한다면 View 사용을 마친 소유자가 View를 해제하고, Runtime은 Runtime 소유자가 해제합니다.
+프레임워크 앱에서는 대상이 문서에 연결된 뒤 `mount()`를 호출하고, 화면이 닫힐 때 `screen.unmount()`를 호출하세요. 렌더링된 DOM 하위 트리는 Viewstem이 관리합니다. 이 예제의 정리 함수는 렌더러와 그 내부 Runtime도 폐기합니다. 렌더러를 여러 화면에서 공유한다면 앱이 사용을 마칠 때 `renderer.dispose()`를 호출하세요.
 
-연결 오류는 [브라우저 UI API](../../api/)에서, 지원하는 JSON은 [컴포넌트 카탈로그](../../components/)에서 확인하세요.
+기존 View를 표시하려면 [대여 연결](../../api/#attach)을 사용하세요. 연결 오류는 [브라우저 UI API](../../api/)에서, 지원하는 JSON은 [컴포넌트 카탈로그](../../components/)에서 확인하세요.

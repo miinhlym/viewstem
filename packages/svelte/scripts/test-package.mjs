@@ -30,33 +30,47 @@ try {
   assert.equal(await readFile(join(directory, 'node_modules/@viewstem/svelte/LICENSE'), 'utf8'), await readFile(join(root, 'LICENSE'), 'utf8'));
   assert.equal(installedManifest.dependencies['@viewstem/core'], core.version);
   await writeFile(join(directory, 'consumer.ts'), `import { createRenderer, ViewstemView, type ComponentAdapter, type MountedView, type ComponentAdapterProps, type ComponentContract, type ViewSpec, type Runtime, type RequestExecutor } from '@viewstem/svelte';
-import type { Component, Snippet } from 'svelte';
+import type { Component, ComponentProps, Snippet } from 'svelte';
+import type { ViewstemViewProps, ViewstemSourceProps } from '@viewstem/svelte';
 const renderer = createRenderer();
 const runtime: Runtime = renderer.runtime;
 const contract: ComponentContract = {kind:'Component',id:'Explicit',spec:{}};
-renderer.registry.registerComponentContract(contract);
+renderer.runtime.registry.registerComponentContract(contract);
 const spec: ViewSpec = {render:{id:'root',componentRef:'Explicit'}};
 const requestExecutor: RequestExecutor = async () => ({status:200,headers:{},body:null});
 createRenderer({requestExecutor});
 createRenderer({runtime});
 declare const adapter: ComponentAdapter;
-renderer.registerComponent('Explicit', adapter);
+renderer.bindComponent('Explicit', adapter);
 declare const props: ComponentAdapterProps;
 const slot: Snippet<[string]> = props.renderSlot;
 const result: Promise<unknown> = props.emit('click', {});
 declare const handle: MountedView;
-const report = await handle.initialComplete;
+const view = await handle.ready;
+const report = await handle.whenSettled(view.initial);
 const generation: number = report.generation;
 await handle.whenRendered();
-const host: Component<{renderer: typeof renderer; view: typeof handle.view}, {whenRendered(): Promise<void>}> = ViewstemView;
+const host: Component<{renderer: typeof renderer; view: typeof view}, {whenRendered(): Promise<void>}> = ViewstemView;
+interface ExistingWrapper extends ViewstemViewProps { title: string }
+declare const wrapper: ExistingWrapper;
+const borrowedView: typeof view = wrapper.view;
+const borrowed: ComponentProps<typeof ViewstemView> = wrapper;
+const owned: ViewstemSourceProps = { renderer, source: spec, inputs: { count: 1 } };
+const sourceProps: ComponentProps<typeof ViewstemView> = owned;
+// @ts-expect-error view and source are mutually exclusive
+const ambiguous: ComponentProps<typeof ViewstemView> = { renderer, view, source: spec };
+// @ts-expect-error view or source is required
+const missing: ComponentProps<typeof ViewstemView> = { renderer };
+// @ts-expect-error initial inputs belong to a new source
+const borrowedWithInputs: ComponentProps<typeof ViewstemView> = { renderer, view, inputs: {} };
 // @ts-expect-error adapter registration is a Component, not arbitrary markup
-renderer.registerComponent('Bad', '<button>');
+renderer.bindComponent('Bad', '<button>');
 // @ts-expect-error the mounting target must be an Element
-renderer.mount({ target: 'body', view: { render: { id: 'x', componentRef: 'Explicit' } } });
+renderer.mount({ target: 'body', source: { render: { id: 'x', componentRef: 'Explicit' } } });
 // @ts-expect-error inputs are read-only core snapshots
 props.inputs.changed = true;
 // @ts-expect-error renderer Registry does not expose the implementation engine
-renderer.registry.fork();
+renderer.runtime.registry.fork();
 // @ts-expect-error renderer Runtime does not expose the variable engine
 renderer.runtime.variable('private');
 // @ts-expect-error engine contracts are not forwarded through Svelte
@@ -84,7 +98,7 @@ handle.settled();
 // @ts-expect-error core View creation does not expose the old mount name
 runtime.mount({view:spec});
 // @ts-expect-error code Component contracts have an explicit registration name
-renderer.registry.registerComponent(contract);
+renderer.runtime.registry.registerComponent(contract);
 `);
   execute(process.execPath, [join(root, 'node_modules/typescript/bin/tsc'), '--strict', '--noEmit', '--target', 'ES2022', '--module', 'NodeNext', '--moduleResolution', 'NodeNext', '--lib', 'ES2022,DOM', 'consumer.ts']);
   await writeFile(join(directory, 'Button.svelte'), `<script lang="ts">
@@ -98,15 +112,16 @@ import * as publicApi from '@viewstem/svelte';
 import Button from './Button.svelte';
 if (Object.keys(publicApi).sort().join(',') !== 'ViewstemView,createRenderer,transformError') throw new Error('unexpected public exports');
 const renderer = createRenderer();
-if ('variable' in renderer.runtime || 'fork' in renderer.registry) throw new Error('implementation exposed');
-const { registry } = renderer;
+if ('variable' in renderer.runtime || 'fork' in renderer.runtime.registry) throw new Error('implementation exposed');
+const { registry } = renderer.runtime;
 registry.registerComponentContract({kind:'Component',id:'Button',spec:{ports:{value:{kind:'Value',schema:{type:'number'},required:true}},events:{click:{schema:{type:'object',additionalProperties:false}}}}});
 registry.registerResources([{kind:'Action',id:'set',spec:{ports:{target:{kind:'State',schema:{type:'number'},required:true}},steps:[{kind:'SetState',target:{'@path':'/ports/target'},value:2}]}}]);
-renderer.registerComponent('Button', Button);
-const handle = await renderer.mount({target:document.querySelector('main'),view:{states:{count:{kind:'State',schema:{type:'number'},initial:0}},render:{id:'button',componentRef:'Button',inputs:{value:{'@path':'/states/count'}},on:{click:{actionRef:'set',inputs:{target:{'@path':'/states/count'}}}}}}});
-await handle.initialComplete;
-if (Object.keys(handle).sort().join(',') !== 'dispose,initialComplete,replace,update,view,whenRendered') throw new Error('unexpected mounted View surface');
-if ('mount' in renderer.runtime || 'registerComponent' in registry || 'snapshot' in handle.view) throw new Error('legacy alias exposed');
+renderer.bindComponent('Button', Button);
+const handle = renderer.mount({target:document.querySelector('main'),source:{states:{count:{kind:'State',schema:{type:'number'},initial:0}},render:{id:'button',componentRef:'Button',inputs:{value:{'@path':'/states/count'}},on:{click:{actionRef:'set',inputs:{target:{'@path':'/states/count'}}}}}}});
+const view = await handle.ready;
+await handle.whenSettled(view.initial);
+if (Object.keys(handle).sort().join(',') !== 'ready,unmount,whenRendered,whenSettled') throw new Error('unexpected mounted View surface');
+if ('mount' in renderer.runtime || 'registerComponent' in registry || 'snapshot' in view) throw new Error('legacy alias exposed');
 await handle.whenRendered();
 document.body.dataset.ready='true';
 window.disposeConsumer=()=>renderer.dispose();

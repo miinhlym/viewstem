@@ -80,7 +80,7 @@ test('preflight build requires declarations, preserves prior output on failure, 
   assert.equal(complete.status, 0, complete.stderr);
   assert.deepEqual((await readdir(join(core, 'dist'))).sort(), [
     'THIRD-PARTY-NOTICES.txt', 'cel-support.json', 'cel.d.ts', 'cel.js', 'cel.js.map', 'chunks', 'http.d.ts', 'http.js', 'http.js.map',
-    'index.d.ts', 'index.js', 'index.js.map',
+    'index.d.ts', 'index.js', 'index.js.map', 'renderer.d.ts', 'renderer.js', 'renderer.js.map',
   ]);
   const chunks = await readdir(join(core, 'dist/chunks'));
   assert.ok(chunks.length > 0);

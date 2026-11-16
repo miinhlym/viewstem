@@ -190,13 +190,23 @@ Assert.condition은 strict boolean이다. true이면 다음 단계로 가고 fal
 
 SetState·RefreshQuery·Assert·If 단계는 결과값이 없는 void 단계다. 단계 id가 있어도 그 결과를 /steps/id에서 읽으면 참조 오류이며, 마지막 단계 값을 Action output으로 암묵 반환하지 않는다. [U13]
 
+### 코드 Action 등록과 갱신
+
+**확정(D154).** TypeScript는 포트 선언에서 핸들러 입력을 추론한다. 포트 맵과 이름이 있는 포트가 선언에 항상 존재하고 `required: true`면 핸들러에서 필수 입력으로 읽는다. 명시 `registerAction<Inputs, Output>`에서 필수인 키마다 올바른 종류의 포트와 `required: true`가 필요하다. `T | undefined`인 필수 키도 이에 해당한다. 포트 이름은 고정된 목록으로 선언하며 동적 키는 Value 포트의 값으로 전달한다. 명시 제네릭과 실제 값 스키마를 맞추는 책임은 호스트에 있다.
+
+Value의 `default`는 키가 생략된 경우에만 적용하므로 TypeScript에서 선택 입력으로 추론한다. View 이벤트도 입력을 한 번 검증한다. 선택 포트에 연결된 표현식이 missing이면 해당 키 없이 호출한다. 필수 포트의 연결값이 missing이거나 어느 포트든 pending이면 `INPUT_NOT_READY`로 실행 전에 실패한다. 평가 오류는 전파한다.
+
+`updateResource()`는 후보 정의와 의존성을 먼저 검증한다. 기존 코드 Action의 포트 이름과 열거 순서, 종류, 필수 여부, 기본값, 해석된 Value·State 스키마 및 출력 유무와 스키마를 보존해야 한다. 기본값은 JSON 값의 배열과 객체 키 순서도 보존한다. 스키마는 `typeRef`를 해석한 구조를 비교하며 객체 키 순서만 무시한다. Type 갱신도 참조하는 모든 코드 Action에 같은 규칙을 적용한다. 표시 이름 변경과 같은 스키마를 가리키는 참조 변경은 허용한다.
+
+후보가 유효해도 계약이 달라지면 `TYPE_CONTRACT_MISMATCH`에 영향을 받는 Action의 `resource`, 변경 위치인 `location` 및 해당 포트의 `input`을 담아 거절한다. Registry 정의와 핸들러, 실행 중인 View와 호출에는 갱신을 적용하지 않는다. 계약 변경 시 공유 Type이 달라지면 새 Type ID를 등록하고, 새 Action ID로 계약과 핸들러를 함께 등록한 뒤 호출 입력과 `actionRef`를 전환한다. 이전 ID를 직접 호출하는 코드 Action의 구현을 교체할 때도 새 ID로 등록한다. 새 View나 `replace()`에서 전환한 구성을 적용한다.
+
 ### 재귀·확장 실행의 경계
 
 **확정(U13, U35):** 선언형 Action의 직접·상호 호출 순환은 조건부 분기 안의 참조까지 등록 검증에서 거절한다. 인라인 Action도 같은 그래프 검사에 포함한다. 코드 Action의 `context.invokeAction`으로 시작한 하위 호출은 부모 호출 스택을 이어받으며, await 뒤 호출이나 선언형/코드형 혼합에서도 동일 정의가 현재 스택에 있으면 ACTION_RECURSION으로 거절한다. 순환이 없는 순차·병렬 하위 호출은 허용한다. 등록된 신뢰 코드 함수 내부의 임의 재귀를 정적으로 분석하거나 강제로 종료한다는 보장은 아니다.
 
 코드 Action은 검증·격리된 inputs와 호출 수명에 묶인 State/Query 핸들, AbortSignal을 받는다. 취소 뒤 새로운 write/refresh/retry는 CANCELLED이며, 늦은 반환값을 수용하지 않는다. 함수가 signal을 무시해 이미 시작한 외부 효과를 끝내는 것은 자동 롤백 대상이 아니다. 코드 반환 Promise의 reject와 결과 검증 실패는 기존 Action 오류 경로로 전파한다.
 
-**코드 하위 호출(U35):** 실행 문맥의 `invokeAction({actionRef 또는 action, inputs})`은 현재 실행의 하위 Action을 시작한다. owner·취소·스택은 부모에서 전달하고 호출자가 바꾸지 못한다. inputs는 명시 전달하며 부모 inputs를 자동 캡처하지 않는다. 대상·권한·입력·출력을 동일한 Action 경로에서 검증하며 결과/오류를 Promise로 돌려준다. 부모 취소는 진행 중인 자손 호출에 전파되고 완료된 State/API 효과는 유지한다. 외부 `runtime.invokeAction`은 독립 호출이며 같은 owner·Action이라는 이유로 부모의 하위 호출로 추측하지 않는다. 코드 Action에서도 내부 작업은 문맥의 함수를 사용해야 한다. 신뢰 코드가 클로저로 확보한 외부 runtime/서비스 기능을 강제 격리한다는 보장은 아니다.
+**코드 하위 호출(U35):** 실행 문맥의 `invokeAction({actionRef 또는 action, inputs})`은 현재 실행의 하위 Action을 시작한다. owner·취소·스택은 부모에서 전달하고 호출자가 바꾸지 못한다. inputs는 명시 전달하며 부모 inputs를 자동 캡처하지 않는다. 대상·권한·입력·출력을 동일한 Action 경로에서 검증하며 결과/오류를 Promise로 돌려준다. 부모 취소는 진행 중인 자손 호출에 전파되고 완료된 State/API 효과는 유지한다. 외부 `view.invokeAction`은 독립 호출이며 같은 owner·Action이라는 이유로 부모의 하위 호출로 추측하지 않는다. 코드 Action에서도 내부 작업은 문맥의 함수를 사용해야 한다. 신뢰 코드가 클로저로 확보한 외부 runtime/서비스 기능을 강제 격리한다는 보장은 아니다.
 
 하위 결과와 오류를 부모 결과에 연결하려면 반환 Promise를 await/return한다. 병렬 작업은 Promise.all 등으로 명시 대기할 수 있다. 부모가 성공·실패·취소로 끝나면 남은 하위 실행을 취소하고 보관한 호출 함수로 새 작업을 시작하는 것도 CANCELLED다. await하지 않은 작업을 암묵적으로 독립 실행으로 전환하거나 부모 완료를 무기한 미루지 않는다. 이는 수명 누수를 막기 위한 기술 세부이며, 일반 코드 Action의 명시 try/catch 복구 계약은 유지한다.
 

@@ -22,11 +22,11 @@ registry.registerComponentContract({
   spec: { ports: { text: { kind: 'Value', schema: { type: 'string' }, required: true } } },
 });
 const runtime = createRuntime({ registry });
-const { view, initialComplete } = await runtime.createView({ view: {
+const view = await runtime.createView({
   states: { title: { kind: 'State', schema: { type: 'string' }, initial: 'Hello' } },
   render: { id: 'label', componentRef: 'Label', inputs: { text: { '@path': '/states/title' } } },
-} });
-await initialComplete;
+});
+await view.whenSettled(view.initial);
 console.log(view.getSnapshot().roots[0].inputs.text); // Hello
 const observed = new Promise(resolve => {
   view.subscribe(snapshot => {
@@ -42,12 +42,12 @@ The component contract tells Core that `Label` accepts a required string. A rend
 
 ## Change an existing definition
 
-Use `view.update(nextSpec)` for the current View while retaining compatible State and node lifetimes. Use `view.replace({ view: nextSpec })` to start a new lifetime and inject current registry definitions. Both return an object with a fresh `initialComplete` promise. Changing `registry.updateResource()` alone does not change existing Views.
+Use `view.updateDefinition(nextSpec)` for the current View while retaining compatible State and node lifetimes. Use `view.replace(nextSpec)` to start a new lifetime and inject current registry definitions. Both return an application handle; pass it to `view.whenSettled(application)` for its report. Changing `registry.updateResource()` alone does not change existing Views.
 
 ## Diagnose a failure
 
 - `REFERENCE_NOT_FOUND`: register each referenced contract or resource before creating the View.
 - `TYPE_MISMATCH`: check the supplied value against the declared port or State schema.
-- `initialComplete` resolves with `queryErrors`: inspect those entries; completion does not mean every Query succeeded and does not mean DOM paint finished.
+- `view.whenSettled(application)` resolves with `queryErrors`: inspect those entries; completion does not mean every Query succeeded and does not mean DOM paint finished.
 
 See [Registry](../../registry/), [Runtime](../../runtime/) and [View](../../view/) for exact methods and ownership rules.

@@ -21,7 +21,7 @@ State와 Derived는 실행 중인 View나 Component 인스턴스에 속합니다
 
 ## 공용 Type 등록하기
 
-독립 리소스는 `kind`, `id`, `spec`을 갖습니다. 마운트 전에 아래 Type을 `renderer.registry.registerResources([definition])`으로 등록합니다.
+독립 리소스는 `kind`, `id`, `spec`을 갖습니다. 마운트 전에 아래 Type을 `renderer.runtime.registry.registerResources([definition])`으로 등록합니다.
 
 
 ```json

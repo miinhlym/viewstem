@@ -76,6 +76,28 @@ test('packed UI renders the same View JSON in four browser hosts', async t => {
   });
   assert.equal(uiPackage.peerDependencies, undefined);
 
+  await writeFile(join(directory, 'consumer.ts'), `
+import { createRenderer, type MountedView, type RenderAttachment, type RendererDiagnostic } from '@viewstem/ui';
+import '@viewstem/ui/styles.css';
+
+const target = document.getElementById('host');
+if (!target) throw new Error('Missing #host');
+const onError = (diagnostic: RendererDiagnostic) => console.error(diagnostic.error);
+const renderer = createRenderer({ onError });
+const screen: MountedView = renderer.mount({
+  target,
+  source: { render: { id: 'hello', componentRef: 'shadcn.Button', inputs: { text: 'Hello' } } },
+});
+const view = await screen.ready;
+const attachment: RenderAttachment = renderer.attach(view, document.createElement('div'));
+await attachment.detach();
+await screen.unmount();
+await renderer.dispose();
+`);
+  execFileSync(process.execPath, [join(workspace, 'node_modules/typescript/bin/tsc'),
+    '--noEmit', '--strict', '--noUncheckedSideEffectImports', '--target', 'ES2022', '--module', 'NodeNext', 'consumer.ts',
+  ], { cwd: directory, stdio: 'inherit' });
+
   await cp(join(testDir, 'hosts'), join(directory, 'hosts'), { recursive: true });
   await cp(join(testDir, 'view.json'), join(directory, 'view.json'));
   await writeFile(join(directory, 'catalog.json'), JSON.stringify(examples));
@@ -167,9 +189,9 @@ test('packed UI renders the same View JSON in four browser hosts', async t => {
         await dialog.waitFor({ state: 'hidden' });
 
         const nameBeforeDetach = await name.inputValue();
-        await page.evaluate(() => {
+        await page.evaluate(async () => {
           const input = document.querySelector('[aria-label=Name]');
-          window.fixture.detach();
+          await window.fixture.detach();
           input.value = 'stale';
           input.dispatchEvent(new Event('input', { bubbles: true }));
         });

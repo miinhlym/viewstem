@@ -19,13 +19,28 @@ PR이나 수동 실행으로 확인합니다.
 
 ## npm 릴리스
 
-공개 패키지에 반영할 변경이 있는 PR은 루트에서 `npx changeset`을 실행하고
-생성된 파일을 함께 커밋합니다. 영향을 받는 패키지, SemVer 변경 수준, 변경
-이력에 들어갈 요약을 선택합니다. `core`, `svelte`, `ui`의 버전은
-독립적으로 관리합니다. Release PR에는 내부 의존성 변경과 갱신한 npm
-lockfile도 포함됩니다.
+[첫 공개 발행](#첫-공개-발행)은 각 패키지의 `package.json`에 적힌 버전을 사용합니다.
+이미 공개한 패키지의 새 버전에 반영할 변경이 있는 PR부터 changeset을 추가합니다.
 
-`main` CI가 성공하면 Changesets가 Release PR을 열거나 갱신합니다.
+### Changeset 작성하기
+
+1. 저장소 루트에서 `npx changeset`을 실행합니다. 영향을 받는 패키지를 선택하고
+   각각의 SemVer 변경 수준을 정합니다. `core`, `svelte`, `ui`의 버전은
+   독립적으로 관리합니다.
+2. 패키지 사용자에게 달라지는 점을 변경 이력에 들어갈 짧은 문장으로 씁니다.
+   사용자가 알아야 할 변경 이유나 이관 방법을 덧붙이고, 자세한 절차가 필요하면
+   기존 가이드에 연결합니다.
+3. 생성된 `.changeset/*.md` 파일에서 패키지 이름, 버전 변경 수준, 요약을 확인한 뒤
+   PR에 함께 커밋합니다.
+
+패치 요약은 “View를 교체할 때 관련 없는 URL 파라미터를 보존합니다”처럼 쓸 수
+있습니다. [Changesets 공식 작성 가이드](https://changesets.dev/faq#how-do-i-add-a-changeset)
+
+### Release PR
+
+`main` CI가 성공하고 대기 중인 changeset이 있으면 Changesets가 Release PR을 열거나
+갱신합니다. Release PR에는 새 버전, 필요한 내부 의존성 변경, 갱신한 npm lockfile이
+포함됩니다.
 `GITHUB_TOKEN`으로 만든 PR의 CI는 GitHub에서 관리자가 실행을 승인해야
 할 수 있습니다. **CI complete** 통과 후 Release PR을 병합합니다.
 병합 커밋에서도 같은 검사가 통과하면 npm에 발행합니다. npm 발행이

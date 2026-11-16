@@ -34,7 +34,7 @@ Each row takes one of the two forms. A reference is a string ID of the indicated
 
 | Usage | Reference | Inline field | Other usage fields |
 | --- | --- | --- | --- |
-| Host View target | `viewRef` | `view` | Host `inputs`, optional `url` configuration |
+| Host View target | `{ ref: id }` | `ViewSpec` | Host `inputs`, optional `url` configuration |
 | Render or slot node | `componentRef` | `component` | `id`, `inputs`, `slots`, `on`, `when`, `repeat` where allowed |
 | Query use or nested Query source | `queryRef` | `query` | `inputs`. Scheduling fields are available on Query uses. |
 | HTTP source | `datasourceRef` | `datasource` | Required `request` |

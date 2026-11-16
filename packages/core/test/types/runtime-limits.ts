@@ -9,7 +9,7 @@ count.write(Number.NaN); count.write(Infinity); count.write(Number.MAX_SAFE_INTE
 scope.registerState<number>('schema-mismatch', { schema: { type: 'string' }, initial: 3 });
 registry.registerAction<{}, boolean>({ kind: 'Action', id: 'schema-mismatch', spec: { output: { schema: { type: 'string' } } } }, () => true);
 // The string does not establish registration, authority, readiness or lifetime.
-await runtime.createView({ viewRef: 'not-registered' });
+await runtime.createView({ ref: 'not-registered' });
 // TypeScript can erase actual return data through an existing () => void type.
 const erasedReturn: () => void = () => 42;
 registry.registerAction<{}>({ kind: 'Action', id: 'erased-void', spec: {} }, erasedReturn);

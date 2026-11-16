@@ -10,84 +10,78 @@ Show a message when a required name is empty or contains only whitespace. Comple
 ## Connect the input and validation message
 
 ```js title="src/main.js"
-import { createRegistry, createRuntime } from '@viewstem/core';
-import { attach, registerShadcn } from '@viewstem/ui';
+import { createRenderer } from '@viewstem/ui';
 import '@viewstem/ui/styles.css';
-
-const registry = createRegistry();
-registerShadcn(registry);
-const runtime = createRuntime({ registry });
 
 const string = { type: 'string' };
 const name = { '@path': '/states/name' };
 
 const target = document.querySelector('#viewstem');
-const mounted = await runtime.createView({
-  view: {
-    states: {
-      name: { kind: 'State', schema: string, initial: '' },
-      nameMessage: {
-        kind: 'Derived',
-        schema: string,
-        variable: {
-          ports: { name: { kind: 'Value', schema: string, required: true } },
-          expression: 'name.trim() == "" ? "Enter a name." : ""',
-        },
-        inputs: { name },
+const renderer = createRenderer();
+const source = {
+  states: {
+    name: { kind: 'State', schema: string, initial: '' },
+    nameMessage: {
+      kind: 'Derived',
+      schema: string,
+      variable: {
+        ports: { name: { kind: 'Value', schema: string, required: true } },
+        expression: 'name.trim() == "" ? "Enter a name." : ""',
       },
-    },
-    render: {
-      id: 'name-field',
-      componentRef: 'shadcn.Field.Field',
-      slots: {
-        default: [
-          {
-            id: 'label',
-            componentRef: 'shadcn.Field.Label',
-            inputs: { for: 'project-name', text: 'Project name' },
-          },
-          {
-            id: 'name-input',
-            componentRef: 'shadcn.Input',
-            inputs: {
-              id: 'project-name',
-              value: name,
-              required: true,
-              'aria-describedby': 'name-message',
-            },
-            on: {
-              input: {
-                action: {
-                  ports: {
-                    target: { kind: 'State', schema: string, required: true },
-                    next: { kind: 'Value', schema: string, required: true },
-                  },
-                  steps: [{
-                    kind: 'SetState',
-                    target: { '@path': '/ports/target' },
-                    value: { '@path': '/ports/next' },
-                  }],
-                },
-                inputs: { target: name, next: { '@path': '/event/value' } },
-              },
-            },
-          },
-          {
-            id: 'validation',
-            componentRef: 'shadcn.Field.Description',
-            inputs: {
-              id: 'name-message',
-              text: { '@path': '/states/nameMessage' },
-              'aria-live': 'polite',
-            },
-          },
-        ],
-      },
+      inputs: { name },
     },
   },
-});
-const attachment = attach(mounted.view, target);
-await mounted.initialComplete;
+  render: {
+    id: 'name-field',
+    componentRef: 'shadcn.Field.Field',
+    slots: {
+      default: [
+        {
+          id: 'label',
+          componentRef: 'shadcn.Field.Label',
+          inputs: { for: 'project-name', text: 'Project name' },
+        },
+        {
+          id: 'name-input',
+          componentRef: 'shadcn.Input',
+          inputs: {
+            id: 'project-name',
+            value: name,
+            required: true,
+            'aria-describedby': 'name-message',
+          },
+          on: {
+            input: {
+              action: {
+                ports: {
+                  target: { kind: 'State', schema: string, required: true },
+                  next: { kind: 'Value', schema: string, required: true },
+                },
+                steps: [{
+                  kind: 'SetState',
+                  target: { '@path': '/ports/target' },
+                  value: { '@path': '/ports/next' },
+                }],
+              },
+              inputs: { target: name, next: { '@path': '/event/value' } },
+            },
+          },
+        },
+        {
+          id: 'validation',
+          componentRef: 'shadcn.Field.Description',
+          inputs: {
+            id: 'name-message',
+            text: { '@path': '/states/nameMessage' },
+            'aria-live': 'polite',
+          },
+        },
+      ],
+    },
+  },
+};
+const screen = renderer.mount({ target, source });
+await screen.ready;
 ```
 
 1. **Store the edit.** The text box reads `/states/name`. Its `input` event passes the edited text from `/event/value` to the Action. The `target` State port connects to the writable cell, so `SetState` updates the same value the text box reads.

@@ -96,15 +96,15 @@ const bothComponent: ComponentNode = { id: 'node', componentRef: 'Text', compone
 // @ts-expect-error COMPONENT_CALL_NEITHER - a node requires a Component target.
 const neitherComponent: ComponentNode = { id: 'node' };
 // @ts-expect-error MOUNT_CALL_BOTH - View ref and inline View cannot coexist.
-await runtime.createView({ viewRef: 'v', view: { render: { id: 'label', componentRef: 'Text' } } });
+await runtime.createView({ ref: 'v', render: { id: 'label', componentRef: 'Text' } });
 // @ts-expect-error MOUNT_CALL_NEITHER - a View target is required.
 await runtime.createView({ inputs: {} });
 // @ts-expect-error INVOKE_CALL_BOTH - explicit Action invocation keeps target XOR.
-await runtime.invokeAction({ actionRef: 'a', action: { steps: [] }, owner: view });
+await view.invokeAction({ actionRef: 'a', action: { steps: [] } });
 // @ts-expect-error INVOKE_OWNER_REQUIRED - lifetime owner is explicit.
 await runtime.invokeAction({ actionRef: 'a' });
-// @ts-expect-error RUNTIME_REGISTRY_REQUIRED - registry is mandatory.
-createRuntime({});
+// @ts-expect-error RUNTIME_REGISTRY_XOR - an injected Registry owns its definitions.
+createRuntime({ registry: runtime.registry, resources: [] });
 // @ts-expect-error STORE_NOMINAL - matching methods do not grant the private Store brand.
 const duckStore: StateStore = { createScope: () => { throw Error(); }, subscribe: () => () => {} };
 // @ts-expect-error ACTION_OBSERVATION_READONLY - results are observation, not writable state.

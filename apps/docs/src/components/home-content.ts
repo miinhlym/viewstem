@@ -53,7 +53,7 @@ export const copy = {
     },
     integration: {
       title: 'Run your first View in the browser.',
-      description: 'Register the default catalog and attach a View to a DOM container. Quick Start walks through the complete example.',
+      description: 'Mount a View with the built-in catalog. Quick Start walks through the complete example.',
       codeLabel: 'Client entry excerpt',
       packages: [
         ['@viewstem/core', 'Validates definitions and executes state, queries, and actions.'],
@@ -119,7 +119,7 @@ export const copy = {
     },
     integration: {
       title: '브라우저에서 첫 View를 실행하세요.',
-      description: '기본 컴포넌트를 등록하고 View를 DOM 컨테이너에 연결합니다. 빠른 시작에서 전체 코드를 실행해 볼 수 있습니다.',
+      description: '기본 카탈로그로 View를 마운트합니다. 빠른 시작에서 전체 코드를 실행해 볼 수 있습니다.',
       codeLabel: '클라이언트 진입 코드 일부',
       packages: [
         ['@viewstem/core', '선언을 검증하고 상태·조회·동작을 실행합니다.'],

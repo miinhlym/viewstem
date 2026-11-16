@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { chromium } from 'playwright';
 
 const root = new URL('../../../', import.meta.url);
+const consumer = process.env.VIEWSTEM_DOCS_CONSUMER_DIR;
+const resolveDir = consumer ? resolve(consumer) : fileURLToPath(root);
 const content = new URL('../src/content/docs/', import.meta.url);
 const origin = 'http://ui-docs.test';
 const browser = await chromium.launch();
@@ -17,15 +20,19 @@ try {
     ]) {
       const markdown = await readFile(new URL(`${locale}/${route}`, content), 'utf8');
       const source = [...markdown.matchAll(/^\x60{3}js\n([\s\S]*?)^\x60{3}$/gm)]
-        .map(match => match[1]).find(code => code.includes('const attachment = attach'));
+        .map(match => match[1]).find(code => code.includes('const screen = renderer.mount'));
       assert.ok(source, route);
+      assert.doesNotMatch(source, /@viewstem\/core|\.attach\(|\.whenSettled\(/);
+      const close = route.startsWith('quickstart/') ? 'async () => { await screen.unmount(); await renderer.dispose(); }' : 'unmount';
       const { outputFiles, metafile } = await build({
+        absWorkingDir: resolveDir,
         stdin: {
-          contents: source + '\nwindow.closeView = () => { attachment.dispose(); runtime.dispose(); };',
-          resolveDir: fileURLToPath(root),
+          contents: `${source}\nwindow.closeView = ${close};`,
+          resolveDir,
         },
         outdir: '.', bundle: true, write: false, format: 'esm', platform: 'browser', metafile: true,
       });
+      if (consumer) assert.ok(Object.hasOwn(metafile.inputs, 'node_modules/@viewstem/ui/dist/index.js'));
       assert.ok(!Object.keys(metafile.inputs).some(input => /node_modules\/(?:svelte|react|vue)\//.test(input)));
       const page = await browser.newPage();
       const errors = [];

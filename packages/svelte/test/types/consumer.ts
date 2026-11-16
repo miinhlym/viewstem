@@ -7,11 +7,12 @@ import TypedAdapter from './TypedAdapter.svelte';
 import TypedHost from './TypedHost.svelte';
 
 const defaultRenderer = createRenderer();
-const { registry, runtime } = defaultRenderer;
+const { runtime } = defaultRenderer;
+const { registry } = runtime;
 const onError: RendererErrorListener = diagnostic => {
-  const phase: 'event' | 'render' = diagnostic.phase;
+  const phase: string = diagnostic.phase;
   const code: string = diagnostic.error.code;
-  void [phase, code, diagnostic.node?.status];
+  void [phase, code, diagnostic.nodeId];
 };
 const renderer: Renderer = createRenderer({ runtime, onError });
 const emptyOptions: RendererOptions = {};
@@ -26,28 +27,21 @@ const sharedRuntime: Runtime = renderer.runtime;
 declare const state: StateHandle<number>;
 void [definition, sharedRuntime, state];
 const adapter: ComponentAdapter = TypedAdapter;
-renderer.registerComponent('Explicit', adapter);
-const registrations: readonly ComponentRegistration[] = [{ contract: { ...contract, id: 'Batched' }, component: adapter }];
-renderer.registerComponents(registrations);
-// @ts-expect-error Batch entries require Svelte implementations.
-renderer.registerComponents([{ contract, component: '<div>' }]);
+renderer.bindComponent('Explicit', adapter);
 declare const view: View;
-declare const target: Element;
+declare const target: HTMLElement;
 declare const fallback: RenderFallback;
 const props: ViewstemViewProps = { renderer, view, onError, fallback };
 const host: Component<ViewstemViewProps, { whenRendered(): Promise<void> }> = TypedHost;
 const publicHost: Component<ViewstemViewProps, { whenRendered(): Promise<void> }> = ViewstemView;
 const attachment: RenderAttachment = renderer.attach(view, target, { context: new Map(), onError, fallback });
-const pending: Promise<MountedView> = renderer.mount({ target, view: { render: { id: 'root', componentRef: 'Explicit' } }, context: new Map(), onError, fallback });
-void pending.then(async rendered => {
-  const report = await rendered.initialComplete;
-  const generation: number = report.generation;
-  const next = await rendered.update({ render: { id: 'next', componentRef: 'Explicit' } });
-  await next.initialComplete;
-  await (await rendered.replace({ viewRef: 'next' })).initialComplete;
-  await rendered.whenRendered();
-  await rendered.dispose();
-  void generation;
+const pending: MountedView = renderer.mount({ target, source: definition, context: new Map(), onError, fallback });
+void pending.ready.then(async rendered => {
+  await pending.whenSettled(rendered.initial);
+  await pending.whenSettled(await rendered.updateDefinition(definition));
+  await pending.whenSettled(await rendered.replace({ ref: 'next' }));
+  await pending.whenRendered();
+  await pending.unmount();
 });
 void [props, host, publicHost, attachment];
 
@@ -58,15 +52,15 @@ createRenderer({ runtime, requestExecutor });
 // @ts-expect-error Runtime cannot be replaced with a structurally unrelated object.
 createRenderer({ runtime: {} });
 // @ts-expect-error A renderer implementation has to be a Svelte Component.
-renderer.registerComponent('bad', {});
+renderer.bindComponent('bad', {});
 // @ts-expect-error An implementation is bound to its explicit string ID.
-renderer.registerComponent(TypedAdapter);
+renderer.bindComponent(TypedAdapter);
 // @ts-expect-error A real DOM Element is required.
-renderer.mount({ target: {}, viewRef: 'view' });
+renderer.mount({ target: {}, source: { ref: 'view' } });
 // @ts-expect-error View target is required.
 renderer.mount({ target });
 // @ts-expect-error Ref and inline View targets are mutually exclusive.
-renderer.mount({ target, viewRef: 'view', view: { render: { id: 'root', componentRef: 'Explicit' } } });
+renderer.mount({ target, source: { ref: 'view', render: { id: 'root', componentRef: 'Explicit' } } });
 // @ts-expect-error Context is an actual Map.
 renderer.attach(view, target, { context: {} });
 // @ts-expect-error Attach requires an actual core View.
@@ -163,7 +157,7 @@ runtime.stateStore.batch([]);
 // @ts-expect-error Store reaction registration uses its explicit name.
 runtime.stateStore.reaction(scope, { watch: [count], target: count, value: 0 });
 // @ts-expect-error Completion is named for the work it waits for.
-pending.then(mounted => mounted.initial);
+pending.initial;
 // @ts-expect-error DOM completion has no previous alias.
 attachment.settled();
 // @ts-expect-error Public Svelte component exposes only whenRendered.

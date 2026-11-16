@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { copyFile, readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 
@@ -134,3 +134,4 @@ const entries = support.map(({ id, family, ports, slots, events }) =>
   `{id:${JSON.stringify(id)},family:${JSON.stringify(family)},ports:${record(ports)},slots:${record(slots)},events:${record(events)}}`);
 await writeFile('dist/basecoat-contracts.js',
   `const v=[${Array.from(sharedValues.keys()).join(',')}];\nexport const support=[${entries.join(',\n')}];\n`);
+await copyFile('src/basecoat-contracts.d.ts', 'dist/basecoat-contracts.d.ts');

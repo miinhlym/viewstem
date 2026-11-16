@@ -77,7 +77,23 @@ export type ValuePort = TypeContract & { readonly kind: 'Value' } & ({ readonly 
 export type StatePort = TypeContract & { readonly kind: 'State'; readonly required?: boolean; readonly default?: never };
 export interface QueryPort { readonly kind: 'Query'; readonly required?: boolean; readonly default?: never; readonly schema?: never; readonly typeRef?: never }
 export type Port = ValuePort | StatePort | QueryPort;
-type PortsFor<I> = { readonly [K in keyof I]: NonNullable<I[K]> extends StateHandle<infer _V> ? StatePort : NonNullable<I[K]> extends QueryHandle<infer _V> ? QueryPort : ValuePort };
+type RequiredKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? never : K }[keyof T];
+// An open index signature does not guarantee that any specific key exists.
+type NamedJsonKey<K> = K extends string | number ? {} extends Record<K, never> ? never : K : never;
+type HasDistinctInputShapes<I, Whole = I> = I extends unknown ? [Whole] extends [I] ? false : true : never;
+type FixedActionInputs<I> = [I] extends [object]
+  ? true extends HasDistinctInputShapes<I> ? never
+  : [keyof I] extends [NamedJsonKey<keyof I>] ? unknown : never
+  : never;
+type PortFor<V> = [NonNullable<V>] extends [never] ? ValuePort
+  : NonNullable<V> extends StateHandle<infer _V> ? StatePort
+  : NonNullable<V> extends QueryHandle<infer _V> ? QueryPort : ValuePort;
+type PortsFor<I> = {
+  readonly [K in keyof I]: K extends RequiredKeys<I> ? PortFor<I[K]> & { readonly required: true } : PortFor<I[K]>
+};
+type ActionPorts<I> = FixedActionInputs<I> & (
+  [RequiredKeys<I>] extends [never] ? { readonly ports?: PortsFor<I> } : { readonly ports: PortsFor<I> }
+);
 type SchemaValue<S> = S extends { readonly const: infer C } ? C : S extends { readonly enum: readonly (infer E)[] } ? E
   : S extends { readonly anyOf: readonly (infer U)[] } | { readonly oneOf: readonly (infer U)[] } ? SchemaValue<U>
   : S extends { readonly 'x-viewstem-type': 'set'; readonly items: infer V } ? Set<SchemaValue<V>>
@@ -89,11 +105,18 @@ type TypeValue<T, S> = T extends readonly unknown[] ? TypeValue<T[number], S> : 
   : T extends 'object' ? S extends { readonly properties: infer P } ? { [K in keyof P as K extends (S extends { readonly required: readonly (infer R)[] } ? R : never) ? K : never]: SchemaValue<P[K]> } & { [K in keyof P as K extends (S extends { readonly required: readonly (infer R)[] } ? R : never) ? never : K]?: SchemaValue<P[K]> } : Record<string, unknown> : unknown;
 type ContractValue<C> = C extends { readonly schema: infer S } ? SchemaValue<S> : unknown;
 type PortValue<P> = P extends { readonly kind: 'State' } ? StateHandle<ContractValue<P>> : P extends { readonly kind: 'Query' } ? QueryHandle<unknown> : ContractValue<P>;
-type InputsFromPorts<P> = { readonly [K in keyof P as P[K] extends { readonly required: true } | { readonly default: JsonValue } ? K : never]: PortValue<P[K]> } & { readonly [K in keyof P as P[K] extends { readonly required: true } | { readonly default: JsonValue } ? never : K]?: PortValue<P[K]> };
+type GuaranteedInputKeys<P> = {
+  [K in keyof P]-?: K extends NamedJsonKey<K> ? P[K] extends { readonly required: true } ? K : never : never
+}[keyof P];
+type InputsFromPorts<P> = {
+  readonly [K in keyof P as K extends GuaranteedInputKeys<P> ? K : never]: PortValue<P[K]>
+} & {
+  readonly [K in keyof P as K extends GuaranteedInputKeys<P> ? never : K]?: PortValue<NonNullable<P[K]>>
+};
 export type ChildActionRequest = ReferenceOrInline<'actionRef', 'action', ActionSpec> & { readonly inputs?: Readonly<Record<string, unknown>>; readonly owner?: never; readonly id?: never };
 export interface ActionContext<I> { readonly inputs: DeepReadonly<I>; readonly signal: AbortSignal; readonly invokeAction: (request: ChildActionRequest) => Promise<unknown> }
 export type ActionHandler<I, O = void> = (context: ActionContext<I>) => [O] extends [void] ? void | Promise<void> : O | Promise<O>;
-export type CodeActionSpec<I, O = void> = { readonly ports?: PortsFor<I>; readonly steps?: never } & ([O] extends [void] ? { readonly output?: never } : { readonly output: TypeContract & { readonly value?: never } });
+export type CodeActionSpec<I, O = void> = ActionPorts<I> & { readonly steps?: never } & ([O] extends [void] ? { readonly output?: never } : { readonly output: TypeContract & { readonly value?: never } });
 export type CodeActionDefinition<I = {}, O = void> = Resource<'Action', CodeActionSpec<I, O>>;
 export interface ActionSnapshot<O = unknown> { readonly status: 'idle' | 'running' | 'success' | 'error'; readonly running: boolean; readonly data: [O] extends [void] ? null : DeepReadonly<O> | null; readonly error: PublicError | null }
 
@@ -132,14 +155,36 @@ export type ComponentNode = ReferenceOrInline<'componentRef', 'component', Compo
 };
 export interface ResourceSpecs { readonly Datasource: DatasourceSpec; readonly Query: QuerySpec; readonly Variable: VariableSpec; readonly Action: ActionSpec; readonly Component: ComponentSpec; readonly View: ViewSpec; readonly Type: { readonly schema: Schema } }
 export type AnyResource = { [K in ResourceKind]: Resource<K, ResourceSpecs[K]> }[ResourceKind];
-export type RegisteredResource = AnyResource | Resource<'Component', ComponentPublicContract> | Resource<'Action', { readonly ports?: Readonly<Record<string, Port>>; readonly output?: TypeContract & { readonly value?: never }; readonly steps?: never }>;
-type InferredNative<P, O> = Resource<'Action', { readonly ports?: P; readonly steps?: never } & (O extends TypeContract ? { readonly output: O & { readonly value?: never } } : { readonly output?: never })>;
+type NativeActionResource = Resource<'Action', {
+  readonly ports?: Readonly<Record<string, Port>>;
+  readonly output?: TypeContract & { readonly value?: never };
+  readonly steps?: never;
+}>;
+export type RegisteredResource = AnyResource | Resource<'Component', ComponentPublicContract> | NativeActionResource;
+type ExtraFields<T, Shape> = T extends unknown ? Exclude<keyof T, keyof Shape> : never;
+type ExactActionFields<D extends NativeActionResource> = Record<ExtraFields<D, NativeActionResource>, never> & {
+  readonly spec: Record<ExtraFields<D['spec'], NativeActionResource['spec']>, never>
+};
+type InferredActionInputs<S extends NativeActionResource['spec']> = S extends unknown
+  ? 'ports' extends keyof S
+    ? S extends { readonly ports: Readonly<Record<string, Port>> }
+      ? InputsFromPorts<NonNullable<S['ports']>>
+      : Partial<InputsFromPorts<NonNullable<S['ports']>>>
+    : {}
+  : never;
+type InferredActionOutput<S> = S extends { readonly output: infer C } ? ContractValue<C> : void;
 export interface Registry {
   readonly [registryBrand]: true;
   registerResources(resources: readonly AnyResource[]): this;
   updateResource(definition: RegisteredResource): this;
-  registerAction<const P extends Readonly<Record<string, Port>> = {}, const O extends TypeContract | undefined = undefined>(definition: InferredNative<P, O>, implementation: ActionHandler<InputsFromPorts<P>, O extends TypeContract ? ContractValue<O> : void>): this;
-  registerAction<I = never, O = void>(definition: [I] extends [never] ? never : CodeActionDefinition<NoInfer<I>, O>, implementation: ActionHandler<NoInfer<I>, O>): this;
+  registerAction<const D extends NativeActionResource>(
+    definition: D & NoInfer<ExactActionFields<D>>,
+    implementation: ActionHandler<NoInfer<InferredActionInputs<D['spec']>>, NoInfer<InferredActionOutput<D['spec']>>>,
+  ): this;
+  registerAction<I = never, O = void>(
+    definition: [I] extends [never] ? never : NoInfer<CodeActionDefinition<I, O>>,
+    implementation: ActionHandler<NoInfer<I>, O>,
+  ): this;
   registerComponentContract(contract: ComponentContract): this;
   registerComponentContracts(contracts: readonly ComponentContract[]): this;
   get<K extends ResourceKind>(kind: K, id: string): DeepReadonly<Extract<RegisteredResource, { kind: K }>>;
@@ -147,32 +192,49 @@ export interface Registry {
   exportResource<K extends ResourceKind>(kind: K, id: string): Extract<RegisteredResource, { kind: K }>;
   isCode(kind: ResourceKind, id: string): boolean;
 }
-export function createRegistry(options?: readonly AnyResource[] | { readonly resources?: readonly AnyResource[]; readonly functions?: readonly CelFunction[] }): Registry;
-export type ViewTarget = ReferenceOrInline<'viewRef', 'view', ViewSpec> & { readonly inputs?: Readonly<Record<string, unknown>>; readonly url?: { readonly adapter: UrlAdapter; readonly bindings: readonly { readonly state: string; readonly key?: string; readonly history?: 'push' | 'replace' }[]; readonly limits?: Partial<{ readonly maxOwnedBytes: number; readonly maxValueBytes: number; readonly maxItems: number; readonly maxKeys: number }> } };
+export interface RegistryOptions { readonly resources?: readonly AnyResource[]; readonly componentContracts?: readonly ComponentContract[]; readonly functions?: readonly CelFunction[] }
+export function createRegistry(options?: readonly AnyResource[] | RegistryOptions): Registry;
+export type ViewSource = (ViewSpec & { readonly ref?: never }) | { readonly ref: string; readonly render?: never };
+export interface ViewOptions {
+  readonly inputs?: Readonly<Record<string, unknown>>;
+  readonly url?: { readonly adapter: UrlAdapter; readonly bindings: readonly { readonly state: string; readonly key?: string; readonly history?: 'push' | 'replace' }[]; readonly limits?: Partial<{ readonly maxOwnedBytes: number; readonly maxValueBytes: number; readonly maxItems: number; readonly maxKeys: number }> };
+  readonly signal?: AbortSignal;
+}
 export interface InitialReport { readonly generation: number; readonly queryErrors: readonly { readonly instanceId: string; readonly query: string; readonly error: PublicError }[] }
-/** Initial executable Queries have completed (including individual errors); pending inputs/gates do not block. */
-export interface ApplicationResult { readonly initialComplete: Promise<InitialReport> }
+declare const applicationBrand: unique symbol;
+export interface ViewApplication { readonly [applicationBrand]: true }
 export interface NodeSnapshot { readonly id: string; readonly instanceId?: string | undefined; readonly address?: string | undefined; readonly generation?: number | undefined; readonly componentRef?: string | undefined; readonly status: 'ready' | 'pending' | 'error' | 'missing'; readonly error: PublicError | null; readonly inputs: DeepReadonly<Record<string, unknown>>; readonly children: readonly NodeSnapshot[]; readonly slots: Readonly<Record<string, readonly NodeSnapshot[]>> }
 export interface ViewSnapshot { readonly generation: number; readonly lifetime?: string | undefined; readonly roots: readonly NodeSnapshot[]; readonly states: Readonly<Record<string, ValueSnapshot<unknown>>>; readonly queries: Readonly<Record<string, QuerySnapshot<unknown>>>; readonly actions: Readonly<Record<string, ActionSnapshot>>; readonly errors: readonly PublicError[] }
-export interface RuntimeOptions {
-  readonly registry: Registry; readonly stateStore?: StateStore; readonly requestExecutor?: RequestExecutor;
-  readonly resourceResolver?: (kind: ResourceKind, id: string) => Awaitable<AnyResource>;
+export interface RuntimeSettings {
+  readonly stateStore?: StateStore;
+  readonly requestExecutor?: RequestExecutor;
+  readonly resourceResolver?: (kind: ResourceKind, id: string, context: { readonly signal: AbortSignal }) => Awaitable<AnyResource>;
   readonly authorize?: (context: { readonly operation: 'invoke'; readonly owner: unknown; readonly definition: unknown } | { readonly operation: 'update'; readonly owner: View; readonly definition: ViewSpec }) => boolean;
-  readonly functions?: readonly CelFunction[]; readonly requestTimeoutMs?: number; readonly clock?: TimerClock;
+  readonly requestTimeoutMs?: number;
+  readonly urlCleanupTimeoutMs?: number;
+  readonly clock?: TimerClock;
 }
+export type RuntimeOptions = RuntimeSettings & (
+  | ({ readonly registry?: never } & RegistryOptions)
+  | ({ readonly registry: Registry } & { readonly [K in keyof RegistryOptions]?: never })
+);
 export interface Runtime {
   readonly [runtimeBrand]: true;
   readonly registry: Registry; readonly stateStore: StateStore;
-  createView(target: ViewTarget): Promise<{ readonly view: View; readonly initialComplete: Promise<InitialReport> }>;
-  invokeAction(request: ReferenceOrInline<'actionRef', 'action', ActionSpec> & { readonly inputs?: Readonly<Record<string, unknown>>; readonly owner: View }): Promise<unknown>;
-  listResources(kind?: ResourceKind): RegisteredResource[]; exportResource<K extends ResourceKind>(kind: K, id: string): Extract<RegisteredResource, { kind: K }>;
+  createView(source: ViewSource, options?: ViewOptions): Promise<View>;
   dispose(): void;
 }
-export function createRuntime(options: RuntimeOptions): Runtime;
+export function createRuntime(options?: RuntimeOptions): Runtime;
+export type ActionRequest = ReferenceOrInline<'actionRef', 'action', ActionSpec> & { readonly inputs?: Readonly<Record<string, unknown>> };
 export interface View {
   readonly [viewBrand]: true;
-  update(spec: ViewSpec, options?: { readonly inputs?: Readonly<Record<string, unknown>>; readonly states?: Readonly<Record<string, unknown>> }): Promise<ApplicationResult>;
-  replace(target: ViewTarget): Promise<ApplicationResult>; exportDefinition(): ViewSpec;
+  readonly initial: ViewApplication;
+  setInputs(inputs: Readonly<Record<string, unknown>>): Promise<ViewApplication>;
+  updateDefinition(spec: ViewSpec, options?: { readonly inputs?: Readonly<Record<string, unknown>>; readonly states?: Readonly<Record<string, unknown>> }): Promise<ViewApplication>;
+  replace(source: ViewSource, options?: ViewOptions): Promise<ViewApplication>;
+  whenSettled(application: ViewApplication): Promise<InitialReport>;
+  invokeAction(request: ActionRequest): Promise<unknown>;
+  exportDefinition(): ViewSpec;
   getState(name: string, instanceId?: string): StateHandle<unknown>; getQuery(name: string, instanceId?: string): QueryHandle<unknown>;
   getSnapshot(): ViewSnapshot;
   /** State writes during an active projection queue a follow-up; the delivered snapshot stays unchanged. */

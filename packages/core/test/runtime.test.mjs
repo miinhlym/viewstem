@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createRegistry, createStateStore, createRuntime } from '@viewstem/core';
+import { createRegistry, createStateStore } from '@viewstem/core';
+import { createRuntime } from './fixtures/runtime-operations.mjs';
 const string={type:'string'},integer={type:'integer'};
 const port=(kind,schema=string)=>({kind,schema,required:true});
 function registry(){const r=createRegistry();r.registerComponentContract({kind:'Component',id:'Text',spec:{ports:{text:port('Value')}}});r.registerComponentContract({kind:'Component',id:'Input',spec:{ports:{value:port('Value')},events:{change:{schema:string}}}});r.registerComponentContract({kind:'Component',id:'Row',spec:{slots:{default:{}}}});r.registerComponentContract({kind:'Component',id:'Button',spec:{events:{click:{schema:{type:'object'}}}}});return r;}

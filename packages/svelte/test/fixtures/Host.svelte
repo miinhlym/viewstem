@@ -7,6 +7,9 @@
   export async function whenRendered() {
     await projection.whenRendered();
   }
+  export function whenSettled(application) { return projection.whenSettled(application); }
+  export function changeView(next) { view = next; }
+  export function changeError(listener) { onError = listener; }
 </script>
 
 {#snippet unavailable(node, error)}

@@ -1,8 +1,9 @@
 import { tick } from 'svelte';
 import { writable } from 'svelte/store';
+import { createDiagnostic, createRenderError } from '@viewstem/core/renderer';
 import type { Subscriber, Unsubscriber } from 'svelte/store';
 import type { NodeSnapshot, PublicError, View, ViewSnapshot } from '@viewstem/core';
-import type { RendererErrorListener, ComponentAdapter, Renderer } from './types.js';
+import type { RendererDiagnostic, RendererErrorListener, ComponentAdapter, Renderer } from './types.js';
 
 export const failure = (code: string, message: string): PublicError => Object.freeze({ code, message });
 export const cancelled = () => failure('CANCELLED', 'The renderer attachment is disposed.');
@@ -19,6 +20,7 @@ export interface RendererState {
   alive: boolean;
   adapters: Map<string, ComponentAdapter>;
   connections: Set<Connection>;
+  ownedViews: Set<() => Promise<void>>;
   onError?: RendererErrorListener;
 }
 export const rendererStates = new WeakMap<Renderer, RendererState>();
@@ -36,8 +38,11 @@ export class Connection {
   private adapters;
   private codeIds;
   private readonly errors = new Map<ReturnType<typeof nodeKey>, PublicError>();
+  private boundaryError: PublicError | undefined;
   private readonly state;
-  constructor(readonly renderer: Renderer, readonly view: View, private readonly onError?: RendererErrorListener) {
+  constructor(readonly renderer: Renderer, readonly view: View, private readonly host: {
+    isOpen: () => boolean; emit: View['emit']; onError: RendererErrorListener;
+  }) {
     this.state = rendererState(renderer);
     this.adapters = new Map(this.state.adapters);
     this.codeIds = new Set(renderer.runtime.registry.list('Component').filter(item => renderer.runtime.registry.isCode('Component', item.id)).map(item => item.id));
@@ -45,7 +50,8 @@ export class Connection {
     let lifetime = initial.lifetime;
     this.value = writable<ViewSnapshot | null>(initial);
     this.unsubscribe = view.subscribe(snapshot => {
-      if (!this.alive) return;
+      if (!this.isOpen()) return;
+      this.boundaryError = undefined;
       // replace injects the current registry into a new View lifetime; update retains it.
       if (snapshot.lifetime !== lifetime) {
         lifetime = snapshot.lifetime;
@@ -57,6 +63,7 @@ export class Connection {
     this.state.connections.add(this);
   }
   subscribe(listener: Subscriber<ViewSnapshot | null>): Unsubscriber { return this.value.subscribe(listener); }
+  isOpen(): boolean { return this.alive && this.host.isOpen(); }
   adapter(node: NodeSnapshot): ComponentAdapter | undefined {
     if (!node.componentRef || !this.codeIds.has(node.componentRef)) return undefined;
     const adapter = this.adapters.get(node.componentRef);
@@ -65,29 +72,23 @@ export class Connection {
   }
   renderFailure(node: NodeSnapshot, caught: unknown): PublicError {
     // Component code is host-owned. Do not expose arbitrary exceptions or input data.
-    const missing = caught === missingAdapter;
-    const error: PublicError = Object.freeze({
-      code: missing ? 'REFERENCE_NOT_FOUND' : 'INTERNAL_ERROR',
-      message: missing ? 'No Svelte implementation is registered for this Component.' : 'The Svelte component could not be rendered.',
-      ...(node.componentRef ? { resource: { kind: 'Component' as const, id: node.componentRef } } : {}),
-      ...(node.instanceId ? { instanceId: node.instanceId } : {}),
-    });
+    const error = createRenderError(caught === missingAdapter, { componentId: node.componentRef, instanceId: node.instanceId });
     this.errors.set(nodeKey(node), error);
-    this.notify('render', error, node);
+    if (this.isOpen()) this.host.onError(createDiagnostic('render', error, { nodeId: node.instanceId }));
     return error;
   }
-  clearRenderFailure(node: NodeSnapshot): void { this.errors.delete(nodeKey(node)); }
-  private notify(phase: 'render' | 'event', error: PublicError, node: NodeSnapshot): void {
-    for (const listener of new Set([this.state.onError, this.onError])) {
-      try { listener?.({ phase, error, node }); } catch { /* A diagnostic observer cannot break rendering or event rejection. */ }
-    }
+  failBoundary(): void {
+    if (!this.isOpen()) return;
+    this.boundaryError = createRenderError(false);
+    this.host.onError(createDiagnostic('render', this.boundaryError));
   }
+  clearRenderFailure(node: NodeSnapshot): void { this.errors.delete(nodeKey(node)); }
   emit(node: NodeSnapshot, event: string, payload: unknown): Promise<unknown> {
     // DOM updates are batched. A retained callback must consult core's current
     // readiness, including writes made before this attachment receives its next projection.
     let current: NodeSnapshot | undefined;
     let disposed = false;
-    if (this.alive && node.address !== undefined) {
+    if (this.isOpen() && node.address !== undefined) {
       let roots: readonly NodeSnapshot[] = [];
       try { roots = this.view.getSnapshot().roots; }
       catch { disposed = true; } // A borrowed View may be disposed before its DOM is detached.
@@ -98,17 +99,17 @@ export class Connection {
         nodes.push(...candidate.children);
       }
     }
-    const result = !this.alive || disposed || !current ? Promise.reject(cancelled()) : current.status !== 'ready'
+    const result = !this.isOpen() || disposed || !current ? Promise.reject(cancelled()) : current.status !== 'ready'
       ? Promise.reject(failure('INPUT_NOT_READY', 'The Component inputs are not ready.'))
-      : this.view.emit(node, event, payload);
+      : this.host.emit(node, event, payload);
     // Observe ignored DOM-handler promises without turning rejection into success.
-    result.catch(error => { if (this.alive) this.notify('event', error, node); });
+    result.catch(() => {});
     return result;
   }
   async whenRendered(): Promise<void> {
     await tick();
-    if (!this.alive) throw cancelled();
-    const error = this.errors.values().next().value;
+    if (!this.isOpen()) throw cancelled();
+    const error = this.boundaryError ?? this.errors.values().next().value;
     if (error) throw error;
   }
   dispose(): void {

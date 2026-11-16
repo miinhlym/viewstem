@@ -4,7 +4,7 @@ English | [한국어](README.ko.md)
 
 The detailed specifications, handoffs, and decision history linked from this map are in Korean. See the [documentation language policy](../CONTRIBUTING.md#documentation-languages).
 
-See the [U42 public API naming migration](handoff/public-api-naming-2026-11-02.md) for the current public names. The [U42 verification record](handoff/public-api-naming-verification-results.json) and earlier API names and hashes remain evidence for their original revisions.
+See the [host integration contract](spec/07-host-integration.md) and the package guides below for the current public API. The [U42 naming migration](handoff/public-api-naming-2026-11-02.md) and [verification record](handoff/public-api-naming-verification-results.json) preserve the API names and evidence for that revision.
 
 Use this map to find the reference for your task. The language-independent contracts are in `VIEWSTEM-SPEC.md` and `spec/`, the JS/TS usage guides are in the package READMEs, and execution results are in the product verification records. The repository documentation can be read independently of earlier chats and private source material.
 
@@ -23,6 +23,7 @@ Use this map to find the reference for your task. The language-independent contr
 | Maintain the home, docs, examples, and playground | [Website maintenance guide](../apps/docs/README.md) |
 | Read package guides and API references | [Site documentation research, structure, and verification](handoff/docs-package-reference-2026-11-05.md) (Korean) |
 | Understand resources and execution rules | [Full specification](VIEWSTEM-SPEC.md) and the topic specifications below |
+| Understand the DOM and Svelte host API design | [Host API implementation plan](designs/viewstem-host-api-implementation-2026-11-13.md) (Korean) |
 | Modify and verify the existing core | [Current setup procedure](handoff/implementation-start.md#새-채팅에서-시작할-때) |
 | Check support and limits | [Implementation handoff](handoff/core-implementation-2026-11-02.md), [CEL support](handoff/core-cel-support.md) |
 | Find the next implementation tasks | [Remaining work](handoff/open-contracts.md#실제-남은-작업) |

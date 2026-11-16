@@ -1,5 +1,6 @@
 // A deliberately small test-only DOM/History adapter; the package has no DOM dependency.
-import { createRegistry,createRuntime,createStateStore,mergeOwnedUrl } from '@viewstem/core';
+import { createRegistry, createStateStore, mergeOwnedUrl } from '@viewstem/core';
+import { createRuntime } from './fixtures/runtime-operations.mjs';
 const p=path=>({'@path':path}),integer={type:'integer'},port=(kind,schema=integer)=>({kind,schema,required:true});
 export async function startBrowserFixture() {
  const registry=createRegistry();

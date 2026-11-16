@@ -61,13 +61,13 @@ const runtime = createRuntime({ registry, stateStore: store, requestExecutor: as
   if (kind !== 'Type') throw Error('This fixture resolver only serves Type definitions');
   return { kind, id, spec: { schema: { type: 'string' } } };
 } });
-const { view, initialComplete: initial } = await runtime.createView({ view: { render: inlineRoot } });
-const first = await initial; const generation: number = first.generation; void generation;
+const view = await runtime.createView({ render: inlineRoot });
+const first = await view.whenSettled(view.initial); const generation: number = first.generation; void generation;
 for (const error of first.queryErrors) { const code: string = error.error.code; void code; }
-await (await view.update(view.exportDefinition())).initialComplete;
-await (await view.replace({ viewRef: 'another-view', inputs: { title: 'example' } })).initialComplete;
-const unknownResult = await runtime.invokeAction({ actionRef: 'confirm', owner: view, inputs: { target: count, list: query } });
+await view.whenSettled(await view.updateDefinition(view.exportDefinition()));
+await view.whenSettled(await view.replace({ ref: 'another-view' }, { inputs: { title: 'example' } }));
+const unknownResult = await view.invokeAction({ actionRef: 'confirm', inputs: { target: count, list: query } });
 if (typeof unknownResult === 'boolean') { const result: boolean = unknownResult; void result; }
-await runtime.invokeAction({ action, owner: view, inputs: { count } });
+await view.invokeAction({ action, inputs: { count } });
 const clock: Clock = { now: () => 123, subscribe: listener => { listener(124); return () => {}; } }; clock.subscribe(value => { const epoch: number = value; void epoch; });
 scope.removeState('count'); scope.dispose(); view.dispose();

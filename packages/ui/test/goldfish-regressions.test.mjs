@@ -11,23 +11,24 @@ const styles = await readFile(new URL('../dist/styles.css', import.meta.url), 'u
 const bundle = await build({
   stdin: { resolveDir: workspace, contents: `
     import { createRegistry, createRuntime } from '@viewstem/core';
-    import { attach, registerShadcn } from '@viewstem/ui';
+    import { registerShadcn } from '@viewstem/ui';
+    import { connect } from './packages/ui/dist/dom.js';
 
     window.mount = async definition => {
       const registry = createRegistry();
       registerShadcn(registry);
       const runtime = createRuntime({ registry });
-      const { view, initialComplete } = await runtime.createView({ view: definition });
+      const view = await runtime.createView(definition);
       window.events = [];
       window.renderErrors = [];
-      const attachment = attach({
+      const attachment = connect({
         ...view,
         emit(node, event, payload) {
           if (!payload?.type) events.push([node.id, event, payload?.value]);
           return view.emit(node, event, payload);
         },
-      }, document.querySelector('#app'), { onError: error => renderErrors.push(String(error.code ?? error)) });
-      await initialComplete;
+      }, document.querySelector('#app'), error => renderErrors.push(String(error.code ?? error)));
+      await view.whenSettled(view.initial);
       window.view = view;
       window.viewErrors = () => view.getSnapshot().errors;
       window.dispose = () => {
@@ -36,6 +37,7 @@ const bundle = await build({
         window.viewErrors = () => errors;
         window.view = undefined;
         attachment.dispose();
+        view.dispose();
         runtime.dispose();
       };
       return view.getSnapshot().roots.map(node => node.status);
@@ -272,7 +274,7 @@ test('P1 structural-1-3: Menubar skips disabled triggers and follows updated DOM
   await page.keyboard.press('Home');
   assert.equal(await focused(), 'File');
   definition.render.slots.default = [file, disabled, help, view];
-  await page.evaluate(spec => window.view.update(spec), definition);
+  await page.evaluate(spec => window.view.updateDefinition(spec), definition);
   await page.keyboard.press('ArrowRight');
   assert.equal(await focused(), 'Help');
   await page.keyboard.press('ArrowLeft');
@@ -520,7 +522,7 @@ test('P2 structural-1-6: removing Popover.Content clears ARIA and stale event ha
   assert.equal(await trigger.getAttribute('aria-expanded'), 'true');
   const incomplete = structuredClone(definition);
   incomplete.render.slots.default.pop();
-  await page.evaluate(spec => window.view.update(spec), incomplete);
+  await page.evaluate(spec => window.view.updateDefinition(spec), incomplete);
   assert.equal(await trigger.getAttribute('aria-expanded'), 'false');
   assert.equal(await trigger.getAttribute('aria-controls'), null);
   const previous = await payloads(page, 'Settings', 'openChangeComplete');
@@ -529,7 +531,7 @@ test('P2 structural-1-6: removing Popover.Content clears ARIA and stale event ha
   await frame(page);
   assert.deepEqual(await payloads(page, 'Settings', 'openChange'), [true]);
   assert.deepEqual(await payloads(page, 'Settings', 'openChangeComplete'), previous);
-  await page.evaluate(spec => window.view.update(spec), definition);
+  await page.evaluate(spec => window.view.updateDefinition(spec), definition);
   await trigger.click();
   assert.equal(await trigger.getAttribute('aria-expanded'), 'true');
   assert.deepEqual(await payloads(page, 'Settings', 'openChange'), [true, true]);

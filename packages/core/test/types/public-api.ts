@@ -98,7 +98,7 @@ const celOptions: CelOptions = { inputs: { n: { type: 'number' } }, functions: [
 const computed: unknown = compileCel('double(n)', celOptions)({ n: 2 });
 const value: CelValue = 2;
 evaluateCel('n', { n: value }, celOptions);
-const runtime = createRuntime({ registry, stateStore: store, requestExecutor: executor, functions: [double] });
+const runtime = createRuntime({ registry, stateStore: store, requestExecutor: executor });
 registry.registerComponentContract({ kind: 'Component', id: 'Leaf', spec: {} }).registerResources([]);
 registry.registerComponentContracts([{ kind: 'Component', id: 'Other', spec: {} }] as const).registerResources([]);
 // @ts-expect-error Only Component contracts are accepted by the batch.
@@ -169,7 +169,7 @@ createRuntime({ registry, authorize: context => {
   }
   return true;
 } });
-await runtime.invokeAction({ owner: view, actionRef: 'typed', inputs: { count } });
+await view.invokeAction({ actionRef: 'typed', inputs: { count } });
 computeGridLayout([{ id: 'leaf' }], [{ id: 'leaf', address: 'node' }]);
 mergeOwnedUrl('https://example.test', { count: '1' });
 void computed;
@@ -207,14 +207,14 @@ const codeSpec: CodeActionSpec<{}, number> = { output: { schema: { type: 'number
 const codeDefinition: CodeActionDefinition<{}, number> = { kind: 'Action', id: 'typed-code', spec: codeSpec };
 registry.registerAction<{}, number>(codeDefinition, () => 7);
 const observed: ActionSnapshot | undefined = view.getSnapshot().actions.submit;
-const created = await runtime.createView({ view: { render: { id: 'leaf', componentRef: 'Leaf' } } });
-const completed: InitialReport = await created.initialComplete;
-const reapplied: InitialReport = await (await view.update(view.exportDefinition())).initialComplete;
-const replaced: InitialReport = await (await view.replace({ view: view.exportDefinition() })).initialComplete;
+const created = await runtime.createView({ render: { id: 'leaf', componentRef: 'Leaf' } });
+const completed: InitialReport = await created.whenSettled(created.initial);
+const reapplied: InitialReport = await view.whenSettled(await view.updateDefinition(view.exportDefinition()));
+const replaced: InitialReport = await view.whenSettled(await view.replace(view.exportDefinition()));
 store.writeBatch([[count, 1]]);
 const cleanup = store.registerReaction(stateScope, { watch: [count], target: scope.registerState('other', { schema: true }), value: 0 });
 cleanup();
-store.getDiagnostics(); registry.exportResource('Action', 'typed'); runtime.exportResource('Action', 'typed');
+store.getDiagnostics(); registry.exportResource('Action', 'typed');
 // @ts-expect-error Headless runtime creation is createView.
 runtime.mount({ view: view.exportDefinition() });
 // @ts-expect-error Component contract registration is explicit.
@@ -223,10 +223,10 @@ registry.registerComponent({ kind: 'Component', id: 'Old', spec: {} });
 registry.export('Action', 'typed');
 // @ts-expect-error Resource export has one name on Registry and Runtime.
 runtime.describeResource('Action', 'typed');
-// @ts-expect-error Completion promise has an explicit name.
-created.initial;
+// @ts-expect-error The old completion field is not exposed.
+created.initialComplete;
 // @ts-expect-error Application result uses the same completion name.
-(await view.update(view.exportDefinition())).initial;
+(await view.updateDefinition(view.exportDefinition())).initial;
 // @ts-expect-error Snapshot getters use getSnapshot.
 view.snapshot();
 // @ts-expect-error Snapshot getters use getSnapshot.

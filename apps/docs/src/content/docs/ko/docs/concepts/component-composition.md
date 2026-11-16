@@ -7,7 +7,7 @@ description: 입력과 인스턴스 소유 범위를 명확히 하면서 Compone
 
 ## Component 정의하기
 
-마운트 전에 이 리소스를 `renderer.registry.registerResources([definition])`으로 등록합니다. 사용하는 UI인 `badge` 패밀리도 등록되어 있어야 합니다.
+마운트 전에 이 리소스를 `renderer.runtime.registry.registerResources([definition])`으로 등록합니다. 기본 브라우저 렌더러에는 배지 카탈로그가 포함되어 있습니다.
 
 
 ```json

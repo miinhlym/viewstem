@@ -1,5 +1,5 @@
 import type { Registry, Runtime, ViewSpec } from '@viewstem/core';
-import type { attach as Attach } from '@viewstem/ui';
+import type { createRenderer } from '@viewstem/ui';
 
 export function sonnerInputs(view: ViewSpec): Record<string, unknown> {
   function visit(value: unknown): Record<string, unknown> | undefined {
@@ -16,13 +16,13 @@ export function sonnerInputs(view: ViewSpec): Record<string, unknown> {
 }
 
 // Executed by the preview and printed verbatim in its consumer setup.ts.
-export async function registerUiToastAction(registry: Registry, runtime: Runtime, target: HTMLElement, attach: typeof Attach, inputs: Record<string, unknown>): Promise<() => void> {
+export async function registerUiToastAction(registry: Registry, runtime: Runtime, target: HTMLElement, attach: ReturnType<typeof createRenderer>['attach'], inputs: Record<string, unknown>): Promise<() => Promise<void>> {
   const toastTarget = target.ownerDocument.createElement('div');
   toastTarget.dataset.demoNotifications = '';
   // Mount the fixed overlay outside the workbench's stacking context.
   target.ownerDocument.body.append(toastTarget);
   try {
-    const { view, initialComplete } = await runtime.createView({ view: {
+    const view = await runtime.createView({
       states: { messages: { kind: 'State', schema: true, initial: [] } },
       render: {
         id: 'docs-notifications', componentRef: 'shadcn.Notifications',
@@ -39,36 +39,35 @@ export async function registerUiToastAction(registry: Registry, runtime: Runtime
           inputs: { target: { '@path': '/states/messages' } },
         } },
       },
-    } });
+    });
     const attachment = attach(view, toastTarget);
-    await initialComplete;
+    await attachment.whenSettled(view.initial);
     registry.registerAction({ kind: 'Action', id: 'docs-show-toast', spec: { ports: {
       title: { kind: 'Value', schema: { type: 'string' }, required: true },
       description: { kind: 'Value', schema: { type: 'string' }, required: true },
     } } }, ({ inputs }) => {
       view.getState('messages').write([{ id: 'viewstem-docs-sonner-demo', title: String(inputs.title), description: String(inputs.description), kind: 'success', duration: 4000 }]);
     });
-    return () => { attachment.dispose(); view.dispose(); toastTarget.remove(); };
+    return async () => { await attachment.detach(); view.dispose(); toastTarget.remove(); };
   } catch (error) { toastTarget.remove(); throw error; }
 }
 
 export function uiDemoSetupSource(view: ViewSpec, family: string) {
   return [
-    "import { createRegistry, createRuntime, type ViewSpec, type Registry, type Runtime } from '@viewstem/core';",
-    "import { attach, registerShadcn } from '@viewstem/ui';",
+    family === 'sonner' ? "import type { ViewSpec, Registry, Runtime } from '@viewstem/core';" : "import type { ViewSpec } from '@viewstem/core';",
+    "import { createRenderer } from '@viewstem/ui';",
     "import '@viewstem/ui/styles.css';",
     "import view from './view.json';", '',
-    'const registry = createRegistry();', 'registerShadcn(registry);',
-    'const runtime = createRuntime({ registry });',
+    'const renderer = createRenderer();',
     'const target = document.querySelector<HTMLElement>("#preview");',
     'if (!target) throw new Error("Missing #preview element");',
-    ...(family === 'sonner' ? ['', `const registerUiToastAction: (registry: Registry, runtime: Runtime, target: HTMLElement, attach: typeof import('@viewstem/ui').attach, inputs: Record<string, unknown>) => Promise<() => void> = ${registerUiToastAction.toString()};`,
-      `const disposeToast = await registerUiToastAction(registry, runtime, target, attach, ${JSON.stringify(sonnerInputs(view))});`] : []), '',
+    ...(family === 'sonner' ? ['', `const registerUiToastAction: (registry: Registry, runtime: Runtime, target: HTMLElement, attach: ReturnType<typeof import('@viewstem/ui').createRenderer>['attach'], inputs: Record<string, unknown>) => Promise<() => Promise<void>> = ${registerUiToastAction.toString()};`,
+      'const { runtime } = renderer;',
+      `const disposeToast = await registerUiToastAction(runtime.registry, runtime, target, renderer.attach.bind(renderer), ${JSON.stringify(sonnerInputs(view))});`] : []), '',
     '// JSON imports widen discriminants; the runtime validates the definition.',
-    'const mounted = await runtime.createView({ view: view as unknown as ViewSpec });',
-    'const attachment = attach(mounted.view, target);', 'await mounted.initialComplete;', '',
-    '// Call when this screen is removed.', 'export function dispose() {',
-    '  attachment.dispose();', ...(family === 'sonner' ? ['  disposeToast();'] : []),
-    '  runtime.dispose();', '}',
+    'const screen = renderer.mount({ target, source: view as unknown as ViewSpec });', 'await screen.ready;', '',
+    '// Call when this screen is removed.', 'export async function dispose() {',
+    '  await screen.unmount();', ...(family === 'sonner' ? ['  await disposeToast();'] : []),
+    '  await renderer.dispose();', '}',
   ].join('\n');
 }

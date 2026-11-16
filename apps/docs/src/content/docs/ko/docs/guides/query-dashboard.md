@@ -11,8 +11,7 @@ sidebar:
 
 ```js title="src/main.js"
 import { createHttpExecutor } from '@viewstem/core/http';
-import { createRegistry, createRuntime } from '@viewstem/core';
-import { attach, registerShadcn } from '@viewstem/ui';
+import { createRenderer } from '@viewstem/ui';
 import '@viewstem/ui/styles.css';
 
 const requestExecutor = createHttpExecutor({
@@ -26,10 +25,6 @@ const requestExecutor = createHttpExecutor({
     return Response.json({ summary });
   },
 });
-
-const registry = createRegistry();
-registerShadcn(registry);
-const runtime = createRuntime({ registry, requestExecutor });
 
 const path = value => ({ '@path': value });
 const string = { type: 'string' };
@@ -49,67 +44,66 @@ const choices = [
 ];
 
 const target = document.querySelector('#viewstem');
-const mounted = await runtime.createView({
-  view: {
-    states: { period: { kind: 'State', schema: string, initial: 'week' } },
-    queries: {
-      report: {
-        inputs: { period },
-        query: {
-          ports: { period: periodInput },
-          sources: {
-            activity: {
-              datasource: { kind: 'Http', baseUrl: 'https://example.test' },
-              request: { method: 'GET', path: '/activity', params: { period: path('/ports/period') } },
-            },
+const renderer = createRenderer({ requestExecutor });
+const source = {
+  states: { period: { kind: 'State', schema: string, initial: 'week' } },
+  queries: {
+    report: {
+      inputs: { period },
+      query: {
+        ports: { period: periodInput },
+        sources: {
+          activity: {
+            datasource: { kind: 'Http', baseUrl: 'https://example.test' },
+            request: { method: 'GET', path: '/activity', params: { period: path('/ports/period') } },
           },
-          transform: { input: path('/sources/activity/summary') },
         },
-      },
-    },
-    render: {
-      id: 'dashboard',
-      componentRef: 'shadcn.Card.Root',
-      slots: {
-        default: [
-          {
-            id: 'controls',
-            componentRef: 'shadcn.Card.Header',
-            slots: {
-              default: choices.map(([next, text]) => ({
-                id: next,
-                componentRef: 'shadcn.Button',
-                inputs: { text, variant: 'outline' },
-                on: { click: { action: setPeriod, inputs: { target: period, next } } },
-              })),
-            },
-          },
-          {
-            id: 'status',
-            componentRef: 'shadcn.Card.Content',
-            inputs: {
-              role: 'status',
-              text: { '@call': 'concat', args: ['조회 상태: ', path('/queries/report/status')] },
-            },
-          },
-          {
-            id: 'result',
-            componentRef: 'shadcn.Card.Content',
-            inputs: { text: path('/queries/report/data') },
-          },
-          {
-            id: 'stale',
-            componentRef: 'shadcn.Card.Content',
-            when: path('/queries/report/stale'),
-            inputs: { text: '마지막으로 성공한 결과를 표시합니다.' },
-          },
-        ],
+        transform: { input: path('/sources/activity/summary') },
       },
     },
   },
-});
-const attachment = attach(mounted.view, target);
-await mounted.initialComplete;
+  render: {
+    id: 'dashboard',
+    componentRef: 'shadcn.Card.Root',
+    slots: {
+      default: [
+        {
+          id: 'controls',
+          componentRef: 'shadcn.Card.Header',
+          slots: {
+            default: choices.map(([next, text]) => ({
+              id: next,
+              componentRef: 'shadcn.Button',
+              inputs: { text, variant: 'outline' },
+              on: { click: { action: setPeriod, inputs: { target: period, next } } },
+            })),
+          },
+        },
+        {
+          id: 'status',
+          componentRef: 'shadcn.Card.Content',
+          inputs: {
+            role: 'status',
+            text: { '@call': 'concat', args: ['조회 상태: ', path('/queries/report/status')] },
+          },
+        },
+        {
+          id: 'result',
+          componentRef: 'shadcn.Card.Content',
+          inputs: { text: path('/queries/report/data') },
+        },
+        {
+          id: 'stale',
+          componentRef: 'shadcn.Card.Content',
+          when: path('/queries/report/stale'),
+          inputs: { text: '마지막으로 성공한 결과를 표시합니다.' },
+        },
+      ],
+    },
+  },
+};
+const screen = renderer.mount({ target, source });
+await screen.ready;
 ```
 
 1. **기간을 바꿉니다.** 각 버튼은 같은 `SetState` Action에 서로 다른 값을 전달합니다. `path`는 Viewstem의 `@path` 식을 만드는 함수입니다. Query 사용 선언은 `/states/period`에서 선택된 기간을 읽어 Query의 `period` 포트에 전달합니다.

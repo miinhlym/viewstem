@@ -34,7 +34,7 @@ sidebar:
 
 | 사용 위치 | 참조 | 인라인 필드 | 함께 쓰는 필드 |
 | --- | --- | --- | --- |
-| 호스트의 View 적용 대상 | `viewRef` | `view` | 호스트 `inputs`, 선택적 `url` 설정 |
+| 호스트의 View 적용 대상 | `{ ref: id }` | `ViewSpec` | 호스트 `inputs`, 선택적 `url` 설정 |
 | render 또는 슬롯 노드 | `componentRef` | `component` | `id`, `inputs`, `slots`, `on`, `when`, 허용 위치의 `repeat` |
 | Query 사용 또는 중첩 Query 소스 | `queryRef` | `query` | `inputs`. 실행 설정은 Query 사용 항목에 둡니다. |
 | HTTP 소스 | `datasourceRef` | `datasource` | 필수 `request` |
