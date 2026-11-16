@@ -19,13 +19,29 @@ Run `npm run check:ui`, `npm run check:svelte`, and `npm run test:ci` locally. C
 
 ## npm releases
 
-Run `npx changeset` for a PR that changes a published package and commit the
-generated file with the PR. Choose the affected packages, their SemVer bumps,
-and a summary for the changelog. Changesets tracks `core`, `svelte`, and
-`ui` independently. The Release PR includes any internal dependency
-updates and the refreshed npm lockfile.
+The [first public release](#first-public-release) uses the version in each
+package's `package.json`. Add a changeset when a PR has a change to ship in a
+new version of a published package.
 
-On a successful `main` CI run, Changesets opens or updates the Release PR.
+### Writing a changeset
+
+1. Run `npx changeset` from the repository root. Select the affected packages
+   and choose a SemVer bump for each. Changesets tracks `core`, `svelte`, and
+   `ui` independently.
+2. Write a short changelog entry that describes what changes for users of the
+   package. Add why it matters or how to migrate when users need that context.
+   Link to an existing guide if the migration needs more detail.
+3. Review the package names, bumps, and summary in the generated
+   `.changeset/*.md` file and commit it with the PR.
+
+A patch summary could read “Preserve unrelated URL parameters when replacing a
+View.” See the [Changesets writing guide](https://changesets.dev/faq#how-do-i-add-a-changeset).
+
+### Release PR
+
+When `main` CI passes and changesets are pending, Changesets opens or updates
+the Release PR with version bumps, any internal dependency updates, and the
+refreshed npm lockfile.
 A maintainer may need to approve its CI run in GitHub because it was created by
 `GITHUB_TOKEN`. Merge the Release PR after **CI complete**. The same check
 must pass on the merged commit before npm publishing runs. Package tags such as
