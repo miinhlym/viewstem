@@ -245,14 +245,14 @@ test('View updates return sanitized public errors without changing the active ap
     ['updateDefinition with a non-finite State value', () => view.updateDefinition(spec, { states: { count: NaN } })],
     ['updateDefinition with an uncloneable definition', () => view.updateDefinition(invalidDefinition)],
   ];
-  for (const [name, attempt] of attempts) await t.test(name, async () => {
+  for (const [name, attempt] of attempts) {
     await assert.rejects(attempt(), error => {
-      assert.deepEqual(error, { code: 'INVALID_DEFINITION', message: 'INVALID_DEFINITION' });
-      assert.equal('stack' in error, false);
+      assert.deepEqual(error, { code: 'INVALID_DEFINITION', message: 'INVALID_DEFINITION' }, name);
+      assert.equal('stack' in error, false, name);
       return true;
-    });
-    assert.deepEqual(view.getSnapshot(), before);
-  });
+    }, name);
+    assert.deepEqual(view.getSnapshot(), before, name);
+  }
 
   await rejectsCode(view.updateDefinition(spec, { states: { count: 'invalid' } }), 'TYPE_MISMATCH');
   assert.deepEqual(view.getSnapshot(), before);
