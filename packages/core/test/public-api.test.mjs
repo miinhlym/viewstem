@@ -227,6 +227,40 @@ test('createView, update and replace expose application handles and retain initi
   assert.deepEqual(core.computeGridLayout([{ id: 'leaf' }], [{ id: 'leaf', address: 'node' }]).get('node'), { row: 1, column: 1, rowSpan: 1, columnSpan: 12 });
 });
 
+test('View updates return sanitized public errors without changing the active application', async t => {
+  const runtime = core.createRuntime({ registry: registry() });
+  t.after(() => runtime.dispose());
+  const spec = {
+    ports: { value: { kind: 'Value', schema: integer, required: true } },
+    states: { count: { kind: 'State', schema: integer, initial: 2 } },
+    render: { ...definition.render, inputs: { value: path('/ports/value') } },
+  };
+  const view = await runtime.createView(spec, { inputs: { value: 1 } });
+  await view.whenSettled(view.initial);
+  const before = view.getSnapshot();
+  const invalidDefinition = { ...spec, render: { ...spec.render, inputs: { value: () => 1 } } };
+  const attempts = [
+    ['setInputs with a non-finite value', () => view.setInputs({ value: NaN })],
+    ['updateDefinition with a non-finite input', () => view.updateDefinition(spec, { inputs: { value: NaN } })],
+    ['updateDefinition with a non-finite State value', () => view.updateDefinition(spec, { states: { count: NaN } })],
+    ['updateDefinition with an uncloneable definition', () => view.updateDefinition(invalidDefinition)],
+  ];
+  for (const [name, attempt] of attempts) await t.test(name, async () => {
+    await assert.rejects(attempt(), error => {
+      assert.deepEqual(error, { code: 'INVALID_DEFINITION', message: 'INVALID_DEFINITION' });
+      assert.equal('stack' in error, false);
+      return true;
+    });
+    assert.deepEqual(view.getSnapshot(), before);
+  });
+
+  await rejectsCode(view.updateDefinition(spec, { states: { count: 'invalid' } }), 'TYPE_MISMATCH');
+  assert.deepEqual(view.getSnapshot(), before);
+  const application = await view.setInputs({ value: 3 });
+  assert.deepEqual(await view.whenSettled(application), { generation: 2, queryErrors: [] });
+  assert.equal(view.getSnapshot().roots[0].inputs.value, 3);
+});
+
 test('copied and fabricated handles cannot enter Registry, Store, Scope, View or State boundaries', async t => {
   const r = registry(), store = core.createStateStore(), scope = store.createScope();
   const count = scope.registerState('count', { schema: integer, initial: 1 });

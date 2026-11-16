@@ -80,11 +80,8 @@ function storeHandle(implementation) {
 function viewHandle(implementation) {
   if (viewHandles.has(implementation)) return viewHandles.get(implementation);
   const result = Object.freeze(Object.defineProperty(Object.assign(Object.create(null), {
-    setInputs: async inputs => implementation.update(undefined, { inputs: copyInputs(inputs) }),
-    updateDefinition: async (spec, options) => implementation.update(spec, {
-      inputs: options?.inputs === undefined ? undefined : copyInputs(options.inputs),
-      states: options?.states === undefined ? undefined : copyInputs(options.states),
-    }),
+    setInputs: (inputs = {}) => updateView(implementation, undefined, { inputs }),
+    updateDefinition: (spec, options) => updateView(implementation, spec, options),
     async replace(source, options) {
       try { return await implementation.replace(viewTarget(source, options), options?.signal); }
       catch (cause) { throw safeError(cause, 'INVALID_DEFINITION'); }
@@ -120,6 +117,17 @@ function copyInputs(inputs = {}) {
   return Object.fromEntries(Object.entries(inputs).map(([key, value]) => [
     key, isStateHandle(value) || isWrappedStateHandle(value) || isQueryHandle(value) || value === undefined ? value : protect(normalize(value, new WeakSet(), trustedCopies(value))),
   ]));
+}
+
+async function updateView(view, spec, options) {
+  try {
+    const inputs = options?.inputs;
+    const states = options?.states;
+    return await view.update(spec, {
+      inputs: inputs === undefined ? undefined : copyInputs(inputs),
+      states: states === undefined ? undefined : copyInputs(states),
+    });
+  } catch (cause) { throw safeError(cause, 'INVALID_DEFINITION'); }
 }
 
 function viewTarget(source, options) {
