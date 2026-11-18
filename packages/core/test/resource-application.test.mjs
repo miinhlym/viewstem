@@ -46,6 +46,53 @@ test('sets and definitions apply to one View together and reject invalid State o
   assert.equal(await (await runtime.createView(definition())).invokeAction({ actionRef: 'newAction' }), 2);
 });
 
+test('a missing input reference keeps the open View and leaves resolver candidates unpublished', async t => {
+  const registry = createRegistry().registerResourceSet(defineResourceSet({
+    id: 'base', version: '1', components: [binding('Base')],
+    actions: [{
+      definition: { kind: 'Action', id: 'increment', spec: { ports: { count: { kind: 'State', schema, required: true } } } },
+      implementation: ({ inputs }) => inputs.count.write(inputs.count.read() + 1),
+    }],
+  }));
+  let resolved = 0;
+  const runtime = createRuntime({ registry, resourceResolver(kind, id) {
+    if (kind === 'Type' && id === 'Retrieved') { resolved++; return resource(id); }
+  } });
+  t.after(() => runtime.dispose());
+  const source = definition();
+  source.render.on = { click: { actionRef: 'increment', inputs: { count: { '@path': '/states/count' } } } };
+  const view = await runtime.createView(source);
+  const cell = view.getState('count');
+  await view.emit(view.getSnapshot().roots[0], 'click', null);
+  assert.equal(cell.read(), 2);
+  registry.registerResourceSet(defineResourceSet({ id: 'new', version: '1', actions: [code('newAction', () => 2)] }));
+
+  const invalid = structuredClone(source);
+  invalid.render.on.click.inputs.count['@path'] = '/states/coutn';
+  const replacement = structuredClone(invalid);
+  replacement.states.extra = { kind: 'State', typeRef: 'Retrieved', initial: 1 };
+  const attempts = [
+    () => view.updateDefinition(invalid, { states: { count: 99 } }),
+    () => view.applyResourceSets({ setIds: ['new'], definition: invalid, states: { count: 99 } }),
+    () => view.replace(replacement),
+  ];
+  const original = view.getSnapshot();
+  const application = view.initial;
+  for (const apply of attempts) {
+    await assert.rejects(apply(), { code: 'REFERENCE_NOT_FOUND', location: '/render/on/click/inputs/count/@path' });
+    assert.deepEqual(view.exportDefinition(), source);
+    assert.equal(view.initial, application);
+    assert.equal(view.getSnapshot().roots[0].generation, original.roots[0].generation);
+    assert.equal(view.getState('count'), cell);
+    assert.equal(cell.read(), 2);
+  }
+  await assert.rejects(view.invokeAction({ actionRef: 'newAction' }), codeIs('REFERENCE_NOT_FOUND'));
+  assert.equal(resolved, 1);
+  assert.throws(() => registry.get('Type', 'Retrieved'), codeIs('REFERENCE_NOT_FOUND'));
+  await view.emit(view.getSnapshot().roots[0], 'click', null);
+  assert.equal(cell.read(), 3);
+});
+
 test('an in-flight Action resolves descendant calls from its starting configuration', async t => {
   let release;
   const held = new Promise(resolve => { release = resolve; });

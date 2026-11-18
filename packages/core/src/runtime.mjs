@@ -1,4 +1,4 @@
-import { Registry } from './registry.mjs';
+import { Registry, actionDeclarations, missingReference } from './registry.mjs';
 import { prepareUrlConnection } from './url.mjs';
 import { StateStore, createStateStore } from './state.mjs';
 import { compilePorts, expression, createQueryHandle, sameContract, stateRoot } from './ports.mjs';
@@ -96,36 +96,42 @@ export class Runtime {
         const existing = candidate.list({ kind, id })[0];
         if (existing && (candidate.isCode(kind, id) || !equal(existing, definition))) fail('INVALID_DEFINITION');
       }
-      const visit = async (kind, id) => {
+      const visit = async ({ kind, id, ...origin }) => {
         check();
         const key = tuple([kind, id]);
         if (seen.has(key)) return;
         seen.add(key);
         let definition;
         try { definition = candidate.get(kind, id); }
-        catch (caught) {
-          if (!this.resourceResolver) throw caught;
+        catch {
+          if (!this.resourceResolver) missingReference(kind, id, origin);
           if (!fetched.has(key)) {
-            const result = await abortable(this.prepare(() => this.resourceResolver(kind, id, { signal })), signal);
+            let result;
+            try {
+              result = await abortable(this.prepare(() => this.resourceResolver(kind, id, { signal })), signal);
+            } catch (caught) {
+              if (safeError(caught).code === 'REFERENCE_NOT_FOUND') missingReference(kind, id, origin);
+              throw caught;
+            }
             check();
-            if (result?.kind !== kind || result?.id !== id) fail('REFERENCE_NOT_FOUND');
+            if (result?.kind !== kind || result?.id !== id) missingReference(kind, id, origin);
             fetched.set(key, structuredClone(result));
           }
           definition = fetched.get(key);
           needed.push(definition);
         }
-        for (const [childKind, childId] of candidate.references(kind, definition.spec)) await visit(childKind, childId);
+        for (const reference of candidate.references(kind, definition.spec, id)) await visit(reference);
         return definition;
       };
       const spec = target.viewRef !== undefined
-        ? (await visit('View', target.viewRef)).spec : target.view;
+        ? (await visit({ kind: 'View', id: target.viewRef, location: '/ref' })).spec : target.view;
       if (target.viewRef === undefined) {
-        for (const [kind, id] of candidate.references('View', spec)) await visit(kind, id);
+        for (const reference of candidate.references('View', spec)) await visit(reference);
       }
       check();
       if (revision !== this.registry.revision) continue;
       if (needed.length) candidate.registerResources(needed);
-      candidate.validateDefinition('View', spec);
+      candidate.validateDefinition('View', spec, target.viewRef);
       return { spec, candidate, revision, additions: needed };
     }
   }
@@ -315,11 +321,11 @@ export class View {
         let connection=[...(plan?.connections??this.connections).values()].find(item=>item.owner.id===owner.id&&item.handler.id===name);
         if(!connection&&plan?.connections){
           const previous=[...this.connections.values()].find(item=>item.owner.id===owner.id&&item.handler.id===name);
-          const declared=this.actionDeclarations(owner.spec).get(name);
+          const declared=actionDeclarations(owner.spec).get(name);
           if(previous&&equal(previous.handler,declared))connection=previous;
         }
         if(connection)value=connection.connection.getSnapshot();
-        else if(plan?.connections&&this.actionNames(owner.spec).has(name))value=idle;
+        else if(plan?.connections&&actionDeclarations(owner.spec).has(name))value=idle;
         else fail('REFERENCE_NOT_FOUND');
       } else if(root==='repeat') {if(!own(extra.repeat??{},name))fail('REFERENCE_NOT_FOUND');value=extra.repeat[name];}
       else if(root==='event') {if(!own(extra,'event'))fail('REFERENCE_NOT_FOUND');return {value:extra.event,offset:1};}
@@ -327,8 +333,6 @@ export class View {
       return {value,offset:2};
     };return {functions:this.runtime.functions,resolve};
   }
-  actionDeclarations(spec) {const declarations=new Map();const walk=node=>{for(const handler of Object.values(node.on??{}))if(handler.id)declarations.set(handler.id,handler);for(const content of Object.values(node.slots??{}))if(Array.isArray(content))content.forEach(walk);};if(spec.render)walk(spec.render);return declarations;}
-  actionNames(spec) {const names=new Set();const walk=node=>{for(const h of Object.values(node.on??{}))if(h.id)names.add(h.id);for(const content of Object.values(node.slots??{}))if(Array.isArray(content))content.forEach(walk);};if(spec.render)walk(spec.render);return names;}
   bindInputs(spec, templates, context, literal = false, registry = this.runtime.registry) {
     const inputs=Object.create(null);
     if(literal)Object.assign(inputs,templates??{});

@@ -142,17 +142,42 @@ test('capability inputs require real writable cells and compatible contracts', (
 test('reference inventory traverses syntax positions, named sources and branch/inline definitions', () => {
   const registry = new Registry();
   const refs = registry.references('Query', query({ alpha: { queryRef: 'one' }, beta: { datasourceRef: 'http', request: {} }, gamma: { query: { ...query(), ports: { p: { kind: 'Value', typeRef: 'type' } } } } }, { queryRef: 'ordinary-data' }));
-  assert.deepEqual(refs, [['Query', 'one'], ['Datasource', 'http'], ['Type', 'type']]);
-  assert.deepEqual(registry.references('Action', { steps: [{ kind: 'If', then: [{ kind: 'Variable', variableRef: 'v' }], else: [{ kind: 'Action', spec: { steps: [{ kind: 'Query', queryRef: 'q' }] } }] }] }), [['Variable', 'v'], ['Query', 'q']]);
+  assert.deepEqual(refs, [
+    { kind: 'Query', id: 'one', location: '/sources/alpha/queryRef' },
+    { kind: 'Datasource', id: 'http', location: '/sources/beta/datasourceRef' },
+    { kind: 'Type', id: 'type', location: '/sources/gamma/query/ports/p/typeRef' },
+  ]);
+  assert.deepEqual(registry.references('Action', { steps: [{ kind: 'If', then: [{ kind: 'Variable', variableRef: 'v' }], else: [{ kind: 'Action', spec: { steps: [{ kind: 'Query', queryRef: 'q' }] } }] }] }, 'outer'), [
+    { kind: 'Variable', id: 'v', resource: { kind: 'Action', id: 'outer' }, location: '/spec/steps/0/then/0/variableRef' },
+    { kind: 'Query', id: 'q', resource: { kind: 'Action', id: 'outer' }, location: '/spec/steps/0/else/0/spec/steps/0/queryRef' },
+  ]);
 });
 
 
-test('when:false preserves unevaluated dynamic input paths while validating syntax', () => {
+test('hidden branches validate declaration names without reading nested data', () => {
   const registry = ui();
-  registry.validateDefinition('View', view(node('hidden', { when: false, inputs: { text: { '@path': '/states/absent' } } })));
+  const hidden = path => node('hidden', { when: false, inputs: { text: { '@path': path } } });
+  assert.throws(() => registry.validateDefinition('View', view(hidden('/states/absent'))), {
+    code: 'REFERENCE_NOT_FOUND', message: 'Unknown State "absent".', location: '/render/inputs/text/@path', input: 'text',
+  });
+  registry.validateDefinition('View', { states: { present: state() }, render: hidden('/states/present/unknown') });
   bad(() => registry.validateDefinition('View', view(node('hidden', { when: false, inputs: { text: { '@path': '/states/absent', extra: true } } }))), 'INVALID_EXPRESSION');
 });
 
+test('reference positions escape authored keys and identify the declaring resource', () => {
+  const registry = ui();
+  registry.registerComponentContract(resource('Component', 'Escaped', { slots: { 'body/~': {} } }));
+  assert.throws(() => registry.registerResources([resource('View', 'example', view({
+    id: 'parent', componentRef: 'Escaped', slots: { 'body/~': [node('child', {
+      inputs: { text: { '@call': 'formatString', args: { value: '${/states/missing}' } } },
+    })] },
+  }))]), {
+    code: 'REFERENCE_NOT_FOUND', message: 'Unknown State "missing".',
+    location: '/spec/render/slots/body~1~0/0/inputs/text/args/value', resource: { kind: 'View', id: 'example' },
+  });
+  registry.validateDefinition('View', view(node('literal', { inputs: { text: { '@@path': '/states/missing' } } })));
+  bad(() => registry.validateDefinition('View', view([node()])));
+});
 
 test('Derived and reaction cycles include explicitly connected State ports', () => {
   const registry = ui();

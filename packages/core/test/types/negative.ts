@@ -12,6 +12,8 @@ type Inputs = { form: { title: string; tags: string[]; metadata: Map<string, { l
 declare const context: ActionContext<Inputs>;
 const registry = createRegistry();
 const runtime = createRuntime({ registry });
+// @ts-expect-error VIEW_SINGLE_ROOT - children belong to the single root's slots.
+void runtime.createView({ render: [{ id: 'leaf', componentRef: 'Leaf' }] });
 
 // @ts-expect-error XOR_SCHEMA_BOTH - schema/typeRef cannot coexist.
 const bothSchema: TypeContract = { schema: { type: 'number' }, typeRef: 'number' };

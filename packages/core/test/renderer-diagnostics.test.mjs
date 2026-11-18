@@ -140,6 +140,85 @@ test('a renderer disposed by its first prepare observer skips the screen observe
   assert.deepEqual(events, ['renderer']);
 });
 
+test('missing references reject preparation with authored positions and a single diagnostic', async t => {
+  const leaf = { ...component, spec: { ...component.spec, events: { click: { schema: true } } } };
+  const runtime = createRuntime({ componentContracts: [leaf] });
+  runtime.registry.registerAction({ kind: 'Action', id: 'increment', spec: {
+    ports: { count: { kind: 'State', required: true, schema: { type: 'integer' } } },
+  } }, () => assert.fail('the Action must not run'));
+  const diagnostics = [];
+  const renderer = host(runtime, { onError: diagnostic => diagnostics.push(diagnostic) });
+  t.after(async () => { await renderer.dispose(); runtime.dispose(); });
+  const states = { count: { kind: 'State', schema: { type: 'integer' } } };
+  for (const [overrides, location, message, code] of [
+    [{ componentRef: 'Absent' }, '/render/componentRef', 'Unknown Component "Absent".'],
+    [{ on: { click: { actionRef: 'incremnt' } } }, '/render/on/click/actionRef', 'Unknown Action "incremnt".'],
+    [{ on: { clik: { actionRef: 'increment' } } }, '/render/on/clik', 'Unknown event "clik" on Component "Leaf".', 'INVALID_DEFINITION'],
+    [{ inputs: { text: { '@path': '/states/coutn' } } }, '/render/inputs/text/@path', 'Unknown State "coutn".'],
+    [{ on: { click: { actionRef: 'increment', inputs: { count: { '@path': '/states/coutn' } } } } },
+      '/render/on/click/inputs/count/@path', 'Unknown State "coutn".'],
+  ]) {
+    const screen = renderer.mount({ target: {}, source: { states, render: { ...render, ...overrides } } });
+    const expected = { code: code ?? 'REFERENCE_NOT_FOUND', location, message };
+    await Promise.all([assert.rejects(screen.ready, expected), assert.rejects(screen.whenRendered(), expected)]);
+    assert.equal(diagnostics.length, 1);
+    const diagnostic = diagnostics.pop();
+    assert.equal(diagnostic.phase, 'prepare');
+    const { input, ...error } = diagnostic.error;
+    assert.deepEqual(error, expected);
+    assert.equal(input, overrides.inputs ? 'text' : overrides.on?.click?.inputs ? 'count' : undefined);
+  }
+});
+
+test('declared inputs wait and report value errors on their own node after preparation', async t => {
+  const runtime = createRuntime({ componentContracts: [
+    component, { kind: 'Component', id: 'Group', spec: { slots: { default: {} } } },
+  ] });
+  const diagnostics = [];
+  const renderer = host(runtime, { onError: diagnostic => diagnostics.push(diagnostic) });
+  t.after(async () => { await renderer.dispose(); runtime.dispose(); });
+  const screen = renderer.mount({ target: {}, source: {
+    states: { label: { kind: 'State', schema: true } },
+    render: { id: 'group', componentRef: 'Group', slots: { default: [
+      { ...render, inputs: { text: { '@path': '/states/label' } } }, { ...render, id: 'sibling' },
+    ] } },
+  } });
+  const view = await screen.ready;
+  const children = () => view.getSnapshot().roots[0].slots.default;
+  assert.deepEqual(children().map(node => node.status), ['pending', 'ready']);
+  assert.equal(diagnostics.length, 0);
+  const generation = children()[0].generation;
+  view.getState('label').write(5);
+  assert.deepEqual(children().map(node => node.status), ['error', 'ready']);
+  assert.equal(diagnostics.length, 1);
+  assert.deepEqual([diagnostics[0].phase, diagnostics[0].nodeId, diagnostics[0].error.code], ['node', 'leaf', 'TYPE_MISMATCH']);
+  view.getState('label').write('ready');
+  assert.deepEqual(children().map(node => node.status), ['ready', 'ready']);
+  assert.equal(children()[0].generation, generation);
+  assert.equal(children()[0].inputs.text, 'ready');
+});
+
+test('missing resolver dependencies point to the fetched declaration that uses them', async t => {
+  let inner = { id: 'inner', componentRef: 'Missing' };
+  const runtime = createRuntime({
+    componentContracts: [component],
+    resourceResolver(kind, id) {
+      if (kind === 'Component' && id === 'Panel') return { kind, id, spec: { render: inner } };
+    },
+  });
+  t.after(() => runtime.dispose());
+  const source = { render: { id: 'panel', componentRef: 'Panel' } };
+  await assert.rejects(runtime.createView(source), {
+    code: 'REFERENCE_NOT_FOUND', message: 'Unknown Component "Missing".',
+    location: '/spec/render/componentRef', resource: { kind: 'Component', id: 'Panel' },
+  });
+  assert.throws(() => runtime.registry.get('Component', 'Panel'), { code: 'REFERENCE_NOT_FOUND' });
+  inner = render;
+  const view = await runtime.createView(source);
+  assert.equal(view.getSnapshot().roots[0].children[0].inputs.text, 'ok');
+  assert.equal(runtime.registry.get('Component', 'Panel').id, 'Panel');
+});
+
 test('the first render only suppresses an already reported failure with the same identity', async t => {
   const runtime = createRuntime({ componentContracts: [component] });
   t.after(() => runtime.dispose());
