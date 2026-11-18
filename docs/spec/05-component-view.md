@@ -75,6 +75,8 @@ Query 사용 인스턴스는 [Query 상세](02-query.md)에 별도로 정리한�
 
 **확정:** View는 서비스가 마운트하는 화면의 진입점과 수명 소유자이며, 재사용 Component는 그 안에서 조합하는 단위다. View 역시 ports·states·queries를 소유할 수 있고 spec.render는 배열이 아닌 단일 루트 노드다. 자식 트리는 각 노드의 slots에 넣는다. 서로 다른 View 마운트는 별도 인스턴스이며 자동 전역 singleton이 아니다.
 
+**D164 · 첫 버전의 View 루트.** 첫 버전은 단일 루트를 유지한다. 여러 컴포넌트를 호스트 요소의 직접 자식으로 배치해야 하는 사용 사례가 생기면 `ViewSpec.render`에 배열을 허용하는 안을 검토한다. [혼합 View 공개 API 리뷰](../designs/viewstem-mixed-view-api-review-2026-11-18.md#4-단일-루트는-실제-배치-제약이다--후속-검토)
+
 ```json
 {
   "kind": "View",

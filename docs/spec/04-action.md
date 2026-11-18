@@ -198,7 +198,11 @@ Value의 `default`는 키가 생략된 경우에만 적용하므로 TypeScript�
 
 `updateResource()`는 후보 정의와 의존성을 먼저 검증한다. 기존 코드 Action의 포트 이름과 열거 순서, 종류, 필수 여부, 기본값, 해석된 Value·State 스키마 및 출력 유무와 스키마를 보존해야 한다. 기본값은 JSON 값의 배열과 객체 키 순서도 보존한다. 스키마는 `typeRef`를 해석한 구조를 비교하며 객체 키 순서만 무시한다. Type 갱신도 참조하는 모든 코드 Action에 같은 규칙을 적용한다. 표시 이름 변경과 같은 스키마를 가리키는 참조 변경은 허용한다.
 
-후보가 유효해도 계약이 달라지면 `TYPE_CONTRACT_MISMATCH`에 영향을 받는 Action의 `resource`, 변경 위치인 `location` 및 해당 포트의 `input`을 담아 거절한다. Registry 정의와 핸들러, 실행 중인 View와 호출에는 갱신을 적용하지 않는다. 계약 변경 시 공유 Type이 달라지면 새 Type ID를 등록하고, 새 Action ID로 계약과 핸들러를 함께 등록한 뒤 호출 입력과 `actionRef`를 전환한다. 이전 ID를 직접 호출하는 코드 Action의 구현을 교체할 때도 새 ID로 등록한다. 새 View나 `replace()`에서 전환한 구성을 적용한다.
+후보가 유효해도 계약이 달라지면 `TYPE_CONTRACT_MISMATCH`에 영향을 받는 Action의 `resource`, 변경 위치인 `location` 및 해당 포트의 `input`을 담아 거절한다. Registry 정의와 핸들러, 실행 중인 View와 호출에는 갱신을 적용하지 않는다. 계약 변경 시 공유 Type이 달라지면 새 Type ID를 등록하고, 새 Action ID로 계약과 핸들러를 함께 등록한 뒤 호출 입력과 `actionRef`를 전환한다. 새 View나 `replace()`에서 전환한 구성을 적용한다.
+
+**리소스 셋 설계에서 보완한 D154.** 입력·출력 계약과 필수 호스트 기능이 같으면 명시적 교체로 같은 Action ID에 새 함수를 게시할 수 있다. 이 중 하나라도 달라지면 새 Action ID를 사용한다. 게시 시 이미 진행 중인 호출은 시작 당시 함수로 계속 실행하고, 열린 View는 서비스가 교체를 명시적으로 적용할 때까지 기존 함수를 사용한다. 새 View와 교체를 받아들인 View는 새 함수를 사용한다. 열린 View의 교체 적용은 해당 View의 내부 수명을 새로 시작하는 일반 교체 계약을 따른다. [리소스 셋의 교체와 View 적용](12-resource-sets-browser.md#공통-저장소와-view-적용)
+
+**공개 API 후속 결정(D154).** `defineCodeAction({ definition, requires? })`으로 코드 Action의 ID, 입출력 계약과 필수 호스트 기능을 한 번 선언한다. 반환한 계약의 `.implement(handler)`는 그 계약에 맞는 함수로 Action 엔트리를 만든다. 다른 파일에서 가져온 엔트리는 `defineResourceSet({ actions: [...] })`과 `registry.replaceResource({ action })`에 전달할 수 있다. 같은 ID의 구현 교체에는 같은 계약의 `.implement()`로 새 함수를 연결한다. 리터럴 스키마에서 핸들러의 입력·출력 타입을 추론하며, `typeRef`를 쓰는 계약은 `defineCodeAction<Inputs, Output>()`으로 타입을 명시할 수 있다. Registry는 실제 스키마를 해석하고 등록·교체 계약을 검증한다.
 
 ### 재귀·확장 실행의 경계
 

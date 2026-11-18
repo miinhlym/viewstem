@@ -26,6 +26,7 @@ Viewstem은 **재사용 리소스로 UI·상태·데이터·동작을 선언하�
 | [09 StateStore·reaction·URL](spec/09-preserved-contracts.md) | Store 주입·관찰·URL·컬렉션 전송의 현행 계약과 이관 근거 |
 | [10 값 상세](spec/10-value-contracts.md) | State의 missing 읽기·undefined·숫자 범위·표현·정규화·미지원 값/순환 거절, literal/escape, 시간 의존 계산, 타입별 비교, 격리·읽기 snapshot, 날짜 경계 |
 | [11 선택 차트](spec/11-optional-charts.md) | core 기본 제공과 구별하는 차트 계약·엔진 범위·독립 실험과 제품 구현의 구분 |
+| [12 리소스 셋과 브라우저 렌더링](spec/12-resource-sets-browser.md) | 패키지 역할, 실행 중 셋 등록과 View별 적용, headless, 혼합 트리 소유권의 확정 설계 |
 
 `[E01]` 등의 근거 표기는 결정 근거 식별자다. E01–E42는 원 통합 명세의 색인이고 E43–E69은 보관 원문 직접 대조와 방 기록 회수로 보완한 근거다. 회수 요약과 원문 전문은 [색인](history/evidence-index.md)에서 구별한다. U01–U41은 이관 후 프로젝트 대화에서 확정한 명확화·값 계약·실행 실험·CEL 패치 진행 전제·검증 진행·도구 구현의 근거다. 해당 대화를 읽어야만 이 명세를 해석할 수 있도록 작성하지 않는다.
 
@@ -49,7 +50,9 @@ JSON 예시는 확정된 구조의 의미를 설명한다. 외부 코드형 Comp
 
 ## 2 가장 큰 그림과 설계 트리
 
-추진 순서는 **공통 계약 → 프레임워크 독립 core → Svelte 렌더러 → 서비스 확장**이다.
+초기 추진 순서는 **공통 계약 → 프레임워크 독립 core → Svelte 렌더러 → 서비스 확장**이었다.
+
+JS/TS 브라우저 렌더러의 후속 구조는 [리소스 셋과 브라우저 렌더링](spec/12-resource-sets-browser.md)의 공통 브라우저 기반과 DOM·Svelte 연결자를 따른다. 현재 패키지 사용법은 [호스트 연결 명세](spec/07-host-integration.md)에서 확인한다.
 
 | 영역 | 확정된 범위 | 구현·검증 경계 |
 |---|---|---|
