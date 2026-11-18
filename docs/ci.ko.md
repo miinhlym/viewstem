@@ -25,7 +25,7 @@ PR이나 수동 실행으로 확인합니다.
 ### Changeset 작성하기
 
 1. 저장소 루트에서 `npx changeset`을 실행합니다. 영향을 받는 패키지를 선택하고
-   각각의 SemVer 변경 수준을 정합니다. `core`, `svelte`, `ui`의 버전은
+   각각의 SemVer 변경 수준을 정합니다. `core`, `dom`, `svelte`, `ui`의 버전은
    독립적으로 관리합니다.
 2. 패키지 사용자에게 달라지는 점을 변경 이력에 들어갈 짧은 문장으로 씁니다.
    사용자가 알아야 할 변경 이유나 이관 방법을 덧붙이고, 자세한 절차가 필요하면
@@ -54,8 +54,8 @@ PR이나 수동 실행으로 확인합니다.
    `main`에서 `npm ci --ignore-scripts`, `npm run build:svelte && npm run build -w @viewstem/ui`,
    `node .github/scripts/npm-release.mjs pack-initial /tmp/viewstem-release`를
    실행합니다. tarball의 문서 링크는 빌드한 소스 커밋을 가리킵니다.
-2. `npm publish <tarball> --access public`과 대화형 2FA로 core, svelte,
-   ui 순서로 공개합니다. 해당 소스 커밋에 각 패키지 태그를 기록합니다.
+2. `npm publish <tarball> --access public`과 대화형 2FA로 네 패키지를 공개합니다.
+   Core, DOM, Svelte, UI 순서로 발행합니다. 해당 소스 커밋에 각 패키지 태그를 기록합니다.
 3. 각 npm 패키지에 Trusted Publisher를 추가합니다. GitHub 소유자는
    `miinhlym`, 저장소는 `viewstem`, 워크플로 파일은 `core.yml`이고
    직접 `npm publish`를 허용합니다. `core.yml`에서 `npm-release.yml`을

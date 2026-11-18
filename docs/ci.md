@@ -26,8 +26,8 @@ new version of a published package.
 ### Writing a changeset
 
 1. Run `npx changeset` from the repository root. Select the affected packages
-   and choose a SemVer bump for each. Changesets tracks `core`, `svelte`, and
-   `ui` independently.
+   and choose a SemVer bump for each. Changesets tracks `core`, `dom`, `svelte`,
+   and `ui` independently.
 2. Write a short changelog entry that describes what changes for users of the
    package. Add why it matters or how to migrate when users need that context.
    Link to an existing guide if the migration needs more detail.
@@ -55,8 +55,8 @@ job skips existing versions with matching tarball integrity.
    `main` checkout, run `npm ci --ignore-scripts`, `npm run build:svelte && npm run build -w @viewstem/ui`,
    then `node .github/scripts/npm-release.mjs pack-initial /tmp/viewstem-release`.
    The tarballs include documentation links pinned to the source commit.
-2. Publish the three tarballs with interactive 2FA and `npm publish <tarball> --access public`
-   in this order: core, svelte, ui. Record their package tags on that commit.
+2. Publish the four tarballs with interactive 2FA and `npm publish <tarball> --access public`.
+   Publish Core first, then DOM, then Svelte and UI. Record their package tags on that commit.
 3. Add a Trusted Publisher for each npm package. Use GitHub owner `miinhlym`,
    repository `viewstem`, and workflow filename `core.yml`, with direct
    `npm publish` allowed. `core.yml` calls `npm-release.yml`. Set up trust when

@@ -30,20 +30,23 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - name: Build all packages once
-        run: npm run build:svelte && npm run build -w @viewstem/ui
+        run: npm run build:dom && npm run build -w @viewstem/ui && npm run build -w @viewstem/svelte
       - name: Core tests, types and acceptance coverage
         run: |
           npm run test:report
           npm run typecheck
           npm run check:coverage
           npm run test:ci
-      - name: Svelte adapter types
-        run: npm run typecheck -w @viewstem/svelte
+      - name: Browser connector and Svelte adapter types
+        run: |
+          npm run typecheck -w @viewstem/dom
+          npm run typecheck -w @viewstem/svelte
       - run: npx playwright install --with-deps --only-shell chromium
       - name: Installed tarball consumers on each Node version
         run: |
           npm run test:package
           npm run test:svelte:package
+          npm run test:dom:package
 
   ui:
     name: Browser and UI consumer tests
@@ -56,9 +59,10 @@ jobs:
           node-version: '24.1.0'
           cache: npm
       - run: npm ci --ignore-scripts
-      - run: npm run build:svelte && npm run build -w @viewstem/ui
+      - run: npm run build:dom && npm run build -w @viewstem/ui && npm run build -w @viewstem/svelte
       - run: npx playwright install --with-deps --only-shell chromium
       - run: npm run test -w @viewstem/ui
+      - run: npm run test -w @viewstem/dom
       - run: npm run test:browser
       - run: npm run test -w @viewstem/svelte
 
