@@ -5,6 +5,8 @@ import type { ActionSnapshot, ActionHandler, ActionContext, CodeActionSpec, Code
 import type { Component, Snippet } from 'svelte';
 import TypedAdapter from './TypedAdapter.svelte';
 import TypedHost from './TypedHost.svelte';
+import ContractAdapter from './ContractAdapter.svelte';
+import { countContract } from './contract.js';
 
 const defaultRenderer = createRenderer();
 const { runtime } = defaultRenderer;
@@ -27,6 +29,50 @@ declare const state: StateHandle<number>;
 void [definition, sharedRuntime, state];
 const adapter: ComponentAdapter = TypedAdapter;
 registry.registerResourceSet(defineResourceSet({ id: 'fixture', version: '1', components: [svelteComponent(contract, adapter)] }));
+const countBinding = svelteComponent(countContract, ContractAdapter);
+registry.registerResourceSet(defineResourceSet({ id: 'typed-fixture', version: '1', components: [countBinding] }));
+svelteComponent(countContract, adapter);
+const textContract = {
+  ...countContract, spec: { ports: { count: { kind: 'Value', schema: { type: 'string' }, required: true } } },
+} as const satisfies ComponentContract;
+// @ts-expect-error The registration contract determines the adapter props.
+svelteComponent(textContract, ContractAdapter);
+declare const typed: ComponentAdapterProps<typeof countContract>;
+// @ts-expect-error Pending inputs may be absent.
+const unchecked: number = typed.node.inputs.count;
+if (typed.node.status === 'ready') {
+  const ready: number = typed.node.inputs.count;
+  // @ts-expect-error Inputs belong to the snapshot and are readonly.
+  typed.node.inputs.count = 9;
+  void ready;
+} else {
+  const incomplete: number | undefined = typed.node.inputs.count;
+  void incomplete;
+}
+const variedContract = {
+  ...countContract,
+  spec: { ports: {
+    optional: { kind: 'Value', schema: { type: 'string' } },
+    cell: { kind: 'State', schema: { type: 'integer' }, required: true },
+    query: { kind: 'Query', required: true },
+    referenced: { kind: 'Value', typeRef: 'CustomType', required: true },
+    config: { kind: 'Value', schema: { type: 'array', items: { type: 'integer' } }, required: true },
+  } },
+} as const satisfies ComponentContract;
+declare const varied: ComponentAdapterProps<typeof variedContract>;
+if (varied.node.status === 'ready') {
+  const text: string | undefined = varied.node.inputs.optional;
+  const state: StateHandle<number> = varied.node.inputs.cell;
+  const value: number | undefined = state.read();
+  const queryStatus: string = varied.node.inputs.query.getSnapshot().status;
+  const config: readonly number[] = varied.node.inputs.config;
+  // @ts-expect-error The literal contract can't resolve Registry Type references.
+  const assumed: number = varied.node.inputs.referenced;
+  // @ts-expect-error Nested snapshot inputs are readonly.
+  varied.node.inputs.config.push(1);
+  void [text, value, queryStatus, config, assumed];
+}
+void unchecked;
 declare const view: View;
 declare const target: HTMLElement;
 declare const fallback: RenderFallback;

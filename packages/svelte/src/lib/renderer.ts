@@ -9,7 +9,9 @@ import { cancelled, failure, rendererStates, transformError } from './lifecycle.
 import type { ComponentAdapter, RenderOptions, Renderer, RendererOptions } from './types.js';
 
 export const SVELTE_CONNECTOR_ID = 'svelte';
-export function svelteComponent(contract: ComponentContract, implementation: ComponentAdapter): ComponentBinding<ComponentAdapter> {
+export function svelteComponent<const C extends ComponentContract>(
+  contract: C, implementation: ComponentAdapter<NoInfer<C>>,
+): ComponentBinding<ComponentAdapter<C>> {
   if (typeof implementation !== 'function') throw failure('INVALID_DEFINITION', 'A Svelte binding requires a Svelte component.');
   return { contract, connectorId: SVELTE_CONNECTOR_ID, implementation };
 }

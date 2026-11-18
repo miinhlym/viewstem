@@ -146,6 +146,14 @@ export type ResourceStateDeclaration = (TypeContract & { readonly kind: 'State';
 export interface Reaction { readonly watch: readonly [PathExpression, ...PathExpression[]]; readonly target: PathExpression; readonly value: JsonValue }
 export interface ComponentPublicContract { readonly ports?: Readonly<Record<string, Port>>; readonly slots?: Readonly<Record<string, { readonly required?: boolean }>>; readonly events?: Readonly<Record<string, TypeContract>> }
 export type ComponentContract = Resource<'Component', ComponentPublicContract>;
+/** Readonly inputs for a ready code Component, inferred from its declared ports. */
+export type ComponentInputs<C extends ComponentContract> = C extends unknown
+  ? C['spec'] extends { readonly ports: infer P }
+    ? DeepReadonly<InputsFromPorts<P>>
+    : 'ports' extends keyof C['spec']
+      ? DeepReadonly<Partial<InputsFromPorts<NonNullable<C['spec']['ports']>>>>
+      : Readonly<Record<never, never>>
+  : never;
 export interface ComponentSpec extends ComponentPublicContract { readonly states?: Readonly<Record<string, ResourceStateDeclaration>>; readonly queries?: Readonly<Record<string, QueryUse>>; readonly queryDefaults?: QueryDefaults; readonly reactions?: readonly Reaction[]; readonly render: ComponentNode }
 export type ViewSpec = Omit<ComponentSpec, 'slots' | 'events'> & { readonly slots?: never; readonly events?: never };
 export type ComponentNode = ReferenceOrInline<'componentRef', 'component', ComponentSpec> & {

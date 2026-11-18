@@ -7,6 +7,8 @@ import Host from './fixtures/Host.svelte';
 import SourceHost from './fixtures/SourceHost.svelte';
 import Crash from './fixtures/Crash.svelte';
 import Reentrant from './fixtures/Reentrant.svelte';
+import ContractAdapter from './types/ContractAdapter.svelte';
+import { countContract } from './types/contract.ts';
 import { observations } from './fixtures/observations.mjs';
 
 // Test-only bridge for historical scenario inputs; the shipped API remains unchanged.
@@ -58,6 +60,10 @@ function createRenderer(options = {}) {
   return renderer;
 }
 export { publicRenderer, publicRuntime, createRegistry, createRuntime, createStateStore, createRenderer, ViewstemView, transformError, Probe, Layout, Host, SourceHost, Crash, Reentrant, flushSync, mount, unmount, tick, observations };
+export function registerTypedCounter(registry) {
+  registry.registerResourceSet(defineResourceSet({ id: 'typed-counter', version: '1', components: [svelteComponent(countContract, ContractAdapter)] }));
+  return countContract.id;
+}
 export const p = value => ({ '@path': value });
 export const resource = (kind, id, spec) => ({ kind, id, spec });
 export const port = (schema = true, required = true) => ({ kind: 'Value', schema, required });

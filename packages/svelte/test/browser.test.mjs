@@ -388,6 +388,35 @@ test('required Value input waiting and type errors recover without replacing sib
   await page.evaluate(async () => { await Fixture.unmount(e.host); });
 }));
 
+test('contract-typed Svelte inputs distinguish first pending from an already displayed value', t => browserTest(t, async page => {
+  await page.evaluate(async () => {
+    const F = Fixture, renderer = F.publicRenderer(), { runtime } = renderer;
+    const target = F.target(), componentRef = F.registerTypedCounter(runtime.registry);
+    const screen = renderer.mount({ target, source: {
+      ports: { value: F.port({ type: 'integer' }, false) },
+      render: { id: 'count', componentRef, inputs: { count: F.p('/ports/value') } },
+    } });
+    const view = await screen.ready;
+    await screen.whenRendered();
+    window.e = { renderer, runtime, target, screen, view, output: target.querySelector('[data-typed-count]') };
+  });
+  const output = page.locator('[data-typed-count]');
+  assert.equal((await output.textContent()).trim(), 'waiting');
+  assert.equal(await output.getAttribute('data-status'), 'pending');
+  await page.evaluate(async () => { await e.view.setInputs({ value: 4 }); await e.screen.whenRendered(); });
+  assert.equal((await output.textContent()).trim(), '4');
+  assert.equal(await output.getAttribute('data-status'), 'ready');
+  await page.locator('[data-typed-local]').click();
+  await page.evaluate(async () => { await e.view.setInputs({}); await e.screen.whenRendered(); });
+  assert.equal((await output.textContent()).trim(), '4');
+  assert.equal(await output.getAttribute('data-status'), 'pending');
+  await page.evaluate(async () => { await e.view.setInputs({ value: 7 }); await e.screen.whenRendered(); });
+  assert.equal((await output.textContent()).trim(), '7');
+  assert.equal(await output.getAttribute('data-status'), 'ready');
+  assert.equal(await page.locator('[data-typed-local]').textContent(), 'local 1');
+  assert.equal(await page.evaluate(() => e.output === e.target.querySelector('[data-typed-count]')), true);
+}));
+
 test('State and Query handles cross explicit ports and stay usable from adapter interactions', t => browserTest(t, async page => {
   await page.evaluate(async () => {
     const F = Fixture; window.e = F.environment();

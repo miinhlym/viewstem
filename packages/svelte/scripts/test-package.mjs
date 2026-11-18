@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtemp, writeFile, rm, readFile, mkdir } from 'node:fs/promises';
+import { mkdtemp, writeFile, rm, readFile, mkdir, copyFile, symlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -100,7 +100,53 @@ runtime.mount({view:spec});
 // @ts-expect-error code Component contracts have an explicit registration name
 renderer.runtime.registry.registerComponent(contract);
 `);
-  execute(process.execPath, [join(root, 'node_modules/typescript/bin/tsc'), '--strict', '--noEmit', '--target', 'ES2022', '--module', 'NodeNext', '--moduleResolution', 'NodeNext', '--lib', 'ES2022,DOM', 'consumer.ts']);
+  const tsc = join(root, 'node_modules/typescript/bin/tsc');
+  const typecheckArgs = ['--strict', '--noEmit', '--target', 'ES2022', '--module', 'NodeNext', '--moduleResolution', 'NodeNext', '--lib', 'ES2022,DOM'];
+  execute(process.execPath, [tsc, ...typecheckArgs, 'consumer.ts']);
+
+  const authorPackage = join(directory, 'contract-package');
+  const authorSource = join(authorPackage, 'src');
+  await mkdir(authorSource, { recursive: true });
+  await Promise.all(['ContractAdapter.svelte', 'contract.ts'].map(name =>
+    copyFile(join(root, 'packages/svelte/test/types', name), join(authorSource, name))));
+  await writeFile(join(authorPackage, 'package.json'), JSON.stringify({
+    name: 'contract-package', private: true, type: 'module',
+    peerDependencies: { svelte: '^5.57.3', '@viewstem/core': core.version, '@viewstem/svelte': svelte.version },
+    exports: { '.': { types: './dist/index.d.ts', import: './dist/index.js' } },
+  }));
+  await writeFile(join(authorPackage, 'tsconfig.json'), JSON.stringify({
+    compilerOptions: { strict: true, target: 'ES2022', module: 'ESNext', moduleResolution: 'Bundler', types: ['svelte'] },
+    include: ['src'],
+  }));
+  await writeFile(join(authorSource, 'index.ts'), `import { svelteComponent } from '@viewstem/svelte';
+import Adapter from './ContractAdapter.svelte';
+import { countContract } from './contract.js';
+export { countContract };
+export const binding = svelteComponent(countContract, Adapter);
+`);
+  execute(process.execPath, [join(root, 'node_modules/@sveltejs/package/src/cli.js'), '-i', 'src', '-o', 'dist'], authorPackage);
+  assert.match(await readFile(join(authorPackage, 'dist/index.d.ts'), 'utf8'), /export declare const binding:/);
+  assert.match(await readFile(join(authorPackage, 'dist/ContractAdapter.svelte.d.ts'), 'utf8'), /ComponentAdapterProps/);
+  await symlink(authorPackage, join(directory, 'node_modules/contract-package'), 'dir');
+  await writeFile(join(directory, 'contract-consumer.ts'), `import { svelteComponent } from '@viewstem/svelte';
+import type { ComponentProps } from 'svelte';
+import { binding, countContract } from 'contract-package';
+svelteComponent(countContract, binding.implementation);
+declare const props: ComponentProps<typeof binding.implementation>;
+// @ts-expect-error Pending numbers might be absent.
+const unchecked: number = props.node.inputs.count;
+if (props.node.status === 'ready') {
+  const count: number = props.node.inputs.count;
+  // @ts-expect-error The ready input is a number.
+  const text: string = props.node.inputs.count;
+}
+const wrongContract = {
+  ...countContract, spec: { ports: { count: { kind: 'Value', schema: { type: 'string' }, required: true } } },
+} as const;
+// @ts-expect-error The exported adapter still requires the number contract.
+svelteComponent(wrongContract, binding.implementation);
+`);
+  execute(process.execPath, [tsc, ...typecheckArgs, 'contract-consumer.ts']);
   await writeFile(join(directory, 'Button.svelte'), `<script lang="ts">
 import type { ComponentAdapterProps } from '@viewstem/svelte';
 let { inputs, node, emit }: ComponentAdapterProps = $props();
@@ -150,7 +196,7 @@ window.disposeConsumer=()=>renderer.dispose();
   await page.evaluate(() => window.disposeConsumer());
   assert.equal(await page.locator('main button').count(), 0);
   assert.deepEqual(errors, []);
-  const report = { nodeVersion: process.version, svelteVersion: '5.57.3', files: paths, integrity: svelte.integrity, bytes: svelte.size, unpackedBytes: svelte.unpackedSize, license: 'MIT; installed text verified', consumerDependencies: Object.keys(consumerManifest.dependencies).sort(), coreResolution: 'local Core and DOM tarballs', imports: '@viewstem/core and @viewstem/svelte public exports', types: 'passed', browser: 'passed', errors };
+  const report = { nodeVersion: process.version, svelteVersion: '5.57.3', files: paths, integrity: svelte.integrity, bytes: svelte.size, unpackedBytes: svelte.unpackedSize, license: 'MIT; installed text verified', consumerDependencies: Object.keys(consumerManifest.dependencies).sort(), coreResolution: 'local Core and DOM tarballs', imports: '@viewstem/core and @viewstem/svelte public exports', types: 'passed', componentDeclarations: 'emitted and consumed', browser: 'passed', errors };
   const results = resolve(root, process.env.VIEWSTEM_SVELTE_RESULTS_DIR ?? 'packages/svelte/test/results');
   await mkdir(results, { recursive: true });
   await writeFile(join(results, `package-node${process.versions.node.split('.')[0]}.json`), JSON.stringify(report, null, 2) + '\n');
