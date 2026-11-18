@@ -1,3 +1,4 @@
+import { bindTestComponents } from './fixtures/components.mjs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createRegistry } from '@viewstem/core';
@@ -10,10 +11,10 @@ const settle = () => new Promise(resolve => setImmediate(resolve));
 
 function runtime(options = {}) {
   const registry = createRegistry();
-  registry.registerComponentContract({
+  bindTestComponents(registry, [{
     kind: 'Component', id: 'Label',
     spec: { ports: { text: { kind: 'Value', schema: { type: 'string' }, required: true } } },
-  });
+  }]);
   return createRuntime({ registry, ...options });
 }
 

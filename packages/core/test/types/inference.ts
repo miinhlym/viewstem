@@ -1,10 +1,37 @@
 import { compileCel } from '@viewstem/core/cel';
 import { createHttpExecutor } from '@viewstem/core/http';
-import { createRegistry, createStateStore, createRuntime, mergeOwnedUrl } from '@viewstem/core';
+import { createRegistry, createStateStore, createRuntime, defineResourceSet, mergeOwnedUrl } from '@viewstem/core';
 import type { QuerySpec, QuerySource, ComponentNode, Step, DatasourceSpec, AnyResource, QueryHandle } from '@viewstem/core';
 import { createHttpExecutor as fromHttp } from '@viewstem/core/http';
 
 const registry = createRegistry();
+const codeSet = defineResourceSet({ id: 'native', version: '1', actions: [
+  { definition: { kind: 'Action', id: 'label', spec: {
+    ports: { title: { kind: 'Value', required: true, schema: { type: 'string' } } },
+    output: { schema: { type: 'integer' } },
+  } }, implementation({ inputs }) {
+    // @ts-expect-error The first handler has a required string input.
+    const value: number = inputs.title;
+    return inputs.title.length;
+  } },
+  { definition: { kind: 'Action', id: 'sync', spec: {
+    ports: { count: { kind: 'State', required: true, schema: { type: 'integer' } } },
+  } }, implementation({ inputs }) {
+    inputs.count.write(3);
+    // @ts-expect-error The second handler takes a numeric State handle.
+    inputs.count.write('invalid');
+  } },
+] });
+registry.registerResourceSet(codeSet);
+registry.replaceResource({ action: { definition: { kind: 'Action', id: 'label', spec: {
+  ports: { title: { kind: 'Value', required: true, schema: { type: 'string' } } },
+  output: { schema: { type: 'integer' } },
+} }, implementation: ({ inputs }) => inputs.title.length } });
+defineResourceSet({ id: 'typed', version: '1', actions: [{
+  definition: { kind: 'Action', id: 'bad', spec: { output: { schema: { type: 'boolean' } } } },
+  // @ts-expect-error This code Action declares a boolean output.
+  implementation: () => 1,
+}] });
 registry.registerAction({ kind: 'Action', id: 'inferred-void', spec: {
   ports: {
     count: { kind: 'State', required: true, schema: { type: 'integer' } },

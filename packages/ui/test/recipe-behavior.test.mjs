@@ -10,15 +10,14 @@ import { sampleBySlug } from './fixtures/samples.mjs';
 const workspace = fileURLToPath(new URL('../../../', import.meta.url));
 const bundle = await build({ stdin: { contents: `
   import { createRegistry, createRuntime } from '@viewstem/core';
-  import { registerShadcn } from '@viewstem/ui';
-  import { connect } from './packages/ui/dist/dom.js';
+  import { createRenderer } from '@viewstem/dom';
+  import { observeCatalog } from './packages/ui/test/observe-catalog.mjs';
   window.mountRecipe = async definition => {
     window.errors = [];
     window.calendarEvents = [];
     window.sliderEvents = [];
-    const observe = view => ({
-      ...view,
-      emit(node, event, payload) {
+    const registry = createRegistry();
+    const connector = observeCatalog(registry, (node, event, payload) => {
         if (['shadcn.Calendar.Root', 'shadcn.RangeCalendar.Root'].includes(node.componentRef) &&
             ['valueChange', 'placeholderChange', 'startValueChange', 'endValueChange'].includes(event)) {
           window.calendarEvents.push([event, payload.value]);
@@ -26,16 +25,16 @@ const bundle = await build({ stdin: { contents: `
         if (node.componentRef === 'shadcn.Slider' && ['valueChange', 'valueCommit'].includes(event)) {
           window.sliderEvents.push([event, payload]);
         }
-        return view.emit(node, event, payload);
-      },
     });
-    const registry = createRegistry(); registerShadcn(registry);
     const runtime = createRuntime({ registry });
     const view = await runtime.createView(definition);
-    const attachment = connect(observe(view), document.querySelector('#app'), e => errors.push(String(e.code ?? e)));
-    await view.whenSettled(view.initial);
+    const target = document.querySelector('#app');
+    target.setAttribute('data-viewstem-ui', '');
+    const renderer = createRenderer({ runtime, connectors: [connector] });
+    const attachment = renderer.attach(view, target, { onError: diagnostic => errors.push(diagnostic.error.code) });
+    await attachment.whenSettled(view.initial);
     window.view = view;
-    window.disposeRecipe = () => { attachment.dispose(); view.dispose(); runtime.dispose(); };
+    window.disposeRecipe = async () => { await renderer.dispose(); view.dispose(); runtime.dispose(); };
   };
 `, resolveDir: workspace }, bundle: true, write: false, platform: 'browser', format: 'iife' });
 

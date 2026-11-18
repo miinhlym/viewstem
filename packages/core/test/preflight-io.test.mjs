@@ -1,8 +1,9 @@
+import { bindTestComponents } from './fixtures/components.mjs';
 import { createHttpExecutor } from '@viewstem/core/http';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 // Exercise the public entry points directly from source; the build owner updates dist.
-import { createRuntime as publicRuntime, createRegistry } from '../src/index.mjs';
+import { createRuntime as publicRuntime, createRegistry, defineResourceSet } from '../src/index.mjs';
 import { runtimeFixture as adaptRuntime } from './fixtures/runtime-operations.mjs';
 const createRuntime = adaptRuntime(publicRuntime);
 // Pending-initialization probes below target the internal Store; the View flows
@@ -13,7 +14,7 @@ import { memoryUrl, link, tick } from './fixtures/state/url-adapter.mjs';
 const integer = { type: 'integer' };
 function runtimeFixture(t) {
   const endpoint = memoryUrl(link({ owned: 8 })), registry = createRegistry();
-  registry.registerComponentContract({ kind: 'Component', id: 'Text', spec: { ports: { value: { kind: 'Value', schema: true } } } });
+  bindTestComponents(registry, [{ kind: 'Component', id: 'Text', spec: { ports: { value: { kind: 'Value', schema: true } } } }], defineResourceSet);
   const runtime = createRuntime({ registry }); t.after(() => runtime.dispose());
   const render = { id: 'text', componentRef: 'Text', inputs: { value: 'ready' } };
   const pending = { ports: { seed: { kind: 'Value', schema: integer } }, states: {

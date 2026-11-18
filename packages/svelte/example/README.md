@@ -12,6 +12,6 @@ Open `http://127.0.0.1:4174`, enter a name, and try the reset button. Set the `P
 
 - `definition.ts` defines the host Component contracts and a JSON-serializable View. An input event triggers an inline SetState Action, and Label displays the resulting Derived value.
 - `adapters/` contains the four Svelte implementations supplied by the host. Stack lays out the default and footer slots. Input and Button emit events only when `node.status` is ready.
-- `App.svelte` starts with `createRenderer()`, explicitly registers the contracts and adapters separately, and passes the result of `renderer.runtime.createView` to `<ViewstemView>`. On teardown, `renderer.dispose()` also cleans up the internal Runtime and View.
+- `App.svelte` starts with `createRenderer()`, registers a resource set containing the contracts and their adapters, and passes the result of `renderer.runtime.createView` to `<ViewstemView>`. On teardown, `renderer.dispose()` also cleans up the internal Runtime and View.
 
 This client app imports all Viewstem APIs and shared types from the public `@viewstem/svelte` entry point. Core is an internal dependency. The app supplies and registers its own components. The local server serves the built HTML and JavaScript on a loopback address.

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createRuntime } from '@viewstem/core';
+import { createTestRuntime as createRuntime } from './fixtures/components.mjs';
 import { createRendererHost } from '@viewstem/core/renderer';
 
 const component = { kind: 'Component', id: 'Leaf', spec: {
@@ -151,7 +151,10 @@ test('the first render only suppresses an already reported failure with the same
       report(reported);
       return { dispose() {}, whenRendered() { throw thrown; } };
     } });
-    await assert.rejects(renderer.mount({ target: {}, source: { render } }).ready, { code: 'INTERNAL_ERROR' });
+    const display = renderer.mount({ target: {}, source: { render } });
+    const view = await display.ready;
+    await assert.rejects(display.whenRendered(), { code: 'INTERNAL_ERROR' });
+    assert.deepEqual(view.exportDefinition(), { render });
     assert.equal(events.length, same ? 1 : 2);
     assert.ok(events.every(diagnostic => diagnostic.phase === 'render'));
     await renderer.dispose();

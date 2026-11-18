@@ -23,7 +23,7 @@ export function notifyDiagnostic(diagnostic, ...observers) {
 
 export function createRenderError(missing, { componentId, instanceId } = {}) {
   return error(missing ? 'REFERENCE_NOT_FOUND' : 'INTERNAL_ERROR', {
-    message: missing ? 'No Svelte implementation is registered for this Component.' : 'The Svelte component could not be rendered.',
+    message: missing ? 'No implementation is available for this Component on the display connection.' : 'The Component could not be rendered.',
     ...(typeof componentId === 'string' ? { resource: { kind: 'Component', id: componentId } } : {}),
     ...(typeof instanceId === 'string' ? { instanceId } : {}),
   });

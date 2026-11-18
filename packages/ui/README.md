@@ -5,12 +5,19 @@ English | [한국어](README.ko.md)
 Default browser UI for rendering Viewstem JSON into a DOM container. The package depends on `@viewstem/core`. Its renderer uses Basecoat 1.1.0 Vega styles and selected Vanilla JS controllers without a React, Vue, or Svelte runtime. The host supplies a connected element.
 
 ```js
-import { createRenderer } from '@viewstem/ui';
+import { createRuntime } from '@viewstem/core';
+import { createRenderer } from '@viewstem/dom';
+import { ui } from '@viewstem/ui';
 import '@viewstem/ui/styles.css';
 
-const renderer = createRenderer();
+const runtime = createRuntime();
+runtime.registry.registerResourceSet(ui);
+const renderer = createRenderer({ runtime });
+const target = document.querySelector('#app');
+if (!target) throw new Error('Missing #app element');
+target.setAttribute('data-viewstem-ui', '');
 const screen = renderer.mount({
-  target: document.querySelector('#app'),
+  target,
   source: {
     render: {
       id: 'save',
@@ -20,15 +27,16 @@ const screen = renderer.mount({
   },
 });
 await screen.ready;
+await screen.whenRendered();
 ```
 
 Call `await screen.unmount()` when the screen closes and `await renderer.dispose()` when the app is done with the renderer. If you need the initial Query report, use `await screen.whenSettled(view.initial)` with the View returned by `screen.ready`.
 
-`createRenderer()` owns a Runtime initialized with the catalog contracts. To supply an existing Runtime, register the catalog first with `registerShadcn(runtime.registry)`, then pass `{ runtime }`. `renderer.attach(view, target)` borrows a View; call `await attachment.detach()` to release the connection. `whenRendered()` waits for the requested DOM projection. Targets must be connected HTMLElements and can be reused after cleanup completes. `onError` receives `{ phase, error }` diagnostics. Pending or failed nodes are omitted from the DOM.
+Register the exported `ui` resource set on the Runtime before creating a View. Mount with `@viewstem/dom` and put `data-viewstem-ui` on the target to apply the styles. `renderer.attach(view, target)` borrows a View, and `await attachment.detach()` releases the display. `whenRendered()` waits for the requested DOM projection.
 
 ## Shared JSON catalog
 
-The renderer registers 66 families and 357 JSON Component IDs. Use the generated `@viewstem/ui/support.json` export for the implemented port schemas, slots, and event payloads. The build derives this reference from the package’s `catalog/shadcn-contracts.json` and the supported inputs, slots, and events of the DOM adapters.
+The `ui` set provides 66 families and 357 JSON Component IDs. Use the generated `@viewstem/ui/support.json` export for the implemented port schemas, slots, and event payloads. The build derives this reference from the package’s `catalog/shadcn-contracts.json` and the supported inputs, slots, and events of the DOM adapters.
 
 Dropdown Menu, Context Menu, and Menubar share a Zag Vanilla menu adapter, including nested menus. Hover Card, Navigation Menu, Resizable, and Scroll Area also use Zag Vanilla. Carousel uses Embla 8.6.0. Select scroll buttons extend the existing Select controller. The remaining components use browser DOM controls and CSS.
 

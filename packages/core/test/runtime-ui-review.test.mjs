@@ -1,3 +1,4 @@
+import { bindTestComponents } from './fixtures/components.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRegistry, createStateStore } from '@viewstem/core';
@@ -20,9 +21,9 @@ const findAll = (view, id) => flatten(view.getSnapshot()).filter(node => node.id
 const flush = async () => { for (let index = 0; index < 20; index++) await Promise.resolve(); };
 function registry() {
   const registry = createRegistry();
-  registry.registerComponentContract(resource('Component', 'Text', { ports: { text: port() } }));
-  registry.registerComponentContract(resource('Component', 'Button', { events: { click: { schema: true } } }));
-  registry.registerComponentContract(resource('Component', 'Row', { slots: { default: {} } }));
+  bindTestComponents(registry, [resource('Component', 'Text', { ports: { text: port() } })]);
+  bindTestComponents(registry, [resource('Component', 'Button', { events: { click: { schema: true } } })]);
+  bindTestComponents(registry, [resource('Component', 'Row', { slots: { default: {} } })]);
   registry.registerResources([resource('Component', 'Counter', { ports: { label: { kind: 'Value', schema: true } }, states: { count: state(0, { type: 'number' }) }, render: text('inside', path('/states/count')) })]);
   return registry;
 }
@@ -151,7 +152,7 @@ test('A22 failed dynamic action input reports preparation error and executes no 
 
 test('U04 invalid event payload calls no Action and preserves idle observation', async t => {
   const r = registry(); let calls = 0;
-  r.registerComponentContract(resource('Component', 'Input', { events: { change: { schema: { type: 'string' } } } }));
+  bindTestComponents(r, [resource('Component', 'Input', { events: { change: { schema: { type: 'string' } } } })]);
   r.registerAction(resource('Action', 'record', {}), () => { calls++; });
   const { view } = await mount(t, { render: { id: 'input', componentRef: 'Input', on: { change: { id: 'recording', actionRef: 'record' } } } }, r);
   await assert.rejects(view.emit(find(view, 'input'), 'change', 123), error => error.code === 'TYPE_MISMATCH');

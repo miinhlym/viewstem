@@ -101,8 +101,8 @@ await runtime.createView({ ref: 'v', render: { id: 'label', componentRef: 'Text'
 await runtime.createView({ inputs: {} });
 // @ts-expect-error INVOKE_CALL_BOTH - explicit Action invocation keeps target XOR.
 await view.invokeAction({ actionRef: 'a', action: { steps: [] } });
-// @ts-expect-error INVOKE_OWNER_REQUIRED - lifetime owner is explicit.
-await runtime.invokeAction({ actionRef: 'a' });
+// @ts-expect-error Headless calls belong to their Runtime and cannot override the owner.
+await runtime.invokeAction({ actionRef: 'a', owner: view });
 // @ts-expect-error RUNTIME_REGISTRY_XOR - an injected Registry owns its definitions.
 createRuntime({ registry: runtime.registry, resources: [] });
 // @ts-expect-error STORE_NOMINAL - matching methods do not grant the private Store brand.
@@ -121,7 +121,21 @@ context.invokeAction({ inputs: {} });
 context.invokeAction({ actionRef: 'a', owner: view });
 // @ts-expect-error CHILD_ID_FORBIDDEN - a child call is not a new observed UI binding.
 context.invokeAction({ actionRef: 'a', id: 'alias' });
+// @ts-expect-error Child calls inherit cancellation from the parent.
+context.invokeAction({ actionRef: 'a', signal: new AbortController().signal });
+// @ts-expect-error An independent invocation requires an AbortSignal when a signal is given.
+view.invokeAction({ actionRef: 'a', signal: { aborted: false } });
 // @ts-expect-error CHILD_OUTPUT_UNKNOWN - a dynamic reference does not prove its result type.
 const childBoolean: boolean = await context.invokeAction({ actionRef: 'a' });
 // @ts-expect-error CHILD_CAPABILITY_READONLY - the bound child caller cannot be replaced.
 context.invokeAction = async () => undefined;
+import { defineResourceSet, createRegistry as createResourceRegistry } from '@viewstem/core';
+
+const resourceRegistry = createResourceRegistry();
+// @ts-expect-error Resource sets must be created through defineResourceSet.
+resourceRegistry.registerResourceSet({ id: 'raw', version: '1', resources: [], actions: [], components: [], dependencies: [] });
+const declaredSet = defineResourceSet({ id: 'declared', version: '1' });
+// @ts-expect-error Set declarations are readonly after creation.
+declaredSet.dependencies.push(declaredSet);
+// @ts-expect-error Each replacement accepts only one entry variant.
+resourceRegistry.replaceResource({ resource: { kind: 'Type', id: 'x', spec: { schema: true } }, component: declaredSet.components[0]! });

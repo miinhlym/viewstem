@@ -1,3 +1,4 @@
+import { bindTestComponents } from './fixtures/components.mjs';
 import { createHttpExecutor } from '@viewstem/core/http';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -20,8 +21,8 @@ const bounded = async promise => {
 };
 function registry(functions = []) {
   const r = createRegistry({ functions });
-  r.registerComponentContract({ kind: 'Component', id: 'Display', spec: { ports: { value: value() } } });
-  r.registerComponentContract({ kind: 'Component', id: 'Row', spec: { slots: { default: {} } } });
+  bindTestComponents(r, [{ kind: 'Component', id: 'Display', spec: { ports: { value: value() } } }]);
+  bindTestComponents(r, [{ kind: 'Component', id: 'Row', spec: { slots: { default: {} } } }]);
   return r;
 }
 const display = (id = 'display', payload = 'ready') => ({ id, componentRef: 'Display', inputs: { value: payload } });

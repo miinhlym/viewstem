@@ -20,6 +20,7 @@
     "@shikijs/themes": "4.6.0",
     "@tailwindcss/vite": "^4.3.3",
     "@viewstem/core": "0.1.0",
+    "@viewstem/dom": "0.1.0",
     "@viewstem/ui": "0.1.0",
     "astro": "6.4.8",
     "clsx": "^2.1.1",

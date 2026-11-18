@@ -18,18 +18,29 @@ export class ActionEngine {
   #cache = new WeakMap();
   #registry; #onChange;
   #owners = new WeakMap();
-  #query; #variable; #store; #authorize;
-  constructor({ registry, store, query = async () => die('REFERENCE_NOT_FOUND'), variable = async () => die('REFERENCE_NOT_FOUND'), authorize = () => true, onChange = () => {} }) {
+  #query; #variable; #store; #authorize; #capabilities;
+  #native = new WeakMap();
+  #resources = new WeakMap();
+  constructor({ registry, store, capabilities = {}, query = async () => die('REFERENCE_NOT_FOUND'), variable = async () => die('REFERENCE_NOT_FOUND'), authorize = () => true, onChange = () => {} }) {
     this.#registry = registry; this.#onChange = onChange; this.#store = store; this.#query = query; this.#variable = variable; this.#authorize = authorize;
+    this.#capabilities = capabilities;
   }
-  definition(reference, spec) {
+  definition(reference, spec, registry = this.#registry) {
     if (reference !== undefined) {
-      const resource = this.#registry.get('Action',reference);
-      if (!this.#cache.has(resource)) this.#cache.set(resource, Object.freeze({...resource.spec,
-        ...(this.#registry.isCode('Action',reference) ? {native:this.#registry.implementation('Action',reference)} : {})}));
-      return this.#cache.get(resource);
+      const resource = registry.get('Action', reference);
+      let cache = this.#cache.get(registry);
+      if (!cache) this.#cache.set(registry, cache = new WeakMap());
+      if (!cache.has(resource)) {
+        const definition = Object.freeze({ ...resource.spec });
+        cache.set(resource, definition);
+        this.#resources.set(definition, Object.freeze({ kind: 'Action', id: resource.id }));
+        if (registry.isCode('Action', reference)) this.#native.set(definition, {
+          implementation: registry.implementation('Action', reference), requirements: registry.actionRequirements(reference), reference,
+        });
+      }
+      return cache.get(resource);
     }
-    this.#registry.validateDefinition('Action',spec);return protect(structuredClone(spec));
+    registry.validateDefinition('Action',spec);return protect(structuredClone(spec));
   }
   owner(isOpen = () => true, signal, onCleanupError) {
     const state = { alive: true, isOpen, signal, onCleanupError, connections: new Set(), ids: new Map(), calls: new Set() }, probe = this;
@@ -40,24 +51,23 @@ export class ActionEngine {
     }, getSnapshot(id) { const item = state.ids.get(id); if (!item) die('REFERENCE_NOT_FOUND'); return item.getSnapshot(); } });
     probe.#owners.set(owner, state); return owner;
   }
-  connect(owner, { id, actionRef, spec, inputs = {}, isOpen = () => true }) {
+  connect(owner, { id, actionRef, spec, inputs = {}, registry = this.#registry, isOpen = () => true }) {
     const state = this.#owners.get(owner);
     if (!state?.alive) die('CANCELLED');
     if ((actionRef !== undefined) === (spec !== undefined)) die('INVALID_DEFINITION');
     if (id !== undefined && (typeof id !== 'string' || !id || state.ids.has(id))) die('INVALID_DEFINITION');
-    let definition = actionRef !== undefined ? this.definition(actionRef) : spec;
-    if (!definition) die('REFERENCE_NOT_FOUND');
-    if (spec !== undefined) definition = this.definition(undefined,spec);
+    const initial = this.definition(actionRef, spec, registry);
     let alive = true, snapshot = idle(), active = null;
     const connection = Object.freeze({ getSnapshot: () => snapshot,
-      invoke: (supplied, canStart = () => true) => {
+      invoke: (supplied, canStart = () => true, configuration = registry) => {
         if (!alive || !state.alive || !state.isOpen() || !isOpen() || !canStart()) return Promise.reject(failure('CANCELLED'));
         if (active) return Promise.resolve(undefined); // Ignore, without queue or join.
+        const definition = configuration === registry ? initial : this.definition(actionRef, spec, configuration);
         const controller = new AbortController(); state.calls.add(controller);
         const call = { controller }; active = call;
         const previous = snapshot;
         let cancelledBeforeStart = false;
-        const promise = this.#invoke(definition, supplied ?? inputs, owner, controller, [], isOpen, () => {
+        const promise = this.#invoke(configuration, definition, supplied ?? inputs, owner, controller.signal, [], isOpen, () => {
           if (canStart()) return true;
           cancelledBeforeStart = true;
           return false;
@@ -81,21 +91,23 @@ export class ActionEngine {
     state.connections.add(connection); if (id !== undefined) state.ids.set(id, connection);
     return connection;
   }
-  invoke(owner, actionRef, inputs = {}, action) {
-    const state = this.#owners.get(owner), definition = this.definition(actionRef, action);
+  invoke(owner, actionRef, inputs = {}, action, registry = this.#registry, signal) {
+    const state = this.#owners.get(owner), definition = this.definition(actionRef, action, registry);
     if (!state?.alive) return Promise.reject(failure('CANCELLED'));
     if (!definition) return Promise.reject(failure('REFERENCE_NOT_FOUND'));
-    const controller = new AbortController(); state.calls.add(controller);
-    return this.#invoke(definition, inputs, owner, controller, []).catch(error => { throw publicError(error); }).finally(() => state.calls.delete(controller));
+    const controller = new AbortController();
+    const callSignal = signal ? AbortSignal.any([controller.signal, signal]) : controller.signal;
+    state.calls.add(controller);
+    return this.#invoke(registry, definition, inputs, owner, callSignal, []).catch(error => { throw publicError(error); }).finally(() => state.calls.delete(controller));
   }
-  async #invoke(definition, supplied, owner, controller, stack, connectionOpen = () => true, canStart = () => true, onStart) {
+  async #invoke(registry, definition, supplied, owner, callSignal, stack, connectionOpen = () => true, canStart = () => true, onStart) {
     const state = this.#owners.get(owner);
-    const signal = state?.signal ? AbortSignal.any([controller.signal, state.signal]) : controller.signal;
+    const signal = state?.signal ? AbortSignal.any([callSignal, state.signal]) : callSignal;
     const isOpen = () => !signal.aborted && state?.alive && state.isOpen() && connectionOpen();
     const check = () => { if (!isOpen()) die('CANCELLED'); };
     const checkStart = () => { check(); if (!canStart()) die('CANCELLED'); };
     checkStart(); if (stack.includes(definition)) die('ACTION_RECURSION');
-    const authorized = this.#authorize({ owner, definition });
+    const authorized = this.#authorize({ owner, definition, resource: this.#resources.get(definition) ?? null });
     checkStart();
     if (authorized !== true) die('EXECUTION_BLOCKED');
     let acceptingChildren = true;
@@ -111,12 +123,12 @@ export class ActionEngine {
         let child;
         if (own(request, 'actionRef')) {
           if (typeof request.actionRef !== 'string' || !request.actionRef) die('INVALID_DEFINITION');
-          child = this.definition(request.actionRef);
+          child = this.definition(request.actionRef, undefined, registry);
           if (!child) die('REFERENCE_NOT_FOUND');
         } else {
-          child = this.definition(undefined,request.action);
+          child = this.definition(undefined,request.action,registry);
         }
-        return this.#invoke(child, own(request, 'inputs') ? request.inputs : {}, owner, childController, [...stack, definition], connectionOpen);
+        return this.#invoke(registry, child, own(request, 'inputs') ? request.inputs : {}, owner, childController.signal, [...stack, definition], connectionOpen);
       })().catch(error => { throw publicError(error); });
       // A forgotten await still gets cancelled with its parent; do not turn that
       // cleanup into an unhandled rejection. Awaiting retains the original error.
@@ -127,7 +139,7 @@ export class ActionEngine {
       let ports;
       try {
         const input = typeof supplied === 'function' ? supplied() : supplied;
-        const prepared = compilePorts({ resourceKind: 'Action', ports: definition.ports ?? {}, types:this.#registry.types(), store: this.#store }).prepare(input, { mode: 'explicit' });
+        const prepared = compilePorts({ resourceKind: 'Action', ports: definition.ports ?? {}, types:registry.types(), store: this.#store }).prepare(input, { mode: 'explicit' });
         ports = prepared.ports;
       } catch (error) {
         const clean = safeError(error); let input;
@@ -157,7 +169,7 @@ export class ActionEngine {
         return Promise.race([current, cancelled]).then(value => { check(); return value; }).finally(() => signal.removeEventListener('abort', abort));
       };
       const evaluate = (template, steps) => evaluateValue(template, {
-        functions:this.#registry.functions,
+        functions:registry.functions,
         resolve(keys) {
           const [root,name] = keys;
           if (root === 'ports') {
@@ -194,7 +206,7 @@ export class ActionEngine {
             else if (step.kind === 'RefreshQuery') await awaitCurrent(target(step.target, 'Query').refresh());
             else {
               // Inputs for State/Query child ports preserve the capability itself.
-              const child = step.kind === 'Action' ? (own(step, 'actionRef') ? this.definition(step.actionRef) : step.spec) : null;
+              const child = step.kind === 'Action' ? (own(step, 'actionRef') ? this.definition(step.actionRef, undefined, registry) : step.spec) : null;
               const inputs = Object.create(null);
               const whole=step.inputs&&Object.hasOwn(step.inputs,'@path')||step.inputs&&Object.hasOwn(step.inputs,'@call');
               if(whole)Object.assign(inputs,evaluate(step.inputs,completed));
@@ -203,10 +215,10 @@ export class ActionEngine {
                 inputs[name] = kind === 'State' || kind === 'Query' ? target(template, kind) : await evaluate(template, completed);
               }
               check();
-              if (step.kind === 'Action') output = await awaitCurrent(this.#invoke(child, inputs, owner, controller, [...stack, definition], connectionOpen));
+              if (step.kind === 'Action') output = await awaitCurrent(this.#invoke(registry, child, inputs, owner, callSignal, [...stack, definition], connectionOpen));
               else {
                 output = await awaitCurrent((step.kind === 'Query' ? this.#query : this.#variable)({
-                  reference: step[refs[step.kind]], spec: step.spec, inputs, signal, isOpen, onCleanupError: state.onCleanupError,
+                  registry, reference: step[refs[step.kind]], spec: step.spec, inputs, signal, isOpen, onCleanupError: state.onCleanupError,
                 }));
               }
             }
@@ -217,16 +229,27 @@ export class ActionEngine {
       };
       let output;
       checkStart();
+      const native = this.#native.get(definition);
+      const capabilities = Object.create(null);
+      if (native) for (const name of native.requirements) {
+        if (!own(this.#capabilities, name) || this.#capabilities[name] === undefined) {
+          die('REFERENCE_NOT_FOUND', {
+            location: `/capabilities/${name.replaceAll('~', '~0').replaceAll('/', '~1')}`,
+            resource: { kind: 'Action', id: native.reference },
+          });
+        }
+        capabilities[name] = this.#capabilities[name];
+      }
       onStart?.();
       checkStart();
-      if (definition.native) output = await awaitCurrent(definition.native(Object.freeze({ inputs: bounded, signal, invokeAction })));
+      if (native) output = await awaitCurrent(native.implementation(Object.freeze({ inputs: bounded, signal, invokeAction, capabilities: Object.freeze(capabilities) })));
       else {
         const steps = await execute(definition.steps);
         check(); if (definition.output) output = await evaluate(definition.output.value, steps);
       }
       check();
-      if (!definition.output) { if (definition.native && output !== undefined) die('TYPE_MISMATCH'); return undefined; }
-      try { return protect(this.#registry.validator(definition.output).accept(output, trustedCopies(output))); }
+      if (!definition.output) { if (native && output !== undefined) die('TYPE_MISMATCH'); return undefined; }
+      try { return protect(registry.validator(definition.output).accept(output, trustedCopies(output))); }
       catch { die('TYPE_MISMATCH', { location: '/output' }); }
     } finally {
       acceptingChildren = false;

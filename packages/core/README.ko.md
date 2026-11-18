@@ -7,13 +7,19 @@ Viewstem은 [MIT 라이선스](LICENSE)로 배포합니다. 함께 배포하는 
 선언형 UI의 검증·값·상태·Query·Action·화면 수명을 실행하는 ESM 라이브러리입니다. DOM, Svelte, 회사 도메인에 의존하지 않습니다.
 
 ```ts
-import { createRegistry, createRuntime } from '@viewstem/core';
+import { createRegistry, createRuntime, defineResourceSet } from '@viewstem/core';
 
 const registry = createRegistry();
-registry.registerComponentContract({
-  kind: 'Component', id: 'Label',
-  spec: { ports: { text: { kind: 'Value', schema: { type: 'string' }, required: true } } },
-});
+registry.registerResourceSet(defineResourceSet({
+  id: 'projection-example', version: '1',
+  components: [{
+    contract: {
+      kind: 'Component', id: 'Label',
+      spec: { ports: { text: { kind: 'Value', schema: { type: 'string' }, required: true } } },
+    },
+    connectorId: 'projection-example', implementation: {},
+  }],
+}));
 const runtime = createRuntime({ registry });
 const view = await runtime.createView({
   states: { title: { kind: 'State', schema: { type: 'string' }, initial: 'Hello' } },
@@ -34,7 +40,7 @@ runtime.dispose();
 
 - `createRegistry`: `(kind, id)` 등록·검증, 코드형 Component/Action 등록, 목록·설명·정의 추출·명시적 정의 교체.
 - `createStateStore`: scope, State, `writeBatch`/동기 `transaction`, 안정적인 읽기 snapshot, `registerReaction`, Clock·URL 연결. Derived는 View/Component의 `states`에 선언합니다. 외부에서 주입한 Store는 runtime 폐기로 제거하지 않습니다.
-- `createRuntime()`은 기본 Registry를 생성합니다. Runtime은 `createView(source, options?)`, `registry`, `stateStore`, `dispose`를 제공합니다. View는 `setInputs`, `updateDefinition`, `replace`, `invokeAction`, `whenSettled`, `emit`, `getSnapshot`, `subscribe`, `getState`, `getQuery`, `exportDefinition`을 제공합니다.
+- `createRuntime()`은 기본 Registry를 생성합니다. Runtime은 `createView(source, options?)`, `invokeAction(request)`, `registry`, `stateStore`, `dispose`를 제공합니다. View는 `setInputs`, `updateDefinition`, `replace`, `invokeAction`, `whenSettled`, `emit`, `getSnapshot`, `subscribe`, `getState`, `getQuery`, `exportDefinition`을 제공합니다.
 - `mergeOwnedUrl`: 호스트 URL adapter에서 소유 키만 병합합니다.
 - `computeGridLayout`: 12열 배치 계산만 제공하며 Grid UI를 자동 등록하지 않습니다.
 
@@ -59,11 +65,13 @@ import { compileCel, evaluateCel, defaultCelLimits } from '@viewstem/core/cel';
 
 View가 투영을 계산하거나 발행하는 중 구독자가 State를 쓰면, runtime은 후속 투영을 예약합니다. 현재의 불변 snapshot 통지를 마친 뒤 새 투영을 발행하며, 그동안 발생한 여러 쓰기는 한 번의 후속 투영으로 합칩니다. 같은 값을 다시 쓰면 새 State 변경을 만들지 않습니다. 변경된 노드 입력은 다음 snapshot에서 확인하고 DOM 반영은 렌더러의 완료 수단으로 확인합니다.
 
-`authorize({operation, owner, definition})`는 Action 실행과 `view.updateDefinition`/기존 화면 `replace`의 변경 권한을 검사합니다. 반환값이 `true`일 때만 허용합니다. 목록 노출 필터, 사용자 신원, 저장 권한은 호스트가 구성합니다. 목록에서 발견했다는 사실이 실행 권한을 주지 않습니다.
+`authorize`는 Action 실행과 기존 View의 변경 권한을 검사합니다. 반환값이 `true`일 때만 허용합니다. Action 호출의 읽기 전용 `resource`는 실행에 사용한 Registry 스냅샷의 `{ kind: 'Action', id }`입니다. 인라인 Action은 `null`이며 하위 호출은 자기 대상을 식별합니다. 목록 노출 필터, 사용자 신원, 저장 권한은 호스트가 구성합니다.
 
 `update`의 owner는 createView가 반환한 공개 View와 같은 객체입니다. `invoke`의 owner는 수명별 비교에만 쓰는 불투명 식별 객체이며 실행 메서드가 없습니다. 권한 콜백에는 등록된 코드 Action의 구현 함수를 전달하지 않습니다.
 
-등록 코드 Action의 `context.invokeAction`은 부모 취소·재귀 스택을 상속합니다. 부모 종료 시 미완료 하위 호출도 취소됩니다. `view.invokeAction(request)`은 해당 View 소유의 독립 실행입니다. 취소된 호출의 State 쓰기·Query refresh는 거절하며 이미 성공한 효과는 되돌리지 않습니다.
+`defineCodeAction({ definition, requires? })`으로 계약을 선언하고 `.implement(handler)`로 타입이 있는 엔트리를 만듭니다. 이 엔트리를 `defineResourceSet({ actions: [entry], ... })`에 전달합니다. 같은 계약에 새 함수를 연결한 엔트리는 `registry.replaceResource({ action: entry })`에 전달합니다. 참조 스키마의 타입은 `defineCodeAction<Inputs, Output>()`으로 명시합니다.
+
+`runtime.invokeAction(request)`와 `view.invokeAction(request)`는 독립 호출을 시작합니다. 요청에 `signal: AbortSignal`을 전달하면 해당 호출과 하위 호출을 취소할 수 있습니다. `context.invokeAction`은 부모의 취소와 재귀 스택을 상속합니다. 취소된 호출은 `CANCELLED`로 거절되며 이미 성공한 효과는 보존됩니다.
 
 ## HTTP와 URL
 

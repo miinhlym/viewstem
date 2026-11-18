@@ -1,3 +1,4 @@
+import { bindTestComponents } from './fixtures/components.mjs';
 import { evaluate } from '../src/expressions.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -37,7 +38,7 @@ test('preflight Grid omitted layout treats prototype-named declaration IDs as or
 async function stateFixture(t, sourceSchema, portSchema, initial) {
   const registry = createRegistry(), store = createStateStore(), scope = store.createScope();
   const cell = scope.registerState('source', { schema: sourceSchema, initial });
-  registry.registerComponentContract({ kind: 'Component', id: 'Empty', spec: {} });
+  bindTestComponents(registry, [{ kind: 'Component', id: 'Empty', spec: {} }]);
   registry.registerAction({ kind: 'Action', id: 'write', spec: { ports: { cell: { kind: 'State', schema: portSchema, required: true }, next: { kind: 'Value', schema: true, required: true } } } }, ({ inputs }) => { inputs.cell.write(inputs.next); });
   const runtime = createRuntime({ registry, stateStore: store });
   t.after(() => { runtime.dispose(); scope.dispose(); });

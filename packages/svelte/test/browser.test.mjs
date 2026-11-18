@@ -23,7 +23,7 @@ test('public renderer mounts, updates, borrows and detaches with the new API', t
     registry.registerComponentContract(F.resource('Component', 'Probe', { ports: { value: F.port() } }));
     const runtime = F.publicRuntime({ registry });
     const renderer = F.publicRenderer({ runtime });
-    renderer.bindComponent('Probe', F.Probe);
+    F.registerBinding(runtime.registry, 'Probe', F.Probe);
     const target = F.target(), other = F.target();
     const spec = { states: { value: F.state('Draft') }, render: F.probe('value', F.p('/states/value')) };
     const screen = renderer.mount({ target, source: spec });
@@ -44,7 +44,7 @@ test('public renderer mounts, updates, borrows and detaches with the new API', t
 test('detaching a borrowed View rejects retained Svelte emitters before teardown', t => browserTest(t, async page => {
   const result = await page.evaluate(async () => {
     const F = Fixture;
-    const renderer = F.publicRenderer({
+    const renderer = F.rendererWithBindings({
       components: [{ contract: F.resource('Component', 'Probe', {
         ports: { value: F.port() }, events: { change: { schema: true } },
       }), component: F.Probe }],
@@ -264,7 +264,7 @@ test('consumer has no implicit adapters or resources; adapter registration is ex
     const unknown = await F.errorOf(() => renderer.registerComponent('Chart', F.Probe));
     registry.registerComponentContract(F.resource('Component', 'Probe', { ports: { value: F.port() } }));
     renderer.registerComponent('Probe', F.Probe);
-    const duplicate = await F.errorOf(() => renderer.registerComponent('Probe', F.Probe));
+    const duplicate = await F.errorOf(() => registry.registerComponentContract(registry.get('Component', 'Probe')));
     registry.registerResources([F.resource('Component', 'Declarative', { render: F.probe('inside', 'expanded') })]);
     const declarative = await F.errorOf(() => renderer.registerComponent('Declarative', F.Probe));
     const target = F.target();
@@ -287,8 +287,8 @@ test('component batch rejects invalid implementations before publishing a render
   const result = await page.evaluate(async () => {
     const F = Fixture;
     const contract = F.resource('Component', 'New', { ports: { value: F.port() } });
-    const failure = await F.errorOf(() => F.publicRenderer({ components: [{ contract, component: {} }] }));
-    const renderer = F.publicRenderer({ components: [{ contract, component: F.Probe }] });
+    const failure = await F.errorOf(() => F.rendererWithBindings({ components: [{ contract, component: {} }] }));
+    const renderer = F.rendererWithBindings({ components: [{ contract, component: F.Probe }] });
     const screen = renderer.mount({ target: F.target(), source: { render: { ...F.probe('x', 'ok'), componentRef: 'New' } } });
     await screen.ready; await renderer.dispose(); return failure.code;
   });
@@ -311,18 +311,18 @@ test('missing adapter rejects ready and releases the target', t => browserTest(t
       shared: diagnostics[0] === local[0], resource: diagnostics[0]?.error.resource,
     };
   });
-  assert.deepEqual(result, { code: 'REFERENCE_NOT_FOUND', empty: '', phases: ['render'], count: 1,
+  assert.deepEqual(result, { code: 'REFERENCE_NOT_FOUND', empty: '', phases: ['prepare'], count: 1,
     shared: true, resource: { kind: 'Component', id: 'Unbound' },
   });
 }));
 
-test('a throwing fallback reports a separate render failure and rejects the first mount', t => browserTest(t, async page => {
+test('a throwing fallback reports a separate render failure after the display connects', t => browserTest(t, async page => {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   const result = await page.evaluate(async () => {
     const F = Fixture;
     const diagnostics = [];
-    const renderer = F.publicRenderer({
+    const renderer = F.rendererWithBindings({
       components: [{ contract: F.resource('Component', 'Crash', { ports: { value: F.port() } }), component: F.Crash }],
       onError: diagnostic => diagnostics.push(diagnostic),
     });
@@ -330,7 +330,8 @@ test('a throwing fallback reports a separate render failure and rejects the firs
     const screen = renderer.mount({ target, source: {
       render: { id: 'crash', componentRef: 'Crash', inputs: { value: 'crash' } },
     }, fallback() { throw Error('private fallback details'); } });
-    const failure = await F.errorOf(() => screen.ready);
+    await screen.ready;
+    const failure = await F.errorOf(() => screen.whenRendered());
     await renderer.dispose();
     return { failure: failure.code, phases: diagnostics.map(d => [d.phase, d.error.code]), empty: target.textContent };
   });
@@ -343,7 +344,7 @@ test('a throwing fallback reports a separate render failure and rejects the firs
 test('a directly hosted View contains a throwing fallback and reports both render failures', t => browserTest(t, async page => {
   const result = await page.evaluate(async () => {
     const F = Fixture, phases = [];
-    const renderer = F.publicRenderer({
+    const renderer = F.rendererWithBindings({
       components: [{ contract: F.resource('Component', 'Crash', { ports: { value: F.port() } }), component: F.Crash }],
       onError: diagnostic => phases.push(diagnostic.phase),
     });
@@ -740,7 +741,7 @@ test('ViewstemView creates from a Svelte source with initial inputs and remounts
     registry.registerComponentContract(F.resource('Component', 'Probe', { ports: { value: F.port() } }));
     const runtime = F.publicRuntime({ registry });
     const renderer = F.publicRenderer({ runtime });
-    renderer.bindComponent('Probe', F.Probe);
+    F.registerBinding(runtime.registry, 'Probe', F.Probe);
     const target = F.target();
     const initialSource = { ports: { text: F.port({type:'string'}) }, render: F.probe('original', F.p('/ports/text')) };
     const host = F.mount(F.SourceHost, { target, props: { renderer, initialSource, inputs: { text: 'initial input' } } });
@@ -774,7 +775,7 @@ test('ViewstemView cancels a delayed source on removal and renderer disposal whi
       return new Promise((resolve, reject) => requests.push({ id, signal, resolve, reject }));
     } });
     const renderer = F.publicRenderer({ runtime });
-    renderer.bindComponent('Probe', F.Probe);
+    F.registerBinding(runtime.registry, 'Probe', F.Probe);
     const source = { render: F.probe('borrowed', 'still usable') };
     const borrowed = await runtime.createView(source);
     const borrowedTarget = F.target();
@@ -820,7 +821,7 @@ test('ViewstemView reports preparation errors once and releases live owned work 
     } });
     const fallback = [];
     const renderer = F.publicRenderer({ runtime, onError: diagnostic => fallback.push(diagnostic) });
-    renderer.bindComponent('Probe', F.Probe);
+    F.registerBinding(runtime.registry, 'Probe', F.Probe);
     const target = F.target();
     const diagnostics = [];
     const broken = F.mount(F.SourceHost, { target, props: {
@@ -851,6 +852,61 @@ test('ViewstemView reports preparation errors once and releases live owned work 
   assert.deepEqual(result, { code: 'REFERENCE_NOT_FOUND', errorUI: 'REFERENCE_NOT_FOUND', diagnostics: [['prepare', 'REFERENCE_NOT_FOUND']], fallback: [['prepare', 'REFERENCE_NOT_FOUND']], first: 'first DOM', closed: 'CANCELLED', staleEvent: 'CANCELLED', aborted: true, empty: '' });
 }));
 
+for (const failCleanup of [false, true]) test(`ViewstemView renderer disposal waits for ${failCleanup ? 'failing' : 'delayed'} owned connector cleanup`, t => browserTest(t, async page => {
+  const result = await page.evaluate(async failCleanup => {
+    const F = Fixture;
+    const runtime = F.publicRuntime();
+    const started = Promise.withResolvers();
+    const release = Promise.withResolvers();
+    let disposeCalls = 0;
+    let rendererFinished = false;
+    const connector = {
+      id: 'external',
+      accepts: value => value === 'label',
+      mount(label, { parent, anchor }) {
+        const node = document.createElement('span');
+        node.textContent = label;
+        parent.insertBefore(node, anchor);
+        return {
+          update() {}, setPending() {}, whenRendered() {},
+          async dispose() {
+            disposeCalls++;
+            started.resolve();
+            await release.promise;
+            node.remove();
+            if (failCleanup) throw Error('connector cleanup failure');
+          },
+        };
+      },
+    };
+    const contract = F.resource('Component', 'Label', {});
+    runtime.registry.registerComponentContract(contract);
+    runtime.registry.replaceResource({ component: { contract, connectorId: connector.id, implementation: 'label' } });
+    const renderer = F.publicRenderer({ runtime, connectors: [connector] });
+    const target = F.target();
+    const host = F.mount(F.ViewstemView, { target, props: {
+      renderer, source: { render: { id: 'label', componentRef: 'Label' } },
+    } });
+    await host.whenRendered();
+    const beforeDispose = target.textContent;
+    const outcome = F.errorOf(() => renderer.dispose()).then(error => {
+      rendererFinished = true;
+      return error?.code;
+    });
+    await started.promise;
+    await new Promise(resolve => setTimeout(resolve, 0));
+    const finishedBeforeRelease = rendererFinished;
+    release.resolve();
+    const error = await outcome;
+    await F.unmount(host);
+    runtime.dispose();
+    return { beforeDispose, finishedBeforeRelease, error, disposeCalls, empty: target.textContent === '' };
+  }, failCleanup);
+  assert.deepEqual(result, {
+    beforeDispose: 'label', finishedBeforeRelease: false, error: failCleanup ? 'INTERNAL_ERROR' : undefined, disposeCalls: 1, empty: true,
+  });
+}));
+
 test('ViewstemView reads the latest diagnostic handler and tolerates disposal during the first diagnostic', t => browserTest(t, async page => {
   const result = await page.evaluate(async () => {
     const F = Fixture;
@@ -858,7 +914,7 @@ test('ViewstemView reads the latest diagnostic handler and tolerates disposal du
     registry.registerComponentContract(F.resource('Component', 'Probe', { ports: { value: F.port({type:'string'}) } }));
     const runtime = F.publicRuntime({ registry });
     const renderer = F.publicRenderer({ runtime });
-    renderer.bindComponent('Probe', F.Probe);
+    F.registerBinding(runtime.registry, 'Probe', F.Probe);
     const makeSource = value => ({
       states: { value: F.state(value) },
       render: F.probe('value', F.p('/states/value')),
@@ -904,7 +960,7 @@ test('direct and imperative Svelte connections share diagnostic delivery without
     const order = [], central = [], local = [];
     const log = diagnostic => { order.push('central'); central.push(diagnostic); };
     const renderer = F.publicRenderer({ runtime, onError: log });
-    renderer.bindComponent('Probe', F.Probe);
+    F.registerBinding(runtime.registry, 'Probe', F.Probe);
     const view = await runtime.createView({
       states: { value: F.state('initial') }, render: F.probe('leaf', F.p('/states/value')),
     });
@@ -954,7 +1010,7 @@ for (const mode of ['source', 'mount']) test(`disposing during a Svelte ${mode} 
       },
     });
     const renderer = F.publicRenderer({ runtime });
-    renderer.bindComponent('Probe', F.Probe);
+    F.registerBinding(runtime.registry, 'Probe', F.Probe);
     let disposal;
     const stop = store.subscribe(null, ({changes}) => {
       if (!disposal && changes.some(change => change.kind === 'added')) disposal = renderer.dispose();
@@ -986,7 +1042,7 @@ test('source captures initial props before onMount and preserves JSON keys in pl
     const F = Fixture;
     const runtime = F.publicRuntime({ componentContracts: [F.resource('Component', 'Probe', { ports: { value: F.port(), label: F.port(true, false) } })] });
     const renderer = F.publicRenderer({ runtime });
-    renderer.bindComponent('Probe', F.Probe);
+    F.registerBinding(runtime.registry, 'Probe', F.Probe);
     const original = {
       ports: { label: F.port() },
       states: JSON.parse('{"__proto__":{"kind":"State","schema":{"type":"string"},"initial":"own key"}}'),
@@ -1026,7 +1082,7 @@ test('borrowed waits stay on the original connection and cached reports end with
     const F = Fixture;
     const runtime = F.publicRuntime({ componentContracts: [F.resource('Component', 'Probe', { ports: { value: F.port() } })] });
     const renderer = F.publicRenderer({ runtime });
-    renderer.bindComponent('Probe', F.Probe);
+    F.registerBinding(runtime.registry, 'Probe', F.Probe);
     const first = await runtime.createView({ render: F.probe('first', 'first') });
     const next = await runtime.createView({ render: F.probe('next', 'next') });
     const target = F.target();

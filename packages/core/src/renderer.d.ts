@@ -1,4 +1,4 @@
-import type { InitialReport, PublicError, Runtime, View, ViewApplication, ViewOptions, ViewSource } from './index.js';
+import type { ComponentBinding, InitialReport, PublicError, Runtime, View, ViewApplication, ViewOptions, ViewSnapshot, ViewSource } from './index.js';
 
 export interface RendererDiagnostic {
   readonly phase: 'prepare' | 'node' | 'query' | 'action' | 'url' | 'render';
@@ -34,31 +34,40 @@ export interface MountedView extends Omit<RenderAttachment, 'detach'> {
 }
 
 type OptionsWithDiagnostics<Options> = Options & { readonly onError?: RendererErrorListener };
-export interface Renderer<Options extends object = {}> {
+export type RenderEmission = (...args: [...Parameters<View['emit']>, current?: () => boolean]) => Promise<unknown>;
+export interface RenderProjection {
+  readonly generation: number;
+  readonly sequence: number;
+  readonly snapshot: ViewSnapshot;
+  componentBinding(id: string): ComponentBinding | undefined;
+  isCodeComponent(id: string): boolean;
+}
+export function subscribeRenderProjection(view: View, listener: (projection: RenderProjection) => void): () => void;
+export interface Renderer<Options extends object = {}, Target extends object = object> {
   readonly runtime: Runtime;
   mount(options: Omit<ViewOptions, 'signal'> & OptionsWithDiagnostics<Options> & {
-    readonly target: HTMLElement;
+    readonly target: Target;
     readonly source: ViewSource;
   }): MountedView;
-  attach(view: View, target: HTMLElement, options?: OptionsWithDiagnostics<Options>): RenderAttachment;
+  attach(view: View, target: Target, options?: OptionsWithDiagnostics<Options>): RenderAttachment;
   dispose(): Promise<void>;
 }
-export interface RendererHostOptions<Options extends object> {
+export interface RendererHostOptions<Options extends object, Target extends object = object> {
   readonly ownsRuntime: boolean;
   readonly onError?: RendererErrorListener;
-  readonly validateTarget: (target: HTMLElement) => boolean;
+  readonly validateTarget: (target: Target) => boolean;
   /** Clean up framework-owned views after the host has stopped accepting new work. */
   readonly disposeOwned?: () => Promise<void>;
-  readonly connect: (view: View, target: HTMLElement, options: OptionsWithDiagnostics<Options>,
+  readonly connect: (view: View, target: Target, options: OptionsWithDiagnostics<Options>,
     onRenderError: (error: unknown, nodeId?: string) => void,
-    connection: { readonly isOpen: () => boolean; readonly emit: View['emit'] }) => {
+    connection: { readonly isOpen: () => boolean; readonly emit: RenderEmission }) => {
       dispose(): void | Promise<void>;
-      whenRendered(): void | Promise<void>;
+      whenRendered(generation: number, sequence: number): void | Promise<void>;
     };
 }
-export function createRendererHost<Options extends object = {}>(
-  runtime: Runtime, options: RendererHostOptions<Options>,
-): Renderer<Options>;
+export function createRendererHost<Options extends object = {}, Target extends object = object>(
+  runtime: Runtime, options: RendererHostOptions<Options, Target>,
+): Renderer<Options, Target>;
 
 /** Capture creation settings for a framework-owned View before starting it. Its signal owns the View until disposal. */
 export function prepareOwnedView(runtime: Runtime, source: ViewSource, options?: Pick<ViewOptions, 'inputs'>): (
@@ -66,7 +75,7 @@ export function prepareOwnedView(runtime: Runtime, source: ViewSource, options?:
 ) => Promise<View>;
 
 /** For connections hosted inside a framework's existing component tree. */
-export function createRenderWaiter(view: View, render: () => void | Promise<void>, options?: {
+export function createRenderWaiter(view: View, render: (generation: number, sequence: number) => void | Promise<void>, options?: {
   onError?: RendererErrorListener;
   getErrorListener?: () => RendererErrorListener | undefined;
   deliverDiagnostic?: (diagnostic: RendererDiagnostic) => void;

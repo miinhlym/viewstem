@@ -35,37 +35,53 @@ function abortable(value, signal) {
   });
 }
 const applications = new WeakMap();
+const retryRegistry = Symbol('retry Registry');
 
 export class Runtime {
-  constructor({registry,stateStore,requestExecutor,resourceResolver,authorize,functions,requestTimeoutMs,clock,urlCleanupTimeoutMs=30000}={}) {
+  constructor({registry,stateStore,requestExecutor,resourceResolver,authorize,functions,hostCapabilities = {},requestTimeoutMs,clock,urlCleanupTimeoutMs=30000}={}) {
     if(!(registry instanceof Registry) || (stateStore!==undefined && !(stateStore instanceof StateStore)))fail('INVALID_DEFINITION');
     if (!Number.isSafeInteger(urlCleanupTimeoutMs) || urlCleanupTimeoutMs <= 0) fail('INVALID_DEFINITION');
+    if (!isRecord(hostCapabilities)) fail('INVALID_DEFINITION');
     Object.assign(this,{registry,stateStore:stateStore??createStateStore(),resourceResolver,authorize,functions,clock,urlCleanupTimeoutMs});
     this.functions=(functions??registry.functions).map(definition => ({ ...definition,
       run: (...args) => this.stateStore.runPureCallback(() => definition.run(...args)),
     }));this.ownsStore=stateStore===undefined;this.views=new Set();this.variables=new WeakMap();this.alive=true;
     this.requestExecutor=requestExecutor??createHttpExecutor({requestTimeoutMs});this.requestTimeoutMs=requestTimeoutMs;
+    this.capabilities = Object.freeze(Object.fromEntries(Object.entries(hostCapabilities)));
     this.configureExecution();
+    this.actionOwner = this.actions.owner(() => this.alive);
+  }
+  preparing = false;
+  prepare(run) {
+    const previous = this.preparing;
+    this.preparing = true;
+    try { return run(); }
+    finally { this.preparing = previous; }
+  }
+  authorizeUpdate(owner, definition) {
+    if (this.authorize && this.prepare(() => this.authorize({ operation: 'update', owner, definition: structuredClone(definition) })) !== true) fail('EXECUTION_BLOCKED');
   }
   configureExecution() {
     const {registry,stateStore,authorize,clock,requestTimeoutMs}=this;
     this.query=createQueryEngine({registry,functions:this.functions,requestExecutor:this.requestExecutor,...(requestTimeoutMs===undefined?{}:{requestTimeoutMs}),clock});
-    this.actions=new ActionEngine({registry,store:this.stateStore,authorize:authorize?({owner,definition})=>authorize({operation:'invoke',owner,definition}):undefined,
-      query:({reference,spec,inputs,signal,isOpen,onCleanupError})=>this.query.execute(reference??{query:spec},{inputs,signal,isOpen,onCleanupError}),
-      variable:({reference,spec,inputs})=>this.variable(reference??spec,inputs),
+    this.actions=new ActionEngine({registry,store:stateStore,capabilities:this.capabilities,authorize:authorize?context=>authorize({operation:'invoke',...context}):undefined,
+      query:({registry,reference,spec,inputs,signal,isOpen,onCleanupError})=>this.query.execute(reference??{query:spec},{registry,inputs,signal,isOpen,onCleanupError}),
+      variable:({registry,reference,spec,inputs})=>this.variable(reference??spec,inputs,registry),
       onChange:()=>{for(const view of this.views)view.refresh();}});
   }
   execution(registry) {
-    const execution=Object.create(this);execution.registry=registry;execution.variables=new WeakMap();execution.configureExecution();return execution;
+    const execution=Object.create(this);execution.registry=registry;return execution;
   }
-  variable(use,inputs={}) {
-    const spec=typeof use==='string'?this.registry.get('Variable',use).spec:use;
-    if(!this.variables.has(spec)) {
-      const schemas=Object.fromEntries(Object.entries(spec.ports??{}).map(([name,port])=>[name,this.registry.schema(port)]));
-      this.variables.set(spec,compileCel(spec.expression,{inputs:schemas,functions:this.functions}));
+  variable(use,inputs={},registry=this.registry) {
+    const spec=typeof use==='string'?registry.get('Variable',use).spec:use;
+    let variables = this.variables.get(registry);
+    if (!variables) this.variables.set(registry, variables = new WeakMap());
+    if(!variables.has(spec)) {
+      const schemas=Object.fromEntries(Object.entries(spec.ports??{}).map(([name,port])=>[name,registry.schema(port)]));
+      variables.set(spec,compileCel(spec.expression,{inputs:schemas,functions:this.functions}));
     }
-    const prepared=compilePorts({resourceKind:'Variable',ports:spec.ports,types:this.registry.types()}).prepare(inputs);
-    return this.variables.get(spec)(prepared.ports);
+    const prepared=compilePorts({resourceKind:'Variable',ports:spec.ports,types:registry.types()}).prepare(inputs);
+    return variables.get(spec)(prepared.ports);
   }
   async resolve(target, signal, fetched) {
     const check = () => { if (signal.aborted) fail('CANCELLED'); };
@@ -90,7 +106,7 @@ export class Runtime {
         catch (caught) {
           if (!this.resourceResolver) throw caught;
           if (!fetched.has(key)) {
-            const result = await abortable(this.resourceResolver(kind, id, { signal }), signal);
+            const result = await abortable(this.prepare(() => this.resourceResolver(kind, id, { signal })), signal);
             check();
             if (result?.kind !== kind || result?.id !== id) fail('REFERENCE_NOT_FOUND');
             fetched.set(key, structuredClone(result));
@@ -131,15 +147,19 @@ export class Runtime {
       throw safeError(caught);
     }
   }
-  invokeAction({owner,actionRef,action,inputs={}}) {
-    if(!this.alive || !(owner instanceof View) || !this.views.has(owner) || !owner.alive) return Promise.reject(error('CANCELLED'));
-    if((actionRef!==undefined)===(action!==undefined))return Promise.reject(error('INVALID_DEFINITION'));
-    try{return owner.runtime.actions.invoke(owner.root.actionOwner,actionRef,inputs,action);}catch(caught){return Promise.reject(safeError(caught));}
+  invokeAction({owner,actionRef,action,inputs={},signal}) {
+    if (this.preparing) return Promise.reject(error('EXECUTION_BLOCKED'));
+    if (!this.alive || (owner && (!(owner instanceof View) || !this.views.has(owner) || !owner.alive || !owner.root))) return Promise.reject(error('CANCELLED'));
+    if ((actionRef===undefined)===(action===undefined)) return Promise.reject(error('INVALID_DEFINITION'));
+    const registry = owner ? owner.runtime.registry : this.registry.fork();
+    try { return this.actions.invoke(owner?.root.actionOwner ?? this.actionOwner, actionRef, inputs, action, registry, signal); }
+    catch (caught) { return Promise.reject(safeError(caught)); }
   }
   dispose() {
     if (this.disposal) return this.disposal.promise;
     this.alive = false;
     const completion = this.disposal = deferred();
+    this.actionOwner.dispose();
     const views = [...this.views].map(view => view.dispose());
     if (this.ownsStore) {
       const release = () => this.stateStore.dispose();
@@ -174,20 +194,26 @@ export class View {
     this.requested = 0;
     this.published = 0;
     this.projectionWaiters = new Set();
+    this.renderListeners = new Set();
     this.unsubscribe = runtime.stateStore.observe(() => this.refresh());
   }
   get alive() { return !this.disposal && this.host.alive && !this.owner?.signal.aborted && (this.owner?.isOpen?.() ?? true); }
-  newApplication() {
-    for (const cancel of this.renderWaiters) cancel(error('CANCELLED'));
-    this.renderWaiters.clear();
-    this.initial?.reject(error('CANCELLED'));
+  prepareApplication() {
     const token = Object.freeze(Object.create(null));
     const report = deferred();
-    const record = { ...report, view: this, token, generation: this.generation };
+    return { ...report, view: this, token, generation: this.generation + 1 };
+  }
+  publishApplication(record) {
+    const previous = this.initial, waiters = [...this.renderWaiters];
+    const { token } = record;
     applications.set(token, record);
     this.initial = record;
     this.firstApplication ??= token;
-    return token;
+    return () => {
+      const cancelled = error('CANCELLED');
+      for (const cancel of waiters) cancel(cancelled);
+      previous?.reject(cancelled);
+    };
   }
   applicationRecord(token) {
     const record = applications.get(token);
@@ -249,6 +275,11 @@ export class View {
   projection() {
     return { generation: this.generation, requested: this.requested, published: this.published };
   }
+  subscribeRenderProjection(listener) {
+    this.renderListeners.add(listener);
+    if (this.renderProjection) listener(this.renderProjection);
+    return () => this.renderListeners.delete(listener);
+  }
   async whenProjected(generation, sequence) {
     if (!this.alive || generation !== this.generation) fail('CANCELLED');
     if (this.published >= sequence) return;
@@ -264,7 +295,7 @@ export class View {
       this.projectionWaiters.delete(waiter);
     }
   }
-  context(owner,extra={}) {
+  context(owner,extra={},plan) {
     const resolve=(keys,target)=>{
       const [root,name]=keys;let value;
       if(keys.length===1&&root!=='event'){
@@ -281,14 +312,14 @@ export class View {
       } else if(root==='queries') {
         const item=owner.queries.get(name);if(!item)fail('REFERENCE_NOT_FOUND');value=target?item.handle:item.usage?.getSnapshot()??{status:'waiting',data:undefined,error:null,dataInputs:undefined,stale:false,waitingReason:'INPUT_NOT_READY'};
       } else if(root==='actions') {
-        let connection=[...(this.planConnections??this.connections).values()].find(item=>item.owner.id===owner.id&&item.handler.id===name);
-        if(!connection&&this.planning){
+        let connection=[...(plan?.connections??this.connections).values()].find(item=>item.owner.id===owner.id&&item.handler.id===name);
+        if(!connection&&plan?.connections){
           const previous=[...this.connections.values()].find(item=>item.owner.id===owner.id&&item.handler.id===name);
           const declared=this.actionDeclarations(owner.spec).get(name);
           if(previous&&equal(previous.handler,declared))connection=previous;
         }
         if(connection)value=connection.connection.getSnapshot();
-        else if(this.planning&&this.actionNames(owner.spec).has(name))value=idle;
+        else if(plan?.connections&&this.actionNames(owner.spec).has(name))value=idle;
         else fail('REFERENCE_NOT_FOUND');
       } else if(root==='repeat') {if(!own(extra.repeat??{},name))fail('REFERENCE_NOT_FOUND');value=extra.repeat[name];}
       else if(root==='event') {if(!own(extra,'event'))fail('REFERENCE_NOT_FOUND');return {value:extra.event,offset:1};}
@@ -298,10 +329,10 @@ export class View {
   }
   actionDeclarations(spec) {const declarations=new Map();const walk=node=>{for(const handler of Object.values(node.on??{}))if(handler.id)declarations.set(handler.id,handler);for(const content of Object.values(node.slots??{}))if(Array.isArray(content))content.forEach(walk);};if(spec.render)walk(spec.render);return declarations;}
   actionNames(spec) {const names=new Set();const walk=node=>{for(const h of Object.values(node.on??{}))if(h.id)names.add(h.id);for(const content of Object.values(node.slots??{}))if(Array.isArray(content))content.forEach(walk);};if(spec.render)walk(spec.render);return names;}
-  bindInputs(spec, templates, context, literal = false) {
+  bindInputs(spec, templates, context, literal = false, registry = this.runtime.registry) {
     const inputs=Object.create(null);
     if(literal)Object.assign(inputs,templates??{});
-    else if(isRecord(templates??{})&&!expressionKind(templates??{},this.runtime.registry.functions)) {
+    else if(isRecord(templates??{})&&!expressionKind(templates??{},registry.functions)) {
       for(const [name,value] of dataEntries(templates??{})) {
         const port=spec.ports?.[name];
         if(port?.kind==='State'||port?.kind==='Query')inputs[name]=evaluate(value,context,{target:true});
@@ -310,13 +341,13 @@ export class View {
     } else Object.assign(inputs,evaluate(templates,context));
     return inputs;
   }
-  prepareInputs(spec, templates, context, mode = 'automatic', literal = false, kind = 'Component') {
-    const inputs = this.bindInputs(spec, templates, context, literal);
-    return compilePorts({resourceKind:kind,ports:spec.ports,types:this.runtime.registry.types(),store:this.runtime.stateStore}).prepare(inputs,{mode});
+  prepareInputs(spec, templates, context, mode = 'automatic', literal = false, kind = 'Component', runtime = this.runtime) {
+    const inputs = this.bindInputs(spec, templates, context, literal, runtime.registry);
+    return compilePorts({resourceKind:kind,ports:spec.ports,types:runtime.registry.types(),store:runtime.stateStore}).prepare(inputs,{mode});
   }
-  makeOwner(spec,ports,id,previous,created) {
-    const store=this.runtime.stateStore,registry=this.runtime.registry;
-    const actionOwner = previous?.actionOwner ?? this.runtime.actions.owner(
+  makeOwner(spec,ports,id,previous,created,runtime,plan) {
+    const { stateStore: store, registry } = runtime;
+    const actionOwner = previous?.actionOwner ?? runtime.actions.owner(
       () => this.alive && this.owners.has(id), this.lifetime.signal,
       cause => this.diagnostics.push(safeError(cause)),
     );
@@ -338,10 +369,10 @@ export class View {
       // Preserve the object referenced by the handle; owner/use are assigned after commit.
       owner.queries.set(name,old?.identity===identity?old:item);
     }
-    for(const name of validateInitials(spec,this.runtime.registry.functions)) {
-      const declaration=spec.states[name],handle=owner.states.get(name),context=this.context(owner);
+    for(const name of validateInitials(spec,registry.functions)) {
+      const declaration=spec.states[name],handle=owner.states.get(name),context=this.context(owner, {}, plan);
       if(declaration.kind==='Derived') {
-        const paths=pathsIn(declaration.inputs??{},this.runtime.registry.functions);
+        const paths=pathsIn(declaration.inputs??{},registry.functions);
         const portNames=new Set(paths.filter(keys=>keys[0]==='ports').flatMap(keys=>keys.length===1?Object.keys(spec.ports??{}):[keys[1]]));
         const dependencies=[...paths.filter(keys=>keys[0]==='states').map(keys=>owner.states.get(keys[1])),
           ...[...portNames].filter(name=>spec.ports?.[name]?.kind==='State').map(name=>ports[name])].filter(Boolean).map(handle=>stateRoot(handle,store));
@@ -364,9 +395,9 @@ export class View {
         owner.computations.set(name,{declaration,variable,values,dependencies});
         store.computed(handle,dependencies,()=>{
           try {
-            const inputs=this.prepareInputs(variable,declaration.inputs??{},context,'automatic',false,'Variable');
+            const inputs=this.prepareInputs(variable,declaration.inputs??{},context,'automatic',false,'Variable',runtime);
             if(inputs.status==='waiting')return {status:'pending'};
-            return {status:'ready',value:this.runtime.variable(variable,inputs.ports)};
+            return {status:'ready',value:runtime.variable(variable,inputs.ports)};
           }catch(caught){return {status:'error',error:safeError(caught)};}
         },{recompute:!unchanged});
       } else if(own(declaration,'initial')) {
@@ -377,16 +408,17 @@ export class View {
     }
     return owner;
   }
-  build(spec,inputs,replace=false,stateWrites,commit) {
-    const runtime=this.runtime,registry=runtime.registry,store=runtime.stateStore;
+  build(spec,inputs,replace=false,stateWrites,commit,runtime=this.runtime) {
+    const { registry, stateStore: store } = runtime;
     const created=[],newConnections=[],next=new Map(),owners=new Map(),connections=new Map(),aliases=new Set();
     const oldOwners=this.owners;let oldInstances=replace?new Map():this.instances,availableConnections=replace?new Map():this.connections;
-    this.planConnections=connections;
+    const plan = { connections };
     let root,roots;
+    const prepare = run => commit ? this.host.prepare(run) : run();
     try {
-      store.transaction(()=>{
-        const prepared=this.prepareInputs(spec,inputs,{},'automatic',true,'View');
-        root=this.makeOwner(spec,prepared.ports,replace?`view:${++nextLifetime}`:this.root?.id??`view:${++nextLifetime}`,replace?null:this.root,created);owners.set(root.id,root);
+      store.transaction(()=>prepare(()=>{
+        const prepared=this.prepareInputs(spec,inputs,{},'automatic',true,'View',runtime);
+        root=this.makeOwner(spec,prepared.ports,replace?`view:${++nextLifetime}`:this.root?.id??`view:${++nextLifetime}`,replace?null:this.root,created,runtime,plan);owners.set(root.id,root);
         const settleWrites=stateWrites?store.stageBatch(Object.entries(stateWrites).map(([name,value])=>[root.states.get(name),value])):null;
         const retainSuspended=(old,instance=old)=>{
           const owner=old.owner?{...old.owner,suspended:true,instance}:null;
@@ -404,12 +436,12 @@ export class View {
         const contentToken=(content,owner,extra,trail)=>Array.isArray(content)?{nodes:content,owner,extra,trail}:owner.slots[pointerKeys(content['@path'])[1]];
         const expandToken=token=>token?token.nodes.flatMap(node=>expand(node,token.owner,token.extra,token.trail)):[];
         const expand=(node,author,extra={},trail=[],repeated=false)=>{
-          const context=this.context(author,extra);
+          const context=this.context(author,extra,plan);
           if(node.repeat&&!repeated) {
             const snapshot=evaluateSnapshot(node.repeat.items,context);if(snapshot.status!=='ready')return [{id:node.id,status:snapshot.status,error:snapshot.error,children:[],inputs:{}}];
             if(!Array.isArray(snapshot.value))fail('TYPE_MISMATCH');const seen=new Set();
             const entries=snapshot.value.map(item=>{
-              const childExtra={...extra,repeat:{...extra.repeat,[node.repeat.as]:item}},value=evaluate(node.repeat.key,this.context(author,childExtra));
+              const childExtra={...extra,repeat:{...extra.repeat,[node.repeat.as]:item}},value=evaluate(node.repeat.key,this.context(author,childExtra,plan));
               if(typeof value!=='string'&&!(typeof value==='number'&&Number.isFinite(value)))fail('TYPE_MISMATCH');
               const key=tuple([typeof value,Object.is(value,-0)?0:value]);if(seen.has(key))fail('INVALID_DEFINITION');seen.add(key);return {childExtra,key};
             });
@@ -427,20 +459,20 @@ export class View {
             if(handler.id){const alias=tuple([author.id,handler.id]);if(aliases.has(alias))fail('INVALID_DEFINITION');aliases.add(alias);}
             const key=tuple([address,generation,event]),prior=availableConnections.get(key);
             const connection=prior&&equal(prior.handler,handler)?prior.connection:runtime.actions.connect(author.actionOwner,{
-              actionRef:handler.actionRef,spec:handler.action,
+              actionRef:handler.actionRef,spec:handler.action,registry,
               isOpen: () => this.connections.get(key)?.connection === connection,
             });
             if(connection!==prior?.connection)newConnections.push(connection);
             connections.set(key,{connection,handler,owner:author});
           }
           let preparation,status='ready',inputError;
-          try{preparation=this.prepareInputs(childSpec,node.inputs??{},context);if(preparation.status==='waiting')status='pending';}
+          try{preparation=this.prepareInputs(childSpec,node.inputs??{},context,'automatic',false,'Component',runtime);if(preparation.status==='waiting')status='pending';}
           catch(caught){status='error';inputError=safeError(caught);preparation={ports:{}};}
           const instance={id:node.id,address,generation,definition:identity,source:node,spec:childSpec,author,extra,inputs:preparation.ports,status,error:inputError,children:[],slots:{},owner:null};
           next.set(address,instance);
           // Missing inputs wait independently; the surrounding screen remains usable.
           if(status!=='ready'){if(preserved&&old.owner)retainSuspended(old,instance);return [instance];}
-          const owner=this.makeOwner(childSpec,preparation.ports,tuple([address,generation]),preserved?old.owner:null,created);owners.set(owner.id,owner);owner.instance=instance;instance.owner=owner;
+          const owner=this.makeOwner(childSpec,preparation.ports,tuple([address,generation]),preserved?old.owner:null,created,runtime,plan);owners.set(owner.id,owner);owner.instance=instance;instance.owner=owner;
           owner.queryDefaults={...author.queryDefaults,...childSpec.queryDefaults};
           owner.slots=Object.fromEntries(Object.keys(childSpec.slots??{}).map(name=>[name,own(node.slots??{},name)?contentToken(node.slots[name],author,extra,trail):{nodes:[],owner:author,extra,trail}]));
           if(childSpec.render)instance.children=expand(childSpec.render,owner,{},[]);
@@ -456,8 +488,8 @@ export class View {
           for(const [id,owner] of previousOwners)if(!owners.has(id))for(const stop of owner.reactions)stop();
           for(const owner of owners.values()) {
             const definitions=owner.suspended?[]:(owner.spec.reactions??[]).map(reaction=>({
-              watch:reaction.watch.map(value=>stateRoot(evaluate(value,this.context(owner),{target:true}),store)),
-              target:stateRoot(evaluate(reaction.target,this.context(owner),{target:true}),store),value:reaction.value
+              watch:reaction.watch.map(value=>stateRoot(evaluate(value,this.context(owner,{},plan),{target:true}),store)),
+              target:stateRoot(evaluate(reaction.target,this.context(owner,{},plan),{target:true}),store),value:reaction.value
             }));
             const previous=previousOwners.get(owner.id)?.reactionDefinitions??[];
             const unchanged=definitions.length===previous.length&&definitions.every((item,index)=>item.target===previous[index].target&&item.watch.length===previous[index].watch.length&&item.watch.every((handle,i)=>handle===previous[index].watch[i])&&equal(item.value,previous[index].value));
@@ -477,9 +509,9 @@ export class View {
           roots=expand(spec.render,root);reconcileReactions(stagedOwners);
         }
         for(const owner of new Set([...oldOwners.values(),...created]))if(!owners.has(owner.id))owner.scope.dispose();
-      }, () => {
+      }), () => {
         if (!this.alive) fail('CANCELLED');
-        commit?.({ root, roots, owners });
+        const afterCommit = commit?.({ root, roots, owners, instances: next });
         const oldConnections = this.connections;
         this.root = root;
         this.roots = roots;
@@ -487,7 +519,7 @@ export class View {
         this.owners = owners;
         this.connections = connections;
         this.queryUses = new Set([...owners.values()].flatMap(owner => [...owner.queries.values()]));
-        this.planConnections = null;
+        plan.connections = null;
         return () => {
           const retained = new Set([...connections.values()].map(entry => entry.connection));
           const cleanup = run => { try { run(); } catch (cause) { this.diagnostics.push(safeError(cause)); } };
@@ -505,10 +537,11 @@ export class View {
               item.use = owner.spec.queries[name];
             }
           }
+          afterCommit?.();
         };
       });
     } catch (caught) {
-      this.planConnections = null;
+      plan.connections = null;
       for (const connection of newConnections) connection.dispose();
       for (const owner of created) owner.actionOwner.dispose();
       throw caught;
@@ -537,7 +570,7 @@ export class View {
         }
       }catch(caught){inputError=safeError(caught);ready=false;}
       if(!current())return;
-      const settings={...owner.queryDefaults,...use,inputs:preparedInputs?.ports??{},preparedInputs,ready,executeWhen,autoRefreshWhen,inputError,owner:item};
+      const settings={...owner.queryDefaults,...use,use,registry:this.runtime.registry,inputs:preparedInputs?.ports??{},preparedInputs,ready,executeWhen,autoRefreshWhen,inputError,owner:item};
       if(!item.usage){
         item.usage=this.runtime.query.createUsage(use,{
           ...settings,onChange:(snapshot, failedRun)=>this.queryChanged(item, snapshot, failedRun),clock:this.runtime.clock,
@@ -562,7 +595,7 @@ export class View {
     // a newer snapshot to listeners still receiving the current one.
     if(this.planning){this.schedule();return;}
     this.planning=true;
-    try{this.build(this.spec,this.inputs);this.configureQueries();this.project();}catch(caught){this.planConnections=null;this.diagnostics.push(safeError(caught));this.project();}finally{this.planning=false;}
+    try{this.build(this.spec,this.inputs);this.configureQueries();this.project();}catch(caught){this.diagnostics.push(safeError(caught));this.project();}finally{this.planning=false;}
   }
   schedule(){if(!this.alive)return;this.requested++;if(this.queued)return;this.queued=true;queueMicrotask(()=>{this.queued=false;this.refresh();});}
   project() {
@@ -570,7 +603,18 @@ export class View {
     const generation = this.generation, snapshot = this.getSnapshot();
     this.updateNodeDiagnostics(snapshot);
     const diagnosticListeners = [...this.diagnosticListeners];
-    this.published = this.requested;for(const listener of this.listeners){if(!this.alive||generation!==this.generation)return;try{listener(snapshot);}catch(caught){this.diagnostics.push(safeError(caught));}}
+    const registry = this.runtime.registry;
+    this.published = this.requested;
+    const projection = this.renderProjection = Object.freeze({
+      generation, sequence: this.published, snapshot,
+      componentBinding: id => registry.componentBinding(id),
+      isCodeComponent: id => registry.isCode('Component', id),
+    });
+    for (const listener of this.renderListeners) {
+      if (!this.alive || generation !== this.generation) return;
+      try { listener(projection); } catch (cause) { this.diagnostics.push(safeError(cause)); }
+    }
+    for(const listener of this.listeners){if(!this.alive||generation!==this.generation)return;try{listener(snapshot);}catch(caught){this.diagnostics.push(safeError(caught));}}
     if(!this.alive||generation!==this.generation)return;
     this.flushProjectionWaiters();
     for (const diagnostic of this.nodeDiagnostics.values()) {
@@ -604,25 +648,43 @@ export class View {
     visit(snapshot.roots);
     this.nodeDiagnostics = next;
   }
+  prepareUrlTransition(target, root, previous, replacing) {
+    const store = this.runtime.stateStore;
+    if (store.urlConnection && store.urlConnection !== previous) fail('INVALID_DEFINITION');
+    const url = target.url;
+    if (url && !Array.isArray(url.bindings)) fail('INVALID_DEFINITION');
+    const bindings = url?.bindings.map(({ state, ...binding }) =>
+      ({ ...binding, state, target: root.states.get(state) ?? fail('REFERENCE_NOT_FOUND') }));
+    const options = url && {
+      ...url, bindings, restore: !replacing,
+      onError: diagnostic => {
+        if (diagnostic.kind === 'connect' && this.url === connection) {
+          this.url = null;
+          this.urlBindings = undefined;
+          this.schedule();
+        }
+        this.reportUrl(diagnostic);
+      },
+    };
+    const connection = prepareUrlConnection(store, options, { previous: previous ?? null, isOpen: () => this.alive, viewOwned: true });
+    return { connection, bindings };
+  }
   async apply(spec, inputs, replace, stateWrites, target, execution, resolved, job) {
     const check = () => {
-      if (!this.alive || job.cancelled || job.signal?.aborted) fail('CANCELLED');
-      if (resolved && this.host.registry.revision !== resolved.revision) fail('INVALID_DEFINITION');
+      if (!this.host.prepare(() => this.alive) || job.cancelled || job.signal?.aborted) fail('CANCELLED');
+      if (resolved && this.host.registry.revision !== resolved.revision) throw retryRegistry;
     };
-    const previousExecution = this.runtime;
     const oldUrl = this.url;
     const replacing = this.root !== undefined;
-    const store = execution.stateStore;
+    const registryCandidate = resolved?.additions?.length ? resolved.candidate : null;
     let application, urlConnection;
-    job.phase = 'commit';
     const committing = this.committing = deferred();
     const committedSnapshot = this.root ? this.getSnapshot() : undefined;
-    this.runtime = execution;
     this.planning = true;
     try {
       check();
       const prepared = execution.registry.validateDefinition('View', spec);
-      const { ports } = this.prepareInputs(prepared, inputs, {}, 'automatic', true, 'View');
+      const { ports } = this.prepareInputs(prepared, inputs, {}, 'automatic', true, 'View', execution);
       inputs = Object.freeze(Object.fromEntries(Object.keys(inputs).map(name =>
         [name, spec.ports[name].kind === 'Value' ? ports[name] : inputs[name]])));
       if (stateWrites) for (const [name, value] of Object.entries(stateWrites)) {
@@ -632,52 +694,52 @@ export class View {
         catch (caught) { throw safeError(caught, 'TYPE_MISMATCH'); }
       }
       this.stagingSnapshot = committedSnapshot;
-      this.build(spec, inputs, replace, stateWrites, ({ root }) => {
-        let urlOptions;
-        if (replace && (target.url || oldUrl)) {
-          if (store.urlConnection && store.urlConnection !== oldUrl) fail('INVALID_DEFINITION');
-          if (target.url) {
-            if (!Array.isArray(target.url.bindings)) fail('INVALID_DEFINITION');
-            urlOptions = { ...target.url, bindings: target.url.bindings.map(({ state, ...binding }) =>
-              ({ ...binding, target: root.states.get(state) ?? fail('REFERENCE_NOT_FOUND') })) };
+      this.build(spec, inputs, replace, stateWrites, ({ root, instances }) => {
+        let urlBindings;
+        const applicationCandidate = this.host.prepare(() => {
+          for (const instance of instances.values()) {
+            const id = instance.source?.componentRef;
+            if (instance.status === 'ready' && !instance.owner?.suspended && id && execution.registry.isCode('Component', id)
+              && !execution.registry.componentBinding(id)) {
+              fail('REFERENCE_NOT_FOUND', { resource: { kind: 'Component', id } });
+            }
           }
-          if (urlOptions) {
-            urlOptions.restore = !replacing;
-            urlOptions.onError = diagnostic => {
-              if (diagnostic.kind === 'connect' && this.url === urlConnection) {
-                this.url = null;
-                this.urlBindings = undefined;
-                this.schedule();
-              }
-              this.reportUrl(diagnostic);
-            };
+          if (replace && (target.url || oldUrl)) {
+            const transition = this.prepareUrlTransition(target, root, oldUrl, replacing);
+            urlConnection = transition.connection;
+            urlBindings = transition.bindings;
+          } else if (oldUrl && this.urlBindings?.some(binding => root.states.get(binding.state) !== binding.target)) {
+            fail('INVALID_DEFINITION');
           }
-          urlConnection = prepareUrlConnection(store, urlOptions, { previous: oldUrl ?? null, isOpen: () => this.alive, viewOwned: true });
-        } else if (oldUrl && this.urlBindings?.some(binding => root.states.get(binding.state) !== binding.target)) {
-          fail('INVALID_DEFINITION');
-        }
-        job.beforeCommit?.();
+          const record = this.prepareApplication();
+          job.beforeCommit?.();
+          return record;
+        });
         check();
-        urlConnection?.commit();
-        if (resolved?.additions.length) this.host.registry.commitCandidate(resolved.candidate);
+        const reservation = urlConnection?.validateReservation();
+        job.phase = 'commit';
+        if (urlConnection) urlConnection.installReservation(reservation);
+        if (registryCandidate) this.host.registry.commitCandidate(registryCandidate);
+        this.runtime = execution;
         this.stagingSnapshot = undefined;
         this.spec = spec;
         this.inputs = inputs;
         this.generation++;
         this.urlDiagnostics = [];
         this.requested++;
-        application = this.newApplication();
+        application = applicationCandidate.token;
         if (urlConnection) {
           this.url = null;
           this.urlTransition = urlConnection;
-          this.urlBindings = target.url?.bindings.map(({ state }) => ({ state, target: root.states.get(state) }));
+          this.urlBindings = urlBindings;
         }
-      });
+        return this.publishApplication(applicationCandidate);
+      }, execution);
     } catch (caught) {
-      this.runtime = previousExecution;
+      if (job.phase === 'prepare') urlConnection?.dispose();
       committing.resolve();
       this.committing = undefined;
-      throw safeError(caught);
+      throw caught === retryRegistry ? caught : safeError(caught);
     } finally {
       this.stagingSnapshot = undefined;
       this.planning = false;
@@ -775,19 +837,37 @@ export class View {
     return this.enqueue(job => {
       const definition = next ?? this.spec;
       this.runtime.registry.validateDefinition('View', definition);
-      if (this.runtime.authorize && this.runtime.authorize({ operation: 'update', owner: this, definition: structuredClone(definition) }) !== true) fail('EXECUTION_BLOCKED');
+      this.host.authorizeUpdate(this, definition);
       return this.apply(definition, inputs ?? this.inputs, false, states, {}, this.runtime, null, job);
     });
   }
   replace(target, signal, beforeCommit) {
-    return this.enqueue(async job => {
-      let resolved;
-      const fetched = new Map();
-      do { resolved = await this.host.resolve(target, job.controller.signal, fetched); }
-      while (resolved.revision !== this.host.registry.revision);
-      if (this.root && this.host.authorize && this.host.authorize({ operation: 'update', owner: this, definition: structuredClone(resolved.spec) }) !== true) fail('EXECUTION_BLOCKED');
+    const fetched = new Map();
+    return this.enqueue(job => this.retryApplication(job, async () => {
+      const resolved = await this.host.resolve(target, job.controller.signal, fetched);
+      if (resolved.revision !== this.host.registry.revision) throw retryRegistry;
+      if (this.root) this.host.authorizeUpdate(this, resolved.spec);
       return this.apply(resolved.spec, target.inputs ?? {}, true, undefined, target, this.host.execution(resolved.candidate), resolved, job);
-    }, signal, beforeCommit);
+    }), signal, beforeCommit);
+  }
+  applyResourceSets({ setIds, definition, inputs, states, signal }, beforeCommit) {
+    return this.enqueue(job => this.retryApplication(job, () => {
+      const revision = this.host.registry.revision;
+      const candidate = this.runtime.registry.includeResourceSets(this.host.registry, setIds);
+      const spec = definition ?? this.spec;
+      candidate.validateDefinition('View', spec);
+      this.host.authorizeUpdate(this, spec);
+      return this.apply(spec, inputs ?? this.inputs, false, states, {}, this.host.execution(candidate), { revision }, job);
+    }), signal, beforeCommit);
+  }
+  async retryApplication(job, run) {
+    for (;;) {
+      if (!this.alive || job.cancelled || job.signal?.aborted) fail('CANCELLED');
+      try { return await run(); }
+      catch (caught) { if (caught !== retryRegistry) throw caught; }
+      // A cancelled prepare must finish rollback before any next attempt.
+      await Promise.resolve();
+    }
   }
   exportDefinition(){return structuredClone(this.spec);}
   getState(name,instanceId){const owner=instanceId?this.owners.get(instanceId):this.root;return owner?.states.get(name)??fail('REFERENCE_NOT_FOUND');}
@@ -815,17 +895,25 @@ export class View {
   }
   subscribe(listener){this.listeners.add(listener);listener(this.getSnapshot());return()=>this.listeners.delete(listener);}
   emit(target,event,payload,canStart=()=>true) {
+    if (this.host.preparing) return Promise.reject(error('EXECUTION_BLOCKED'));
     try {
       if(!this.alive || !canStart())fail('CANCELLED');
       const instance=typeof target==='string'?this.instances.get(target)??[...this.instances.values()].find(item=>item.owner?.id===target):this.instances.get(target.address);
       if(!instance || (typeof target!=='string' && target.generation!==instance.generation))fail('CANCELLED');
+      if (instance.status !== 'ready' || instance.owner?.suspended) fail('INPUT_NOT_READY');
+      const current = () => {
+        const latest = this.instances.get(instance.address);
+        return this.alive && latest?.generation === instance.generation && latest.status === 'ready' && !latest.owner?.suspended && canStart();
+      };
+      if (!current()) fail('CANCELLED');
       const contract=instance.spec.events?.[event];if(!contract)fail('REFERENCE_NOT_FOUND');let data;try{data=protect(this.runtime.registry.validator(contract).accept(payload));}catch(caught){throw safeError(caught,'TYPE_MISMATCH');}
       const handler=instance.source.on?.[event];if(!handler)return Promise.resolve();
       const context=this.context(instance.author,{...instance.extra,event:data});
-      if(handler.emit){const receiver=instance.author.instance;if(!receiver)fail('REFERENCE_NOT_FOUND');return this.emit(receiver,handler.emit,evaluate(handler.payload,context),canStart);}
+      if(handler.emit){const receiver=instance.author.instance;if(!receiver)fail('REFERENCE_NOT_FOUND');return this.emit(receiver,handler.emit,evaluate(handler.payload,context),current);}
       const key=tuple([instance.address,instance.generation,event]),connection=this.connections.get(key)?.connection;if(!connection)fail('CANCELLED');
       const spec=handler.action??this.runtime.registry.get('Action',handler.actionRef).spec;
-      return connection.invoke(() => this.bindInputs(spec, handler.inputs ?? {}, context), canStart)
+      const registry = this.runtime.registry;
+      return connection.invoke(() => this.bindInputs(spec, handler.inputs ?? {}, context, false, registry), current, registry)
         .catch(caught => { if (this.alive && caught.code !== 'CANCELLED') this.diagnostic('action', caught, instance.id); throw caught; });
     } catch (caught) {
       const failure = safeError(caught);
@@ -843,6 +931,7 @@ export class View {
     for (const cancel of this.renderWaiters) cancel(error('CANCELLED'));
     this.renderWaiters.clear();
     this.listeners.clear();
+    this.renderListeners.clear();
     this.diagnosticListeners.clear();
     let failure;
     const cleanup = run => { try { run(); } catch (cause) { failure ??= safeError(cause); } };

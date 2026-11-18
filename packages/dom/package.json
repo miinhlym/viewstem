@@ -1,0 +1,23 @@
+{
+  "name": "@viewstem/dom",
+  "version": "0.1.0",
+  "description": "Browser renderer and DOM component connector for Viewstem",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miinhlym/viewstem.git",
+    "directory": "packages/dom"
+  },
+  "engines": { "node": ">=22" },
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
+  },
+  "files": ["dist", "README.md", "README.ko.md", "LICENSE"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p test/types/tsconfig.json",
+    "test": "node --test test/browser.test.mjs"
+  },
+  "dependencies": { "@viewstem/core": "0.1.0" }
+}

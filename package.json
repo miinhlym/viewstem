@@ -25,9 +25,12 @@
     "check": "npm run build && npm run test:report && npm run typecheck && npm run check:coverage",
     "test:browser": "node packages/core/test/cel-browser.mjs && node packages/core/test/browser.mjs",
     "test:package": "node packages/core/scripts/test-package.mjs",
+    "build:dom": "npm run build && npm run build -w @viewstem/dom",
+    "check:dom": "npm run build:dom && npm run typecheck -w @viewstem/dom && npm run test -w @viewstem/dom",
+    "test:dom:package": "node --test packages/dom/test/public-consumer.test.mjs",
     "check:coverage": "node packages/core/scripts/check-coverage.mjs packages/core/test/results/current.json",
     "test:report": "node packages/core/scripts/run-tests.mjs",
-    "build:svelte": "npm run build && npm run build -w @viewstem/svelte",
+    "build:svelte": "npm run build:dom && npm run build -w @viewstem/svelte",
     "check:svelte": "npm run build:svelte && npm run typecheck -w @viewstem/svelte && npm run test -w @viewstem/svelte && npm run test:svelte:package",
     "test:svelte": "npm run build:svelte && npm run test -w @viewstem/svelte",
     "test:svelte:package": "node packages/svelte/scripts/test-package.mjs",
@@ -35,7 +38,7 @@
     "postinstall": "patch-package --error-on-fail",
     "typecheck:docs": "npm run typecheck -w @viewstem/docs",
     "release:version": "changeset version && npm install --package-lock-only --ignore-scripts --no-audit --no-fund",
-    "build:ui": "npm run build && npm run build -w @viewstem/ui",
+    "build:ui": "npm run build:dom && npm run build -w @viewstem/ui",
     "check:ui": "npm run build:ui && npm run test -w @viewstem/ui"
   },
   "devDependencies": {

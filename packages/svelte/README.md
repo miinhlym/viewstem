@@ -27,12 +27,14 @@ For the standalone example, add `<div id="panel"></div>` to your HTML and put th
 ```
 
 ```ts
-import { createRenderer, type ComponentContract, type ViewSpec } from '@viewstem/svelte';
+import { defineResourceSet } from '@viewstem/core';
+import { createRenderer, svelteComponent, type ComponentContract, type ViewSpec } from '@viewstem/svelte';
 import Label from './Label.svelte';
 
 const contract = { kind: 'Component', id: 'Label', spec: { ports: { text: { kind: 'Value', schema: { type: 'string' }, required: true } } } } satisfies ComponentContract;
 const source = { states: { text: { kind: 'State', schema: { type: 'string' }, initial: 'Draft' } }, render: { id: 'label', componentRef: 'Label', inputs: { text: { '@path': '/states/text' } } } } satisfies ViewSpec;
-const renderer = createRenderer({ components: [{ contract, component: Label }] });
+const renderer = createRenderer();
+renderer.runtime.registry.registerResourceSet(defineResourceSet({ id: 'labels', version: '1', components: [svelteComponent(contract, Label)] }));
 const target = document.querySelector<HTMLElement>('#panel');
 if (!target) throw new Error('Missing panel');
 const screen = renderer.mount({ target, source });
@@ -44,7 +46,7 @@ console.log(target.textContent); // Saved
 
 When the screen closes, call `await screen.unmount()`. When the app is done with the renderer, call `await renderer.dispose()`. If you also need the initial Query report, await `screen.whenSettled(view.initial)` and inspect `queryErrors`.
 
-`createRenderer({ runtime })` borrows a Runtime. Call `renderer.bindComponent(id, component)` to bind a Svelte implementation to an existing code Component. Use the attachment's `detach()` to release its DOM connection. Removing a directly hosted `ViewstemView` from the Svelte tree releases its connection. The original owner manages the borrowed View and any injected Runtime.
+`createRenderer({ runtime })` borrows the Runtime. Create a binding with `svelteComponent(contract, Adapter)` and register the resource set with `renderer.runtime.registry.registerResourceSet(set)`. Call `detach()` to release a display.
 
 ## Svelte adapters
 
@@ -63,4 +65,4 @@ A code-backed Component keeps the same adapter instance for its address and gene
 
 Host adapters own layout and the DOM. The renderer adds no implicit Row or Column layouts or wrapper elements. It renders the core-evaluated nodes for named slots in their original order and connects declarative Components to the subviews expanded by core. Keyed rendering preserves local Svelte state for visible repeated items with the same address and generation. Removing and recreating an item starts a new lifetime. If a declarative parent's unready inputs cause core to omit a child projection, the child Svelte view detaches and the internal state retained by core survives.
 
-When hosting `ViewstemView` in your own Svelte root, configure `transformError` from this package on Svelte's `mount` or `hydrate`. It sanitizes arbitrary host-thrown values before they reach a boundary. A `fallback` snippet can render pending or failed nodes; an initial `mount()` render failure rejects `screen.ready` and releases the target. A live connection reports render failures to `onError` and can retry on a new projection.
+When hosting `ViewstemView` in your own Svelte root, configure `transformError` from this package on Svelte's `mount` or `hydrate`. It sanitizes arbitrary host-thrown values before they reach a boundary. A `fallback` snippet can render pending or failed nodes; a render failure rejects `screen.whenRendered()` and leaves the display connected. A live connection reports render failures to `onError` and can retry on a new projection.

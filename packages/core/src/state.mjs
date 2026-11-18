@@ -46,7 +46,10 @@ export class StateStore {
   }
   transaction(run, beforeNotify) {
     this.assertCanWrite();
-    if (this.#transaction) return run();
+    if (this.#transaction) {
+      if (beforeNotify) fail('INVALID_DEFINITION');
+      return run();
+    }
     if (this.#notifying && !beforeNotify) return this.#runTransaction(run, undefined, []);
     return this.#runTransaction(run, beforeNotify);
   }
@@ -163,8 +166,10 @@ export class StateStore {
     this.#perform(() => { if (isCurrent()) this.#commit(prepared,new Set(prepared.keys()),'url'); });
   }
   get urlConnection() { return this.#url; }
-  reserveUrl(connection, previous) {
+  validateUrlReservation(previous) {
     if (this.#url !== previous) fail('INVALID_DEFINITION');
+  }
+  reserveUrl(connection) {
     this.#url = connection;
   }
   releaseUrl(connection) { if (this.#url === connection) this.#url = null; }
@@ -172,7 +177,7 @@ export class StateStore {
     this.assertCanWrite();
     if (this.#url) fail('INVALID_DEFINITION');
     const connection = prepareUrlConnection(this, options);
-    connection.commit();
+    connection.installReservation(connection.validateReservation());
     if (!connection.start()) fail('CANCELLED');
     return connection;
   }

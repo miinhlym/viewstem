@@ -1,5 +1,5 @@
-import { createRegistry, createRuntime as publicRuntime, createStateStore } from '@viewstem/core';
-import { createRenderer as publicRenderer, ViewstemView, transformError } from '@viewstem/svelte';
+import { createRegistry, createRuntime as publicRuntime, createStateStore, defineResourceSet } from '@viewstem/core';
+import { createRenderer as publicRenderer, svelteComponent, ViewstemView, transformError } from '@viewstem/svelte';
 import { flushSync, mount, unmount, tick } from 'svelte';
 import Probe from './fixtures/Probe.svelte';
 import Layout from './fixtures/Layout.svelte';
@@ -30,16 +30,26 @@ function createRuntime(options) {
   };
   rawRuntimes.set(runtime, raw); return runtime;
 }
+export function registerBinding(registry, id, component) {
+  registry.replaceResource({ component: svelteComponent(registry.get('Component', id), component) });
+}
+export function rendererWithBindings({ components, ...options }) {
+  const renderer = publicRenderer(options);
+  renderer.runtime.registry.registerResourceSet(defineResourceSet({ id: 'fixture-renderer', version: '1',
+    components: components.map(({ contract, component }) => svelteComponent(contract, component)),
+  }));
+  return renderer;
+}
 function createRenderer(options = {}) {
   const rawRuntime = options.runtime && (rawRuntimes.get(options.runtime) ?? options.runtime);
   const renderer = publicRenderer({ ...options, ...(rawRuntime && { runtime: rawRuntime }) });
   const runtime = options.runtime ?? (() => { const raw = renderer.runtime; const wrapped = { ...raw, async createView({ view, viewRef, ...opts }) { const v = adaptView(await raw.createView(view ?? { ref: viewRef }, opts)); return { view: v, initialComplete: v.whenSettled(v.initial) }; }, exportResource: (kind, id) => raw.registry.exportResource(kind, id), listResources: kind => raw.registry.list(kind), invokeAction: ({ owner, ...request }) => owner.invokeAction(request) }; rawRuntimes.set(wrapped, raw); return wrapped; })();
   renderer.runtime = runtime;
   renderer.registry = runtime.registry;
-  renderer.registerComponent = renderer.bindComponent;
-  renderer.registerComponents = entries => { runtime.registry.registerComponentContracts(entries.map(e => e.contract)); for (const e of entries) renderer.bindComponent(e.contract.id, e.component); };
+  renderer.registerComponent = (id, component) => registerBinding(runtime.registry, id, component);
+  renderer.registerComponents = entries => { runtime.registry.registerComponentContracts(entries.map(e => e.contract)); for (const e of entries) registerBinding(runtime.registry, e.contract.id, e.component); };
   const attach = renderer.attach.bind(renderer), mount = renderer.mount.bind(renderer);
-  renderer.attach = (view, target, opts) => { const a = attach(rawView(view), target, opts); return { view, whenRendered: a.whenRendered, dispose: a.detach }; };
+  renderer.attach = (view, target, opts) => { const a = attach(rawView(view), target, opts); return { ...a, view, dispose: a.detach }; };
   renderer.mount = async ({ view, viewRef, target, ...opts }) => {
     const screen = mount({ target, source: view ?? { ref: viewRef }, ...opts });
     const v = adaptView(await screen.ready);

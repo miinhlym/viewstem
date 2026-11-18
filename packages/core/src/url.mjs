@@ -188,18 +188,22 @@ export function prepareUrlConnection(store, options, { previous = null, isOpen =
     stopAdapter(stopUrl);
   };
   const connection=Object.freeze({ready,isReady:()=>initialized,restore:restoreNow,getDiagnostics:()=>[...diagnostics], dispose,
-    commit() {
-      if (!isOpen()) fail('CANCELLED');
-      for (const binding of prepared) {
-        if (store.baseline(binding.target).status === 'pending') initialPending.add(binding.target);
-      }
-      claims = adapter ? adapterOwners.get(adapter) ?? new Map() : undefined;
+    validateReservation() {
+      const pending = prepared.filter(binding => store.baseline(binding.target).status === 'pending');
+      store.validateUrlReservation(previous);
+      const nextClaims = adapter ? adapterOwners.get(adapter) ?? new Map() : undefined;
       const old = previousKeys;
-      if (claims) for (const key of keys) {
-        const owner = claims.get(key);
-        if (owner && (claims !== old?.claims || owner !== old.token || !old.keys.has(key))) fail('INVALID_DEFINITION');
+      if (nextClaims) for (const key of keys) {
+        const owner = nextClaims.get(key);
+        if (owner && (nextClaims !== old?.claims || owner !== old.token || !old.keys.has(key))) fail('INVALID_DEFINITION');
       }
-      store.reserveUrl(connection, previous);
+      return { pending, claims: nextClaims, old, addresses: prepared.map(binding => binding.target.address) };
+    },
+    installReservation(reservation) {
+      const { pending, old, addresses } = reservation;
+      for (const binding of pending) initialPending.add(binding.target);
+      claims = reservation.claims;
+      store.reserveUrl(connection);
       if (old) reserved.set(old.claims, new Set(old.keys));
       if (claims) {
         adapterOwners.set(adapter, claims);
@@ -208,7 +212,7 @@ export function prepareUrlConnection(store, options, { previous = null, isOpen =
       for (const [owned, ownedKeys] of reserved) for (const key of ownedKeys) owned.set(key, token);
       previous?.pause();
       previous = null;
-      if (io) stopStore = store.observeUrlChanges(prepared.map(binding => binding.target.address), observeStore);
+      if (io) stopStore = store.observeUrlChanges(addresses, observeStore);
       connectionTokens.set(connection, { token, keys, claims, io });
     },
     start() {

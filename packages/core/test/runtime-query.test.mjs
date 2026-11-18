@@ -1,3 +1,4 @@
+import { bindTestComponents } from './fixtures/components.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { setImmediate } from 'node:timers/promises';
@@ -18,9 +19,9 @@ const bounded = async promise => {
 };
 function registry() {
   const registry = createRegistry();
-  registry.registerComponentContract({ kind: 'Component', id: 'Display', spec: { ports: { value: port() } } });
-  registry.registerComponentContract({ kind: 'Component', id: 'Row', spec: { slots: { default: {} } } });
-  registry.registerComponentContract({ kind: 'Component', id: 'Button', spec: { events: { click: { schema: { type: 'object' } } } } });
+  bindTestComponents(registry, [{ kind: 'Component', id: 'Display', spec: { ports: { value: port() } } }]);
+  bindTestComponents(registry, [{ kind: 'Component', id: 'Row', spec: { slots: { default: {} } } }]);
+  bindTestComponents(registry, [{ kind: 'Component', id: 'Button', spec: { events: { click: { schema: { type: 'object' } } } } }]);
   return registry;
 }
 const display = (id = 'display', value = 'static') => ({ id, componentRef: 'Display', inputs: { value } });

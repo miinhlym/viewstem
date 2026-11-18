@@ -19,10 +19,12 @@ function registryHandle(implementation) {
   if (registryHandles.has(implementation)) return registryHandles.get(implementation);
   const result = handle({
     registerResources(resources) { implementation.registerResources(resources); return result; },
+    registerResourceSet(set) { implementation.registerResourceSet(set); return result; },
     registerComponentContract(contract) { implementation.registerComponentContract(contract); return result; },
     registerComponentContracts(contracts) { implementation.registerComponentContracts(contracts); return result; },
     registerAction(definition, run) { implementation.registerAction(definition, run); return result; },
     updateResource(definition) { implementation.updateResource(definition); return result; },
+    replaceResource(entry) { implementation.replaceResource(entry); return result; },
     get: (kind, id) => implementation.get(kind, id),
     list: filter => implementation.list(filter),
     exportResource: (kind, id) => implementation.exportResource(kind, id),
@@ -82,12 +84,27 @@ function viewHandle(implementation) {
   const result = Object.freeze(Object.defineProperty(Object.assign(Object.create(null), {
     setInputs: (inputs = {}) => updateView(implementation, undefined, { inputs }),
     updateDefinition: (spec, options) => updateView(implementation, spec, options),
+    async applyResourceSets({ setIds, definition, inputs, states, signal } = {}) {
+      try {
+        if (!Array.isArray(setIds) || !setIds.length) fail('INVALID_DEFINITION');
+        const ids = Array.from(setIds);
+        if (ids.some(id => typeof id !== 'string' || !id)) fail('INVALID_DEFINITION');
+        if (definition === null) fail('INVALID_DEFINITION');
+        return await implementation.applyResourceSets({
+          setIds: ids, definition: structuredClone(definition), signal,
+          inputs: inputs === undefined ? undefined : copyInputs(inputs),
+          states: states === undefined ? undefined : copyInputs(states),
+        });
+      } catch (cause) { throw safeError(cause, 'INVALID_DEFINITION'); }
+    },
     async replace(source, options) {
       try { return await implementation.replace(viewTarget(source, options), options?.signal); }
       catch (cause) { throw safeError(cause, 'INVALID_DEFINITION'); }
     },
     whenSettled: application => implementation.whenSettled(application),
-    invokeAction: request => implementation.host.invokeAction({ ...request, owner: implementation }),
+    async invokeAction(request) {
+      return implementation.host.invokeAction({ ...actionRequest(request), owner: implementation });
+    },
     exportDefinition: () => implementation.exportDefinition(),
     getState: (name, instanceId) => implementation.getState(name, instanceId),
     getQuery: (name, instanceId) => implementation.getQuery(name, instanceId),
@@ -102,12 +119,25 @@ function viewHandle(implementation) {
 function authorization(callback) {
   if (callback === undefined) return undefined;
   if (typeof callback !== 'function') fail('INVALID_DEFINITION');
-  return ({ operation, owner, definition }) => {
+  return ({ operation, owner, definition, resource }) => {
     if (operation === 'update') return callback({ operation, owner: viewHandle(owner), definition });
     if (!actionOwners.has(owner)) actionOwners.set(owner, handle({}));
-    const { native: _implementation, ...contract } = definition;
-    return callback({ operation, owner: actionOwners.get(owner), definition: Object.freeze(contract) });
+    return callback(Object.freeze({ operation, owner: actionOwners.get(owner), definition, resource }));
   };
+}
+
+const readAborted = Object.getOwnPropertyDescriptor(AbortSignal.prototype, 'aborted').get;
+function actionRequest(request) {
+  if (!request || typeof request !== 'object' || Array.isArray(request)
+    || Object.keys(request).some(key => !['actionRef', 'action', 'inputs', 'signal'].includes(key))) fail('INVALID_DEFINITION');
+  const { actionRef, action, inputs, signal } = request;
+  if (signal !== undefined) {
+    let aborted;
+    try { aborted = readAborted.call(signal); }
+    catch { fail('INVALID_DEFINITION', { location: '/signal' }); }
+    if (aborted) fail('CANCELLED');
+  }
+  return { actionRef, action, inputs, signal };
 }
 
 export const createRegistry = options => registryHandle(new Registry(options));
@@ -172,6 +202,9 @@ export function createRuntime({ registry, resources, componentContracts, functio
     registry: registryHandle(implementation.registry),
     stateStore: storeHandle(implementation.stateStore),
     createView: (source, options) => createView(result, source, options),
+    async invokeAction(request) {
+      return implementation.invokeAction(actionRequest(request));
+    },
     dispose() { void implementation.dispose(); },
   });
   runtimes.set(result, implementation);

@@ -1,9 +1,9 @@
 import type { Component, Snippet } from 'svelte';
-import type { ComponentContract, NodeSnapshot, PublicError, Runtime, RuntimeOptions, View, ViewOptions, ViewSource } from '@viewstem/core';
+import type { NodeSnapshot, PublicError, Runtime, RuntimeOptions, View, ViewOptions, ViewSource } from '@viewstem/core';
+import type { ComponentConnector, ComponentMountContext } from '@viewstem/dom';
 import type { Renderer as CoreRenderer, RendererDiagnostic, MountedView, RenderAttachment } from '@viewstem/core/renderer';
-export interface ComponentAdapterProps { readonly inputs: NodeSnapshot['inputs']; readonly node: NodeSnapshot; readonly emit: (event: string, payload: unknown) => Promise<unknown>; readonly renderSlot: Snippet<[name: string]>; }
+export interface ComponentAdapterProps { readonly inputs: NodeSnapshot['inputs']; readonly node: NodeSnapshot; readonly emit: ComponentMountContext['emit']; readonly renderSlot: Snippet<[name: string]>; readonly provideSlot: ComponentMountContext['provideSlot']; }
 export type ComponentAdapter = Component<ComponentAdapterProps>;
-export interface ComponentRegistration { readonly contract: ComponentContract; readonly component: ComponentAdapter; }
 export type { RendererDiagnostic, MountedView, RenderAttachment };
 export type RendererErrorListener = (diagnostic: RendererDiagnostic) => void;
 export type RenderFallback = Snippet<[node: NodeSnapshot, error: PublicError | null]>;
@@ -21,5 +21,5 @@ export type ViewstemViewComponentProps = ViewstemSourceProps | (ViewstemViewProp
   readonly prepareError?: never;
 });
 export interface RenderOptions { readonly context?: Map<unknown, unknown>; readonly onError?: RendererErrorListener; readonly fallback?: RenderFallback; }
-export interface Renderer extends CoreRenderer<RenderOptions> { bindComponent(id: string, component: ComponentAdapter): void; }
-export type RendererOptions = { readonly onError?: RendererErrorListener } & ((RuntimeOptions & { readonly components?: readonly ComponentRegistration[]; readonly runtime?: never }) | ({ readonly runtime: Runtime; readonly components?: never } & { readonly [K in keyof RuntimeOptions]?: never }));
+export type Renderer = CoreRenderer<RenderOptions, HTMLElement>;
+export type RendererOptions = { readonly onError?: RendererErrorListener; readonly connectors?: readonly ComponentConnector[] } & ((RuntimeOptions & { readonly runtime?: never }) | ({ readonly runtime: Runtime } & { readonly [K in keyof RuntimeOptions]?: never }));

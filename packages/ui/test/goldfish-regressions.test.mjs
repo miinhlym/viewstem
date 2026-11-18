@@ -11,32 +11,32 @@ const styles = await readFile(new URL('../dist/styles.css', import.meta.url), 'u
 const bundle = await build({
   stdin: { resolveDir: workspace, contents: `
     import { createRegistry, createRuntime } from '@viewstem/core';
-    import { registerShadcn } from '@viewstem/ui';
-    import { connect } from './packages/ui/dist/dom.js';
+    import { createRenderer } from '@viewstem/dom';
+    import { observeCatalog } from './packages/ui/test/observe-catalog.mjs';
 
     window.mount = async definition => {
       const registry = createRegistry();
-      registerShadcn(registry);
-      const runtime = createRuntime({ registry });
-      const view = await runtime.createView(definition);
       window.events = [];
       window.renderErrors = [];
-      const attachment = connect({
-        ...view,
-        emit(node, event, payload) {
-          if (!payload?.type) events.push([node.id, event, payload?.value]);
-          return view.emit(node, event, payload);
-        },
-      }, document.querySelector('#app'), error => renderErrors.push(String(error.code ?? error)));
-      await view.whenSettled(view.initial);
+      const connector = observeCatalog(registry, (node, event, payload) => {
+        if (!payload?.type) events.push([node.id, event, payload?.value]);
+      });
+      const runtime = createRuntime({ registry });
+      const view = await runtime.createView(definition);
+      const target = document.querySelector('#app');
+      target.setAttribute('data-viewstem-ui', '');
+      const renderer = createRenderer({ runtime, connectors: [connector] });
+      const attachment = renderer.attach(view, target, { onError: diagnostic => renderErrors.push(diagnostic.error.code) });
+      await attachment.whenSettled(view.initial);
       window.view = view;
       window.viewErrors = () => view.getSnapshot().errors;
-      window.dispose = () => {
+      window.dispose = async () => {
         if (!window.view) return;
         const errors = window.viewErrors();
         window.viewErrors = () => errors;
         window.view = undefined;
-        attachment.dispose();
+        await renderer.dispose();
+        target.removeAttribute('data-viewstem-ui');
         view.dispose();
         runtime.dispose();
       };

@@ -15,33 +15,33 @@ const execute = (command, args, cwd = directory) => execFileSync(command, args, 
 let server, browser;
 try {
   const pack = name => JSON.parse(execute('npm', ['pack', join(root, 'packages', name), '--pack-destination', directory, '--ignore-scripts', '--json'], root))[0];
-  const core = pack('core'), svelte = pack('svelte');
+  const core = pack('core'), dom = pack('dom'), svelte = pack('svelte');
   const paths = svelte.files.map(file => file.path);
   for (const path of ['LICENSE', 'README.md', 'README.ko.md', 'dist/index.js', 'dist/index.d.ts', 'dist/ViewstemView.svelte', 'dist/ViewstemView.svelte.d.ts', 'dist/renderer.js', 'dist/types.d.ts']) assert.ok(paths.includes(path), path);
   assert.ok(paths.every(path => ['LICENSE', 'README.md', 'README.ko.md', 'package.json'].includes(path) || path.startsWith('dist/')));
   assert.ok(paths.every(path => !/(?:^|\/)(?:test|example|node_modules)\//.test(path)));
-  // The override resolves unpublished core locally. It is not a consumer dependency.
-  await writeFile(join(directory, 'package.json'), JSON.stringify({ private: true, type: 'module', overrides: { '@viewstem/core': `file:${join(directory, core.filename)}` } }));
-  execute('npm', ['install', join(directory, svelte.filename), 'svelte@5.57.3', '--ignore-scripts', '--no-audit', '--no-fund']);
+  await writeFile(join(directory, 'package.json'), JSON.stringify({ private: true, type: 'module' }));
+  execute('npm', ['install', ...[core, dom, svelte].map(pkg => join(directory, pkg.filename)), 'svelte@5.57.3', '--ignore-scripts', '--no-audit', '--no-fund']);
   const consumerManifest = JSON.parse(await readFile(join(directory, 'package.json'), 'utf8'));
-  assert.deepEqual(Object.keys(consumerManifest.dependencies).sort(), ['@viewstem/svelte', 'svelte']);
+  assert.deepEqual(Object.keys(consumerManifest.dependencies).sort(), ['@viewstem/core', '@viewstem/dom', '@viewstem/svelte', 'svelte']);
   const installedManifest = JSON.parse(await readFile(join(directory, 'node_modules/@viewstem/svelte/package.json'), 'utf8'));
   assert.equal(installedManifest.license, 'MIT');
   assert.equal(await readFile(join(directory, 'node_modules/@viewstem/svelte/LICENSE'), 'utf8'), await readFile(join(root, 'LICENSE'), 'utf8'));
   assert.equal(installedManifest.dependencies['@viewstem/core'], core.version);
-  await writeFile(join(directory, 'consumer.ts'), `import { createRenderer, ViewstemView, type ComponentAdapter, type MountedView, type ComponentAdapterProps, type ComponentContract, type ViewSpec, type Runtime, type RequestExecutor } from '@viewstem/svelte';
+  assert.equal(installedManifest.dependencies['@viewstem/dom'], dom.version);
+  await writeFile(join(directory, 'consumer.ts'), `import { createRenderer, svelteComponent, ViewstemView, type ComponentAdapter, type MountedView, type ComponentAdapterProps, type ComponentContract, type ViewSpec, type Runtime, type RequestExecutor } from '@viewstem/svelte';
+import { defineResourceSet } from '@viewstem/core';
 import type { Component, ComponentProps, Snippet } from 'svelte';
 import type { ViewstemViewProps, ViewstemSourceProps } from '@viewstem/svelte';
 const renderer = createRenderer();
 const runtime: Runtime = renderer.runtime;
 const contract: ComponentContract = {kind:'Component',id:'Explicit',spec:{}};
-renderer.runtime.registry.registerComponentContract(contract);
 const spec: ViewSpec = {render:{id:'root',componentRef:'Explicit'}};
 const requestExecutor: RequestExecutor = async () => ({status:200,headers:{},body:null});
 createRenderer({requestExecutor});
 createRenderer({runtime});
 declare const adapter: ComponentAdapter;
-renderer.bindComponent('Explicit', adapter);
+runtime.registry.registerResourceSet(defineResourceSet({ id: 'consumer', version: '1', components: [svelteComponent(contract, adapter)] }));
 declare const props: ComponentAdapterProps;
 const slot: Snippet<[string]> = props.renderSlot;
 const result: Promise<unknown> = props.emit('click', {});
@@ -64,7 +64,7 @@ const missing: ComponentProps<typeof ViewstemView> = { renderer };
 // @ts-expect-error initial inputs belong to a new source
 const borrowedWithInputs: ComponentProps<typeof ViewstemView> = { renderer, view, inputs: {} };
 // @ts-expect-error adapter registration is a Component, not arbitrary markup
-renderer.bindComponent('Bad', '<button>');
+svelteComponent(contract, '<button>');
 // @ts-expect-error the mounting target must be an Element
 renderer.mount({ target: 'body', source: { render: { id: 'x', componentRef: 'Explicit' } } });
 // @ts-expect-error inputs are read-only core snapshots
@@ -107,16 +107,17 @@ let { inputs, node, emit }: ComponentAdapterProps = $props();
 </script>
 <button disabled={node.status !== 'ready'} onclick={() => emit('click', {})}>{String(inputs.value)}</button>
 `);
-  await writeFile(join(directory, 'consumer.mjs'), `import { createRenderer } from '@viewstem/svelte';
+  await writeFile(join(directory, 'consumer.mjs'), `import { createRenderer, svelteComponent } from '@viewstem/svelte';
+import { defineResourceSet } from '@viewstem/core';
 import * as publicApi from '@viewstem/svelte';
 import Button from './Button.svelte';
-if (Object.keys(publicApi).sort().join(',') !== 'ViewstemView,createRenderer,transformError') throw new Error('unexpected public exports');
+if (Object.keys(publicApi).sort().join(',') !== 'SVELTE_CONNECTOR_ID,ViewstemView,createRenderer,svelteComponent,svelteConnector,transformError') throw new Error('unexpected public exports');
 const renderer = createRenderer();
 if ('variable' in renderer.runtime || 'fork' in renderer.runtime.registry) throw new Error('implementation exposed');
 const { registry } = renderer.runtime;
-registry.registerComponentContract({kind:'Component',id:'Button',spec:{ports:{value:{kind:'Value',schema:{type:'number'},required:true}},events:{click:{schema:{type:'object',additionalProperties:false}}}}});
+const contract = {kind:'Component',id:'Button',spec:{ports:{value:{kind:'Value',schema:{type:'number'},required:true}},events:{click:{schema:{type:'object',additionalProperties:false}}}}};
 registry.registerResources([{kind:'Action',id:'set',spec:{ports:{target:{kind:'State',schema:{type:'number'},required:true}},steps:[{kind:'SetState',target:{'@path':'/ports/target'},value:2}]}}]);
-renderer.bindComponent('Button', Button);
+registry.registerResourceSet(defineResourceSet({ id: 'consumer', version: '1', components: [svelteComponent(contract, Button)] }));
 const handle = renderer.mount({target:document.querySelector('main'),source:{states:{count:{kind:'State',schema:{type:'number'},initial:0}},render:{id:'button',componentRef:'Button',inputs:{value:{'@path':'/states/count'}},on:{click:{actionRef:'set',inputs:{target:{'@path':'/states/count'}}}}}}});
 const view = await handle.ready;
 await handle.whenSettled(view.initial);
@@ -149,7 +150,7 @@ window.disposeConsumer=()=>renderer.dispose();
   await page.evaluate(() => window.disposeConsumer());
   assert.equal(await page.locator('main button').count(), 0);
   assert.deepEqual(errors, []);
-  const report = { nodeVersion: process.version, svelteVersion: '5.57.3', files: paths, integrity: svelte.integrity, bytes: svelte.size, unpackedBytes: svelte.unpackedSize, license: 'MIT; installed text verified', consumerDependencies: Object.keys(consumerManifest.dependencies).sort(), coreResolution: 'transitive dependency; local tarball override for unpublished core', imports: '@viewstem/svelte only (runtime and shared types)', types: 'passed', browser: 'passed', errors };
+  const report = { nodeVersion: process.version, svelteVersion: '5.57.3', files: paths, integrity: svelte.integrity, bytes: svelte.size, unpackedBytes: svelte.unpackedSize, license: 'MIT; installed text verified', consumerDependencies: Object.keys(consumerManifest.dependencies).sort(), coreResolution: 'local Core and DOM tarballs', imports: '@viewstem/core and @viewstem/svelte public exports', types: 'passed', browser: 'passed', errors };
   const results = resolve(root, process.env.VIEWSTEM_SVELTE_RESULTS_DIR ?? 'packages/svelte/test/results');
   await mkdir(results, { recursive: true });
   await writeFile(join(results, `package-node${process.versions.node.split('.')[0]}.json`), JSON.stringify(report, null, 2) + '\n');

@@ -34,7 +34,8 @@
     "**/*.css"
   ],
   "dependencies": {
-    "@viewstem/core": "0.1.0"
+    "@viewstem/core": "0.1.0",
+    "@viewstem/dom": "0.1.0"
   },
   "peerDependencies": {
     "svelte": "^5.57.3"

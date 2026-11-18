@@ -1,3 +1,4 @@
+import { bindTestComponents } from './fixtures/components.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRegistry, createStateStore } from '@viewstem/core';
@@ -8,10 +9,10 @@ const path = value => ({ '@path': value });
 const leaf = { id: 'leaf', componentRef: 'Leaf' };
 function fixture(t, options = {}) {
   const calls = { input: 0, result: 0 };
-  const registry = createRegistry({ functions: [
+  const registry = bindTestComponents(createRegistry({ functions: [
     { name: 'observeInput', inputs: [integer], output: integer, run: n => { calls.input++; return n; } },
     { name: 'observeResult', inputs: [integer], output: integer, run: n => { calls.result++; return n; } },
-  ] }).registerComponentContract({ kind: 'Component', id: 'Leaf', spec: { ports: { value: { kind: 'Value', schema: integer } } } });
+  ] }), [{ kind: 'Component', id: 'Leaf', spec: { ports: { value: { kind: 'Value', schema: integer } } } }]);
   const store = createStateStore(), scope = store.createScope(), runtime = createRuntime({ registry, stateStore: store, ...options });
   t.after(() => { runtime.dispose(); store.dispose(); });
   return { calls, registry, store, scope, runtime };
@@ -49,7 +50,7 @@ test('Derived rebinds current owner ports and definitions without evaluating unc
 
 test('failed Derived input and definition updates restore the old callback and dependency graph', async t => {
   const f = fixture(t), first = f.scope.registerState('first', { schema: integer, initial: 1 }), second = f.scope.registerState('second', { schema: integer, initial: 10 });
-  f.registry.registerComponentContract({ kind: 'Component', id: 'Row', spec: { slots: { default: {} } } });
+  bindTestComponents(f.registry, [{ kind: 'Component', id: 'Row', spec: { slots: { default: {} } } }]);
   const spec = { ports: { source: state }, states: { computed: derived(path('/ports/source')) }, render: { id: 'row', componentRef: 'Row', slots: { default: [leaf] } } };
   const { view, initialComplete: initial } = await f.runtime.createView({ view: spec, inputs: { source: first } }); await initial;
   const output = view.getState('computed'), generation = view.getSnapshot().generation;

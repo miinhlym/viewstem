@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
-  import { createRenderer, ViewstemView, type View } from '@viewstem/svelte';
+  import { defineResourceSet } from '@viewstem/core';
+  import { createRenderer, svelteComponent, ViewstemView, type View } from '@viewstem/svelte';
   import Stack from './adapters/Stack.svelte';
   import Label from './adapters/Label.svelte';
   import Input from './adapters/Input.svelte';
@@ -8,11 +9,10 @@
   import { contracts, viewDefinition } from './definition.js';
 
   const renderer = createRenderer({ onError: ({ error }) => { issue = error.message; } });
-  for (const contract of contracts) renderer.runtime.registry.registerComponentContract(contract);
-  renderer.bindComponent('Stack', Stack);
-  renderer.bindComponent('Label', Label);
-  renderer.bindComponent('Input', Input);
-  renderer.bindComponent('Button', Button);
+  const adapters = new Map([['Stack', Stack], ['Label', Label], ['Input', Input], ['Button', Button]]);
+  renderer.runtime.registry.registerResourceSet(defineResourceSet({ id: 'svelte-example', version: '1',
+    components: contracts.map(contract => svelteComponent(contract, adapters.get(contract.id)!)),
+  }));
 
   let view = $state.raw<View | null>(null);
   let issue = $state('');

@@ -1,4 +1,4 @@
-import { failure } from './connection.js';
+import { failure } from './lifecycle.js';
 
 /** Copy a JSON definition, including Svelte's reactive properties. */
 export function snapshotSource(value: unknown, active = new Set<object>()): unknown {

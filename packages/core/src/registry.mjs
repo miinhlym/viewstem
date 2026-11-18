@@ -4,36 +4,15 @@ import { validateTemplate, pointerKeys } from './expressions.mjs';
 import { compileCel } from './cel/index.mjs';
 import { prepareHeaders } from './http/headers.mjs';
 import { fail, safeError } from './errors.mjs';
+import { record, object, name, fields, json, copy, freeze } from './definition.mjs';
+import { assertResourceSet, orderedResourceSets, replacementEntry } from './resource-set.mjs';
 
 const own = (value, key) => Object.hasOwn(value, key);
 const kinds = new Set(['Datasource', 'Query', 'Variable', 'Action', 'Component', 'View', 'Type']);
 const key = (kind, id) => JSON.stringify([kind, id]);
 const invalid = () => fail('INVALID_DEFINITION');
-const record = value => value !== null && typeof value === 'object' && [null, Object.prototype].includes(Object.getPrototypeOf(value));
-const object = value => { if (!record(value)) invalid(); return value; };
-const name = value => { if (typeof value !== 'string' || !value) invalid(); return value; };
-const fields = (value, allowed) => { object(value); if (Object.keys(value).some(item => !allowed.includes(item))) invalid(); };
+const noRequirements = Object.freeze([]);
 const map = (value = {}) => object(value);
-const freeze = value => { if (value && typeof value === 'object') { for (const child of Object.values(value)) freeze(child); Object.freeze(value); } return value; };
-// Definitions are JSON declarations. Reject accessors, functions, native values,
-// sparse arrays and cycles before copying or inspecting expression syntax.
-function json(value, active = new Set()) {
-  if (value === null || ['string', 'boolean'].includes(typeof value)) return;
-  if (typeof value === 'number' && Number.isFinite(value)) return;
-  if (!Array.isArray(value) && !record(value)) invalid();
-  if (active.has(value)) invalid();
-  active.add(value);
-  const descriptors = Object.getOwnPropertyDescriptors(value);
-  for (const [property, descriptor] of Object.entries(descriptors)) {
-    if (Array.isArray(value) && property === 'length') continue;
-    if (!own(descriptor, 'value') || !descriptor.enumerable) invalid();
-    json(descriptor.value, active);
-  }
-  if (Array.isArray(value)) for (let index = 0; index < value.length; index++) if (!own(value, index)) invalid();
-  if (Object.getOwnPropertySymbols(value).length) invalid();
-  active.delete(value);
-}
-const copy = value => { json(value); return structuredClone(value); };
 const syntax = value => validateTemplate(value);
 const optional = (value, field, fallback = {}) => own(value, field) ? value[field] : fallback;
 const hasExpression = value => dynamic(value) || (Array.isArray(value) ? value.some(hasExpression) : record(value) && Object.values(value).some(hasExpression));
@@ -88,9 +67,22 @@ function acyclic(graph) {
   for (const id of graph.keys()) visit(id);
 }
 
+function definitionKey(definition, codeKind) {
+  fields(definition, ['kind', 'id', 'name', 'spec']);
+  if (!kinds.has(definition.kind) || !own(definition, 'spec')) invalid();
+  if (codeKind !== undefined && definition.kind !== codeKind) invalid();
+  name(definition.id);
+  object(definition.spec);
+  if (own(definition, 'name') && typeof definition.name !== 'string') invalid();
+  return key(definition.kind, definition.id);
+}
+
 export class Registry {
   #definitions = new Map();
   #implementations = new Map();
+  #actionRequirements = new Map();
+  #componentBindings = new Map();
+  #sets = new Map();
   #code = new Set();
   #functions = Object.freeze([]);
   revision = 0;
@@ -116,9 +108,57 @@ export class Registry {
     return [...this.#definitions.values()].filter(matches).map(definition => copy(definition));
   }
   exportResource(kind, id) { return copy(this.get(kind, id)); }
-  fork() { const next = new Registry(); next.#definitions = new Map(this.#definitions); next.#implementations = new Map(this.#implementations); next.#code = new Set(this.#code); next.#functions = this.#functions; return next; }
+  fork() {
+    const next = new Registry();
+    next.#definitions = new Map(this.#definitions);
+    next.#implementations = new Map(this.#implementations);
+    next.#actionRequirements = new Map(this.#actionRequirements);
+    next.#componentBindings = new Map(this.#componentBindings);
+    next.#sets = new Map(this.#sets);
+    next.#code = new Set(this.#code);
+    next.#functions = this.#functions;
+    return next;
+  }
   types() { return Object.fromEntries([...this.#definitions.values()].filter(value => value.kind === 'Type').map(value => [value.id, value.spec.schema])); }
   implementation(kind, id) { return this.#implementations.get(key(kind, id)); }
+  actionRequirements(id) { return this.#actionRequirements.get(key('Action', id)) ?? noRequirements; }
+  componentBinding(id) { return this.#componentBindings.get(key('Component', id)); }
+  includeResourceSets(source, ids) {
+    const candidate = this.fork();
+    const seen = new Set();
+    const add = id => {
+      if (seen.has(id)) return;
+      seen.add(id);
+      const set = source.#sets.get(id) ?? fail('REFERENCE_NOT_FOUND', { message: `Unknown resource set ${id}.` });
+      for (const dependency of set.dependencies) add(dependency);
+      for (const address of set.keys) {
+        const definition = source.#definitions.get(address);
+        const current = candidate.#definitions.get(address);
+        const implementation = source.#implementations.get(address);
+        const binding = source.#componentBindings.get(address);
+        const requirements = source.#actionRequirements.get(address) ?? noRequirements;
+        if (current) {
+          const priorBinding = candidate.#componentBindings.get(address);
+          if (!equal(current, definition) || candidate.#code.has(address) !== source.#code.has(address)
+            || candidate.#implementations.get(address) !== implementation || Boolean(priorBinding) !== Boolean(binding)
+            || priorBinding?.connectorId !== binding?.connectorId || priorBinding?.implementation !== binding?.implementation
+            || !equal(candidate.#actionRequirements.get(address) ?? noRequirements, requirements)) {
+            fail('INVALID_DEFINITION', { resource: { kind: definition.kind, id: definition.id } });
+          }
+          continue;
+        }
+        candidate.#definitions.set(address, definition);
+        if (source.#code.has(address)) candidate.#code.add(address);
+        if (implementation) candidate.#implementations.set(address, implementation);
+        if (requirements.length) candidate.#actionRequirements.set(address, requirements);
+        if (binding) candidate.#componentBindings.set(address, binding);
+      }
+      candidate.#sets.set(id, set);
+    };
+    for (const id of ids) add(id);
+    candidate.#validateAll();
+    return candidate;
+  }
   isCode(kind, id) { return this.#code.has(key(kind, id)); }
   schema(contract) {
     object(contract);
@@ -139,35 +179,78 @@ export class Registry {
   }
   #register(resources, codeKind, implementation, contracts = []) {
     if (!Array.isArray(resources)) invalid();
-    const definitions = [...Array.from(resources, definition => [copy(definition), codeKind]),
-      ...Array.from(contracts, definition => [copy(definition), 'Component'])];
+    const definitions = [...Array.from(resources, definition => [freeze(copy(definition)), codeKind]),
+      ...Array.from(contracts, definition => [freeze(copy(definition)), 'Component'])];
     const candidate = this.fork();
     for (const [definition, codeKind] of definitions) {
-      fields(definition, ['kind', 'id', 'name', 'spec']);
-      if (!kinds.has(definition.kind) || !own(definition, 'spec')) invalid();
-      if (codeKind !== undefined && definition.kind !== codeKind) invalid();
-      name(definition.id); object(definition.spec);
-      if (own(definition, 'name') && typeof definition.name !== 'string') invalid();
-      const address = key(definition.kind, definition.id);
-      if (candidate.#definitions.has(address)) invalid();
-      candidate.#definitions.set(address, freeze(definition));
-      if (codeKind !== undefined) candidate.#code.add(address);
+      const address = candidate.#insert(definition, codeKind);
       if (implementation !== undefined) candidate.#implementations.set(address, implementation);
     }
+    return this.#publish(candidate);
+  }
+  #insert(definition, codeKind) {
+    const address = definitionKey(definition, codeKind);
+    if (this.#definitions.has(address)) invalid();
+    this.#definitions.set(address, definition);
+    if (codeKind !== undefined) this.#code.add(address);
+    return address;
+  }
+  registerResourceSet(root) {
+    const sets = orderedResourceSets(assertResourceSet(root));
+    const candidate = this.fork();
+    for (const set of sets) {
+      const existing = candidate.#sets.get(set.id);
+      if (existing?.declaration === set) continue;
+      if (existing) fail('INVALID_DEFINITION', {
+        message: `Resource set ${set.id} is already declared (${existing.declaration.version}, ${set.version}).`,
+      });
+      const keys = set.resources.map(definition => candidate.#insert(definition));
+      for (const action of set.actions) {
+        const address = candidate.#insert(action.definition, 'Action');
+        candidate.#implementations.set(address, action.implementation);
+        candidate.#actionRequirements.set(address, action.requires);
+        keys.push(address);
+      }
+      for (const binding of set.components) {
+        const address = candidate.#insert(binding.contract, 'Component');
+        candidate.#componentBindings.set(address, binding);
+        keys.push(address);
+      }
+      candidate.#sets.set(set.id, { declaration: set, dependencies: set.dependencies.map(dependency => dependency.id), keys });
+    }
+    return candidate.#sets.size === this.#sets.size ? this : this.#publish(candidate);
+  }
+  #publish(candidate, definition) {
     try { candidate.#validateAll(); } catch (error) { throw safeError(error, 'INVALID_DEFINITION'); }
+    if (definition) this.#checkUpdatedContracts(candidate, definition);
     this.commitCandidate(candidate);
     return this;
   }
   updateResource(resource) {
-    const definition = copy(resource);
-    fields(definition, ['kind', 'id', 'name', 'spec']);
-    if (!kinds.has(definition.kind) || !own(definition, 'spec')) invalid();
-    name(definition.id); object(definition.spec);
-    if (own(definition, 'name') && typeof definition.name !== 'string') invalid();
+    const definition = freeze(copy(resource));
+    const address = definitionKey(definition);
     this.get(definition.kind, definition.id);
     const candidate = this.fork();
-    candidate.#definitions.set(key(definition.kind, definition.id), freeze(definition));
-    try { candidate.#validateAll(); } catch (error) { throw safeError(error, 'INVALID_DEFINITION'); }
+    candidate.#definitions.set(address, definition);
+    const binding = this.#componentBindings.get(address);
+    if (binding) candidate.#componentBindings.set(address, Object.freeze({ ...binding, contract: definition }));
+    return this.#publish(candidate, definition);
+  }
+  replaceResource(entry) {
+    const { definition, codeKind, action, component } = replacementEntry(entry);
+    const address = definitionKey(definition, codeKind);
+    this.get(definition.kind, definition.id);
+    if (this.#code.has(address) !== (codeKind !== undefined)) invalid();
+    const candidate = this.fork();
+    candidate.#definitions.set(address, definition);
+    if (action) {
+      candidate.#implementations.set(address, action.implementation);
+      candidate.#actionRequirements.set(address, action.requires);
+    }
+    if (component) candidate.#componentBindings.set(address, component);
+    return this.#publish(candidate, definition);
+  }
+  #checkUpdatedContracts(candidate, definition) {
     if (definition.kind === 'Action' && this.isCode('Action', definition.id)) {
       this.#checkActionContract(candidate, definition.id);
     } else if (definition.kind === 'Type') {
@@ -179,8 +262,6 @@ export class Registry {
         }
       }
     }
-    this.commitCandidate(candidate);
-    return this;
   }
   #checkActionContract(candidate, id) {
     const before = this.get('Action', id).spec;
@@ -188,7 +269,7 @@ export class Registry {
     const oldPorts = before.ports ?? {}, newPorts = after.ports ?? {};
     const oldNames = Object.keys(oldPorts), newNames = Object.keys(newPorts);
     const mismatch = (location, input) => fail('TYPE_CONTRACT_MISMATCH', {
-      message: 'A registered code Action must keep its input and output contract.',
+      message: 'A registered code Action must keep its inputs, output and required host capabilities.',
       resource: { kind: 'Action', id },
       location,
       ...(input === undefined ? {} : { input }),
@@ -210,11 +291,15 @@ export class Registry {
     if (oldNames.some((name, index) => name !== newNames[index])) mismatch('/ports');
     if (Boolean(before.output) !== Boolean(after.output)
       || (before.output && !sameSchema(before.output, after.output))) mismatch('/output');
+    if (!equal(this.actionRequirements(id), candidate.actionRequirements(id))) mismatch('/requires');
   }
   commitCandidate(candidate) {
     this.#definitions = candidate.#definitions;
     this.#code = candidate.#code;
     this.#implementations = candidate.#implementations;
+    this.#actionRequirements = candidate.#actionRequirements;
+    this.#componentBindings = candidate.#componentBindings;
+    this.#sets = candidate.#sets;
     this.revision++;
   }
   #validateAll() {

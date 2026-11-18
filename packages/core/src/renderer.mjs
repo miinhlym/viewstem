@@ -5,6 +5,9 @@ import { createDiagnostic, notifyDiagnostic } from './diagnostics.mjs';
 export { createDiagnostic, createPreparationError, createRenderError, notifyDiagnostic } from './diagnostics.mjs';
 
 const targets = new WeakMap();
+export function subscribeRenderProjection(view, listener) {
+  return rendererView(view).subscribeRenderProjection(listener);
+}
 export function createRenderWaiter(view, render, {
   onError, getErrorListener, deliverDiagnostic, onClose, isOpen = () => true, onRenderFailure,
 } = {}) {
@@ -58,7 +61,7 @@ export function createRenderWaiter(view, render, {
     await whileConnected(engine.whenProjected(generation, sequence));
     if (!open() || engine.generation !== generation) fail('CANCELLED');
     try {
-      const rendering = render();
+      const rendering = render(generation, sequence);
       if (engine.generation !== generation) {
         void Promise.resolve(rendering).catch(() => {});
         fail('CANCELLED');
@@ -73,7 +76,7 @@ export function createRenderWaiter(view, render, {
     if (!open() || engine.generation !== generation) fail('CANCELLED');
   }
   return {
-    emit: (target, event, payload) => engine.emit(target, event, payload, open),
+    emit: (target, event, payload, current = () => true) => engine.emit(target, event, payload, () => open() && current()),
     async whenRendered() {
       const { generation, requested } = engine.projection();
       await wait(generation, requested);
@@ -107,7 +110,6 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
     targets.set(target, token);
     const controller = new AbortController();
     let adapter, waiter, closeView, stopped, preparing, connecting = false, explicitlyClosed = false;
-    let initialRenderReported = false;
     let finishConnecting;
     const connected = new Promise(resolve => { finishConnecting = resolve; });
     const isOpen = () => !closing && !stopped && targets.get(target) === token;
@@ -131,9 +133,11 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
       check();
       connecting = true;
       try {
-        waiter = createRenderWaiter(view, () => adapter.whenRendered(), {
+        waiter = createRenderWaiter(view, (generation, sequence) => adapter.whenRendered(generation, sequence), {
           deliverDiagnostic: diagnostic => diagnostics(diagnostic),
-          onRenderFailure(cause) { initialRenderReported = isObject(cause) && reportedRenderFailures.has(cause); },
+          onRenderFailure(cause) {
+            if (!isObject(cause) || !reportedRenderFailures.has(cause)) renderError(cause);
+          },
           isOpen, onClose: () => { void stop().catch(() => {}); },
         });
         check();
@@ -175,7 +179,7 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
     entries.add(close);
     return {
       start, stop, close, isOpen,
-      reportedRenderFailure: failure => initialRenderReported || (isObject(failure) && reportedRenderFailures.has(failure)),
+      reportedRenderFailure: failure => isObject(failure) && reportedRenderFailures.has(failure),
       prepare(source, options) {
         // Publish the internal preparation before reading any host-provided data.
         let resolve, reject;
@@ -197,15 +201,14 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
     runtime,
     mount({ target, source, inputs, url, ...options }) {
       const task = entry(target, options);
-      let rendered = false;
+      let connected = false;
       const ready = (async () => {
         let phase = 'prepare';
         try {
           const view = await task.prepare(source, { inputs, url });
           phase = 'render';
           task.start(view);
-          await task.whenRendered();
-          rendered = true;
+          connected = true;
           return view;
         } catch (cause) {
           const failure = task.isOpen() ? safeError(cause) : error('CANCELLED');
@@ -219,11 +222,8 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
       ready.catch(() => {});
       return {
         ready, unmount: task.close,
-        async whenRendered() {
-          if (rendered) await task.whenRendered();
-          else await ready;
-        },
-        async whenSettled(application) { if (!rendered) await ready; return task.whenSettled(application); },
+        whenRendered() { return connected ? task.whenRendered() : ready.then(() => task.whenRendered()); },
+        whenSettled(application) { return connected ? task.whenSettled(application) : ready.then(() => task.whenSettled(application)); },
       };
     },
     attach(view, target, options = {}) {

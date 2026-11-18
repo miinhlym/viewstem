@@ -1,3 +1,4 @@
+import { bindTestComponents } from './fixtures/components.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRegistry, createStateStore } from '@viewstem/core';
@@ -6,7 +7,7 @@ import { FakeClock } from './query-fixtures.mjs';
 import { memoryUrl, link, tick } from './fixtures/state/url-adapter.mjs';
 const integer = { type: 'integer' }, path = value => ({ '@path': value });
 function fixture(endpoint = memoryUrl(), stateStore, options) {
-  const registry = createRegistry(); registry.registerComponentContract({ kind: 'Component', id: 'Text', spec: { ports: { value: { kind: 'Value', schema: true } } } });
+  const registry = createRegistry(); bindTestComponents(registry, [{ kind: 'Component', id: 'Text', spec: { ports: { value: { kind: 'Value', schema: true } } } }]);
   const requests = [], runtime = createRuntime({ registry, ...(stateStore ? { stateStore } : {}), ...options, requestExecutor: async plan => { requests.push(plan); return { status: 200, headers: {}, body: requests.length }; } });
   const view = (initial = 1, extra = {}) => ({ states: { value: { kind: 'State', schema: integer, initial }, ...extra.states }, ...extra,
     render: { id: 'text', componentRef: 'Text', inputs: { value: path('/states/value') } } });

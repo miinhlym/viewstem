@@ -2,10 +2,10 @@
   import { onDestroy, onMount, tick, untrack } from 'svelte';
   import { createDiagnostic, createPreparationError, notifyDiagnostic, prepareOwnedView } from '@viewstem/core/renderer';
   import type { PublicError, View, ViewApplication, ViewSource } from '@viewstem/core';
-  import type { ViewstemViewComponentProps } from './types.js';
-  import { cancelled, failure, rendererStates } from './connection.js';
+  import type { RenderAttachment, ViewstemViewComponentProps } from './types.js';
+  import { cancelled, failure, rendererStates } from './lifecycle.js';
   import { snapshotSource } from './source.js';
-  import ConnectedView from './ConnectedView.svelte';
+  import Display from './Display.svelte';
 
   let { renderer, view, source, inputs, onError, fallback, pending, prepareError }: ViewstemViewComponentProps = $props();
 
@@ -21,7 +21,8 @@
     catch (error) { return { owned: true as const, renderer, error: error as PublicError }; }
   });
 
-  let attached: ReturnType<typeof ConnectedView> | undefined = $state.raw();
+  let attached: ReturnType<typeof Display> | undefined = $state.raw();
+  let ownedDisplay: RenderAttachment | undefined;
   let ownedView: View | undefined = $state.raw();
   let loading = $state(false);
   let preparationError: PublicError | undefined = $state.raw();
@@ -55,7 +56,8 @@
       if (cleanup) return cleanup;
       closed = true;
       cleanup = Promise.resolve().then(async () => {
-        const results = await Promise.allSettled([closeView?.(), prepare?.catch(() => {})]);
+        const results = await Promise.allSettled([closeView?.(), ownedDisplay?.detach(), prepare?.catch(() => {})]);
+        ownedDisplay = undefined;
         await tick();
         const failed = results.find(result => result.status === 'rejected');
         if (failed) throw failed.reason;
@@ -141,7 +143,8 @@
   {@render prepareError?.(propError)}
 {:else if initial.owned}
   {#if ownedView}
-    <ConnectedView renderer={initial.renderer} view={ownedView} {onError} {fallback} isOpen={() => !closed && !destroyed} bind:this={attached} />
+    <Display renderer={initial.renderer} view={ownedView} {onError} {fallback} isOpen={() => !closed && !destroyed}
+      onAttach={display => { ownedDisplay = display; }} bind:this={attached} />
   {:else if preparationError}
     {@render prepareError?.(preparationError)}
   {:else if loading}
@@ -150,7 +153,7 @@
 {:else if view !== undefined && source === undefined}
   {#key renderer}
     {#key view}
-      <ConnectedView {renderer} {view} {onError} {fallback} isOpen={() => !destroyed} bind:this={attached} />
+      <Display {renderer} {view} {onError} {fallback} isOpen={() => !destroyed} bind:this={attached} />
     {/key}
   {/key}
 {/if}

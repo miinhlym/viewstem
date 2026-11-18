@@ -1,3 +1,4 @@
+import { bindTestComponents } from './fixtures/components.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRegistry, createStateStore, mergeOwnedUrl } from '@viewstem/core';
@@ -16,8 +17,8 @@ const find = (view, id) => nodes(view).find(node => node.id === id);
 const bounded = async promise => { let timer; try { return await Promise.race([promise, new Promise((_, reject) => { timer = setTimeout(() => reject(Error('management fixture deadline')), 1500); })]); } finally { clearTimeout(timer); } };
 function registry() {
   const r = createRegistry();
-  r.registerComponentContract(resource('Component', 'Text', { ports: { text: { kind: 'Value', schema: true, required: true } } }));
-  r.registerComponentContract(resource('Component', 'Row', { slots: { default: {} } }));
+  bindTestComponents(r, [resource('Component', 'Text', { ports: { text: { kind: 'Value', schema: true, required: true } } })]);
+  bindTestComponents(r, [resource('Component', 'Row', { slots: { default: {} } })]);
   return r;
 }
 function runtime(t, r = registry(), options = {}) { const runtime = createRuntime({ registry: r, ...options }); t.after(() => runtime.dispose()); return runtime; }
@@ -139,7 +140,7 @@ test('N02 referenced definitions resolve recursively in their expected kind and 
 
 test('M07 UI events and explicit invocation use the same deny and allow Action policy', async t => {
   const r = registry(); let allowed = false, calls = 0;
-  r.registerComponentContract(resource('Component', 'Button', { events: { click: { schema: true } } }));
+  bindTestComponents(r, [resource('Component', 'Button', { events: { click: { schema: true } } })]);
   r.registerAction(resource('Action', 'action', { output: { schema: number } }), () => { calls++; return calls; });
   const { view, runtime: instance } = await mounted(t, { render: { id: 'button', componentRef: 'Button', on: { click: { id: 'observed', actionRef: 'action' } } } }, r, { authorize: () => allowed });
   await assert.rejects(view.emit(find(view, 'button'), 'click', null), error => error.code === 'EXECUTION_BLOCKED');
@@ -157,7 +158,7 @@ test('N02 malformed resolved graph never executes data or replaces the current s
 
 test('M04 Query, Variable, Type and Action references stay pinned across updates until explicit replacement', async t => {
   const r = registry();
-  r.registerComponentContract(resource('Component', 'Button', { events: { click: { schema: true } } }));
+  bindTestComponents(r, [resource('Component', 'Button', { events: { click: { schema: true } } })]);
   r.registerResources([
     resource('Type', 'Count', { schema: { type: 'number', maximum: 10 } }),
     resource('Variable', 'offset', { ports: { n: { kind: 'Value', schema: number, required: true } }, expression: 'n + 1.0' }),
@@ -221,7 +222,7 @@ test('M01 failed build after a retained Component input becomes pending preserve
 });
 
 test('U07 suspended nested owner preserves active Action, local State and Query handle until resume', async t => {
-  const r = registry(); r.registerComponentContract(resource('Component', 'Button', { events: { click: { schema: true } } }));
+  const r = registry(); bindTestComponents(r, [resource('Component', 'Button', { events: { click: { schema: true } } })]);
   let release, actionSignal; const requests = [];
   r.registerAction(resource('Action', 'wait', { output: { schema: true } }), context => { actionSignal = context.signal; return new Promise(resolve => { release = resolve; }); });
   r.registerResources([
@@ -287,7 +288,7 @@ test('U12 node ids remain unique across two Row containers in one author owner',
 
 test('disposed Views reject unhandled events even when no State or Action owns cleanup', async t => {
   const r = registry();
-  r.registerComponentContract(resource('Component', 'EventOnly', { events: { click: { schema: true } } }));
+  bindTestComponents(r, [resource('Component', 'EventOnly', { events: { click: { schema: true } } })]);
   const instance = runtime(t, r);
   const created = await instance.createView({ view: { render: { id: 'button', componentRef: 'EventOnly' } } });
   await created.initialComplete;

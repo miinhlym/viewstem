@@ -1,10 +1,11 @@
+import { bindTestComponents } from './fixtures/components.mjs';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createRegistry, createStateStore } from '@viewstem/core';
 import { createRuntime } from './fixtures/runtime-operations.mjs';
 const string={type:'string'},integer={type:'integer'};
 const port=(kind,schema=string)=>({kind,schema,required:true});
-function registry(){const r=createRegistry();r.registerComponentContract({kind:'Component',id:'Text',spec:{ports:{text:port('Value')}}});r.registerComponentContract({kind:'Component',id:'Input',spec:{ports:{value:port('Value')},events:{change:{schema:string}}}});r.registerComponentContract({kind:'Component',id:'Row',spec:{slots:{default:{}}}});r.registerComponentContract({kind:'Component',id:'Button',spec:{events:{click:{schema:{type:'object'}}}}});return r;}
+function registry(){const r=createRegistry();bindTestComponents(r, [{kind:'Component',id:'Text',spec:{ports:{text:port('Value')}}}]);bindTestComponents(r, [{kind:'Component',id:'Input',spec:{ports:{value:port('Value')},events:{change:{schema:string}}}}]);bindTestComponents(r, [{kind:'Component',id:'Row',spec:{slots:{default:{}}}}]);bindTestComponents(r, [{kind:'Component',id:'Button',spec:{events:{click:{schema:{type:'object'}}}}}]);return r;}
 const node=(id,componentRef,inputs)=>({id,componentRef,...(inputs?{inputs}: {})});
 const p=path=>({'@path':path});
 const flush=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};

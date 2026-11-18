@@ -1,5 +1,5 @@
-import { createRenderer, ViewstemView, transformError } from '@viewstem/svelte';
-import type { ComponentRegistration } from '@viewstem/svelte';
+import { createRenderer, svelteComponent, ViewstemView, transformError } from '@viewstem/svelte';
+import { defineResourceSet } from '@viewstem/core';
 import type { ComponentAdapterProps, RendererErrorListener, RenderFallback, RenderAttachment, MountedView, ComponentAdapter, Renderer, RendererOptions, ViewstemViewProps, PublicError, View, ComponentContract, ViewSpec, RequestExecutor, StateHandle, Runtime } from '@viewstem/svelte';
 import type { ActionSnapshot, ActionHandler, ActionContext, CodeActionSpec, CodeActionDefinition, StateScope, CelFunction, CelValue } from '@viewstem/svelte';
 import type { Component, Snippet } from 'svelte';
@@ -22,12 +22,11 @@ const requestExecutor: RequestExecutor = async (_plan, { signal }) => ({ status:
 createRenderer({ requestExecutor, stateStore: runtime.stateStore, resourceResolver: async (_kind, id) => ({ kind: 'View', id, spec: { render: { id: 'root', componentRef: 'Explicit' } } }) });
 const contract: ComponentContract = { kind: 'Component', id: 'Explicit', spec: {} };
 const definition: ViewSpec = { render: { id: 'root', componentRef: 'Explicit' } };
-registry.registerComponentContract(contract);
 const sharedRuntime: Runtime = renderer.runtime;
 declare const state: StateHandle<number>;
 void [definition, sharedRuntime, state];
 const adapter: ComponentAdapter = TypedAdapter;
-renderer.bindComponent('Explicit', adapter);
+registry.registerResourceSet(defineResourceSet({ id: 'fixture', version: '1', components: [svelteComponent(contract, adapter)] }));
 declare const view: View;
 declare const target: HTMLElement;
 declare const fallback: RenderFallback;
@@ -52,9 +51,9 @@ createRenderer({ runtime, requestExecutor });
 // @ts-expect-error Runtime cannot be replaced with a structurally unrelated object.
 createRenderer({ runtime: {} });
 // @ts-expect-error A renderer implementation has to be a Svelte Component.
-renderer.bindComponent('bad', {});
+svelteComponent(contract, {});
 // @ts-expect-error An implementation is bound to its explicit string ID.
-renderer.bindComponent(TypedAdapter);
+svelteComponent(TypedAdapter);
 // @ts-expect-error A real DOM Element is required.
 renderer.mount({ target: {}, source: { ref: 'view' } });
 // @ts-expect-error View target is required.

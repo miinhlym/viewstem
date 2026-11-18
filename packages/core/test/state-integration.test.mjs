@@ -1,3 +1,4 @@
+import { bindTestComponents } from './fixtures/components.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRegistry, createStateStore } from '@viewstem/core';
@@ -8,7 +9,7 @@ const integer = { type: 'integer' }, string = { type: 'string' }, date = { 'x-vi
 const tick = async () => { for (let i = 0; i < 5; i++) await Promise.resolve(); };
 
 test('C03 expected-kind registry lookup never falls back to Component', () => {
-  const registry = createRegistry(); registry.registerComponentContract({ kind: 'Component', id: 'same', spec: {} });
+  const registry = createRegistry(); bindTestComponents(registry, [{ kind: 'Component', id: 'same', spec: {} }]);
   assert.throws(() => registry.get('Query', 'same'), { code: 'REFERENCE_NOT_FOUND' });
   assert.throws(() => registry.get('Query', 'absent'), { code: 'REFERENCE_NOT_FOUND' });
 });
@@ -22,7 +23,7 @@ test('C06/C13 same cell connects twice; equal local names have independent react
   const store = createStateStore(), scope = store.createScope(), other = store.createScope();
   const one = scope.registerState('value', { schema: integer, initial: 1 }), two = other.registerState('value', { schema: integer, initial: 2 });
   const ports = { one: { kind: 'State', schema: integer }, two: { kind: 'State', schema: integer } };
-  const registry = createRegistry(); registry.registerComponentContract({ kind: 'Component', id: 'Pair', spec: { ports } });
+  const registry = createRegistry(); bindTestComponents(registry, [{ kind: 'Component', id: 'Pair', spec: { ports } }]);
   const runtime = createRuntime({ registry, stateStore: store });
   const { view, initialComplete: initial } = await runtime.createView({ view: { ports, render: { id: 'pair', componentRef: 'Pair', inputs: { one: { '@path': '/ports/one' }, two: { '@path': '/ports/two' } } } }, inputs: { one, two: one } }); await initial;
   const linked = view.getSnapshot().roots[0].inputs;
@@ -119,7 +120,7 @@ test('V57 registered async Action is executable while function/Promise data rema
   const registry = createRegistry(), store = createStateStore(); let executions = 0;
   const run = async () => { executions++; return 7; };
   registry.registerAction({ kind: 'Action', id: 'code', spec: { output: { schema: integer } } }, run);
-  registry.registerComponentContract({ kind: 'Component', id: 'Leaf', spec: {} });
+  bindTestComponents(registry, [{ kind: 'Component', id: 'Leaf', spec: {} }]);
   const runtime = createRuntime({ registry, stateStore: store });
   const { view, initialComplete: initial } = await runtime.createView({ view: { render: { id: 'leaf', componentRef: 'Leaf' } } }); await initial;
   assert.equal(await runtime.invokeAction({ owner: view, actionRef: 'code' }), 7); assert.equal(executions, 1);
@@ -135,7 +136,7 @@ test('V01/C09/K24 explicit Clock drives dependent CEL only, reset keeps initial 
   const registry = createRegistry({ functions: [
     { name: 'observeDay', inputs: [string], output: string, run: day => { calls++; return day; } },
     { name: 'observeTomorrow', inputs: [string], output: string, run: day => { nextCalls++; return day; } },
-  ] }); registry.registerComponentContract({ kind: 'Component', id: 'Leaf', spec: {} });
+  ] }); bindTestComponents(registry, [{ kind: 'Component', id: 'Leaf', spec: {} }]);
   const runtime = createRuntime({ registry, stateStore: store });
   const { view, initialComplete: initial } = await runtime.createView({ view: {
     ports: { now: { kind: 'State', schema: integer }, zone: { kind: 'State', schema: string } },
@@ -187,7 +188,7 @@ test('V51 negative zero avoids downstream CEL/reaction/Query requests', async ()
   const registry = createRegistry({ functions: [{ name: 'observeNumber', inputs: [{ type: 'number' }], output: { type: 'number' }, run: n => { calculations++; return n; } }] }), store = createStateStore(), scope = store.createScope(), source = scope.registerState('source', { schema: { type: 'number' }, initial: 0 }), selected = scope.registerState('selected', { schema: integer, initial: 9 });
   store.registerReaction(scope, { watch: [source], target: selected, value: 0 });
   registry.registerResources([{ kind: 'Query', id: 'q', spec: { ports: { n: { kind: 'Value', schema: { type: 'number' }, required: true } }, sources: { main: { datasource: { kind: 'Http', baseUrl: 'https://example.test' }, request: { method: 'GET', path: 'items' } } }, transform: { input: { '@path': '/sources/main' } } } }]);
-  registry.registerComponentContract({ kind: 'Component', id: 'Leaf', spec: {} });
+  bindTestComponents(registry, [{ kind: 'Component', id: 'Leaf', spec: {} }]);
   const runtime = createRuntime({ registry, stateStore: store, requestExecutor: async () => { requests++; return { status: 200, headers: {}, body: 1 }; } });
   const { initialComplete: initial } = await runtime.createView({ view: {
     ports: { source: { kind: 'State', schema: { type: 'number' } } },

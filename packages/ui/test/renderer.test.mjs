@@ -11,16 +11,21 @@ const workspace = fileURLToPath(new URL('../../../', import.meta.url));
 test('DOM renderer owns mounted views and borrows attachments', async t => {
   const bundle = await build({
     stdin: { resolveDir: workspace, contents: `
-      import { createRenderer, registerShadcn } from '@viewstem/ui';
+      import { createRenderer } from '@viewstem/dom';
+      import { ui } from '@viewstem/ui';
       import { createRuntime, createStateStore } from '@viewstem/core';
       window.createRendererForTest = createRenderer;
-      window.renderer = createRenderer();
+      const runtime = createRuntime();
+      runtime.registry.registerResourceSet(ui);
+      window.renderer = createRenderer({ runtime });
       window.source = {
         states: { label: { kind: 'State', schema: { type: 'string' }, initial: 'Draft' } },
         render: { id: 'label', componentRef: 'shadcn.Badge', inputs: { text: { '@path': '/states/label' } } },
       };
       window.clickAndDetach = async (left, right) => {
-        const renderer = createRenderer();
+        const runtime = createRuntime();
+        runtime.registry.registerResourceSet(ui);
+        const renderer = createRenderer({ runtime });
         let calls = 0;
         renderer.runtime.registry.registerAction({ kind: 'Action', id: 'record', spec: {} }, () => { calls++; });
         const view = await renderer.runtime.createView({
@@ -29,6 +34,7 @@ test('DOM renderer owns mounted views and borrows attachments', async t => {
         });
         const first = renderer.attach(view, left);
         const second = renderer.attach(view, right);
+        await Promise.all([first.whenRendered(), second.whenRendered()]);
         left.querySelector('button').click();
         await first.detach();
         const afterDetach = calls;
@@ -47,7 +53,7 @@ test('DOM renderer owns mounted views and borrows attachments', async t => {
           requests++;
           return new Promise(() => {});
         } });
-        registerShadcn(runtime.registry);
+        runtime.registry.registerResourceSet(ui);
         const renderer = createRenderer({ runtime });
         const stop = store.subscribe(null, ({ changes }) => {
           if (changes.some(change => change.kind === 'added')) disposal = renderer.dispose();
@@ -127,11 +133,12 @@ test('DOM renderer owns mounted views and borrows attachments', async t => {
 test('DOM and Svelte reserve the same target across renderers', async t => {
   const bundle = await build({
     stdin: { resolveDir: workspace, contents: `
-      import { createRenderer as createDom } from '@viewstem/ui';
+      import { createRuntime } from '@viewstem/core';
+      import { createRenderer as createDom } from '@viewstem/dom';
       import { createRenderer as createSvelte } from './packages/svelte/src/lib/renderer.ts';
       window.makeRenderers = () => {
         const resourceResolver = () => new Promise(() => {});
-        return [createDom({ resourceResolver }), createSvelte({ resourceResolver })];
+        return [createDom({ runtime: createRuntime({ resourceResolver }) }), createSvelte({ resourceResolver })];
       };
     ` },
     bundle: true, write: false, platform: 'browser', format: 'iife', conditions: ['browser'],
@@ -163,4 +170,70 @@ test('DOM and Svelte reserve the same target across renderers', async t => {
     return [domFirst, svelteFirst];
   });
   assert.deepEqual(result, ['INVALID_DEFINITION', 'INVALID_DEFINITION']);
+});
+
+test('a DOM Card, Svelte layout and DOM Button share the same View State and Actions', async t => {
+  const { outputFiles } = await build({
+    stdin: { resolveDir: workspace, contents: `
+      import { createRuntime, defineResourceSet } from '@viewstem/core';
+      import { createRenderer } from '@viewstem/dom';
+      import { svelteConnector, svelteComponent } from '@viewstem/svelte';
+      import { ui } from '@viewstem/ui';
+      import Layout from './packages/svelte/test/fixtures/Layout.svelte';
+      import Probe from './packages/svelte/test/fixtures/Probe.svelte';
+      const runtime = createRuntime();
+      runtime.registry.registerResourceSet(defineResourceSet({ id: 'mix', version: '1', dependencies: [ui], components: [
+        svelteComponent({ kind: 'Component', id: 'Layout', spec: { slots: { default: {} } } }, Layout),
+        svelteComponent({ kind: 'Component', id: 'Chart', spec: { ports: { value: { kind: 'Value', schema: true, required: true } } } }, Probe),
+      ] }));
+      const renderer = createRenderer({ runtime, connectors: [svelteConnector] });
+      const path = value => ({ '@path': value });
+      const str = { type: 'string' };
+      window.run = async () => {
+        const target = document.querySelector('main');
+        const mounted = renderer.mount({ target, source: {
+          states: { title: { kind: 'State', schema: str, initial: 'Before' }, href: { kind: 'State', schema: true, initial: null } },
+          render: { id: 'card', componentRef: 'shadcn.Card.Root', slots: { default: [
+            { id: 'layout', componentRef: 'Layout', slots: { default: [
+              { id: 'button', componentRef: 'shadcn.Button', inputs: { text: path('/states/title'), href: path('/states/href') }, on: { click: {
+                action: { ports: { title: { kind: 'State', schema: str, required: true } }, steps: [
+                  { kind: 'SetState', target: path('/ports/title'), value: 'After' },
+                ] }, inputs: { title: path('/states/title') },
+              } } },
+              { id: 'chart', componentRef: 'Chart', inputs: { value: path('/states/title') } },
+            ] } },
+          ] } },
+        } });
+        const view = await mounted.ready;
+        await mounted.whenRendered();
+        const card = target.querySelector('[data-vs-part=card]');
+        const action = () => card.querySelector('[data-layout] [data-vs-component=Button]');
+        const first = action().localName;
+        action().click();
+        await new Promise(resolve => setTimeout(resolve, 0));
+        await mounted.whenRendered();
+        const values = [ action().textContent, card.querySelector('[data-value]').textContent ];
+        view.getState('href').write('/download');
+        await mounted.whenRendered();
+        const second = action().localName;
+        view.getState('href').write(null);
+        await mounted.whenRendered();
+        const third = action().localName;
+        await mounted.unmount();
+        return { values, tags: [first, second, third], empty: target.childNodes.length === 0 };
+      };
+    ` },
+    bundle: true, write: false, platform: 'browser', format: 'iife', conditions: ['browser', 'svelte'],
+    plugins: [{ name: 'svelte', setup(builder) {
+      builder.onLoad({ filter: /\.svelte$/ }, async ({ path }) => ({
+        contents: compile(await readFile(path, 'utf8'), { filename: path, generate: 'client' }).js.code, loader: 'js',
+      }));
+    } }],
+  });
+  const browser = await chromium.launch();
+  t.after(() => browser.close());
+  const page = await browser.newPage();
+  await page.setContent('<main data-viewstem-ui></main>');
+  await page.addScriptTag({ content: outputFiles[0].text });
+  assert.deepEqual(await page.evaluate(() => window.run()), { values: ['After', 'After'], tags: ['button', 'a', 'button'], empty: true });
 });
