@@ -42,7 +42,7 @@ Changing a borrowed `view` or its `renderer` replaces the connection. Removing t
 
 When the View and renderer use the same Runtime, their registrations come from the same Registry. To share a Runtime the host already owns, create the renderer with `createRenderer({ runtime })`.
 
-For a View from a different Runtime, match the code-backed or declarative kind of each referenced Component ID in both Registries. Register the same public contract and its Svelte implementation for each code-backed Component. The renderer uses its own Registry and adapter registrations and does not compare the two Registries for compatibility.
+For a View from a different Runtime, register the components in the Runtime that creates the View. The renderer uses the implementations already bound to that View and supplies the connectors. For example, if the View uses a component bound with `svelteComponent()`, the renderer's built-in Svelte connector can display it. Supply any custom connectors when creating the renderer.
 
 The same borrowing rules apply to [`renderer.attach`](../renderer/#attach). Use `ViewstemView` for a child of your Svelte app and `attach` for a renderer-managed root on a DOM Element.
 

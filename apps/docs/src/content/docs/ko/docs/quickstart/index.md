@@ -10,18 +10,22 @@ JSON View로 **Hello, Viewstem** 버튼 하나를 표시합니다. 앱에서 실
 Vite로 만든 앱의 `index.html`에서 `<div id="app"></div>`를 아래 요소로 바꿉니다. 기존 앱에서는 View를 표시할 위치에 비어 있는 요소를 추가하세요.
 
 ```html
-<div id="viewstem"></div>
+<div id="viewstem" data-viewstem-ui></div>
 ```
 
 ## 2. View를 마운트
 
-Vite 앱의 `src/main.js`를 아래 코드로 교체하세요. 기존 앱에서는 대상 요소가 문서에 추가된 뒤 클라이언트에서 실행합니다. `createRenderer()`에는 `shadcn.Button`을 포함한 기본 카탈로그가 들어 있습니다.
+Vite 앱의 `src/main.js`를 아래 코드로 교체하세요. 기존 앱에서는 대상 요소가 문서에 추가된 뒤 클라이언트에서 실행합니다. `ui` 셋을 등록하면 `shadcn.Button` 등 카탈로그 컴포넌트를 사용할 수 있습니다.
 
 ```js
-import { createRenderer } from '@viewstem/ui';
+import { createRuntime } from '@viewstem/core';
+import { createRenderer } from '@viewstem/dom';
+import { ui } from '@viewstem/ui';
 import '@viewstem/ui/styles.css';
 
-const renderer = createRenderer();
+const runtime = createRuntime();
+runtime.registry.registerResourceSet(ui);
+const renderer = createRenderer({ runtime });
 const screen = renderer.mount({
   target: document.getElementById('viewstem'),
   source: {
@@ -32,7 +36,7 @@ const screen = renderer.mount({
     },
   },
 });
-await screen.ready;
+await screen.whenRendered();
 ```
 
 ## 3. 브라우저에서 확인
@@ -41,7 +45,7 @@ await screen.ready;
 npm run dev
 ```
 
-터미널에 표시된 주소를 열면 **Hello, Viewstem** 버튼이 보입니다. View 정의의 `inputs.text`를 바꿔 버튼 문구가 달라지는지 확인하세요. `screen.ready`는 첫 DOM 반영을 기다립니다. 화면을 닫을 때는 `await screen.unmount()`를, 앱에서 렌더러 사용을 마칠 때는 `await renderer.dispose()`를 호출하세요.
+터미널에 표시된 주소를 열면 **Hello, Viewstem** 버튼이 보입니다. View 정의의 `inputs.text`를 바꿔 버튼 문구가 달라지는지 확인하세요. `await screen.ready`로 준비된 View를 얻고, `await screen.whenRendered()`로 DOM 반영을 기다립니다. 화면을 닫을 때는 `screen.unmount()`를 기다립니다. 앱을 종료할 때는 `renderer.dispose()`를 기다린 뒤 `runtime.dispose()`를 호출합니다.
 
 ## 다음 단계
 

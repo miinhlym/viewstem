@@ -45,12 +45,15 @@ sidebar:
 | 실패 | 확인할 위치 |
 | --- | --- |
 | 잘못된 옵션·등록·대상 | 해당 설정 호출이 동기 예외를 던집니다. |
-| 마운트 중 정의 준비 또는 첫 렌더 실패 | `screen.ready`가 거절되고 대상 예약이 풀립니다. 문제를 고친 뒤 다시 마운트할 수 있습니다. |
+| 마운트 중 정의 준비 실패 | `screen.ready`와 `screen.whenRendered()`가 거절됩니다. `onError`는 `prepare` 진단을 받고 대상 예약이 풀립니다. |
 | `ViewstemView`의 `source` 준비 실패 | `prepareError`에 공개 오류를 전달하고 `onError`에 `prepare` 진단을 한 번 보냅니다. `whenRendered()`도 그 오류로 거절됩니다. |
+| 노드 입력을 평가하는 중 실패 | `onError`는 `node` 진단을 받습니다. 어댑터가 노드 오류 상태를 화면에 표시했다면 렌더는 완료됩니다. |
 | 실행 가능한 최초 Query 실패 | 완료 보고의 `queryErrors`에 기록됩니다. |
-| Svelte 구현 누락 또는 어댑터 렌더 실패 | 경계에서 각각 `REFERENCE_NOT_FOUND` 또는 `INTERNAL_ERROR`를 보고합니다. 살아 있는 연결은 폴백을 표시하고 새 투영에서 다시 시도할 수 있습니다. |
+| Svelte 구현 누락 또는 어댑터 렌더 실패 | 표시 연결의 `render` 진단에 각각 `REFERENCE_NOT_FOUND` 또는 `INTERNAL_ERROR`를 보고합니다. 살아 있는 연결은 폴백을 표시하고 새 투영에서 다시 시도할 수 있습니다. |
 | 어댑터 `emit()` 실패 | 호출 Promise가 거절됩니다. Core가 처리한 이벤트의 Action 오류는 `action` 진단에도 전달됩니다. 어댑터의 입력 미준비(`INPUT_NOT_READY`)와 오래된 연결(`CANCELLED`)은 `emit()`의 거절로 처리합니다. |
 | 직접 호출한 `view.invokeAction()` 또는 View 변경 실패 | 해당 호출의 Promise가 거절됩니다. |
 | 정리 또는 새 적용으로 완료 대기 취소 | 대기 Promise가 `CANCELLED`로 거절됩니다. |
 
 활성 렌더 오류가 있으면 폴백이 표시되어도 `whenRendered()`와 렌더러의 `whenSettled(application)`가 거절될 수 있습니다. 이미 완료된 Core 변경은 적용된 상태로 유지됩니다.
+
+선언에 없는 참조는 준비 단계에서 오류를 반환합니다. `error.message`에서 찾지 못한 이름을, `error.location`에서 참조 위치를 가리키는 JSON Pointer를 확인하세요. 예를 들어 [혼합 카운터 예제](../guides/mount-in-svelte/#mix-default-ui)에서 State 이름을 잘못 쓰면 `/render/slots/default/0/inputs/count/@path`가 해당 위치를 가리킵니다. 등록된 리소스는 선언 문서를 기준으로 `/spec`을 포함합니다. 열린 View의 변경이 거절되면 기존 정의, State, 표시를 유지합니다. 선언된 State의 필수 값이 아직 없으면 그 값이 필요한 노드가 `pending`이 됩니다.

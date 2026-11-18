@@ -16,9 +16,9 @@ Use `import type` from `@viewstem/svelte` for renderer-owned contracts and the s
 | `RenderOptions` | [Options for DOM connections](../renderer/#renderoptions) |
 | `MountedView` | [Owned View and application methods](../mounted-view/#mountedview) |
 | `RenderAttachment` | [DOM connection handle](../mounted-view/#renderattachment) |
-| `ComponentAdapter` | [Svelte component type](../adapters/#componentadapter) |
-| `ComponentAdapterProps` | [Adapter inputs, node, events, and slots](../adapters/#componentadapterprops) |
-| `ComponentRegistration` | [Contract and implementation pair](../adapters/#componentregistration) |
+| `ComponentAdapter<Contract>` | [Svelte component bound to a contract](../adapters/#componentadapter) |
+| `ComponentAdapterProps<Contract>` | [Adapter inputs by node status, events, and slots](../adapters/#componentadapterprops) |
+| `ComponentBinding` | [Contract and implementation pair](../adapters/#componentbinding) |
 | `ViewstemViewProps`, `ViewstemSourceProps`, `ViewstemViewComponentProps` | [Props for direct Svelte hosting](../viewstem-view/#viewstemviewprops) |
 | `RendererDiagnostic` | [Render or event diagnostic](../errors/#rendererdiagnostic) |
 | `RendererErrorListener` | [Diagnostic callback](../errors/#renderererrorlistener) |

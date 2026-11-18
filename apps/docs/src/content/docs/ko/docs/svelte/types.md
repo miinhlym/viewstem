@@ -16,9 +16,9 @@ sidebar:
 | `RenderOptions` | [DOM 연결 옵션](../renderer/#renderoptions) |
 | `MountedView` | [소유 View와 적용 메서드](../mounted-view/#mountedview) |
 | `RenderAttachment` | [DOM 연결 핸들](../mounted-view/#renderattachment) |
-| `ComponentAdapter` | [Svelte 컴포넌트 타입](../adapters/#componentadapter) |
-| `ComponentAdapterProps` | [어댑터 입력, 노드, 이벤트, 슬롯](../adapters/#componentadapterprops) |
-| `ComponentRegistration` | [계약과 구현의 쌍](../adapters/#componentregistration) |
+| `ComponentAdapter<Contract>` | [계약에 연결한 Svelte 컴포넌트 타입](../adapters/#componentadapter) |
+| `ComponentAdapterProps<Contract>` | [노드 상태별 입력, 이벤트, 슬롯](../adapters/#componentadapterprops) |
+| `ComponentBinding` | [계약과 구현의 쌍](../adapters/#componentbinding) |
 | `ViewstemViewProps`, `ViewstemSourceProps`, `ViewstemViewComponentProps` | [직접 호스팅하는 Svelte 컴포넌트 props](../viewstem-view/#viewstemviewprops) |
 | `RendererDiagnostic` | [렌더링 또는 이벤트 진단](../errors/#rendererdiagnostic) |
 | `RendererErrorListener` | [진단 콜백](../errors/#renderererrorlistener) |

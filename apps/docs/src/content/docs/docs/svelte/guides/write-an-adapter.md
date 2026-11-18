@@ -48,27 +48,26 @@ Add `Panel.svelte`. Call `emit` with the declared event name and payload. Disabl
 Use this as `main.ts`. The `Panel` contract declares `body` and the `reveal` event with a `null` payload. The View provides a `Label` in `body` and uses its own State to control the label's visibility.
 
 ```ts
-import { createRenderer } from '@viewstem/svelte';
+import { defineResourceSet } from '@viewstem/core';
+import { createRenderer, svelteComponent } from '@viewstem/svelte';
 import Panel from './Panel.svelte';
 import { label } from './label.js';
 
 const target = document.getElementById('app');
 if (!target) throw new Error('Missing #app element.');
 
-const renderer = createRenderer({ components: [
+const renderer = createRenderer();
+renderer.runtime.registry.registerResourceSet(defineResourceSet({ id: 'details', version: '1', components: [
   label,
-  {
-    contract: {
+  svelteComponent({
       kind: 'Component',
       id: 'Panel',
       spec: {
         slots: { body: {} },
         events: { reveal: { schema: { type: 'null' } } },
       },
-    },
-    component: Panel,
-  },
-] });
+  }, Panel),
+] }));
 
 const mounted = renderer.mount({
   target,

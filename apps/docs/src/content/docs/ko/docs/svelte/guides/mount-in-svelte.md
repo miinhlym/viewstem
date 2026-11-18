@@ -50,19 +50,16 @@ sidebar:
 `label.ts`에서 어댑터 ID를 `Label`로 지정하고 필수 포트 `text`를 선언합니다. 등록을 마치면 View 정의에서 이 ID를 참조할 수 있습니다.
 
 ```ts
-import type { ComponentRegistration } from '@viewstem/svelte';
+import { svelteComponent } from '@viewstem/svelte';
 import Label from './Label.svelte';
 
-export const label: ComponentRegistration = {
-  contract: {
+export const label = svelteComponent({
     kind: 'Component',
     id: 'Label',
     spec: {
       ports: { text: { kind: 'Value', schema: { type: 'string' }, required: true } },
     },
-  },
-  component: Label,
-};
+}, Label);
 ```
 
 ## 2. View를 만들고 표시하기
@@ -72,10 +69,13 @@ export const label: ComponentRegistration = {
 ```svelte
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { defineResourceSet } from '@viewstem/core';
   import { createRenderer, ViewstemView, type ViewSpec } from '@viewstem/svelte';
   import { label } from './label.js';
 
-  const renderer = createRenderer({ components: [label] });
+  const renderer = createRenderer();
+
+  renderer.runtime.registry.registerResourceSet(defineResourceSet({ id: 'labels', version: '1', components: [label] }));
   const source: ViewSpec = {
     render: {
       id: 'greeting',
@@ -132,12 +132,14 @@ View를 직접 제어하거나 최초 Query 보고를 기다리려면 [기존 Vi
 <!-- Layout.svelte -->
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { defineResourceSet } from '@viewstem/core';
   import { createRenderer } from '@viewstem/svelte';
   import SettingsPage from './SettingsPage.svelte';
   import { label } from './label.js';
 
   let { showSettings }: { showSettings: boolean } = $props();
-  const renderer = createRenderer({ components: [label] });
+  const renderer = createRenderer();
+  renderer.runtime.registry.registerResourceSet(defineResourceSet({ id: 'labels', version: '1', components: [label] }));
   onMount(() => () => { void renderer.dispose().catch(console.error); });
 </script>
 
@@ -165,3 +167,128 @@ View를 직접 제어하거나 최초 Query 보고를 기다리려면 [기존 Vi
 ```
 
 페이지를 닫으면 `ViewstemView`가 준비 중인 요청이나 생성한 View를 정리합니다. 레이아웃이 남아 있는 동안 공유 렌더러는 다음 페이지에서도 사용할 수 있습니다. 앱이 Svelte의 `mount` 또는 `hydrate`를 직접 호출한다면 기존 루트 오류 정책에 맞춰 [`transformError`](../../errors/#transformerror)를 설정하세요. 프레임워크가 루트를 관리한다면 그 프레임워크의 오류 설정을 확인하세요. 위의 `main.ts`는 루트를 직접 마운트하는 Vite 예제입니다.
+
+<a id="mix-default-ui"></a>
+
+## 기본 UI 버튼과 Svelte 컴포넌트 섞기
+
+Svelte TypeScript 클라이언트 빌드와 Core·DOM·Svelte·UI 로컬 패키지가 필요합니다. [Svelte 설치 절차](/ko/docs/installation/#svelte-패키지-빌드-및-설치)를 따른 뒤 [브라우저 UI 빌드](/ko/docs/installation/#브라우저-ui-패키지-빌드)에서 만든 UI tarball도 설치하세요. 다음 파일로 독립 실행할 수 있습니다.
+
+`index.html`
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Viewstem counter</title>
+  </head>
+  <body>
+    <main id="app" data-viewstem-ui></main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
+```
+
+`src/counter-contract.ts`
+
+```ts
+import type { ComponentContract } from '@viewstem/core';
+
+export const integer = { type: 'integer' } as const;
+export const counterContract = {
+  kind: 'Component',
+  id: 'demo.Counter',
+  spec: { ports: { count: { kind: 'Value', required: true, schema: integer } } },
+} as const satisfies ComponentContract;
+```
+
+`src/Counter.svelte`
+
+```svelte
+<script lang="ts">
+  import type { ComponentAdapterProps } from '@viewstem/svelte';
+  import type { counterContract } from './counter-contract.js';
+
+  let { node }: ComponentAdapterProps<typeof counterContract> = $props();
+</script>
+
+<output aria-label="Count">
+  {#if node.status === 'ready'}
+    {node.inputs.count.toFixed(0)}
+  {:else}
+    {node.inputs.count ?? '—'}
+  {/if}
+</output>
+```
+
+`src/main.ts`
+
+```ts
+import { defineCodeAction, defineResourceSet, type ViewSpec } from '@viewstem/core';
+import { createRenderer, svelteComponent } from '@viewstem/svelte';
+import { ui } from '@viewstem/ui';
+import '@viewstem/ui/styles.css';
+import Counter from './Counter.svelte';
+import { counterContract, integer } from './counter-contract.js';
+
+const increment = defineCodeAction({
+  definition: {
+    kind: 'Action',
+    id: 'increment',
+    spec: { ports: { count: { kind: 'State', required: true, schema: integer } } },
+  },
+}).implement(({ inputs }) => {
+  inputs.count.write((inputs.count.read() ?? 0) + 1);
+});
+
+const target = document.getElementById('app');
+if (!target) throw new Error('Missing #app');
+
+export const renderer = createRenderer();
+renderer.runtime.registry.registerResourceSet(defineResourceSet({
+  id: 'counter-demo',
+  version: '1',
+  dependencies: [ui],
+  components: [svelteComponent(counterContract, Counter)],
+  actions: [increment],
+}));
+
+const count = { '@path': '/states/count' };
+export const source: ViewSpec = {
+  states: { count: { kind: 'State', schema: integer, initial: 0 } },
+  render: {
+    id: 'card',
+    componentRef: 'shadcn.Card.Root',
+    slots: { default: [
+      { id: 'counter', componentRef: counterContract.id, inputs: { count } },
+      {
+        id: 'plus',
+        componentRef: 'shadcn.Button',
+        inputs: { text: '+1' },
+        on: { click: { actionRef: 'increment', inputs: { count } } },
+      },
+    ] },
+  },
+};
+
+export const screen = renderer.mount({ target, source });
+await screen.whenRendered();
+```
+
+렌더러는 한 View에서 Svelte와 DOM을 연결합니다. 예제 셋의 `dependencies: [ui]`는 기본 UI를 함께 등록합니다. CSS import와 `data-viewstem-ui`로 마운트 영역에 스타일을 적용합니다. Card가 단일 루트가 되고 `default` 슬롯에 두 컴포넌트가 들어갑니다.
+
+기본 `shadcn.Button`이 `click`을 보냅니다. 핸들러가 `/states/count`를 Action의 `State` 포트에 연결하므로 Action은 쓰기 가능한 핸들을 받습니다. Svelte 컴포넌트는 같은 경로를 `Value` 포트에 연결해 타입이 추론된 노드에서 숫자를 읽습니다.
+
+앱을 실행하면 카운트가 0부터 시작합니다. **+1**을 클릭하면 1, 포커스가 있는 버튼에서 Enter를 누르면 2가 표시됩니다. `screen.whenRendered()`는 첫 표시를 기다립니다. View 핸들도 필요하면 `await screen.ready`를 사용하세요. 화면만 닫을 때는 `await screen.unmount()`, 앱에서 렌더러 사용을 끝낼 때는 `await renderer.dispose()`를 호출하세요.
+
+카운터의 입력 경로를 `/states/coutn`으로 바꾸면 첫 화면 준비가 실패하고 아래 오류를 반환합니다. [오류 레퍼런스](../../errors/#failure-and-recovery)
+
+```json
+{
+  "code": "REFERENCE_NOT_FOUND",
+  "message": "Unknown State \"coutn\".",
+  "location": "/render/slots/default/0/inputs/count/@path",
+  "input": "count"
+}
+```

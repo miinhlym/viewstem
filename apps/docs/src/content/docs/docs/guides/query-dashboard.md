@@ -5,13 +5,15 @@ sidebar:
   order: 2
 ---
 
-Show an activity count for the last 7 or 30 days. Complete the [Quick Start](../../quickstart/), keep `<div id="viewstem"></div>` in `index.html`, and replace `src/main.js` with the example below. Run `npm run dev` and open the URL printed by Vite. The example uses simulated HTTP responses, so it runs without an API server.
+Show an activity count for the last 7 or 30 days. Complete the [Quick Start](../../quickstart/), keep `<div id="viewstem" data-viewstem-ui></div>` in `index.html`, and replace `src/main.js` with the example below. Run `npm run dev` and open the URL printed by Vite. The example uses simulated HTTP responses, so it runs without an API server.
 
 ## Connect the period to a Query
 
 ```js title="src/main.js"
 import { createHttpExecutor } from '@viewstem/core/http';
-import { createRenderer } from '@viewstem/ui';
+import { createRuntime } from '@viewstem/core';
+import { createRenderer } from '@viewstem/dom';
+import { ui } from '@viewstem/ui';
 import '@viewstem/ui/styles.css';
 
 const requestExecutor = createHttpExecutor({
@@ -44,7 +46,9 @@ const choices = [
 ];
 
 const target = document.querySelector('#viewstem');
-const renderer = createRenderer({ requestExecutor });
+const runtime = createRuntime({ requestExecutor });
+runtime.registry.registerResourceSet(ui);
+const renderer = createRenderer({ runtime });
 const source = {
   states: { period: { kind: 'State', schema: string, initial: 'week' } },
   queries: {

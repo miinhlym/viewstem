@@ -71,6 +71,7 @@ type JsonValue = null | boolean | number | string
 | <a id="reaction"></a>`Reaction` | [state-and-ports](/docs/dsl/state-and-ports/) |
 | <a id="componentpubliccontract"></a>`ComponentPublicContract` | [view-and-component](/docs/dsl/view-and-component/) |
 | <a id="componentcontract"></a>`ComponentContract` | [registry](/docs/core/registry/) |
+| <a id="componentinputs"></a>`ComponentInputs<Contract>` | Readonly inputs inferred from a [ready Component's ports](/docs/svelte/adapters/#readiness-and-identity). |
 | <a id="componentspec"></a>`ComponentSpec` | [view-and-component](/docs/dsl/view-and-component/) |
 | <a id="viewspec"></a>`ViewSpec` | [view-and-component](/docs/dsl/view-and-component/) |
 | <a id="componentnode"></a>`ComponentNode` | [view-and-component](/docs/dsl/view-and-component/) |

@@ -30,7 +30,7 @@ You provide the components, markup, and styling. Register your own adapters. Use
 | --- | --- |
 | [Renderer setup and registration](./renderer/) | `createRenderer`, `Renderer`, `RendererOptions`, `RenderOptions` |
 | [View handles and timing](./mounted-view/) | `MountedView`, `RenderAttachment` |
-| [Adapter contract](./adapters/) | `ComponentAdapter`, `ComponentAdapterProps`, `ComponentRegistration` |
+| [Adapter contract](./adapters/) | `ComponentAdapter`, `ComponentAdapterProps`, `ComponentBinding` |
 | [Svelte host component](./viewstem-view/) | `ViewstemView`, `ViewstemViewProps` |
 | [Errors and fallback](./errors/) | `transformError`, `RendererDiagnostic`, `RendererErrorListener`, `RenderFallback` |
 | [Type index](./types/) | Renderer-owned types and links to the shared core contracts |

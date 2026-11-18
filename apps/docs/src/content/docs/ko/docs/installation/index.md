@@ -16,8 +16,9 @@ Viewstem 패키지는 공개 npm 레지스트리에 아직 발행되지 않았�
 | 하려는 일 | 필요한 패키지 |
 |---|---|
 | DOM 없이 실행·상태·Query를 사용하기 | `@viewstem/core` |
-| 공통 UI 카탈로그를 브라우저 DOM에 렌더링하기 | `@viewstem/core`, `@viewstem/ui` ([로컬 빌드 및 설치](../ui/guides/mount-in-browser/)) |
-| 직접 만든 Svelte 컴포넌트로 렌더링하기 | `@viewstem/core`, `@viewstem/svelte` |
+| DOM 컴포넌트로 View 렌더링하기 | `@viewstem/core`, `@viewstem/dom` |
+| 공통 UI 카탈로그를 브라우저 DOM에 렌더링하기 | `@viewstem/core`, `@viewstem/dom`, `@viewstem/ui` |
+| 직접 만든 Svelte 컴포넌트로 렌더링하기 | `@viewstem/core`, `@viewstem/dom`, `@viewstem/svelte` |
 
 ### Core만 설치하기
 
@@ -38,16 +39,16 @@ npm pack -w @viewstem/core --pack-destination ../viewstem-packages
 ```sh
 npm run build:ui
 mkdir -p ../viewstem-packages
-npm pack -w @viewstem/core -w @viewstem/ui --pack-destination ../viewstem-packages
+npm pack -w @viewstem/core -w @viewstem/dom -w @viewstem/ui --pack-destination ../viewstem-packages
 ```
 
-앱 디렉터리에서 두 tarball을 설치합니다. 아래 경로는 앱과 `viewstem-packages`가 같은 상위 디렉터리에 있을 때의 예입니다.
+앱 디렉터리에서 세 tarball을 함께 설치합니다. 아래 경로는 앱과 `viewstem-packages`가 같은 상위 디렉터리에 있을 때의 예입니다.
 
 ```sh
-npm install ../viewstem-packages/viewstem-core-0.1.0.tgz ../viewstem-packages/viewstem-ui-0.1.0.tgz
+npm install ../viewstem-packages/viewstem-core-0.1.0.tgz ../viewstem-packages/viewstem-dom-0.1.0.tgz ../viewstem-packages/viewstem-ui-0.1.0.tgz
 ```
 
-[빠른 시작](../quickstart/)은 순수 JS Vite 앱이나 기존 앱의 브라우저 컨테이너에서 실행할 수 있습니다.
+직접 만든 DOM 컴포넌트만 사용한다면 `npm run build:dom`으로 빌드하고 UI 워크스페이스와 tarball을 생략하세요. UI 카탈로그도 설치했다면 [빠른 시작](../quickstart/)으로 이어가세요.
 
 ## Svelte 패키지 빌드 및 설치
 
@@ -56,13 +57,13 @@ npm install ../viewstem-packages/viewstem-core-0.1.0.tgz ../viewstem-packages/vi
 ```sh
 npm run build:svelte
 mkdir -p ../viewstem-packages
-npm pack -w @viewstem/core -w @viewstem/svelte --pack-destination ../viewstem-packages
+npm pack -w @viewstem/core -w @viewstem/dom -w @viewstem/svelte --pack-destination ../viewstem-packages
 ```
 
-Svelte 앱 폴더에서 두 tarball을 함께 설치하세요.
+Svelte 앱 폴더에서 세 tarball을 함께 설치하세요.
 
 ```sh
-npm install ../viewstem-packages/viewstem-core-0.1.0.tgz ../viewstem-packages/viewstem-svelte-0.1.0.tgz
+npm install ../viewstem-packages/viewstem-core-0.1.0.tgz ../viewstem-packages/viewstem-dom-0.1.0.tgz ../viewstem-packages/viewstem-svelte-0.1.0.tgz
 ```
 
 [Svelte 연결 가이드](../svelte/guides/mount-in-svelte/)로 이어가세요.

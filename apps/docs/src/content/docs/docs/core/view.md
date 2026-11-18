@@ -28,12 +28,21 @@ Compatible retained nodes keep State and lifetimes. Removing nodes, changing the
 
 In the current implementation, a retained Query use also retains `refresh` and `intervalMs` settings omitted from `updateDefinition`. Omission does not restore their defaults. Set `refresh` explicitly; use `replace` when you need a new Query lifetime with fresh defaults. See [Query settings](../../dsl/queries/).
 
+Use `setInputs(inputs)` to replace the full input map while keeping the current definition and resource configuration.
+
+<a id="applyresourcesets"></a>
+## applyResourceSets(options)
+
+Pass `{ setIds, definition?, inputs?, states?, signal? }` with one or more set IDs already registered in the Runtime's Registry. If omitted, the current definition and inputs are retained. The new resource configuration and definition commit together after validation. Compatible nodes keep their State and lifetimes. A conflict that requires changing an existing definition or binding rejects the application. The optional signal cancels preparation before commit.
+
 <a id="replace"></a>
 ## replace(source, options?)
 
 `replace(source: ViewSource, options?): Promise<ViewApplication>` validates the target, injects current registry definitions and starts a new lifetime with fresh initial State. Inputs default to `{}`. Previous event capabilities, owned Query work and child Actions become stale. URL replacement also removes old owned keys. Permission checks apply to replacement of an existing View.
 
-Both methods return a `ViewApplication`. Await `view.whenSettled(application)` for initial executable Queries. Read `queryErrors`; completion does not guarantee Query success. A newer application or disposal can cancel an earlier completion promise.
+To adopt Registry replacements without editing the View definition, call `view.replace(view.exportDefinition(), { inputs, url })` with the inputs the new lifetime needs and any URL bindings to reconnect.
+
+All four operations return a `ViewApplication`. Await `view.whenSettled(application)` for initial executable Queries and inspect `queryErrors`. A newer application or disposal can cancel an earlier completion promise.
 
 ## emit(target, event, payload)
 

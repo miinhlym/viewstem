@@ -43,12 +43,15 @@ Supply a fallback snippet through `RenderOptions` or `ViewstemViewProps`. It rec
 | Failure | Where it appears |
 | --- | --- |
 | Invalid options, registration, or target | The relevant setup call throws synchronously. |
-| View preparation or first render fails during mount | `screen.ready` rejects and the target reservation is released. Fix the issue before mounting again. |
+| View preparation fails during mount | `screen.ready` and `screen.whenRendered()` reject. `onError` receives a `prepare` diagnostic and the target reservation is released. |
 | `ViewstemView` source preparation fails | `prepareError` receives the public error and `onError` receives one `prepare` diagnostic. `whenRendered()` rejects with the same error. |
+| An input fails during node evaluation | `onError` receives a `node` diagnostic. The adapter can display the node's error state, which counts as a completed render. |
 | Eligible initial Query fails | The completion report contains an entry in `queryErrors`. |
-| Svelte implementation is missing or an adapter render fails | The boundary reports `REFERENCE_NOT_FOUND` or `INTERNAL_ERROR`, respectively. A live connection can show a fallback and retry on the next projection. |
+| Svelte implementation is missing or an adapter render fails | The display reports a `render` diagnostic with `REFERENCE_NOT_FOUND` or `INTERNAL_ERROR`, respectively. A live connection can show a fallback and retry on the next projection. |
 | Adapter `emit()` fails | The call's promise rejects. Action failures from events handled by Core also produce an `action` diagnostic. Handle adapter readiness failures (`INPUT_NOT_READY`) and stale connections (`CANCELLED`) through the `emit()` rejection. |
 | A direct `view.invokeAction()` or View change fails | The call's promise rejects. |
 | A wait is cancelled by teardown or a new application | The waiting promise rejects with `CANCELLED`. |
 
 An active render failure can reject `whenRendered()` and renderer-aware `whenSettled(application)` even if a fallback is visible. Core changes that completed before the failure remain applied.
+
+A missing declaration produces a preparation error. Read `error.message` for the missing name and `error.location` for the JSON Pointer to its use. For example, `/render/slots/default/0/inputs/count/@path` identifies the misspelled State path in the [mixed counter example](../guides/mount-in-svelte/#mix-default-ui). A registered resource's pointer starts at its declaration document and includes `/spec`. If an update is rejected, the open View keeps its previous definition, State, and display. A declared State that lacks a required value puts the dependent node in `pending`.

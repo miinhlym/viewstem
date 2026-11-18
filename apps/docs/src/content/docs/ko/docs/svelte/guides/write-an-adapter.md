@@ -48,27 +48,26 @@ sidebar:
 다음 코드를 `main.ts`에 넣습니다. `Panel` 계약은 `body`와 페이로드가 `null`인 `reveal` 이벤트를 선언합니다. View는 `body`에 `Label`을 전달하고 자체 State로 표시 여부를 정합니다.
 
 ```ts
-import { createRenderer } from '@viewstem/svelte';
+import { defineResourceSet } from '@viewstem/core';
+import { createRenderer, svelteComponent } from '@viewstem/svelte';
 import Panel from './Panel.svelte';
 import { label } from './label.js';
 
 const target = document.getElementById('app');
 if (!target) throw new Error('#app 요소가 필요합니다.');
 
-const renderer = createRenderer({ components: [
+const renderer = createRenderer();
+renderer.runtime.registry.registerResourceSet(defineResourceSet({ id: 'details', version: '1', components: [
   label,
-  {
-    contract: {
+  svelteComponent({
       kind: 'Component',
       id: 'Panel',
       spec: {
         slots: { body: {} },
         events: { reveal: { schema: { type: 'null' } } },
       },
-    },
-    component: Panel,
-  },
-] });
+  }, Panel),
+] }));
 
 const mounted = renderer.mount({
   target,

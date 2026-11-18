@@ -3,17 +3,19 @@ title: 브라우저 UI API
 description: 카탈로그 등록, 기존 View 연결, 스타일과 지원 메타데이터 import를 설명합니다.
 ---
 
-`@viewstem/ui`는 `createRenderer`, `registerShadcn`과 공개 타입 `RendererOptions`, `Renderer`, `MountedView`, `RenderAttachment`, `RendererDiagnostic`, `RendererErrorListener`를 제공합니다.
-
-## 렌더러 만들기
-
-`createRenderer()`는 기본 카탈로그가 포함된 Runtime을 만들고 소유합니다. 자체 Runtime을 구성하려면 `createRenderer({ requestExecutor, onError })`처럼 옵션을 전달하세요. 기존 Runtime을 빌릴 때는 `createRenderer({ runtime, onError })`를 호출합니다.
-
-주입할 Runtime에 카탈로그가 필요하면 View를 만들기 전에 `registerShadcn(runtime.registry)`를 한 번 호출하세요. 357개 Component 계약을 한 묶음으로 등록합니다. 중복 ID가 있으면 이전 Registry가 유지됩니다.
+`@viewstem/ui`의 `ui` 셋을 `runtime.registry.registerResourceSet(ui)`로 등록하고 View를 생성합니다. `@viewstem/dom`의 `createRenderer`에 `{ runtime }`을 전달합니다. 마운트 대상에 `data-viewstem-ui`를 지정하면 스타일이 적용됩니다. 리소스 ID가 충돌하면 기존 Registry가 유지됩니다.
 
 ## 새 View 마운트
 
-`renderer.mount({ target, source, inputs?, url?, onError? })`는 화면 핸들을 즉시 반환합니다. `await screen.ready`는 첫 DOM 반영 뒤 View를 반환합니다. State를 쓰고 표시를 확인할 때는 `await screen.whenRendered()`를 사용하세요. 최초 Query 보고와 DOM 반영이 필요하면 `await screen.whenSettled(view.initial)`을 호출하고 `queryErrors`를 확인하세요. `setInputs()`, `updateDefinition()`, `replace()`가 반환한 적용 핸들도 `whenSettled()`에 전달할 수 있습니다. `setInputs()`는 입력 맵 전체를 교체합니다. [View 연산](../../core/view/)을 참고하세요.
+`renderer.mount({ target, source, inputs?, url?, onError? })`는 화면 핸들을 즉시 반환합니다.
+
+| 대기 | 결과 |
+|---|---|
+| `await screen.ready` | View 준비와 표시 연결 성립 뒤의 View |
+| `await screen.whenRendered()` | 첫 렌더나 State 갱신에 따른 해당 표시 연결의 DOM 반영 |
+| `await screen.whenSettled(application)` | 해당 적용의 최초 Query 보고와 표시 연결의 DOM 반영. `queryErrors`를 확인합니다. |
+
+최초 적용은 `view.initial`로 관찰합니다. 이후에는 `setInputs()`, `updateDefinition()`, `applyResourceSets()`, `replace()`가 반환한 적용 핸들을 사용합니다. [View 연산](../../core/view/)을 참고하세요.
 
 `await screen.unmount()`는 준비 중인 작업을 취소하고 소유 View와 DOM의 정리를 기다립니다. Query가 요청 실행기에 도달하기 전에 닫으면 요청을 시작하지 않습니다. 이미 시작한 요청에는 중단 신호를 보내고 늦게 도착한 결과는 폐기합니다.
 
@@ -23,15 +25,15 @@ description: 카탈로그 등록, 기존 View 연결, 스타일과 지원 메타
 
 `renderer.attach(view, target, { onError }?)`는 `whenRendered()`, `whenSettled(application)`, `detach()`가 있는 연결을 반환합니다. `await attachment.detach()`는 DOM과 구독을 정리합니다. 빌린 View는 소유자가 폐기합니다.
 
-두 경로 모두 문서에 연결된 미예약 HTML 요소가 필요합니다. 정리가 끝난 뒤 대상을 재사용하세요. `await renderer.dispose()`는 렌더러가 만든 화면과 대여 연결, 내부에서 생성한 Runtime을 정리합니다. 주입 Runtime의 수명은 호스트가 관리합니다.
+두 경로 모두 문서에 연결된 미예약 HTML 요소가 필요합니다. 정리가 끝난 뒤 대상을 재사용하세요. `await renderer.dispose()`는 렌더러가 만든 화면과 대여 연결을 정리합니다. Runtime은 호스트가 `runtime.dispose()`로 정리합니다.
 
 ## 오류와 진단
 
 | 상황 | 확인할 위치 |
 | --- | --- |
 | 대상이 없거나 연결되지 않았거나 이미 예약됨 | `mount()` 또는 `attach()`의 동기 예외 |
-| 정의 준비·최초 렌더 실패 | `screen.ready`가 자동 정리 후 거절. `onError`에 `prepare` 또는 `render` 진단 |
-| `attach()`에서 대여 View의 최초 렌더 실패 | `attach()`의 동기 예외 |
+| View 준비 실패 | `screen.ready`가 정리 후 거절하고 `onError`에서 `prepare` 진단을 받습니다. |
+| 컴포넌트 렌더 실패 | 해당 표시 연결의 `whenRendered()`가 거절하고 `onError`에서 `render` 진단을 받습니다. |
 | 이후 노드·Query·UI 이벤트 Action·URL·렌더 오류 | `onError` 진단. 최초 Query 실패는 `whenSettled()`의 `queryErrors`에도 기록 |
 | 직접 실행한 `view.invokeAction()` 또는 View 변경 실패 | 해당 호출의 Promise 거절 |
 | 정리나 새 적용으로 완료 대기가 취소됨 | 대기 Promise가 `CANCELLED`로 거절 |

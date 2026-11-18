@@ -5,19 +5,23 @@ sidebar:
   order: 1
 ---
 
-Show a message when a required name is empty or contains only whitespace. Complete the [Quick Start](../../quickstart/), keep `<div id="viewstem"></div>` in `index.html`, and replace `src/main.js` with the example below. Run `npm run dev` and open the URL printed by Vite.
+Show a message when a required name is empty or contains only whitespace. Complete the [Quick Start](../../quickstart/), keep `<div id="viewstem" data-viewstem-ui></div>` in `index.html`, and replace `src/main.js` with the example below. Run `npm run dev` and open the URL printed by Vite.
 
 ## Connect the input and validation message
 
 ```js title="src/main.js"
-import { createRenderer } from '@viewstem/ui';
+import { createRuntime } from '@viewstem/core';
+import { createRenderer } from '@viewstem/dom';
+import { ui } from '@viewstem/ui';
 import '@viewstem/ui/styles.css';
 
 const string = { type: 'string' };
 const name = { '@path': '/states/name' };
 
 const target = document.querySelector('#viewstem');
-const renderer = createRenderer();
+const runtime = createRuntime();
+runtime.registry.registerResourceSet(ui);
+const renderer = createRenderer({ runtime });
 const source = {
   states: {
     name: { kind: 'State', schema: string, initial: '' },

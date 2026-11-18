@@ -44,7 +44,7 @@ Query가 요청 실행기에 도달하기 전에 닫으면 요청을 시작하�
 
 View와 렌더러가 같은 Runtime을 사용하면 동일한 Registry를 참조합니다. 호스트가 소유한 Runtime을 공유하려면 `createRenderer({ runtime })`으로 렌더러를 생성하세요.
 
-다른 Runtime의 View라면 참조하는 각 Component ID의 코드형 또는 선언형 종류가 두 Registry에서 일치해야 합니다. 코드형 Component마다 같은 공개 계약과 Svelte 구현을 등록하세요. 렌더러는 자체 Registry와 어댑터 등록을 사용하며 두 Registry의 호환성 검증은 호스트가 담당합니다.
+다른 Runtime의 View를 빌릴 때는 View를 생성하는 Runtime에 컴포넌트를 등록하세요. 렌더러는 View에 연결된 구현을 사용하고 그 구현을 표시할 연결자를 공급합니다. 예를 들어 `svelteComponent()`로 등록된 구현은 렌더러의 기본 Svelte 연결자로 표시할 수 있습니다. 외부 연결자가 필요한 경우 렌더러를 생성할 때 전달하세요.
 
 같은 규칙이 [`renderer.attach`](../renderer/#attach)에도 적용됩니다. Svelte 앱의 자식 컴포넌트로 렌더링하려면 `ViewstemView`를, DOM 요소에 렌더러가 관리하는 루트를 만들려면 `attach`를 사용하세요.
 

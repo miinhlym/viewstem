@@ -28,12 +28,21 @@ View는 State·Query·이벤트 수명을 가진 실행 중 화면 하나입니�
 
 현재 구현에서 유지되는 Query use는 `updateDefinition`에서 생략한 `refresh`·`intervalMs` 설정도 보존합니다. 생략으로 기본값을 복원하지 마세요. `refresh`는 값을 명시하고, 새 Query 수명과 기본 설정이 필요하면 `replace`를 사용하세요. [Query 설정](../../dsl/queries/)을 참고하세요.
 
+현재 정의와 리소스 구성을 유지하면서 입력 맵 전체를 교체하려면 `setInputs(inputs)`를 사용합니다.
+
+<a id="applyresourcesets"></a>
+## applyResourceSets(options)
+
+`{ setIds, definition?, inputs?, states?, signal? }`을 전달합니다. `setIds`에는 Runtime의 Registry에 등록된 셋 ID를 하나 이상 지정합니다. 정의와 입력을 생략하면 현재 값을 유지합니다. 검증에 성공하면 리소스 구성과 정의를 함께 확정하고, 호환되는 노드의 State와 수명을 유지합니다. 기존 정의나 구현 연결을 바꿔야 하는 충돌이 있으면 적용을 거절합니다. `signal`로 확정 전 준비를 취소할 수 있습니다.
+
 <a id="replace"></a>
 ## replace(source, options?)
 
 `replace(source: ViewSource, options?): Promise<ViewApplication>`는 대상을 검증하고 최신 레지스트리 정의를 주입한 뒤 초기 State를 가진 새 수명을 시작합니다. 입력의 기본값은 `{}`입니다. 이전 이벤트 대상·소유 Query 작업·하위 Action은 유효하지 않게 됩니다. URL 교체는 이전 소유 키도 제거합니다. 기존 View를 교체할 때 권한 검사를 적용합니다.
 
-두 메서드는 `ViewApplication`을 반환합니다. `view.whenSettled(application)`으로 처음 실행 가능한 Query들의 완료를 기다립니다. 완료가 Query 성공을 보장하지 않으므로 `queryErrors`를 확인하세요. 새 적용이나 폐기는 이전 완료 약속을 취소할 수 있습니다.
+View 정의를 수정하지 않고 교체된 리소스를 반영하려면 `view.replace(view.exportDefinition(), { inputs, url })`에 새 수명에 필요한 입력과 다시 연결할 URL 바인딩을 전달합니다.
+
+네 연산은 `ViewApplication`을 반환합니다. `view.whenSettled(application)`으로 처음 실행 가능한 Query들의 완료를 기다리고 `queryErrors`를 확인합니다. 새 적용이나 폐기는 이전 대기를 취소할 수 있습니다.
 
 ## emit(target, event, payload)
 

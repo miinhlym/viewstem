@@ -14,13 +14,16 @@ First [prepare the example entry point](../mount-in-svelte/#prepare-entry) so `i
 ## 1. Mount and wait for the DOM
 
 ```ts
+import { defineResourceSet } from '@viewstem/core';
 import { createRenderer, type ViewSpec } from '@viewstem/svelte';
 import { label } from './label.js';
 
 const target = document.getElementById('app');
 if (!target) throw new Error('Missing #app element.');
 
-const renderer = createRenderer({ components: [label] });
+const renderer = createRenderer();
+
+renderer.runtime.registry.registerResourceSet(defineResourceSet({ id: 'labels', version: '1', components: [label] }));
 
 const spec: ViewSpec = {
   states: {
@@ -41,7 +44,7 @@ await mounted.whenRendered();
 console.log(target.textContent?.trim()); // Saved draft
 ```
 
-`ready` returns the View after the first DOM update. Use `whenSettled(view.initial)` if you also need the eligible initial Query report and its DOM update. After a State write, `whenRendered()` waits for the DOM update. Query execution and browser paint run independently of that DOM wait.
+`ready` returns the View after preparation and connection. Use `whenSettled(view.initial)` if you also need the eligible initial Query report and its DOM update. After a State write, `whenRendered()` waits for the DOM update. Query execution and browser paint run independently of that DOM wait.
 
 ## 2. Update the current View, then replace its lifetime
 

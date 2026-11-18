@@ -5,13 +5,15 @@ sidebar:
   order: 2
 ---
 
-최근 7일 또는 30일의 방문 횟수를 표시합니다. [시작 가이드](../../quickstart/)를 완료한 뒤 `index.html`의 `<div id="viewstem"></div>`를 유지하고 `src/main.js`를 아래 코드로 교체하세요. `npm run dev`를 실행하고 Vite가 출력하는 URL을 여세요. 모의 HTTP 응답을 사용하므로 API 서버 없이 실행할 수 있습니다.
+최근 7일 또는 30일의 방문 횟수를 표시합니다. [시작 가이드](../../quickstart/)를 완료한 뒤 `index.html`의 `<div id="viewstem" data-viewstem-ui></div>`를 유지하고 `src/main.js`를 아래 코드로 교체하세요. `npm run dev`를 실행하고 Vite가 출력하는 URL을 여세요. 모의 HTTP 응답을 사용하므로 API 서버 없이 실행할 수 있습니다.
 
 ## 기간을 Query에 연결하기
 
 ```js title="src/main.js"
 import { createHttpExecutor } from '@viewstem/core/http';
-import { createRenderer } from '@viewstem/ui';
+import { createRuntime } from '@viewstem/core';
+import { createRenderer } from '@viewstem/dom';
+import { ui } from '@viewstem/ui';
 import '@viewstem/ui/styles.css';
 
 const requestExecutor = createHttpExecutor({
@@ -44,7 +46,9 @@ const choices = [
 ];
 
 const target = document.querySelector('#viewstem');
-const renderer = createRenderer({ requestExecutor });
+const runtime = createRuntime({ requestExecutor });
+runtime.registry.registerResourceSet(ui);
+const renderer = createRenderer({ runtime });
 const source = {
   states: { period: { kind: 'State', schema: string, initial: 'week' } },
   queries: {

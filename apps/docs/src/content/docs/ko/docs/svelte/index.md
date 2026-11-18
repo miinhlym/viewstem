@@ -30,7 +30,7 @@ sidebar:
 | --- | --- |
 | [렌더러 설정과 등록](./renderer/) | `createRenderer`, `Renderer`, `RendererOptions`, `RenderOptions` |
 | [View 핸들과 완료 시점](./mounted-view/) | `MountedView`, `RenderAttachment` |
-| [어댑터 계약](./adapters/) | `ComponentAdapter`, `ComponentAdapterProps`, `ComponentRegistration` |
+| [어댑터 계약](./adapters/) | `ComponentAdapter`, `ComponentAdapterProps`, `ComponentBinding` |
 | [Svelte 호스트 컴포넌트](./viewstem-view/) | `ViewstemView`, `ViewstemViewProps` |
 | [오류와 폴백](./errors/) | `transformError`, `RendererDiagnostic`, `RendererErrorListener`, `RenderFallback` |
 | [타입 색인](./types/) | 렌더러 전용 타입과 공용 Core 타입의 레퍼런스 |

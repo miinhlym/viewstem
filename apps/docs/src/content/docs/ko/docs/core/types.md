@@ -71,6 +71,7 @@ type JsonValue = null | boolean | number | string
 | <a id="reaction"></a>`Reaction` | [state-and-ports](/ko/docs/dsl/state-and-ports/) |
 | <a id="componentpubliccontract"></a>`ComponentPublicContract` | [view-and-component](/ko/docs/dsl/view-and-component/) |
 | <a id="componentcontract"></a>`ComponentContract` | [registry](/ko/docs/core/registry/) |
+| <a id="componentinputs"></a>`ComponentInputs<Contract>` | [준비된 Component의 포트](/ko/docs/svelte/adapters/#준비-상태와-노드-동일성)에서 추론한 읽기 전용 입력 |
 | <a id="componentspec"></a>`ComponentSpec` | [view-and-component](/ko/docs/dsl/view-and-component/) |
 | <a id="viewspec"></a>`ViewSpec` | [view-and-component](/ko/docs/dsl/view-and-component/) |
 | <a id="componentnode"></a>`ComponentNode` | [view-and-component](/ko/docs/dsl/view-and-component/) |
