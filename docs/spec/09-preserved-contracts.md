@@ -133,6 +133,8 @@ D150의 호스트 API는 Store와 View를 먼저 커밋한다. 이전 소유 키
 
 최초 성공 로드는 기본값 뒤 URL을 복원하고, 같은 renderer의 명시 전체 교체는 이전 화면 소유 상태를 정리하고 새 초기값으로 커밋한 뒤 이전 URL key 정리를 시도한다. URL 정리 실패는 위 U33을 따른다. 같은 화면의 뒤로/앞으로 복원과 새 페이지·탭의 공유 링크 복원은 지원 의미에 포함된다. 살아 있는 renderer의 다른 화면 목적 URL과 리소스를 함께 조율하는 SPA 전환·reset/restore 옵션은 현재 범위에 복원하지 않는다. URL 연결·어댑터는 아래 U13, 오류 DTO는 공통 오류 계약을 따른다. [E46]
 
+선택한 키만 제거할 때는 선택 밖의 키에 대기 중인 State 쓰기를 다시 유효한 작업으로 전달한다. 지연된 최초 복원 자체가 실패하면 `UrlConnection.ready`는 `kind: 'connect'` 진단으로 거절한다. 명시적으로 준비를 닫으면 `ready`가 이행해도 `isReady()`는 false다. URL 단계와 키는 연결의 `UrlDiagnostic`으로 관찰한다.
+
 ### URL 어댑터와 제한 프로필
 
 **확정(U13):** `store.connectUrl({adapter, bindings, limits})`로 연결한다. bindings는 `{target:StateHandle, key?, history?}` 배열이며 기본 key는 p. + 로컬 이름, history 기본값은 replace다. 서로 다른 scope라도 최종 key 중복은 오류다. 반환 핸들의 dispose는 연결만 해제하고 URL을 지우지 않는다.

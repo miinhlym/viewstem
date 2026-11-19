@@ -39,6 +39,7 @@ type JsonValue = null | boolean | number | string
 | <a id="storeobservation"></a>`StoreObservation` | [state-store](/ko/docs/core/state-store/) |
 | <a id="urladapter"></a>`UrlAdapter` | [url](/ko/docs/core/url/) |
 | <a id="urlconnection"></a>`UrlConnection` | [url](/ko/docs/core/url/) |
+| <a id="urldiagnostic"></a>`UrlDiagnostic` | [URL](/ko/docs/core/url/) |
 | <a id="statestore"></a>`StateStore` | [state-store](/ko/docs/core/state-store/) |
 | <a id="createstatestore"></a>`createStateStore` | [state-store](/ko/docs/core/state-store/) |
 | <a id="clock"></a>`Clock` | [state-store](/ko/docs/core/state-store/) |

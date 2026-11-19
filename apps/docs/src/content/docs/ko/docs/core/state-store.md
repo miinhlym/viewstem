@@ -26,7 +26,7 @@ scope가 없는 `StateStore`를 반환합니다. 호스트가 만든 Store는 `c
 | `subscribe(selector, listener)` | `null`, `StateAddress` 하나 또는 주소 배열; 구독 해제 함수 | 현재 관찰값을 즉시 전달하고 이후 해당 변경을 전달합니다. `null`은 전체 State입니다. |
 | `registerReaction(owner, reaction)` | 발급된 `StateScope`; `{ watch: StateHandle[], target: StateHandle, value: unknown }`; 해제 함수 | 감시 값이 바뀌면 고정값을 설정합니다. watch는 비어 있으면 안 되며 중복 target reaction과 순환을 거절합니다. |
 | `connectUrl(options)` | `UrlConnection` 반환 | Store당 활성 연결 하나입니다. [URL](../url/)에서 설명합니다. |
-| `getDiagnostics()` | `readonly PublicError[]` | 관찰자·정리·연결에서 수집한 진단입니다. 호출자의 현재 연산이 직접 던진 예외와 구분하세요. |
+| `getDiagnostics()` | `readonly PublicError[]` | Store 관찰자와 정리 오류를 모읍니다. URL 연결 오류는 `connection.getDiagnostics()`에서 읽습니다. |
 | `dispose()` | void | URL, 모든 scope, 시계 구독, 관찰자를 정리합니다. |
 
 reaction은 같은 변경 확정 과정에 포함됩니다. 호출자가 같은 배치에서 reaction의 target을 명시적으로 썼다면 해당 확정 과정에서는 명시적 쓰기가 우선합니다. listener에서 발생한 쓰기는 현재 전달 중인 관찰값을 바꾸지 않고 큐에 들어갑니다. listener 예외는 진단으로 기록합니다.

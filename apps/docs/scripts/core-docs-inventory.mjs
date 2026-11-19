@@ -8,7 +8,7 @@ export const routes = {
   runtime: 'Runtime createRuntime RuntimeOptions RuntimeSettings ViewSource ViewOptions ViewApplication ActionRequest InitialReport PublicError TimerClock',
   view: 'View ViewSnapshot NodeSnapshot QueryHandle QuerySnapshot ActionSnapshot',
   'state-store': 'StateStore createStateStore StateScope StateHandle StateAddress StateDeclaration StoreObservation ValueSnapshot Clock',
-  url: 'UrlAdapter UrlConnection mergeOwnedUrl',
+  url: 'UrlAdapter UrlConnection UrlDiagnostic mergeOwnedUrl',
   http: 'HttpExecutorOptions createHttpExecutor HttpExecutionPlan HttpResponse RequestExecutor',
   cel: 'CelOptions CelLimits CelFunction CelValue compileCel evaluateCel defaultCelLimits',
   utilities: 'GridConfig GridPlacement computeGridLayout',

@@ -62,6 +62,8 @@ export class StateStore {
     pending.cleanup = [];
     pending.rollback = [];
     pending.deferredMutations = deferredMutations;
+    pending.explicitWrites = new Set();
+    pending.reactionBaseline = new Map();
     const restore = () => {
       this.#cells = cells; this.#reactions = reactions; this.#scopes = scopes;
       for (const [lifetime, alive] of lifetimes) lifetime.alive = alive;
@@ -73,6 +75,9 @@ export class StateStore {
     try {
       result = run();
       if (result?.then) fail('INVALID_DEFINITION');
+      if (pending.reactionBaseline.size) {
+        this.#commit(new Map(), pending.explicitWrites, 'explicit', pending.reactionBaseline);
+      }
       afterCommit = beforeNotify?.();
     }
     catch (caught) {
@@ -100,27 +105,24 @@ export class StateStore {
       afterCommit?.();
       for (const cleanup of pending.cleanup) cleanup();
     } finally { this.#notifying = wasNotifying; }
-    const changes = new Map();
-    for (const change of pending) {
-      const key = keyOf(change.target), first = changes.get(key);
-      if (first?.kind === 'added' && change.kind === 'removed') changes.delete(key);
-      else {
-        const merged = first?.kind === 'added' ? {...change,kind:'added'} : first?.kind === 'removed' && change.kind === 'added' ? {...change,kind:'replaced'} : change;
-        if (merged !== change && this.#urlChanges.has(change)) this.#urlChanges.add(merged);
-        changes.set(key, merged);
+    const lastChanges = new Map(pending.map(change => [keyOf(change.target), change]));
+    const changes = [];
+    for (const [key, last] of lastChanges) {
+      const before = cells.get(key), after = this.#cells.get(key);
+      if (!before && !after) continue;
+      if (before && before === after && same(previous.get(before).state, after.state)) {
+        after.state = previous.get(before).state;
+        continue;
       }
-    }
-    for(const [key,change] of changes) {
-      const before=cells.get(key),after=this.#cells.get(key);
-      if(before && after===before && same(previous.get(before).state,after.state)) {
-        after.state=previous.get(before).state;
-        if(change.kind==='updated')changes.delete(key);
-      }
+      const kind = !before ? 'added' : !after ? 'removed' : before === after ? 'updated' : 'replaced';
+      const change = this.#change(after ?? before, kind);
+      if (after?.generation === last.generation && this.#urlChanges.has(last)) this.#urlChanges.add(change);
+      changes.push(change);
     }
     const wasPublishing = this.#publishing;
     this.#publishing = true;
     try {
-      this.#notify([...changes.values()]);
+      this.#notify(changes);
       if (pending.baseline) for (const listener of this.#baselineListeners) listener();
     } finally { this.#publishing = wasPublishing; }
     this.#drain();
@@ -158,12 +160,21 @@ export class StateStore {
   baseline(handle) { return this.#cellFor(handle).baseline; }
   hasWritten(handle) { return this.#cellFor(handle).writes > 0; }
   observeBaseline(listener) { this.#baselineListeners.add(listener);return ()=>this.#baselineListeners.delete(listener); }
-  restore(entries, isCurrent = () => true) {
-    const prepared = new Map(entries.map(([handle,snapshot]) => {
-      const cell=this.#cellFor(handle);if(cell.derived)fail('TYPE_MISMATCH');
-      return [cell,snapshot.status === 'ready' ? this.#accept(cell,snapshot.value) : snapshot.status === 'error' ? errorState(snapshot.error) : snapshot.status === 'pending' ? pending : missing];
-    }));
-    this.#perform(() => { if (isCurrent()) this.#commit(prepared,new Set(prepared.keys()),'url'); });
+  restore(prepareEntries, isCurrent, onRestored, onFailure) {
+    this.#perform(() => {
+      if (!isCurrent()) return;
+      try {
+        const entries = prepareEntries();
+        if (!isCurrent()) return;
+        const prepared = new Map(entries.map(([handle, snapshot]) => {
+          const cell = this.#cellFor(handle);
+          if (cell.derived) fail('TYPE_MISMATCH');
+          return [cell, snapshot.status === 'ready' ? this.#accept(cell, snapshot.value) : snapshot.status === 'error' ? errorState(snapshot.error) : snapshot.status === 'pending' ? pending : missing];
+        }));
+        this.#commit(prepared, new Set(prepared.keys()), 'url');
+      } catch (caught) { onFailure(caught); return; }
+      if (isCurrent()) onRestored();
+    });
   }
   get urlConnection() { return this.#url; }
   validateUrlReservation(previous) {
@@ -191,21 +202,58 @@ export class StateStore {
     const current = () => { if (!lifetime.alive) fail('CANCELLED'); };
     const scope = Object.freeze({ scopeId,
       connectClock(target, clock) {
-        current();store.#cellFor(target);
-        if(!clock || typeof clock.now !== 'function' || typeof clock.subscribe !== 'function')fail('INVALID_DEFINITION');
-        const update=value=>{if(!Number.isSafeInteger(value))fail('TYPE_MISMATCH');target.write(value);};
-        update(clock.now());let active=true;
-        const stop=clock.subscribe(value=>{if(active&&lifetime.alive)update(value);});
-        if(typeof stop!=='function')fail('INVALID_DEFINITION');
+        store.assertCanWrite();
+        current();
+        const cell = store.#cellFor(target);
+        if (cell.derived) fail('READ_ONLY');
+        if (!clock || typeof clock.now !== 'function' || typeof clock.subscribe !== 'function') fail('INVALID_DEFINITION');
+        const isCurrent = () => lifetime.alive && store.#cells.get(keyOf(cell.address)) === cell;
+        const accept = value => {
+          if (!Number.isSafeInteger(value)) fail('TYPE_MISMATCH');
+          return store.#accept(cell, value);
+        };
+        let initial = accept(clock.now());
+        let active = true, subscribing = true, subscriptionError, stop;
+        const update = (snapshot, initialWrite = false) => {
+          store.assertCanWrite();
+          store.#perform(() => {
+            if (!active || !isCurrent()) {
+              if (initialWrite && store.#transaction) fail('CANCELLED');
+              return;
+            }
+            store.#writePrepared(new Map([[cell, snapshot]]), 'explicit');
+          });
+        };
         const unsubscribe = () => {
           if (!active) return;
           active = false;
           clockSubscriptions.delete(unsubscribe);
-          try { stop(); } catch (caught) { store.#diagnostics.push(safeError(caught)); }
+          cell.clockSubscriptions.delete(unsubscribe);
+          if (typeof stop === 'function') {
+            try { stop(); } catch (caught) { store.#diagnostics.push(safeError(caught)); }
+          }
         };
-        clockSubscriptions.add(unsubscribe);
-        store.#transaction?.rollback.push(unsubscribe);
-        return unsubscribe;
+        try {
+          if (!isCurrent()) fail('CANCELLED');
+          stop = clock.subscribe(value => {
+            if (!active || !isCurrent()) return;
+            if (subscribing) {
+              try { initial = accept(value); } catch (caught) { subscriptionError ??= caught; }
+            } else update(accept(value));
+          });
+          subscribing = false;
+          if (typeof stop !== 'function') fail('INVALID_DEFINITION');
+          if (!isCurrent()) fail('CANCELLED');
+          if (subscriptionError) throw subscriptionError;
+          clockSubscriptions.add(unsubscribe);
+          cell.clockSubscriptions.add(unsubscribe);
+          store.#transaction?.rollback.push(unsubscribe);
+          update(initial, true);
+          return unsubscribe;
+        } catch (caught) {
+          unsubscribe();
+          throw caught;
+        }
       },
       registerState(name, declaration) { current(); return store.#register(scopeId, name, declaration, false, current); },
       replaceState(name, declaration) { current(); return store.#register(scopeId, name, declaration, true, current); },
@@ -219,11 +267,14 @@ export class StateStore {
           lifetime.alive = false;
           store.#scopes.delete(scope);
           const cleanup = () => { if (!lifetime.alive) for (const stop of clockSubscriptions) stop(); };
-          if (store.#transaction) store.#transaction.cleanup.push(cleanup); else cleanup();
+          store.#afterCommit(cleanup);
         };
         const remove = () => {
           const removed = [...store.#cells.values()].filter(cell => cell.address.scopeId === scopeId);
-          for (const cell of removed) store.#cells.delete(keyOf(cell.address));
+          for (const cell of removed) {
+            store.#cells.delete(keyOf(cell.address));
+            store.#retireClock(cell);
+          }
           for (const [target, reaction] of store.#reactions) if (reaction.owner === scopeId || removed.includes(target) || reaction.watch.some(cell => removed.includes(cell))) store.#reactions.delete(target);
           store.#structuralCommit(removed.map(cell => store.#change(cell, 'removed')));
         };
@@ -242,6 +293,16 @@ export class StateStore {
 
   #lookup(address) { return this.#cells.get(keyOf(address)) ?? fail('REFERENCE_NOT_FOUND'); }
   #current(cell) { if (this.#cells.get(keyOf(cell.address)) !== cell) fail('CANCELLED'); }
+  #afterCommit(cleanup) {
+    if (this.#transaction) { this.#transaction.cleanup.push(cleanup); return; }
+    const wasNotifying = this.#notifying;
+    this.#notifying = true;
+    try { cleanup(); } finally { this.#notifying = wasNotifying; }
+  }
+  #retireClock(cell) {
+    if (!cell.clockSubscriptions.size) return;
+    this.#afterCommit(() => { for (const stop of cell.clockSubscriptions) stop(); });
+  }
   #accept(cell, value) {
     try { return Object.freeze({ status: 'ready', value: protect(cell.validator.accept(value, trustedCopies(value))) }); }
     catch (error) { throw safeError(error, 'TYPE_MISMATCH'); }
@@ -252,7 +313,7 @@ export class StateStore {
     if (replace ? !previous : previous) fail(replace ? 'REFERENCE_NOT_FOUND' : 'DUPLICATE_STATE');
     if (!declaration || typeof declaration !== 'object' || !Object.hasOwn(declaration, 'schema')) fail('INVALID_DEFINITION');
     let validator;try { validator = compileSchema(declaration.schema); } catch(caught) { throw safeError(caught,'INVALID_DEFINITION'); }
-    const cell = { address, generation: ++nextGeneration, validator, schema: structuredClone(declaration.schema), initialSettled: Object.hasOwn(declaration, 'initial'), state: missing, baseline: missing, writes: 0,
+    const cell = { address, generation: ++nextGeneration, validator, schema: structuredClone(declaration.schema), initialSettled: Object.hasOwn(declaration, 'initial'), state: missing, baseline: missing, writes: 0, clockSubscriptions: new Set(),
       derived: declaration.derived, dependencies: (declaration.dependencies ?? []).map(handle => this.#cellFor(handle)) };
     if (cell.derived && typeof cell.derived !== 'function') fail('INVALID_DEFINITION');
     // Async initialization is distinct from ordinary stored data.
@@ -271,7 +332,7 @@ export class StateStore {
         store.#current(cell); if (cell.derived) fail('READ_ONLY');
         if (cell.baseline.status === 'pending') fail('VALUE_PENDING');
         if (cell.baseline.status === 'error') throw cell.baseline.error;
-        store.#perform(() => { store.#current(cell); cell.writes++; store.#commit(new Map([[cell, cell.baseline]]), new Set([cell]), 'explicit'); });
+        store.#perform(() => store.#writePrepared(new Map([[cell, cell.baseline]]), 'explicit'));
       },
     });
     // Structural preparation occurs before replacing the old generation.
@@ -283,7 +344,10 @@ export class StateStore {
       // Later mutations in the candidate may already have touched this cell.
       if (initial) Object.assign(cell, initial);
       this.#cells.set(key, cell);
-      if (previous) for (const [target, reaction] of this.#reactions) if (target === previous || reaction.watch.includes(previous)) this.#reactions.delete(target);
+      if (previous) {
+        for (const [target, reaction] of this.#reactions) if (target === previous || reaction.watch.includes(previous)) this.#reactions.delete(target);
+        this.#retireClock(previous);
+      }
       this.#structuralCommit([this.#change(cell, previous ? 'replaced' : 'added')]);
     });
     stateHandles.add(cell.handle);
@@ -312,6 +376,7 @@ export class StateStore {
     this.#perform(() => {
       this.#current(cell); this.#cells.delete(keyOf(cell.address));
       for (const [target, reaction] of this.#reactions) if (target === cell || reaction.watch.includes(cell)) this.#reactions.delete(target);
+      this.#retireClock(cell);
       this.#structuralCommit([this.#change(cell, 'removed')]);
     });
   }
@@ -325,11 +390,12 @@ export class StateStore {
       if (prepared.has(cell)) fail('DUPLICATE_TARGET');
       prepared.set(cell, this.#accept(cell, value));
     }
-    this.#perform(() => {
-      for (const cell of prepared.keys()) this.#current(cell);
-      for (const cell of prepared.keys()) if (origin !== 'initial') cell.writes++;
-      this.#commit(prepared, new Set(prepared.keys()), origin);
-    });
+    this.#perform(() => this.#writePrepared(prepared, origin));
+  }
+  #writePrepared(prepared, origin) {
+    for (const cell of prepared.keys()) this.#current(cell);
+    for (const cell of prepared.keys()) if (origin !== 'initial') cell.writes++;
+    this.#commit(prepared, new Set(prepared.keys()), origin);
   }
   stageBatch(changes) {
     const before=new Map([...this.#cells.values()].map(cell=>[cell,cell.state]));
@@ -389,23 +455,31 @@ export class StateStore {
     // A dependency is a generation-bound cell, never an automatic name rebind.
     for (const cell of this.#order()) if (cell.derived) {
       const snapshot = this.#calculate(cell, staged); staged.set(cell, snapshot);
-      if (!same(cell.state, snapshot)) { cell.state = snapshot; changes.push(this.#change(cell, 'updated')); }
+      if (!same(cell.state, snapshot)) {
+        this.#transaction?.reactionBaseline.delete(cell);
+        cell.state = snapshot;
+        changes.push(this.#change(cell, 'updated'));
+      }
     }
     this.#notify(changes);
   }
   #commit(prepared, explicit, origin, baseline) {
-    const staged = new Map([...this.#cells.values()].map(cell => [cell, cell.state])), before=new Map(staged);
-    if(baseline)for(const [cell,snapshot] of baseline)if(before.has(cell))before.set(cell,snapshot);
+    const before = new Map([...this.#cells.values()].map(cell => [cell, cell.state]));
+    const staged = new Map(before);
+    const deferReactions = origin === 'explicit' && !baseline && this.#transaction;
+    if (deferReactions) for (const cell of explicit) deferReactions.explicitWrites.add(cell);
     for (const [cell, snapshot] of prepared) staged.set(cell, snapshot);
     for (const cell of this.#order()) {
       if (!staged.has(cell)) continue;
       if (cell.derived && cell.dependencies.some(item => !same(before.get(item) ?? missing, staged.get(item) ?? missing))) staged.set(cell, this.#calculate(cell, staged));
       const reaction = this.#reactions.get(cell);
-      if (reaction && origin === 'explicit' && !explicit.has(cell)
-        && reaction.watch.some(item => changedValue(before.get(item) ?? missing, staged.get(item) ?? missing))) staged.set(cell, reaction.value);
+      if (reaction && origin === 'explicit' && !deferReactions && !explicit.has(cell)
+        && reaction.watch.some(item => changedValue(baseline?.get(item) ?? before.get(item) ?? missing, staged.get(item) ?? missing))) staged.set(cell, reaction.value);
     }
     const changes = [];
     for (const [cell, snapshot] of staged) if (!same(cell.state, snapshot)) {
+      if (deferReactions && !deferReactions.reactionBaseline.has(cell)) deferReactions.reactionBaseline.set(cell, cell.state);
+      if (origin !== 'explicit') this.#transaction?.reactionBaseline.delete(cell);
       cell.state = snapshot;
       const change = this.#change(cell, 'updated');
       if (origin === 'explicit' || origin === 'stage') this.#urlChanges.add(change);

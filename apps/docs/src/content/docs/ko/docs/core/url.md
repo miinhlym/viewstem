@@ -44,11 +44,11 @@ interface UrlAdapter {
 
 | 멤버 | 동작 |
 |---|---|
-| `ready: Promise<void>` | 초기 동기화를 진행할 수 있을 때 완료합니다. 초기값 대기 중에는 지연될 수 있습니다. |
-| `isReady(): boolean` | 초기화 완료 여부입니다. |
+| `ready: Promise<void>` | 초기 동기화가 끝나거나 준비 중 연결을 명시적으로 닫으면 이행합니다. 지연 준비가 실패하면 `kind: "connect"` 진단으로 거절됩니다. |
+| `isReady(): boolean` | 현재 연결이 열려 있고 초기화가 성공했는지 반환합니다. |
 | `restore(): void` | 현재 URL을 다시 읽어 연결된 State에 반영합니다. |
-| `getDiagnostics(): readonly PublicError[]` | URL 파싱·제한·복원·쓰기 진단입니다. |
-| `removeOwned(selected?): Promise<void \| { applied?: boolean }>` | 전체 소유 키 또는 선택한 연결 State 핸들의 키를 제거하며 replace history를 요청합니다. |
+| `getDiagnostics(): readonly UrlDiagnostic[]` | 연결별 오류와 실패 단계 `kind`, 해당할 때 URL `key`를 반환합니다. |
+| `removeOwned(selected?): Promise<void \| { applied?: boolean }>` | 전체 또는 선택된 소유 키를 replace 방식으로 제거합니다. 선택 밖의 키에 대기 중인 State 쓰기는 유지합니다. |
 | `dispose(): void` | 관찰을 끝내고 키 소유권을 해제합니다. URL 키를 암묵적으로 지우지는 않습니다. |
 
 ## 제한

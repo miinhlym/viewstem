@@ -50,9 +50,13 @@ export interface UrlAdapter {
   read(): string; subscribe(listener: () => void): () => void;
   writeOwned(patch: Readonly<Record<string, string | null>>, context: { readonly mode: 'push' | 'replace'; readonly isCurrent: () => boolean }): Awaitable<void | { readonly applied?: boolean }>;
 }
+export interface UrlDiagnostic extends PublicError {
+  readonly kind: 'connect' | 'restore' | 'write' | 'replace-cleanup' | 'cleanup';
+  readonly key?: string;
+}
 export interface UrlConnection {
   readonly ready: Promise<void>; isReady(): boolean;
-  restore(): void; getDiagnostics(): readonly PublicError[];
+  restore(): void; getDiagnostics(): readonly UrlDiagnostic[];
   removeOwned(selected?: readonly StateHandle<any>[]): Promise<void | { readonly applied?: boolean }>;
   dispose(): void;
 }
@@ -64,7 +68,7 @@ export interface StateStore {
   subscribe(selector: null | StateAddress | readonly StateAddress[], listener: (observation: StoreObservation) => void): () => void;
   writeBatch(changes: readonly (readonly [StateHandle<any>, unknown])[]): void;
   registerReaction(owner: StateScope, reaction: { readonly watch: readonly StateHandle<any>[]; readonly target: StateHandle<any>; readonly value: unknown }): () => void;
-  connectUrl(options: { readonly adapter: UrlAdapter; readonly bindings: readonly { readonly target: StateHandle<any>; readonly key?: string; readonly history?: 'push' | 'replace' }[]; readonly restore?: boolean; readonly limits?: Partial<{ readonly maxOwnedBytes: number; readonly maxValueBytes: number; readonly maxItems: number; readonly maxKeys: number }>; readonly onError?: (error: PublicError) => void }): UrlConnection;
+  connectUrl(options: { readonly adapter: UrlAdapter; readonly bindings: readonly { readonly target: StateHandle<any>; readonly key?: string; readonly history?: 'push' | 'replace' }[]; readonly restore?: boolean; readonly limits?: Partial<{ readonly maxOwnedBytes: number; readonly maxValueBytes: number; readonly maxItems: number; readonly maxKeys: number }>; readonly onError?: (error: UrlDiagnostic) => void }): UrlConnection;
   getDiagnostics(): readonly PublicError[]; dispose(): void;
 }
 export function createStateStore(): StateStore;

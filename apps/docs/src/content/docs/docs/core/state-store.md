@@ -26,7 +26,7 @@ Returns a `StateStore` with no scopes. A host-created store can be injected into
 | `subscribe(selector, listener)` | `null`, one `StateAddress`, or address array; returns unsubscribe | Immediately delivers the current observation, then matching changes. `null` observes all State. |
 | `registerReaction(owner, reaction)` | Issued `StateScope`; `{ watch: StateHandle[], target: StateHandle, value: unknown }`; returns unregister | Sets a fixed value when watched values change. Watch list must be nonempty; duplicate target reactions and cycles are rejected. |
 | `connectUrl(options)` | Returns `UrlConnection` | One active connection per store; see [URL](../url/). |
-| `getDiagnostics()` | `readonly PublicError[]` | Collected observer/cleanup/connection diagnostics; this is not an exception thrown by the caller's current operation. |
+| `getDiagnostics()` | `readonly PublicError[]` | Collects Store observer and cleanup errors. Read URL errors through `connection.getDiagnostics()`. |
 | `dispose()` | Returns void | Ends URL wiring, all scopes, clock subscriptions and observers. |
 
 Reactions are part of the same change settlement. If the caller explicitly writes a reaction's target in that batch, the explicit write wins for that settlement. Listener-triggered writes are queued rather than changing the observation currently being delivered. Listener exceptions are recorded as diagnostics.
