@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-프로젝트 목록을 하나의 행 템플릿으로 표시합니다. [시작 가이드](../../quickstart/)에서 워크스페이스와 `<div id="viewstem" data-viewstem-ui></div>`를 준비한 뒤 클라이언트 진입 코드를 아래 코드로 교체하세요.
+프로젝트 목록을 하나의 행 템플릿으로 표시합니다. [시작 가이드](../../quickstart/)에서 워크스페이스와 `<div id="viewstem"></div>`를 준비한 뒤 클라이언트 진입 코드를 아래 코드로 교체하세요.
 
 ```js
 import { createRuntime } from '@viewstem/core';

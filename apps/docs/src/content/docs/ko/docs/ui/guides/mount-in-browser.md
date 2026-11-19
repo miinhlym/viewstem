@@ -12,7 +12,7 @@ description: Core, DOM, UI를 설치하고 브라우저에 View를 마운트합�
 패키지와 CSS import를 처리할 수 있는 브라우저 빌드를 사용하세요. 앱 HTML에 컨테이너와 클라이언트 진입점을 추가합니다.
 
 ```html
-<div id="app" data-viewstem-ui></div>
+<div id="app"></div>
 <script type="module" src="/main.js"></script>
 ```
 

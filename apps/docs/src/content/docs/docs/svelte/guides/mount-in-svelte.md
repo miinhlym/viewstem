@@ -185,7 +185,7 @@ Use a Svelte TypeScript client build and install the local Core, DOM, Svelte, an
     <title>Viewstem counter</title>
   </head>
   <body>
-    <main id="app" data-viewstem-ui></main>
+    <main id="app"></main>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
@@ -277,7 +277,7 @@ export const screen = renderer.mount({ target, source });
 await screen.whenRendered();
 ```
 
-The renderer connects Svelte and DOM in one View. The demo set registers the default UI through `dependencies: [ui]`, and the target opts into its styles with the CSS import and `data-viewstem-ui`. The Card supplies a single root and its `default` slot holds both children.
+The renderer connects Svelte and DOM in one View. The demo set registers the default UI through `dependencies: [ui]`. Import the CSS to style the elements owned by the default UI. The Card supplies a single root and its `default` slot holds both children.
 
 The default `shadcn.Button` emits `click`. Its handler binds `/states/count` to a `State` port, so the Action gets a writable handle. The Svelte component binds the same path to a `Value` port and receives the evaluated number through its typed node.
 

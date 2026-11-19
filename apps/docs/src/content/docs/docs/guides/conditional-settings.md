@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-Show the weekly digest options when email notifications are enabled. Start with the workspace setup and `<div id="viewstem" data-viewstem-ui></div>` from the [Quickstart](../../quickstart/), then replace its client entry with this code.
+Show the weekly digest options when email notifications are enabled. Start with the workspace setup and `<div id="viewstem"></div>` from the [Quickstart](../../quickstart/), then replace its client entry with this code.
 
 ```js
 import { createRuntime } from '@viewstem/core';

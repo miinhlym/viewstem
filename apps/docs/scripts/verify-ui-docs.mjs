@@ -22,8 +22,13 @@ try {
       const source = [...markdown.matchAll(/^\x60{3}js\n([\s\S]*?)^\x60{3}$/gm)]
         .map(match => match[1]).find(code => code.includes('const screen = renderer.mount'));
       assert.ok(source, route);
-      assert.doesNotMatch(source, /@viewstem\/core|\.attach\(|\.whenSettled\(/);
-      const close = route.startsWith('quickstart/') ? 'async () => { await screen.unmount(); await renderer.dispose(); }' : 'unmount';
+      assert.match(source, /runtime\.registry\.registerResourceSet\(ui\)/);
+      assert.match(source, /import ['"]@viewstem\/ui\/styles\.css['"]/);
+      const container = markdown.match(new RegExp(`<div id="${target}"[^>]*></div>`))?.[0];
+      assert.ok(container, route);
+      assert.doesNotMatch(container, /data-viewstem-ui/);
+      const close = route.startsWith('quickstart/')
+        ? 'async () => { await screen.unmount(); await renderer.dispose(); await runtime.dispose(); }' : 'shutdown';
       const { outputFiles, metafile } = await build({
         absWorkingDir: resolveDir,
         stdin: {
@@ -40,12 +45,15 @@ try {
       try {
         await page.route(`${origin}/**`, route => {
           const pathname = new URL(route.request().url()).pathname;
-          if (pathname === '/') return route.fulfill({ contentType: 'text/html', body: `<!doctype html><div id="${target}"></div><link rel="stylesheet" href="/stdin.css"><script type="module" src="/stdin.js"></script>` });
+          if (pathname === '/') return route.fulfill({ contentType: 'text/html', body: `<!doctype html>${container}<link rel="stylesheet" href="/stdin.css"><script type="module" src="/stdin.js"></script>` });
           const asset = outputFiles.find(file => file.path.endsWith(pathname));
           return asset ? route.fulfill({ contentType: pathname.endsWith('.css') ? 'text/css' : 'text/javascript', body: asset.text }) : route.abort();
         });
         await page.goto(origin);
-        await page.getByRole('button', { name: label, exact: true }).waitFor({ timeout: 10000 });
+        const button = page.getByRole('button', { name: label, exact: true });
+        await button.waitFor({ timeout: 10000 });
+        assert.equal(await button.getAttribute('data-vs-ui-owner'), 'viewstem-ui');
+        assert.ok(await button.evaluate(element => parseFloat(getComputedStyle(element).paddingInlineStart) > 8));
         await page.waitForFunction(() => typeof window.closeView === 'function');
         await page.evaluate(() => window.closeView());
         assert.equal(await page.locator(`#${target} > *`).count(), 0);

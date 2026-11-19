@@ -25,9 +25,7 @@ For a standalone screen with `@viewstem/ui` installed, pass the set directly. Th
   };
 </script>
 
-<div data-viewstem-ui>
-  <ViewstemView {source} resourceSets={[ui]} />
-</div>
+<ViewstemView {source} resourceSets={[ui]} />
 ```
 
 See the [Svelte mounting guide](https://github.com/miinhlym/viewstem/blob/main/apps/docs/src/content/docs/docs/svelte/guides/mount-in-svelte.md#existing-app) for adding a page with a shared renderer to an existing app.

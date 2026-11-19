@@ -20,7 +20,7 @@ README에서 확인하세요.
 
 ## 브라우저에 View 연결하기
 
-[설치 안내](apps/docs/src/content/docs/ko/docs/installation/index.md#브라우저-ui-패키지-빌드)에 따라 Core, DOM, UI를 설치합니다. HTML에 `<div id="panel" data-viewstem-ui></div>`를 추가하고 클라이언트에서 아래 코드를 실행합니다.
+[설치 안내](apps/docs/src/content/docs/ko/docs/installation/index.md#브라우저-ui-패키지-빌드)에 따라 Core, DOM, UI를 설치합니다. HTML에 `<div id="panel"></div>`를 추가하고 클라이언트에서 아래 코드를 실행합니다.
 
 ```ts
 import { createRuntime } from '@viewstem/core';

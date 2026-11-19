@@ -175,6 +175,7 @@
 | D166 | 등록 엔트리와 코드 바인딩의 계약 보존 | `registerAction(entry)`도 필수 호스트 기능을 보존한다. 코드 Component 바인딩을 유지할 때 포트·슬롯·이벤트를 보호하고 계약과 구현은 명시적으로 함께 교체할 수 있다. [Action 명세](../spec/04-action.md) · [브라우저 명세](../spec/12-resource-sets-browser.md) | 공개 등록 경로 차이와 호환되지 않는 계약 갱신 재현 |
 | D167 | 정리 완료와 관찰 수명 | Core Runtime과 View의 `dispose()`에서 정리를 기다릴 수 있다. 자동 정리 실패는 렌더러·화면의 오류 관찰 경로로 전달한다. 투영·View 구독은 최초 콜백 실패를 되돌리고 폐기 후 재생을 멈춘다. [호스트 명세](../spec/07-host-integration.md) | EGM 공개 API 재리뷰의 종료 및 구독 재현 |
 | D168 | URL 준비 실패와 선택 제거의 관찰 | 지연된 초기 준비 실패는 `ready` 거절과 URL 진단으로 관찰하고, 선택 제거는 나머지 키의 대기 쓰기를 보존한다. [URL 명세](../spec/09-preserved-contracts.md) | EGM 공개 API 재리뷰의 지연 어댑터 재현 |
+| D169 | UI 셋 스타일의 DOM 소유권 | 각 셋의 기본 스타일을 소유 DOM에 적용한다. 같은 셋 ID로 DOM 생성과 CSS 빌드를 연결한다. `data-viewstem-ui`는 이전 테마 지정 범위로 사용한다. [브라우저 명세](../spec/12-resource-sets-browser.md#ui-셋의-스타일-소유권) | 혼합 UI의 CSS 리셋 재현과 EGM 설계에 따라 사용자 구현 요청 |
 
 리소스 셋과 혼합 렌더링의 후속 선택은 [별도 결정 이력](resource-sets-browser-2026-11-16.md)에 있다. D144의 패키지 역할에서 바뀌는 부분과 D150–D158의 현재 호스트 구현 기준을 함께 확인할 수 있다.
 

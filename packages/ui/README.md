@@ -15,7 +15,6 @@ runtime.registry.registerResourceSet(ui);
 const renderer = createRenderer({ runtime });
 const target = document.querySelector('#app');
 if (!target) throw new Error('Missing #app element');
-target.setAttribute('data-viewstem-ui', '');
 const screen = renderer.mount({
   target,
   source: {
@@ -32,7 +31,7 @@ await screen.whenRendered();
 
 Call `await screen.unmount()` when the screen closes and `await renderer.dispose()` when the app is done with the renderer. If you need the initial Query report, use `await screen.whenSettled(view.initial)` with the View returned by `screen.ready`.
 
-Register the exported `ui` resource set on the Runtime before creating a View. Mount with `@viewstem/dom` and put `data-viewstem-ui` on the target to apply the styles. `renderer.attach(view, target)` borrows a View, and `await attachment.detach()` releases the display. `whenRendered()` waits for the requested DOM projection.
+Register the exported `ui` resource set on the Runtime before creating a View. Mount with `@viewstem/dom` and import the CSS once to style the elements owned by the default UI. `renderer.attach(view, target)` borrows a View, and `await attachment.detach()` releases the display. `whenRendered()` waits for the requested DOM projection.
 
 ## Shared JSON catalog
 
@@ -52,8 +51,10 @@ Calendar, Range Calendar, and Date Picker use Zag Vanilla for date navigation an
 
 Data Table uses TanStack Table Core. The JSON recipe keeps caller-owned sorting, filtering, pagination, and selection state. A page outside the available range is clamped for display, and a page size change starts from the first displayed row. Row IDs may be strings or numbers and must be unique after conversion to strings. `selectedIds` and `selectedIdsChange` use the string form. Selected IDs outside the current data remain in the selection state.
 
-Basecoat styles are scoped to the renderer subtree. Set `.dark` or `data-theme="dark"` on an ancestor to switch themes. Basecoat controllers are registered locally and attached to individual DOM nodes. Their teardown is part of attachment disposal. The build includes the Basecoat license in `dist/BASECOAT-LICENSE.md`.
+Basecoat styles target elements owned by the default UI. Set `.dark` or `data-theme="dark"` on an ancestor to switch themes. Basecoat controllers are registered locally and attached to individual DOM nodes. Their teardown is part of attachment disposal. The build includes the Basecoat license in `dist/BASECOAT-LICENSE.md`.
 
 ## Verify locally
 
 From the workspace root, install the locked dependencies and Chromium, then run `npm run check:ui`. The test installs the core and UI tarballs in an isolated consumer and runs the same [View JSON](test/view.json) in plain JS, React, Vue, and Svelte. The vanilla dependency and bundle checks enforce the framework boundary. The browser suite also mounts the [66 original catalog ViewSpecs](test/fixtures/samples.mjs) and verifies State and Action behavior for the date and table recipes.
+
+Set prefixed theme variables such as `--viewstem-primary` and `--viewstem-radius` on an ancestor. The legacy `data-viewstem-ui` attribute provides a boundary for older theme variables. When sets are mixed, each set's CSS directly styles its own elements.

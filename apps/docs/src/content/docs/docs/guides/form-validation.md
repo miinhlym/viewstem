@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-Show a message when a required name is empty or contains only whitespace. Complete the [Quick Start](../../quickstart/), keep `<div id="viewstem" data-viewstem-ui></div>` in `index.html`, and replace `src/main.js` with the example below. Run `npm run dev` and open the URL printed by Vite.
+Show a message when a required name is empty or contains only whitespace. Complete the [Quick Start](../../quickstart/), keep `<div id="viewstem"></div>` in `index.html`, and replace `src/main.js` with the example below. Run `npm run dev` and open the URL printed by Vite.
 
 ## Connect the input and validation message
 

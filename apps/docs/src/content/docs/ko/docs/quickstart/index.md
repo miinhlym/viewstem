@@ -10,7 +10,7 @@ JSON View로 **Hello, Viewstem** 버튼 하나를 표시합니다. 앱에서 실
 Vite로 만든 앱의 `index.html`에서 `<div id="app"></div>`를 아래 요소로 바꿉니다. 기존 앱에서는 View를 표시할 위치에 비어 있는 요소를 추가하세요.
 
 ```html
-<div id="viewstem" data-viewstem-ui></div>
+<div id="viewstem"></div>
 ```
 
 ## 2. View를 마운트

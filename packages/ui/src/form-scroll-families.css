@@ -1,11 +1,11 @@
-[data-viewstem-ui] .vs-questionnaire {
+.vs-questionnaire {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   width: 100%;
   min-width: 0;
 }
-[data-viewstem-ui] .vs-questionnaire-item {
+.vs-questionnaire-item {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -14,12 +14,12 @@
   padding: 0;
   outline: none;
 }
-[data-viewstem-ui] .vs-questionnaire-title { font-size: 1rem; line-height: 1.5rem; font-weight: 600; text-wrap: pretty; }
-[data-viewstem-ui] .vs-questionnaire-title:not(:has(~ .vs-questionnaire-description)) { margin-block-end: 1.25rem; }
-[data-viewstem-ui] .vs-questionnaire-description { color: var(--muted-foreground); font-size: var(--text-sm); line-height: var(--text-sm--line-height); text-wrap: pretty; }
-[data-viewstem-ui] .vs-questionnaire-option-label .vs-questionnaire-description { line-height: inherit; }
-[data-viewstem-ui] .vs-questionnaire-choices { display: grid; gap: .75rem; min-width: 0; }
-[data-viewstem-ui] .vs-questionnaire-choice {
+.vs-questionnaire-title { font-size: 1rem; line-height: 1.5rem; font-weight: 600; text-wrap: pretty; }
+.vs-questionnaire-title:not(:has(~ .vs-questionnaire-description)) { margin-block-end: 1.25rem; }
+.vs-questionnaire-description { color: var(--muted-foreground); font-size: var(--text-sm); line-height: var(--text-sm--line-height); text-wrap: pretty; }
+.vs-questionnaire-option-label .vs-questionnaire-description { line-height: inherit; }
+.vs-questionnaire-choices { display: grid; gap: .75rem; min-width: 0; }
+.vs-questionnaire-choice {
   display: flex;
   align-items: flex-start;
   gap: .75rem;
@@ -36,15 +36,15 @@
   user-select: none;
   transition: background-color 150ms, border-color 150ms;
 }
-[data-viewstem-ui] .vs-questionnaire-choice:hover { background: color-mix(in oklab, var(--muted) 50%, transparent); }
-[data-viewstem-ui] .vs-questionnaire-choice[data-checked] { border-color: color-mix(in oklab, var(--primary) 40%, transparent); background: var(--muted); }
-[data-viewstem-ui] .vs-questionnaire-choice[data-invalid] { border-color: var(--destructive); }
-[data-viewstem-ui] .vs-questionnaire-choice:has(> input:focus-visible) {
+.vs-questionnaire-choice:hover { background: color-mix(in oklab, var(--muted) 50%, transparent); }
+.vs-questionnaire-choice[data-checked] { border-color: color-mix(in oklab, var(--primary) 40%, transparent); background: var(--muted); }
+.vs-questionnaire-choice[data-invalid] { border-color: var(--destructive); }
+.vs-questionnaire-choice:has(> input:focus-visible) {
   border-color: var(--ring);
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
 }
-[data-viewstem-ui] .vs-questionnaire-choice[data-disabled] { pointer-events: none; opacity: .5; }
-[data-viewstem-ui] .vs-questionnaire-option-input {
+.vs-questionnaire-choice[data-disabled] { pointer-events: none; opacity: .5; }
+.vs-questionnaire-option-input {
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -53,7 +53,7 @@
   cursor: pointer;
   opacity: 0;
 }
-[data-viewstem-ui] .vs-questionnaire-option-label {
+.vs-questionnaire-option-label {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -61,7 +61,7 @@
   gap: .25rem;
   line-height: 1.375;
 }
-[data-viewstem-ui] .vs-questionnaire-indicator {
+.vs-questionnaire-indicator {
   display: grid;
   place-items: center;
   flex: none;
@@ -72,23 +72,23 @@
   border-radius: .25rem;
   pointer-events: none;
 }
-[data-viewstem-ui] .vs-questionnaire-choice:has([data-vs-component="Questionnaire.ChoiceDescription"]) .vs-questionnaire-indicator { margin-block-start: .125rem; }
-[data-viewstem-ui] .vs-questionnaire-choice[data-type="radio"] .vs-questionnaire-indicator { border-radius: 50%; }
-[data-viewstem-ui] .vs-questionnaire-choice[data-checked] .vs-questionnaire-indicator { background: var(--primary); border-color: var(--primary); color: var(--primary-foreground); }
-[data-viewstem-ui] .vs-questionnaire-choice[data-checked] .vs-questionnaire-indicator::before {
+.vs-questionnaire-choice:has([data-vs-component="Questionnaire.ChoiceDescription"]) .vs-questionnaire-indicator { margin-block-start: .125rem; }
+.vs-questionnaire-choice[data-type="radio"] .vs-questionnaire-indicator { border-radius: 50%; }
+.vs-questionnaire-choice[data-checked] .vs-questionnaire-indicator { background: var(--primary); border-color: var(--primary); color: var(--primary-foreground); }
+.vs-questionnaire-choice[data-checked] .vs-questionnaire-indicator::before {
   content: "";
   width: .875rem;
   height: .875rem;
   background: currentColor;
   mask: var(--check-icon) center / contain no-repeat;
 }
-[data-viewstem-ui] .vs-questionnaire-choice[data-checked][data-type="radio"] .vs-questionnaire-indicator::before {
+.vs-questionnaire-choice[data-checked][data-type="radio"] .vs-questionnaire-indicator::before {
   width: .5rem;
   height: .5rem;
   border-radius: 50%;
   mask: none;
 }
-[data-viewstem-ui] .vs-questionnaire-shortcut {
+.vs-questionnaire-shortcut {
   display: grid;
   place-items: center;
   flex: none;
@@ -103,30 +103,30 @@
   font: 500 .625rem/1 var(--font-mono, monospace);
   pointer-events: none;
 }
-[data-viewstem-ui] .vs-questionnaire-input { width: 100%; min-width: 0; }
-[data-viewstem-ui] .vs-questionnaire-actions {
+.vs-questionnaire-input { width: 100%; min-width: 0; }
+.vs-questionnaire-actions {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: .5rem;
   min-height: 2.75rem;
 }
-[data-viewstem-ui] .vs-questionnaire-actions > button { grid-row: 1; min-height: 2.75rem; justify-self: end; }
-[data-viewstem-ui] .vs-questionnaire-previous { grid-column: 1; justify-self: start !important; }
-[data-viewstem-ui] .vs-questionnaire-skip { grid-column: 2; }
-[data-viewstem-ui] .vs-questionnaire-next { grid-column: 3; }
-[data-viewstem-ui] .vs-questionnaire-progress { min-height: 1lh; min-width: 14ch; width: fit-content; color: var(--muted-foreground); font-size: .75rem; line-height: 1rem; font-weight: 500; font-variant-numeric: tabular-nums; }
-[data-viewstem-ui] .vs-questionnaire-error { margin-block-start: .5rem; color: var(--destructive); font-size: var(--text-sm); line-height: var(--text-sm--line-height); }
-[data-viewstem-ui] .vs-questionnaire [hidden] { display: none; }
+.vs-questionnaire-actions > button { grid-row: 1; min-height: 2.75rem; justify-self: end; }
+.vs-questionnaire-previous { grid-column: 1; justify-self: start !important; }
+.vs-questionnaire-skip { grid-column: 2; }
+.vs-questionnaire-next { grid-column: 3; }
+.vs-questionnaire-progress { min-height: 1lh; min-width: 14ch; width: fit-content; color: var(--muted-foreground); font-size: .75rem; line-height: 1rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.vs-questionnaire-error { margin-block-start: .5rem; color: var(--destructive); font-size: var(--text-sm); line-height: var(--text-sm--line-height); }
+.vs-questionnaire [hidden] { display: none; }
 @media (width < 40rem) {
-  [data-viewstem-ui] .vs-questionnaire-input { min-height: 2.75rem; }
+  .vs-questionnaire-input { min-height: 2.75rem; }
 }
 @media (width >= 40rem) {
-  [data-viewstem-ui] .vs-questionnaire-actions { min-height: 2.25rem; }
-  [data-viewstem-ui] .vs-questionnaire-actions > button { min-height: 0; }
+  .vs-questionnaire-actions { min-height: 2.25rem; }
+  .vs-questionnaire-actions > button { min-height: 0; }
 }
 
-[data-viewstem-ui] .vs-message-scroller {
+.vs-message-scroller {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -135,7 +135,7 @@
   min-height: 0;
   overflow: hidden;
 }
-[data-viewstem-ui] .vs-message-viewport {
+.vs-message-viewport {
   width: 100%;
   height: 100%;
   min-width: 0;
@@ -147,14 +147,14 @@
   overscroll-behavior: contain;
   contain: content;
 }
-[data-viewstem-ui] .vs-message-viewport:has(~ .vs-message-scroll-button[data-direction="end"][data-active="true"]) {
+.vs-message-viewport:has(~ .vs-message-scroll-button[data-direction="end"][data-active="true"]) {
   mask-image: linear-gradient(to bottom, black calc(100% - 2rem), transparent);
 }
-[data-viewstem-ui] .vs-message-content { display: flex; flex-direction: column; gap: 2rem; min-height: 100%; height: max-content; }
-[data-viewstem-ui] .vs-message-item { min-width: 0; flex: none; }
-[data-viewstem-ui] .vs-message-tail { flex: none; }
-[data-viewstem-ui] .vs-message-tail[hidden] { display: none; }
-[data-viewstem-ui] .vs-message-scroll-button {
+.vs-message-content { display: flex; flex-direction: column; gap: 2rem; min-height: 100%; height: max-content; }
+.vs-message-item { min-width: 0; flex: none; }
+.vs-message-tail { flex: none; }
+.vs-message-tail[hidden] { display: none; }
+.vs-message-scroll-button {
   position: absolute;
   inset-inline-start: 50%;
   translate: -50%;
@@ -165,71 +165,71 @@
   background: var(--background);
   transition: translate 200ms cubic-bezier(.23,1,.32,1), scale 200ms, opacity 200ms;
 }
-[data-viewstem-ui] .vs-message-scroll-button:dir(rtl) { translate: 50%; }
-[data-viewstem-ui] .vs-message-scroll-button:hover { background: var(--muted); }
-[data-viewstem-ui] .vs-message-scroll-button[data-direction="start"] { top: 1rem; }
-[data-viewstem-ui] .vs-message-scroll-button[data-direction="end"] { bottom: 1rem; }
-[data-viewstem-ui] .vs-message-scroll-button[data-active="false"] {
+.vs-message-scroll-button:dir(rtl) { translate: 50%; }
+.vs-message-scroll-button:hover { background: var(--muted); }
+.vs-message-scroll-button[data-direction="start"] { top: 1rem; }
+.vs-message-scroll-button[data-direction="end"] { bottom: 1rem; }
+.vs-message-scroll-button[data-active="false"] {
   pointer-events: none;
   opacity: 0;
   scale: .95;
   transition-duration: 400ms;
   transition-timing-function: cubic-bezier(.7,0,.84,0);
 }
-[data-viewstem-ui] .vs-message-scroll-button[data-active="false"][data-direction="start"] { translate: -50% -100%; }
-[data-viewstem-ui] .vs-message-scroll-button[data-active="false"][data-direction="end"] { translate: -50% 100%; }
-[data-viewstem-ui] .vs-message-scroll-button[data-vs-scroll-icon]::before {
+.vs-message-scroll-button[data-active="false"][data-direction="start"] { translate: -50% -100%; }
+.vs-message-scroll-button[data-active="false"][data-direction="end"] { translate: -50% 100%; }
+.vs-message-scroll-button[data-vs-scroll-icon]::before {
   content: "";
   width: 1rem;
   height: 1rem;
   background: currentColor;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 5v14m7-7-7 7-7-7'/%3E%3C/svg%3E") center / contain no-repeat;
 }
-[data-viewstem-ui] .vs-message-scroll-button[data-direction="start"]::before { rotate: 180deg; }
+.vs-message-scroll-button[data-direction="start"]::before { rotate: 180deg; }
 @media (prefers-reduced-motion: reduce) {
-  [data-viewstem-ui] .vs-message-scroll-button { transition: none; }
+  .vs-message-scroll-button { transition: none; }
 }
 
-[data-viewstem-ui] [data-vs-component="ScrollArea.Root"].vs-scroll-area {
+[data-vs-component="ScrollArea.Root"].vs-scroll-area {
   position: relative;
   overflow: hidden;
 }
-[data-viewstem-ui] .vs-scroll-area-viewport {
+.vs-scroll-area-viewport {
   width: 100%;
   height: 100%;
   border-radius: inherit;
   overflow: auto;
   scrollbar-width: none;
 }
-[data-viewstem-ui] .vs-scroll-area-viewport:focus-visible {
+.vs-scroll-area-viewport:focus-visible {
   outline: 1px solid var(--ring);
   outline-offset: -1px;
   box-shadow: inset 0 0 0 3px color-mix(in oklab, var(--ring) 50%, transparent);
 }
-[data-viewstem-ui] .vs-scrollbar-definition { display: none; }
-[data-viewstem-ui] .vs-scroll-area-scrollbar {
+.vs-scrollbar-definition { display: none; }
+.vs-scroll-area-scrollbar {
   display: flex;
   z-index: 1;
   padding: 1px;
 }
-[data-viewstem-ui] .vs-scroll-area-scrollbar[data-orientation="vertical"] { width: .625rem; }
-[data-viewstem-ui] .vs-scroll-area-scrollbar[data-orientation="horizontal"] { height: .625rem; }
-[data-viewstem-ui] .vs-scroll-area-thumb { position: relative; border-radius: 9999px; background: var(--border); }
-[data-viewstem-ui] .vs-scroll-area-thumb[data-orientation="vertical"] { width: 100%; }
-[data-viewstem-ui] .vs-scroll-area-thumb[data-orientation="horizontal"] { height: 100%; }
-[data-viewstem-ui] .vs-scroll-area-scrollbar[hidden], [data-viewstem-ui] .vs-scroll-area-corner[data-state="hidden"] { display: none; }
-[data-viewstem-ui] .vs-scroll-area[data-vs-scroll-mode="hover"]:not([data-vs-hovering]) .vs-scroll-area-scrollbar,
-[data-viewstem-ui] .vs-scroll-area[data-vs-scroll-mode="scroll"]:not([data-vs-scrolling]) .vs-scroll-area-scrollbar {
+.vs-scroll-area-scrollbar[data-orientation="vertical"] { width: .625rem; }
+.vs-scroll-area-scrollbar[data-orientation="horizontal"] { height: .625rem; }
+.vs-scroll-area-thumb { position: relative; border-radius: 9999px; background: var(--border); }
+.vs-scroll-area-thumb[data-orientation="vertical"] { width: 100%; }
+.vs-scroll-area-thumb[data-orientation="horizontal"] { height: 100%; }
+.vs-scroll-area-scrollbar[hidden], .vs-scroll-area-corner[data-state="hidden"] { display: none; }
+.vs-scroll-area[data-vs-scroll-mode="hover"]:not([data-vs-hovering]) .vs-scroll-area-scrollbar,
+.vs-scroll-area[data-vs-scroll-mode="scroll"]:not([data-vs-scrolling]) .vs-scroll-area-scrollbar {
   opacity: 0;
   pointer-events: none;
 }
 
-[data-viewstem-ui] .select > .vs-select-with-scroll {
+.select > .vs-select-with-scroll {
   max-height: min(18rem, calc(100vh - 4rem));
   overflow: hidden;
 }
-[data-viewstem-ui] .vs-select-with-scroll > [role="listbox"] { min-height: 0; overflow: auto; scrollbar-width: none; }
-[data-viewstem-ui] .vs-select-scroll-button {
+.vs-select-with-scroll > [role="listbox"] { min-height: 0; overflow: auto; scrollbar-width: none; }
+.vs-select-scroll-button {
   position: sticky;
   z-index: 2;
   display: grid;
@@ -239,13 +239,13 @@
   color: var(--popover-foreground);
   cursor: default;
 }
-[data-viewstem-ui] .vs-select-scroll-button::after {
+.vs-select-scroll-button::after {
   content: "";
   width: 100%;
   height: 1.5rem;
   background: var(--popover) var(--chevron-down-icon) center / 1rem no-repeat;
 }
-[data-viewstem-ui] .vs-select-scroll-button[data-direction="up"] { top: 0; margin-block-end: -1.5rem; }
-[data-viewstem-ui] .vs-select-scroll-button[data-direction="up"]::after { rotate: 180deg; }
-[data-viewstem-ui] .vs-select-scroll-button[data-direction="down"] { bottom: 0; margin-block-start: -1.5rem; }
-[data-viewstem-ui] .vs-select-scroll-button[hidden] { display: none; }
+.vs-select-scroll-button[data-direction="up"] { top: 0; margin-block-end: -1.5rem; }
+.vs-select-scroll-button[data-direction="up"]::after { rotate: 180deg; }
+.vs-select-scroll-button[data-direction="down"] { bottom: 0; margin-block-start: -1.5rem; }
+.vs-select-scroll-button[hidden] { display: none; }

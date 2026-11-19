@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-이메일 알림을 켰을 때 주간 요약 설정을 표시합니다. [시작 가이드](../../quickstart/)에서 워크스페이스와 `<div id="viewstem" data-viewstem-ui></div>`를 준비한 뒤 클라이언트 진입 코드를 아래 코드로 교체하세요.
+이메일 알림을 켰을 때 주간 요약 설정을 표시합니다. [시작 가이드](../../quickstart/)에서 워크스페이스와 `<div id="viewstem"></div>`를 준비한 뒤 클라이언트 진입 코드를 아래 코드로 교체하세요.
 
 ```js
 import { createRuntime } from '@viewstem/core';

@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-Show an activity count for the last 7 or 30 days. Complete the [Quick Start](../../quickstart/), keep `<div id="viewstem" data-viewstem-ui></div>` in `index.html`, and replace `src/main.js` with the example below. Run `npm run dev` and open the URL printed by Vite. The example uses simulated HTTP responses, so it runs without an API server.
+Show an activity count for the last 7 or 30 days. Complete the [Quick Start](../../quickstart/), keep `<div id="viewstem"></div>` in `index.html`, and replace `src/main.js` with the example below. Run `npm run dev` and open the URL printed by Vite. The example uses simulated HTTP responses, so it runs without an API server.
 
 ## Connect the period to a Query
 

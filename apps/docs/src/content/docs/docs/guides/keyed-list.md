@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-Render a list of projects from one row template. Start with the workspace setup and `<div id="viewstem" data-viewstem-ui></div>` from the [Quickstart](../../quickstart/), then replace its client entry with this code.
+Render a list of projects from one row template. Start with the workspace setup and `<div id="viewstem"></div>` from the [Quickstart](../../quickstart/), then replace its client entry with this code.
 
 ```js
 import { createRuntime } from '@viewstem/core';

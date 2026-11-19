@@ -28,3 +28,25 @@ export const label: DomComponent = {
 ```
 
 If the connector applies its DOM asynchronously, provide `whenRendered(signal)` to report when its own DOM and slots are ready. The renderer waits for that result, then renders children into the slots provided so far and runs `afterChildren` if supplied. The display's `whenRendered()` covers both the connector and those children.
+
+## Styles for a component set
+
+Use the same package-specific style ID for the CSS build and for the DOM your components create. The ID starts with a lowercase letter and uses lowercase letters, digits, and hyphens.
+
+```js
+import { createStyleScope } from '@viewstem/dom/styles';
+
+const forms = createStyleScope('acme-forms');
+const input = forms.createElement(document, 'input');
+```
+
+Use `createElementNS(document, namespace, tag)` for owned SVG and `mark(element)` for an element created by a library on your behalf. Keep the host and borrowed slot elements in their original scopes.
+
+```js
+import postcss from 'postcss';
+import { scopeUiCss } from '@viewstem/dom/styles/postcss';
+
+const result = await postcss([scopeUiCss('acme-forms')]).process(css, { from: 'styles.css' });
+```
+
+Resolve CSS imports before this step and publish the resulting stylesheet. The plugin scopes the final target of each selector and prefixes internal custom properties, layers, and animation names. Use `publicProperties` for custom properties the app can set by name. Consumers import the stylesheet once and register your set as usual.

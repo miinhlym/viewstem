@@ -4,6 +4,7 @@ import { normalizeProps, spreadProps, VanillaMachine, type Attrs } from '@zag-js
 import { uniqueId, type Behavior, type Send } from './behaviors.js';
 import { emitFrom, readInputs } from './component-context.js';
 import type { Markup } from './dynamic-catalog.js';
+import { styleScope } from './style-scope.js';
 
 type Inputs = NodeSnapshot['inputs'];
 const propsOf = readInputs;
@@ -64,21 +65,21 @@ export const formScrollEvents: Record<string, string> = {
 export function formScrollHost(name: string, control: HTMLElement): HTMLElement | undefined {
   const doc = control.ownerDocument;
   if (name === 'ScrollArea.Root') {
-    const viewport = doc.createElement('div');
+    const viewport = styleScope.createElement(doc, 'div');
     viewport.className = 'vs-scroll-area-viewport';
-    const content = doc.createElement('div');
+    const content = styleScope.createElement(doc, 'div');
     content.className = 'vs-scroll-area-content';
     viewport.append(content);
     control.append(viewport);
     return content;
   }
   if (name === 'Questionnaire.Choice') {
-    const input = doc.createElement('input');
+    const input = styleScope.createElement(doc, 'input');
     input.className = 'vs-questionnaire-option-input';
-    const indicator = doc.createElement('span');
+    const indicator = styleScope.createElement(doc, 'span');
     indicator.className = 'vs-questionnaire-indicator';
     indicator.setAttribute('aria-hidden', 'true');
-    const label = doc.createElement('span');
+    const label = styleScope.createElement(doc, 'span');
     label.className = 'vs-questionnaire-option-label';
     control.append(input, indicator, label);
     return label;
@@ -94,7 +95,7 @@ function showFallback(element: HTMLElement, content: string, className: string, 
     return;
   }
   if (!label) {
-    label = element.ownerDocument.createElement('span');
+    label = styleScope.createElement(element.ownerDocument, 'span');
     label.className = className;
     element.append(label);
   }
@@ -396,7 +397,7 @@ function questionnaire(form: HTMLFormElement, send: Send, signal: AbortSignal): 
         const shortcut = !input.disabled ? shortcuts[logical !== undefined && logical >= 0 ? logical : index++] : undefined;
         const old = choice.querySelector<HTMLElement>('.vs-questionnaire-shortcut');
         if (shortcut) {
-          const badge = old ?? form.ownerDocument.createElement('kbd');
+          const badge = old ?? styleScope.createElement(form.ownerDocument, 'kbd');
           badge.className = 'vs-questionnaire-shortcut';
           badge.textContent = shortcut;
           badge.setAttribute('aria-hidden', 'true');
@@ -496,7 +497,7 @@ function messageScroller(root: HTMLElement, signal: AbortSignal): Behavior {
       return;
     }
     if (!tail) {
-      tail = root.ownerDocument.createElement('div');
+      tail = styleScope.createElement(root.ownerDocument, 'div');
       tail.setAttribute('aria-hidden', 'true');
       content.append(tail);
     }
@@ -587,7 +588,7 @@ function scrollContainer(root: HTMLElement, send: Send, signal: AbortSignal): Be
   const win = doc.defaultView!;
   const viewport = root.querySelector<HTMLElement>('.vs-scroll-area-viewport')!;
   const content = root.querySelector<HTMLElement>('.vs-scroll-area-content')!;
-  const corner = doc.createElement('div');
+  const corner = styleScope.createElement(doc, 'div');
   corner.className = 'vs-scroll-area-corner';
   root.append(corner);
   const id = uniqueId();
@@ -680,8 +681,8 @@ function scrollContainer(root: HTMLElement, send: Send, signal: AbortSignal): Be
     for (const [orientation, marker] of requested) {
       let entry = tracks.get(orientation);
       if (!entry) {
-        const track = doc.createElement('div');
-        const thumb = doc.createElement('div');
+        const track = styleScope.createElement(doc, 'div');
+        const thumb = styleScope.createElement(doc, 'div');
         thumb.className = 'vs-scroll-area-thumb';
         track.append(thumb);
         root.insertBefore(track, corner);

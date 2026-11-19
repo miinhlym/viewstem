@@ -1,7 +1,7 @@
 import type { NodeSnapshot } from '@viewstem/core';
 import type { DomComponent } from '@viewstem/dom';
 import { attributes, components, domEvents, support } from './shadcn.js';
-import { chart, combobox, command, commandDialog, disclosure, group, modal, notifications, popover, range, select, tabs, tooltip, uniqueId, type Behavior, type Send } from './behaviors.js';
+import { chart, combobox, command, commandDialog, disclosure, group, modal, notifications, popover, range, scopeChartColor, select, tabs, tooltip, uniqueId, type Behavior, type Send } from './behaviors.js';
 import { dateCalendar } from './date-calendar.js';
 import { multiSlider } from './slider.js';
 import { dataTable } from './data-table.js';
@@ -10,6 +10,7 @@ import { menus } from './menus.js';
 import { markupBehavior, markupTag } from './markup-families.js';
 import { widgetBehavior } from './widget-families.js';
 import { formScrollBehavior, formScrollHost } from './form-scroll-families.js';
+import { styleScope } from './style-scope.js';
 
 type Entry = {
   node: NodeSnapshot;
@@ -106,7 +107,7 @@ export function catalogComponent(name: string): DomComponent {
       const part = modalParts.exec(name)?.[1]?.toLowerCase();
       const childAction = !!node.slots.child?.length && !!part;
       const childTrigger = !!node.slots.child?.length && (/^(?:DropdownMenu|HoverCard|Tooltip|Popover)\.Trigger$/.test(name) || name === 'Popover.Close');
-      const control = doc.createElement(childAction || childTrigger ? 'span' : tag);
+      const control = styleScope.createElement(doc, childAction || childTrigger ? 'span' : tag);
       if (defaults) for (const [key, value] of Object.entries(defaults)) {
         if (name !== 'Button' || tag !== 'a' || key !== 'type') control.setAttribute(key, value);
       }
@@ -114,35 +115,35 @@ export function catalogComponent(name: string): DomComponent {
       let element = control;
       let host = formScrollHost(name, control) ?? control;
       if (name === 'Carousel.Content' || name === 'HoverCard.Content' || name === 'AspectRatio') {
-        element = doc.createElement('div');
+        element = styleScope.createElement(doc, 'div');
         element.className = name === 'Carousel.Content' ? 'vs-carousel-viewport' : name === 'HoverCard.Content' ? 'vs-hover-positioner' : 'vs-ui-aspect-frame';
         element.append(control);
       } else if (name === 'CodeBlock.Content') {
-        host = doc.createElement('code');
+        host = styleScope.createElement(doc, 'code');
         control.append(host);
       } else if (name === 'Command.Input') {
-        element = doc.createElement('header');
+        element = styleScope.createElement(doc, 'header');
         element.append(control);
       } else if (name === 'Table.Root') {
-        element = doc.createElement('div');
+        element = styleScope.createElement(doc, 'div');
         element.className = 'table-container';
         element.append(control);
       } else if (tag === 'dialog') {
-        host = doc.createElement('div');
+        host = styleScope.createElement(doc, 'div');
         control.append(host);
       } else if (name === 'Sidebar.Root') {
-        host = doc.createElement('nav');
+        host = styleScope.createElement(doc, 'nav');
         control.append(host);
       } else if (name === 'Field.Separator' || name === 'Command.Group') {
-        host = doc.createElement(name === 'Field.Separator' ? 'span' : 'div');
+        host = styleScope.createElement(doc, name === 'Field.Separator' ? 'span' : 'div');
         control.append(host);
       } else if (/^(?:DropdownMenu|ContextMenu|Menubar)\.(?:Sub)?Content$/.test(name)) {
-        element = doc.createElement('div');
+        element = styleScope.createElement(doc, 'div');
         element.dataset.vsMenuPositioner = '';
         control.setAttribute('aria-hidden', 'true');
         element.append(control);
       } else if (name === 'Select.Content') {
-        host = doc.createElement('div');
+        host = styleScope.createElement(doc, 'div');
         host.setAttribute('role', 'listbox');
         control.append(host);
       }
@@ -243,14 +244,14 @@ export function catalogComponent(name: string): DomComponent {
         }, { signal });
       }
       if (name === 'Progress' || name === 'Field.Separator' || name === 'Command.Group') {
-        const auxiliary = doc.createElement(name === 'Field.Separator' ? 'hr' : 'span');
+        const auxiliary = styleScope.createElement(doc, name === 'Field.Separator' ? 'hr' : 'span');
         if (name === 'Field.Separator') auxiliary.setAttribute('role', 'separator');
         if (name === 'Command.Group') auxiliary.setAttribute('role', 'heading');
         control.prepend(auxiliary);
         entry.auxiliary = auxiliary;
       }
       if (name === 'Dialog.Content' || name === 'Sheet.Content') {
-        const close = doc.createElement('button');
+        const close = styleScope.createElement(doc, 'button');
         close.type = 'button';
         close.className = 'btn vs-dialog-dismiss';
         close.dataset.variant = 'ghost';
@@ -261,7 +262,7 @@ export function catalogComponent(name: string): DomComponent {
         entry.auxiliary = close;
       }
       if (name === 'Drawer.Content') {
-        const handle = doc.createElement('div');
+        const handle = styleScope.createElement(doc, 'div');
         handle.className = 'vs-drawer-handle';
         handle.setAttribute('aria-hidden', 'true');
         host.append(handle);
@@ -387,7 +388,7 @@ export function catalogComponent(name: string): DomComponent {
         for (const key of Array.from(control.style)) if (key.startsWith('--color-')) control.style.removeProperty(key);
         for (const [key, { color }] of Object.entries(config)) {
           if (/^[\w-]+$/.test(key) && color && doc.defaultView?.CSS.supports('color', color)) {
-            control.style.setProperty('--color-' + key, color);
+            control.style.setProperty('--color-' + key, scopeChartColor(color));
           }
         }
       }

@@ -11,13 +11,21 @@
   },
   "engines": { "node": ">=22" },
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./styles": { "types": "./dist/styles.d.ts", "import": "./dist/styles.js" },
+    "./styles/postcss": { "types": "./dist/styles-postcss.d.ts", "import": "./dist/styles-postcss.js" }
   },
   "files": ["dist", "README.md", "README.ko.md", "LICENSE"],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p test/types/tsconfig.json",
-    "test": "node --test test/browser.test.mjs"
+    "test": "node --test test/browser.test.mjs test/styles.test.mjs"
   },
-  "dependencies": { "@viewstem/core": "0.1.0" }
+  "dependencies": {
+    "@csstools/css-parser-algorithms": "4.0.3",
+    "@csstools/css-tokenizer": "4.0.3",
+    "@viewstem/core": "0.1.0",
+    "postcss": "8.5.8",
+    "postcss-selector-parser": "7.1.1"
+  }
 }

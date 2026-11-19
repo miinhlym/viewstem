@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-필수 항목인 이름이 비어 있거나 공백뿐이면 메시지를 표시합니다. [시작 가이드](../../quickstart/)를 완료한 뒤 `index.html`의 `<div id="viewstem" data-viewstem-ui></div>`를 유지하고 `src/main.js`를 아래 코드로 교체하세요. `npm run dev`를 실행하고 Vite가 출력하는 URL을 여세요.
+필수 항목인 이름이 비어 있거나 공백뿐이면 메시지를 표시합니다. [시작 가이드](../../quickstart/)를 완료한 뒤 `index.html`의 `<div id="viewstem"></div>`를 유지하고 `src/main.js`를 아래 코드로 교체하세요. `npm run dev`를 실행하고 Vite가 출력하는 URL을 여세요.
 
 ## 입력과 검증 메시지 연결하기
 

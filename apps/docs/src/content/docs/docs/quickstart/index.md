@@ -10,7 +10,7 @@ Render a **Hello, Viewstem** button from a JSON View. Complete [Installation](..
 In the Vite starter’s `index.html`, replace `<div id="app"></div>` with the element below. In an existing app, add an empty element where the View should appear.
 
 ```html
-<div id="viewstem" data-viewstem-ui></div>
+<div id="viewstem"></div>
 ```
 
 ## 2. Mount the View

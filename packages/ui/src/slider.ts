@@ -2,13 +2,14 @@ import { connect, machine } from '@zag-js/slider';
 import { normalizeProps, spreadProps, VanillaMachine } from '@zag-js/vanilla';
 import { uniqueId, type Behavior, type Send } from './behaviors.js';
 import { sliderKeyValue, sliderScale, snapSliderValue } from './slider-values.js';
+import { styleScope } from './style-scope.js';
 
 export function multiSlider(element: HTMLElement, send: Send, signal: AbortSignal): Behavior {
   const doc = element.ownerDocument;
-  const root = doc.createElement('div');
-  const control = doc.createElement('div');
-  const track = doc.createElement('div');
-  const range = doc.createElement('div');
+  const root = styleScope.createElement(doc, 'div');
+  const control = styleScope.createElement(doc, 'div');
+  const track = styleScope.createElement(doc, 'div');
+  const range = styleScope.createElement(doc, 'div');
   const id = uniqueId();
   track.append(range);
   control.append(track);
@@ -68,7 +69,7 @@ export function multiSlider(element: HTMLElement, send: Send, signal: AbortSigna
     api.value.forEach((_, index) => {
       let thumb = thumbs[index];
       if (!thumb) {
-        thumb = doc.createElement('div');
+        thumb = styleScope.createElement(doc, 'div');
         thumbs.push(thumb);
         control.append(thumb);
       }

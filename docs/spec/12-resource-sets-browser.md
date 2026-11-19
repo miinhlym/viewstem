@@ -105,7 +105,13 @@ Viewstem은 서비스가 신뢰해 직접 가져온 셋·연결자 코드만 실
 
 독립 셋 패키지는 앱과 같은 Core 모듈 인스턴스에서 셋을 정의한다. 앱 쪽에 해석되도록 Core를 peer dependency로 선언하고 해당 패키지 번들에서 외부화한다.
 
-### Svelte 어댑터 입력 타입
+## UI 셋의 스타일 소유권
+
+**D169.** 브라우저 UI 셋은 자신이 만든 DOM에 기본 스타일을 적용한다. 소유 표시가 붙은 조상 아래에 있더라도, 슬롯에 들어온 외부 요소의 기본 외형은 해당 요소의 셋이 정한다. 일반 CSS 상속과 호스트가 서로 연결한 테마 변수는 기존 브라우저 규칙을 따른다.
+
+DOM 작성자는 `@viewstem/dom/styles`의 `createStyleScope(id)`와 `@viewstem/dom/styles/postcss`의 `scopeUiCss(id)`를 같은 셋 식별자로 사용할 수 있다. 도구는 CSS 규칙의 최종 대상에 소유 조건을 적용한다. 앱은 필요한 셋의 CSS를 가져온다. 기존 `data-viewstem-ui`는 이전 테마 변수를 읽는 범위다. [설계 초안](../designs/viewstem-ui-set-policy-review-2026-11-19/design_draft.md)
+
+## Svelte 어댑터 입력 타입
 
 **D162 · 등록 계약에서 Svelte 입력 타입 추론.** 어댑터는 `ComponentAdapterProps<typeof contract>`로 Component 계약의 포트에서 입력 타입을 추론한다. TypeScript에서 `svelteComponent(contract, implementation)`으로 바인딩을 만들 때 구현의 props 타입이 같은 계약과 일치하는지 검사한다. 타입 인자 없는 `ComponentAdapterProps`도 공통 어댑터에서 사용할 수 있다.
 

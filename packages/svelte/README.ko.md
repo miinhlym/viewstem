@@ -25,9 +25,7 @@ Viewstem View를 Svelte 컴포넌트로 표시합니다. Svelte 5.57.3 이상 5.
   };
 </script>
 
-<div data-viewstem-ui>
-  <ViewstemView {source} resourceSets={[ui]} />
-</div>
+<ViewstemView {source} resourceSets={[ui]} />
 ```
 
 기존 앱에서 공유 렌더러를 레이아웃에 두고 페이지를 붙이는 예제는 [Svelte 마운트 가이드](https://github.com/miinhlym/viewstem/blob/main/apps/docs/src/content/docs/ko/docs/svelte/guides/mount-in-svelte.md#existing-app)를 참고하세요.

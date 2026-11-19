@@ -1,0 +1,22 @@
+@layer base, components;
+
+@layer base {
+  :where(button, input) {
+    box-sizing: content-box;
+  }
+}
+
+@layer components {
+  .btn {
+    --acme-forms-accent: rgb(0 90 110);
+    background-color: var(--acme-forms-accent);
+    border-radius: 3px;
+  }
+
+  .acme-section {
+    & > header {
+      display: flow-root;
+      padding-inline: 11px;
+    }
+  }
+}

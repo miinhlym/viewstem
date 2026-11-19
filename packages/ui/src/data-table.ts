@@ -6,6 +6,7 @@ import {
 } from '@tanstack/table-core';
 import { storeReactivityBindings } from '@tanstack/table-core/store-reactivity-bindings';
 import { uniqueId, type Behavior, type Send } from './behaviors.js';
+import { styleScope } from './style-scope.js';
 
 const features = tableFeatures({
   coreReactivityFeature: storeReactivityBindings(), columnFilteringFeature, globalFilteringFeature,
@@ -21,31 +22,31 @@ type Labels = Partial<Record<'filter' | 'select' | 'selectRow' | 'noRows' | 'pre
 
 export function dataTable(element: HTMLElement, send: Send, signal: AbortSignal): Behavior {
   const doc = element.ownerDocument;
-  const filter = doc.createElement('input');
+  const filter = styleScope.createElement(doc, 'input');
   filter.type = 'search';
   filter.className = 'input';
-  const container = doc.createElement('div');
+  const container = styleScope.createElement(doc, 'div');
   container.className = 'table-container';
-  const tableElement = doc.createElement('table');
+  const tableElement = styleScope.createElement(doc, 'table');
   tableElement.className = 'table';
-  const head = doc.createElement('thead');
-  const body = doc.createElement('tbody');
+  const head = styleScope.createElement(doc, 'thead');
+  const body = styleScope.createElement(doc, 'tbody');
   tableElement.append(head, body);
   container.append(tableElement);
-  const footer = doc.createElement('div');
+  const footer = styleScope.createElement(doc, 'div');
   footer.className = 'vs-data-table-footer';
-  const previous = doc.createElement('button');
-  const next = doc.createElement('button');
+  const previous = styleScope.createElement(doc, 'button');
+  const next = styleScope.createElement(doc, 'button');
   previous.type = next.type = 'button';
   previous.className = next.className = 'btn';
   previous.dataset.variant = next.dataset.variant = 'outline';
   previous.dataset.size = next.dataset.size = 'sm';
-  const page = doc.createElement('span');
+  const page = styleScope.createElement(doc, 'span');
   page.className = 'vs-data-table-page';
-  const pageSizeControl = doc.createElement('div');
+  const pageSizeControl = styleScope.createElement(doc, 'div');
   pageSizeControl.className = 'vs-data-table-page-size';
-  const sizeLabel = doc.createElement('label');
-  const size = doc.createElement('select');
+  const sizeLabel = styleScope.createElement(doc, 'label');
+  const size = styleScope.createElement(doc, 'select');
   size.id = uniqueId();
   size.className = 'select';
   size.dataset.size = 'sm';
@@ -140,21 +141,21 @@ export function dataTable(element: HTMLElement, send: Send, signal: AbortSignal)
     let restoreFocus: HTMLElement | undefined;
     head.replaceChildren();
     for (const group of table.getHeaderGroups()) {
-      const tr = doc.createElement('tr');
-      const select = doc.createElement('th');
+      const tr = styleScope.createElement(doc, 'tr');
+      const select = styleScope.createElement(doc, 'th');
       select.scope = 'col'; select.textContent = text.select; tr.append(select);
       for (const header of group.headers) {
-        const th = doc.createElement('th');
+        const th = styleScope.createElement(doc, 'th');
         th.scope = 'col';
         const direction = header.column.getIsSorted();
         if (direction) th.setAttribute('aria-sort', direction === 'asc' ? 'ascending' : 'descending');
         const label = String(header.column.columnDef.header ?? '');
         if (header.column.getCanSort()) {
-          const button = doc.createElement('button');
+          const button = styleScope.createElement(doc, 'button');
           button.type = 'button'; button.className = 'btn';
           button.dataset.variant = 'ghost';
           button.dataset.size = 'sm';
-          const icon = doc.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          const icon = styleScope.createElementNS(doc, 'http://www.w3.org/2000/svg', 'svg');
           icon.setAttribute('aria-hidden', 'true');
           icon.setAttribute('viewBox', '0 0 24 24');
           icon.setAttribute('fill', 'none');
@@ -162,7 +163,7 @@ export function dataTable(element: HTMLElement, send: Send, signal: AbortSignal)
           icon.setAttribute('stroke-width', '2');
           icon.setAttribute('stroke-linecap', 'round');
           icon.setAttribute('stroke-linejoin', 'round');
-          const path = doc.createElementNS(icon.namespaceURI, 'path');
+          const path = styleScope.createElementNS(doc, icon.namespaceURI, 'path');
           path.setAttribute('d', direction === 'asc' ? 'M12 19V5 M5 12l7-7 7 7' :
             direction === 'desc' ? 'M12 5v14 M5 12l7 7 7-7' : 'm21 16-4 4-4-4 M17 20V4 M3 8l4-4 4 4 M7 4v16');
           icon.append(path);
@@ -177,10 +178,10 @@ export function dataTable(element: HTMLElement, send: Send, signal: AbortSignal)
     }
     body.replaceChildren();
     for (const row of rows) {
-      const tr = doc.createElement('tr');
+      const tr = styleScope.createElement(doc, 'tr');
       if (row.getIsSelected()) tr.dataset.state = 'selected';
-      const td = doc.createElement('td');
-      const checkbox = doc.createElement('input');
+      const td = styleScope.createElement(doc, 'td');
+      const checkbox = styleScope.createElement(doc, 'input');
       checkbox.type = 'checkbox'; checkbox.className = 'input'; checkbox.checked = row.getIsSelected();
       checkbox.dataset.vsRowId = String(row.original[rowId]);
       if (focusedRow === checkbox.dataset.vsRowId) restoreFocus = checkbox;
@@ -188,15 +189,15 @@ export function dataTable(element: HTMLElement, send: Send, signal: AbortSignal)
       checkbox.addEventListener('change', () => row.toggleSelected(checkbox.checked));
       td.append(checkbox); tr.append(td);
       for (const cell of row.getAllCells()) {
-        const cellElement = doc.createElement('td');
+        const cellElement = styleScope.createElement(doc, 'td');
         cellElement.textContent = String(cell.getValue() ?? '');
         tr.append(cellElement);
       }
       body.append(tr);
     }
     if (!rows.length) {
-      const tr = doc.createElement('tr');
-      const td = doc.createElement('td');
+      const tr = styleScope.createElement(doc, 'tr');
+      const td = styleScope.createElement(doc, 'td');
       td.colSpan = definitions.length + 1; td.className = 'vs-data-table-empty'; td.textContent = text.noRows;
       tr.append(td); body.append(tr);
     }
@@ -206,7 +207,7 @@ export function dataTable(element: HTMLElement, send: Send, signal: AbortSignal)
     sizeLabel.textContent = text.rowsPerPage;
     size.replaceChildren();
     for (const value of [...new Set([10, 25, 50, pageSize])].sort((a, b) => a - b)) {
-      const option = doc.createElement('option'); option.value = String(value); option.textContent = String(value); size.append(option);
+      const option = styleScope.createElement(doc, 'option'); option.value = String(value); option.textContent = String(value); size.append(option);
     }
     size.value = String(pageSize);
     restoreFocus?.focus();

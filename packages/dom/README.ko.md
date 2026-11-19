@@ -28,3 +28,25 @@ export const label: DomComponent = {
 ```
 
 연결자가 DOM을 비동기로 반영하면 `whenRendered(signal)`로 자체 DOM과 슬롯의 준비 완료를 알립니다. 렌더러는 그 결과를 기다린 뒤 그 시점까지 제공된 슬롯에 자식을 배치하고, `afterChildren`이 있으면 호출합니다. 표시 연결의 `whenRendered()`는 연결자와 슬롯 자식의 반영을 모두 기다립니다.
+
+## 컴포넌트 셋의 스타일
+
+CSS 빌드와 컴포넌트가 만드는 DOM에 같은 셋별 스타일 ID를 지정합니다. ID는 소문자로 시작하며 소문자·숫자·하이픈을 사용합니다.
+
+```js
+import { createStyleScope } from '@viewstem/dom/styles';
+
+const forms = createStyleScope('acme-forms');
+const input = forms.createElement(document, 'input');
+```
+
+자체 SVG에는 `createElementNS(document, namespace, tag)`를 사용합니다. 라이브러리가 해당 컴포넌트용으로 만든 요소는 `mark(element)`로 표시합니다. 호스트와 빌린 슬롯 요소는 자신의 범위를 유지합니다.
+
+```js
+import postcss from 'postcss';
+import { scopeUiCss } from '@viewstem/dom/styles/postcss';
+
+const result = await postcss([scopeUiCss('acme-forms')]).process(css, { from: 'styles.css' });
+```
+
+CSS import를 먼저 해결한 뒤 이 변환을 적용하고 결과 CSS를 배포합니다. 변환은 각 선택자의 최종 대상을 제한하고 내부 CSS 변수, 레이어, 애니메이션 이름에 접두사를 붙입니다. 앱이 이름으로 재정의할 변수는 `publicProperties`에 지정합니다. 소비자는 CSS를 한 번 가져오고 기존 방식으로 셋을 등록합니다.

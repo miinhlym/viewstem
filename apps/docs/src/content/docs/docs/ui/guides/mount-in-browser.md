@@ -12,7 +12,7 @@ Build and install the [Core, DOM, and UI tarballs](../../../installation/#build-
 Use a browser build that resolves package imports and handles CSS imports. Add the container and the client entry to your app's HTML.
 
 ```html
-<div id="app" data-viewstem-ui></div>
+<div id="app"></div>
 <script type="module" src="/main.js"></script>
 ```
 
