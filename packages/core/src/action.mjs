@@ -107,7 +107,9 @@ export class ActionEngine {
     const check = () => { if (!isOpen()) die('CANCELLED'); };
     const checkStart = () => { check(); if (!canStart()) die('CANCELLED'); };
     checkStart(); if (stack.includes(definition)) die('ACTION_RECURSION');
-    const authorized = this.#authorize({ owner, definition, resource: this.#resources.get(definition) ?? null });
+    let authorized;
+    try { authorized = this.#authorize({ owner, definition, resource: this.#resources.get(definition) ?? null }); }
+    catch (cause) { checkStart(); throw cause; }
     checkStart();
     if (authorized !== true) die('EXECUTION_BLOCKED');
     let acceptingChildren = true;
@@ -251,6 +253,9 @@ export class ActionEngine {
       if (!definition.output) { if (native && output !== undefined) die('TYPE_MISMATCH'); return undefined; }
       try { return protect(registry.validator(definition.output).accept(output, trustedCopies(output))); }
       catch { die('TYPE_MISMATCH', { location: '/output' }); }
+    } catch (cause) {
+      check();
+      throw cause;
     } finally {
       acceptingChildren = false;
       signal.removeEventListener('abort', abortChildren);

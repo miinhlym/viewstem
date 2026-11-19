@@ -134,6 +134,44 @@ for (const owner of ['runtime', 'view']) test(`a single ${owner} invocation sign
   assert.equal(cell.read(), 1);
 });
 
+for (const owner of ['runtime', 'view']) {
+  for (const phase of ['authorize', 'body']) {
+    test(`${owner} invocation reports cancellation if the ${phase} callback aborts and throws`, async t => {
+      const r = registry();
+      let controller = new AbortController();
+      let bodyCalls = 0;
+      let abort = true;
+      function reject(signal) {
+        if (abort) controller.abort(new Error('private abort reason'));
+        signal.throwIfAborted();
+        throw Error('private callback failure');
+      }
+      native(r, 'called', {}, ({ signal }) => {
+        bodyCalls++;
+        if (phase === 'body') reject(signal);
+      });
+      const runtime = createPublicRuntime({ registry: r, authorize(context) {
+        if (context.operation === 'invoke' && phase === 'authorize') reject(controller.signal);
+        return true;
+      } });
+      t.after(() => runtime.dispose());
+      const view = await runtime.createView({ render: { id: 'empty', componentRef: 'Empty' } });
+      const target = owner === 'runtime' ? runtime : view;
+      await assert.rejects(target.invokeAction({ actionRef: 'called', signal: controller.signal }), {
+        code: 'CANCELLED', message: 'CANCELLED',
+      });
+      assert.equal(bodyCalls, phase === 'authorize' ? 0 : 1);
+
+      abort = false;
+      controller = new AbortController();
+      await assert.rejects(target.invokeAction({ actionRef: 'called', signal: controller.signal }), {
+        code: 'INTERNAL_ERROR', message: 'INTERNAL_ERROR',
+      });
+      assert.equal(bodyCalls, phase === 'authorize' ? 0 : 2);
+    });
+  }
+}
+
 test('A17 false If without else continues; missing then is rejected without execution', async t => {
   const r = registry(), trace = [];
   native(r, 'then', {}, () => { trace.push('then'); }); native(r, 'after', {}, () => { trace.push('after'); });
