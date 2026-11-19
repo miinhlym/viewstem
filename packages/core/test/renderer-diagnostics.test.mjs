@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createTestRuntime as createRuntime } from './fixtures/components.mjs';
-import { createRendererHost } from '@viewstem/core/renderer';
+import { attachHostedView, createRendererHost } from '@viewstem/core/renderer';
 
 const component = { kind: 'Component', id: 'Leaf', spec: {
   ports: { text: { kind: 'Value', required: true, schema: { type: 'string' } } },
@@ -138,6 +138,36 @@ test('a renderer disposed by its first prepare observer skips the screen observe
   await assert.rejects(screen.ready, { code: 'REFERENCE_NOT_FOUND' });
   await renderer.dispose();
   assert.deepEqual(events, ['renderer']);
+});
+
+test('hosted diagnostics check the connection after reading the current observer and report teardown once', async t => {
+  const runtime = createRuntime({ componentContracts: [component] });
+  const events = [];
+  let reportDisposal, closing;
+  const renderer = host(runtime, {
+    onError: diagnostic => events.push(['renderer', diagnostic.phase, diagnostic.nodeId]),
+    connect(_view, _target, _options, _onError, connection) {
+      reportDisposal = connection.reportDisposal;
+      return { whenRendered() {}, dispose() { throw new Error('display cleanup failed'); } };
+    },
+  });
+  t.after(async () => { await renderer.dispose(); await runtime.dispose(); });
+  const view = await runtime.createView({ render });
+  const display = attachHostedView(renderer, view, {}, {}, {
+    isOpen: () => true, isRendererOpen: () => true, closeWithRenderer: false,
+    getErrorListener() {
+      closing ??= display.detach();
+      return diagnostic => events.push(['screen', diagnostic.phase, diagnostic.nodeId]);
+    },
+  });
+  reportDisposal(new Error('node cleanup failed'), 'leaf');
+  await assert.rejects(closing, { code: 'INTERNAL_ERROR' });
+  assert.equal(display.detach(), closing);
+  assert.deepEqual(events, [
+    ['renderer', 'dispose', 'leaf'],
+    ['renderer', 'dispose', undefined],
+    ['screen', 'dispose', undefined],
+  ]);
 });
 
 test('missing references reject preparation with authored positions and a single diagnostic', async t => {

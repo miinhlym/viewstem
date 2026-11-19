@@ -14,8 +14,9 @@ export function notifyDiagnostic(diagnostic, ...observers) {
   if (diagnostic.error.code === 'CANCELLED') return;
   let listeners = delivered.get(diagnostic);
   if (!listeners) delivered.set(diagnostic, listeners = new WeakSet());
-  for (const { listener, isOpen } of observers) {
-    if (typeof listener !== 'function' || listeners.has(listener) || (isOpen && !isOpen())) continue;
+  for (const observer of observers) {
+    const listener = observer.getListener ? observer.getListener() : observer.listener;
+    if (typeof listener !== 'function' || listeners.has(listener) || (observer.isOpen && !observer.isOpen())) continue;
     listeners.add(listener);
     try { void Promise.resolve(listener(diagnostic)).catch(() => {}); } catch {}
   }

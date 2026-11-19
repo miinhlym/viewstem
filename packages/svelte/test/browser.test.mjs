@@ -985,16 +985,27 @@ test('ViewstemView delivers each failed automatic node cleanup and keeps renderi
   ] });
 }));
 
-test('ViewstemView skips its automatic cleanup diagnostic after the renderer observer unmounts it', t => browserTest(t, async page => {
-  const result = await page.evaluate(async () => {
+for (const closeBy of ['unmount', 'view', 'runtime', 'owning renderer', 'borrowing renderer']) test(`ViewstemView checks display ownership during node cleanup: ${closeBy}`, t => browserTest(t, async page => {
+  const result = await page.evaluate(async closeBy => {
     const F = Fixture;
-    const runtime = F.publicRuntime();
     const diagnostics = [];
-    let host, unmounting;
-    const renderer = F.publicRenderer({ runtime, onError(diagnostic) {
-      diagnostics.push(['renderer', diagnostic.phase, diagnostic.nodeId]);
-      unmounting = F.unmount(host);
-    } });
+    let host, view, close, closing, waitAtClose;
+    const renderer = F.publicRenderer({
+      ...(closeBy === 'owning renderer' ? {} : { runtime: F.publicRuntime() }),
+      onError(diagnostic) {
+        diagnostics.push(['renderer', diagnostic.phase, diagnostic.nodeId]);
+        closing = close();
+        waitAtClose = F.errorOf(() => host.whenRendered());
+      },
+    });
+    const { runtime } = renderer;
+    close = {
+      unmount: () => F.unmount(host),
+      view: () => view.dispose(),
+      runtime: () => runtime.dispose(),
+      'owning renderer': () => renderer.dispose(),
+      'borrowing renderer': () => renderer.dispose(),
+    }[closeBy];
     runtime.registry.registerResourceSet(F.defineResourceSet({ id: 'cleanup', version: '1', components: [{
       contract: F.resource('Component', 'Cleanup', {}), connectorId: 'dom',
       implementation: { mount({ parent, anchor }) {
@@ -1004,7 +1015,7 @@ test('ViewstemView skips its automatic cleanup diagnostic after the renderer obs
         return { update() {}, setPending() {}, dispose() { throw Error('automatic cleanup failure'); } };
       } },
     }] }));
-    const view = await runtime.createView({
+    view = await runtime.createView({
       states: { shown: F.state(true, { type: 'boolean' }) },
       render: { id: 'leaf', componentRef: 'Cleanup', when: F.p('/states/shown') },
     });
@@ -1016,13 +1027,20 @@ test('ViewstemView skips its automatic cleanup diagnostic after the renderer obs
     const initial = target.textContent;
     view.getState('shown').write(false);
     const outcome = await F.errorOf(() => host.whenRendered());
-    await unmounting;
+    const atClose = await waitAtClose;
+    await closing;
+    if (closeBy !== 'unmount') await F.unmount(host);
     await renderer.dispose();
     await runtime.dispose();
-    return { initial, outcome: outcome?.code, diagnostics, empty: target.childNodes.length === 0 };
-  });
+    return { initial, outcome: outcome?.code, atClose: atClose?.code, diagnostics, empty: target.childNodes.length === 0 };
+  }, closeBy);
+  const remainsOpen = closeBy === 'borrowing renderer';
   assert.deepEqual(result, {
-    initial: 'mounted', outcome: 'CANCELLED', diagnostics: [['renderer', 'dispose', 'leaf']], empty: true,
+    initial: 'mounted',
+    outcome: remainsOpen ? undefined : 'CANCELLED',
+    atClose: remainsOpen ? undefined : 'CANCELLED',
+    diagnostics: [['renderer', 'dispose', 'leaf'], ...(remainsOpen ? [['screen', 'dispose', 'leaf']] : [])],
+    empty: true,
   });
 }));
 

@@ -1,6 +1,6 @@
 import { mount, tick, unmount } from 'svelte';
 import { createRuntime, type ComponentBinding, type ComponentContract } from '@viewstem/core';
-import { createDiagnostic, createRenderError, notifyDiagnostic, runtimeOwnsView } from '@viewstem/core/renderer';
+import { attachHostedView, createRenderError, notifyDiagnostic, runtimeOwnsView } from '@viewstem/core/renderer';
 import type { View } from '@viewstem/core';
 import { createRenderer as createBrowserRenderer, type BrowserDisplayOptions, type ComponentConnector } from '@viewstem/dom';
 import ComponentMount from './ComponentMount.svelte';
@@ -68,6 +68,7 @@ function browserOptions({ context, fallback, onError }: RenderOptions = {}): Bro
   };
 }
 
+// Preparation and owner cleanup can fail before or after a display connection exists.
 export function reportComponentDiagnostic(renderer: Renderer | undefined, diagnostic: RendererDiagnostic, onError: RendererErrorListener | undefined, isOpen: () => boolean) {
   const state = renderer && rendererStates.get(renderer);
   const teardown = diagnostic.phase === 'dispose' && diagnostic.nodeId === undefined;
@@ -80,33 +81,17 @@ export function reportComponentDiagnostic(renderer: Renderer | undefined, diagno
 type ComponentDisplayOptions = Omit<RenderOptions, 'onError'> & {
   getErrorListener: () => RendererErrorListener | undefined;
   isOpen: () => boolean;
-  trackCleanup: boolean;
+  ownsView: boolean;
 };
 export function attachComponentView(renderer: Renderer, view: View, target: HTMLElement,
-  { getErrorListener, isOpen, trackCleanup, ...options }: ComponentDisplayOptions): RenderAttachment {
+  { getErrorListener, isOpen, ownsView, ...options }: ComponentDisplayOptions): RenderAttachment {
   const state = rendererStates.get(renderer);
   if (!state?.alive) throw cancelled();
-  const browser = createBrowserRenderer({ runtime: state.runtime, connectors: state.connectors });
-  let reportedDisposal = false;
-  let cleanup: Promise<void> | undefined;
-  const attachment = browser.attach(view, target, browserOptions({ ...options, onError: report }));
-  function report(diagnostic: RendererDiagnostic) {
-    if (diagnostic.phase === 'dispose' && diagnostic.nodeId === undefined) {
-      if (reportedDisposal) return;
-      reportedDisposal = true;
-    }
-    reportComponentDiagnostic(renderer, diagnostic, getErrorListener(), () => !cleanup && isOpen());
-  }
-  function detach() {
-    return cleanup ??= attachment.detach().catch(cause => {
-      report(createDiagnostic('dispose', cause));
-      throw cause;
-    }).finally(() => { state?.ownedCleanups.delete(detach); });
-  }
-  if (trackCleanup && state.alive && state.ownsRuntime && runtimeOwnsView(state.runtime, view)) {
-    state.ownedCleanups.add(detach);
-  }
-  return { ...attachment, detach };
+  return attachHostedView(state.browser, view, target, browserOptions(options), {
+    getErrorListener, isOpen, isRendererOpen: () => state.alive,
+    // An owned source already waits for its display when the component closes.
+    closeWithRenderer: !ownsView && state.ownsRuntime && runtimeOwnsView(state.runtime, view),
+  });
 }
 
 export function createRenderer({ runtime: injected, onError, connectors = [], ...runtimeOptions }: RendererOptions = {}): Renderer {
@@ -114,7 +99,7 @@ export function createRenderer({ runtime: injected, onError, connectors = [], ..
   const runtime = injected ?? createRuntime(runtimeOptions as Parameters<typeof createRuntime>[0]);
   const browserConnectors = [svelteConnector, ...connectors];
   const browser = createBrowserRenderer({ runtime, connectors: browserConnectors, ...(onError ? { onError } : {}) });
-  const state = { alive: true, runtime, ownsRuntime: !injected, connectors: browserConnectors, ownedCleanups: new Set<() => Promise<void>>(), ...(onError ? { onError } : {}) };
+  const state = { alive: true, runtime, ownsRuntime: !injected, browser, ownedCleanups: new Set<() => Promise<void>>(), ...(onError ? { onError } : {}) };
   let cleanup: Promise<void> | undefined;
   const renderer: Renderer = {
     runtime,

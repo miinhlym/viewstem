@@ -1,6 +1,6 @@
 import { createRenderError } from '@viewstem/core/renderer';
 import type { PublicError, Runtime } from '@viewstem/core';
-import type { ComponentConnector } from '@viewstem/dom';
+import type { BrowserRenderer } from '@viewstem/dom';
 import type { Renderer, RendererErrorListener } from './types.js';
 
 export const failure = (code: string, message: string): PublicError => Object.freeze({ code, message });
@@ -11,7 +11,7 @@ export interface RendererState {
   alive: boolean;
   runtime: Runtime;
   ownsRuntime: boolean;
-  connectors: readonly ComponentConnector[];
+  browser: BrowserRenderer;
   ownedCleanups: Set<() => Promise<void>>;
   onError?: RendererErrorListener;
 }

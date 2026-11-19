@@ -14,7 +14,8 @@ export function createDiagnostic(phase: RendererDiagnostic['phase'], cause: unkn
   nodeId?: string | undefined;
 }): RendererDiagnostic;
 export function notifyDiagnostic(diagnostic: RendererDiagnostic, ...observers: {
-  listener: RendererErrorListener | undefined;
+  listener?: RendererErrorListener | undefined;
+  getListener?: () => RendererErrorListener | undefined;
   isOpen?: () => boolean;
 }[]): void;
 export function createRenderError(missing: boolean, details?: {
@@ -76,6 +77,17 @@ export interface RendererHostOptions<Options extends object, Target extends obje
 export function createRendererHost<Options extends object = {}, Target extends object = object>(
   runtime: Runtime, options: RendererHostOptions<Options, Target>,
 ): Renderer<Options, Target>;
+
+/** Attach a framework-owned display through the same host as imperative rendering. */
+export function attachHostedView<Options extends object, Target extends object>(
+  host: Renderer<Options, Target>, view: View, target: Target, options: Options,
+  owner: {
+    readonly isOpen: () => boolean;
+    readonly isRendererOpen: () => boolean;
+    readonly getErrorListener: () => RendererErrorListener | undefined;
+    readonly closeWithRenderer: boolean;
+  },
+): RenderAttachment;
 
 /** Capture settings now and resolve a Runtime factory on start. The signal owns the View until disposal. */
 export function prepareOwnedView(runtime: Runtime | (() => Runtime), source: ViewSource, options?: Pick<ViewOptions, 'inputs'>): (

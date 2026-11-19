@@ -25,7 +25,7 @@
       active = untrack(() => {
         if (!isOpen()) throw cancelled();
         const display = attachComponentView(renderer, view, target, {
-          context, getErrorListener, isOpen, trackCleanup: onAttach === undefined,
+          context, getErrorListener, isOpen, ownsView: onAttach !== undefined,
           ...(fallback ? { fallback } : {}),
         });
         onAttach?.(display);
