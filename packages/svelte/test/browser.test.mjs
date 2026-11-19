@@ -940,6 +940,51 @@ test('standalone removal cancels a pending Query and reports delayed connector t
   assert.deepEqual(await page.evaluate(() => standalone.diagnostics.map(d => [d.phase, d.error.code, d.error.message])), [['dispose', 'INTERNAL_ERROR', 'INTERNAL_ERROR']]);
 }));
 
+test('ViewstemView delivers each failed automatic node cleanup and keeps rendering', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture;
+    const runtime = F.publicRuntime();
+    const renderer = F.publicRenderer({ runtime });
+    let failCleanup = true;
+    const layout = F.svelteComponent(F.resource('Component', 'Layout', { slots: { default: {} } }), F.Layout);
+    runtime.registry.registerResourceSet(F.defineResourceSet({ id: 'cleanup', version: '1', components: [layout, {
+      contract: F.resource('Component', 'Cleanup', { ports: { value: F.port() } }), connectorId: 'dom',
+      implementation: { mount({ node, parent, anchor }) {
+        const label = parent.ownerDocument.createElement('span');
+        label.textContent = node.inputs.value;
+        parent.insertBefore(label, anchor);
+        return { update() {}, setPending() {}, dispose() { if (failCleanup) throw Error('private cleanup failure'); } };
+      } },
+    }] }));
+    const view = await runtime.createView({
+      states: { shown: F.state(true, { type: 'boolean' }) },
+      render: { id: 'layout', componentRef: 'Layout', slots: { default: [
+        { id: 'repeated', componentRef: 'Cleanup', when: F.p('/states/shown'),
+          repeat: { items: ['one', 'two'], as: 'item', key: F.p('/repeat/item') }, inputs: { value: F.p('/repeat/item') } },
+      ] } },
+    });
+    const diagnostics = [];
+    const target = F.target();
+    const host = F.mount(F.ViewstemView, { target, props: { view, renderer, onError: diagnostic => diagnostics.push(diagnostic) } });
+    await host.whenRendered();
+    const initial = target.textContent.trim();
+    view.getState('shown').write(false);
+    await host.whenRendered();
+    const hidden = target.textContent.trim();
+    view.getState('shown').write(true);
+    await host.whenRendered();
+    const restored = target.textContent.trim();
+    failCleanup = false;
+    await F.unmount(host);
+    await renderer.dispose();
+    await runtime.dispose();
+    return { initial, hidden, restored, diagnostics: diagnostics.map(d => [d.phase, d.nodeId, d.error.code]) };
+  });
+  assert.deepEqual(result, { initial: 'onetwo', hidden: '', restored: 'onetwo', diagnostics: [
+    ['dispose', 'repeated', 'INTERNAL_ERROR'], ['dispose', 'repeated', 'INTERNAL_ERROR'],
+  ] });
+}));
+
 test('ViewstemView cancels a delayed source on removal and renderer disposal while borrowing stays usable', t => browserTest(t, async page => {
   const result = await page.evaluate(async () => {
     const F = Fixture;

@@ -3,8 +3,8 @@ import { createDiagnostic, createRenderError, subscribeRenderProjection, type Re
 import type { ComponentConnector, MountedComponent } from './connector.js';
 import type { BrowserDisplayOptions, MountedDisplayFallback } from './renderer.js';
 
-type Host = { readonly isOpen: () => boolean; readonly emit: RenderEmission };
 type OnError = (cause: unknown, nodeId?: string) => void;
+type Host = { readonly isOpen: () => boolean; readonly emit: RenderEmission; readonly reportDisposal: OnError };
 type Branch = { parent: HTMLElement; before: Node | null; nodes: Map<string, MountedNode>; isOpen: () => boolean };
 type Slot = { branch: Branch };
 type MountedNode = {
@@ -162,7 +162,7 @@ class BrowserConnection {
       const binding = next?.componentRef ? work.projection.componentBinding(next.componentRef) : undefined;
       if (next && next.generation === node.snapshot.generation && binding === node.binding) continue;
       owner.nodes.delete(key);
-      await this.#remove(node).catch(cause => this.#fail(work, cause, node.snapshot.id));
+      await this.#remove(node, this.host.reportDisposal);
     }
     if (!this.#current(work) || !owner.isOpen()) return;
     let before = owner.before;
@@ -215,7 +215,7 @@ class BrowserConnection {
   async #clearRetiredSlots(node: MountedNode) {
     for (const old of node.retiredSlots) {
       node.retiredSlots.delete(old);
-      await this.#clear(old);
+      await this.#clear(old, this.host.reportDisposal);
     }
   }
 
@@ -241,7 +241,7 @@ class BrowserConnection {
     const { branch: owner, snapshot, key } = node;
     const before = node.end.nextSibling;
     owner.nodes.delete(key);
-    await this.#remove(node).catch(cause => this.#fail(work, cause, snapshot.id));
+    await this.#remove(node, this.host.reportDisposal);
     if (!this.options.fallback || !this.#current(work) || !owner.isOpen()) return;
     const next = before?.parentNode === owner.parent ? before : owner.before;
     const replacement = this.#createNode(key, snapshot, owner, node.binding, next);
@@ -281,9 +281,12 @@ class BrowserConnection {
       if (node.fallback) {
         const { start, handle } = node.fallback;
         node.fallback = undefined;
-        await handle?.dispose();
-        clearRange(start, node.end);
-        start.remove();
+        try { await handle?.dispose(); }
+        catch (cause) { this.host.reportDisposal(cause, snapshot.id); }
+        finally {
+          clearRange(start, node.end);
+          start.remove();
+        }
         if (!this.#current(work)) return;
       }
       const id = snapshot.componentRef;
@@ -329,11 +332,15 @@ class BrowserConnection {
     }
   }
 
-  async #remove(node: MountedNode) {
+  async #remove(node: MountedNode, reportDisposal?: OnError) {
     node.lifetime.abort();
     const cleanup = [node.children, ...[...node.slots.values()].map(slot => slot.branch), ...node.retiredSlots];
-    const results = await Promise.allSettled(cleanup.map(child => this.#clear(child)));
+    const results = await Promise.allSettled(cleanup.map(child => this.#clear(child, reportDisposal)));
     try { await (node.handle ? node.handle.dispose() : node.fallback?.handle?.dispose()); }
+    catch (cause) {
+      if (!reportDisposal) throw cause;
+      reportDisposal(cause, node.snapshot.id);
+    }
     finally {
       clearRange(node.start, node.end);
       node.start.remove();
@@ -343,10 +350,10 @@ class BrowserConnection {
     if (failure) throw failure.reason;
   }
 
-  async #clear(owner: Branch) {
+  async #clear(owner: Branch, reportDisposal?: OnError) {
     const nodes = [...owner.nodes.values()];
     owner.nodes.clear();
-    const results = await Promise.allSettled(nodes.map(node => this.#remove(node)));
+    const results = await Promise.allSettled(nodes.map(node => this.#remove(node, reportDisposal)));
     const failure = results.find(result => result.status === 'rejected');
     if (failure) throw failure.reason;
   }

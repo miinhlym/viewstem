@@ -243,6 +243,76 @@ globalThis.pendingSlots = async () => {
   return { wasLive, waited, retiredEvent, result, removed, offeredWhilePending, waiting, resumed, disposed };
 };
 
+globalThis.slotDisposalFailure = async () => {
+  const runtime = createRuntime();
+  const diagnostics = [], rightDiagnostics = [], disposed = [];
+  const observe = diagnostic => diagnostics.push([diagnostic.phase, diagnostic.nodeId, diagnostic.error.code]);
+  const renderer = createRenderer({ runtime, onError: observe });
+  runtime.registry.registerResourceSet(defineResourceSet({ id: 'slot-disposal', version: '1', components: [
+    component('Parent', { ports: { replace: flag }, slots: { main: {}, aside: {} } }, ctx => {
+      const parent = document.createElement('section');
+      const aside = document.createElement('aside');
+      parent.append(aside);
+      ctx.parent.insertBefore(parent, ctx.anchor);
+      const onLeft = left.contains(parent);
+      let host, replace = ctx.node.inputs.replace;
+      function provideMain() {
+        const next = document.createElement('div');
+        parent.insertBefore(next, aside);
+        ctx.provideSlot('main', next);
+        host?.remove();
+        host = next;
+      }
+      provideMain();
+      ctx.provideSlot('aside', aside);
+      return { update(next) {
+        if (onLeft && replace !== next.inputs.replace) { replace = next.inputs.replace; provideMain(); }
+      }, setPending() {}, dispose() { parent.remove(); } };
+    }),
+    component('Child', { ports: { label: text } }, ctx => {
+      const child = document.createElement('span');
+      const label = ctx.node.inputs.label;
+      child.textContent = label;
+      ctx.parent.insertBefore(child, ctx.anchor);
+      const onLeft = left.contains(child);
+      return { update() {}, setPending() {}, async dispose() {
+        if (!onLeft) return;
+        disposed.push(label);
+        if (label !== 'stable') throw Error('child cleanup failed');
+      } };
+    }),
+  ] }));
+  const screen = renderer.mount({ target: left, onError: observe, inputs: { replace: false }, source: {
+    ports: { replace: flag },
+    render: { id: 'parent', componentRef: 'Parent', inputs: { replace: path('/ports/replace') }, slots: {
+      main: [
+        { id: 'main-one', componentRef: 'Child', inputs: { label: 'one' } },
+        { id: 'main-two', componentRef: 'Child', inputs: { label: 'two' } },
+      ],
+      aside: [{ id: 'aside', componentRef: 'Child', inputs: { label: 'stable' } }],
+    } },
+  } });
+  const view = await screen.ready;
+  const other = createRenderer({ runtime });
+  const attachment = other.attach(view, right, { onError: diagnostic => rightDiagnostics.push(diagnostic.phase) });
+  await Promise.all([screen.whenRendered(), attachment.whenRendered()]);
+  const parent = left.querySelector('section');
+  const [one, two, aside] = parent.querySelectorAll('span');
+  const rightOne = right.querySelector('span');
+  const application = await view.setInputs({ replace: true });
+  const results = await Promise.all([code(screen.whenSettled(application)), code(attachment.whenSettled(application))]);
+  const replaced = [one, two].every(node => !node.isConnected) && left.querySelector('span') !== one;
+  const display = [left.querySelector('section') === parent, left.querySelector('aside span') === aside,
+    left.textContent, right.querySelector('span') === rightOne, right.textContent];
+  const retired = [...disposed].sort();
+  const explicit = await code(screen.unmount());
+  await attachment.detach();
+  await renderer.dispose();
+  await other.dispose();
+  await runtime.dispose();
+  return { results, replaced, display, retired, diagnostics: diagnostics.sort(), rightDiagnostics, explicit, empty: left.childNodes.length === 0 };
+};
+
 globalThis.missingConnector = async () => {
   const runtime = createRuntime();
   runtime.registry.registerResourceSet(defineResourceSet({
@@ -300,5 +370,14 @@ test('a pending parent retires withdrawn slots, defers new children and keeps th
   assert.deepEqual(await page.evaluate(() => globalThis.pendingSlots()), {
     wasLive: 'success', waited: true, retiredEvent: 'CANCELLED', result: 'success', removed: true,
     offeredWhilePending: true, waiting: [true, true, true, 'aside'], resumed: [false, true, true, 'mainaside', 1], disposed: 2,
+  });
+});
+
+test('slot disposal failures report per child while replacement and other branches can render', async t => {
+  const page = await browserPage(t);
+  assert.deepEqual(await page.evaluate(() => globalThis.slotDisposalFailure()), {
+    results: ['success', 'success'], replaced: true, display: [true, true, 'onetwostable', true, 'onetwostable'],
+    retired: ['one', 'two'], diagnostics: [['dispose', 'main-one', 'INTERNAL_ERROR'], ['dispose', 'main-two', 'INTERNAL_ERROR']],
+    rightDiagnostics: [], explicit: 'INTERNAL_ERROR', empty: true,
   });
 });

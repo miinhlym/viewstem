@@ -90,7 +90,7 @@ export function attachComponentView(renderer: Renderer, view: View, target: HTML
   let reportedDisposal = false;
   const attachment = browser.attach(view, target, browserOptions({ ...options, onError: report }));
   function report(diagnostic: RendererDiagnostic) {
-    if (diagnostic.phase === 'dispose') {
+    if (diagnostic.phase === 'dispose' && diagnostic.nodeId === undefined) {
       if (reportedDisposal) return;
       reportedDisposal = true;
     }

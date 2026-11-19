@@ -150,7 +150,10 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
           },
         });
         check();
-        adapter = connect(view, target, options, renderError, { isOpen, emit: waiter.emit });
+        adapter = connect(view, target, options, renderError, {
+          isOpen, emit: waiter.emit,
+          reportDisposal(cause, nodeId) { diagnostics(createDiagnostic('dispose', cause, { nodeId })); },
+        });
         check();
       } finally {
         connecting = false;

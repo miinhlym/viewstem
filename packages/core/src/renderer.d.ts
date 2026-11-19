@@ -64,7 +64,11 @@ export interface RendererHostOptions<Options extends object, Target extends obje
   readonly disposeOwned?: () => Promise<void>;
   readonly connect: (view: View, target: Target, options: OptionsWithDiagnostics<Options>,
     onRenderError: (error: unknown, nodeId?: string) => void,
-    connection: { readonly isOpen: () => boolean; readonly emit: RenderEmission }) => {
+    connection: {
+      readonly isOpen: () => boolean;
+      readonly emit: RenderEmission;
+      readonly reportDisposal: (error: unknown, nodeId?: string) => void;
+    }) => {
       dispose(): void | Promise<void>;
       whenRendered(generation: number, sequence: number): void | Promise<void>;
     };
