@@ -85,55 +85,53 @@ export class Runtime {
   }
   async resolve(target, signal, fetched) {
     const check = () => { if (signal.aborted) fail('CANCELLED'); };
-    for (;;) {
-      check();
-      const revision = this.registry.revision;
-      const candidate = this.registry.fork();
-      const seen = new Set();
-      const needed = [];
-      for (const [key, definition] of fetched) {
-        const [kind, id] = JSON.parse(key);
-        const existing = candidate.list({ kind, id })[0];
-        if (existing && (candidate.isCode(kind, id) || !equal(existing, definition))) fail('INVALID_DEFINITION');
-      }
-      const visit = async ({ kind, id, ...origin }) => {
-        check();
-        const key = tuple([kind, id]);
-        if (seen.has(key)) return;
-        seen.add(key);
-        let definition;
-        try { definition = candidate.get(kind, id); }
-        catch {
-          if (!this.resourceResolver) missingReference(kind, id, origin);
-          if (!fetched.has(key)) {
-            let result;
-            try {
-              result = await abortable(this.prepare(() => this.resourceResolver(kind, id, { signal })), signal);
-            } catch (caught) {
-              if (safeError(caught).code === 'REFERENCE_NOT_FOUND') missingReference(kind, id, origin);
-              throw caught;
-            }
-            check();
-            if (result?.kind !== kind || result?.id !== id) missingReference(kind, id, origin);
-            fetched.set(key, structuredClone(result));
-          }
-          definition = fetched.get(key);
-          needed.push(definition);
-        }
-        for (const reference of candidate.references(kind, definition.spec, id)) await visit(reference);
-        return definition;
-      };
-      const spec = target.viewRef !== undefined
-        ? (await visit({ kind: 'View', id: target.viewRef, location: '/ref' })).spec : target.view;
-      if (target.viewRef === undefined) {
-        for (const reference of candidate.references('View', spec)) await visit(reference);
-      }
-      check();
-      if (revision !== this.registry.revision) continue;
-      if (needed.length) candidate.registerResources(needed);
-      candidate.validateDefinition('View', spec, target.viewRef);
-      return { spec, candidate, revision, additions: needed };
+    check();
+    const revision = this.registry.revision;
+    const candidate = this.registry.fork();
+    const seen = new Set();
+    const needed = [];
+    for (const [key, definition] of fetched) {
+      const [kind, id] = JSON.parse(key);
+      const existing = candidate.list({ kind, id })[0];
+      if (existing && (candidate.isCode(kind, id) || !equal(existing, definition))) fail('INVALID_DEFINITION');
     }
+    const visit = async ({ kind, id, ...origin }) => {
+      check();
+      const key = tuple([kind, id]);
+      if (seen.has(key)) return;
+      seen.add(key);
+      let definition;
+      try { definition = candidate.get(kind, id); }
+      catch {
+        if (!this.resourceResolver) missingReference(kind, id, origin);
+        if (!fetched.has(key)) {
+          let result;
+          try {
+            result = await abortable(this.prepare(() => this.resourceResolver(kind, id, { signal })), signal);
+          } catch (caught) {
+            if (safeError(caught).code === 'REFERENCE_NOT_FOUND') missingReference(kind, id, origin);
+            throw caught;
+          }
+          check();
+          if (result?.kind !== kind || result?.id !== id) missingReference(kind, id, origin);
+          fetched.set(key, structuredClone(result));
+        }
+        definition = fetched.get(key);
+        needed.push(definition);
+      }
+      for (const reference of candidate.references(kind, definition.spec, id)) await visit(reference);
+      return definition;
+    };
+    const spec = target.viewRef !== undefined
+      ? (await visit({ kind: 'View', id: target.viewRef, location: '/ref' })).spec : target.view;
+    if (target.viewRef === undefined) {
+      for (const reference of candidate.references('View', spec)) await visit(reference);
+    }
+    check();
+    if (revision !== this.registry.revision) throw retryRegistry;
+    if (needed.length) candidate.registerResources(needed);
+    candidate.validateDefinition('View', spec, target.viewRef);
+    return { spec, candidate, revision, additions: needed };
   }
   async createView(target, signal, beforeCommit, owner) {
     if (!this.alive) fail('CANCELLED');
@@ -890,8 +888,8 @@ export class View {
       if (!this.alive || job.cancelled || job.signal?.aborted) fail('CANCELLED');
       try { return await run(); }
       catch (caught) { if (caught !== retryRegistry) throw caught; }
-      // A cancelled prepare must finish rollback before any next attempt.
-      await Promise.resolve();
+      // Rollback has completed. Let host events, including cancellation, run before retrying.
+      await new Promise(resolve => setTimeout(resolve, 0));
     }
   }
   exportDefinition(){return structuredClone(this.spec);}

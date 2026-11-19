@@ -274,6 +274,70 @@ test('a URL key reserved by another StateStore in the final callback prevents th
   assert.equal(new URL(f.endpoint.read()).searchParams.get('next'), '4');
 });
 
+for (const method of ['registerResources', 'registerComponentContracts']) {
+  test(`an empty ${method} in an update callback does not restart set application`, async t => {
+    const registry = createRegistry().registerResourceSet(defineResourceSet({ id: 'base', version: '1', components: [binding('Base')] }));
+    let attempts = 0;
+    const runtime = createRuntime({ registry, authorize({ operation }) {
+      if (operation === 'update' && ++attempts <= 3) assert.equal(registry[method]([]), registry);
+      return true;
+    } });
+    t.after(() => runtime.dispose());
+    const view = await runtime.createView(definition());
+    registry.registerResourceSet(defineResourceSet({ id: 'new', version: '1', actions: [code('fresh', () => 2)] }));
+    await view.whenSettled(await view.applyResourceSets({ setIds: ['new'] }));
+    assert.equal(attempts, 1);
+    assert.equal(await view.invokeAction({ actionRef: 'fresh' }), 2);
+  });
+}
+
+test('a host timer can cancel replacement during repeated real Registry conflicts', async t => {
+  const f = replacementFixture(t), view = await f.view;
+  await view.whenSettled(view.initial);
+  const controller = new AbortController(), initial = view.initial, oldCount = view.getState('count');
+  let attempts = 0, timer, attemptsAtCancellation;
+  t.after(() => clearTimeout(timer));
+  const result = rendererView(view).replace(f.target, controller.signal, () => {
+    if (++attempts === 1) {
+      timer = setTimeout(() => { attemptsAtCancellation = attempts; controller.abort(); }, 0);
+    }
+    if (attempts <= 16) f.registry.registerResources([resource(`Winner-${attempts}`)]);
+  });
+  await assert.rejects(result, { code: 'CANCELLED' });
+  assert.ok(attempts > 0 && attempts <= 16);
+  assert.equal(attemptsAtCancellation, attempts);
+  assert.equal(f.registry.get('Type', `Winner-${attempts}`).id, `Winner-${attempts}`);
+  assert.throws(() => f.registry.get('Type', 'Retrieved'), { code: 'REFERENCE_NOT_FOUND' });
+  assert.equal(view.initial, initial);
+  assert.equal(view.getState('count'), oldCount);
+  assert.equal(oldCount.read(), 1);
+  assert.deepEqual(view.exportDefinition(), definition());
+  assert.deepEqual(f.calls, { resolve: 1, subscribe: 1, query: 0 });
+  assert.deepEqual(f.endpoint.attempts, []);
+  await view.whenSettled(await view.updateDefinition(definition(), { states: { count: 5 } }));
+  assert.equal(oldCount.read(), 5);
+});
+
+test('a resolver publication conflict leaves a host turn for cancellation before retry', async t => {
+  const registry = createRegistry().registerResourceSet(defineResourceSet({ id: 'base', version: '1', components: [binding('Base')] }));
+  const controller = new AbortController();
+  let timer, lookups = 0;
+  const runtime = createRuntime({ registry, resourceResolver(kind, id) {
+    assert.deepEqual([kind, id], ['Type', 'Retrieved']);
+    lookups++;
+    registry.registerResources([resource('Winner')]);
+    timer = setTimeout(() => controller.abort(), 0);
+    return resource(id);
+  } });
+  t.after(async () => { clearTimeout(timer); await runtime.dispose(); });
+  const source = definition();
+  source.states.extra = { kind: 'State', typeRef: 'Retrieved', initial: 1 };
+  await assert.rejects(runtime.createView(source, { signal: controller.signal }), { code: 'CANCELLED' });
+  assert.equal(lookups, 1);
+  assert.equal(registry.get('Type', 'Winner').id, 'Winner');
+  assert.throws(() => registry.get('Type', 'Retrieved'), { code: 'REFERENCE_NOT_FOUND' });
+});
+
 for (const cancel of [true, false]) {
   test(`rechecking a changed Registry ${cancel ? 'discards the cancelled candidate' : 'publishes both nonconflicting changes'}`, async t => {
     const f = replacementFixture(t), view = await f.view;

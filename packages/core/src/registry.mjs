@@ -220,6 +220,7 @@ export class Registry {
     if (!Array.isArray(contracts)) invalid();
     const definitions = [...Array.from(resources, definition => [freeze(copy(definition)), undefined]),
       ...Array.from(contracts, definition => [freeze(copy(definition)), 'Component'])];
+    if (!definitions.length) return this;
     const candidate = this.fork();
     for (const [definition, codeKind] of definitions) {
       candidate.#insert(definition, codeKind);
