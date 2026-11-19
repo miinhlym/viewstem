@@ -40,7 +40,7 @@ const screen = renderer.mount({
 await screen.whenRendered();
 ```
 
-On route exit, await `screen.unmount()`. On app shutdown, await `renderer.dispose()` and dispose the app-owned Runtime with `runtime.dispose()`.
+On route exit, await `screen.unmount()`. On app shutdown, await `renderer.dispose()` and then await `runtime.dispose()` for the app-owned Runtime.
 
 ## Documentation
 

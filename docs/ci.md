@@ -11,11 +11,11 @@ use a pull request or manual dispatch to check them.
 
 ## Checks and environments
 
-- Node 22 and 24 build core, the Svelte adapter and browser UI, and check core and Svelte types and tarball consumers.
-- Chromium runs the core and Svelte browser tests and the UI tarball consumer tests. The UI suite covers plain JS, React, Vue and Svelte hosts, the original JSON for all 66 families, and date and table State and events.
+- Node 22 and 24 build Core, DOM, Svelte, and UI. The compatibility jobs check Core, DOM, and Svelte types and installed-package consumers, including the independent DOM and mixed-rendering fixtures.
+- Chromium runs the Core, DOM, and Svelte browser tests and the UI tarball consumer tests. The UI suite covers plain JS, React, Vue and Svelte hosts, the original JSON for all 66 families, and date and table State and events.
 - **CI complete** requires both compatibility and browser jobs to pass.
 
-Run `npm run check:ui`, `npm run check:svelte`, and `npm run test:ci` locally. CI uses Playwright Chromium's headless shell.
+Choose the local check for the packages you change. Run `npm run check:dom` for the DOM renderer and CSS transformer, `npm run check:ui` for the UI catalog, `npm run check:svelte` for the Svelte renderer, and `npm run test:ci` for the release planner. CI uses Playwright Chromium's headless shell.
 
 ## npm releases
 

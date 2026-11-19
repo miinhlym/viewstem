@@ -180,7 +180,7 @@
 
 **UI 경로.** `packages/ui/src/index.ts`는 일반 공개 셋 `ui`를 제공한다. `dom.ts`의 카탈로그 노드 생성·입력 반영·이벤트·behavior를 `components.ts`의 컴포넌트 구현으로 옮기고 전체 트리 연결·`renderList`를 제거한다. `shadcn.ts`의 계약 생성 및 레시피, `component-context.ts`, 스타일, 지원표는 카탈로그가 소유한다. DOM 연결자는 요소 배치와 제거를 처리하며 카탈로그 이름을 조회하지 않는다.
 
-1. 기존 컴포넌트의 마크업·ARIA·이벤트 계약과 ID를 유지한다. DOM 구현이 제공하는 슬롯의 실제 컨테이너에 자식을 배치한다. NativeSelect의 옵션 반영과 Tooltip의 자식 식별 같이 자식 DOM이 있어야 하는 기존 동작은 `afterChildren` 경로에서 검증한다. 순수 DOM의 메뉴·table·select 레시피와 CSS는 기존 `data-viewstem-ui` 스코프와 유효한 DOM을 유지하는지 확인한다. 스코프는 커스텀 연결자 노드마다 wrapper로 삽입하지 않고, UI를 쓰는 소비 진입점의 브라우저 mount 영역에 지정한다.
+1. 기존 컴포넌트의 마크업·ARIA·이벤트 계약과 ID를 유지한다. DOM 구현이 제공하는 슬롯의 실제 컨테이너에 자식을 배치한다. NativeSelect의 옵션 반영과 Tooltip의 자식 식별 같이 자식 DOM이 있어야 하는 기존 동작은 `afterChildren` 경로에서 검증한다. 순수 DOM의 메뉴·table·select 레시피는 유효한 DOM을 유지하는지 확인한다. CSS 검증은 셋의 소유 요소에만 스타일이 직접 적용되는지와 브라우저 진입점이 기본 UI CSS를 함께 불러오는지를 확인한다. [D169·D170 스타일 계약](../spec/12-resource-sets-browser.md#ui-셋의-스타일-소유권)
 2. 카탈로그의 `update()`는 노드 배치와 자신의 컨트롤 재구성을 구별한다. 동일 키의 `Button.href`가 바뀌거나 `child` 슬롯 유무로 태그·구조가 바뀌면 기존 리스너와 behavior를 정리하고 기존 슬롯을 철회한 뒤 같은 배치 범위에 새 제어 요소를 만든다. 새 슬롯은 별도 등록으로 제공한다. 이전 요소의 콜백은 정리 신호를 검사하고 새 이벤트를 보내지 못한다. Core 노드 수명과 다른 형제 DOM은 유지한다. `Button.href` 추가·제거에서 `<button> → <a> → <button>`과 이벤트 횟수를 단언한다. [현행 태그 선택](../../packages/ui/src/markup-families.ts) · [카탈로그 구현](../../packages/ui/src/components.ts)
 3. 새 DOM 경로는 앱에서 `ui` 셋을 직접 등록한 뒤 View를 생성한다. 의존 등록도 같은 `ui` 선언을 사용한다. Svelte 편의 렌더러는 DOM·Svelte 연결자를 조립하고 UI 셋 등록은 앱의 선택에 따른다. 전환 단계에서 양 패키지의 이전 순회를 제거하고 저장소 안의 예제·테스트·문서 앱을 같은 변경에 이행한다.
 

@@ -47,6 +47,7 @@ sidebar:
 | 잘못된 옵션·등록·대상 | 해당 설정 호출이 동기 예외를 던집니다. |
 | 마운트 중 정의 준비 실패 | `screen.ready`와 `screen.whenRendered()`가 거절됩니다. `onError`는 `prepare` 진단을 받고 대상 예약이 풀립니다. |
 | `ViewstemView`의 `source` 준비 실패 | `prepareError`에 공개 오류를 전달하고 `onError`에 `prepare` 진단을 한 번 보냅니다. `whenRendered()`도 그 오류로 거절됩니다. |
+| 화면 갱신 중 노드 정리 실패 | 실패한 `nodeId`가 담긴 `dispose` 진단을 전달하고 다른 노드는 계속 렌더링합니다. 렌더러 관찰자가 `ViewstemView`를 제거하면 같은 진단의 화면 콜백은 건너뜁니다. |
 | 자동으로 표시를 해제하거나 종속 리소스를 정리하던 중 실패 | `onError`에 `dispose` 진단이 전달됩니다. 앱이 직접 요청한 정리의 실패는 반환 Promise에서 확인합니다. |
 | 노드 입력을 평가하는 중 실패 | `onError`는 `node` 진단을 받습니다. 어댑터가 노드 오류 상태를 화면에 표시했다면 렌더는 완료됩니다. |
 | 실행 가능한 최초 Query 실패 | 완료 보고의 `queryErrors`에 기록됩니다. |

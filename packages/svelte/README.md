@@ -1,5 +1,7 @@
 # @viewstem/svelte
 
+English | [한국어](README.ko.md)
+
 Render Viewstem Views with Svelte components. Install `@viewstem/core` and `@viewstem/svelte` in a Svelte 5.57.3 or later 5.x app.
 
 | Where the View belongs | Call |
@@ -62,7 +64,7 @@ console.log(target.textContent); // Saved
 
 When the screen closes, call `await screen.unmount()`. When the app is done with the renderer, call `await renderer.dispose()`. If you also need the initial Query report, await `screen.whenSettled(view.initial)` and inspect `queryErrors`.
 
-`createRenderer({ runtime })` borrows the Runtime. Create a binding with `svelteComponent(contract, Adapter)` and register the resource set with `renderer.runtime.registry.registerResourceSet(set)`. Call `detach()` to release a display.
+`createRenderer({ runtime })` borrows the Runtime. The app that owns it awaits `runtime.dispose()` after disposing the renderer. Create a binding with `svelteComponent(contract, Adapter)` and register the resource set with `renderer.runtime.registry.registerResourceSet(set)`. Call `detach()` to release a display.
 
 ## Svelte adapters
 
@@ -74,6 +76,7 @@ An adapter is a Svelte component that accepts the public `ComponentAdapterProps`
 | `node` | The current `NodeSnapshot`, including address, generation, readiness status, errors, and named slots. |
 | `emit(name, payload)` | Emits a core event for the current instance. Returns the actual Action result or rejects with a public error. |
 | `renderSlot` | A `Snippet<[name: string]>`. Use `{@render renderSlot('body')}` to render a named slot. |
+| `provideSlot(name, host)` | Register a DOM slot host. The returned callback withdraws the registration. |
 
 The renderer passes `inputs` as a single prop without spreading the entries onto the DOM or mapping them to individual Svelte props. Write through an explicitly passed State handle or through `emit`. The renderer leaves button disabling based on external Action activity to the adapter.
 

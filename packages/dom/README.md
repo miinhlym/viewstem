@@ -1,5 +1,7 @@
 # @viewstem/dom
 
+English | [한국어](README.ko.md)
+
 Register component contracts and implementations through `defineResourceSet` in `@viewstem/core`. For vanilla DOM, use `DOM_CONNECTOR_ID` and supply a `DomComponent`. Pass the Runtime to `createRenderer({ runtime })`. Additional connectors can be supplied through `connectors`.
 
 `renderer.mount({ target, source })` owns its View. `await mounted.ready` returns the View when it is prepared and connected. `await mounted.whenRendered()` observes DOM completion on that connection. Use `renderer.attach(view, target)` to display an existing View and `detach()` to release the display.
@@ -49,7 +51,7 @@ import { scopeUiCss } from '@viewstem/dom/styles/postcss';
 const result = await postcss([scopeUiCss('acme-forms')]).process(css, { from: 'styles.css' });
 ```
 
-Resolve CSS imports before this step and publish the resulting stylesheet. The plugin scopes the final target of each selector and prefixes internal custom properties, layers, and animation names. Use `publicProperties` for custom properties the app can set by name.
+Resolve CSS imports before this step and publish the resulting stylesheet. The plugin scopes the final target of each selector and prefixes internal custom properties, layers, and animation names. In `.theme { .field { … } }`, an owned `.field` can match inside a host or another set's `.theme`. Declarations on `.theme` itself apply to owned `.theme` elements. Use `publicProperties` for custom properties the app can set by name.
 
 When a component updates a local stylesheet property from JavaScript, pass `forms.localProperty('--progress')` to `element.style.setProperty()`. This resolves the same name that the build emits for `--progress`.
 

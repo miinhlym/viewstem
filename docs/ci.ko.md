@@ -11,11 +11,11 @@ PR이나 수동 실행으로 확인합니다.
 
 ## 검사와 환경
 
-- Node 22·24에서 core와 Svelte 어댑터, 브라우저 UI를 빌드하고 core·Svelte 타입과 tarball 소비자를 검사합니다.
-- Chromium에서 core·Svelte 브라우저 테스트와 UI tarball 소비자 테스트를 실행합니다. UI 검사는 순수 JS·React·Vue·Svelte 호스트, 원본 66개 계열의 JSON, 날짜·테이블의 State와 이벤트를 다룹니다.
+- Node 22·24에서 Core·DOM·Svelte·UI를 빌드합니다. 호환성 검사에서는 Core·DOM·Svelte 타입과 설치된 패키지의 소비 경로를 확인합니다. 독립 DOM 설치와 혼합 렌더링도 포함합니다.
+- Chromium에서 Core·DOM·Svelte 브라우저 테스트와 UI tarball 소비자 테스트를 실행합니다. UI 검사는 순수 JS·React·Vue·Svelte 호스트, 원본 66개 계열의 JSON, 날짜·테이블의 State와 이벤트를 다룹니다.
 - **CI complete**는 호환성 검사와 브라우저 검사가 모두 성공해야 통과합니다.
 
-로컬에서는 `npm run check:ui`, `npm run check:svelte`, `npm run test:ci`를 실행합니다. CI 브라우저는 Playwright Chromium의 headless shell을 사용합니다.
+변경한 패키지에 맞춰 로컬 검사를 선택합니다. DOM 렌더러·CSS 변환은 `npm run check:dom`, UI 카탈로그는 `npm run check:ui`, Svelte 렌더러는 `npm run check:svelte`, 릴리스 계획은 `npm run test:ci`로 확인합니다. CI 브라우저는 Playwright Chromium의 headless shell을 사용합니다.
 
 ## npm 릴리스
 

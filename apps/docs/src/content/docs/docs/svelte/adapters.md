@@ -23,6 +23,7 @@ For a specific contract, declare it with `as const satisfies ComponentContract`,
 | `node` | `NodeSnapshot`, with contract-specific inputs when typed | The current core projection with status, errors, identity, and named slots. Read `node.inputs` to narrow inputs by status. |
 | `emit` | `(event: string, payload: unknown) => Promise<unknown>` | Send an event from this node and receive the actual Action result. |
 | `renderSlot` | `Snippet<[name: string]>` | Render the ordered children for a named slot. |
+| `provideSlot` | `(name: string, host: HTMLElement, before?: Node \| null) => () => void` | Register a DOM host for a named slot. The returned callback withdraws the registration. |
 
 The props are read-only. Write through an explicitly passed State handle or dispatch an event. Choose which inputs, if any, to use as DOM attributes.
 
@@ -43,6 +44,8 @@ The call checks current core readiness even if Svelte is still applying a DOM up
 ### renderSlot
 
 Call the snippet with the contract's slot name, for example `{@render renderSlot('body')}`. An empty or absent slot renders no children. Core evaluates slot children in the context of the author that supplied them. The Svelte adapter decides where to render them in its markup.
+
+Use `provideSlot(name, host)` when the slot children need to be direct DOM children of `host`. Call the returned function when that host is removed.
 
 ## ComponentBinding
 

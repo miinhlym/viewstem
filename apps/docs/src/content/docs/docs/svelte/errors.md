@@ -45,6 +45,7 @@ Supply a fallback snippet through `RenderOptions` or `ViewstemViewProps`. It rec
 | Invalid options, registration, or target | The relevant setup call throws synchronously. |
 | View preparation fails during mount | `screen.ready` and `screen.whenRendered()` reject. `onError` receives a `prepare` diagnostic and the target reservation is released. |
 | `ViewstemView` source preparation fails | `prepareError` receives the public error and `onError` receives one `prepare` diagnostic. `whenRendered()` rejects with the same error. |
+| A node fails to clean up during a display update | `onError` receives a `dispose` diagnostic with its `nodeId`. Other nodes keep rendering. If the renderer's observer removes `ViewstemView`, the screen callback for that diagnostic is skipped. |
 | Automatic display or owned resource cleanup fails | `onError` receives a `dispose` diagnostic. Observe the promise when requesting cleanup explicitly. |
 | An input fails during node evaluation | `onError` receives a `node` diagnostic. The adapter can display the node's error state, which counts as a completed render. |
 | Eligible initial Query fails | The completion report contains an entry in `queryErrors`. |

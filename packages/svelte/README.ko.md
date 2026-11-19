@@ -1,5 +1,7 @@
 # @viewstem/svelte
 
+[English](README.md) | 한국어
+
 Viewstem View를 Svelte 컴포넌트로 표시합니다. Svelte 5.57.3 이상 5.x 앱에서 `@viewstem/core`와 `@viewstem/svelte`를 설치하세요.
 
 | 표시할 곳과 View | 호출 |
@@ -62,7 +64,7 @@ console.log(target.textContent); // Saved
 
 화면이 닫히면 `await screen.unmount()`를, 앱이 렌더러 사용을 마치면 `await renderer.dispose()`를 호출하세요. 최초 Query 보고까지 필요하면 `await screen.whenSettled(view.initial)`을 호출하고 `queryErrors`를 확인하세요.
 
-`createRenderer({ runtime })`은 Runtime을 빌립니다. `svelteComponent(contract, Adapter)`를 셋에 담아 `renderer.runtime.registry.registerResourceSet(set)`으로 등록합니다. 표시는 `detach()`로 정리합니다.
+`createRenderer({ runtime })`은 Runtime을 빌립니다. Runtime을 소유한 앱은 렌더러를 정리한 뒤 `runtime.dispose()`를 기다립니다. `svelteComponent(contract, Adapter)`를 셋에 담아 `renderer.runtime.registry.registerResourceSet(set)`으로 등록합니다. 표시는 `detach()`로 정리합니다.
 
 ## Svelte 어댑터
 
@@ -74,6 +76,7 @@ console.log(target.textContent); // Saved
 | `node` | 현재 `NodeSnapshot`. 주소·세대·준비 상태·오류·이름별 slot 등 |
 | `emit(name, payload)` | 현재 인스턴스의 core 이벤트 호출. 실제 Action 결과를 반환하거나 공통 오류로 reject |
 | `renderSlot` | `Snippet<[name: string]>`. `{@render renderSlot('body')}`로 지정 slot 표시 |
+| `provideSlot(name, host)` | 슬롯의 DOM 호스트를 등록합니다. 반환 함수로 등록을 철회합니다. |
 
 입력을 임의 DOM attribute로 펼치거나 Svelte prop 이름으로 바꾸지 않습니다. `inputs`의 값은 직접 수정하지 않고, 명시 전달된 State 핸들이나 `emit`으로 쓰기를 수행합니다. 외부 Action 실행 상태를 버튼의 disabled 값에 자동 연결하지도 않습니다.
 

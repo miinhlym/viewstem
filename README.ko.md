@@ -40,7 +40,7 @@ const screen = renderer.mount({
 await screen.whenRendered();
 ```
 
-화면이 닫히면 `screen.unmount()`를 기다립니다. 앱을 종료할 때는 `renderer.dispose()`를 기다린 뒤 앱이 소유한 Runtime을 `runtime.dispose()`로 정리합니다.
+화면이 닫히면 `screen.unmount()`를 기다립니다. 앱을 종료할 때는 `renderer.dispose()`를 기다린 뒤 앱이 소유한 Runtime의 `runtime.dispose()`도 기다립니다.
 
 ## 문서
 

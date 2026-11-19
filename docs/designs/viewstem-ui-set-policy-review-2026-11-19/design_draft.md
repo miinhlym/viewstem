@@ -4,6 +4,8 @@
 - 작성자 miinhlym
 - 상태 설계 제안
 
+이 초안의 수동 CSS import 예시는 당시 제안이다. 현재 스타일 소유권과 브라우저 자동 로딩은 확정된 D169·D170을 따른다. [현행 스타일 계약](../../spec/12-resource-sets-browser.md#ui-셋의-스타일-소유권)
+
 ## 배경과 문제
 
 한 View에서 `@viewstem/ui`의 Card 안에 외부 Svelte 입력을 넣을 수 있다. 앱이 현재 `styles.css`를 가져오고 상위에 `data-viewstem-ui`를 붙이면 외부 입력에도 Basecoat의 리셋이 적용된다. Chromium 재현에서는 같은 일반 입력이 범위 밖에서 테두리 `2px`, 범위 안에서 `0px`였다. [재현 근거](review-evidence.md) · [CSS 빌드](../../../packages/ui/scripts/build-basecoat.mjs#L14)

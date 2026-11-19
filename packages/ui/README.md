@@ -2,7 +2,7 @@
 
 English | [한국어](README.ko.md)
 
-Default browser UI for rendering Viewstem JSON into a DOM container. The package depends on `@viewstem/core`. Its renderer uses Basecoat 1.1.0 Vega styles and selected Vanilla JS controllers without a React, Vue, or Svelte runtime. The host supplies a connected element.
+Default UI resource set for Viewstem. Its components use the `@viewstem/dom` connector, Basecoat 1.1.0 Vega styles, and selected Vanilla JS controllers. The host supplies a connected element.
 
 ```js
 import { createRuntime } from '@viewstem/core';
@@ -28,9 +28,9 @@ await screen.ready;
 await screen.whenRendered();
 ```
 
-Call `await screen.unmount()` when the screen closes and `await renderer.dispose()` when the app is done with the renderer. If you need the initial Query report, use `await screen.whenSettled(view.initial)` with the View returned by `screen.ready`.
+Call `await screen.unmount()` when the screen closes. On app shutdown, await `renderer.dispose()` and then await `runtime.dispose()` for the Runtime created above. If you need the initial Query report, use `await screen.whenSettled(view.initial)` with the View returned by `screen.ready`.
 
-Register the exported `ui` resource set on the Runtime before creating a View. Browser bundlers such as Vite include the scoped CSS when they import `@viewstem/ui`. The `@viewstem/ui/styles.css` export is available for hosts that load the stylesheet explicitly. `renderer.attach(view, target)` borrows a View, and `await attachment.detach()` releases the display. `whenRendered()` waits for the requested DOM projection.
+Register the exported `ui` resource set before creating a View. A set that includes `ui` in `dependencies` registers it along with its own resources. When a browser bundler selects the `browser` export, the import of `@viewstem/ui` includes its scoped CSS in either case. Hosts that load stylesheets explicitly can use `@viewstem/ui/styles.css`. `renderer.attach(view, target)` borrows a View, and `await attachment.detach()` releases the display. `whenRendered()` waits for the requested DOM projection.
 
 ## Shared JSON catalog
 
@@ -54,6 +54,6 @@ Basecoat styles target elements owned by the default UI. Set `.dark` or `data-th
 
 ## Verify locally
 
-From the workspace root, install the locked dependencies and Chromium, then run `npm run check:ui`. The test installs the core and UI tarballs in an isolated consumer and runs the same [View JSON](test/view.json) in plain JS, React, Vue, and Svelte. The vanilla dependency and bundle checks enforce the framework boundary. The browser suite also mounts the [66 original catalog ViewSpecs](test/fixtures/samples.mjs) and verifies State and Action behavior for the date and table recipes.
+From the workspace root, install the locked dependencies and Chromium, then run `npm run check:ui`. The test installs the Core, DOM, and UI tarballs in an isolated consumer and runs the same [View JSON](test/view.json) in plain JS, React, Vue, and Svelte. The vanilla dependency and bundle checks enforce the framework boundary. The browser suite also mounts the [66 original catalog ViewSpecs](test/fixtures/samples.mjs) and verifies State and Action behavior for the date and table recipes.
 
 Set prefixed theme variables such as `--viewstem-primary` and `--viewstem-radius` on an ancestor. The legacy `data-viewstem-ui` attribute provides a boundary for older theme variables. When sets are mixed, each set's CSS directly styles its own elements.

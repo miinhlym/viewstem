@@ -25,7 +25,7 @@ description: 카탈로그 등록, 기존 View 연결, 스타일과 지원 메타
 
 `renderer.attach(view, target, { onError }?)`는 `whenRendered()`, `whenSettled(application)`, `detach()`가 있는 연결을 반환합니다. `await attachment.detach()`는 DOM과 구독을 정리합니다. 빌린 View는 소유자가 폐기합니다.
 
-두 경로 모두 문서에 연결된 미예약 HTML 요소가 필요합니다. 정리가 끝난 뒤 대상을 재사용하세요. `await renderer.dispose()`는 렌더러가 만든 화면과 대여 연결을 정리합니다. Runtime은 호스트가 `runtime.dispose()`로 정리합니다.
+두 경로 모두 문서에 연결된 미예약 HTML 요소가 필요합니다. 정리가 끝난 뒤 대상을 재사용하세요. `await renderer.dispose()`는 렌더러가 만든 화면과 대여 연결을 정리합니다. 주입한 Runtime을 소유한 앱은 이어서 `runtime.dispose()`를 기다립니다.
 
 ## 오류와 진단
 
@@ -34,11 +34,12 @@ description: 카탈로그 등록, 기존 View 연결, 스타일과 지원 메타
 | 대상이 없거나 연결되지 않았거나 이미 예약됨 | `mount()` 또는 `attach()`의 동기 예외 |
 | View 준비 실패 | `screen.ready`가 정리 후 거절하고 `onError`에서 `prepare` 진단을 받습니다. |
 | 컴포넌트 렌더 실패 | 해당 표시 연결의 `whenRendered()`가 거절하고 `onError`에서 `render` 진단을 받습니다. |
+| 화면 갱신 중 노드 정리 실패 | `onError`에서 실패한 `nodeId`가 담긴 `dispose` 진단을 받습니다. 다른 노드는 계속 렌더링합니다. |
 | 이후 노드·Query·UI 이벤트 Action·URL·렌더 오류 | `onError` 진단. 최초 Query 실패는 `whenSettled()`의 `queryErrors`에도 기록 |
 | 직접 실행한 `view.invokeAction()` 또는 View 변경 실패 | 해당 호출의 Promise 거절 |
 | 정리나 새 적용으로 완료 대기가 취소됨 | 대기 Promise가 `CANCELLED`로 거절 |
 
-`onError`는 `{ phase, error, nodeId?, application? }`을 받습니다. `phase`는 `prepare`, `node`, `query`, `action`, `url`, `render` 중 하나입니다. 리터럴 Component 입력이 스키마 검증에 실패하면 `error.input`에 포트 이름이, Component 참조가 있으면 `error.resource`에 해당 Component가 기록됩니다. 렌더러 콜백이 화면 또는 연결 콜백보다 먼저 호출됩니다. 여러 연결이 같은 View를 관찰하더라도 같은 함수는 한 진단 발생을 한 번 받습니다.
+`onError`는 `{ phase, error, nodeId?, application? }`을 받습니다. `phase`는 `prepare`, `node`, `query`, `action`, `url`, `render`, `dispose` 중 하나입니다. 리터럴 Component 입력이 스키마 검증에 실패하면 `error.input`에 포트 이름이, Component 참조가 있으면 `error.resource`에 해당 Component가 기록됩니다. 렌더러 콜백이 화면 또는 연결 콜백보다 먼저 호출됩니다. 렌더러 콜백이 표시를 닫으면 같은 진단의 남은 콜백은 건너뜁니다. 여러 연결이 같은 View를 관찰하더라도 같은 함수는 한 진단 발생을 한 번 받습니다.
 
 ## 스타일과 메타데이터
 

@@ -25,7 +25,7 @@ Pass `view.initial` for the first application or use the handle returned by `set
 
 `renderer.attach(view, target, { onError }?)` returns an attachment with `whenRendered()`, `whenSettled(application)`, and `detach()`. `await attachment.detach()` releases the DOM and subscription. The original owner disposes the borrowed View.
 
-Both paths require a connected, unreserved HTML element. Wait for cleanup before reusing it. `await renderer.dispose()` releases the renderer's screens and attachments. The Runtime's owner calls `runtime.dispose()`.
+Both paths require a connected, unreserved HTML element. Wait for cleanup before reusing it. `await renderer.dispose()` releases the renderer's screens and attachments. The app that owns the injected Runtime then awaits `runtime.dispose()`.
 
 ## Errors and diagnostics
 
@@ -34,11 +34,12 @@ Both paths require a connected, unreserved HTML element. Wait for cleanup before
 | Target is missing, disconnected, or already reserved | Synchronous exception from `mount()` or `attach()` |
 | View preparation fails | `screen.ready` rejects after cleanup and `onError` receives a `prepare` diagnostic |
 | A component fails during render | The display’s `whenRendered()` rejects and `onError` receives a `render` diagnostic |
+| A node fails to clean up during a display update | `onError` receives a `dispose` diagnostic with its `nodeId`. Other nodes continue rendering. |
 | Later node, Query, UI event Action, URL, or render error | `onError` diagnostics. Initial Query failures also appear in the `whenSettled()` report's `queryErrors` |
 | A direct `view.invokeAction()` or View change fails | The call's promise rejects |
 | A wait is cancelled by cleanup or a new application | The waiting promise rejects with `CANCELLED` |
 
-`onError` receives `{ phase, error, nodeId?, application? }`. The phases are `prepare`, `node`, `query`, `action`, `url`, and `render`. When a literal Component input fails schema validation, `error.input` identifies the port and `error.resource` identifies the referenced Component when present. The renderer callback runs before the screen or attachment callback. The same function receives a diagnostic occurrence once, even when multiple attachments observe the same View.
+`onError` receives `{ phase, error, nodeId?, application? }`. The phases are `prepare`, `node`, `query`, `action`, `url`, `render`, and `dispose`. When a literal Component input fails schema validation, `error.input` identifies the port and `error.resource` identifies the referenced Component when present. The renderer callback runs before the screen or attachment callback. If it closes the display, any remaining callback for that diagnostic is skipped. The same function receives a diagnostic occurrence once, even when multiple attachments observe the same View.
 
 ## Styles and metadata
 

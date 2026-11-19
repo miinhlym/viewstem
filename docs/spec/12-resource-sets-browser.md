@@ -112,7 +112,7 @@ Viewstem은 서비스가 신뢰해 직접 가져온 셋·연결자 코드만 실
 
 **D169.** 브라우저 UI 셋은 자신이 만든 DOM에 기본 스타일을 적용한다. 소유 표시가 붙은 조상 아래에 있더라도, 슬롯에 들어온 외부 요소의 기본 외형은 해당 요소의 셋이 정한다. 일반 CSS 상속과 호스트가 서로 연결한 테마 변수는 기존 브라우저 규칙을 따른다.
 
-DOM 작성자는 `@viewstem/dom/styles`의 `createStyleScope(id)`와 `@viewstem/dom/styles/postcss`의 `scopeUiCss(id)`를 같은 셋 식별자로 사용할 수 있다. 도구는 CSS 규칙의 최종 대상에 소유 조건을 적용한다. 기존 `data-viewstem-ui`는 이전 테마 변수를 읽는 범위다. [설계 초안](../designs/viewstem-ui-set-policy-review-2026-11-19/design_draft.md)
+DOM 작성자는 `@viewstem/dom/styles`의 `createStyleScope(id)`와 `@viewstem/dom/styles/postcss`의 `scopeUiCss(id)`를 같은 셋 식별자로 사용할 수 있다. 도구는 CSS 규칙의 최종 대상에 소유 조건을 적용한다. 중첩 선택자의 조상 조건은 그대로 유지하며, 조상에 직접 적용되는 선언은 그 조상이 해당 셋 소유일 때만 적용한다. 기존 `data-viewstem-ui`는 이전 테마 변수를 읽는 범위다. [설계 배경](../designs/viewstem-ui-set-policy-review-2026-11-19/design_draft.md)
 
 서로 다른 셋 ID로 빌드한 스타일은 CSS 레이어, 애니메이션, 내부 CSS 변수 이름을 공유하지 않는다. `publicProperties`로 지정한 테마 변수는 원래 이름을 유지한다. 컴포넌트가 JavaScript에서 내부 CSS 변수를 갱신할 때는 `createStyleScope(id).localProperty(name)`으로 빌드와 같은 이름을 얻는다.
 

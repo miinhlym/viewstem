@@ -44,7 +44,7 @@ await screen.whenRendered();
 npm run dev
 ```
 
-터미널에 표시된 주소를 열면 **Hello, Viewstem** 버튼이 보입니다. View 정의의 `inputs.text`를 바꿔 버튼 문구가 달라지는지 확인하세요. `await screen.ready`로 준비된 View를 얻고, `await screen.whenRendered()`로 DOM 반영을 기다립니다. 화면을 닫을 때는 `screen.unmount()`를 기다립니다. 앱을 종료할 때는 `renderer.dispose()`를 기다린 뒤 `runtime.dispose()`를 호출합니다.
+터미널에 표시된 주소를 열면 **Hello, Viewstem** 버튼이 보입니다. View 정의의 `inputs.text`를 바꿔 버튼 문구가 달라지는지 확인하세요. `await screen.ready`로 준비된 View를 얻고, `await screen.whenRendered()`로 DOM 반영을 기다립니다. 화면을 닫을 때는 `screen.unmount()`를 기다립니다. 앱을 종료할 때는 `renderer.dispose()`를 기다린 뒤 `runtime.dispose()`도 기다립니다.
 
 ## 다음 단계
 

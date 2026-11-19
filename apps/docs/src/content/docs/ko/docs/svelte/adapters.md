@@ -23,6 +23,7 @@ sidebar:
 | `node` | `NodeSnapshot`. 계약을 지정하면 입력 타입 추론 | 상태, 오류, 식별 정보, 이름 있는 슬롯을 담은 Core 스냅샷입니다. `node.inputs`를 사용하면 상태에 따라 입력 타입을 좁힐 수 있습니다. |
 | `emit` | `(event: string, payload: unknown) => Promise<unknown>` | 노드에서 이벤트를 보내고 실제 Action 결과를 받습니다. |
 | `renderSlot` | `Snippet<[name: string]>` | 지정한 슬롯의 자식을 순서대로 표시합니다. |
+| `provideSlot` | `(name: string, host: HTMLElement, before?: Node \| null) => () => void` | 이름이 있는 슬롯의 DOM 호스트를 등록합니다. 반환 함수로 등록을 철회합니다. |
 
 Prop은 읽기 전용입니다. 쓰기는 명시적으로 전달받은 State 핸들이나 이벤트를 사용합니다. 어떤 입력을 DOM 속성으로 사용할지는 어댑터가 결정합니다.
 
@@ -43,6 +44,8 @@ Svelte가 DOM을 갱신하는 중에도 호출 시점의 Core 준비 상태를 �
 ### renderSlot
 
 `{@render renderSlot('body')}`처럼 계약에 선언한 슬롯 이름으로 snippet을 호출합니다. 슬롯이 비어 있거나 생략되면 자식을 렌더링하지 않습니다. Core는 슬롯을 제공한 작성자의 문맥에서 자식을 평가합니다. 어댑터는 마크업에서 슬롯을 표시할 위치를 정합니다.
+
+슬롯 자식을 `host`의 직접 DOM 자식으로 배치하려면 `provideSlot(name, host)`를 사용합니다. 호스트를 제거할 때 반환된 철회 함수를 호출합니다.
 
 ## ComponentBinding
 

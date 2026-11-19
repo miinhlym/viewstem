@@ -18,6 +18,7 @@ export function sonnerInputs(view: ViewSpec): Record<string, unknown> {
 // Executed by the preview and printed verbatim in its consumer setup.ts.
 export async function registerUiToastAction(registry: Registry, runtime: Runtime, target: HTMLElement, attach: ReturnType<typeof createRenderer>['attach'], inputs: Record<string, unknown>): Promise<() => Promise<void>> {
   const toastTarget = target.ownerDocument.createElement('div');
+  // The docs theme also supplies legacy variables for this separate display.
   toastTarget.setAttribute('data-viewstem-ui', '');
   toastTarget.dataset.demoNotifications = '';
   // Mount the fixed overlay outside the workbench's stacking context.
@@ -49,7 +50,7 @@ export async function registerUiToastAction(registry: Registry, runtime: Runtime
     } } }, ({ inputs }) => {
       view.getState('messages').write([{ id: 'viewstem-docs-sonner-demo', title: String(inputs.title), description: String(inputs.description), kind: 'success', duration: 4000 }]);
     });
-    return async () => { await attachment.detach(); view.dispose(); toastTarget.remove(); };
+    return async () => { await attachment.detach(); await view.dispose(); toastTarget.remove(); };
   } catch (error) { toastTarget.remove(); throw error; }
 }
 
@@ -65,13 +66,12 @@ export function uiDemoSetupSource(view: ViewSpec, family: string) {
     'const renderer = createRenderer({ runtime });',
     'const target = document.querySelector<HTMLElement>("#preview");',
     'if (!target) throw new Error("Missing #preview element");',
-    'target.setAttribute("data-viewstem-ui", "");',
     ...(family === 'sonner' ? ['', `const registerUiToastAction: (registry: Registry, runtime: Runtime, target: HTMLElement, attach: ReturnType<typeof import('@viewstem/dom').createRenderer>['attach'], inputs: Record<string, unknown>) => Promise<() => Promise<void>> = ${registerUiToastAction.toString()};`,
       `const disposeToast = await registerUiToastAction(runtime.registry, runtime, target, renderer.attach.bind(renderer), ${JSON.stringify(sonnerInputs(view))});`] : []), '',
     '// JSON imports widen discriminants; the runtime validates the definition.',
     'const screen = renderer.mount({ target, source: view as unknown as ViewSpec });', 'await screen.ready;', 'await screen.whenRendered();', '',
     '// Call when this screen is removed.', 'export async function dispose() {',
     '  await screen.unmount();', ...(family === 'sonner' ? ['  await disposeToast();'] : []),
-    '  await renderer.dispose();', '  runtime.dispose();', '}',
+    '  await renderer.dispose();', '  await runtime.dispose();', '}',
   ].join('\n');
 }

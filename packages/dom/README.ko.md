@@ -1,5 +1,7 @@
 # @viewstem/dom
 
+[English](README.md) | 한국어
+
 `@viewstem/core`의 `defineResourceSet`으로 컴포넌트 계약과 구현을 등록합니다. 바닐라 DOM 구현은 `DOM_CONNECTOR_ID`와 `DomComponent`를 사용합니다. `createRenderer({ runtime })`에 Runtime을 전달하고, 다른 연결자는 `connectors`로 추가합니다.
 
 `renderer.mount({ target, source })`는 View를 소유합니다. `mounted.ready`는 View가 준비되고 표시 연결이 성립하면 View를 반환합니다. `mounted.whenRendered()`로 해당 연결의 렌더 완료를 확인합니다. 기존 View는 `renderer.attach(view, target)`으로 표시하고 `detach()`로 표시 연결을 해제합니다.
@@ -49,7 +51,7 @@ import { scopeUiCss } from '@viewstem/dom/styles/postcss';
 const result = await postcss([scopeUiCss('acme-forms')]).process(css, { from: 'styles.css' });
 ```
 
-CSS import를 먼저 해결한 뒤 이 변환을 적용하고 결과 CSS를 배포합니다. 변환은 각 선택자의 최종 대상을 제한하고 내부 CSS 변수, 레이어, 애니메이션 이름에 접두사를 붙입니다. 앱이 이름으로 재정의할 변수는 `publicProperties`에 지정합니다.
+CSS import를 먼저 해결한 뒤 이 변환을 적용하고 결과 CSS를 배포합니다. 변환은 각 선택자의 최종 대상을 제한하고 내부 CSS 변수, 레이어, 애니메이션 이름에 접두사를 붙입니다. `.theme { .field { … } }`에서는 호스트나 다른 셋의 `.theme` 아래에 있는 자기 셋의 `.field`에도 스타일이 적용됩니다. `.theme` 자체의 선언은 자기 셋의 `.theme`에 적용됩니다. 앱이 이름으로 재정의할 변수는 `publicProperties`에 지정합니다.
 
 컴포넌트가 내부 변수를 JavaScript에서 갱신할 때는 `forms.localProperty('--progress')`를 `element.style.setProperty()`에 넘깁니다. 빌드가 CSS의 `--progress`에 붙이는 접두사와 같은 이름을 얻습니다.
 

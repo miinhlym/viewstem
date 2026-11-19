@@ -77,11 +77,12 @@ npx playwright install chromium
 |---|---|
 | core 동작 또는 계약 | `npm run check`; 브라우저 동작이면 `npm run test:browser` 추가 |
 | core 패키지 구성·타입 선언·패키지 README | `npm run build` 후 `npm run test:package` |
+| DOM 렌더러·연결자·CSS 격리 | `npm run check:dom`. 공개 진입점과 독립 소비 경로는 네 패키지를 모두 빌드한 뒤 `npm run test:dom:package`로 확인합니다. |
 | Svelte 렌더러 또는 해당 예제 | `npm run check:svelte` |
 | 브라우저 UI 카탈로그·생성 계약·스타일·fixture | `npm run check:ui` |
 | 사이트 UI·콘텐츠·탐색·예제 | [사이트 유지보수 안내](apps/docs/README.ko.md#변경-영역에-맞는-검증-선택)에서 수정 위치와 관련 검증 확인 |
 | CI 설정 | `npm run test:ci`; workflow 문법을 확인하고 [CI 안내](docs/ci.ko.md)의 영향받는 브라우저 검증 실행 |
-| 패키지 메타데이터나 라이선스 파일만 변경 | 해당 패키지를 빌드하고 core는 `npm run test:package`, Svelte는 `npm run test:svelte:package`를 실행. UI는 `npm run check:ui` 후 `npm pack --dry-run -w @viewstem/ui`로 구성 확인 |
+| 패키지 메타데이터나 라이선스 파일만 변경 | 해당 패키지를 빌드하고 설치 검사를 실행합니다. Core는 `npm run test:package`, DOM은 네 패키지를 모두 빌드한 뒤 `npm run test:dom:package`, Svelte는 `npm run test:svelte:package`를 실행합니다. UI는 `npm run check:ui` 후 `npm pack --dry-run -w @viewstem/ui`로 구성을 확인합니다. |
 | 커뮤니티 문서나 템플릿만 변경 | 링크·예제·해당 JSON/YAML 문법과 `git diff --check` 확인 |
 
 Svelte나 UI를 렌더링하는 테스트는 빌드한 패키지 export를 사용합니다.
@@ -117,6 +118,7 @@ npm 패키지를 변경할 때는 [Changeset 작성하기](docs/ci.ko.md#changes
 `Signed-off-by` 줄은 선택 사항입니다.
 
 Viewstem 자체 라이선스의 기준은 루트 `LICENSE`입니다. 설치된 패키지에도
-라이선스가 포함되도록 세 패키지 디렉터리에 동일한 사본을 둡니다.
-사본과 패키지의 `license` 필드를 함께 맞추세요. core와 Svelte의 소비자 테스트는
-설치된 라이선스와 외부 고지를 확인합니다. UI 패키지 구성에서는 Viewstem과 Basecoat 라이선스를 확인하세요.
+라이선스가 포함되도록 네 패키지 디렉터리에 동일한 사본을 둡니다.
+사본과 패키지의 `license` 필드를 함께 맞추세요. Core와 Svelte의 소비자 테스트는
+설치된 라이선스 문구를 확인하고 Core 테스트는 vendored CEL 고지도 확인합니다.
+DOM 독립 소비 테스트는 네 tarball에 모두 `LICENSE`가 포함됐는지 확인합니다. UI 패키지 구성에서는 Viewstem과 Basecoat 라이선스를 확인하세요.

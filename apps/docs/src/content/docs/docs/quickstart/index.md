@@ -44,7 +44,7 @@ await screen.whenRendered();
 npm run dev
 ```
 
-Open the URL printed in the terminal. You should see a **Hello, Viewstem** button. Change `inputs.text` in the View definition to update the label. Use `await screen.ready` to get the prepared View and `await screen.whenRendered()` to wait for the DOM. Await `screen.unmount()` when the screen closes. On app shutdown, await `renderer.dispose()` and call `runtime.dispose()`.
+Open the URL printed in the terminal. You should see a **Hello, Viewstem** button. Change `inputs.text` in the View definition to update the label. Use `await screen.ready` to get the prepared View and `await screen.whenRendered()` to wait for the DOM. Await `screen.unmount()` when the screen closes. On app shutdown, await `renderer.dispose()` and then await `runtime.dispose()`.
 
 ## Next steps
 

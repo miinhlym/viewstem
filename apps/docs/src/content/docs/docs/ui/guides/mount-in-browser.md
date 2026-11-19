@@ -45,7 +45,7 @@ export async function shutdown() {
   try {
     await renderer.dispose();
   } finally {
-    runtime.dispose();
+    await runtime.dispose();
   }
 }
 ```

@@ -12,10 +12,11 @@
 |---|---|
 | 원자 등록, URL 예약 충돌, 리비전 재시도 중 취소, 진행 Query·Action 유지 | `npm run check`, `npm run test:package` |
 | 슬롯 교체·keyed 이동, 렌더 실패 격리, 직접 호스팅한 Svelte의 부모 context와 표시 수명, UI 카탈로그 | `npm run check:dom`, `npm run check:svelte`, `npm run check:ui`, `npm run test:browser` |
+| 제거된 Svelte 화면의 자동 정리 진단, 다른 셋 조상 아래의 중첩 CSS 적용 | `npm run check:svelte`, `npm run check:dom` |
 | 문서 앱 소비 경로 | `npm run typecheck:docs`, `npm run build:docs` |
 | 임시 디렉터리의 독립 소비자 세 구성 | `npm run test:dom:package`. Core 단독 Node 실행, Svelte 없는 DOM 단독, 외부 연결자와 공식 두 연결자의 혼합을 tarball로 검증한다. |
 
-로컬 Node 22.23.4와 24.19.0에서 Core 테스트 1,158개와 Core·Svelte·DOM 패키지 소비 검증을 통과했다. 브라우저 검증은 Chromium에서 실행했다. npm 공개 발행 절차는 별도 작업이다.
+초기 구현 검증에서는 로컬 Node 22.23.4와 24.19.0에서 Core 테스트 1,158개와 Core·Svelte·DOM 패키지 소비 검증을 통과했다. 브라우저 검증은 Chromium에서 실행했다. npm 공개 발행 절차는 별도 작업이다.
 
 ## 이관 기준점
 
