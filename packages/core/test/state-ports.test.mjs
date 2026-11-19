@@ -219,7 +219,10 @@ await test('integration/Query-delegate-branding-identity-and-nested-cancellation
   assert.deepEqual(calls, ["getSnapshot", ['refresh', signal], ['retry', signal]]);
   code(() => ports.prepare({ input: delegate }), 'TYPE_CONTRACT_MISMATCH'); code(() => boundedQuery(delegate, () => {}), 'TYPE_CONTRACT_MISMATCH');
   code(() => ports.prepare({ input: { ...child } }), 'TYPE_CONTRACT_MISMATCH');
-  alive = false; for (const method of ["getSnapshot", 'refresh', 'retry']) code(() => child[method](), 'CANCELLED');
+  alive = false;
+  code(() => child.getSnapshot(), 'CANCELLED');
+  await assert.rejects(child.refresh(), { code: 'CANCELLED' });
+  await assert.rejects(child.retry(), { code: 'CANCELLED' });
   assert.equal(calls.length, 3); assert.equal(await query.refresh(), 2);
 });
 await test('A22/preparation-errors-identify-exact-structural-type-and-expression-input', () => {
