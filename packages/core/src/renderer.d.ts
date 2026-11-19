@@ -1,7 +1,7 @@
 import type { ComponentBinding, InitialReport, PublicError, Runtime, View, ViewApplication, ViewOptions, ViewSnapshot, ViewSource } from './index.js';
 
 export interface RendererDiagnostic {
-  readonly phase: 'prepare' | 'node' | 'query' | 'action' | 'url' | 'render';
+  readonly phase: 'prepare' | 'node' | 'query' | 'action' | 'url' | 'render' | 'dispose';
   readonly error: PublicError;
   readonly application?: ViewApplication;
   readonly nodeId?: string;
@@ -19,6 +19,7 @@ export function notifyDiagnostic(diagnostic: RendererDiagnostic, ...observers: {
 }[]): void;
 export function createRenderError(missing: boolean, details?: {
   componentId?: string | undefined;
+  connectorId?: string | undefined;
   instanceId?: string | undefined;
 }): PublicError;
 export function createPreparationError(message: string): PublicError;
@@ -43,6 +44,8 @@ export interface RenderProjection {
   isCodeComponent(id: string): boolean;
 }
 export function subscribeRenderProjection(view: View, listener: (projection: RenderProjection) => void): () => void;
+/** Identify which borrowed displays will close when this Runtime is disposed. */
+export function runtimeOwnsView(runtime: Runtime, view: View): boolean;
 export interface Renderer<Options extends object = {}, Target extends object = object> {
   readonly runtime: Runtime;
   mount(options: Omit<ViewOptions, 'signal'> & OptionsWithDiagnostics<Options> & {
@@ -55,6 +58,7 @@ export interface Renderer<Options extends object = {}, Target extends object = o
 export interface RendererHostOptions<Options extends object, Target extends object = object> {
   readonly ownsRuntime: boolean;
   readonly onError?: RendererErrorListener;
+  /** Return false for an unsupported target, or throw a public error with host-specific details. */
   readonly validateTarget: (target: Target) => boolean;
   /** Clean up framework-owned views after the host has stopped accepting new work. */
   readonly disposeOwned?: () => Promise<void>;
@@ -69,8 +73,8 @@ export function createRendererHost<Options extends object = {}, Target extends o
   runtime: Runtime, options: RendererHostOptions<Options, Target>,
 ): Renderer<Options, Target>;
 
-/** Capture creation settings for a framework-owned View before starting it. Its signal owns the View until disposal. */
-export function prepareOwnedView(runtime: Runtime, source: ViewSource, options?: Pick<ViewOptions, 'inputs'>): (
+/** Capture settings now and resolve a Runtime factory on start. The signal owns the View until disposal. */
+export function prepareOwnedView(runtime: Runtime | (() => Runtime), source: ViewSource, options?: Pick<ViewOptions, 'inputs'>): (
   signal: AbortSignal, owner?: { isOpen?: () => boolean; onCreate?: (close: () => Promise<void>) => void },
 ) => Promise<View>;
 

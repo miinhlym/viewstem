@@ -59,7 +59,7 @@ function createRenderer(options = {}) {
   };
   return renderer;
 }
-export { publicRenderer, publicRuntime, createRegistry, createRuntime, createStateStore, createRenderer, ViewstemView, transformError, Probe, Layout, Host, SourceHost, Crash, Reentrant, flushSync, mount, unmount, tick, observations };
+export { publicRenderer, publicRuntime, createRegistry, createRuntime, createStateStore, createRenderer, defineResourceSet, svelteComponent, ViewstemView, transformError, Probe, Layout, Host, SourceHost, Crash, Reentrant, flushSync, mount, unmount, tick, observations };
 export function registerTypedCounter(registry) {
   registry.registerResourceSet(defineResourceSet({ id: 'typed-counter', version: '1', components: [svelteComponent(countContract, ContractAdapter)] }));
   return countContract.id;

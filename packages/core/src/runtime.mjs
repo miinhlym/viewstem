@@ -140,9 +140,9 @@ export class Runtime {
     const view = new View(this, undefined, owner);
     this.views.add(view);
     const close = () => view.dispose();
-    view.disposeOnAbort = close;
+    view.disposeOnAbort = () => { void close().catch(() => {}); };
     try {
-      owner?.signal.addEventListener('abort', close, { once: true });
+      owner?.signal.addEventListener('abort', view.disposeOnAbort, { once: true });
       owner?.onCreate?.(close);
       if (!view.alive) fail('CANCELLED');
       await view.replace(target, signal, beforeCommit);
@@ -189,7 +189,7 @@ function finishCleanup(tasks, completion) {
 
 export class View {
   constructor(host,execution=host.execution(host.registry.fork()),owner) {
-    const runtime=execution;this.host=host;this.runtime=runtime;this.owner=owner;this.generation=0;this.instances=new Map();this.owners=new Map();this.connections=new Map();this.listeners=new Set();this.diagnostics=[];this.planning=false;this.queued=false;
+    const runtime=execution;this.host=host;this.runtime=runtime;this.owner=owner;this.generation=0;this.instances=new Map();this.owners=new Map();this.connections=new Map();this.listeners=new Map();this.diagnostics=[];this.planning=false;this.queued=false;
     this.lifetime = new AbortController();
     this.queryUses = new Set();
     this.renderWaiters = new Set();
@@ -200,7 +200,7 @@ export class View {
     this.requested = 0;
     this.published = 0;
     this.projectionWaiters = new Set();
-    this.renderListeners = new Set();
+    this.renderListeners = new Map();
     this.unsubscribe = runtime.stateStore.observe(() => this.refresh());
   }
   get alive() { return !this.disposal && this.host.alive && !this.owner?.signal.aborted && (this.owner?.isOpen?.() ?? true); }
@@ -282,9 +282,24 @@ export class View {
     return { generation: this.generation, requested: this.requested, published: this.published };
   }
   subscribeRenderProjection(listener) {
-    this.renderListeners.add(listener);
-    if (this.renderProjection) listener(this.renderProjection);
-    return () => this.renderListeners.delete(listener);
+    return this.subscribeSnapshot(this.renderListeners, listener, () => this.renderProjection);
+  }
+  subscribeSnapshot(listeners, listener, read) {
+    if (!this.alive) return () => {};
+    const subscribed = listeners.get(listener);
+    const registration = subscribed ?? {};
+    listeners.set(listener, registration);
+    const unsubscribe = () => {
+      if (listeners.get(listener) === registration) listeners.delete(listener);
+    };
+    try {
+      const snapshot = read();
+      if (snapshot !== undefined) listener(snapshot);
+    } catch (cause) {
+      if (!subscribed) unsubscribe();
+      throw cause;
+    }
+    return unsubscribe;
   }
   async whenProjected(generation, sequence) {
     if (!this.alive || generation !== this.generation) fail('CANCELLED');
@@ -614,11 +629,17 @@ export class View {
       componentBinding: id => registry.componentBinding(id),
       isCodeComponent: id => registry.isCode('Component', id),
     });
-    for (const listener of this.renderListeners) {
+    const listeners = [...this.listeners];
+    for (const [listener, registration] of [...this.renderListeners]) {
       if (!this.alive || generation !== this.generation) return;
+      if (this.renderListeners.get(listener) !== registration) continue;
       try { listener(projection); } catch (cause) { this.diagnostics.push(safeError(cause)); }
     }
-    for(const listener of this.listeners){if(!this.alive||generation!==this.generation)return;try{listener(snapshot);}catch(caught){this.diagnostics.push(safeError(caught));}}
+    for (const [listener, registration] of listeners) {
+      if (!this.alive || generation !== this.generation) return;
+      if (this.listeners.get(listener) !== registration) continue;
+      try { listener(snapshot); } catch (cause) { this.diagnostics.push(safeError(cause)); }
+    }
     if(!this.alive||generation!==this.generation)return;
     this.flushProjectionWaiters();
     for (const diagnostic of this.nodeDiagnostics.values()) {
@@ -836,14 +857,14 @@ export class View {
       }
     });
   }
-  update(spec, { inputs, states } = {}) {
+  update(spec, { inputs, states, signal } = {}) {
     const next = spec === undefined ? undefined : structuredClone(spec);
     return this.enqueue(job => {
       const definition = next ?? this.spec;
       this.runtime.registry.validateDefinition('View', definition);
       this.host.authorizeUpdate(this, definition);
       return this.apply(definition, inputs ?? this.inputs, false, states, {}, this.runtime, null, job);
-    });
+    }, signal);
   }
   replace(target, signal, beforeCommit) {
     const fetched = new Map();
@@ -897,7 +918,7 @@ export class View {
     for(const entry of this.connections.values())if(entry.owner.id===this.root?.id&&entry.handler.id)actions[entry.handler.id]=entry.connection.getSnapshot();
     return Object.freeze({generation:this.generation,lifetime:this.root?.id,roots:Object.freeze((this.roots??[]).map(serialize)),states:Object.freeze(states),queries:Object.freeze(queries),actions:Object.freeze(actions),errors:Object.freeze([...this.diagnostics])});
   }
-  subscribe(listener){this.listeners.add(listener);listener(this.getSnapshot());return()=>this.listeners.delete(listener);}
+  subscribe(listener) { return this.subscribeSnapshot(this.listeners, listener, () => this.getSnapshot()); }
   emit(target,event,payload,canStart=()=>true) {
     if (this.host.preparing) return Promise.reject(error('EXECUTION_BLOCKED'));
     try {

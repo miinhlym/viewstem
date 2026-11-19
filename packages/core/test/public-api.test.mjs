@@ -21,7 +21,7 @@ function surface(value, names) {
 
 test('public package exports only the selected root and optional subpath APIs', async () => {
   assert.deepEqual(Object.keys(core).sort(), ['createRegistry', 'createRuntime', 'createStateStore', 'computeGridLayout', 'defineCodeAction', 'defineResourceSet', 'mergeOwnedUrl'].sort());
-  assert.deepEqual(Object.keys(renderer).sort(), ['createDiagnostic', 'createPreparationError', 'createRenderError', 'createRenderWaiter', 'createRendererHost', 'notifyDiagnostic', 'prepareOwnedView', 'subscribeRenderProjection']);
+  assert.deepEqual(Object.keys(renderer).sort(), ['createDiagnostic', 'createPreparationError', 'createRenderError', 'createRenderWaiter', 'createRendererHost', 'notifyDiagnostic', 'prepareOwnedView', 'runtimeOwnsView', 'subscribeRenderProjection']);
   assert.deepEqual(Object.keys(http), ['createHttpExecutor']);
   assert.deepEqual(Object.keys(cel).sort(), ['compileCel', 'evaluateCel', "defaultCelLimits"].sort());
   assert.equal(cel.compileCel('n + 1', { inputs: { n: integer } })({ n: 1 }), 2);
@@ -73,6 +73,65 @@ test('actual handles expose only public methods and preserve chains and injected
   assert.equal(r.get('Type', 'Int').spec.schema.type, 'number');
   assert.throws(() => { runtime.registry = {}; }, TypeError);
   assert.throws(() => { view.runtime = runtime; }, TypeError);
+});
+
+test('failed initial subscriptions are removed and subscriptions added during publication replay only once', async t => {
+  const runtime = core.createRuntime({ registry: registry() });
+  t.after(() => runtime.dispose());
+  const view = await runtime.createView({
+    ...definition,
+    states: { count: { kind: 'State', schema: integer, initial: 0 } },
+    render: { ...definition.render, inputs: { value: path('/states/count') } },
+  });
+  const other = core.createRuntime({ registry: runtime.registry });
+  t.after(() => other.dispose());
+  assert.equal(renderer.runtimeOwnsView(runtime, view), true);
+  assert.equal(renderer.runtimeOwnsView(other, view), false);
+  assert.equal(renderer.runtimeOwnsView({}, {}), false);
+  let snapshots = 0, projections = 0, added = 0, registered = false;
+  const replayedValues = [];
+  const callback = snapshot => replayedValues.push(snapshot.states.count.value);
+  let unsubscribe;
+  view.subscribe(snapshot => {
+    if (snapshot.states.count.value === 1) {
+      unsubscribe();
+      view.subscribe(callback);
+    }
+  });
+  unsubscribe = view.subscribe(callback);
+  assert.throws(() => view.subscribe(() => { snapshots++; throw Error('snapshot'); }), /snapshot/);
+  assert.throws(() => renderer.subscribeRenderProjection(view, () => { projections++; throw Error('projection'); }), /projection/);
+  renderer.subscribeRenderProjection(view, projection => {
+    if (projection.snapshot.states.count.value === 1 && !registered) {
+      registered = true;
+      renderer.subscribeRenderProjection(view, () => { added++; });
+    }
+  });
+  view.getState('count').write(1);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual({ snapshots, projections, added }, { snapshots: 1, projections: 1, added: 1 });
+  assert.deepEqual(replayedValues, [0, 1]);
+
+  const disposing = view.dispose();
+  assert.equal(view.dispose(), disposing);
+  await disposing;
+  view.subscribe(() => { snapshots++; })();
+  renderer.subscribeRenderProjection(view, () => { projections++; })();
+  assert.deepEqual({ snapshots, projections }, { snapshots: 1, projections: 1 });
+});
+
+test('setInputs and updateDefinition accept caller cancellation before commit', async t => {
+  const runtime = core.createRuntime({ registry: registry() });
+  t.after(() => runtime.dispose());
+  const view = await runtime.createView(definition);
+  const signal = AbortSignal.abort();
+  await rejectsCode(view.setInputs({}, { signal }), 'CANCELLED');
+  await rejectsCode(view.setInputs({}, { get signal() { throw Error('invalid signal'); } }), 'INVALID_DEFINITION');
+  const controller = new AbortController();
+  const update = view.updateDefinition({ render: { id: 'next', componentRef: 'Leaf' } }, { signal: controller.signal });
+  controller.abort();
+  await rejectsCode(update, 'CANCELLED');
+  assert.deepEqual(view.exportDefinition(), definition);
 });
 
 test('Component contract batches roll back completely and retain existing Registry configuration', async t => {

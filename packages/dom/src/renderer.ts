@@ -1,5 +1,5 @@
 import type { NodeSnapshot, PublicError, Runtime } from '@viewstem/core';
-import { createRendererHost, type Renderer, type RendererErrorListener } from '@viewstem/core/renderer';
+import { createPreparationError, createRendererHost, type Renderer, type RendererErrorListener } from '@viewstem/core/renderer';
 import type { ComponentConnector } from './connector.js';
 import { connectBrowser } from './connection.js';
 import { domConnector } from './dom-connector.js';
@@ -42,7 +42,10 @@ export function createRenderer({ runtime, connectors = [], onError, ...unexpecte
     ...(onError ? { onError } : {}),
     validateTarget(target: HTMLElement) {
       const type = target?.ownerDocument?.defaultView?.HTMLElement;
-      return Boolean(type && target instanceof type && target.isConnected);
+      if (!type || !(target instanceof type) || !target.isConnected) {
+        throw createPreparationError('The render target must be a connected HTMLElement.');
+      }
+      return true;
     },
     connect: (view, target, options, onRenderError, host) => connectBrowser(view, target, implementations, options, host, onRenderError),
   });

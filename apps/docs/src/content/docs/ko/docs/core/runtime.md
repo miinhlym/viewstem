@@ -22,11 +22,15 @@ import type { Runtime, RuntimeOptions, ViewSource, ViewOptions, InitialReport } 
 | `registry` | `Registry`, 선택 | 검증된 정의를 제공하는 공용 레지스트리입니다. |
 | `stateStore` | `StateStore`, 생략하면 새 Store | 호스트 State를 주입합니다. 주입한 Store의 정리는 호출자 책임입니다. |
 | `requestExecutor` | `RequestExecutor`, fetch 기반 HTTP 실행기 | 버전이 있는 계획과 AbortSignal을 받아 `HttpResponse`를 반환합니다. |
-| `resourceResolver` | `(kind, id) => Awaitable<AnyResource>`, 없음 | View 준비 중 없는 참조를 해결합니다. 요청한 종류·ID를 반환해야 하며 해결한 정의는 배치로 등록합니다. |
+| `resourceResolver` | `(kind, id, { signal }) => Awaitable<AnyResource \| undefined>`, 없음 | `createView()`와 `replace()`에서 누락된 선언을 조회합니다. 누락이면 `undefined`, 찾으면 요청한 종류와 ID로 반환합니다. |
 | `authorize` | 동기 콜백, 없음 | Action 호출이나 View 갱신·교체를 승인합니다. 설정했다면 명시적 `true`만 허용입니다. |
 | `functions` | 읽기 전용 `CelFunction[]`, Registry 함수 목록 | 실행에 사용하는 CEL 함수입니다. 등록·실행 환경을 호환되게 유지하세요. |
+| `hostCapabilities` | 읽기 전용 이름·값 맵, 빈 맵 | 등록한 코드 Action이 필수로 선언한 기능을 실행 시 제공합니다. |
 | `requestTimeoutMs` | 양의 안전 정수, 30000ms | Query/HTTP 요청 제한 시간입니다. 사용자 실행기도 취소를 따라야 합니다. |
-| `clock` | `TimerClock`, 시스템 스케줄러 | Query 스케줄링용 `now` 숫자 또는 함수, `setTimeout(callback, milliseconds)`, `clearTimeout(token)`입니다. 앱 State용 시계와 다릅니다. |
+| `urlCleanupTimeoutMs` | 양의 안전한 정수, 30000ms | View 교체 중 이전 URL 키 제거의 제한 시간입니다. |
+| `clock` | `TimerClock`, 시스템 스케줄러 | Query 타이머용입니다. `now`는 시계와 함께 증가하는 숫자 또는 함수이며 `setTimeout`, `clearTimeout`과 같은 시간 기준을 사용합니다. |
+
+해결한 선언은 검증 후 함께 게시합니다. `updateDefinition()`·`applyResourceSets()`·독립 Action 호출은 각 호출에서 선택한 Registry에서 참조를 찾습니다.
 
 ## createView(source, options?)
 
@@ -66,7 +70,7 @@ await runtime.invokeAction({ actionRef: 'saveDraft', inputs, signal: request.sig
 - `runtime.registry`, `runtime.stateStore`: 공개 핸들의 읽기 전용 참조입니다.
 - `runtime.registry.list(filter?)`: 분리된 리소스 선언 목록이며 `ResourceKind`로 제한할 수 있습니다.
 - `runtime.registry.exportResource(kind, id)`: 한 리소스의 분리된 선언입니다. 실행 중 State나 구현 함수는 추출하지 않습니다.
-- `dispose(): void`: 모든 View와 소유 작업을 정리합니다. 내부에서 만든 Store는 폐기하고 주입한 Store는 호출자가 정리합니다. 반복 호출해도 안전합니다.
+- `dispose(): Promise<void>`는 모든 View와 소유 작업의 실행을 막고 실제 정리 완료 또는 오류를 반환합니다. 주입한 Store는 호출자가 정리합니다. 반복 호출은 같은 Promise를 돌려줍니다.
 
 <a id="authorization"></a>
 ## 권한과 진단

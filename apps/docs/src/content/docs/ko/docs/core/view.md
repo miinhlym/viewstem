@@ -12,7 +12,7 @@ View는 State·Query·이벤트 수명을 가진 실행 중 화면 하나입니�
 | 메서드 | 시그니처와 동작 |
 |---|---|
 | `getSnapshot()` | 현재 출력의 불변 `ViewSnapshot`을 반환합니다. |
-| `subscribe(listener)` | `(snapshot: ViewSnapshot) => void`를 즉시 호출하고 이후 출력 변경 때 호출합니다. 구독 해제 함수 `() => void`를 반환합니다. |
+| `subscribe(listener)` | `(snapshot: ViewSnapshot) => void`를 즉시 호출하고 이후 출력 변경 때 호출합니다. 구독 해제 함수 `() => void`를 반환합니다. 최초 콜백이 실패하면 등록을 되돌립니다. 폐기 뒤 구독에는 스냅샷을 재생하지 않습니다. |
 | `getState(name, instanceId?)` | `StateHandle<unknown>`을 반환합니다. instanceId 생략 시 루트 View, 지정 시 해당 Component 소유자의 로컬 State를 찾습니다. |
 | `getQuery(name, instanceId?)` | 같은 소유자 선택 규칙으로 `QueryHandle<unknown>`을 반환합니다. |
 | `exportDefinition()` | 분리된 `ViewSpec`을 반환합니다. 현재 State 값·실행 중 작업·함수는 포함하지 않습니다. |
@@ -28,7 +28,7 @@ View는 State·Query·이벤트 수명을 가진 실행 중 화면 하나입니�
 
 현재 구현에서 유지되는 Query use는 `updateDefinition`에서 생략한 `refresh`·`intervalMs` 설정도 보존합니다. 생략으로 기본값을 복원하지 마세요. `refresh`는 값을 명시하고, 새 Query 수명과 기본 설정이 필요하면 `replace`를 사용하세요. [Query 설정](../../dsl/queries/)을 참고하세요.
 
-현재 정의와 리소스 구성을 유지하면서 입력 맵 전체를 교체하려면 `setInputs(inputs)`를 사용합니다.
+현재 정의와 리소스 구성을 유지하면서 입력 맵 전체를 교체하려면 `setInputs(inputs, { signal }?)`를 사용합니다.
 
 <a id="applyresourcesets"></a>
 ## applyResourceSets(options)
@@ -42,6 +42,8 @@ View는 State·Query·이벤트 수명을 가진 실행 중 화면 하나입니�
 
 View 정의를 수정하지 않고 교체된 리소스를 반영하려면 `view.replace(view.exportDefinition(), { inputs, url })`에 새 수명에 필요한 입력과 다시 연결할 URL 바인딩을 전달합니다.
 
+네 변경은 커밋 전에 선택적 `signal`로 취소할 수 있습니다. 더 최신 변경이 시작되면 아직 커밋되지 않은 준비를 대체합니다. 예를 들어 `setInputs()`는 resolver를 기다리는 `replace()`를 취소하고 현재 View에 입력을 적용할 수 있습니다.
+
 네 연산은 `ViewApplication`을 반환합니다. `view.whenSettled(application)`으로 처음 실행 가능한 Query들의 완료를 기다리고 `queryErrors`를 확인합니다. 새 적용이나 폐기는 이전 대기를 취소할 수 있습니다.
 
 ## emit(target, event, payload)
@@ -50,7 +52,7 @@ View 정의를 수정하지 않고 교체된 리소스를 반영하려면 `view.
 
 ## dispose()
 
-구독과 소유 Action·Query 작업을 정리하고 소유 State·URL 연결을 제거하며 이전 이벤트 대상을 무효화합니다. 반복 호출할 수 있습니다. 모든 View가 끝났다면 Runtime 전체를 폐기하세요.
+`dispose(): Promise<void>`는 새 실행을 차단한 뒤 소유 구독, State, Query 작업과 URL 연결을 정리합니다. 반복 호출은 같은 Promise를 돌려줍니다.
 
 ## ViewSnapshot
 

@@ -31,7 +31,7 @@ const stop = view.subscribe(snapshot => {
 });
 view.getState('title').write('Updated');
 stop();
-runtime.dispose();
+await runtime.dispose();
 ```
 
 `view.whenSettled(application)`은 이번 적용에서 실행 가능한 첫 Query들의 성공/오류가 확정된 완료 신호입니다. UI는 준비된 부분부터 관찰할 수 있습니다. 입력 미준비·gate 차단은 완료를 막지 않으며 Query 오류는 `(await view.whenSettled(view.initial)).queryErrors`에 포함됩니다. DOM paint 완료 신호는 아닙니다.
@@ -40,11 +40,11 @@ runtime.dispose();
 
 - `createRegistry`: `(kind, id)` 등록·검증, 코드형 Component/Action 등록, 목록·설명·정의 추출·명시적 정의 교체.
 - `createStateStore`: scope, State, `writeBatch`/동기 `transaction`, 안정적인 읽기 snapshot, `registerReaction`, Clock·URL 연결. Derived는 View/Component의 `states`에 선언합니다. 외부에서 주입한 Store는 runtime 폐기로 제거하지 않습니다.
-- `createRuntime()`은 기본 Registry를 생성합니다. Runtime은 `createView(source, options?)`, `invokeAction(request)`, `registry`, `stateStore`, `dispose`를 제공합니다. View는 `setInputs`, `updateDefinition`, `replace`, `invokeAction`, `whenSettled`, `emit`, `getSnapshot`, `subscribe`, `getState`, `getQuery`, `exportDefinition`을 제공합니다.
+- `createRuntime()`은 기본 Registry를 생성합니다. Runtime은 `createView(source, options?)`, `invokeAction(request)`, `registry`, `stateStore`, `dispose`를 제공합니다. View는 `setInputs`, `updateDefinition`, `applyResourceSets`, `replace`, `invokeAction`, `whenSettled`, `emit`, `getSnapshot`, `subscribe`, `getState`, `getQuery`, `exportDefinition`을 제공합니다.
 - `mergeOwnedUrl`: 호스트 URL adapter에서 소유 키만 병합합니다.
 - `computeGridLayout`: 12열 배치 계산만 제공하며 Grid UI를 자동 등록하지 않습니다.
 
-루트의 실행 export는 위 다섯 개입니다. 선택 실행기는 별도 진입점에서 가져옵니다.
+루트 진입점은 `defineCodeAction`과 `defineResourceSet`도 내보냅니다. 선택 실행기는 별도 진입점에서 가져옵니다.
 
 ```ts
 import { createHttpExecutor } from '@viewstem/core/http';

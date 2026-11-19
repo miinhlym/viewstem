@@ -6,10 +6,29 @@ Viewstem View를 Svelte 컴포넌트로 표시합니다. Svelte 5.57.3 이상 5.
 | --- | --- |
 | 별도 DOM 요소에 새 View 표시 | `renderer.mount({ target, source })` |
 | 별도 DOM 요소에 기존 View 표시 | `renderer.attach(view, target)` |
+| 기존 Svelte 트리에서 독립 화면 | `<ViewstemView {source} resourceSets={[ui]} />` |
 | 기존 Svelte 트리에서 새 View | `<ViewstemView {renderer} {source} />` |
 | 기존 Svelte 트리에서 기존 View | `<ViewstemView {renderer} {view} />` |
 
 기존 Svelte 앱에서는 `ViewstemView`를 표시할 위치에 두세요. `source`는 클라이언트에서 View를 만들고 제거 시 생성 작업과 View를 정리합니다. `inputs`는 최초 생성에 쓰이며 새 화면은 `{#key}`로 다시 마운트합니다. `pending`과 `prepareError` 스니펫으로 준비 상태를 표시할 수 있습니다. `view`는 앱이 가진 View를 빌립니다.
+
+`@viewstem/ui`를 설치한 독립 화면에서는 셋을 직접 전달합니다. 컴포넌트가 클라이언트에서 초기화하고 제거 때 정리합니다.
+
+```svelte
+<script lang="ts">
+  import { ViewstemView, type ViewSpec } from '@viewstem/svelte';
+  import { ui } from '@viewstem/ui';
+  import '@viewstem/ui/styles.css';
+
+  const source: ViewSpec = {
+    render: { id: 'save', componentRef: 'shadcn.Button', inputs: { text: '저장' } },
+  };
+</script>
+
+<div data-viewstem-ui>
+  <ViewstemView {source} resourceSets={[ui]} />
+</div>
+```
 
 기존 앱에서 공유 렌더러를 레이아웃에 두고 페이지를 붙이는 예제는 [Svelte 마운트 가이드](https://github.com/miinhlym/viewstem/blob/main/apps/docs/src/content/docs/ko/docs/svelte/guides/mount-in-svelte.md#existing-app)를 참고하세요.
 
@@ -63,6 +82,6 @@ console.log(target.textContent); // Saved
 
 주소·세대가 있는 코드 Component는 준비 상태가 달라져도 같은 어댑터 인스턴스를 유지합니다. 어댑터가 `node.status`를 확인해 pending/error/missing 표시와 입력 비활성을 처리해야 합니다. 이때 `inputs`가 완전하지 않을 수 있습니다. `emit`은 **호출 순간의 core 상태**가 ready인 경우만 전달하며, 오래된 세대·해제된 연결은 CANCELLED입니다. 입력의 IME 처리·접근성·디자인은 실제 입력을 구현하는 호스트 어댑터의 책임입니다.
 
-레이아웃과 DOM은 호스트 어댑터가 소유합니다. 렌더러는 암묵적인 Row/Column이나 wrapper DOM을 추가하지 않습니다. 이름 있는 slot은 core가 평가한 노드 배열을 원래 순서대로 렌더링하며, 선언형 Component는 core가 확장한 하위 화면으로 연결합니다. 같은 주소·세대의 표시 중인 반복 항목은 keyed 렌더링으로 Svelte 로컬 상태를 유지하고, 제거·재생성은 새 수명입니다. 선언형 부모의 입력이 미준비라 하위 projection이 생략되면 해당 하위 Svelte 화면은 분리되지만 core가 보존한 내부 상태는 유지됩니다.
+레이아웃과 DOM은 호스트 어댑터가 소유합니다. 선언형 `ViewstemView`와 `renderSlot`은 `display: contents` 요소를 사용합니다. 직접 자식 DOM이 필요하면 호스트 요소에 `provideSlot`을 사용하세요. 이름 있는 slot은 core가 평가한 노드 배열을 원래 순서대로 렌더링하며, 선언형 Component는 core가 확장한 하위 화면으로 연결합니다. 같은 주소·세대의 표시 중인 반복 항목은 keyed 렌더링으로 Svelte 로컬 상태를 유지하고, 제거·재생성은 새 수명입니다. 선언형 부모의 입력이 미준비라 하위 projection이 생략되면 해당 하위 Svelte 화면은 분리되지만 core가 보존한 내부 상태는 유지됩니다.
 
 직접 Svelte 루트에서 `ViewstemView`를 호스팅할 때는 이 패키지의 `transformError`를 Svelte `mount` 또는 `hydrate`에 설정하세요. 경계에 도달하기 전에 호스트의 예외 값을 정제합니다. `fallback` 스니펫으로 대기 또는 오류 노드를 표시할 수 있으며 렌더 오류는 `screen.whenRendered()`를 거절하고 표시 연결은 유지합니다. 살아 있는 연결은 렌더 오류를 `onError`로 보고하고 새 투영에서 다시 시도할 수 있습니다.

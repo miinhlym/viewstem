@@ -32,7 +32,7 @@ const stop = view.subscribe(snapshot => {
 });
 view.getState('title').write('Updated');
 stop();
-runtime.dispose();
+await runtime.dispose();
 ```
 
 `view.whenSettled(application)` settles once the initial queries eligible to run for this application of the view have succeeded or failed. The UI can observe parts of the view as they become ready. Unready inputs and closed gates do not delay completion, and query errors appear in `(await view.whenSettled(view.initial)).queryErrors`. DOM paint is outside the scope of this signal.
@@ -41,11 +41,11 @@ runtime.dispose();
 
 - `createRegistry` registers and validates resources by `(kind, id)`, registers code-backed Components and Actions, lists and describes resources, and exports and explicitly replaces definitions.
 - `createStateStore` manages scopes and State, provides `writeBatch` and synchronous `transaction`, exposes stable read snapshots, and supports `registerReaction` and clock and URL integration. Declare Derived values in the `states` of a View or Component. Disposing the runtime preserves an injected store.
-- `createRuntime()` creates a Registry by default. The Runtime exposes `createView(source, options?)`, `invokeAction(request)`, `registry`, `stateStore`, and `dispose`. A View exposes `setInputs`, `updateDefinition`, `replace`, `invokeAction`, `whenSettled`, `emit`, `getSnapshot`, `subscribe`, `getState`, `getQuery`, and `exportDefinition`.
+- `createRuntime()` creates a Registry by default. The Runtime exposes `createView(source, options?)`, `invokeAction(request)`, `registry`, `stateStore`, and `dispose`. A View exposes `setInputs`, `updateDefinition`, `applyResourceSets`, `replace`, `invokeAction`, `whenSettled`, `emit`, `getSnapshot`, `subscribe`, `getState`, `getQuery`, and `exportDefinition`.
 - `mergeOwnedUrl` lets a host URL adapter merge only the keys it owns.
 - `computeGridLayout` calculates a 12-column layout. Grid UI requires separate registration.
 
-The root entry point has these five runtime exports. Import optional executors from their own entry points.
+The root entry point also exports `defineCodeAction` and `defineResourceSet`. Import optional executors from their own entry points.
 
 ```ts
 import { createHttpExecutor } from '@viewstem/core/http';

@@ -176,6 +176,25 @@ globalThis.syncPending = async () => {
   runtime.dispose();
   return { waiting, resumed, disposed, empty: left.childNodes.length === 0 };
 };
+
+globalThis.missingConnector = async () => {
+  const runtime = createRuntime();
+  runtime.registry.registerResourceSet(defineResourceSet({
+    id: 'external', version: '1', components: [{
+      contract: { kind: 'Component', id: 'Badge', spec: {} },
+      connectorId: 'external', implementation: {},
+    }],
+  }));
+  const renderer = createRenderer({ runtime });
+  const mounted = renderer.mount({ target: left, source: {
+    render: { id: 'badge', componentRef: 'Badge' },
+  } });
+  await mounted.ready;
+  const failure = await mounted.whenRendered().catch(error => error);
+  await renderer.dispose();
+  await runtime.dispose();
+  return failure;
+};
 `;
 
 test('DOM display reconciles keyed ranges, scopes failures and follows the latest projection', async t => {
@@ -199,4 +218,8 @@ test('DOM display reconciles keyed ranges, scopes failures and follows the lates
   assert.deepEqual(await page.evaluate(() => globalThis.syncPending()), {
     waiting: [true, 'before', true], resumed: [true, 'after', false], disposed: ['before'], empty: true,
   });
+  const missing = await page.evaluate(() => globalThis.missingConnector());
+  assert.equal(missing.code, 'REFERENCE_NOT_FOUND');
+  assert.equal(missing.message, 'Connector "external" is unavailable on this display connection.');
+  assert.deepEqual(missing.resource, { kind: 'Component', id: 'Badge' });
 });

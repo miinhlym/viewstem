@@ -1,9 +1,10 @@
 <script lang="ts">
   import { getAllContexts, untrack } from 'svelte';
+  import { createDiagnostic } from '@viewstem/core/renderer';
   import type { View, ViewApplication } from '@viewstem/core';
   import type { Renderer, RenderAttachment, RenderFallback, RendererErrorListener } from './types.js';
   import { cancelled } from './lifecycle.js';
-  import { attachComponentView } from './renderer.js';
+  import { attachComponentView, reportComponentDiagnostic } from './renderer.js';
 
   let { renderer, view, onError, fallback, isOpen, onAttach }: {
     renderer: Renderer; view: View;
@@ -17,20 +18,23 @@
   let resolve: () => void;
   const prepared = new Promise<void>(done => { resolve = done; });
   let failure: { cause: unknown } | undefined;
+  const getErrorListener = () => untrack(() => onError);
 
   function connect(target: HTMLDivElement) {
     try {
       active = untrack(() => {
         if (!isOpen()) throw cancelled();
         const display = attachComponentView(renderer, view, target, {
-          context,
-          onError: diagnostic => { if (isOpen()) onError?.(diagnostic); },
+          context, getErrorListener, isOpen, trackCleanup: onAttach === undefined,
           ...(fallback ? { fallback } : {}),
-        }, isOpen);
+        });
         onAttach?.(display);
         return { renderer, view, display };
       });
-    } catch (cause) { failure = { cause }; }
+    } catch (cause) {
+      failure = { cause };
+      reportComponentDiagnostic(renderer, createDiagnostic('render', cause), getErrorListener(), isOpen);
+    }
     resolve();
     return () => {
       const display = active?.display;
@@ -39,8 +43,8 @@
     };
   }
 
-  export function matches(owner: Renderer, targetView: View | undefined) {
-    return active?.renderer === owner && active.view === targetView;
+  export function matches(owner: Renderer | undefined, targetView: View | undefined) {
+    return active !== undefined && active.renderer === owner && active.view === targetView;
   }
 
   async function attached(): Promise<RenderAttachment> {

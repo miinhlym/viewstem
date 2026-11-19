@@ -1,5 +1,5 @@
 import { disposeRendererRuntime, prepareOwnedView, rendererView } from './api.mjs';
-export { prepareOwnedView } from './api.mjs';
+export { prepareOwnedView, runtimeOwnsView } from './api.mjs';
 import { error, fail, safeError } from './errors.mjs';
 import { createDiagnostic, notifyDiagnostic } from './diagnostics.mjs';
 export { createDiagnostic, createPreparationError, createRenderError, notifyDiagnostic } from './diagnostics.mjs';
@@ -100,11 +100,16 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
   let disposed;
   let closing = false;
 
+  function supportsTarget(target) {
+    try { return validateTarget(target); }
+    catch (cause) { throw safeError(cause, 'INVALID_DEFINITION'); }
+  }
+
   function entry(target, options) {
     if (closing) fail('CANCELLED');
-    const valid = validateTarget(target);
+    const valid = supportsTarget(target);
     if (closing) fail('CANCELLED');
-    if (!valid) fail('INVALID_DEFINITION', { message: 'The render target must be a connected HTMLElement.' });
+    if (!valid) fail('INVALID_DEFINITION', { message: 'This renderer does not support the supplied target.' });
     if (targets.has(target)) fail('INVALID_DEFINITION', { message: 'The render target already has a Viewstem connection. Wait for its cleanup before reusing it.' });
     const token = {};
     targets.set(target, token);
@@ -125,9 +130,9 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
     };
     function check() {
       if (!isOpen()) fail('CANCELLED');
-      const valid = validateTarget(target);
+      const valid = supportsTarget(target);
       if (!isOpen()) fail('CANCELLED');
-      if (!valid) fail('INVALID_DEFINITION', { message: 'The render target must be a connected HTMLElement.' });
+      if (!valid) fail('INVALID_DEFINITION', { message: 'This renderer does not support the supplied target.' });
     }
     function start(view) {
       check();
@@ -138,7 +143,11 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
           onRenderFailure(cause) {
             if (!isObject(cause) || !reportedRenderFailures.has(cause)) renderError(cause);
           },
-          isOpen, onClose: () => { void stop().catch(() => {}); },
+          isOpen,
+          onClose() {
+            if (stopped || closing) return;
+            void stop().catch(cause => diagnostics(createDiagnostic('dispose', cause), () => !closing && !explicitlyClosed));
+          },
         });
         check();
         adapter = connect(view, target, options, renderError, { isOpen, emit: waiter.emit });

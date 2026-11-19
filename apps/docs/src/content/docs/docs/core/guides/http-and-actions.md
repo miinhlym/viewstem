@@ -12,18 +12,27 @@ Inject an HTTP executor and expose an application function as a typed Action.
 This Node example uses a local mock transport, so it performs no network requests. Save it as `http-action.mjs` in a project with Core installed and run it with Node.
 
 ```js title="http-action.mjs"
-import { createRegistry, createRuntime } from '@viewstem/core';
+import { createRegistry, createRuntime, defineCodeAction, defineResourceSet } from '@viewstem/core';
 import { createHttpExecutor } from '@viewstem/core/http';
 
 const registry = createRegistry();
-registry.registerComponentContract({ kind: 'Component', id: 'Empty', spec: {} });
-registry.registerAction({
-  kind: 'Action', id: 'label',
-  spec: {
-    ports: { name: { kind: 'Value', schema: { type: 'string' }, required: true } },
-    output: { schema: { type: 'string' } },
+registry.registerResourceSet(defineResourceSet({
+  id: 'projection', version: '1',
+  components: [{
+    contract: { kind: 'Component', id: 'Empty', spec: {} },
+    connectorId: 'projection-example', implementation: {},
+  }],
+}));
+const label = defineCodeAction({
+  definition: {
+    kind: 'Action', id: 'label',
+    spec: {
+      ports: { name: { kind: 'Value', schema: { type: 'string' }, required: true } },
+      output: { schema: { type: 'string' } },
+    },
   },
-}, ({ inputs }) => `Hello, ${inputs.name}`);
+});
+registry.registerAction(label.implement(({ inputs }) => `Hello, ${inputs.name}`));
 const execute = createHttpExecutor({
   authorize: ({ destination }) => new URL(destination).origin === 'https://api.example.test',
   transport: async () => new Response(JSON.stringify({ title: 'Project' }), {
@@ -46,10 +55,10 @@ console.log(report.queryErrors.length); // 0
 console.log(view.getQuery('project').getSnapshot().data); // Project
 console.log(await view.invokeAction({ actionRef: 'label', inputs: { name: 'Viewstem' } }));
 // Hello, Viewstem
-runtime.dispose();
+await runtime.dispose();
 ```
 
-The Query transforms the response body into `Project`. The code Action receives prepared inputs and returns a schema-checked string. A code Action has a contract and a separate function; do not add `steps` or `output.value` to its declaration.
+The Query transforms the response body into `Project`. The code Action receives prepared inputs and returns a schema-checked string. The Action entry pairs its declared contract with a host function. The projection-only Component supplies a binding during View preparation.
 
 ## Connect a real transport
 

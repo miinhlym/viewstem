@@ -794,6 +794,152 @@ test('ViewstemView creates from a Svelte source with initial inputs and remounts
   assert.deepEqual(result, { first: ['initial input', 'from-parent'], retained: ['initial input', 'local 1'], replaced: ['new screen', 'local 0'], empty: '' });
 }));
 
+test('a standalone source captures its initial sets and renders Svelte and DOM bindings in the component context', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture;
+    const layout = F.svelteComponent(F.resource('Component', 'Layout', { slots: { default: {}, header: {}, body: {}, footer: {} } }), F.Layout);
+    const probe = F.svelteComponent(F.resource('Component', 'Probe', { ports: { value: F.port() } }), F.Probe);
+    const dom = { contract: F.resource('Component', 'DomLabel', {}), connectorId: 'dom', implementation: {
+      mount({ parent, anchor }) {
+        const label = parent.ownerDocument.createElement('span');
+        label.textContent = 'DOM';
+        parent.insertBefore(label, anchor);
+        return { update() {}, dispose() { label.remove(); } };
+      },
+    } };
+    const set = F.defineResourceSet({ id: 'mixed', version: '1', components: [layout, probe, dom] });
+    const source = {
+      ports: { label: F.port() },
+      render: F.layout([F.probe('first', F.p('/ports/label')), { id: 'native', componentRef: 'DomLabel' }]),
+    };
+    const target = F.target(), resourceSets = [set], inputs = { label: 'first input' };
+    const host = F.mount(F.SourceHost, { target, props: { initialSource: source, inputs, resourceSets } });
+    resourceSets.length = 0;
+    inputs.label = 'mutated input';
+    await F.tick();
+    await host.whenRendered();
+    const initial = target.querySelector('[data-value]')?.textContent;
+    const context = target.querySelector('[data-context]')?.textContent;
+    const native = target.querySelector('span')?.textContent;
+    host.changeSource({ ...source, render: F.probe('next', 'second source') });
+    host.changeSets([set]);
+    await F.tick();
+    await host.whenRendered();
+    const beforeRemount = target.querySelector('[data-value]')?.textContent;
+    host.remount();
+    await F.tick();
+    await host.whenRendered();
+    const afterRemount = target.querySelector('[data-value]')?.textContent;
+    await F.unmount(host);
+    await F.tick();
+    return { initial, context, native, beforeRemount, afterRemount, empty: target.textContent };
+  });
+  assert.deepEqual(result, { initial: 'first input', context: 'from-parent', native: 'DOM', beforeRemount: 'first input', afterRemount: 'second source', empty: '' });
+}));
+
+test('standalone registration, preparation and display failures reach the diagnostic callback and the render wait', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture;
+    const crash = F.svelteComponent(F.resource('Component', 'Crash', { ports: { value: F.port() } }), F.Crash);
+    const first = F.defineResourceSet({ id: 'duplicate', version: '1', components: [crash] });
+    const second = F.defineResourceSet({ id: 'duplicate', version: '1' });
+    const source = { render: { id: 'crash', componentRef: 'Crash', inputs: { value: 'crash' } } };
+    const attempts = [];
+    for (const resourceSets of [[first, second], [], [first]]) {
+      const phases = [], target = F.target();
+      const host = F.mount(F.SourceHost, { target, props: {
+        initialSource: source, resourceSets, onError: diagnostic => phases.push([diagnostic.phase, diagnostic.error.code]),
+      } });
+      await F.tick();
+      const failure = await F.errorOf(() => host.whenRendered());
+      const errorUI = target.querySelector('[data-prepare-error]')?.textContent;
+      await F.unmount(host);
+      attempts.push({ code: failure?.code, phases, errorUI });
+    }
+    return attempts;
+  });
+  assert.deepEqual(result, [
+    { code: 'INVALID_DEFINITION', phases: [['prepare', 'INVALID_DEFINITION']], errorUI: 'INVALID_DEFINITION' },
+    { code: 'REFERENCE_NOT_FOUND', phases: [['prepare', 'REFERENCE_NOT_FOUND']], errorUI: 'REFERENCE_NOT_FOUND' },
+    { code: 'INTERNAL_ERROR', phases: [['render', 'INTERNAL_ERROR']], errorUI: undefined },
+  ]);
+}));
+
+test('removing a standalone source during preparation prevents the candidate from mounting', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture;
+    let runtimeCreations = 0, mounted = 0;
+    const originalFetch = Object.getOwnPropertyDescriptor(window, 'fetch');
+    Object.defineProperty(window, 'fetch', { configurable: true, enumerable: originalFetch.enumerable,
+      get() { runtimeCreations++; return originalFetch.value; },
+    });
+    try {
+      const component = { contract: F.resource('Component', 'Label', {}), connectorId: 'dom', implementation: {
+        mount() { mounted++; return { update() {}, dispose() {} }; },
+      } };
+      const set = F.defineResourceSet({ id: 'pending-standalone', version: '1', components: [component] });
+      const target = F.target(), diagnostics = [];
+      const host = F.mount(F.ViewstemView, { target, props: {
+        source: { render: { id: 'label', componentRef: 'Label' } }, resourceSets: [set], onError: d => diagnostics.push(d.phase),
+      } });
+      F.flushSync();
+      const outcome = F.errorOf(() => host.whenRendered());
+      await F.unmount(host);
+      return { runtimeCreations, mounted, code: (await outcome)?.code, empty: target.textContent, diagnostics };
+    } finally { Object.defineProperty(window, 'fetch', originalFetch); }
+  });
+  assert.deepEqual(result, { runtimeCreations: 1, mounted: 0, code: 'CANCELLED', empty: '', diagnostics: [] });
+}));
+
+test('standalone removal cancels a pending Query and reports delayed connector teardown once', t => browserTest(t, async page => {
+  await page.evaluate(async () => {
+    const F = Fixture;
+    const sample = window.standalone = { diagnostics: [], disposed: 0 };
+    const originalFetch = window.fetch;
+    window.fetch = (_url, { signal }) => new Promise(resolve => {
+      sample.signal = signal;
+      sample.reply = () => resolve(new Response('late', { headers: { 'content-type': 'text/plain' } }));
+    });
+    const component = { contract: F.resource('Component', 'Label', {}), connectorId: 'dom', implementation: {
+      mount({ parent, anchor }) {
+        const label = parent.ownerDocument.createElement('span');
+        label.textContent = 'first paint';
+        parent.insertBefore(label, anchor);
+        return { update() {}, async dispose() {
+          sample.disposed++;
+          await new Promise(resolve => { sample.deliverCleanup = resolve; });
+          throw Error('private teardown');
+        } };
+      },
+    } };
+    const set = F.defineResourceSet({ id: 'standalone', version: '1', components: [component] });
+    sample.target = F.target();
+    sample.host = F.mount(F.ViewstemView, { target: sample.target, props: {
+      source: { queries: { pending: { query: { sources: { response: {
+        datasource: { kind: 'Http', baseUrl: 'https://example.test' }, request: { method: 'GET', path: '/pending' },
+      } }, transform: { input: F.p('/sources/response') } } } }, render: { id: 'label', componentRef: 'Label' } },
+      resourceSets: [set], onError: async diagnostic => { sample.diagnostics.push(diagnostic); throw Error('observer rejection'); },
+    } });
+    await sample.host.whenRendered();
+    window.fetch = originalFetch;
+  });
+  await page.waitForFunction(() => !!standalone.signal);
+  assert.equal(await page.locator('span').textContent(), 'first paint');
+  await page.evaluate(() => Fixture.unmount(standalone.host));
+  await page.waitForFunction(() => typeof standalone.deliverCleanup === 'function');
+  const result = await page.evaluate(async () => {
+    const sample = standalone;
+    const cancelled = await Fixture.errorOf(() => sample.host.whenRendered());
+    const aborted = sample.signal.aborted;
+    sample.reply();
+    sample.deliverCleanup();
+    return { cancelled: cancelled?.code, aborted, disposed: sample.disposed, empty: sample.target.textContent };
+  });
+  await page.waitForFunction(() => standalone.diagnostics.length === 1);
+  assert.deepEqual(result, { cancelled: 'CANCELLED', aborted: true, disposed: 1, empty: '' });
+  assert.deepEqual(await page.evaluate(() => standalone.diagnostics.map(d => [d.phase, d.error.code, d.error.message])), [['dispose', 'INTERNAL_ERROR', 'INTERNAL_ERROR']]);
+}));
+
 test('ViewstemView cancels a delayed source on removal and renderer disposal while borrowing stays usable', t => browserTest(t, async page => {
   const result = await page.evaluate(async () => {
     const F = Fixture;
@@ -936,6 +1082,56 @@ for (const failCleanup of [false, true]) test(`ViewstemView renderer disposal wa
   });
 }));
 
+test('renderer disposal waits for its Runtime’s borrowed component display and leaves a foreign View attached', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture;
+    const diagnostics = [];
+    const rendererDiagnostics = [];
+    const onError = diagnostic => diagnostics.push([diagnostic.phase, diagnostic.error.code]);
+    const renderer = F.publicRenderer({ onError: diagnostic => rendererDiagnostics.push(diagnostic.phase) });
+    const contract = F.resource('Component', 'Label', {});
+    let finish;
+    const set = F.defineResourceSet({ id: 'direct-views', version: '1', components: [{ contract, connectorId: 'dom', implementation: {
+      mount({ parent, anchor, node }) {
+        const label = parent.ownerDocument.createElement('span');
+        label.textContent = node.id;
+        parent.insertBefore(label, anchor);
+        return { update() {}, async dispose() {
+          if (node.id === 'owned') {
+            await new Promise(resolve => { finish = resolve; });
+            throw Error('private connector cleanup');
+          }
+          label.remove();
+        } };
+      },
+    } }] });
+    renderer.runtime.registry.registerResourceSet(set);
+    const foreign = F.publicRuntime({ registry: renderer.runtime.registry });
+    const ownView = await renderer.runtime.createView({ render: { id: 'owned', componentRef: 'Label' } });
+    const otherView = await foreign.createView({ render: { id: 'other', componentRef: 'Label' } });
+    const ownTarget = F.target(), otherTarget = F.target();
+    const own = F.mount(F.ViewstemView, { target: ownTarget, props: { renderer, view: ownView, onError } });
+    const other = F.mount(F.ViewstemView, { target: otherTarget, props: { renderer, view: otherView, onError } });
+    await Promise.all([own.whenRendered(), other.whenRendered()]);
+    let finished = false;
+    const outcome = F.errorOf(() => renderer.dispose()).then(error => { finished = true; return error; });
+    while (!finish) await new Promise(resolve => setTimeout(resolve, 0));
+    const finishedBeforeRelease = finished;
+    finish();
+    const error = await outcome;
+    const cancelled = await F.errorOf(() => own.whenRendered());
+    await other.whenRendered();
+    const displays = [ownTarget.textContent, otherTarget.textContent];
+    await Promise.all([F.unmount(own), F.unmount(other)]);
+    await foreign.dispose();
+    return { finishedBeforeRelease, error: error?.code, cancelled: cancelled?.code, displays, diagnostics, rendererDiagnostics };
+  });
+  assert.deepEqual(result, {
+    finishedBeforeRelease: false, error: 'INTERNAL_ERROR', cancelled: 'CANCELLED',
+    displays: ['', 'other'], diagnostics: [['dispose', 'INTERNAL_ERROR']], rendererDiagnostics: [],
+  });
+}));
+
 test('ViewstemView reads the latest diagnostic handler and tolerates disposal during the first diagnostic', t => browserTest(t, async page => {
   const result = await page.evaluate(async () => {
     const F = Fixture;
@@ -1015,6 +1211,34 @@ test('direct and imperative Svelte connections share diagnostic delivery without
     return outcome;
   });
   assert.deepEqual(result, { order: ['central', 'screen', 'screen'], first: [1, 1, true], phases: ['node', 'node'], central: 1 });
+}));
+
+test('the same async observer on a Svelte renderer and component sees a Query failure once', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture, seen = [];
+    let rejectQuery;
+    const onError = async diagnostic => { seen.push(diagnostic.phase); throw Error('observer rejection'); };
+    const renderer = F.rendererWithBindings({
+      components: [{ contract: F.resource('Component', 'Probe', { ports: { value: F.port() } }), component: F.Probe }],
+      requestExecutor: () => new Promise((_resolve, reject) => { rejectQuery = reject; }),
+      onError,
+    });
+    const view = await renderer.runtime.createView({
+      queries: { failing: { query: { sources: { response: {
+        datasource: { kind: 'Http', baseUrl: 'https://example.test' }, request: { method: 'GET', path: '/fail' },
+      } }, transform: { input: F.p('/sources/response') } } } },
+      render: F.probe('probe', 'first paint'),
+    });
+    const host = F.mount(F.Host, { target: F.target(), props: { renderer, view, onError } });
+    await F.tick();
+    await host.whenRendered();
+    rejectQuery({ code: 'HTTP_ERROR' });
+    await host.whenSettled(view.initial);
+    await F.unmount(host);
+    await renderer.dispose();
+    return seen;
+  });
+  assert.deepEqual(result, ['query']);
 }));
 
 for (const mode of ['source', 'mount']) test(`disposing during a Svelte ${mode} State commit prevents the first Query and waits for cleanup`, t => browserTest(t, async page => {

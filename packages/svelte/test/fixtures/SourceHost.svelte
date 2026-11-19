@@ -2,13 +2,14 @@
   import { setContext, untrack } from 'svelte';
   import { ViewstemView } from '@viewstem/svelte';
 
-  let { renderer, initialSource, inputs, onError } = $props();
+  let { renderer, initialSource, inputs, resourceSets, onError } = $props();
   let source = $state(untrack(() => structuredClone(initialSource)));
   let key = $state(0);
   let visible = $state(true);
   let projection = $state.raw();
   setContext('viewstem-test-context', 'from-parent');
   export function changeSource(next) { source = next; }
+  export function changeSets(next) { resourceSets = next; }
   export function remount() { key += 1; }
   export function hide() { visible = false; }
   export function whenRendered() { return projection.whenRendered(); }
@@ -16,7 +17,7 @@
 
 {#if visible}
   {#key key}
-    <ViewstemView {renderer} {source} {inputs} {onError} pending={loading} prepareError={failed} bind:this={projection} />
+    <ViewstemView {renderer} {source} {inputs} {resourceSets} {onError} pending={loading} prepareError={failed} bind:this={projection} />
   {/key}
 {/if}
 

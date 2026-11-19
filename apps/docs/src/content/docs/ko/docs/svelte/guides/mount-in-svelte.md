@@ -11,6 +11,7 @@ sidebar:
 | --- | --- |
 | 별도 DOM 요소에 새 View 표시 | [`renderer.mount({ target, source })`](../manage-view-lifecycle/) |
 | 별도 DOM 요소에 기존 View 표시 | [`renderer.attach(view, target)`](../../renderer/#mount-and-attach) |
+| 기존 Svelte 트리에서 독립 화면 | [`<ViewstemView {source} resourceSets={[ui]} />`](../../viewstem-view/) |
 | 기존 Svelte 트리에서 새 View 생성 | [`<ViewstemView {renderer} {source} />`](../../viewstem-view/) |
 | 기존 Svelte 트리에서 이미 만든 View 표시 | [`<ViewstemView {renderer} {view} />`](../../viewstem-view/#borrowing-a-view) |
 

@@ -21,9 +21,12 @@ export function notifyDiagnostic(diagnostic, ...observers) {
   }
 }
 
-export function createRenderError(missing, { componentId, instanceId } = {}) {
+export function createRenderError(missing, { componentId, connectorId, instanceId } = {}) {
+  const missingMessage = typeof connectorId === 'string'
+    ? `Connector ${JSON.stringify(connectorId)} is unavailable on this display connection.`
+    : 'No implementation is available for this Component on the display connection.';
   return error(missing ? 'REFERENCE_NOT_FOUND' : 'INTERNAL_ERROR', {
-    message: missing ? 'No implementation is available for this Component on the display connection.' : 'The Component could not be rendered.',
+    message: missing ? missingMessage : 'The Component could not be rendered.',
     ...(typeof componentId === 'string' ? { resource: { kind: 'Component', id: componentId } } : {}),
     ...(typeof instanceId === 'string' ? { instanceId } : {}),
   });

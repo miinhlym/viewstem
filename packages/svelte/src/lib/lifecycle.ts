@@ -10,8 +10,9 @@ export function transformError(_cause: unknown): PublicError { return createRend
 export interface RendererState {
   alive: boolean;
   runtime: Runtime;
+  ownsRuntime: boolean;
   connectors: readonly ComponentConnector[];
-  ownedViews: Set<() => Promise<void>>;
+  ownedCleanups: Set<() => Promise<void>>;
   onError?: RendererErrorListener;
 }
 export const rendererStates = new WeakMap<Renderer, RendererState>();

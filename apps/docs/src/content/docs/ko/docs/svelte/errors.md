@@ -17,7 +17,7 @@ sidebar:
 
 | 필드 | 타입 | 의미 |
 | --- | --- | --- |
-| `readonly phase` | `'prepare' \| 'node' \| 'query' \| 'action' \| 'url' \| 'render'` | 오류가 발생한 단계입니다. |
+| `readonly phase` | `'prepare' \| 'node' \| 'query' \| 'action' \| 'url' \| 'render' \| 'dispose'` | 오류가 발생한 단계입니다. |
 | `readonly error` | `PublicError` | 공개 오류입니다. 렌더링 오류에 Component 참조와 인스턴스 ID가 포함될 수 있습니다. |
 | `readonly nodeId?` | `string` | 관련 노드를 식별할 수 있을 때 제공됩니다. |
 | `readonly application?` | `ViewApplication` | 관련 적용 핸들이 있을 때 제공됩니다. |
@@ -47,6 +47,7 @@ sidebar:
 | 잘못된 옵션·등록·대상 | 해당 설정 호출이 동기 예외를 던집니다. |
 | 마운트 중 정의 준비 실패 | `screen.ready`와 `screen.whenRendered()`가 거절됩니다. `onError`는 `prepare` 진단을 받고 대상 예약이 풀립니다. |
 | `ViewstemView`의 `source` 준비 실패 | `prepareError`에 공개 오류를 전달하고 `onError`에 `prepare` 진단을 한 번 보냅니다. `whenRendered()`도 그 오류로 거절됩니다. |
+| 자동으로 표시를 해제하거나 종속 리소스를 정리하던 중 실패 | `onError`에 `dispose` 진단이 전달됩니다. 앱이 직접 요청한 정리의 실패는 반환 Promise에서 확인합니다. |
 | 노드 입력을 평가하는 중 실패 | `onError`는 `node` 진단을 받습니다. 어댑터가 노드 오류 상태를 화면에 표시했다면 렌더는 완료됩니다. |
 | 실행 가능한 최초 Query 실패 | 완료 보고의 `queryErrors`에 기록됩니다. |
 | Svelte 구현 누락 또는 어댑터 렌더 실패 | 표시 연결의 `render` 진단에 각각 `REFERENCE_NOT_FOUND` 또는 `INTERNAL_ERROR`를 보고합니다. 살아 있는 연결은 폴백을 표시하고 새 투영에서 다시 시도할 수 있습니다. |

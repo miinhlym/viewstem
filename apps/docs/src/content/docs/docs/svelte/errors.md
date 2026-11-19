@@ -17,7 +17,7 @@ The function maps arbitrary thrown values to a fixed `INTERNAL_ERROR` DTO withou
 
 | Field | Type | Meaning |
 | --- | --- | --- |
-| `readonly phase` | `'prepare' \| 'node' \| 'query' \| 'action' \| 'url' \| 'render'` | The phase that reported the failure. |
+| `readonly phase` | `'prepare' \| 'node' \| 'query' \| 'action' \| 'url' \| 'render' \| 'dispose'` | The phase that reported the failure. |
 | `readonly error` | `PublicError` | The public error. A render error can include the Component reference and instance ID. |
 | `readonly nodeId?` | `string` | Identifies the affected node when available. |
 | `readonly application?` | `ViewApplication` | The associated application handle when available. |
@@ -45,6 +45,7 @@ Supply a fallback snippet through `RenderOptions` or `ViewstemViewProps`. It rec
 | Invalid options, registration, or target | The relevant setup call throws synchronously. |
 | View preparation fails during mount | `screen.ready` and `screen.whenRendered()` reject. `onError` receives a `prepare` diagnostic and the target reservation is released. |
 | `ViewstemView` source preparation fails | `prepareError` receives the public error and `onError` receives one `prepare` diagnostic. `whenRendered()` rejects with the same error. |
+| Automatic display or owned resource cleanup fails | `onError` receives a `dispose` diagnostic. Observe the promise when requesting cleanup explicitly. |
 | An input fails during node evaluation | `onError` receives a `node` diagnostic. The adapter can display the node's error state, which counts as a completed render. |
 | Eligible initial Query fails | The completion report contains an entry in `queryErrors`. |
 | Svelte implementation is missing or an adapter render fails | The display reports a `render` diagnostic with `REFERENCE_NOT_FOUND` or `INTERNAL_ERROR`, respectively. A live connection can show a fallback and retry on the next projection. |

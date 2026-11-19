@@ -11,6 +11,7 @@ Choose the entry point for your host.
 | --- | --- |
 | A new View in a separate DOM element | [`renderer.mount({ target, source })`](../manage-view-lifecycle/) |
 | An existing View in a separate DOM element | [`renderer.attach(view, target)`](../../renderer/#mount-and-attach) |
+| A standalone screen in an existing Svelte tree | [`<ViewstemView {source} resourceSets={[ui]} />`](../../viewstem-view/) |
 | A new View inside an existing Svelte tree | [`<ViewstemView {renderer} {source} />`](../../viewstem-view/) |
 | An existing View inside an existing Svelte tree | [`<ViewstemView {renderer} {view} />`](../../viewstem-view/#borrowing-a-view) |
 

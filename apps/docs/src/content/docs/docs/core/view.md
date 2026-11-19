@@ -12,7 +12,7 @@ A View is one executing screen with its own State, Query and event lifetimes. Ob
 | Method | Signature and behavior |
 |---|---|
 | `getSnapshot()` | Returns an immutable `ViewSnapshot` of the current projection. |
-| `subscribe(listener)` | Calls `(snapshot: ViewSnapshot) => void` immediately, then on projection changes. Returns `() => void` to stop observing. |
+| `subscribe(listener)` | Calls `(snapshot: ViewSnapshot) => void` immediately, then on projection changes. Returns `() => void` to stop observing. A thrown initial callback is removed. Subscribing after disposal does not replay. |
 | `getState(name, instanceId?)` | Returns `StateHandle<unknown>`; omit `instanceId` for the root View, supply a component owner's instance ID for local State. |
 | `getQuery(name, instanceId?)` | Returns `QueryHandle<unknown>` with the same ownership selection. |
 | `exportDefinition()` | Returns a detached `ViewSpec`; no current State values, in-flight work or functions. |
@@ -28,7 +28,7 @@ Compatible retained nodes keep State and lifetimes. Removing nodes, changing the
 
 In the current implementation, a retained Query use also retains `refresh` and `intervalMs` settings omitted from `updateDefinition`. Omission does not restore their defaults. Set `refresh` explicitly; use `replace` when you need a new Query lifetime with fresh defaults. See [Query settings](../../dsl/queries/).
 
-Use `setInputs(inputs)` to replace the full input map while keeping the current definition and resource configuration.
+Use `setInputs(inputs, { signal }?)` to replace the full input map while keeping the current definition and resource configuration.
 
 <a id="applyresourcesets"></a>
 ## applyResourceSets(options)
@@ -42,6 +42,8 @@ Pass `{ setIds, definition?, inputs?, states?, signal? }` with one or more set I
 
 To adopt Registry replacements without editing the View definition, call `view.replace(view.exportDefinition(), { inputs, url })` with the inputs the new lifetime needs and any URL bindings to reconnect.
 
+All four changes accept an optional `signal` to cancel before commit. The latest change supersedes earlier preparation that has yet to commit. For example, `setInputs()` can supersede a `replace()` waiting for the resolver and apply its input to the current View.
+
 All four operations return a `ViewApplication`. Await `view.whenSettled(application)` for initial executable Queries and inspect `queryErrors`. A newer application or disposal can cancel an earlier completion promise.
 
 ## emit(target, event, payload)
@@ -50,7 +52,7 @@ Returns `Promise<unknown>`. Target can be a runtime address/owner ID string, a `
 
 ## dispose()
 
-Stops subscriptions, cancels owned Actions and Query work, removes owned State and URL connections, and invalidates old event capabilities. It is safe to call more than once. Dispose the whole Runtime when all its Views are finished.
+`dispose(): Promise<void>` blocks new execution, then waits for owned subscriptions, State, Query work, and URL connections to be cleaned up. Repeated calls return the same promise.
 
 ## ViewSnapshot
 

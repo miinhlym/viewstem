@@ -21,11 +21,15 @@ Returns a `Runtime`. `options.registry`, when provided, must be a Registry issue
 | `registry` | `Registry`, optional | Shared source of validated definitions. |
 | `stateStore` | `StateStore`, new store if omitted | Inject host State; caller owns an injected store's cleanup. |
 | `requestExecutor` | `RequestExecutor`, fetch-backed HTTP executor | Execute a versioned plan with an AbortSignal; return `HttpResponse`. |
-| `resourceResolver` | `(kind, id) => Awaitable<AnyResource>`, absent | Resolve missing referenced resources while preparing a View; must return the requested kind and ID. Resolved definitions are registered as a batch. |
+| `resourceResolver` | `(kind, id, { signal }) => Awaitable<AnyResource \| undefined>`, absent | Finds missing declarations for `createView()` and `replace()`. Return `undefined` when absent, or a declaration with the requested kind and ID. |
 | `authorize` | Synchronous callback, absent | Approve Action invocation or View updates/replacement. Only an explicit `true` allows an operation when supplied. |
 | `functions` | Readonly `CelFunction[]`, Registry functions | CEL functions used for execution. Keep registration and execution environments compatible. |
+| `hostCapabilities` | Readonly name-to-value map, empty | Supplies required capabilities to registered code Actions at invocation. |
 | `requestTimeoutMs` | Positive safe integer, 30000ms | Query/HTTP request deadline. A custom executor must honor cancellation. |
-| `clock` | `TimerClock`, system scheduling | Query scheduling: `now` number or function, `setTimeout(callback, milliseconds)`, `clearTimeout(token)`. Not an application State clock. |
+| `urlCleanupTimeoutMs` | Positive safe integer, 30000ms | Deadline for removing previous URL keys during View replacement. |
+| `clock` | `TimerClock`, system scheduling | Schedules Queries. Supply an advancing `now` value or function on the same time base as `setTimeout` and `clearTimeout`. |
+
+Resolved declarations are validated and published together. `updateDefinition()`, `applyResourceSets()`, and independent Action calls resolve against the Registry selected for the operation.
 
 ## createView(source, options?)
 
@@ -65,7 +69,7 @@ An already aborted signal rejects with `CANCELLED` before authorization. Abortin
 - `runtime.registry` and `runtime.stateStore`: readonly references to the public handles.
 - `runtime.registry.list(filter?)`: detached resource declarations, optionally filtered by `ResourceKind`.
 - `runtime.registry.exportResource(kind, id)`: detached declaration for one resource; does not export live State or implementation functions.
-- `dispose(): void`: dispose all Views and cancel owned work. An internally created store is disposed; an injected store remains the caller's responsibility. Repeated disposal is safe.
+- `dispose(): Promise<void>` stops execution in owned Views and waits for cleanup or reports its failure. The caller owns an injected store. Repeated calls return the same promise.
 
 <a id="authorization"></a>
 ## Authorization and diagnostics

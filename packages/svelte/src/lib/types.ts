@@ -1,5 +1,5 @@
 import type { Component, Snippet } from 'svelte';
-import type { ComponentContract, ComponentInputs, NodeSnapshot, PublicError, Runtime, RuntimeOptions, View, ViewOptions, ViewSource } from '@viewstem/core';
+import type { ComponentContract, ComponentInputs, NodeSnapshot, PublicError, ResourceSet, Runtime, RuntimeOptions, View, ViewOptions, ViewSource } from '@viewstem/core';
 import type { ComponentConnector, ComponentMountContext } from '@viewstem/dom';
 import type { Renderer as CoreRenderer, RendererDiagnostic, MountedView, RenderAttachment } from '@viewstem/core/renderer';
 type AdapterNode<C extends ComponentContract> = ComponentContract extends C ? NodeSnapshot
@@ -23,11 +23,17 @@ export interface ViewstemViewProps { readonly renderer: Renderer; readonly view:
 export type ViewstemSourceProps = Omit<ViewstemViewProps, 'view'> & Pick<ViewOptions, 'inputs'> & {
   readonly source: ViewSource;
   readonly view?: never;
+  readonly resourceSets?: never;
   readonly pending?: Snippet;
   readonly prepareError?: Snippet<[error: PublicError]>;
 };
-export type ViewstemViewComponentProps = ViewstemSourceProps | (ViewstemViewProps & {
+type OwnedSourceProps = Omit<ViewstemSourceProps, 'renderer' | 'resourceSets'> & {
+  readonly renderer?: never;
+  readonly resourceSets?: readonly ResourceSet[];
+};
+export type ViewstemViewComponentProps = OwnedSourceProps | ViewstemSourceProps | (ViewstemViewProps & {
   readonly source?: never;
+  readonly resourceSets?: never;
   readonly inputs?: never;
   readonly pending?: never;
   readonly prepareError?: never;

@@ -295,7 +295,7 @@ export interface Runtime {
   readonly registry: Registry; readonly stateStore: StateStore;
   createView(source: ViewSource, options?: ViewOptions): Promise<View>;
   invokeAction(request: ActionRequest): Promise<unknown>;
-  dispose(): void;
+  dispose(): Promise<void>;
 }
 export function createRuntime(options?: RuntimeOptions): Runtime;
 export type ActionRequest = ReferenceOrInline<'actionRef', 'action', ActionSpec> & {
@@ -305,8 +305,8 @@ export type ActionRequest = ReferenceOrInline<'actionRef', 'action', ActionSpec>
 export interface View {
   readonly [viewBrand]: true;
   readonly initial: ViewApplication;
-  setInputs(inputs: Readonly<Record<string, unknown>>): Promise<ViewApplication>;
-  updateDefinition(spec: ViewSpec, options?: { readonly inputs?: Readonly<Record<string, unknown>>; readonly states?: Readonly<Record<string, unknown>> }): Promise<ViewApplication>;
+  setInputs(inputs: Readonly<Record<string, unknown>>, options?: { readonly signal?: AbortSignal }): Promise<ViewApplication>;
+  updateDefinition(spec: ViewSpec, options?: { readonly inputs?: Readonly<Record<string, unknown>>; readonly states?: Readonly<Record<string, unknown>>; readonly signal?: AbortSignal }): Promise<ViewApplication>;
   applyResourceSets(options: { readonly setIds: readonly string[]; readonly definition?: ViewSpec; readonly inputs?: Readonly<Record<string, unknown>>; readonly states?: Readonly<Record<string, unknown>>; readonly signal?: AbortSignal }): Promise<ViewApplication>;
   replace(source: ViewSource, options?: ViewOptions): Promise<ViewApplication>;
   whenSettled(application: ViewApplication): Promise<InitialReport>;
@@ -317,7 +317,7 @@ export interface View {
   /** State writes during an active projection queue a follow-up; the delivered snapshot stays unchanged. */
   subscribe(listener: (snapshot: ViewSnapshot) => void): () => void;
   emit(target: string | NodeSnapshot | { readonly address: string; readonly generation: number }, event: string, payload: unknown): Promise<unknown>;
-  dispose(): void;
+  dispose(): Promise<void>;
 }
 
 export type CelValue = null | boolean | number | string | readonly CelValue[] | { readonly [key: string]: CelValue | undefined } | ReadonlySet<CelValue> | ReadonlyMap<string | number, CelValue>;

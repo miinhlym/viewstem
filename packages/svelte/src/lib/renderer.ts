@@ -1,12 +1,12 @@
 import { mount, tick, unmount } from 'svelte';
 import { createRuntime, type ComponentBinding, type ComponentContract } from '@viewstem/core';
-import { createRenderError, notifyDiagnostic } from '@viewstem/core/renderer';
+import { createDiagnostic, createRenderError, notifyDiagnostic, runtimeOwnsView } from '@viewstem/core/renderer';
 import type { View } from '@viewstem/core';
 import { createRenderer as createBrowserRenderer, type BrowserDisplayOptions, type ComponentConnector } from '@viewstem/dom';
 import ComponentMount from './ComponentMount.svelte';
 import FallbackMount from './FallbackMount.svelte';
 import { cancelled, failure, rendererStates, transformError } from './lifecycle.js';
-import type { ComponentAdapter, RenderOptions, Renderer, RendererOptions } from './types.js';
+import type { ComponentAdapter, RendererDiagnostic, RendererErrorListener, RenderAttachment, RenderOptions, Renderer, RendererOptions } from './types.js';
 
 export const SVELTE_CONNECTOR_ID = 'svelte';
 export function svelteComponent<const C extends ComponentContract>(
@@ -68,13 +68,45 @@ function browserOptions({ context, fallback, onError }: RenderOptions = {}): Bro
   };
 }
 
-export function attachComponentView(renderer: Renderer, view: View, target: HTMLElement, options: RenderOptions, isOpen: () => boolean) {
+export function reportComponentDiagnostic(renderer: Renderer | undefined, diagnostic: RendererDiagnostic, onError: RendererErrorListener | undefined, isOpen: () => boolean) {
+  const state = renderer && rendererStates.get(renderer);
+  const disposing = diagnostic.phase === 'dispose';
+  notifyDiagnostic(diagnostic,
+    { listener: state?.onError, isOpen: () => !!state?.alive && (disposing || isOpen()) },
+    { listener: onError, isOpen: () => disposing || isOpen() },
+  );
+}
+
+type ComponentDisplayOptions = Omit<RenderOptions, 'onError'> & {
+  getErrorListener: () => RendererErrorListener | undefined;
+  isOpen: () => boolean;
+  trackCleanup: boolean;
+};
+export function attachComponentView(renderer: Renderer, view: View, target: HTMLElement,
+  { getErrorListener, isOpen, trackCleanup, ...options }: ComponentDisplayOptions): RenderAttachment {
   const state = rendererStates.get(renderer);
   if (!state?.alive) throw cancelled();
   const browser = createBrowserRenderer({ runtime: state.runtime, connectors: state.connectors });
-  return browser.attach(view, target, browserOptions({ ...options, onError: diagnostic => notifyDiagnostic(diagnostic,
-    { listener: state.onError, isOpen: () => state.alive && isOpen() }, { listener: options.onError, isOpen },
-  ) }));
+  let reportedDisposal = false;
+  const attachment = browser.attach(view, target, browserOptions({ ...options, onError: report }));
+  function report(diagnostic: RendererDiagnostic) {
+    if (diagnostic.phase === 'dispose') {
+      if (reportedDisposal) return;
+      reportedDisposal = true;
+    }
+    reportComponentDiagnostic(renderer, diagnostic, getErrorListener(), isOpen);
+  }
+  let cleanup: Promise<void> | undefined;
+  function detach() {
+    return cleanup ??= attachment.detach().catch(cause => {
+      report(createDiagnostic('dispose', cause));
+      throw cause;
+    }).finally(() => { state?.ownedCleanups.delete(detach); });
+  }
+  if (trackCleanup && state.alive && state.ownsRuntime && runtimeOwnsView(state.runtime, view)) {
+    state.ownedCleanups.add(detach);
+  }
+  return { ...attachment, detach };
 }
 
 export function createRenderer({ runtime: injected, onError, connectors = [], ...runtimeOptions }: RendererOptions = {}): Renderer {
@@ -82,7 +114,7 @@ export function createRenderer({ runtime: injected, onError, connectors = [], ..
   const runtime = injected ?? createRuntime(runtimeOptions as Parameters<typeof createRuntime>[0]);
   const browserConnectors = [svelteConnector, ...connectors];
   const browser = createBrowserRenderer({ runtime, connectors: browserConnectors, ...(onError ? { onError } : {}) });
-  const state = { alive: true, runtime, connectors: browserConnectors, ownedViews: new Set<() => Promise<void>>(), ...(onError ? { onError } : {}) };
+  const state = { alive: true, runtime, ownsRuntime: !injected, connectors: browserConnectors, ownedCleanups: new Set<() => Promise<void>>(), ...(onError ? { onError } : {}) };
   let cleanup: Promise<void> | undefined;
   const renderer: Renderer = {
     runtime,
@@ -100,8 +132,9 @@ export function createRenderer({ runtime: injected, onError, connectors = [], ..
       let resolve!: () => void;
       let reject!: (reason: unknown) => void;
       cleanup = new Promise<void>((done, failed) => { resolve = done; reject = failed; });
-      if (!injected) runtime.dispose();
-      const work = [browser.dispose(), ...[...state.ownedViews].map(close => close())];
+      const ownedCleanups = [...state.ownedCleanups];
+      const runtimeCleanup = state.ownsRuntime ? runtime.dispose() : undefined;
+      const work = [runtimeCleanup, browser.dispose(), ...ownedCleanups.map(close => close())];
       void Promise.allSettled(work).then(results => {
         const failed = results.find(result => result.status === 'rejected');
         if (failed) reject(failed.reason); else resolve();

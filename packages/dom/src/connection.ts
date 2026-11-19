@@ -284,7 +284,11 @@ class BrowserConnection {
       try {
         if (!node.handle) {
           if (!connector || !binding || !connector.accepts(binding.implementation)) {
-            throw createRenderError(true, { componentId: id, ...(snapshot.instanceId === undefined ? {} : { instanceId: snapshot.instanceId }) });
+            throw createRenderError(true, {
+              componentId: id,
+              connectorId: connector ? undefined : binding?.connectorId,
+              instanceId: snapshot.instanceId,
+            });
           }
           const current = () => node.handle !== undefined && node.children.isOpen()
             && this.#work?.projection.componentBinding(id) === binding;

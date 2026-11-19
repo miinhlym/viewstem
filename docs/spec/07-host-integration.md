@@ -27,6 +27,8 @@ DOM과 Svelte의 명령형 연결을 공통 `createRenderer → mount → unmoun
 
 소유 View의 생성 설정은 컴포넌트 초기화 시점에 캡처하고, 클라이언트 마운트 뒤 생성한다. 이미 커밋한 State의 알림 중 렌더러를 폐기하면 확정한 Registry 변경은 보존하며 최초 Query를 시작하기 전에 소유 View를 닫는다. 렌더러 폐기 Promise는 소유 View 정리가 끝난 뒤 이행한다. 기존 표시 연결에서 시작한 완료 대기는 교체 또는 폐기에 따라 취소되며, 닫힌 연결의 캐시는 조회할 수 없다.
 
+**D165 · 독립 Svelte 화면의 소유권.** `<ViewstemView {source} resourceSets={[ui]} />`는 클라이언트에서 자체 Runtime·렌더러를 만들고, 첫 설정으로 캡처한 셋을 등록한 뒤 View를 준비한다. 셋 등록이나 준비가 실패하면 준비 진단을 전달하고 실패한 수명을 정리한다. 화면을 제거하면 준비 취소와 전체 정리를 컴포넌트가 관리한다. 여러 화면에서 Runtime을 공유할 때는 앱이 소유한 렌더러를 전달한다. `resourceSets`와 외부 `renderer`는 함께 사용할 수 없으며 `view`는 외부 렌더러를 요구한다. UI 셋과 스타일은 소비자가 명시적으로 가져온다.
+
 **D152 · 소유 View의 실행 차단과 정리.** 브라우저와 Svelte의 `mount()`, Svelte의 `ViewstemView source`는 같은 소유 생성 경로를 쓴다. 후보 View는 참조 해결 전에 소유자에 등록한다. 공개 Core `createView()`와 `replace()`의 준비 신호는 동기 확정 직전까지 유효하다. 호스트의 종료는 View 수명 전체에 적용하며, 확정 후 알림 중에 닫으면 Registry 커밋과 외부 소유 셀을 보존하고 해당 View의 실행을 차단한다.
 
 렌더러 전체를 닫을 때는 모든 소유 화면의 실행 자격을 먼저 무효화한다. Store 트랜잭션, 알림 또는 순수 함수 실행 중 종료를 요청하면 실행을 차단한 뒤 구조를 바꾸는 정리를 해당 구간 밖에서 수행한다. `unmount()`와 렌더러 `dispose()`는 소유 scope·구독·타이머·표시 연결의 정리를 기다린다. 진행 중 HTTP와 resolver에는 중단 신호를 전달하며, URL은 `isCurrent()`로 늦은 반영을 차단한다. 이 외부 작업들의 응답은 종료 완료의 조건에 포함하지 않는다. 대여 연결 해제는 View와 다른 표시 연결의 수명을 유지한다.
@@ -35,7 +37,7 @@ DOM과 Svelte의 명령형 연결은 종료 호출 즉시 해당 연결에서 �
 
 호스트 타이머와 URL 어댑터에서 돌아온 뒤에도 종료 상태를 확인한다. HTTP 실행기 호출과 URL 복원·쓰기는 해당 수명이 유효할 때만 시작한다. 호환 갱신에서는 유지한 Query 사용과 캐시를 보존한다. Store 알림 중 시작한 갱신·재시도는 최신 Query 설정이 적용된 뒤 판정한다. 닫히거나 교체된 연결에서 진행 중인 표시 대기는 `CANCELLED`로 끝난다.
 
-**D153 · 렌더러와 화면의 오류 관찰.** `mount()`, `attach()`, `ViewstemView`는 렌더러 관찰자 다음에 화면 관찰자를 호출한다. 각 호출 직전에 연결과 관찰자의 수명을 확인한다. 같은 진단 발생에는 연결이나 렌더러를 가로질러 함수 참조당 한 번 전달한다. 새 연결의 현재 노드·Query 오류와 현재 적용의 URL 진단은 발생 당시의 불변 공개 데이터를 사용한다. Query 실행 실패는 다음 실행에 의해 투영에서 가려져도 당시 관찰자에게 전달한다. 연결의 렌더 실패는 해당 연결의 관찰자에게만 전달한다. 관찰자 예외·Promise 거절과 정상 취소는 새 진단을 만들지 않는다.
+**D153 · 렌더러와 화면의 오류 관찰.** `mount()`, `attach()`, `ViewstemView`는 렌더러 관찰자 다음에 화면 관찰자를 호출한다. 각 호출 직전에 연결과 관찰자의 수명을 확인한다. 같은 진단 발생에는 연결이나 렌더러를 가로질러 함수 참조당 한 번 전달한다. 새 연결의 현재 노드·Query 오류와 현재 적용의 URL 진단은 발생 당시의 불변 공개 데이터를 사용한다. Query 실행 실패는 다음 실행에 의해 투영에서 가려져도 당시 관찰자에게 전달한다. 연결의 렌더 실패는 해당 연결의 관찰자에게만 전달한다. 관찰자 예외·Promise 거절과 정상 취소는 새 진단을 만들지 않는다. 자동 표시 및 소유 자원 정리 실패는 `dispose` 진단으로 전달한다. 직접 요청한 정리는 반환 Promise로 실패를 관찰할 수 있다.
 
 ## 10.8 서비스 연결과 에이전트의 같은 경로
 
@@ -83,11 +85,11 @@ await serviceApi.saveDefinition(view.exportDefinition());
 | createRuntime(options?) | Registry 생략 시 생성, stateStore·requestExecutor·resourceResolver 선택. Store 생략 시 core가 생성·소유하며 주입 Store의 수명은 서비스가 유지. 실제 필요한 의존성이 없을 때만 오류 |
 | runtime.createView(source, options?) | 구조를 확정한 뒤 View 반환. `view.initial`로 최초 적용을 식별 |
 | runtime.invokeAction(request) | View 없이 Runtime 수명 안에서 독립 호출 시작. 선택적 `signal`로 해당 호출 취소 |
-| view.updateDefinition(viewSpec, options?) / view.setInputs(inputs) | 다음 전체 View spec을 원자 reconcile. 같은 owner·노드 ID·대상 정의의 상태 유지. 실패 시 기존 정의·상태 유지 |
+| view.updateDefinition(viewSpec, options?) / view.setInputs(inputs, options?) | 다음 전체 View spec 또는 입력을 원자 reconcile. 같은 owner·노드 ID·대상 정의의 상태 유지. 확정 전 `signal` 취소나 실패 시 기존 정의·상태 유지 |
 | view.applyResourceSets(options) | 현재 수명에서 대상 셋과 의존 셋을 추가하고 전달받은 정의·입력·State와 같이 확정 |
 | view.replace(source, options?) | 같은 View의 내부 수명 교체. 준비 실패는 기존 View를 보존하며 성공은 적용 핸들을 반환 |
 | view.exportDefinition() | 현재 View spec을 반환. 독립 리소스로 저장할 kind/id/name 외피는 서비스가 부여. 자동 저장·runtime snapshot export 아님 |
-| view.dispose() | 소유 실행·내부 상태·구독 정리. 서비스 Store의 외부 소유 셀은 유지. 반복 호출은 안전한 no-op |
+| runtime.dispose() / view.dispose() | 소유 실행을 즉시 막고 구조 정리 완료 또는 실패를 Promise로 반환. 서비스 Store의 외부 소유 셀은 유지. 반복 호출은 같은 Promise를 반환 |
 | view.invokeAction({actionRef 또는 action, inputs?, signal?}) | View 수명 안에서 독립 호출 시작. 공개 대상·권한·입력 검증 후 실행하고 실제 결과/void 또는 공통 오류 반환 |
 | context.invokeAction({actionRef 또는 action, inputs}) | 코드 Action의 부모에 연결된 하위 호출. 부모 owner·스택·취소를 상속하며 변경 불가. 명시 입력·대상·권한·출력 검증 후 결과/오류 Promise 반환 [U35] |
 
@@ -95,9 +97,9 @@ await serviceApi.saveDefinition(view.exportDefinition());
 
 View는 적용 시점의 Registry 정의와 코드 핸들러를 보관한다. 새 View와 `view.replace()`는 최신 Registry를 사용하고 `view.updateDefinition()`은 현재 수명에 주입된 Registry를 사용한다. 코드 Action 갱신의 비교 기준과 이전 절차는 [코드 Action 등록과 갱신](04-action.md#코드-action-등록과-갱신)을 따른다.
 
-View가 투영을 계산·발행하는 중 구독자가 State를 변경하면 재계산 요청을 버리지 않고 기존 microtask 큐에 합친다. 현재 전달 중인 snapshot은 유지하며, 통지를 마친 뒤 후속 투영에서 변경된 입력을 발행한다. 예약된 투영이 남아 있으면 해당 적용의 초기 완료를 먼저 확정하지 않는다. View 폐기 뒤에는 예약 작업이 발행하지 않으며, 교체 뒤에는 현재 정의와 수명으로 계산한다. 일반적인 State 쓰기나 core 이벤트 전체를 별도 비동기 실행 엔진으로 바꾸는 것은 아니다. [D131 구현·회귀 검증](../handoff/view-subscription-projection-fix-2026-11-06.md)을 따른다.
+View가 투영을 계산·발행하는 중 구독자가 State를 변경하면 재계산 요청을 버리지 않고 기존 microtask 큐에 합친다. 현재 전달 중인 snapshot은 유지하며, 통지를 마친 뒤 후속 투영에서 변경된 입력을 발행한다. 통지 중 새 구독은 현재 값을 한 번 읽는다. 최초 콜백이 던지면 구독 등록을 되돌리며, 폐기 뒤 구독하면 값을 재생하지 않는다. 커밋 전의 View 변경은 같은 큐에서 최신 요청으로 대체된다. 예약된 투영이 남아 있으면 해당 적용의 초기 완료를 먼저 확정하지 않는다. View 폐기 뒤에는 예약 작업이 발행하지 않으며, 교체 뒤에는 현재 정의와 수명으로 계산한다. 일반적인 State 쓰기나 core 이벤트 전체를 별도 비동기 실행 엔진으로 바꾸는 것은 아니다. [D131 구현·회귀 검증](../handoff/view-subscription-projection-fix-2026-11-06.md)을 따른다.
 
-update는 유지할 State의 계약과 기존 연결을 새 정의로 재검증한다. 구조 준비에 필요한 정의는 resolver로 조회한다. 데이터 Query·코드 Action은 구조 검증 뒤 실행한다. native 실행 context는 `{inputs, signal, invokeAction, capabilities}`이며 State/Query inputs에는 호출 한정 핸들을 넣는다. `capabilities`에는 Action이 요구하고 Runtime에서 공급한 기능을 담는다. 서비스 연결층이 공개 대상과 호출자 권한을 먼저 확인한다.
+update는 유지할 State의 계약과 기존 연결을 새 정의로 재검증한다. `createView()`와 `replace()`의 구조 준비에서만 누락된 정의를 resolver로 조회한다. Resolver는 미발견을 `undefined`로 반환할 수 있다. `updateDefinition()`·`applyResourceSets()`·독립 Action 실행은 해당 호출이 선택한 Registry의 정의를 사용한다. 데이터 Query·코드 Action은 구조 검증 뒤 실행한다. native 실행 context는 `{inputs, signal, invokeAction, capabilities}`이며 State/Query inputs에는 호출 한정 핸들을 넣는다. `capabilities`에는 Action이 요구하고 Runtime에서 공급한 기능을 담는다. 서비스 연결층이 공개 대상과 호출자 권한을 먼저 확인한다.
 
 U35의 하위 호출은 부모가 끝난 뒤 사용할 수 없고, 대기하지 않은 자손도 부모 종료 시 취소한다. 별도 UI 관찰 id를 받지 않으며 입력·결과의 의미와 신뢰 코드 경계는 [Action 하위 호출 계약](04-action.md#재귀확장-실행의-경계)을 따른다. JS/TS 문맥의 함수명은 `invokeAction`으로 구체화했으며 다른 언어에서도 같은 수명·오류 의미를 유지한다.
 

@@ -156,7 +156,7 @@ registry.registerAction({ kind: 'Action', id: 'inferred', spec: { ports: { title
   return title.length > 0;
 });
 declare const actionSnapshot: ActionSnapshot;
-const celFunction: CelFunction<[number], number> = { name: 'double', inputs: [{ type: 'number' }], output: { type: 'number' }, run: n => n * 2 };
+const celFunction: CelFunction<[number], number> = { name: 'twice', inputs: [{ type: 'number' }], output: { type: 'number' }, run: n => n * 2 };
 const celValue: CelValue = 1;
 createRenderer({ functions: [celFunction] });
 void [stateSnapshot, viewSnapshot, diagnostics, actionSnapshot, celValue];

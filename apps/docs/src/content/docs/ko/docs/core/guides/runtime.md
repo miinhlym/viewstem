@@ -14,13 +14,19 @@ sidebar:
 ## 등록·실행·관찰하기
 
 ```js title="run-view.mjs"
-import { createRegistry, createRuntime } from '@viewstem/core';
+import { createRegistry, createRuntime, defineResourceSet } from '@viewstem/core';
 
 const registry = createRegistry();
-registry.registerComponentContract({
-  kind: 'Component', id: 'Label',
-  spec: { ports: { text: { kind: 'Value', schema: { type: 'string' }, required: true } } },
-});
+registry.registerResourceSet(defineResourceSet({
+  id: 'projection', version: '1',
+  components: [{
+    contract: {
+      kind: 'Component', id: 'Label',
+      spec: { ports: { text: { kind: 'Value', schema: { type: 'string' }, required: true } } },
+    },
+    connectorId: 'projection-example', implementation: {},
+  }],
+}));
 const runtime = createRuntime({ registry });
 const view = await runtime.createView({
   states: { title: { kind: 'State', schema: { type: 'string' }, initial: 'Hello' } },
@@ -35,10 +41,10 @@ const observed = new Promise(resolve => {
 });
 view.getState('title').write('Updated');
 console.log(await observed); // Updated
-runtime.dispose();
+await runtime.dispose();
 ```
 
-컴포넌트 계약은 `Label`이 필수 문자열 입력을 받는다고 Core에 알립니다. 실제 UI 구현은 렌더러가 담당하며 이 예제에서는 출력 스냅샷을 읽습니다. `Hello`, `Updated` 로그를 통해 State가 노드 입력에 반영되는 것을 확인할 수 있습니다. `view.subscribe()`는 현재 스냅샷을 즉시 전달하고 구독 해제 함수를 반환합니다. 이 짧은 예제는 런타임을 폐기하면서 모든 구독을 정리합니다. 개별 관찰을 먼저 끝낼 때는 반환된 함수를 호출하세요.
+준비된 코드 Component에는 바인딩이 필요하므로 투영용 바인딩을 등록합니다. 계약은 `Label`의 필수 문자열 입력을 선언합니다. 이 예제는 렌더러 없이 출력 스냅샷을 읽습니다. `Hello`, `Updated` 로그를 통해 State가 노드 입력에 반영되는 것을 확인할 수 있습니다. `view.subscribe()`는 현재 스냅샷을 즉시 전달하고 구독 해제 함수를 반환합니다. 이 짧은 예제는 런타임을 폐기하면서 모든 구독을 정리합니다. 개별 관찰을 먼저 끝낼 때는 반환된 함수를 호출하세요.
 
 ## 실행 중 정의 바꾸기
 

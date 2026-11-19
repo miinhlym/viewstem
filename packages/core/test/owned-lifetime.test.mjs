@@ -461,3 +461,35 @@ test('a timer cleanup failure still releases every owned scope and target', asyn
   assert.equal(stateCount(store), 0);
   await host.mount({ target, source: { render } }).ready;
 });
+
+test('an owning signal abort observes cleanup failures without throwing from the event listener', async t => {
+  const controller = new AbortController();
+  const active = new Map();
+  const runtime = createRuntime({
+    componentContracts,
+    clock: {
+      now: 0,
+      setTimeout(_callback, delay) {
+        const handle = {};
+        active.set(handle, delay);
+        return handle;
+      },
+      clearTimeout(handle) {
+        const delay = active.get(handle);
+        active.delete(handle);
+        if (delay === 10) throw Error('poll cleanup failed');
+      },
+    },
+    requestExecutor: () => ({ status: 200, headers: {}, body: 'ok' }),
+  });
+  t.after(() => runtime.dispose());
+  const view = await prepareOwnedView(runtime, {
+    ...source, queries: { first: { ...source.queries.first, intervalMs: 10 } },
+  })(controller.signal);
+  await view.whenSettled(view.initial);
+  assert.deepEqual([...active.values()], [10]);
+  controller.abort();
+  await assert.rejects(view.dispose(), { code: 'INTERNAL_ERROR' });
+  assert.equal(active.size, 0);
+  await new Promise(resolve => setImmediate(resolve));
+});

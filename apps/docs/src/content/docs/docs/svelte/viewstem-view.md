@@ -10,21 +10,22 @@ sidebar:
 Import from `@viewstem/svelte` and pass a `renderer` with either a `source` or a `view`. Both inherit the parent Svelte context. See the [mounting guide](../guides/mount-in-svelte/) for a runnable example.
 
 ```svelte
+<ViewstemView {source} resourceSets={[ui]} />
 <ViewstemView {renderer} source={{ ref: 'settings' }} inputs={{ accountId }} />
 <ViewstemView {renderer} view={sharedView} />
 ```
 
 ## ViewstemViewProps
 
-`ViewstemViewProps` remains the interface for borrowed Views. `ViewstemSourceProps` describes creation. `ViewstemViewComponentProps` and `ComponentProps<typeof ViewstemView>` cover both forms.
+`ViewstemViewProps` names the borrowed-View props. `ViewstemSourceProps` describes creation with a supplied renderer. `ViewstemViewComponentProps` and `ComponentProps<typeof ViewstemView>` cover all forms, including standalone screens.
 
-Passing both `view` and `source`, or neither, produces `INVALID_DEFINITION`. In either form, `onError` adds a screen observer alongside the renderer observer, and `fallback` displays an individual failed node.
+Supply exactly one of `view` and `source`. A borrowed `view` requires a `renderer`. `resourceSets` is available for `source` without a supplied renderer. Invalid combinations produce `INVALID_DEFINITION`. `onError` observes diagnostics and `fallback` displays an individual failed node.
 
 ## Create from a source
 
 Creation starts after the component mounts in the browser. The server and initial hydration render an empty region. Pass an inline `ViewSpec` or `{ ref }` as the `source`. Inline definitions created with Svelte `$state` are supported.
 
-The component captures `renderer`, `source`, and `inputs` at initialization and uses those values after browser mount. Later `source` or `inputs` changes keep the existing View. Use `{#key}` to create a new screen, switch ownership mode, or change the renderer for an owned View.
+The component captures `renderer`, `source`, `inputs`, and `resourceSets` at initialization. A standalone screen creates its Runtime and renderer after browser mount and registers its initial sets in order before preparing the View. Use `{#key}` to start a new screen with changed configuration or ownership.
 
 The optional `pending` snippet shows preparation, and `prepareError(error)` shows failure. A preparation failure also sends a `prepare` diagnostic to `onError`. Removing the component or disposing the renderer cancels preparation and disposes the owned View. The host manages the shared renderer and any injected Runtime.
 
