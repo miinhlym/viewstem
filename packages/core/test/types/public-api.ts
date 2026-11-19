@@ -114,9 +114,9 @@ registry.replaceResource({ action: { ...countAction, implementation: () => 'wron
 const count = scope.registerState<number>('count', { schema: { type: 'integer' }, initial: 0 });
 const httpOptions: HttpExecutorOptions = { authorize: ({ destination }) => destination.startsWith('https:') };
 const executor: RequestExecutor = createHttpExecutor(httpOptions);
-const double: CelFunction<[number], number> = { name: 'double', inputs: [{ type: 'number' }], output: { type: 'number' }, run: value => value * 2 };
-const celOptions: CelOptions = { inputs: { n: { type: 'number' } }, functions: [double], limits: { depth: defaultCelLimits.depth } };
-const computed: unknown = compileCel('double(n)', celOptions)({ n: 2 });
+const twice: CelFunction<[number], number> = { name: 'twice', inputs: [{ type: 'number' }], output: { type: 'number' }, run: value => value * 2 };
+const celOptions: CelOptions = { inputs: { n: { type: 'number' } }, functions: [twice], limits: { depth: defaultCelLimits.depth } };
+const computed: unknown = compileCel('twice(n)', celOptions)({ n: 2 });
 const value: CelValue = 2;
 evaluateCel('n', { n: value }, celOptions);
 const runtime = createRuntime({ registry, stateStore: store, requestExecutor: executor });

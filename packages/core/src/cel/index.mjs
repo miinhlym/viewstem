@@ -1,4 +1,5 @@
 import { Environment } from '../../vendor/cel-js/lib/index.js';
+import { RESERVED } from '../../vendor/cel-js/lib/globals.js';
 import { compileSchema, equal } from '../schema.mjs';
 import { toCelInteger, fromCelInteger } from '../values.mjs';
 import { protect, trustedCopies } from '../immutable.mjs';
@@ -26,18 +27,30 @@ function rawMember(value) {
   if (typeof value === 'bigint') return fromCelInteger(value);
   return value;
 }
+const blockedIdentifiers = new Set(['optional', 'cel', 'google', 'bytes', 'uint', 'type', 'int', 'double', 'string', 'bool', 'map', 'list', 'null_type']);
+const blockedCalls = new Set(['bytes', 'uint', 'type', 'json', 'hex', 'base64', 'at', 'or', 'orValue', 'hasValue', 'value', 'of', 'none', 'ofNonZeroValue']);
+
 // Restrict the candidate's larger default namespace to this package's documented
 // profile, including unexecuted branches and macros. Walk only syntax arguments.
 function assertProfile(ast) {
   function visit(node) {
     if (Array.isArray(node)) { for (const child of node) visit(child); return; }
     if (!node || typeof node !== 'object' || !own(node, 'op')) return;
-    if (node.op === 'id' && ['optional', 'cel', 'google', 'bytes', 'uint', 'type', 'int', 'double', 'string', 'bool', 'map', 'list', 'null_type'].includes(node.args)) fail('UNSUPPORTED_CEL_FEATURE');
-    if (['call', 'rcall'].includes(node.op) && ['bytes', 'uint', 'type', 'json', 'hex', 'base64', 'at', 'or', 'orValue', 'hasValue', 'value', 'of', 'none', 'ofNonZeroValue'].includes(node.args[0])) fail('UNSUPPORTED_CEL_FEATURE');
+    if (node.op === 'id' && blockedIdentifiers.has(node.args)) fail('UNSUPPORTED_CEL_FEATURE');
+    if ((node.op === 'call' || node.op === 'rcall') && blockedCalls.has(node.args[0])) fail('UNSUPPORTED_CEL_FEATURE');
     if (node.op === 'value' && node.args !== null && typeof node.args === 'object') fail('UNSUPPORTED_CEL_FEATURE');
     visit(node.args);
   }
   visit(ast);
+}
+
+function reservedFunctionNames(environment) {
+  const { functions, variables } = environment.getDefinitions();
+  return new Set([
+    ...RESERVED, 'true', 'false', 'null', 'in',
+    ...blockedIdentifiers, ...blockedCalls,
+    ...functions.map(({ name }) => name), ...variables.map(({ name }) => name),
+  ]);
 }
 
 /** Compile a pure, synchronous CEL evaluator. Schemas are registered immediately. */
@@ -50,7 +63,6 @@ export function compileCel(expression, { inputs = {}, output, functions = [], li
   const resultCodec = compileSchema(output === undefined ? true : output);
   const environment = new Environment({ homogeneousAggregateLiterals: false, enableOptionalTypes: false, limits: { maxEvaluationCost: cost, maxAstNodes: 10000, maxDepth: limits.depth } });
   for (const [name, constructor] of Object.entries({ NativeSet, NativeMap, DateValue })) environment.registerType(name, constructor);
-  for (const [name, codec] of Object.entries(codecs)) environment.registerVariable(name, celType(codec.plan));
   // Stack-local session swapping permits a trusted callback to evaluate another
   // compiled expression without corrupting its caller's identity bookkeeping.
   let session;
@@ -96,12 +108,15 @@ export function compileCel(expression, { inputs = {}, output, functions = [], li
   register('dateText(DateValue): string', value => payload(value).raw);
   register('dateKind(DateValue): string', value => payload(value).kind);
   for (const [signature, handler] of calendarFunctions) register(signature, handler);
-  const names = new Set();
+  let names;
   for (const definition of functions) {
-    if (!definition || !/^[A-Za-z_][A-Za-z0-9_]*$/.test(definition.name) || names.has(definition.name) || !Array.isArray(definition.inputs) || typeof definition.run !== 'function' || !own(definition, 'output')) fail('INVALID_DEFINITION');
-    names.add(definition.name);
+    if (!definition || !Array.isArray(definition.inputs) || typeof definition.run !== 'function' || !own(definition, 'output')) fail('INVALID_DEFINITION');
+    const { name } = definition;
+    names ??= reservedFunctionNames(environment);
+    if (typeof name !== 'string' || !/^[A-Za-z_][A-Za-z0-9_]*$/.test(name) || names.has(name)) fail('INVALID_DEFINITION');
+    names.add(name);
     const args = definition.inputs.map(schema => compileSchema(schema)), result = compileSchema(definition.output), run = definition.run;
-    register(`${definition.name}(${args.map(codec => celType(codec.plan)).join(', ')}): ${celType(result.plan)}`, (...encoded) => {
+    register(`${name}(${args.map(codec => celType(codec.plan)).join(', ')}): ${celType(result.plan)}`, (...encoded) => {
       try {
         const native = encoded.map((value, i) => session.accept(args[i], session.decode(args[i].plan, value), limits.inputNodes));
         const raw = run(...native);
@@ -110,6 +125,7 @@ export function compileCel(expression, { inputs = {}, output, functions = [], li
       } catch (error) { session.fatal = error; throw error; }
     });
   }
+  for (const [name, codec] of Object.entries(codecs)) environment.registerVariable(name, celType(codec.plan));
   const parsed = environment.parse(expression);
   assertProfile(parsed.ast);
   const checked = parsed.check();

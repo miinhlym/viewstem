@@ -50,7 +50,7 @@ console.log(evaluateCel('count + 1', { count: 4 }, options)); // 5
 
 ## CelFunction과 CelValue
 
-함수는 `{ name, inputs: Schema[], output: Schema, run }`입니다. 이름은 `[A-Za-z_][A-Za-z0-9_]*` 형식이며 기본 함수·다른 등록 함수와 충돌하면 안 됩니다. `run(...args)`는 동기·순수 함수로서 깊은 읽기 전용의 스키마 검증된 인자를 받고 스키마로 검증할 `CelValue`를 반환합니다. 제네릭 인자 튜플을 명시하면 TypeScript가 각 인자의 타입을 확인할 수 있습니다. Promise는 금지합니다. 한도가 임의의 호스트 콜백을 sandbox로 격리하거나 JavaScript 실행 시간을 제한하지는 않습니다.
+함수는 `{ name, inputs: Schema[], output: Schema, run }`입니다. 이름은 `[A-Za-z_][A-Za-z0-9_]*` 형식입니다. 중복 이름, CEL 키워드, 표현식 프로필의 예약 이름, 내장 이름은 등록 시 `INVALID_DEFINITION`으로 거절합니다. 내장 이름은 모든 인자 개수와 수신자 호출에 걸쳐 예약합니다. `run(...args)`는 동기·순수 함수로서 깊은 읽기 전용의 스키마 검증된 인자를 받고 스키마로 검증할 `CelValue`를 반환합니다. 제네릭 인자 튜플을 명시하면 TypeScript가 각 인자의 타입을 확인할 수 있습니다. Promise는 금지합니다. 한도가 임의의 호스트 콜백을 sandbox로 격리하거나 JavaScript 실행 시간을 제한하지는 않습니다.
 
 `CelValue`는 null·boolean·유한 숫자·문자열·읽기 전용 배열/객체·읽기 전용 Set·문자열/숫자 키의 읽기 전용 Map을 포함합니다. 실제 허용 형태는 Core 스키마 프로필을 따릅니다. 일반 `number`는 CEL double이며 `integer`는 JavaScript 경계에서 안전 정수여야 합니다. 명시적인 날짜·시간 스키마는 선언한 문자열과 시간대 규칙을 사용합니다.
 

@@ -50,7 +50,7 @@ The compiler also enforces an AST node ceiling of 10000. Compile/evaluation erro
 
 ## CelFunction and CelValue
 
-A function is `{ name, inputs: Schema[], output: Schema, run }`. Names match `[A-Za-z_][A-Za-z0-9_]*` and must not collide with built-ins or other registered functions. `run(...args)` is synchronous and pure, receives deeply readonly schema-validated arguments, and returns a schema-validated `CelValue`. Explicit generic argument tuples let TypeScript type each argument. Promises are not allowed. Limits do not sandbox arbitrary host callbacks or impose an execution-time limit on their JavaScript.
+A function is `{ name, inputs: Schema[], output: Schema, run }`. Names match `[A-Za-z_][A-Za-z0-9_]*`. Registration rejects duplicate names, CEL keywords, profile-reserved names, and built-in names with `INVALID_DEFINITION`. Built-in names are reserved across arities and receiver forms. `run(...args)` is synchronous and pure, receives deeply readonly schema-validated arguments, and returns a schema-validated `CelValue`. Explicit generic argument tuples let TypeScript type each argument. Promises are not allowed. Limits do not sandbox arbitrary host callbacks or impose an execution-time limit on their JavaScript.
 
 `CelValue` includes null, booleans, finite numbers, strings, readonly arrays/objects, readonly Sets and readonly Maps with string/number keys. Core schema profiles determine the admitted forms. A general `number` is CEL double; an `integer` must be a safe integer at the JavaScript boundary. Explicit date/time schemas use declared strings and timezone rules.
 

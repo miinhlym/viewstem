@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { createRegistry } from '@viewstem/core';
 import { compileCel, evaluateCel } from '../src/cel/index.mjs';
 import { protect } from '../src/immutable.mjs';
 import * as engine from '../vendor/cel-js/lib/index.js';
@@ -134,6 +135,16 @@ test('trusted pure functions validate arguments/results and reject async', () =>
   assert.throws(() => run('bad() == 1 || true', {}, {}, boolean, { functions: invalid }));
   const async = [{ name: 'later', inputs: [], output: boolean, run: async () => true }];
   throwsCode(() => run('later() || true', {}, {}, boolean, { functions: async }), 'ASYNC_CEL_FUNCTION');
+});
+test('function admission rejects reserved and unreachable names even when unused or of a different arity', () => {
+  const make = name => ({ name, inputs: [], output: boolean, run: () => true });
+  for (const name of ['size', 'matches', 'contains', 'filter', 'setHas', 'addDate', 'double', 'cel', 'ofNonZeroValue', 'if', 'in', 'true', 'null']) {
+    const functions = [make(name)];
+    assert.throws(() => compileCel('true', { functions }), { code: 'INVALID_DEFINITION' }, name);
+    assert.throws(() => createRegistry({ functions }), { code: 'INVALID_DEFINITION' }, name);
+  }
+  assert.throws(() => compileCel('true', { functions: [make('custom'), make('custom')] }), { code: 'INVALID_DEFINITION' });
+  assert.equal(compileCel('custom() && size([1]) == 1', { functions: [make('custom')] })(), true);
 });
 test('size, cost, expression, input/output and depth controls survive error masking', () => {
   const evaluate = compileCel('xs.all(x, x > 0) || true', { inputs: { xs: array(integer) }, output: boolean, cost: 30 });

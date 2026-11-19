@@ -121,8 +121,8 @@ const href: string = mergeOwnedUrl('https://example.test?a=1', { a: null }); voi
 const stopClock = scope.connectClock(count, { now: () => 123, subscribe: listener => { listener(124); return () => {}; } }); stopClock();
 // @ts-expect-error clocks supply numeric State cells.
 scope.connectClock(scope.registerState<string>('text', { schema: { type: 'string' } }), { now: () => 1, subscribe: () => () => {} });
-const pureRegistry = createRegistry({ functions: [{ name: 'double', inputs: [{ type: 'number' }], output: { type: 'number' }, run: (...args) => Number(args[0]) * 2 }] });
-pureRegistry.registerResources([{ kind: 'Variable', id: 'double', spec: { ports: { n: { kind: 'Value', required: true, schema: { type: 'number' } } }, expression: 'double(n)' } }]);
+const pureRegistry = createRegistry({ functions: [{ name: 'twice', inputs: [{ type: 'number' }], output: { type: 'number' }, run: (...args) => Number(args[0]) * 2 }] });
+pureRegistry.registerResources([{ kind: 'Variable', id: 'double', spec: { ports: { n: { kind: 'Value', required: true, schema: { type: 'number' } } }, expression: 'twice(n)' } }]);
 pureRegistry.updateResource({ kind: 'Variable', id: 'double', spec: { expression: '1' } });
 // @ts-expect-error trusted functions are a readonly registry snapshot.
 pureRegistry.functions.push({ name: 'x', inputs: [], output: true, run: () => 1 });
