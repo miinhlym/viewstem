@@ -53,6 +53,10 @@ const result = await postcss([scopeUiCss('acme-forms')]).process(css, { from: 's
 
 Resolve CSS imports before this step and publish the resulting stylesheet. The plugin scopes the final target of each selector and prefixes internal custom properties, layers, and animation names. In `.theme { .field { … } }`, an owned `.field` can match inside a host or another set's `.theme`. Declarations on `.theme` itself apply to owned `.theme` elements. Use `publicProperties` for custom properties the app can set by name.
 
+The plugin accepts `@media`, `@supports`, `@container`, `@scope`, `@starting-style`, `@layer`, `@keyframes`, and private `@property` registrations. Top-level `@charset` and `@namespace` directives are also supported. Expand build-tool directives before this step. Other at-rules fail the build.
+
+Declare document-wide rules such as `@font-face` and `@counter-style` in a host stylesheet. The host also registers public custom properties and defines names used by document View Transitions, named anchors, or named scroll and view timelines. Set styles can reference a host-provided font, counter style, or public custom property in their own rules.
+
 When a component updates a local stylesheet property from JavaScript, pass `forms.localProperty('--progress')` to `element.style.setProperty()`. This resolves the same name that the build emits for `--progress`.
 
 To bundle styles with the set, make the package’s `browser` export import the generated CSS and re-export the set from its JavaScript entry. Put the `browser` condition before the normal JavaScript entry in `exports`, and include the browser entry and the CSS in `sideEffects`. Consumers register the set as usual. Export the stylesheet separately for hosts that load CSS explicitly.

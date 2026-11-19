@@ -116,6 +116,10 @@ DOM 작성자는 `@viewstem/dom/styles`의 `createStyleScope(id)`와 `@viewstem/
 
 서로 다른 셋 ID로 빌드한 스타일은 CSS 레이어, 애니메이션, 내부 CSS 변수 이름을 공유하지 않는다. `publicProperties`로 지정한 테마 변수는 원래 이름을 유지한다. 컴포넌트가 JavaScript에서 내부 CSS 변수를 갱신할 때는 `createStyleScope(id).localProperty(name)`으로 빌드와 같은 이름을 얻는다.
 
+셋 스타일시트는 소유권 검사를 적용하는 그룹 규칙(`@media`, `@supports`, `@container`, `@scope`, `@starting-style`)과 셋별로 이름을 변환하는 `@layer`, `@keyframes`, 비공개 `@property`를 지원한다. 스타일시트의 최상위 `@charset`, `@namespace` 지시문도 지원한다. 빌드 도구의 지시문과 `@import`는 변환 전에 해결한다. 변환기가 분류하지 않은 `@` 규칙은 빌드에서 오류를 반환한다.
+
+`@font-face`, `@counter-style`, `@position-try`와 공개 변수의 `@property` 등록은 호스트 스타일시트가 맡는다. 문서 View Transition이나 트리를 가로지르는 앵커·타임라인 이름을 정의하거나 범위를 지정하는 선언도 호스트가 관리한다. 셋은 자기 요소의 규칙에서 호스트가 제공한 글꼴, 카운터 스타일, 공개 테마 값을 참조할 수 있다. 이 정책은 문서나 트리에 등록된 이름이 선택자의 소유권 조건과 별도로 해석되므로 적용한다.
+
 **D170.** `@viewstem/ui`의 `browser` 진입점은 셋과 기본 CSS를 함께 불러온다. 이 조건을 선택하는 브라우저 번들러에서는 다른 셋을 통해 간접으로 가져올 때도 CSS가 포함된다. Node는 셋 정의를 내보내는 JS 진입점을 사용한다. 스타일시트를 직접 불러오는 호스트는 `@viewstem/ui/styles.css`를 사용한다. Registry 등록은 셋의 리소스를 게시한다.
 
 ## Svelte 어댑터 입력 타입
