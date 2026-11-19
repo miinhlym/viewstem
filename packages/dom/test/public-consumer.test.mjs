@@ -37,7 +37,7 @@ test('independent consumers use the packed headless, DOM and mixed packages', { 
     execute(process.execPath, [tsc, '-p', 'tsconfig.json'], directory);
   }
 
-  async function install(t, packages, entry, extraFiles = [], peer = []) {
+  async function install(t, packages, entry, extraFiles = [], peer = [], prepareInstall) {
     const base = await mkdtemp(join(tmpdir(), 'viewstem-independent-'));
     t.after(() => rm(base, { recursive: true, force: true }));
     const directory = await realpath(base);
@@ -56,8 +56,31 @@ test('independent consumers use the packed headless, DOM and mixed packages', { 
       const entryPoint = await realpath(fileURLToPath(resolved[index]));
       assert.ok(entryPoint.startsWith(join(directory, 'node_modules', '@viewstem', name, 'dist') + '/'));
     }
+    await prepareInstall?.(directory);
     await prepareFixture(directory, entry, extraFiles);
     return { directory, require };
+  }
+
+  async function installExternalAuthor(directory) {
+    const author = join(directory, 'author');
+    await mkdir(author);
+    await writeFile(join(author, 'package.json'), JSON.stringify({
+      name: 'viewstem-test-author',
+      version: '1.0.0',
+      type: 'module',
+      peerDependencies: { '@viewstem/core': '^0.1.0', '@viewstem/dom': '^0.1.0', '@viewstem/ui': '^0.1.0' },
+      exports: Object.fromEntries(['external-set', 'external-connector', 'common-set'].map(name =>
+        ['./' + name, { types: './dist/' + name + '.d.ts', import: './dist/' + name + '.js' }])),
+      files: ['dist'],
+    }));
+    await prepareFixture(author, 'external-set.ts', ['external-connector.ts', 'common-set.ts']);
+    execute(process.execPath, [tsc, '-p', 'tsconfig.json', '--noEmit', 'false', '--declaration', '--outDir', 'dist'], author);
+    const [pack] = JSON.parse(execute('npm', ['pack', '--pack-destination', packRoot, '--ignore-scripts', '--json'], author));
+    execute('npm', ['install', join(packRoot, pack.filename), '--ignore-scripts', '--no-audit', '--no-fund'], directory);
+    const resolveCore = ['--input-type=module', '-e', "console.log(import.meta.resolve('@viewstem/core'))"];
+    const coreFromApp = execute(process.execPath, resolveCore, directory);
+    const coreFromAuthor = execute(process.execPath, resolveCore, join(directory, 'node_modules/viewstem-test-author'));
+    assert.equal(coreFromAuthor, coreFromApp);
   }
 
   let browser;
@@ -123,7 +146,7 @@ test('independent consumers use the packed headless, DOM and mixed packages', { 
 
   const mixedPackages = ['core', 'dom', 'ui', 'svelte'];
   const mixedInstallation = await install(t, mixedPackages, 'main.ts',
-    ['common-set.ts', 'external-set.ts', 'external-connector.ts', 'Layout.svelte'], ['svelte@5.57.3']);
+    ['Layout.svelte'], ['svelte@5.57.3'], installExternalAuthor);
   await t.test('a public third-party connector shares State and slots with official DOM and Svelte', async t => {
     assert.deepEqual(await runBrowser(t, mixedInstallation, 'main.ts', mixedPackages), {
       answer: 42, title: 'After', labels: ['After', 'After'], kept: true, moved: 'compact', restored: ['beta', 'alpha'],

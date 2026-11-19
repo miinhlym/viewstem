@@ -171,6 +171,7 @@
 | D162 | 등록 계약에서 Svelte 입력 타입 추론 | `ComponentAdapterProps<typeof contract>`로 포트 타입을 추론하고 `svelteComponent()`에서 같은 계약으로 어댑터 타입을 검사한다. `ready`에서는 필수 Value가 존재한다. `pending`에서는 값이 없거나 이전에 표시한 값이 남을 수 있다. [브라우저 명세](../spec/12-resource-sets-browser.md#svelte-어댑터-입력-타입) | 2026-11-18 혼합 View 공개 API 리뷰 후 사용자 결정 |
 | D163 | 선언에 없는 참조와 State 값 대기의 구분 | 선언에 없는 참조는 준비 단계에서 위치와 함께 오류를 반환한다. 열린 View에서는 후보를 거절하고 기존 화면과 State를 유지한다. 노드가 필요로 하는 선언된 State의 값이 아직 없으면 해당 노드를 대기 상태로 둔다. [브라우저 명세](../spec/12-resource-sets-browser.md#실패-경계) | 2026-11-18 혼합 View 공개 API 리뷰 후 사용자 결정 |
 | D164 | 첫 버전의 단일 View 루트 유지 | 여러 컴포넌트를 호스트 요소의 직접 자식으로 배치해야 하는 사용 사례가 생기면 `ViewSpec.render` 배열을 검토한다. [View 명세](../spec/05-component-view.md#106-view-화면-구성과-인스턴스) | 2026-11-18 혼합 View 공개 API 리뷰 후 사용자 결정 |
+| D166 | 등록 엔트리와 코드 바인딩의 계약 보존 | `registerAction(entry)`도 필수 호스트 기능을 보존한다. 코드 Component 바인딩을 유지할 때 포트·슬롯·이벤트를 보호하고 계약과 구현은 명시적으로 함께 교체할 수 있다. [Action 명세](../spec/04-action.md) · [브라우저 명세](../spec/12-resource-sets-browser.md) | 공개 등록 경로 차이와 호환되지 않는 계약 갱신 재현 |
 
 리소스 셋과 혼합 렌더링의 후속 선택은 [별도 결정 이력](resource-sets-browser-2026-11-16.md)에 있다. D144의 패키지 역할에서 바뀌는 부분과 D150–D158의 현재 호스트 구현 기준을 함께 확인할 수 있다.
 

@@ -22,7 +22,7 @@ function registryHandle(implementation) {
     registerResourceSet(set) { implementation.registerResourceSet(set); return result; },
     registerComponentContract(contract) { implementation.registerComponentContract(contract); return result; },
     registerComponentContracts(contracts) { implementation.registerComponentContracts(contracts); return result; },
-    registerAction(definition, run) { implementation.registerAction(definition, run); return result; },
+    registerAction(...args) { implementation.registerAction(...args); return result; },
     updateResource(definition) { implementation.updateResource(definition); return result; },
     replaceResource(entry) { implementation.replaceResource(entry); return result; },
     get: (kind, id) => implementation.get(kind, id),

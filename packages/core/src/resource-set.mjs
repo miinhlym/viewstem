@@ -26,7 +26,9 @@ function array(value, parse) {
 }
 
 export function assertResourceSet(set) {
-  if (!declaredSets.has(set)) invalid();
+  if (!declaredSets.has(set)) fail('INVALID_DEFINITION', {
+    message: 'Expected a ResourceSet created by defineResourceSet in the same @viewstem/core instance.',
+  });
   return set;
 }
 

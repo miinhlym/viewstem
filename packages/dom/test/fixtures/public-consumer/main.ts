@@ -1,9 +1,9 @@
 import { createRuntime, defineResourceSet, type ViewSpec } from '@viewstem/core';
 import { createRenderer } from '@viewstem/dom';
 import { svelteComponent, svelteConnector } from '@viewstem/svelte';
-import { commonSet } from './common-set.js';
-import { externalSet } from './external-set.js';
-import { disposals, externalConnector, mounts } from './external-connector.js';
+import { commonSet } from 'viewstem-test-author/common-set';
+import { externalSet } from 'viewstem-test-author/external-set';
+import { disposals, externalConnector, mounts } from 'viewstem-test-author/external-connector';
 import Layout from './Layout.svelte';
 
 const registrySetup = defineResourceSet({ id: 'mixed', version: '1', dependencies: [externalSet], components: [

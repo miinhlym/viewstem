@@ -101,6 +101,10 @@ Viewstem은 서비스가 신뢰해 직접 가져온 셋·연결자 코드만 실
 - 한 core View의 State·Action·이벤트 공유와 프레임워크 native context 전파는 계약이 다르다. DOM 경계를 넘는 Svelte native context 전파는 미확정이며 향후 지원 여부도 열려 있다.
 - 1차 검증은 Svelte Layout 안의 DOM Button, DOM Card 안의 Svelte PlantMap 또는 Chart를 기준으로 한다. 임의 중첩과 프레임워크별 기능 전체의 지원은 이 사례에서 일반화하지 않는다. Menu·Trigger의 결합, `table`·`select`의 DOM 의미, 직접 자식 CSS와 wrapper, portal, SSR·hydration, context·transition의 상세 동작은 별도 범위다. [수락 시나리오](../handoff/resource-sets-browser-2026-11-16.md#후속-수락-시나리오)
 
+#코드 Component의 구현 바인딩을 보존하는 갱신은 포트·슬롯·이벤트의 해석된 계약을 유지한다. 직접 계약 변경과 참조 Type 변경에 같은 기준을 적용한다. 다른 계약에 맞춘 새 구현을 게시하려면 계약과 바인딩을 `replaceResource({ component })`로 함께 교체한다. 새 View와 명시적으로 교체를 적용한 열린 View에 새 조합을 사용한다.
+
+독립 셋 패키지는 앱과 같은 Core 모듈 인스턴스에서 셋을 정의한다. 앱 쪽에 해석되도록 Core를 peer dependency로 선언하고 해당 패키지 번들에서 외부화한다.
+
 ### Svelte 어댑터 입력 타입
 
 **D162 · 등록 계약에서 Svelte 입력 타입 추론.** 어댑터는 `ComponentAdapterProps<typeof contract>`로 Component 계약의 포트에서 입력 타입을 추론한다. TypeScript에서 `svelteComponent(contract, implementation)`으로 바인딩을 만들 때 구현의 props 타입이 같은 계약과 일치하는지 검사한다. 타입 인자 없는 `ComponentAdapterProps`도 공통 어댑터에서 사용할 수 있다.

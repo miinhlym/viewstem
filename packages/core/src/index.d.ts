@@ -145,7 +145,13 @@ export interface QueryDefaults { readonly refresh?: boolean; readonly intervalMs
 export type ResourceStateDeclaration = (TypeContract & { readonly kind: 'State'; readonly initial?: ValueExpression }) | (TypeContract & ReferenceOrInline<'variableRef', 'variable', VariableSpec> & { readonly kind: 'Derived'; readonly inputs?: InputExpressions });
 export interface Reaction { readonly watch: readonly [PathExpression, ...PathExpression[]]; readonly target: PathExpression; readonly value: JsonValue }
 export interface ComponentPublicContract { readonly ports?: Readonly<Record<string, Port>>; readonly slots?: Readonly<Record<string, { readonly required?: boolean }>>; readonly events?: Readonly<Record<string, TypeContract>> }
-export type ComponentContract = Resource<'Component', ComponentPublicContract>;
+export type ComponentContract = Resource<'Component', ComponentPublicContract & {
+  readonly render?: never;
+  readonly states?: never;
+  readonly queries?: never;
+  readonly queryDefaults?: never;
+  readonly reactions?: never;
+}>;
 /** Readonly inputs for a ready code Component, inferred from its declared ports. */
 export type ComponentInputs<C extends ComponentContract> = C extends unknown
   ? C['spec'] extends { readonly ports: infer P }
@@ -234,6 +240,7 @@ export interface Registry {
   registerResourceSet(set: ResourceSet): this;
   updateResource(definition: RegisteredResource): this;
   replaceResource<const D extends NativeActionResource>(entry: ReplaceResourceInput<D>): this;
+  registerAction<const D extends NativeActionResource>(entry: CodeActionEntry<D> | AuthoredCodeAction): this;
   registerAction<const D extends NativeActionResource>(
     definition: D & NoInfer<ExactActionFields<D>>,
     implementation: ActionHandler<NoInfer<InferredActionInputs<D['spec']>>, NoInfer<InferredActionOutput<D['spec']>>>,
@@ -266,7 +273,7 @@ export interface RuntimeSettings {
   readonly stateStore?: StateStore;
   readonly requestExecutor?: RequestExecutor;
   readonly hostCapabilities?: Readonly<Record<string, unknown>>;
-  readonly resourceResolver?: (kind: ResourceKind, id: string, context: { readonly signal: AbortSignal }) => Awaitable<AnyResource>;
+  readonly resourceResolver?: (kind: ResourceKind, id: string, context: { readonly signal: AbortSignal }) => Awaitable<AnyResource | undefined>;
   readonly authorize?: (context:
     | { readonly operation: 'invoke'; readonly owner: unknown; readonly definition: unknown; readonly resource: { readonly kind: 'Action'; readonly id: string } | null }
     | { readonly operation: 'update'; readonly owner: View; readonly definition: ViewSpec }

@@ -24,8 +24,9 @@ import type { Registry, AnyResource, ComponentContract, CodeActionDefinition } f
 | `registerResources(resources)` | Readonly `AnyResource[]`; returns this Registry | Validate and register a batch atomically, including references within that batch. Duplicate identities reject the whole batch. |
 | `registerComponentContract(contract)` | `ComponentContract`; returns this Registry | Register a code-backed Component's ports, slots and events. Does not supply rendering or accept a `render` tree. |
 | `registerComponentContracts(contracts)` | Readonly `ComponentContract[]`; returns this Registry | Atomic batch form; does not overwrite an existing identity. |
+| `registerAction(entry)` | Code Action entry; returns this Registry | Registers inputs, output, implementation, and required host capabilities together. |
 | `registerAction(definition, implementation)` | Code Action contract and `ActionHandler`; returns this Registry | Register a host function under an Action ID. See below. |
-| `updateResource(definition)` | `RegisteredResource`; returns this Registry | Validate the replacement and its dependencies before committing. Code Actions keep their registered input and output contracts. |
+| `updateResource(definition)` | `RegisteredResource`; returns this Registry | Validate the replacement and its dependencies before committing. Code Actions keep their registered input and output contracts. Keeping a code Component binding also preserves its ports, slots, and events. |
 | `replaceResource(entry)` | `{ resource }`, `{ action }`, or `{ component }`; returns this Registry | Explicitly replace an existing definition or code binding. A code Action keeps its input, output, and required host capability contracts. |
 
 Registration rejects malformed fields, unsupported schemas and invalid references. Validation errors are public diagnostics such as `INVALID_DEFINITION`, `REFERENCE_NOT_FOUND` or `TYPE_CONTRACT_MISMATCH`; inspect `code` rather than parsing `message`. A failed update preserves the previous registry. Definitions are copied at entry: mutating the original object later has no effect.
@@ -42,6 +43,8 @@ Registration rejects malformed fields, unsupported schemas and invalid reference
 Create a set with `defineResourceSet({ id, version, dependencies?, resources?, actions?, components? })` from `@viewstem/core`. A dependency is an already imported set. Registering the same set object again reuses the registration. A different set object with the same set ID is a conflict, even when its version string matches.
 
 An existing View keeps its current resource configuration. To add a registered set to that View, use [`applyResourceSets()`](../view/#applyresourcesets). To adopt replacements in the current Registry, create a new View or use [`replace()`](../view/#replace).
+
+An independent set package should declare `@viewstem/core` as a peer dependency and externalize it when bundling so its sets use the app's Core module instance. Use `replaceResource({ component })` to change a code Component's contract and binding together, or to add a binding to a previously registered contract.
 
 ## Code Actions
 
@@ -89,6 +92,8 @@ Use `defineCodeAction<Inputs, Output>({ definition, requires? })` for explicit t
 State and Query ports receive issued handles. A pure value input is isolated and deeply readonly. Child calls still pass permission checks. Return values are schema-checked; ending or cancelling the parent cancels unfinished child calls. Already completed effects are not rolled back.
 
 For a complete runnable example, see [Connect HTTP and code Actions](../guides/http-and-actions/). Resource envelopes and declarative Actions are described in [DSL resources](../../dsl/resources/) and [DSL Actions](../../dsl/actions/).
+
+To register a standalone Action, pass the same entry to `registry.registerAction(greetAction)`. The two-argument overload is available for functions with no required host capabilities.
 
 ### Updating a code Action
 

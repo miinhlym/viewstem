@@ -202,7 +202,7 @@ Value의 `default`는 키가 생략된 경우에만 적용하므로 TypeScript�
 
 **리소스 셋 설계에서 보완한 D154.** 입력·출력 계약과 필수 호스트 기능이 같으면 명시적 교체로 같은 Action ID에 새 함수를 게시할 수 있다. 이 중 하나라도 달라지면 새 Action ID를 사용한다. 게시 시 이미 진행 중인 호출은 시작 당시 함수로 계속 실행하고, 열린 View는 서비스가 교체를 명시적으로 적용할 때까지 기존 함수를 사용한다. 새 View와 교체를 받아들인 View는 새 함수를 사용한다. 열린 View의 교체 적용은 해당 View의 내부 수명을 새로 시작하는 일반 교체 계약을 따른다. [리소스 셋의 교체와 View 적용](12-resource-sets-browser.md#공통-저장소와-view-적용)
 
-**공개 API 후속 결정(D154).** `defineCodeAction({ definition, requires? })`으로 코드 Action의 ID, 입출력 계약과 필수 호스트 기능을 한 번 선언한다. 반환한 계약의 `.implement(handler)`는 그 계약에 맞는 함수로 Action 엔트리를 만든다. 다른 파일에서 가져온 엔트리는 `defineResourceSet({ actions: [...] })`과 `registry.replaceResource({ action })`에 전달할 수 있다. 같은 ID의 구현 교체에는 같은 계약의 `.implement()`로 새 함수를 연결한다. 리터럴 스키마에서 핸들러의 입력·출력 타입을 추론하며, `typeRef`를 쓰는 계약은 `defineCodeAction<Inputs, Output>()`으로 타입을 명시할 수 있다. Registry는 실제 스키마를 해석하고 등록·교체 계약을 검증한다.
+**공개 API 후속 결정(D154).** `defineCodeAction({ definition, requires? })`으로 코드 Action의 ID, 입출력 계약과 필수 호스트 기능을 한 번 선언한다. 반환한 계약의 `.implement(handler)`는 그 계약에 맞는 함수로 Action 엔트리를 만든다. 다른 파일에서 가져온 엔트리는 `defineResourceSet({ actions: [...] })`, `registry.registerAction(entry)`, `registry.replaceResource({ action })`에 전달할 수 있다. 세 경로에서 필수 호스트 기능을 함께 유지한다. 기존 정의·함수 두 인자 등록은 호스트 기능 요구가 없는 경우에 사용한다. 같은 ID의 구현 교체에는 같은 계약의 `.implement()`로 새 함수를 연결한다. 리터럴 스키마에서 핸들러의 입력·출력 타입을 추론하며, `typeRef`를 쓰는 계약은 `defineCodeAction<Inputs, Output>()`으로 타입을 명시할 수 있다. Registry는 실제 스키마를 해석하고 등록·교체 계약을 검증한다.
 
 ### 재귀·확장 실행의 경계
 

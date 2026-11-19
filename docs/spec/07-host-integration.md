@@ -75,8 +75,9 @@ await serviceApi.saveDefinition(view.exportDefinition());
 | defineResourceSet(input) / registry.registerResourceSet(set) | 선언·코드 구현·의존 셋을 담아 검증 후 함께 게시 |
 | defineCodeAction(input).implement(handler) | 코드 Action 계약을 선언하고 셋 등록·교체용 엔트리를 생성 |
 | registry.replaceResource(entry) | 같은 등록 유형의 리소스를 명시적으로 교체. 코드 Action은 입출력과 필수 기능을 보존 |
+| registry.registerAction(entry) | 코드 Action 엔트리 전체 등록. 입력·출력과 구현, 필수 호스트 기능을 함께 보존 |
 | registry.registerAction(definition, implementation) | 코드형 Action의 공개 정의와 실행 함수 등록. 같은 종류 ID 중복 거절. 타입에서 필수인 입력에는 해당 포트와 required:true를 요구 |
-| registry.updateResource(definition) | 의존 정의까지 검증한 뒤 기존 정의를 교체. 등록된 코드 Action의 실행 계약이 직접 또는 Type 갱신으로 바뀌면 원자적으로 거절. 새 계약은 새 Action ID로 등록 |
+| registry.updateResource(definition) | 의존 정의까지 검증한 뒤 기존 정의를 교체. 등록된 코드 Action이나 바인딩을 유지하는 코드 Component의 계약이 직접 또는 Type 갱신으로 바뀌면 원자적으로 거절. 새 Action 계약은 새 ID로 등록하고 Component 계약은 바인딩과 함께 명시적으로 교체 |
 | registry.registerComponentContract(contract) | 코드 Component의 계약 등록. View에서 곧바로 표시할 때는 해당 ID에 구현 바인딩 필요 |
 | createStateStore() | 서비스가 소유할 core Store 생성. createScope()로 격리된 소유 범위 생성 |
 | createRuntime(options?) | Registry 생략 시 생성, stateStore·requestExecutor·resourceResolver 선택. Store 생략 시 core가 생성·소유하며 주입 Store의 수명은 서비스가 유지. 실제 필요한 의존성이 없을 때만 오류 |

@@ -5,7 +5,7 @@ import { compileCel } from './cel/index.mjs';
 import { prepareHeaders } from './http/headers.mjs';
 import { fail, safeError } from './errors.mjs';
 import { record, object, name, fields, json, copy, freeze } from './definition.mjs';
-import { assertResourceSet, orderedResourceSets, replacementEntry } from './resource-set.mjs';
+import { assertResourceSet, codeActionEntry, orderedResourceSets, replacementEntry } from './resource-set.mjs';
 
 const own = (value, key) => Object.hasOwn(value, key);
 const kinds = new Set(['Datasource', 'Query', 'Variable', 'Action', 'Component', 'View', 'Type']);
@@ -134,7 +134,7 @@ export class Registry {
     const resources = Array.isArray(options) ? options : options?.resources ?? [];
     const contracts = Array.isArray(options) ? [] : options?.componentContracts ?? [];
     if (!Array.isArray(resources) || !Array.isArray(contracts)) invalid();
-    if (resources.length || contracts.length) this.#register(resources, undefined, undefined, contracts);
+    if (resources.length || contracts.length) this.#register(resources, contracts);
   }
   get functions() { return this.#functions; }
   get(kind, id) { return this.#definitions.get(key(kind, id)) ?? fail('REFERENCE_NOT_FOUND'); }
@@ -203,24 +203,26 @@ export class Registry {
   }
   validator(contract) { return compileSchema(this.schema(contract)); }
   registerResources(resources) { return this.#register(resources); }
-  registerAction(definition, implementation) {
-    if (definition?.kind !== 'Action' || typeof implementation !== 'function') invalid();
-    return this.#register([definition], 'Action', implementation);
+  registerAction(entry, implementation) {
+    const action = codeActionEntry(arguments.length === 1 ? entry : { definition: entry, implementation });
+    const candidate = this.fork();
+    candidate.#insertAction(action);
+    return this.#publish(candidate);
   }
   registerComponentContract(contract) {
     return this.registerComponentContracts([contract]);
   }
   registerComponentContracts(contracts) {
-    return this.#register(contracts, 'Component');
+    return this.#register([], contracts);
   }
-  #register(resources, codeKind, implementation, contracts = []) {
+  #register(resources, contracts = []) {
     if (!Array.isArray(resources)) invalid();
-    const definitions = [...Array.from(resources, definition => [freeze(copy(definition)), codeKind]),
+    if (!Array.isArray(contracts)) invalid();
+    const definitions = [...Array.from(resources, definition => [freeze(copy(definition)), undefined]),
       ...Array.from(contracts, definition => [freeze(copy(definition)), 'Component'])];
     const candidate = this.fork();
     for (const [definition, codeKind] of definitions) {
-      const address = candidate.#insert(definition, codeKind);
-      if (implementation !== undefined) candidate.#implementations.set(address, implementation);
+      candidate.#insert(definition, codeKind);
     }
     return this.#publish(candidate);
   }
@@ -229,6 +231,12 @@ export class Registry {
     if (this.#definitions.has(address)) invalid();
     this.#definitions.set(address, definition);
     if (codeKind !== undefined) this.#code.add(address);
+    return address;
+  }
+  #insertAction(action) {
+    const address = this.#insert(action.definition, 'Action');
+    this.#implementations.set(address, action.implementation);
+    this.#actionRequirements.set(address, action.requires);
     return address;
   }
   registerResourceSet(root) {
@@ -241,12 +249,7 @@ export class Registry {
         message: `Resource set ${set.id} is already declared (${existing.declaration.version}, ${set.version}).`,
       });
       const keys = set.resources.map(definition => candidate.#insert(definition));
-      for (const action of set.actions) {
-        const address = candidate.#insert(action.definition, 'Action');
-        candidate.#implementations.set(address, action.implementation);
-        candidate.#actionRequirements.set(address, action.requires);
-        keys.push(address);
-      }
+      for (const action of set.actions) keys.push(candidate.#insertAction(action));
       for (const binding of set.components) {
         const address = candidate.#insert(binding.contract, 'Component');
         candidate.#componentBindings.set(address, binding);
@@ -256,9 +259,9 @@ export class Registry {
     }
     return candidate.#sets.size === this.#sets.size ? this : this.#publish(candidate);
   }
-  #publish(candidate, definition) {
+  #publish(candidate, definition, replacesComponent = false) {
     try { candidate.#validateAll(); } catch (error) { throw safeError(error, 'INVALID_DEFINITION'); }
-    if (definition) this.#checkUpdatedContracts(candidate, definition);
+    if (definition) this.#checkUpdatedContracts(candidate, definition, replacesComponent);
     this.commitCandidate(candidate);
     return this;
   }
@@ -284,18 +287,44 @@ export class Registry {
       candidate.#actionRequirements.set(address, action.requires);
     }
     if (component) candidate.#componentBindings.set(address, component);
-    return this.#publish(candidate, definition);
+    return this.#publish(candidate, definition, component !== undefined);
   }
-  #checkUpdatedContracts(candidate, definition) {
+  #checkUpdatedContracts(candidate, definition, replacesComponent) {
     if (definition.kind === 'Action' && this.isCode('Action', definition.id)) {
       this.#checkActionContract(candidate, definition.id);
+    } else if (definition.kind === 'Component' && !replacesComponent && this.componentBinding(definition.id)) {
+      this.#checkComponentContract(candidate, definition.id);
     } else if (definition.kind === 'Type') {
-      for (const action of this.#definitions.values()) {
-        if (action.kind !== 'Action' || !this.isCode('Action', action.id)) continue;
-        const { ports = {}, output } = action.spec;
-        if (output?.typeRef === definition.id || Object.values(ports).some(port => port.typeRef === definition.id)) {
-          this.#checkActionContract(candidate, action.id);
+      for (const resource of this.#definitions.values()) {
+        if (!['Action', 'Component'].includes(resource.kind) || !this.isCode(resource.kind, resource.id)) continue;
+        if (![...contracts(resource.spec, documentRoot)].some(([contract]) => contract.typeRef === definition.id)) continue;
+        if (resource.kind === 'Action') this.#checkActionContract(candidate, resource.id);
+        else if (this.componentBinding(resource.id)) this.#checkComponentContract(candidate, resource.id);
+      }
+    }
+  }
+  #checkComponentContract(candidate, id) {
+    const before = this.get('Component', id).spec;
+    const after = candidate.get('Component', id).spec;
+    const sameSchema = (left, right) => equal(this.schema(left), candidate.schema(right));
+    for (const field of ['ports', 'slots', 'events']) {
+      const previous = before[field] ?? {};
+      const next = after[field] ?? {};
+      for (const name of new Set([...Object.keys(previous), ...Object.keys(next)])) {
+        const left = previous[name], right = next[name];
+        if (own(previous, name) && own(next, name)) {
+          if (field === 'slots' && (left.required === true) === (right.required === true)) continue;
+          if (field === 'events' && sameSchema(left, right)) continue;
+          if (field === 'ports' && left.kind === right.kind
+            && (left.required === true) === (right.required === true)
+            && sameDefault(left.default, right.default)
+            && (left.kind === 'Query' || sameSchema(left, right))) continue;
         }
+        fail('TYPE_CONTRACT_MISMATCH', {
+          message: 'Changing a code Component contract requires replacing its binding explicitly.',
+          resource: { kind: 'Component', id },
+          location: `/${field}/${pointerToken(name)}`,
+        });
       }
     }
   }

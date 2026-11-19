@@ -120,6 +120,8 @@ const computed: unknown = compileCel('twice(n)', celOptions)({ n: 2 });
 const value: CelValue = 2;
 evaluateCel('n', { n: value }, celOptions);
 const runtime = createRuntime({ registry, stateStore: store, requestExecutor: executor });
+createRegistry().registerAction(countAction);
+createRuntime({ resourceResolver: async () => undefined });
 const headlessResult: unknown = await runtime.invokeAction({ actionRef: 'answer' });
 void headlessResult;
 registry.registerComponentContract({ kind: 'Component', id: 'Leaf', spec: {} }).registerResources([]);

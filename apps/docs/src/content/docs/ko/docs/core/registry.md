@@ -24,8 +24,9 @@ import type { Registry, AnyResource, ComponentContract, CodeActionDefinition } f
 | `registerResources(resources)` | 읽기 전용 `AnyResource[]`; 현재 Registry 반환 | 같은 배치 안의 참조를 포함해 원자적으로 검증·등록합니다. 식별자가 중복되면 배치 전체를 거절합니다. |
 | `registerComponentContract(contract)` | `ComponentContract`; 현재 Registry 반환 | 코드 Component의 포트·슬롯·이벤트 계약을 등록합니다. 화면 구현을 제공하거나 `render` 트리를 받는 API가 아닙니다. |
 | `registerComponentContracts(contracts)` | 읽기 전용 `ComponentContract[]`; 현재 Registry 반환 | 원자적인 배치 등록입니다. 기존 식별자를 덮어쓰지 않습니다. |
+| `registerAction(entry)` | 코드 Action 엔트리, Registry 반환 | 입력·출력과 필수 호스트 기능을 함께 등록합니다. |
 | `registerAction(definition, implementation)` | 코드 Action 계약과 `ActionHandler`; 현재 Registry 반환 | Action ID에 호스트 함수를 등록합니다. 아래에서 설명합니다. |
-| `updateResource(definition)` | `RegisteredResource`; 현재 Registry 반환 | 교체할 정의와 의존 정의를 검증한 뒤 반영합니다. 코드 Action의 등록된 입력·출력 계약을 보존합니다. |
+| `updateResource(definition)` | `RegisteredResource`; 현재 Registry 반환 | 교체할 정의와 의존 정의를 검증한 뒤 반영합니다. 코드 Action의 등록된 입력·출력 계약을 보존합니다. 코드 Component의 바인딩을 보존하는 경우 포트·슬롯·이벤트 계약도 유지합니다. |
 | `replaceResource(entry)` | `{ resource }`, `{ action }`, `{ component }` 중 하나, 현재 Registry 반환 | 기존 정의나 코드 연결을 명시적으로 교체합니다. 코드 Action의 입력·출력과 필수 호스트 기능 계약을 보존합니다. |
 
 잘못된 필드·미지원 스키마·유효하지 않은 참조는 등록을 거절합니다. 오류는 `INVALID_DEFINITION`, `REFERENCE_NOT_FOUND`, `TYPE_CONTRACT_MISMATCH` 등의 공개 진단입니다. `message`를 파싱하지 말고 `code`를 확인하세요. 갱신 실패 시 기존 레지스트리를 유지합니다. 입력 정의는 복사하므로 등록 후 원본 객체를 변경해도 영향을 주지 않습니다.
@@ -44,6 +45,8 @@ import type { Registry, AnyResource, ComponentContract, CodeActionDefinition } f
 열린 View는 현재 리소스 구성을 유지합니다. 등록한 셋을 열린 View에 추가하려면 [`applyResourceSets()`](../view/#applyresourcesets)를 사용합니다. Registry에 게시한 교체를 반영하려면 새 View를 만들거나 [`replace()`](../view/#replace)를 사용합니다.
 
 <a id="code-actions"></a>
+독립 셋 패키지는 `@viewstem/core`를 peer dependency로 선언하고 번들에서 외부화해 앱과 같은 Core 모듈 인스턴스로 셋을 정의하세요. 코드 Component의 계약과 바인딩을 함께 바꿀 때는 `replaceResource({ component })`를 사용합니다. 계약만 등록한 기존 ID에 처음 바인딩을 붙일 때도 이 경로를 사용합니다.
+
 ## 코드 Action
 
 `greet.ts`에서 계약과 첫 구현을 선언합니다.
@@ -90,6 +93,8 @@ TypeScript는 포트 선언에서 입력을, 결과 스키마에서 출력을 �
 State·Query 포트는 발급된 핸들을 받습니다. 일반 값 입력은 격리된 깊은 읽기 전용 값입니다. 하위 호출도 권한 검사를 수행합니다. 반환값은 스키마로 검증하며 부모 종료·취소 시 미완료 하위 호출을 취소합니다. 이미 완료된 효과는 되돌리지 않습니다.
 
 전체 실행 예제는 [HTTP와 코드 Action 연결하기](../guides/http-and-actions/)에 있습니다. 리소스 외피와 선언형 Action은 [DSL 리소스](../../dsl/resources/), [DSL Action](../../dsl/actions/)에서 설명합니다.
+
+독립 Action 하나를 등록하려면 `registry.registerAction(greetAction)`으로 같은 엔트리를 전달합니다. 기존 두 인자 등록은 추가 호스트 기능을 요구하지 않는 함수에 사용할 수 있습니다.
 
 ### 코드 Action 갱신하기
 

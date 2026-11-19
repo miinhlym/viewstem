@@ -141,6 +141,56 @@ test('a code Action contract captures its definition and requirements before bin
   throwsCode(() => contract.implement(null));
 });
 
+test('direct registration of an authored Action preserves its required capabilities', async t => {
+  const definition = action('load', { output: { schema: { type: 'string' } } });
+  const entry = defineCodeAction({ definition, requires: ['storage'] }).implement(({ capabilities }) => capabilities.storage);
+  const registry = createRegistry();
+  assert.equal(registry.registerAction(entry), registry);
+  const withoutStorage = createRuntime({ registry });
+  const withStorage = createRuntime({ registry, hostCapabilities: { storage: 'saved' } });
+  t.after(() => Promise.all([withoutStorage.dispose(), withStorage.dispose()]));
+  await assert.rejects(withoutStorage.invokeAction({ actionRef: 'load' }), {
+    code: 'REFERENCE_NOT_FOUND', location: '/capabilities/storage',
+  });
+  assert.equal(await withStorage.invokeAction({ actionRef: 'load' }), 'saved');
+  assert.throws(() => registry.replaceResource({ action: { definition, implementation: () => 'other' } }), {
+    code: 'TYPE_CONTRACT_MISMATCH', location: '/requires',
+  });
+});
+
+test('retained code Component bindings keep their resolved port, event, and slot contracts', () => {
+  const schema = { type: 'string' };
+  const spec = {
+    ports: { value: { kind: 'Value', typeRef: 'Label', required: true } },
+    events: { change: { typeRef: 'Label' } },
+    slots: { default: {} },
+  };
+  const original = { contract: contract('Leaf', spec), connectorId: 'test', implementation: {} };
+  const registry = new Registry().registerResourceSet(declareSet({
+    id: 'base', version: '1', resources: [type('Label', schema)], components: [original],
+  }));
+  const pinned = registry.fork();
+  registry.updateResource({ ...original.contract, name: 'Display label' });
+  for (const [change, location] of [
+    [{ ...spec, ports: { value: { kind: 'Value', schema: { type: 'integer' }, required: true } } }, '/ports/value'],
+    [{ ...spec, events: {} }, '/events/change'],
+    [{ ...spec, slots: { default: { required: true } } }, '/slots/default'],
+  ]) {
+    assert.throws(() => registry.updateResource(contract('Leaf', change)), {
+      code: 'TYPE_CONTRACT_MISMATCH', resource: { kind: 'Component', id: 'Leaf' }, location,
+    });
+  }
+  assert.throws(() => registry.updateResource(type('Label', { type: 'integer' })), {
+    code: 'TYPE_CONTRACT_MISMATCH', resource: { kind: 'Component', id: 'Leaf' }, location: '/ports/value',
+  });
+  assert.equal(registry.componentBinding('Leaf').implementation, original.implementation);
+  assert.deepEqual(registry.get('Type', 'Label').spec.schema, schema);
+  const replacement = { ...original, contract: contract('Leaf', { ...spec, events: {} }), implementation: {} };
+  registry.replaceResource({ component: replacement });
+  assert.equal(registry.componentBinding('Leaf').implementation, replacement.implementation);
+  assert.equal(pinned.componentBinding('Leaf').implementation, original.implementation);
+});
+
 test('binding replacement is local to the new Registry and re-registering a dependency keeps the new binding', () => {
   const original = binding('Leaf');
   const base = declareSet({ id: 'base', version: '1', components: [original] });
