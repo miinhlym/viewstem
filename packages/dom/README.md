@@ -4,7 +4,7 @@ Register component contracts and implementations through `defineResourceSet` in 
 
 `renderer.mount({ target, source })` owns its View. `await mounted.ready` returns the View when it is prepared and connected. `await mounted.whenRendered()` observes DOM completion on that connection. Use `renderer.attach(view, target)` to display an existing View and `detach()` to release the display.
 
-A `fallback({ parent, anchor, node, error })` can insert static DOM before `anchor` in `parent`. The renderer clears that range before rendering the fallback again or replacing it with the ready component. Return a handle with `dispose()` to clean up resources such as timers. Optional `update(context)` and `whenRendered()` let a mounted fallback update in place and signal its completion.
+A `fallback({ parent, anchor, node, error })` can insert static DOM before `anchor` in `parent`. Return a handle with `dispose()` to clean up resources such as timers. Without `update(context)`, a returned handle is disposed and the fallback is recreated when the node's status or error changes. Implement `update(context)` to use the latest snapshot in place. Optional `whenRendered()` signals completion.
 
 A connector places its DOM before `context.anchor` in `context.parent`, then returns a `MountedComponent`. Register each named content host with `provideSlot`. Its cleanup callback withdraws that registration. The browser renderer places Viewstem children in registered hosts and handles movement and disposal. An implementation should stop its work when the supplied instance or update signal is aborted.
 

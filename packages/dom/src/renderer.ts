@@ -11,6 +11,7 @@ export interface DisplayFallbackContext {
   readonly error: PublicError | null;
 }
 export interface MountedDisplayFallback {
+  /** Update in place. Without this hook a changed status or error recreates the fallback. */
   update?(context: DisplayFallbackContext): void;
   whenRendered?(): void | Promise<void>;
   dispose(): void | Promise<void>;

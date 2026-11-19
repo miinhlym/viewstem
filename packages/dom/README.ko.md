@@ -4,7 +4,7 @@
 
 `renderer.mount({ target, source })`는 View를 소유합니다. `mounted.ready`는 View가 준비되고 표시 연결이 성립하면 View를 반환합니다. `mounted.whenRendered()`로 해당 연결의 렌더 완료를 확인합니다. 기존 View는 `renderer.attach(view, target)`으로 표시하고 `detach()`로 표시 연결을 해제합니다.
 
-`fallback({ parent, anchor, node, error })`는 `parent` 안에서 `anchor` 앞에 정적 DOM을 넣을 수 있습니다. 렌더러는 fallback을 다시 그리거나 준비된 컴포넌트로 전환하기 전에 해당 범위를 비웁니다. 타이머 같은 자원을 정리하려면 `dispose()`가 있는 핸들을 반환하세요. 선택 메서드인 `update(context)`와 `whenRendered()`로 이미 표시한 fallback을 갱신하고 완료 시점을 알릴 수 있습니다.
+`fallback({ parent, anchor, node, error })`는 `parent` 안에서 `anchor` 앞에 정적 DOM을 넣을 수 있습니다. 타이머 같은 자원을 정리하려면 `dispose()`가 있는 핸들을 반환하세요. 반환한 핸들에 `update(context)`가 없으면 노드의 상태나 오류가 바뀔 때 기존 핸들을 정리하고 fallback을 다시 만듭니다. 같은 자리에서 최신 스냅샷을 반영하려면 `update(context)`를 구현하세요. 선택 메서드인 `whenRendered()`는 완료 시점을 알립니다.
 
 연결자는 `context.parent`에서 `context.anchor` 바로 앞에 DOM을 배치하고 `MountedComponent`를 반환합니다. `provideSlot`으로 슬롯 호스트를 등록하면 브라우저 렌더러가 자식의 배치와 이동·정리를 처리합니다. 반환된 철회 함수로 슬롯 등록을 해제합니다. 인스턴스나 갱신 신호가 취소되면 연결자 작업을 종료합니다.
 

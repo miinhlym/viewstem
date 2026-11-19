@@ -7,6 +7,7 @@ type OnError = (cause: unknown, nodeId?: string) => void;
 type Host = { readonly isOpen: () => boolean; readonly emit: RenderEmission; readonly reportDisposal: OnError };
 type Branch = { parent: HTMLElement; before: Node | null; nodes: Map<string, MountedNode>; isOpen: () => boolean };
 type Slot = { branch: Branch };
+type Fallback = { start: Comment; handle: MountedDisplayFallback | undefined; status: NodeSnapshot['status']; errorKey: string };
 type MountedNode = {
   key: string;
   snapshot: NodeSnapshot;
@@ -22,7 +23,7 @@ type MountedNode = {
   acceptingSlots: boolean;
   pending: boolean;
   hasRenderedReady: boolean;
-  fallback: { start: Comment; handle: MountedDisplayFallback | undefined } | undefined;
+  fallback: Fallback | undefined;
 };
 type Work = {
   projection: RenderProjection;
@@ -142,12 +143,15 @@ class BrowserConnection {
     return this.#cleanup;
   }
 
-  #createNode(key: string, item: NodeSnapshot, owner: Branch, binding: ComponentBinding | undefined, before = owner.before): MountedNode {
+  #createNode(key: string, item: NodeSnapshot, owner: Branch, binding: ComponentBinding | undefined,
+    range?: Pick<MountedNode, 'start' | 'end'>): MountedNode {
     const { parent } = owner;
-    const start = parent.ownerDocument.createComment('viewstem');
-    const end = parent.ownerDocument.createComment('/viewstem');
-    parent.insertBefore(start, before);
-    parent.insertBefore(end, before);
+    const start = range?.start ?? parent.ownerDocument.createComment('viewstem');
+    const end = range?.end ?? parent.ownerDocument.createComment('/viewstem');
+    if (!range) {
+      parent.insertBefore(start, owner.before);
+      parent.insertBefore(end, owner.before);
+    }
     const lifetime = new AbortController();
     return { key, snapshot: item, start, end, lifetime, binding, handle: undefined, branch: owner, fallback: undefined,
       children: branch(parent, end, () => owner.isOpen() && !lifetime.signal.aborted), slots: new Map(),
@@ -219,34 +223,58 @@ class BrowserConnection {
     }
   }
 
-  async #fallback(node: MountedNode, error: PublicError | null, signal: AbortSignal) {
-    if (!this.options.fallback) return;
+  async #fallback(node: MountedNode, error: PublicError | null, work: Work) {
+    const render = this.options.fallback;
+    if (!render) return;
     const parent = node.branch.parent;
     const context = { parent, anchor: node.end, node: node.snapshot, error };
+    const { status } = node.snapshot;
+    const errorKey = JSON.stringify(error);
+    const previous = node.fallback;
+    if (previous?.handle && !previous.handle.update && (previous.status !== status || previous.errorKey !== errorKey)) {
+      await this.#removeFallback(node, previous);
+      if (!this.#current(work) || !node.branch.isOpen()) return;
+    }
     if (!node.fallback) {
       const start = parent.ownerDocument.createComment('viewstem fallback');
       parent.insertBefore(start, node.end);
-      node.fallback = { start, handle: undefined };
+      node.fallback = { start, handle: undefined, status, errorKey };
     }
     const fallback = node.fallback;
-    if (fallback.handle) fallback.handle.update?.(context);
-    else {
+    fallback.status = status;
+    fallback.errorKey = errorKey;
+    if (fallback.handle?.update) fallback.handle.update(context);
+    else if (!fallback.handle) {
       clearRange(fallback.start, node.end);
-      fallback.handle = this.options.fallback(context) ?? undefined;
+      fallback.handle = render(context) ?? undefined;
     }
+    const signal = work.controller.signal;
     if (fallback.handle?.whenRendered) await untilAborted(fallback.handle.whenRendered(), signal);
+  }
+
+  async #removeFallback(node: MountedNode, fallback: Fallback) {
+    node.fallback = undefined;
+    try { await fallback.handle?.dispose(); }
+    catch (cause) { this.host.reportDisposal(cause, node.snapshot.id); }
+    finally {
+      clearRange(fallback.start, node.end);
+      fallback.start.remove();
+    }
   }
 
   async #replaceWithFallback(node: MountedNode, error: PublicError | null, work: Work) {
     const { branch: owner, snapshot, key } = node;
-    const before = node.end.nextSibling;
-    owner.nodes.delete(key);
-    await this.#remove(node, this.host.reportDisposal);
-    if (!this.options.fallback || !this.#current(work) || !owner.isOpen()) return;
-    const next = before?.parentNode === owner.parent ? before : owner.before;
-    const replacement = this.#createNode(key, snapshot, owner, node.binding, next);
+    if (!this.options.fallback) {
+      owner.nodes.delete(key);
+      await this.#remove(node, this.host.reportDisposal);
+      return;
+    }
+    // Retain this range while other failed siblings clean up their contents.
+    const replacement = this.#createNode(key, snapshot, owner, node.binding, node);
     owner.nodes.set(key, replacement);
-    try { await this.#fallback(replacement, error, work.controller.signal); }
+    await this.#disposeContents(node, this.host.reportDisposal);
+    if (!this.#current(work) || !owner.isOpen()) return;
+    try { await this.#fallback(replacement, error, work); }
     catch (cause) { this.#fail(work, cause, snapshot.id); }
   }
 
@@ -269,24 +297,17 @@ class BrowserConnection {
       }
       if (snapshot.status === 'error' && !connector?.renderUnready) {
         if (node.handle || node.children.nodes.size) await this.#replaceWithFallback(node, snapshot.error, work);
-        else await this.#fallback(node, snapshot.error, signal);
+        else await this.#fallback(node, snapshot.error, work);
         return;
       }
       if (snapshot.status !== 'ready' && !connector?.renderUnready) {
         if (node.handle && !node.pending) node.handle.setPending(true);
-        if (!node.handle) await this.#fallback(node, null, signal);
+        if (!node.handle) await this.#fallback(node, null, work);
         node.pending = true;
         return;
       }
       if (node.fallback) {
-        const { start, handle } = node.fallback;
-        node.fallback = undefined;
-        try { await handle?.dispose(); }
-        catch (cause) { this.host.reportDisposal(cause, snapshot.id); }
-        finally {
-          clearRange(start, node.end);
-          start.remove();
-        }
+        await this.#removeFallback(node, node.fallback);
         if (!this.#current(work)) return;
       }
       const id = snapshot.componentRef;
@@ -332,7 +353,7 @@ class BrowserConnection {
     }
   }
 
-  async #remove(node: MountedNode, reportDisposal?: OnError) {
+  async #disposeContents(node: MountedNode, reportDisposal?: OnError) {
     node.lifetime.abort();
     const cleanup = [node.children, ...[...node.slots.values()].map(slot => slot.branch), ...node.retiredSlots];
     const results = await Promise.allSettled(cleanup.map(child => this.#clear(child, reportDisposal)));
@@ -341,13 +362,17 @@ class BrowserConnection {
       if (!reportDisposal) throw cause;
       reportDisposal(cause, node.snapshot.id);
     }
+    finally { clearRange(node.start, node.end); }
+    const failure = results.find(result => result.status === 'rejected');
+    if (failure) throw failure.reason;
+  }
+
+  async #remove(node: MountedNode, reportDisposal?: OnError) {
+    try { await this.#disposeContents(node, reportDisposal); }
     finally {
-      clearRange(node.start, node.end);
       node.start.remove();
       node.end.remove();
     }
-    const failure = results.find(result => result.status === 'rejected');
-    if (failure) throw failure.reason;
   }
 
   async #clear(owner: Branch, reportDisposal?: OnError) {

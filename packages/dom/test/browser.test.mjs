@@ -158,6 +158,103 @@ globalThis.staticFallback = async () => {
   return { loading, updatedWhilePending, ready, keptSibling, empty: left.textContent === '' };
 };
 
+globalThis.fallbackOrder = async first => {
+  const runtime = createRuntime(), renderer = createRenderer({ runtime });
+  const gates = new Map();
+  for (const id of ['A', 'B']) {
+    let release, show;
+    const cleanup = new Promise(resolve => { release = resolve; });
+    const fallback = new Promise(resolve => { show = resolve; });
+    gates.set(id, { cleanup, release, fallback, show });
+  }
+  runtime.registry.registerResourceSet(defineResourceSet({ id: 'fallback-order', version: '1', components: [
+    component('List', { slots: { default: {} } }, ctx => {
+      ctx.provideSlot('default', ctx.parent);
+      return { update() {}, setPending() {}, dispose() {} };
+    }),
+    component('Item', { ports: { fail: flag } }, ctx => {
+      const id = ctx.node.id, element = document.createElement('span');
+      const gate = gates.get(id);
+      let failed = false;
+      element.dataset.id = id;
+      element.textContent = id;
+      ctx.parent.insertBefore(element, ctx.anchor);
+      return { update(next) {
+        if (ctx.parent === left && gate && next.inputs.fail) { failed = true; throw Error('update failed'); }
+      }, setPending() {}, async dispose() {
+        if (failed) await gate.cleanup;
+        element.remove();
+      } };
+    }),
+  ] }));
+  const view = await runtime.createView({
+    states: { fail: { kind: 'State', schema: { type: 'boolean' }, initial: false } },
+    render: { id: 'list', componentRef: 'List', slots: { default: ['A', 'B', 'C'].map(id =>
+      ({ id, componentRef: 'Item', inputs: { fail: path('/states/fail') } })) } },
+  });
+  const screen = renderer.attach(view, left, { fallback({ parent, anchor, node }) {
+    const element = document.createElement('span');
+    element.textContent = node.id + '!';
+    parent.insertBefore(element, anchor);
+    gates.get(node.id).show();
+  } });
+  const mirror = renderer.attach(view, right);
+  await Promise.all([screen.whenRendered(), mirror.whenRendered()]);
+  const sibling = left.querySelector('[data-id="C"]'), mirrorFirst = right.querySelector('[data-id="A"]');
+  view.getState('fail').write(true);
+  const failed = code(screen.whenRendered());
+  gates.get(first).release();
+  await gates.get(first).fallback;
+  gates.get(first === 'A' ? 'B' : 'A').release();
+  const result = await failed;
+  await mirror.whenRendered();
+  const order = left.textContent;
+  view.getState('fail').write(false);
+  await screen.whenRendered();
+  const restored = left.textContent;
+  const kept = [left.querySelector('[data-id="C"]') === sibling, right.querySelector('[data-id="A"]') === mirrorFirst, right.textContent];
+  await renderer.dispose();
+  await runtime.dispose();
+  return { result, order, restored, kept };
+};
+
+globalThis.fallbackTransitions = async updateInPlace => {
+  const { renderer, runtime } = fixture();
+  const mounts = [], disposals = [];
+  const screen = renderer.mount({ target: left, source: {
+    ports: { value: { kind: 'Value', schema: true } },
+    states: { unrelated: { kind: 'State', schema: { type: 'boolean' }, initial: false } },
+    render: { id: 'slow', componentRef: 'Slow', inputs: { value: path('/ports/value') } },
+  }, fallback(context) {
+    const label = next => next.error?.code ?? next.node.status;
+    const original = label(context), element = document.createElement('span');
+    mounts.push(original);
+    element.textContent = original;
+    context.parent.insertBefore(element, context.anchor);
+    return {
+      ...(updateInPlace ? { update(next) { element.textContent = label(next); } } : {}),
+      dispose() { disposals.push(original); element.remove(); },
+    };
+  } });
+  const view = await screen.ready;
+  await screen.whenRendered();
+  const starting = left.querySelector('span');
+  const initial = left.textContent;
+  view.getState('unrelated').write(true);
+  await screen.whenRendered();
+  const keptWhenUnrelated = left.querySelector('span') === starting;
+  await screen.whenSettled(await view.setInputs({ value: 42 }));
+  const error = [left.textContent, left.querySelector('span') === starting];
+  await screen.whenSettled(await view.setInputs({}));
+  const pendingAgain = left.textContent;
+  await screen.whenSettled(await view.setInputs({ value: 'ready' }));
+  const ready = left.textContent;
+  await screen.unmount();
+  await renderer.dispose();
+  await runtime.dispose();
+  return { initial, keptWhenUnrelated, error, pendingAgain, ready, mounts, disposals, empty: left.childNodes.length === 0 };
+};
+
 globalThis.syncPending = async () => {
   const { renderer, runtime, disposed } = fixture();
   const mounted = renderer.mount({ target: left, inputs: { label: 'before' }, source: {
@@ -379,5 +476,25 @@ test('slot disposal failures report per child while replacement and other branch
     results: ['success', 'success'], replaced: true, display: [true, true, 'onetwostable', true, 'onetwostable'],
     retired: ['one', 'two'], diagnostics: [['dispose', 'main-one', 'INTERNAL_ERROR'], ['dispose', 'main-two', 'INTERNAL_ERROR']],
     rightDiagnostics: [], explicit: 'INTERNAL_ERROR', empty: true,
+  });
+});
+
+test('fallbacks keep sibling order regardless of the failing components’ disposal order', { timeout: 10_000 }, async t => {
+  const page = await browserPage(t);
+  for (const first of ['A', 'B']) await t.test(first, async () => {
+    assert.deepEqual(await page.evaluate(id => globalThis.fallbackOrder(id), first), {
+      result: 'INTERNAL_ERROR', order: 'A!B!C', restored: 'ABC', kept: [true, true, 'ABC'],
+    });
+  });
+});
+
+test('a disposable fallback displays each node status with or without an update hook', async t => {
+  const page = await browserPage(t);
+  for (const update of [false, true]) await t.test(update ? 'update in place' : 'dispose only', async () => {
+    const mounts = update ? ['pending'] : ['pending', 'TYPE_MISMATCH', 'pending'];
+    assert.deepEqual(await page.evaluate(value => globalThis.fallbackTransitions(value), update), {
+      initial: 'pending', keptWhenUnrelated: true, error: ['TYPE_MISMATCH', update], pendingAgain: 'pending', ready: 'ready',
+      mounts, disposals: mounts, empty: true,
+    });
   });
 });
