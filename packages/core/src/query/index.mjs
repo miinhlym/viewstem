@@ -46,21 +46,21 @@ export function createQueryEngine({ registry, requestExecutor, requestTimeoutMs 
       || !Number.isSafeInteger(requestTimeoutMs) || requestTimeoutMs <= 0) fail('INVALID_DEFINITION');
   const caches = new Map();
   let nextRequest = 0;
-  const get = (kind, id) => {
-    const definition = registry.get(kind, id);
+  const get = (configuration, kind, id) => {
+    const definition = configuration.get(kind, id);
     if (!definition) fail('REFERENCE_NOT_FOUND');
     return definition;
   };
-  const resolve = use => {
-    if (typeof use === 'string') return { definition: get('Query', use), resource: { kind: 'Query', id: use }, location: '/spec' };
+  const resolve = (use, configuration) => {
+    if (typeof use === 'string') return { definition: get(configuration, 'Query', use), resource: { kind: 'Query', id: use }, location: '/spec' };
     record(use);
-    if (own(use, 'queryRef')) return resolve(use.queryRef);
+    if (own(use, 'queryRef')) return resolve(use.queryRef, configuration);
     if (own(use, 'query')) return { definition: use.query, location: '/query' };
     return { definition: use, ...(use.id ? { resource: { kind: 'Query', id: use.id } } : {}), location: use.spec ? '/spec' : '' };
   };
-  const prepare = (use, inputs, mode = 'explicit') => {
-    const spec = objectSpec(resolve(use).definition);
-    return compilePorts({ resourceKind: 'Query', ports: spec.ports ?? {}, types: registry.types?.() ?? {} }).prepare(inputs, { mode });
+  const prepare = (use, inputs, mode = 'explicit', configuration = registry) => {
+    const spec = objectSpec(resolve(use, configuration).definition);
+    return compilePorts({ resourceKind: 'Query', ports: spec.ports ?? {}, types: configuration.types?.() ?? {} }).prepare(inputs, { mode });
   };
   // Timeouts belong to each request plan, never to an entire composite execution.
   const executePlan = (plan, signal, isOpen, onCleanupError) => new Promise((resolve, reject) => {
@@ -107,8 +107,8 @@ export function createQueryEngine({ registry, requestExecutor, requestTimeoutMs 
       );
     } catch (error) { finish(undefined, safeError(error, 'HTTP_ERROR')); }
   });
-  async function execute(use, { inputs = {}, preparedInputs, signal: parentSignal, owner, fresh = true, isCurrent = () => true, isOpen = () => true, onCleanupError } = {}) {
-    const root = resolve(use), controller = new AbortController();
+  async function execute(use, { registry: configuration = registry, inputs = {}, preparedInputs, signal: parentSignal, owner, fresh = true, isCurrent = () => true, isOpen = () => true, onCleanupError } = {}) {
+    const root = resolve(use, configuration), controller = new AbortController();
     const abort = () => controller.abort();
     if (parentSignal?.aborted) abort(); else parentSignal?.addEventListener('abort', abort, { once: true });
     const signal = controller.signal, staged = new Map();
@@ -125,7 +125,7 @@ export function createQueryEngine({ registry, requestExecutor, requestTimeoutMs 
           throw publicError('INPUT_NOT_READY', { location: `${location}/ports/${escape(name)}`, ...(resource ? { resource } : {}) });
       }
       const prepared = (lineage.length ? undefined : preparedInputs)
-        ?? compilePorts({ resourceKind: 'Query', ports: spec.ports ?? {}, types: registry.types?.() ?? {} }).prepare(originalValues, { mode: 'explicit' });
+        ?? compilePorts({ resourceKind: 'Query', ports: spec.ports ?? {}, types: configuration.types?.() ?? {} }).prepare(originalValues, { mode: 'explicit' });
       const values = prepared.ports;
       if (prepared.status !== 'ready') fail('INPUT_NOT_READY');
       const key = JSON.stringify(path), cached = committed.get(key);
@@ -139,7 +139,7 @@ export function createQueryEngine({ registry, requestExecutor, requestTimeoutMs 
           if (declarations.length !== 1) fail('INVALID_DEFINITION');
           if (own(source, 'queryRef') || own(source, 'query')) {
             if (own(source, 'request')) fail('INVALID_DEFINITION');
-            const child = own(source, 'queryRef') ? get('Query', source.queryRef) : source.query;
+            const child = own(source, 'queryRef') ? get(configuration, 'Query', source.queryRef) : source.query;
             const nestedInputs = await evaluate(source.inputs === undefined ? {} : source.inputs, { values: { ports: values } });
             record(nestedInputs);
             const referenced = own(source, 'queryRef');
@@ -149,7 +149,7 @@ export function createQueryEngine({ registry, requestExecutor, requestTimeoutMs 
           } else {
             if (own(source, 'inputs')) fail('INVALID_DEFINITION');
             record(source.request);
-            const datasource = objectSpec(own(source, 'datasourceRef') ? get('Datasource', source.datasourceRef) : source.datasource);
+            const datasource = objectSpec(own(source, 'datasourceRef') ? get(configuration, 'Datasource', source.datasourceRef) : source.datasource);
             const response = await executePlan({ version: 1, requestId: `viewstem-${++nextRequest}`,
               datasource: normalize(datasource), request: normalize(source.request), inputs: encodeBoundary(values) }, signal, isOpen, onCleanupError);
             check(); output[alias] = normalize(response.body);

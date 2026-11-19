@@ -40,9 +40,11 @@ async function buildHost(host, directory) {
     }],
   });
   const inputs = Object.keys(bundle.metafile.inputs);
+  assert.ok(inputs.includes('node_modules/@viewstem/ui/dist/browser.js'));
   assert.ok(inputs.includes('node_modules/@viewstem/ui/dist/index.js'));
   assert.ok(inputs.includes('node_modules/@viewstem/ui/dist/styles.css'));
   assert.ok(inputs.includes('node_modules/@viewstem/core/dist/index.js'));
+  assert.ok(inputs.includes('node_modules/@viewstem/dom/dist/index.js'));
   if (host === 'vanilla') assert.deepEqual(inputs.filter(path => frameworkModule.test(path)), []);
   else assert.ok(inputs.some(path => path.includes(`node_modules/${host}/`)), `${host} must run its real runtime`);
   return bundle.outputFiles;
@@ -52,7 +54,7 @@ test('packed UI renders the same View JSON in four browser hosts', async t => {
   const directory = await mkdtemp(join(tmpdir(), 'viewstem-ui-consumer-'));
   t.after(() => rm(directory, { recursive: true, force: true }));
   await writeFile(join(directory, 'package.json'), '{"private":true,"type":"module"}\n');
-  const packs = ['core', 'ui'].map(pkg => JSON.parse(npm(workspace, [
+  const packs = ['core', 'dom', 'ui'].map(pkg => JSON.parse(npm(workspace, [
     'pack', `./packages/${pkg}`, '--pack-destination', directory, '--ignore-scripts', '--json',
   ]))[0]);
   npm(directory, ['install', ...packs.map(pack => join(directory, pack.filename)), '--ignore-scripts', '--no-audit', '--no-fund']);
@@ -61,6 +63,7 @@ test('packed UI renders the same View JSON in four browser hosts', async t => {
   const uiPackage = JSON.parse(await readFile(join(directory, 'node_modules/@viewstem/ui/package.json'), 'utf8'));
   assert.deepEqual(uiPackage.dependencies, {
     '@viewstem/core': '0.1.0',
+    '@viewstem/dom': '0.1.0',
     '@internationalized/date': '3.12.0',
     '@tanstack/table-core': '9.0.0',
     '@zag-js/date-picker': '1.47.0',
@@ -76,14 +79,26 @@ test('packed UI renders the same View JSON in four browser hosts', async t => {
   });
   assert.equal(uiPackage.peerDependencies, undefined);
 
+  execFileSync(process.execPath, ['--input-type=module', '-e', `
+    import assert from 'node:assert/strict';
+    import { readFileSync } from 'node:fs';
+    import { ui } from '@viewstem/ui';
+    assert.equal(ui.id, '@viewstem/ui');
+    assert.match(readFileSync(new URL(import.meta.resolve('@viewstem/ui/styles.css')), 'utf8'), /data-vs-ui-owner/);
+  `], { cwd: directory, stdio: 'inherit' });
+
   await writeFile(join(directory, 'consumer.ts'), `
-import { createRenderer, type MountedView, type RenderAttachment, type RendererDiagnostic } from '@viewstem/ui';
+import { createRenderer, type MountedView, type RenderAttachment, type RendererDiagnostic } from '@viewstem/dom';
+import { createRuntime } from '@viewstem/core';
+import { ui } from '@viewstem/ui';
 import '@viewstem/ui/styles.css';
 
 const target = document.getElementById('host');
 if (!target) throw new Error('Missing #host');
 const onError = (diagnostic: RendererDiagnostic) => console.error(diagnostic.error);
-const renderer = createRenderer({ onError });
+const runtime = createRuntime();
+runtime.registry.registerResourceSet(ui);
+const renderer = createRenderer({ runtime, onError });
 const screen: MountedView = renderer.mount({
   target,
   source: { render: { id: 'hello', componentRef: 'shadcn.Button', inputs: { text: 'Hello' } } },

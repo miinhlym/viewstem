@@ -11,8 +11,9 @@ sidebar:
 
 ```js title="src/main.js"
 import { createHttpExecutor } from '@viewstem/core/http';
-import { createRenderer } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
+import { createRuntime } from '@viewstem/core';
+import { createRenderer } from '@viewstem/dom';
+import { ui } from '@viewstem/ui';
 
 const requestExecutor = createHttpExecutor({
   transport: async (url) => {
@@ -44,7 +45,9 @@ const choices = [
 ];
 
 const target = document.querySelector('#viewstem');
-const renderer = createRenderer({ requestExecutor });
+const runtime = createRuntime({ requestExecutor });
+runtime.registry.registerResourceSet(ui);
+const renderer = createRenderer({ runtime });
 const source = {
   states: { period: { kind: 'State', schema: string, initial: 'week' } },
   queries: {

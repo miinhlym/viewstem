@@ -75,6 +75,8 @@ Query 사용 인스턴스는 [Query 상세](02-query.md)에 별도로 정리한�
 
 **확정:** View는 서비스가 마운트하는 화면의 진입점과 수명 소유자이며, 재사용 Component는 그 안에서 조합하는 단위다. View 역시 ports·states·queries를 소유할 수 있고 spec.render는 배열이 아닌 단일 루트 노드다. 자식 트리는 각 노드의 slots에 넣는다. 서로 다른 View 마운트는 별도 인스턴스이며 자동 전역 singleton이 아니다.
 
+**D164 · 첫 버전의 View 루트.** 첫 버전은 단일 루트를 유지한다. 여러 컴포넌트를 호스트 요소의 직접 자식으로 배치해야 하는 사용 사례가 생기면 `ViewSpec.render`에 배열을 허용하는 안을 검토한다. [혼합 View 공개 API 리뷰](../designs/viewstem-mixed-view-api-review-2026-11-18.md#4-단일-루트는-실제-배치-제약이다--후속-검토)
+
 ```json
 {
   "kind": "View",
@@ -140,3 +142,5 @@ Grid는 등록 Component이며 core 공통 CSS 문법이 아니다. Grid.inputs.
 12열 기준으로 row·column·rowSpan·columnSpan은 1부터 시작하는 양의 정수다. row와 column 모두 있으면 고정, 모두 없으면 자동, 하나만 있으면 오류다. 기본 span은 12×1이며 layout 항목 생략도 같다. 활성 고정 사각형을 먼저 예약하고 겹침·범위 초과를 오류로 처리한다. 자동 항목은 원래 노드/반복 확장 순서에 따라 앞으로만 행 우선 검색하며 전체 사각형의 빈 공간을 확인한다. dense 되채움이나 고정 항목 밀기는 없다.
 
 반복 템플릿은 공통 span만 지정하며 항목별 고정 좌표는 1차 제외다. when:false는 공간을 차지하지 않지만 선언된 layout 키는 유효하다. 알 수 없는 선언 ID는 오류다. 슬롯 전달은 작성자와 ID 정보를 보존한다. 좌표 변경이 상태 정체성을 바꾸지 않는다. 읽기/접근성 순서는 원래 순서다. 행 높이·gap은 디자인 시스템 기준, 넘친 셀 내용은 내부 스크롤이며 자동 높이 증가·드래그 편집은 후속이다. 구체 픽셀 값은 정하지 않았다.
+
+JS/TS 배치 함수 `computeGridLayout`의 확장 인스턴스 주소는 반환 Map의 키다. 반복 인스턴스는 선언 ID를 공유할 수 있으며 주소는 Map 키 비교 기준으로 고유해야 한다. 중복 주소는 `INVALID_DEFINITION`과 `GRID_DUPLICATE_ADDRESS` 메시지로 거절한다.

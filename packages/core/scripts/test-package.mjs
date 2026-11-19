@@ -1,4 +1,4 @@
-import { mkdtemp,readFile,writeFile,rm } from 'node:fs/promises';
+import { mkdir,mkdtemp,readFile,writeFile,rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -20,12 +20,14 @@ try {
  assert.equal(await readFile(join(installed,'LICENSE'),'utf8'),await readFile(join(root,'LICENSE'),'utf8'));
  assert.ok((await readFile(join(installed,'dist/THIRD-PARTY-NOTICES.txt'),'utf8')).includes(await readFile(join(pkg,'vendor/cel-js/LICENSE'),'utf8')));
  await writeFile(join(directory,'consumer.mjs'),`import assert from 'node:assert/strict';
-import {createRegistry,createRuntime,createStateStore} from '@viewstem/core';
+import {createRegistry,createRuntime,createStateStore,defineResourceSet} from '@viewstem/core';
 import {createHttpExecutor} from '@viewstem/core/http';
 import {compileCel} from '@viewstem/core/cel';
 import support from '@viewstem/core/cel-support.json' with {type:'json'};
-const registry=createRegistry();registry.registerComponentContract({kind:'Component',id:'Leaf',spec:{}});
-registry.registerAction({kind:'Action',id:'answer',spec:{output:{schema:{type:'boolean'}}}},()=>false);
+const registry=createRegistry();
+registry.registerResourceSet(defineResourceSet({id:'answers',version:'1',components:[{contract:{kind:'Component',id:'Leaf',spec:{}},connectorId:'test',implementation:{}}],actions:[{
+  definition:{kind:'Action',id:'answer',spec:{output:{schema:{type:'boolean'}}}},implementation:()=>false,
+}]}));
 const runtime=createRuntime({registry}),view=await runtime.createView({render:{id:'leaf',componentRef:'Leaf'}});await view.whenSettled(view.initial);
 assert.equal(await view.invokeAction({actionRef:'answer'}),false);
 assert.equal(compileCel('x+1',{inputs:{x:{type:'integer'}}})({x:2}),3);
@@ -35,11 +37,16 @@ assert.equal(typeof createHttpExecutor(),'function');assert.ok(support);store.di
  execute(process.execPath,['consumer.mjs']);
  // Run the package-boundary suite from the isolated installation as well: it
  // must resolve only shipped exports, never workspace source or an alias.
+ await mkdir(join(directory,'fixtures'));
+ await writeFile(join(directory,'fixtures/components.mjs'),await readFile(join(pkg,'test/fixtures/components.mjs')));
  await writeFile(join(directory,'public-api.test.mjs'),await readFile(join(pkg,'test/public-api.test.mjs')));
  await writeFile(join(directory,'owned-lifetime.test.mjs'),await readFile(join(pkg,'test/owned-lifetime.test.mjs')));
  await writeFile(join(directory,'renderer-diagnostics.test.mjs'),await readFile(join(pkg,'test/renderer-diagnostics.test.mjs')));
- const boundaryTests = execute(process.execPath,['--test','public-api.test.mjs','owned-lifetime.test.mjs','renderer-diagnostics.test.mjs']);
+ const boundaryTests = execute(process.execPath,['--test','--test-reporter=tap','public-api.test.mjs','owned-lifetime.test.mjs','renderer-diagnostics.test.mjs']);
+ const publicBoundaryTests = Number(/^# tests (\d+)$/m.exec(boundaryTests)?.[1]);
+ assert.ok(publicBoundaryTests > 0);
  await writeFile(join(directory,'public-api.ts'),await readFile(join(pkg,'test/types/public-api.ts')));
+ await writeFile(join(directory,'code-action-authoring.ts'),await readFile(join(pkg,'test/types/code-action-authoring.ts')));
  await writeFile(join(directory,'code-action-ports.ts'),await readFile(join(pkg,'test/types/code-action-ports.ts')));
  await writeFile(join(directory,'consumer.ts'),`import {createRegistry,createRuntime,createStateStore,type View} from '@viewstem/core';
 import {createHttpExecutor} from '@viewstem/core/http';
@@ -52,8 +59,13 @@ declare const view:View;const node=view.getSnapshot().roots[0];if(node)await vie
 cell.write('wrong');
 const runtime=createRuntime({registry,stateStore:store,requestExecutor:createHttpExecutor()});runtime.dispose();
 `);
- const typecheck = [join(root,'node_modules/typescript/bin/tsc'),'--strict','--noUncheckedIndexedAccess','--noEmit','--target','ES2022','--module','NodeNext','--moduleResolution','NodeNext','--lib','ES2022,DOM','consumer.ts','public-api.ts','code-action-ports.ts'];
+ const compiler = [join(root,'node_modules/typescript/bin/tsc'),'--strict','--noUncheckedIndexedAccess','--target','ES2022','--module','NodeNext','--moduleResolution','NodeNext','--lib','ES2022,DOM'];
+ const typecheck = [...compiler,'--noEmit','consumer.ts','public-api.ts','code-action-ports.ts'];
  execute(process.execPath,[...typecheck,'--exactOptionalPropertyTypes']);
  execute(process.execPath,typecheck);
- console.log(JSON.stringify({nodeVersion:process.version,package:packed.name,version:packed.version,files:packed.files.map(file=>file.path),integrity:packed.integrity,bytes:packed.size,unpackedBytes:packed.unpackedSize,license:'MIT; installed text and vendored CEL notice verified',runtime:'passed',publicBoundaryTests:Number(/^# tests (\d+)$/m.exec(boundaryTests)?.[1]),types:'passed'},null,2));
+ // Downstream authors publish declarations for both contracts and implemented entries.
+ execute(process.execPath,[...compiler,'--exactOptionalPropertyTypes','--declaration','--emitDeclarationOnly','--outDir','action-exports','code-action-authoring.ts']);
+ await writeFile(join(directory,'action-exports/public-api.ts'),await readFile(join(directory,'public-api.ts')));
+ execute(process.execPath,[...compiler,'--exactOptionalPropertyTypes','--noEmit','action-exports/public-api.ts']);
+ console.log(JSON.stringify({nodeVersion:process.version,package:packed.name,version:packed.version,files:packed.files.map(file=>file.path),integrity:packed.integrity,bytes:packed.size,unpackedBytes:packed.unpackedSize,license:'MIT; installed text and vendored CEL notice verified',runtime:'passed',publicBoundaryTests,types:'passed',actionDeclarations:'emitted and consumed'},null,2));
 }finally{await rm(directory,{recursive:true,force:true});}

@@ -83,11 +83,12 @@ commands below identify the relevant local gates.
 |---|---|
 | Core behavior or contracts | `npm run check`; add `npm run test:browser` for browser behavior |
 | Core package contents, declarations, or package README | `npm run build` then `npm run test:package` |
+| DOM renderer, connectors, or CSS scoping | `npm run check:dom`. For package exports or independent consumers, build all four packages and run `npm run test:dom:package`. |
 | Svelte renderer or its example | `npm run check:svelte` |
 | Browser UI catalog, generated contracts, styles, or fixtures | `npm run check:ui` |
 | Website UI, content, navigation, or examples | Follow the [website maintenance guide](apps/docs/README.md#choose-checks-by-the-changed-boundary) for source owners and targeted checks |
 | CI configuration | `npm run test:ci`; validate workflow syntax and run the affected browser checks described in the [CI guide](docs/ci.md) |
-| Package metadata or license files only | Build the affected package and run `npm run test:package` for core or `npm run test:svelte:package` for Svelte. For UI, run `npm run check:ui` and inspect `npm pack --dry-run -w @viewstem/ui`. |
+| Package metadata or license files only | Build the affected package and run its installed-package check. Use `npm run test:package` for Core, `npm run test:dom:package` for DOM (after building all four packages), or `npm run test:svelte:package` for Svelte. For UI, run `npm run check:ui` and inspect `npm pack --dry-run -w @viewstem/ui`. |
 | Community documentation or templates only | Check links, examples, JSON/YAML syntax where applicable, and `git diff --check` |
 
 Tests that render Svelte or UI components consume built package exports. Rebuild
@@ -125,7 +126,7 @@ licenses and attribution, and identify new third-party material in the pull requ
 No separate contributor license agreement (CLA), copyright assignment, or DCO
 sign-off is required. A `Signed-off-by` line is optional.
 
-The root `LICENSE` is the reference for Viewstem's own license. The three package
+The root `LICENSE` is the reference for Viewstem's own license. The four package
 directories carry identical copies so installed packages include the license.
 Keep those copies and the package `license` fields aligned. Existing package
-consumer checks verify the installed license and third-party notices for core and Svelte. Inspect the UI package contents for the Viewstem and Basecoat licenses.
+consumer checks verify installed license text for Core and Svelte and the vendored CEL notice for Core. The independent DOM check verifies that all four tarballs include `LICENSE`. Inspect the UI package contents for the Viewstem and Basecoat licenses.

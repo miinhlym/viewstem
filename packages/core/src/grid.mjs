@@ -22,6 +22,12 @@ export function computeGridLayout(declarations, expanded, layout = {}) {
     if (declaration.repeat && plan.row) fail('INVALID_DEFINITION', {message:'GRID_REPEAT_FIXED'});
     plans.set(id, plan);
   }
+  const addresses = new Set();
+  for (const item of expanded) {
+    if (!plans.has(item.id)) fail('INVALID_DEFINITION', {message:'GRID_UNKNOWN_ID'});
+    if (addresses.has(item.address)) fail('INVALID_DEFINITION', {message:'GRID_DUPLICATE_ADDRESS'});
+    addresses.add(item.address);
+  }
   const occupied = [], placements = new Map();
   const overlaps = (left, right) => left.row <= lastRow(right) && right.row <= lastRow(left)
     && left.column <= lastColumn(right) && right.column <= lastColumn(left);
@@ -30,7 +36,7 @@ export function computeGridLayout(declarations, expanded, layout = {}) {
     occupied.push(box); placements.set(item.address, box);
   };
   for (const item of expanded) {
-    const plan = plans.get(item.id) ?? fail('INVALID_DEFINITION', {message:'GRID_UNKNOWN_ID'});
+    const plan = plans.get(item.id);
     if (plan.row) reserve(item, { ...plan });
   }
   let row = 1, column = 1;

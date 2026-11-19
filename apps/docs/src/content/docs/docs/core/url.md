@@ -44,11 +44,11 @@ interface UrlAdapter {
 
 | Member | Behavior |
 |---|---|
-| `ready: Promise<void>` | Resolves after initial synchronization can proceed; pending initial values may delay it. |
-| `isReady(): boolean` | Whether initialization has completed. |
+| `ready: Promise<void>` | Resolves after initial synchronization or explicit disposal during startup. Deferred startup failure rejects with a `kind: "connect"` diagnostic. |
+| `isReady(): boolean` | Whether the connection is open and initialized successfully. |
 | `restore(): void` | Re-read the current URL into bound State. |
-| `getDiagnostics(): readonly PublicError[]` | URL parsing, limit, restore or write diagnostics. |
-| `removeOwned(selected?): Promise<void \| { applied?: boolean }>` | Remove all owned keys, or keys for selected bound State handles; requests replace history. |
+| `getDiagnostics(): readonly UrlDiagnostic[]` | Returns connection errors with their phase in `kind` and the URL `key` when applicable. |
+| `removeOwned(selected?): Promise<void \| { applied?: boolean }>` | Removes all or selected owned keys with replace history. Preserves pending State writes for keys outside the selection. |
 | `dispose(): void` | Stop observation and release key ownership. Does not implicitly remove URL keys. |
 
 ## Limits

@@ -1,10 +1,12 @@
 import { createRegistry, createRuntime, type ViewSpec } from '@viewstem/core';
-import { createRenderer, registerShadcn } from '@viewstem/ui';
+import { createRenderer } from '@viewstem/dom';
+import { ui } from '@viewstem/ui';
 import { registerUiToastAction, sonnerInputs } from './component-demo-ui-setup';
 
 export async function mountUiComponentDemo(target: HTMLElement, view: ViewSpec, family: string, onError: (error: unknown) => void) {
   const registry = createRegistry();
-  registerShadcn(registry);
+  registry.registerResourceSet(ui);
+  target.setAttribute('data-viewstem-ui', '');
   const runtime = createRuntime({ registry });
   const renderer = createRenderer({ runtime });
   let attachment: ReturnType<typeof renderer.attach> | undefined;

@@ -1,10 +1,21 @@
 import { disposeRendererRuntime, prepareOwnedView, rendererView } from './api.mjs';
-export { prepareOwnedView } from './api.mjs';
+export { prepareOwnedView, runtimeOwnsView } from './api.mjs';
 import { error, fail, safeError } from './errors.mjs';
 import { createDiagnostic, notifyDiagnostic } from './diagnostics.mjs';
 export { createDiagnostic, createPreparationError, createRenderError, notifyDiagnostic } from './diagnostics.mjs';
 
 const targets = new WeakMap();
+const hostAttachments = new WeakMap();
+
+export function attachHostedView(renderer, view, target, options, owner) {
+  const attach = hostAttachments.get(renderer);
+  if (!attach) fail('INVALID_DEFINITION', { message: 'A hosted display requires a renderer host.' });
+  return attach(view, target, options, owner);
+}
+
+export function subscribeRenderProjection(view, listener) {
+  return rendererView(view).subscribeRenderProjection(listener);
+}
 export function createRenderWaiter(view, render, {
   onError, getErrorListener, deliverDiagnostic, onClose, isOpen = () => true, onRenderFailure,
 } = {}) {
@@ -25,7 +36,7 @@ export function createRenderWaiter(view, render, {
     });
   }
   const diagnosticListener = deliverDiagnostic ?? (getErrorListener || onError
-    ? diagnostic => notifyDiagnostic(diagnostic, { listener: getErrorListener ? getErrorListener() : onError, isOpen: open })
+    ? diagnostic => notifyDiagnostic(diagnostic, { listener: onError, getListener: getErrorListener, isOpen: open })
     : undefined);
   const stopDiagnostic = diagnosticListener ? engine.onDiagnostic(diagnostic => {
     if (open()) diagnosticListener(diagnostic);
@@ -58,7 +69,7 @@ export function createRenderWaiter(view, render, {
     await whileConnected(engine.whenProjected(generation, sequence));
     if (!open() || engine.generation !== generation) fail('CANCELLED');
     try {
-      const rendering = render();
+      const rendering = render(generation, sequence);
       if (engine.generation !== generation) {
         void Promise.resolve(rendering).catch(() => {});
         fail('CANCELLED');
@@ -73,7 +84,7 @@ export function createRenderWaiter(view, render, {
     if (!open() || engine.generation !== generation) fail('CANCELLED');
   }
   return {
-    emit: (target, event, payload) => engine.emit(target, event, payload, open),
+    emit: (target, event, payload, current = () => true) => engine.emit(target, event, payload, () => open() && current()),
     async whenRendered() {
       const { generation, requested } = engine.projection();
       await wait(generation, requested);
@@ -97,22 +108,31 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
   let disposed;
   let closing = false;
 
-  function entry(target, options) {
+  function supportsTarget(target) {
+    try { return validateTarget(target); }
+    catch (cause) { throw safeError(cause, 'INVALID_DEFINITION'); }
+  }
+
+  function entry(target, options, owner) {
     if (closing) fail('CANCELLED');
-    const valid = validateTarget(target);
+    const valid = supportsTarget(target);
     if (closing) fail('CANCELLED');
-    if (!valid) fail('INVALID_DEFINITION', { message: 'The render target must be a connected HTMLElement.' });
+    if (!valid) fail('INVALID_DEFINITION', { message: 'This renderer does not support the supplied target.' });
     if (targets.has(target)) fail('INVALID_DEFINITION', { message: 'The render target already has a Viewstem connection. Wait for its cleanup before reusing it.' });
     const token = {};
     targets.set(target, token);
     const controller = new AbortController();
-    let adapter, waiter, closeView, stopped, preparing, connecting = false, explicitlyClosed = false;
-    let initialRenderReported = false;
+    let adapter, waiter, engine, closeView, stopped, preparing, connecting = false, explicitlyClosed = false;
     let finishConnecting;
     const connected = new Promise(resolve => { finishConnecting = resolve; });
-    const isOpen = () => !closing && !stopped && targets.get(target) === token;
+    const closeWithRenderer = !owner || owner.closeWithRenderer;
+    const isTargetOpen = () => !stopped && (!closeWithRenderer || !closing) && targets.get(target) === token
+      && (owner?.isOpen() ?? true);
+    // The view can depend on the target owner. That owner must never depend on the view.
+    const isOpen = () => isTargetOpen() && (engine?.alive ?? true);
     const diagnostics = (diagnostic, open = isOpen) => notifyDiagnostic(diagnostic,
-      { listener: onError, isOpen: open }, { listener: options.onError, isOpen: open });
+      { listener: onError, isOpen: () => !closing && (owner?.isRendererOpen() ?? true) && open() },
+      owner ? { getListener: owner.getErrorListener, isOpen: open } : { listener: options.onError, isOpen: open });
     // Key by the failure value that the adapter reports and later throws.
     const reportedRenderFailures = new WeakSet();
     const isObject = value => value !== null && (typeof value === 'object' || typeof value === 'function');
@@ -123,21 +143,32 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
     };
     function check() {
       if (!isOpen()) fail('CANCELLED');
-      const valid = validateTarget(target);
+      const valid = supportsTarget(target);
       if (!isOpen()) fail('CANCELLED');
-      if (!valid) fail('INVALID_DEFINITION', { message: 'The render target must be a connected HTMLElement.' });
+      if (!valid) fail('INVALID_DEFINITION', { message: 'This renderer does not support the supplied target.' });
     }
-    function start(view) {
+    function start(view, viewEngine) {
+      engine = viewEngine;
       check();
       connecting = true;
       try {
-        waiter = createRenderWaiter(view, () => adapter.whenRendered(), {
+        waiter = createRenderWaiter(view, (generation, sequence) => adapter.whenRendered(generation, sequence), {
           deliverDiagnostic: diagnostic => diagnostics(diagnostic),
-          onRenderFailure(cause) { initialRenderReported = isObject(cause) && reportedRenderFailures.has(cause); },
-          isOpen, onClose: () => { void stop().catch(() => {}); },
+          onRenderFailure(cause) {
+            if (!isObject(cause) || !reportedRenderFailures.has(cause)) renderError(cause);
+          },
+          isOpen,
+          onClose() {
+            if (stopped || (!owner && closing)) return;
+            const cleanup = stop();
+            if (!owner) void cleanup.catch(cause => diagnostics(createDiagnostic('dispose', cause), () => !closing && !explicitlyClosed));
+          },
         });
         check();
-        adapter = connect(view, target, options, renderError, { isOpen, emit: waiter.emit });
+        adapter = connect(view, target, options, renderError, {
+          isOpen, emit: waiter.emit,
+          reportDisposal(cause, nodeId) { diagnostics(createDiagnostic('dispose', cause, { nodeId })); },
+        });
         check();
       } finally {
         connecting = false;
@@ -150,8 +181,10 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
     }
     function stop() {
       if (stopped) return stopped;
-      let resolve, reject;
-      stopped = new Promise((yes, no) => { resolve = yes; reject = no; });
+      const { promise, resolve, reject } = Promise.withResolvers();
+      stopped = promise;
+      // A framework attachment's teardown is observed even after the component has been removed.
+      if (owner) void stopped.catch(cause => diagnostics(createDiagnostic('dispose', cause), () => true));
       waiter?.dispose();
       const viewCleanup = closeView?.();
       controller.abort();
@@ -172,17 +205,17 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
       })();
       return stopped;
     }
-    entries.add(close);
+    if (closeWithRenderer) entries.add(close);
     return {
       start, stop, close, isOpen,
-      reportedRenderFailure: failure => initialRenderReported || (isObject(failure) && reportedRenderFailures.has(failure)),
+      reportedRenderFailure: failure => isObject(failure) && reportedRenderFailures.has(failure),
       prepare(source, options) {
         // Publish the internal preparation before reading any host-provided data.
         let resolve, reject;
         preparing = new Promise((yes, no) => { resolve = yes; reject = no; });
         try {
           resolve(prepareOwnedView(runtime, source, options, check)(controller.signal, {
-            isOpen, onCreate(close) { closeView = close; },
+            isOpen: isTargetOpen, onCreate(close) { closeView = close; },
           }));
         } catch (cause) { reject(cause); }
         return preparing;
@@ -193,19 +226,26 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
     };
   }
 
-  return {
+  function attach(view, target, options, owner) {
+    const engine = rendererView(view);
+    const task = entry(target, options, owner);
+    try { task.start(view, engine); }
+    catch (cause) { void task.stop().catch(() => {}); throw safeError(cause); }
+    return { detach: task.close, whenRendered: task.whenRendered, whenSettled: task.whenSettled };
+  }
+
+  const renderer = {
     runtime,
     mount({ target, source, inputs, url, ...options }) {
       const task = entry(target, options);
-      let rendered = false;
+      let connected = false;
       const ready = (async () => {
         let phase = 'prepare';
         try {
           const view = await task.prepare(source, { inputs, url });
           phase = 'render';
-          task.start(view);
-          await task.whenRendered();
-          rendered = true;
+          task.start(view, rendererView(view));
+          connected = true;
           return view;
         } catch (cause) {
           const failure = task.isOpen() ? safeError(cause) : error('CANCELLED');
@@ -219,19 +259,12 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
       ready.catch(() => {});
       return {
         ready, unmount: task.close,
-        async whenRendered() {
-          if (rendered) await task.whenRendered();
-          else await ready;
-        },
-        async whenSettled(application) { if (!rendered) await ready; return task.whenSettled(application); },
+        whenRendered() { return connected ? task.whenRendered() : ready.then(() => task.whenRendered()); },
+        whenSettled(application) { return connected ? task.whenSettled(application) : ready.then(() => task.whenSettled(application)); },
       };
     },
     attach(view, target, options = {}) {
-      rendererView(view);
-      const task = entry(target, options);
-      try { task.start(view); }
-      catch (cause) { void task.stop().catch(() => {}); throw safeError(cause); }
-      return { detach: task.close, whenRendered: task.whenRendered, whenSettled: task.whenSettled };
+      return attach(view, target, options);
     },
     dispose() {
       if (disposed) return disposed;
@@ -255,4 +288,6 @@ export function createRendererHost(runtime, { ownsRuntime, onError, validateTarg
       return disposed;
     },
   };
+  hostAttachments.set(renderer, attach);
+  return renderer;
 }

@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const registry = 'https://registry.npmjs.org';
-const packages = ['core', 'svelte', 'ui'];
+const packages = ['core', 'dom', 'svelte', 'ui'];
 const stableVersion = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const run = (command, args) => execFileSync(command, args, { encoding: 'utf8' }).trim();
 
@@ -32,13 +32,19 @@ export function releaseTargets(readManifest) {
   return packages.flatMap(directory => {
     const previous = readManifest(directory, true);
     const current = readManifest(directory, false);
-    assert.equal(previous.name, `@viewstem/${directory}`);
-    assert.equal(current.name, previous.name);
+    assert.equal(current.name, `@viewstem/${directory}`);
     assert.ok(!current.private, `${current.name} must be public`);
+    const target = { directory, name: current.name, version: current.version };
+    if (directory === 'dom' && previous === null) {
+      assert.match(current.version, stableVersion);
+      return [target];
+    }
+    assert.ok(previous, `Missing previous manifest for ${current.name}`);
+    assert.equal(previous.name, current.name);
     if (current.version === previous.version) return [];
     assert.equal(compareVersions(current.version, previous.version), 1,
       `Invalid version bump for ${current.name}`);
-    return [{ directory, name: current.name, version: current.version }];
+    return [target];
   });
 }
 
@@ -72,8 +78,12 @@ async function plan() {
   const pages = JSON.parse(run('gh', ['api', '--paginate', '--slurp',
     `repos/${repository}/commits/${sha}/pulls`]));
   const release = pages.flat().find(pr => isReleasePullRequest(pr, repository, sha));
-  const targets = release ? releaseTargets((directory, previous) =>
-    JSON.parse(run('git', ['show', `${previous ? before : sha}:packages/${directory}/package.json`]))) : [];
+  const targets = release ? releaseTargets((directory, previous) => {
+    const path = `packages/${directory}/package.json`;
+    const ref = previous ? before : sha;
+    if (previous && directory === 'dom' && !run('git', ['ls-tree', '--full-tree', ref, '--', path])) return null;
+    return JSON.parse(run('git', ['show', `${ref}:${path}`]));
+  }) : [];
   if (release) assert.ok(targets.length, 'Release PR must bump at least one public package');
   await appendFile(process.env.GITHUB_OUTPUT, `targets=${JSON.stringify(targets)}\n`);
 }

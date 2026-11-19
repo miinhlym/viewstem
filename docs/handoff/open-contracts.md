@@ -12,6 +12,7 @@ Svelte 5 클라이언트 렌더러는 [U39 구현·검증 인계](svelte-impleme
 
 | 범위 | 남은 작업과 완료 기준 | 기준 계약·근거 |
 |---|---|---|
+| 리소스 셋·브라우저 렌더링 발행 | 로컬에서 등록·View 적용, 혼합 슬롯과 독립 tarball 소비를 검증했다. 최초 npm 발행에서 `@viewstem/dom`을 발행 대상에 포함한다. | [구현과 검증](resource-sets-browser-2026-11-16.md#구현과-검증), [발행 작업](../designs/viewstem-resource-sets-implementation-2026-11-16.md#6-독립-소비자-수락과-패키지-검증) |
 | Dart core·Flutter | 별도 실행기를 같은 의미로 구현하고 교차 적합성 검증. 기존 Dart CEL 후보의 불일치는 해결된 것으로 취급하지 않음 | [제품·언어 경계](implementation-start.md#2-제품과-의존성-경계), [후보 검증 기록](verification-ledger.md) |
 | 선택 차트 패키지 | 엔진별 실제 지원표·공개 입력·렌더링을 제품 패키지로 검증. 독립 실험 통과를 제품 완료로 옮기지 않음 | [차트 계약](../spec/11-optional-charts.md), 제품 인수 대응표의 X 항목 |
 | 실제 서비스 연결 | 서비스가 resolver·권한·secret 저장소·router를 구현하고 해당 환경에서 검증. core에 도메인 의존성을 추가하지 않음 | [HTTP·인증](../spec/01-datasource-auth.md), [호스트 권한](../spec/07-host-integration.md) |

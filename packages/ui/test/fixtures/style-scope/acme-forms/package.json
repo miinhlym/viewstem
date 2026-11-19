@@ -1,0 +1,19 @@
+{
+  "name": "@acme/forms",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "browser": "./browser.mjs",
+      "default": "./index.mjs"
+    },
+    "./styles.css": "./styles.css"
+  },
+  "files": ["index.mjs", "browser.mjs", "styles.css"],
+  "sideEffects": ["./browser.mjs", "**/*.css"],
+  "peerDependencies": {
+    "@viewstem/core": "^0.1.0",
+    "@viewstem/dom": "^0.1.0",
+    "@viewstem/ui": "^0.1.0"
+  }
+}

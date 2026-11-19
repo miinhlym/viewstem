@@ -4,12 +4,13 @@ import * as core from '@viewstem/core';
 import * as http from '@viewstem/core/http';
 import * as cel from '@viewstem/core/cel';
 import * as renderer from '@viewstem/core/renderer';
+import { bindTestComponents, createTestRuntime } from './fixtures/components.mjs';
 
 const integer = { type: 'integer' };
 const path = value => ({ '@path': value });
 const leaf = { kind: 'Component', id: 'Leaf', spec: { ports: { value: { kind: 'Value', schema: integer } } } };
 const definition = { render: { id: 'leaf', componentRef: 'Leaf' } };
-const registry = () => core.createRegistry().registerComponentContract(leaf);
+const registry = () => bindTestComponents(core.createRegistry(), [leaf]);
 const rejectsCode = (promise, code) => assert.rejects(promise, error => error.code === code);
 const throwsCode = (run, code = 'INVALID_DEFINITION') => assert.throws(run, error => error.code === code);
 function surface(value, names) {
@@ -19,8 +20,8 @@ function surface(value, names) {
 }
 
 test('public package exports only the selected root and optional subpath APIs', async () => {
-  assert.deepEqual(Object.keys(core).sort(), ['createRegistry', 'createRuntime', 'createStateStore', "computeGridLayout", 'mergeOwnedUrl'].sort());
-  assert.deepEqual(Object.keys(renderer).sort(), ['createDiagnostic', 'createPreparationError', 'createRenderError', 'createRenderWaiter', 'createRendererHost', 'notifyDiagnostic', 'prepareOwnedView']);
+  assert.deepEqual(Object.keys(core).sort(), ['createRegistry', 'createRuntime', 'createStateStore', 'computeGridLayout', 'defineCodeAction', 'defineResourceSet', 'mergeOwnedUrl'].sort());
+  assert.deepEqual(Object.keys(renderer).sort(), ['attachHostedView', 'createDiagnostic', 'createPreparationError', 'createRenderError', 'createRenderWaiter', 'createRendererHost', 'notifyDiagnostic', 'prepareOwnedView', 'runtimeOwnsView', 'subscribeRenderProjection']);
   assert.deepEqual(Object.keys(http), ['createHttpExecutor']);
   assert.deepEqual(Object.keys(cel).sort(), ['compileCel', 'evaluateCel', "defaultCelLimits"].sort());
   assert.equal(cel.compileCel('n + 1', { inputs: { n: integer } })({ n: 1 }), 2);
@@ -45,10 +46,10 @@ test('actual handles expose only public methods and preserve chains and injected
   t.after(() => { runtime.dispose(); store.dispose(); });
   const view = await runtime.createView({ ...definition, queries: { rows: { query: { sources: {}, transform: { input: [] } } } } });
   await view.whenSettled(view.initial);
-  surface(r, ['registerResources', 'registerComponentContract', 'registerComponentContracts', 'registerAction', 'updateResource', 'get', 'list', 'exportResource', 'isCode']);
+  surface(r, ['registerResources', 'registerResourceSet', 'registerComponentContract', 'registerComponentContracts', 'registerAction', 'updateResource', 'replaceResource', 'get', 'list', 'exportResource', 'isCode']);
   surface(store, ['createScope', 'transaction', 'subscribe', "writeBatch", "registerReaction", 'connectUrl', "getDiagnostics", 'dispose']);
-  surface(runtime, ['registry', 'stateStore', 'createView', 'dispose']);
-  surface(view, ['initial', 'setInputs', 'updateDefinition', 'replace', 'whenSettled', 'invokeAction', 'exportDefinition', 'getState', 'getQuery', 'getSnapshot', 'subscribe', 'emit', 'dispose']);
+  surface(runtime, ['registry', 'stateStore', 'createView', 'invokeAction', 'dispose']);
+  surface(view, ['initial', 'setInputs', 'updateDefinition', 'applyResourceSets', 'replace', 'whenSettled', 'invokeAction', 'exportDefinition', 'getState', 'getQuery', 'getSnapshot', 'subscribe', 'emit', 'dispose']);
   assert.deepEqual(Reflect.ownKeys(view.getQuery('rows')).sort(), ['getSnapshot', 'refresh', 'retry']);
   const scope = store.createScope(), cell = scope.registerState('count', { schema: integer, initial: 1 });
   assert.deepEqual(Reflect.ownKeys(cell).sort(), ['address', 'generation', 'getSnapshot', 'read', 'reset', 'write']);
@@ -74,13 +75,72 @@ test('actual handles expose only public methods and preserve chains and injected
   assert.throws(() => { view.runtime = runtime; }, TypeError);
 });
 
+test('failed initial subscriptions are removed and subscriptions added during publication replay only once', async t => {
+  const runtime = core.createRuntime({ registry: registry() });
+  t.after(() => runtime.dispose());
+  const view = await runtime.createView({
+    ...definition,
+    states: { count: { kind: 'State', schema: integer, initial: 0 } },
+    render: { ...definition.render, inputs: { value: path('/states/count') } },
+  });
+  const other = core.createRuntime({ registry: runtime.registry });
+  t.after(() => other.dispose());
+  assert.equal(renderer.runtimeOwnsView(runtime, view), true);
+  assert.equal(renderer.runtimeOwnsView(other, view), false);
+  assert.equal(renderer.runtimeOwnsView({}, {}), false);
+  let snapshots = 0, projections = 0, added = 0, registered = false;
+  const replayedValues = [];
+  const callback = snapshot => replayedValues.push(snapshot.states.count.value);
+  let unsubscribe;
+  view.subscribe(snapshot => {
+    if (snapshot.states.count.value === 1) {
+      unsubscribe();
+      view.subscribe(callback);
+    }
+  });
+  unsubscribe = view.subscribe(callback);
+  assert.throws(() => view.subscribe(() => { snapshots++; throw Error('snapshot'); }), /snapshot/);
+  assert.throws(() => renderer.subscribeRenderProjection(view, () => { projections++; throw Error('projection'); }), /projection/);
+  renderer.subscribeRenderProjection(view, projection => {
+    if (projection.snapshot.states.count.value === 1 && !registered) {
+      registered = true;
+      renderer.subscribeRenderProjection(view, () => { added++; });
+    }
+  });
+  view.getState('count').write(1);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual({ snapshots, projections, added }, { snapshots: 1, projections: 1, added: 1 });
+  assert.deepEqual(replayedValues, [0, 1]);
+
+  const disposing = view.dispose();
+  assert.equal(view.dispose(), disposing);
+  await disposing;
+  view.subscribe(() => { snapshots++; })();
+  renderer.subscribeRenderProjection(view, () => { projections++; })();
+  assert.deepEqual({ snapshots, projections }, { snapshots: 1, projections: 1 });
+});
+
+test('setInputs and updateDefinition accept caller cancellation before commit', async t => {
+  const runtime = core.createRuntime({ registry: registry() });
+  t.after(() => runtime.dispose());
+  const view = await runtime.createView(definition);
+  const signal = AbortSignal.abort();
+  await rejectsCode(view.setInputs({}, { signal }), 'CANCELLED');
+  await rejectsCode(view.setInputs({}, { get signal() { throw Error('invalid signal'); } }), 'INVALID_DEFINITION');
+  const controller = new AbortController();
+  const update = view.updateDefinition({ render: { id: 'next', componentRef: 'Leaf' } }, { signal: controller.signal });
+  controller.abort();
+  await rejectsCode(update, 'CANCELLED');
+  assert.deepEqual(view.exportDefinition(), definition);
+});
+
 test('Component contract batches roll back completely and retain existing Registry configuration', async t => {
   const r = core.createRegistry({ functions: [{ name: 'twiceForBatch', inputs: [integer], output: integer, run: n => n * 2 }] });
   r.registerResources([
     { kind: 'Type', id: 'Int', spec: { schema: integer } },
     { kind: 'Variable', id: 'answer', spec: { expression: 'twiceForBatch(3)' } },
   ]);
-  r.registerComponentContract(leaf);
+  bindTestComponents(r, [leaf]);
   const typed = { kind: 'Component', id: 'Typed', spec: { ports: { value: { kind: 'Value', typeRef: 'Int', required: true } } } };
   for (const later of [leaf, typed, { kind: 'Component', id: 'Invalid', spec: { render: definition.render } }]) {
     const before = r.list();
@@ -92,6 +152,7 @@ test('Component contract batches roll back completely and retain existing Regist
   assert.equal(r.registerComponentContracts([typed, other]), r);
   assert.equal(r.isCode('Component', typed.id), true);
   assert.equal(r.isCode('Component', other.id), true);
+  r.replaceResource({ component: { contract: typed, connectorId: 'test', implementation: {} } });
   const runtime = core.createRuntime({ registry: r }); t.after(() => runtime.dispose());
   const created = await runtime.createView({
     states: { result: { kind: 'Derived', typeRef: 'Int', variableRef: 'answer' } },
@@ -103,7 +164,7 @@ test('Component contract batches roll back completely and retain existing Regist
 
 test('code Action defaults distinguish omitted inputs from missing View event bindings', async t => {
   const r = registry();
-  r.registerComponentContract({ ...leaf, id: 'Button', spec: { events: { click: { schema: true } } } });
+  bindTestComponents(r, [{ ...leaf, id: 'Button', spec: { events: { click: { schema: true } } } }]);
   const string = { type: 'string' };
   const optional = { kind: 'Value', schema: string, default: 'fallback' };
   let calls = 0;
@@ -152,7 +213,7 @@ test('code Action defaults distinguish omitted inputs from missing View event bi
 
 test('running observers cannot change the event Action input already captured', async t => {
   const r = registry();
-  r.registerComponentContract({ ...leaf, id: 'Button', spec: { events: { click: { schema: true } } } });
+  bindTestComponents(r, [{ ...leaf, id: 'Button', spec: { events: { click: { schema: true } } } }]);
   r.registerAction({ kind: 'Action', id: 'read', spec: {
     ports: { n: { kind: 'Value', required: true, schema: integer } }, output: { schema: integer },
   } }, ({ inputs }) => inputs.n);
@@ -174,7 +235,7 @@ test('running observers cannot change the event Action input already captured', 
 
 test('rejected Action contract updates leave calls intact and new IDs can be applied explicitly', async t => {
   const r = registry();
-  r.registerComponentContract({ ...leaf, id: 'Button', spec: { events: { click: { schema: true } } } });
+  bindTestComponents(r, [{ ...leaf, id: 'Button', spec: { events: { click: { schema: true } } } }]);
   const type = (id, schema) => ({ kind: 'Type', id, spec: { schema } });
   const action = (id, typeRef) => ({ kind: 'Action', id, spec: { output: { typeRef } } });
   const source = actionRef => ({ render: { id: 'button', componentRef: 'Button', on: { click: { actionRef } } } });
@@ -312,6 +373,7 @@ test('authorization sees the public View and stable opaque invoke owners without
   assert.equal(await view.invokeAction({ actionRef: 'parent' }), 7);
   assert.equal(await view.invokeAction({ actionRef: 'answer' }), 7);
   assert.equal(executed, 2); assert.equal(contexts.length, 3);
+  assert.deepEqual(contexts.map(context => context.resource), ['parent', 'answer', 'answer'].map(id => ({ kind: 'Action', id })));
   const owner = contexts[0].owner;
   surface(owner, []);
   assert.notEqual(owner, view);
@@ -319,6 +381,8 @@ test('authorization sees the public View and stable opaque invoke owners without
     assert.equal(context.operation, 'invoke'); assert.equal(context.owner, owner);
     assert.deepEqual(context.definition, action.spec);
     assert.equal(Object.isFrozen(context.definition), true);
+    assert.equal(Object.isFrozen(context.resource), true);
+    assert.equal(Object.isFrozen(context), true);
     assert.equal('native' in context.definition, false);
     assert.equal(Object.values(context.definition).some(value => typeof value === 'function'), false);
   }
@@ -434,7 +498,7 @@ test('Store observers read the committed View, and failed URL subscribe preserve
 });
 
 test('mixed component contracts and resource definitions validate together', async t => {
-  const runtime = core.createRuntime({
+  const runtime = createTestRuntime({
     componentContracts: [{ kind: 'Component', id: 'Typed', spec: { ports: { value: { kind: 'Value', typeRef: 'Integer' } } } }],
     resources: [
       { kind: 'View', id: 'example', spec: { render: { id: 'typed', componentRef: 'Typed', inputs: { value: 7 } } } },

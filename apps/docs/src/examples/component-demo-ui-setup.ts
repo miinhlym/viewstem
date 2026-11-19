@@ -1,5 +1,5 @@
 import type { Registry, Runtime, ViewSpec } from '@viewstem/core';
-import type { createRenderer } from '@viewstem/ui';
+import type { createRenderer } from '@viewstem/dom';
 
 export function sonnerInputs(view: ViewSpec): Record<string, unknown> {
   function visit(value: unknown): Record<string, unknown> | undefined {
@@ -18,6 +18,8 @@ export function sonnerInputs(view: ViewSpec): Record<string, unknown> {
 // Executed by the preview and printed verbatim in its consumer setup.ts.
 export async function registerUiToastAction(registry: Registry, runtime: Runtime, target: HTMLElement, attach: ReturnType<typeof createRenderer>['attach'], inputs: Record<string, unknown>): Promise<() => Promise<void>> {
   const toastTarget = target.ownerDocument.createElement('div');
+  // The docs theme also supplies legacy variables for this separate display.
+  toastTarget.setAttribute('data-viewstem-ui', '');
   toastTarget.dataset.demoNotifications = '';
   // Mount the fixed overlay outside the workbench's stacking context.
   target.ownerDocument.body.append(toastTarget);
@@ -48,26 +50,28 @@ export async function registerUiToastAction(registry: Registry, runtime: Runtime
     } } }, ({ inputs }) => {
       view.getState('messages').write([{ id: 'viewstem-docs-sonner-demo', title: String(inputs.title), description: String(inputs.description), kind: 'success', duration: 4000 }]);
     });
-    return async () => { await attachment.detach(); view.dispose(); toastTarget.remove(); };
+    return async () => { await attachment.detach(); await view.dispose(); toastTarget.remove(); };
   } catch (error) { toastTarget.remove(); throw error; }
 }
 
 export function uiDemoSetupSource(view: ViewSpec, family: string) {
   return [
     family === 'sonner' ? "import type { ViewSpec, Registry, Runtime } from '@viewstem/core';" : "import type { ViewSpec } from '@viewstem/core';",
-    "import { createRenderer } from '@viewstem/ui';",
-    "import '@viewstem/ui/styles.css';",
+    "import { createRuntime } from '@viewstem/core';",
+    "import { createRenderer } from '@viewstem/dom';",
+    "import { ui } from '@viewstem/ui';",
     "import view from './view.json';", '',
-    'const renderer = createRenderer();',
+    'const runtime = createRuntime();',
+    'runtime.registry.registerResourceSet(ui);',
+    'const renderer = createRenderer({ runtime });',
     'const target = document.querySelector<HTMLElement>("#preview");',
     'if (!target) throw new Error("Missing #preview element");',
-    ...(family === 'sonner' ? ['', `const registerUiToastAction: (registry: Registry, runtime: Runtime, target: HTMLElement, attach: ReturnType<typeof import('@viewstem/ui').createRenderer>['attach'], inputs: Record<string, unknown>) => Promise<() => Promise<void>> = ${registerUiToastAction.toString()};`,
-      'const { runtime } = renderer;',
+    ...(family === 'sonner' ? ['', `const registerUiToastAction: (registry: Registry, runtime: Runtime, target: HTMLElement, attach: ReturnType<typeof import('@viewstem/dom').createRenderer>['attach'], inputs: Record<string, unknown>) => Promise<() => Promise<void>> = ${registerUiToastAction.toString()};`,
       `const disposeToast = await registerUiToastAction(runtime.registry, runtime, target, renderer.attach.bind(renderer), ${JSON.stringify(sonnerInputs(view))});`] : []), '',
     '// JSON imports widen discriminants; the runtime validates the definition.',
-    'const screen = renderer.mount({ target, source: view as unknown as ViewSpec });', 'await screen.ready;', '',
+    'const screen = renderer.mount({ target, source: view as unknown as ViewSpec });', 'await screen.ready;', 'await screen.whenRendered();', '',
     '// Call when this screen is removed.', 'export async function dispose() {',
     '  await screen.unmount();', ...(family === 'sonner' ? ['  await disposeToast();'] : []),
-    '  await renderer.dispose();', '}',
+    '  await renderer.dispose();', '  await runtime.dispose();', '}',
   ].join('\n');
 }

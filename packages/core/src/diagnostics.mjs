@@ -14,16 +14,20 @@ export function notifyDiagnostic(diagnostic, ...observers) {
   if (diagnostic.error.code === 'CANCELLED') return;
   let listeners = delivered.get(diagnostic);
   if (!listeners) delivered.set(diagnostic, listeners = new WeakSet());
-  for (const { listener, isOpen } of observers) {
-    if (typeof listener !== 'function' || listeners.has(listener) || (isOpen && !isOpen())) continue;
+  for (const observer of observers) {
+    const listener = observer.getListener ? observer.getListener() : observer.listener;
+    if (typeof listener !== 'function' || listeners.has(listener) || (observer.isOpen && !observer.isOpen())) continue;
     listeners.add(listener);
     try { void Promise.resolve(listener(diagnostic)).catch(() => {}); } catch {}
   }
 }
 
-export function createRenderError(missing, { componentId, instanceId } = {}) {
+export function createRenderError(missing, { componentId, connectorId, instanceId } = {}) {
+  const missingMessage = typeof connectorId === 'string'
+    ? `Connector ${JSON.stringify(connectorId)} is unavailable on this display connection.`
+    : 'No implementation is available for this Component on the display connection.';
   return error(missing ? 'REFERENCE_NOT_FOUND' : 'INTERNAL_ERROR', {
-    message: missing ? 'No Svelte implementation is registered for this Component.' : 'The Svelte component could not be rendered.',
+    message: missing ? missingMessage : 'The Component could not be rendered.',
     ...(typeof componentId === 'string' ? { resource: { kind: 'Component', id: componentId } } : {}),
     ...(typeof instanceId === 'string' ? { instanceId } : {}),
   });

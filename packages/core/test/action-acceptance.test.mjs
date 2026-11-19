@@ -1,7 +1,8 @@
+import { bindTestComponents } from './fixtures/components.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 // Exercise the built package consumer surface; run npm run build first.
-import { createRegistry, createStateStore } from '@viewstem/core';
+import { createRegistry, createRuntime as createPublicRuntime, createStateStore } from '@viewstem/core';
 import { createRuntime } from './fixtures/runtime-operations.mjs';
 const integer = { type: 'integer' }, string = { type: 'string' }, boolean = { type: 'boolean' }, object = { type: 'object' };
 const path = value => ({ '@path': value }), call = name => ({ '@call': name, args: [] });
@@ -17,9 +18,9 @@ function deferred() { let resolve, reject; const promise = new Promise((yes, no)
 const flush = async () => { for (let i = 0; i < 30; i++) await Promise.resolve(); };
 function registry(functions = []) {
   const registry = createRegistry({ functions });
-  registry.registerComponentContract(resource('Component', 'Empty', {}));
-  registry.registerComponentContract(resource('Component', 'Button', { events: { click: { schema: true } } }));
-  registry.registerComponentContract(resource('Component', 'Row', { slots: { default: {} } }));
+  bindTestComponents(registry, [resource('Component', 'Empty', {})]);
+  bindTestComponents(registry, [resource('Component', 'Button', { events: { click: { schema: true } } })]);
+  bindTestComponents(registry, [resource('Component', 'Row', { slots: { default: {} } })]);
   return registry;
 }
 async function mount(t, registry, spec = { render: { id: 'empty', componentRef: 'Empty' } }, options = {}, inputs) {
@@ -30,6 +31,146 @@ async function mount(t, registry, spec = { render: { id: 'empty', componentRef: 
 const buttonView = (actionRef, inputs = {}, extra = {}) => ({ ...extra, render: { id: 'button', componentRef: 'Button', on: { click: { id: 'observed', actionRef, inputs } } } });
 const emit = (view, event = null) => view.emit(view.getSnapshot().roots[0], 'click', event);
 const snapshot = view => view.getSnapshot().actions.observed;
+
+test('Action authorization identifies registered targets across direct, event and child calls', async t => {
+  const r = registry(), seen = [], executed = [];
+  for (const id of ['allowed', 'blocked']) native(r, id, {}, () => { executed.push(id); });
+  declarative(r, 'parent', { steps: [
+    step('allowed', { id: 'blocked' }),
+    { kind: 'Action', id: 'inline-step', spec: { steps: [] } },
+  ] });
+  const runtime = createPublicRuntime({ registry: r, authorize(context) {
+    if (context.operation === 'update') return true;
+    seen.push(context.resource);
+    return context.resource?.id !== 'blocked';
+  } });
+  t.after(() => runtime.dispose());
+  const view = await runtime.createView(buttonView('parent'));
+  await assert.rejects(runtime.invokeAction({ actionRef: 'blocked' }), { code: 'EXECUTION_BLOCKED' });
+  await view.invokeAction({ actionRef: 'allowed' });
+  await emit(view);
+  const inline = await runtime.createView({
+    render: { id: 'button', componentRef: 'Button', on: { click: { id: 'blocked', action: { steps: [] } } } },
+  });
+  await emit(inline);
+  await runtime.invokeAction({ action: { steps: [] } });
+  const named = id => ({ kind: 'Action', id });
+  assert.deepEqual(seen, [named('blocked'), named('allowed'), named('parent'), named('allowed'), null, null, null]);
+  assert.deepEqual(executed, ['allowed', 'allowed']);
+});
+
+test('authorization and execution use the same Action definition after a registry replacement', async t => {
+  const r = registry(), seen = [];
+  const spec = value => ({ steps: [], output: { schema: string, value } });
+  declarative(r, 'read', spec('old'));
+  const runtime = createPublicRuntime({ registry: r, authorize(context) {
+    if (context.operation === 'invoke') seen.push([context.resource.id, context.definition.output.value]);
+    return true;
+  } });
+  t.after(() => runtime.dispose());
+  const source = { render: { id: 'empty', componentRef: 'Empty' } };
+  const oldView = await runtime.createView(source);
+  r.replaceResource({ resource: resource('Action', 'read', spec('new')) });
+  const newView = await runtime.createView(source);
+  const request = { actionRef: 'read' };
+  assert.equal(await oldView.invokeAction(request), 'old');
+  assert.equal(await runtime.invokeAction(request), 'new');
+  assert.equal(await newView.invokeAction(request), 'new');
+  assert.deepEqual(seen, [['read', 'old'], ['read', 'new'], ['read', 'new']]);
+});
+
+for (const owner of ['runtime', 'view']) test(`a single ${owner} invocation signal cancels its own Action tree`, async t => {
+  const r = registry(), store = createStateStore();
+  const cell = store.createScope().registerState('count', { schema: integer, initial: 0 });
+  const childStarted = deferred(), childRelease = deferred(), childFinished = deferred(), otherRelease = deferred();
+  let checked = 0, effects = 0, parentSignal, otherSignal;
+  native(r, 'child', {}, async ({ signal }) => {
+    effects++;
+    childStarted.resolve(signal);
+    try { await childRelease.promise; }
+    finally { childFinished.resolve(); }
+  });
+  declarative(r, 'relay', { steps: [step('child')] });
+  native(r, 'parent', { ports: { cell: state(integer) } }, async ({ inputs, signal, invokeAction }) => {
+    parentSignal = signal;
+    inputs.cell.write(1);
+    await invokeAction({ actionRef: 'relay' });
+    inputs.cell.write(2);
+  });
+  native(r, 'other', { output: { schema: integer } }, async ({ signal }) => {
+    otherSignal = signal;
+    await otherRelease.promise;
+    return 42;
+  });
+  const runtime = createPublicRuntime({ registry: r, stateStore: store, authorize() { checked++; return true; } });
+  t.after(() => { runtime.dispose(); store.dispose(); });
+  const view = await runtime.createView({ render: { id: 'empty', componentRef: 'Empty' } });
+  const target = owner === 'runtime' ? runtime : view;
+  const request = { actionRef: 'parent', inputs: { cell } };
+  await assert.rejects(target.invokeAction({ ...request, signal: AbortSignal.abort() }), { code: 'CANCELLED' });
+  await assert.rejects(target.invokeAction({ ...request, signal: { aborted: false } }), { code: 'INVALID_DEFINITION', location: '/signal' });
+  assert.equal(checked, 0);
+  assert.equal(effects, 0);
+  assert.equal(cell.read(), 0);
+
+  const controller = new AbortController();
+  const parent = target.invokeAction({ ...request, signal: controller.signal });
+  const cancelled = assert.rejects(parent, { code: 'CANCELLED' });
+  const other = target.invokeAction({ actionRef: 'other', signal: new AbortController().signal });
+  const childSignal = await childStarted.promise;
+  controller.abort(new Error('caller aborted'));
+  await cancelled;
+  assert.equal(parentSignal.aborted, true);
+  assert.equal(childSignal.aborted, true);
+  assert.equal(otherSignal.aborted, false);
+  assert.equal(cell.read(), 1);
+  assert.equal(effects, 1);
+
+  if (owner === 'runtime') childRelease.resolve();
+  else childRelease.reject(new Error('late failure'));
+  await childFinished.promise;
+  otherRelease.resolve();
+  assert.equal(await other, 42);
+  assert.equal(cell.read(), 1);
+});
+
+for (const owner of ['runtime', 'view']) {
+  for (const phase of ['authorize', 'body']) {
+    test(`${owner} invocation reports cancellation if the ${phase} callback aborts and throws`, async t => {
+      const r = registry();
+      let controller = new AbortController();
+      let bodyCalls = 0;
+      let abort = true;
+      function reject(signal) {
+        if (abort) controller.abort(new Error('private abort reason'));
+        signal.throwIfAborted();
+        throw Error('private callback failure');
+      }
+      native(r, 'called', {}, ({ signal }) => {
+        bodyCalls++;
+        if (phase === 'body') reject(signal);
+      });
+      const runtime = createPublicRuntime({ registry: r, authorize(context) {
+        if (context.operation === 'invoke' && phase === 'authorize') reject(controller.signal);
+        return true;
+      } });
+      t.after(() => runtime.dispose());
+      const view = await runtime.createView({ render: { id: 'empty', componentRef: 'Empty' } });
+      const target = owner === 'runtime' ? runtime : view;
+      await assert.rejects(target.invokeAction({ actionRef: 'called', signal: controller.signal }), {
+        code: 'CANCELLED', message: 'CANCELLED',
+      });
+      assert.equal(bodyCalls, phase === 'authorize' ? 0 : 1);
+
+      abort = false;
+      controller = new AbortController();
+      await assert.rejects(target.invokeAction({ actionRef: 'called', signal: controller.signal }), {
+        code: 'INTERNAL_ERROR', message: 'INTERNAL_ERROR',
+      });
+      assert.equal(bodyCalls, phase === 'authorize' ? 0 : 2);
+    });
+  }
+}
 
 test('A17 false If without else continues; missing then is rejected without execution', async t => {
   const r = registry(), trace = [];
@@ -158,6 +299,46 @@ test('A11/A13/A15 active event connection ignores duplicate while independent sh
   eventGate.resolve(); await flush(); assert.equal(snapshot(f.view).status, 'idle'); assert.equal(snapshot(f.view).data, null); assert.equal(shared.read(), 3);
   assert.equal(await emit(f.view), 'event'); assert.equal(snapshot(f.view).status, 'success'); shared.write(4); assert.equal(shared.read(), 4); scope.dispose();
 });
+
+for (const outcome of ['success', 'error']) {
+  test(`a terminal ${outcome} notification allows the next event on the same connection`, async t => {
+    const r = registry(), release = deferred();
+    let calls = 0;
+    native(r, 'work', { output: { schema: integer } }, () => {
+      const callNumber = ++calls;
+      if (callNumber === 1 && outcome === 'error') throw { code: 'ASSERTION_FAILED' };
+      if (callNumber === 2) return release.promise;
+      return callNumber;
+    });
+    const runtime = createPublicRuntime({ registry: r });
+    t.after(() => runtime.dispose());
+    const view = await runtime.createView(buttonView('work'));
+    let completed, second;
+    const stop = view.subscribe(current => {
+      const action = current.actions.observed;
+      if (completed || action.status !== outcome) return;
+      completed = action;
+      second = view.emit(current.roots[0], 'click', null);
+      void second.catch(() => {});
+    });
+    t.after(stop);
+
+    const first = emit(view);
+    if (outcome === 'error') await assert.rejects(first, { code: 'ASSERTION_FAILED' });
+    else assert.equal(await first, 1);
+    assert.equal(completed.running, false);
+    assert.equal(calls, 2);
+    assert.equal(await emit(view), undefined);
+    assert.equal(calls, 2);
+    assert.deepEqual(snapshot(view), { status: 'running', running: true, data: null, error: null });
+
+    release.resolve(2);
+    assert.equal(await second, 2);
+    assert.deepEqual(snapshot(view), { status: 'success', running: false, data: 2, error: null });
+    assert.equal(await emit(view), 3);
+  });
+}
+
 test('A16 self-removing SetState cancels child steps and normal output evaluation', async t => {
   let children = 0, outputs = 0;
   const r = registry([{ name: 'outputMarker', inputs: [], output: string, run() { outputs++; return 'output'; } }]);
@@ -218,7 +399,7 @@ test('K21 item-local when skips hidden inputs/Queries; hidden duplicate keys sti
 });
 test('A21 same observation id in two Component instances has independently visible running/success states', async t => {
   const r = registry(), gates = { one: deferred(), two: deferred() };
-  r.registerComponentContract(resource('Component', 'Status', { ports: { value: value(string) } }));
+  bindTestComponents(r, [resource('Component', 'Status', { ports: { value: value(string) } })]);
   native(r, 'wait', { ports: { tag: value(string) }, output: { schema: string } }, async ({ inputs }) => { await gates[inputs.tag].promise; return inputs.tag; });
   r.registerResources([resource('Component', 'Caller', { ports: { tag: value(string) }, render: { id: 'row', componentRef: 'Row', slots: { default: [
     { id: 'status', componentRef: 'Status', inputs: { value: path('/actions/local/status') } },

@@ -59,28 +59,33 @@ export function prepareUrlConnection(store, options, { previous = null, isOpen =
   const reserved = new Map();
   const controller = new AbortController();
   const { signal } = controller;
-  let readyResolve;
-  const ready = new Promise(resolve => { readyResolve = resolve; });
-  let alive = true, paused = false, started = false, activating = false, initialized = false;
-  let revision = 0, restoring = false, firstRestore = true, restorePending = restore;
+  let readyResolve, readyReject;
+  const ready = new Promise((resolve, reject) => { readyResolve = resolve; readyReject = reject; });
+  // View-owned and fire-and-forget connections can observe failures via diagnostics.
+  ready.catch(() => {});
+  let alive = true, paused = false, started = false, activating = false, initialized = false, readyState = false;
+  let revision = 0, cleanupRevision, restoring = false, firstRestore = true, restorePending = restore;
   const open = () => alive && store.urlConnection === connection && isOpen();
   const check = () => { if (!open()) fail('CANCELLED'); };
   const initialPending = new Set();
   const bindingByGeneration = new Map(prepared.map(binding => [binding.target.generation, binding]));
   const dirty = new Map(), diagnostics = [];
-  const report = (caught, kind, key) => {
-    if (!isOpen()) return;
+  const diagnostic = (caught, kind, key) => {
     const failure = safeError(caught, 'TYPE_MISMATCH');
-    const item = error(failure.code, { ...failure, kind, ...(key === undefined ? {} : { key }) });
+    return error(failure.code, { ...failure, kind, ...(key === undefined ? {} : { key }) });
+  };
+  const emit = item => {
+    if (!isOpen()) return;
     diagnostics.push(item);
     try { onError?.(item); } catch {}
   };
+  const report = (caught, kind, key) => emit(diagnostic(caught, kind, key));
   const limitOutput=patch=>{
     const owned=parts(mergeOwnedUrl(io.read(),patch)).filter(part=>keys.has(part.key));
     if(bytes(owned.map(part=>part.raw).join('&'))>limits.maxOwnedBytes || owned.some(part=>bytes(part.encodedValue)>limits.maxValueBytes))fail('LIMIT_EXCEEDED');
   };
   const writeDirty=()=>{
-    if(!open()||paused||!started||activating||!initialized||restoring||!dirty.size)return;
+    if(!open()||paused||!started||activating||!readyState||restoring||cleanupRevision===revision||!dirty.size)return;
     const current=++revision,isCurrent=()=>open()&&!paused&&revision===current;
     const patch=Object.fromEntries([...dirty].map(([key,item])=>[key,item.value]));
     const mode=[...dirty.values()].some(item=>item.history==='push')?'push':'replace';
@@ -90,20 +95,43 @@ export function prepareUrlConnection(store, options, { previous = null, isOpen =
       Promise.resolve(io.writeOwned(patch,{mode,isCurrent})).then(result=>{if(isCurrent()&&result?.applied!==false)dirty.clear();},caught=>{if(isCurrent())report(caught,'write');});
     }catch(caught){if(isCurrent())report(caught,'write');}
   };
-  const applyRestore=()=>{
-    const wasRestoring = restoring;
-    restoring = true;
-    try { restoreFromUrl(); }
-    finally { restoring = wasRestoring; }
-  };
-  const restoreFromUrl=()=>{
+  const applyRestore = onDeferredFailure => {
     const restoringRevision = revision;
     const isCurrent = () => open() && !paused && revision === restoringRevision;
+    let synchronous = true;
+    const wasRestoring = restoring;
+    restoring = true;
+    try {
+      store.restore(() => {
+        const wasRestoring = restoring;
+        restoring = true;
+        try { return restoreEntries(isCurrent); }
+        finally { restoring = wasRestoring; }
+      }, isCurrent, () => {
+        firstRestore = false;
+        readyState = true;
+        readyResolve();
+        if (!synchronous) {
+          // Let subscriber writes drain before retrying any remaining dirty keys.
+          const restoredRevision = revision;
+          queueMicrotask(() => { if (revision === restoredRevision) writeDirty(); });
+        }
+      }, caught => {
+        if (synchronous) throw caught;
+        onDeferredFailure(caught);
+      });
+    } finally {
+      restoring = wasRestoring;
+      synchronous = false;
+    }
+    writeDirty();
+  };
+  const restoreEntries = isCurrent => {
     const all=parts(io.read()),owned=all.filter(part=>keys.has(part.key));
     check();
-    if (!isCurrent()) return;
+    if (!isCurrent()) return [];
     const tooLarge=bytes(owned.map(part=>part.raw).join('&'))>limits.maxOwnedBytes;
-    const entries=prepared.map(binding=>{
+    return prepared.map(binding=>{
       if (dirty.has(binding.key) || (firstRestore && initialPending.has(binding.target) && store.hasWritten(binding.target))) {
         return [binding.target, binding.target.getSnapshot()];
       }
@@ -119,30 +147,39 @@ export function prepareUrlConnection(store, options, { previous = null, isOpen =
       }catch(caught){report(caught,'restore',binding.key);}
       return [binding.target,snapshot];
     });
-    if (!isCurrent()) return;
-    firstRestore=false;
-    store.restore(entries,isCurrent);
-    readyResolve();
   };
   const initialize=()=>{
     if(!open()||paused||!started||initialized)return;
     for(const binding of prepared)binding.baseline=store.baseline(binding.target);
     initialized=prepared.every(binding=>binding.baseline.status!=='pending');
     if(!initialized)return;
-    if(restorePending)applyRestore();else{firstRestore=false;readyResolve();}
-    writeDirty();
+    if (restorePending) applyRestore(failConnect);
+    else {
+      firstRestore = false;
+      readyState = true;
+      readyResolve();
+      writeDirty();
+    }
+  };
+  const failConnect = caught => {
+    if (!open()) return;
+    const failure = diagnostic(caught, 'connect');
+    close(failure);
+    emit(failure);
   };
   const guardedInitialize = () => {
     try { initialize(); }
-    catch (caught) {
-      dispose();
-      report(caught, 'connect');
-    }
+    catch (caught) { failConnect(caught); }
+  };
+  const guardedRestore = () => {
+    const onFailure = readyState ? caught => { if (open()) report(caught, 'restore'); } : failConnect;
+    try { applyRestore(onFailure); }
+    catch (caught) { onFailure(caught); }
   };
   const restoreNow=()=>{
     if(!open()||paused||!started)return;++revision;dirty.clear();restorePending=true;
     if(!initialized)guardedInitialize();
-    else try { applyRestore(); writeDirty(); } catch (caught) { report(caught, 'restore'); }
+    else guardedRestore();
   };
   const observeStore=payload=>{
     if (!open() || paused) return;
@@ -164,7 +201,10 @@ export function prepareUrlConnection(store, options, { previous = null, isOpen =
       changed = true;
     }
     if (changed) {
-      if (!restoring) ++revision;
+      if (!restoring && (readyState || cleanupRevision === revision)) {
+        ++revision;
+        if (initialized && !readyState) guardedRestore();
+      }
       writeDirty();
     }
   };
@@ -172,7 +212,7 @@ export function prepareUrlConnection(store, options, { previous = null, isOpen =
   const stopAdapter = stop => {
     try { stop?.(); } catch (caught) { report(caught, 'cleanup'); }
   };
-  const dispose = () => {
+  const close = failure => {
     if (!alive) return;
     alive = false;
     ++revision;
@@ -184,22 +224,27 @@ export function prepareUrlConnection(store, options, { previous = null, isOpen =
     }
     store.releaseUrl(connection);
     controller.abort();
-    readyResolve();
+    if (failure) readyReject(failure); else readyResolve();
     stopAdapter(stopUrl);
   };
-  const connection=Object.freeze({ready,isReady:()=>initialized,restore:restoreNow,getDiagnostics:()=>[...diagnostics], dispose,
-    commit() {
-      if (!isOpen()) fail('CANCELLED');
-      for (const binding of prepared) {
-        if (store.baseline(binding.target).status === 'pending') initialPending.add(binding.target);
-      }
-      claims = adapter ? adapterOwners.get(adapter) ?? new Map() : undefined;
+  const dispose = () => close();
+  const connection=Object.freeze({ready,isReady:()=>open()&&!paused&&readyState,restore:restoreNow,getDiagnostics:()=>[...diagnostics], dispose,
+    validateReservation() {
+      const pending = prepared.filter(binding => store.baseline(binding.target).status === 'pending');
+      store.validateUrlReservation(previous);
+      const nextClaims = adapter ? adapterOwners.get(adapter) ?? new Map() : undefined;
       const old = previousKeys;
-      if (claims) for (const key of keys) {
-        const owner = claims.get(key);
-        if (owner && (claims !== old?.claims || owner !== old.token || !old.keys.has(key))) fail('INVALID_DEFINITION');
+      if (nextClaims) for (const key of keys) {
+        const owner = nextClaims.get(key);
+        if (owner && (nextClaims !== old?.claims || owner !== old.token || !old.keys.has(key))) fail('INVALID_DEFINITION');
       }
-      store.reserveUrl(connection, previous);
+      return { pending, claims: nextClaims, old, addresses: prepared.map(binding => binding.target.address) };
+    },
+    installReservation(reservation) {
+      const { pending, old, addresses } = reservation;
+      for (const binding of pending) initialPending.add(binding.target);
+      claims = reservation.claims;
+      store.reserveUrl(connection);
       if (old) reserved.set(old.claims, new Set(old.keys));
       if (claims) {
         adapterOwners.set(adapter, claims);
@@ -208,7 +253,7 @@ export function prepareUrlConnection(store, options, { previous = null, isOpen =
       for (const [owned, ownedKeys] of reserved) for (const key of ownedKeys) owned.set(key, token);
       previous?.pause();
       previous = null;
-      if (io) stopStore = store.observeUrlChanges(prepared.map(binding => binding.target.address), observeStore);
+      if (io) stopStore = store.observeUrlChanges(addresses, observeStore);
       connectionTokens.set(connection, { token, keys, claims, io });
     },
     start() {
@@ -293,10 +338,26 @@ export function prepareUrlConnection(store, options, { previous = null, isOpen =
       else reserved.delete(old.claims);
       return failure;
     },
-    async removeOwned(selected=prepared.map(b=>b.target)){
-      if (!open() || paused) return {applied:false};
-      const selectedKeys=prepared.filter(b=>selected.includes(b.target)).map(b=>b.key);const current=++revision;
-      dirty.clear();try{return await io.writeOwned(Object.fromEntries(selectedKeys.map(key=>[key,null])),{mode:'replace',isCurrent:()=>open()&&revision===current});}catch(caught){if(open()&&revision===current)report(caught,'replace-cleanup');return {applied:false};}
+    async removeOwned(selected = prepared.map(binding => binding.target)) {
+      if (!open() || paused) return { applied: false };
+      const selectedKeys = prepared.filter(binding => selected.includes(binding.target)).map(binding => binding.key);
+      if (!selectedKeys.length) return { applied: true };
+      const current = ++revision;
+      cleanupRevision = current;
+      const isCurrent = () => open() && !paused && revision === current;
+      for (const key of selectedKeys) dirty.delete(key);
+      try {
+        return await io.writeOwned(Object.fromEntries(selectedKeys.map(key => [key, null])), { mode: 'replace', isCurrent });
+      } catch (caught) {
+        if (isCurrent()) report(caught, 'replace-cleanup');
+        return { applied: false };
+      } finally {
+        if (cleanupRevision === current) cleanupRevision = undefined;
+        if (isCurrent()) {
+          if (initialized && !readyState) guardedRestore();
+          else writeDirty();
+        }
+      }
     },
   });
   return connection;

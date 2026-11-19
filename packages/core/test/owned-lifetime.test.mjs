@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createRuntime, createStateStore } from '@viewstem/core';
+import { createRuntime as createPublicRuntime, createStateStore } from '@viewstem/core';
+import { createTestRuntime as createRuntime } from './fixtures/components.mjs';
 import { createRendererHost, prepareOwnedView } from '@viewstem/core/renderer';
 
 const componentContracts = [{ kind: 'Component', id: 'Leaf', spec: {} }];
@@ -16,6 +17,25 @@ const query = (...paths) => ({ query: {
   transform: { input: path('/sources/source0') },
 } });
 const source = { render, states, queries: { first: query('/first') } };
+
+test('aborting an independent Action during authorization prevents the body from starting', async t => {
+  const controllers = [];
+  let calls = 0;
+  const runtime = createPublicRuntime({ authorize({ operation }) {
+    if (operation === 'invoke') controllers.at(-1).abort();
+    return true;
+  } });
+  t.after(() => runtime.dispose());
+  runtime.registry.registerAction({ kind: 'Action', id: 'write', spec: {} }, () => { calls++; });
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const controller = new AbortController();
+    controllers.push(controller);
+    await assert.rejects(runtime.invokeAction({ actionRef: 'write', signal: controller.signal }), cancelled);
+    assert.equal(controller.signal.aborted, true);
+  }
+  assert.equal(calls, 0);
+});
+
 const createHost = (runtime, options) => createRendererHost(runtime, {
   ownsRuntime: false,
   validateTarget: () => true,
@@ -440,4 +460,36 @@ test('a timer cleanup failure still releases every owned scope and target', asyn
   assert.equal(active.size, 0);
   assert.equal(stateCount(store), 0);
   await host.mount({ target, source: { render } }).ready;
+});
+
+test('an owning signal abort observes cleanup failures without throwing from the event listener', async t => {
+  const controller = new AbortController();
+  const active = new Map();
+  const runtime = createRuntime({
+    componentContracts,
+    clock: {
+      now: 0,
+      setTimeout(_callback, delay) {
+        const handle = {};
+        active.set(handle, delay);
+        return handle;
+      },
+      clearTimeout(handle) {
+        const delay = active.get(handle);
+        active.delete(handle);
+        if (delay === 10) throw Error('poll cleanup failed');
+      },
+    },
+    requestExecutor: () => ({ status: 200, headers: {}, body: 'ok' }),
+  });
+  t.after(() => runtime.dispose());
+  const view = await prepareOwnedView(runtime, {
+    ...source, queries: { first: { ...source.queries.first, intervalMs: 10 } },
+  })(controller.signal);
+  await view.whenSettled(view.initial);
+  assert.deepEqual([...active.values()], [10]);
+  controller.abort();
+  await assert.rejects(view.dispose(), { code: 'INTERNAL_ERROR' });
+  assert.equal(active.size, 0);
+  await new Promise(resolve => setImmediate(resolve));
 });

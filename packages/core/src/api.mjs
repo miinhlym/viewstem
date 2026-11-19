@@ -19,10 +19,12 @@ function registryHandle(implementation) {
   if (registryHandles.has(implementation)) return registryHandles.get(implementation);
   const result = handle({
     registerResources(resources) { implementation.registerResources(resources); return result; },
+    registerResourceSet(set) { implementation.registerResourceSet(set); return result; },
     registerComponentContract(contract) { implementation.registerComponentContract(contract); return result; },
     registerComponentContracts(contracts) { implementation.registerComponentContracts(contracts); return result; },
-    registerAction(definition, run) { implementation.registerAction(definition, run); return result; },
+    registerAction(...args) { implementation.registerAction(...args); return result; },
     updateResource(definition) { implementation.updateResource(definition); return result; },
+    replaceResource(entry) { implementation.replaceResource(entry); return result; },
     get: (kind, id) => implementation.get(kind, id),
     list: filter => implementation.list(filter),
     exportResource: (kind, id) => implementation.exportResource(kind, id),
@@ -80,21 +82,36 @@ function storeHandle(implementation) {
 function viewHandle(implementation) {
   if (viewHandles.has(implementation)) return viewHandles.get(implementation);
   const result = Object.freeze(Object.defineProperty(Object.assign(Object.create(null), {
-    setInputs: (inputs = {}) => updateView(implementation, undefined, { inputs }),
+    setInputs: (inputs = {}, options) => updateView(implementation, undefined, options, inputs),
     updateDefinition: (spec, options) => updateView(implementation, spec, options),
+    async applyResourceSets({ setIds, definition, inputs, states, signal } = {}) {
+      try {
+        if (!Array.isArray(setIds) || !setIds.length) fail('INVALID_DEFINITION');
+        const ids = Array.from(setIds);
+        if (ids.some(id => typeof id !== 'string' || !id)) fail('INVALID_DEFINITION');
+        if (definition === null) fail('INVALID_DEFINITION');
+        return await implementation.applyResourceSets({
+          setIds: ids, definition: structuredClone(definition), signal,
+          inputs: inputs === undefined ? undefined : copyInputs(inputs),
+          states: states === undefined ? undefined : copyInputs(states),
+        });
+      } catch (cause) { throw safeError(cause, 'INVALID_DEFINITION'); }
+    },
     async replace(source, options) {
       try { return await implementation.replace(viewTarget(source, options), options?.signal); }
       catch (cause) { throw safeError(cause, 'INVALID_DEFINITION'); }
     },
     whenSettled: application => implementation.whenSettled(application),
-    invokeAction: request => implementation.host.invokeAction({ ...request, owner: implementation }),
+    async invokeAction(request) {
+      return implementation.host.invokeAction({ ...actionRequest(request), owner: implementation });
+    },
     exportDefinition: () => implementation.exportDefinition(),
     getState: (name, instanceId) => implementation.getState(name, instanceId),
     getQuery: (name, instanceId) => implementation.getQuery(name, instanceId),
     getSnapshot: () => implementation.getSnapshot(),
     subscribe: listener => implementation.subscribe(listener),
     emit: (target, event, payload) => implementation.emit(target, event, payload),
-    dispose() { void implementation.dispose(); },
+    dispose: () => implementation.dispose(),
   }), 'initial', { enumerable: true, get: () => implementation.firstApplication }));
   views.set(result, implementation); viewHandles.set(implementation, result);
   return result;
@@ -102,12 +119,27 @@ function viewHandle(implementation) {
 function authorization(callback) {
   if (callback === undefined) return undefined;
   if (typeof callback !== 'function') fail('INVALID_DEFINITION');
-  return ({ operation, owner, definition }) => {
+  return ({ operation, owner, definition, resource }) => {
     if (operation === 'update') return callback({ operation, owner: viewHandle(owner), definition });
     if (!actionOwners.has(owner)) actionOwners.set(owner, handle({}));
-    const { native: _implementation, ...contract } = definition;
-    return callback({ operation, owner: actionOwners.get(owner), definition: Object.freeze(contract) });
+    return callback(Object.freeze({ operation, owner: actionOwners.get(owner), definition, resource }));
   };
+}
+
+const readAborted = Object.getOwnPropertyDescriptor(AbortSignal.prototype, 'aborted').get;
+function checkSignal(signal) {
+  if (signal === undefined) return;
+  let aborted;
+  try { aborted = readAborted.call(signal); }
+  catch { fail('INVALID_DEFINITION', { location: '/signal' }); }
+  if (aborted) fail('CANCELLED');
+}
+function actionRequest(request) {
+  if (!request || typeof request !== 'object' || Array.isArray(request)
+    || Object.keys(request).some(key => !['actionRef', 'action', 'inputs', 'signal'].includes(key))) fail('INVALID_DEFINITION');
+  const { actionRef, action, inputs, signal } = request;
+  checkSignal(signal);
+  return { actionRef, action, inputs, signal };
 }
 
 export const createRegistry = options => registryHandle(new Registry(options));
@@ -119,13 +151,16 @@ function copyInputs(inputs = {}) {
   ]));
 }
 
-async function updateView(view, spec, options) {
+async function updateView(view, spec, options, replacementInputs) {
   try {
-    const inputs = options?.inputs;
-    const states = options?.states;
+    const signal = options?.signal;
+    checkSignal(signal);
+    const inputs = replacementInputs === undefined ? options?.inputs : replacementInputs;
+    const states = replacementInputs === undefined ? options?.states : undefined;
     return await view.update(spec, {
       inputs: inputs === undefined ? undefined : copyInputs(inputs),
       states: states === undefined ? undefined : copyInputs(states),
+      signal,
     });
   } catch (cause) { throw safeError(cause, 'INVALID_DEFINITION'); }
 }
@@ -152,14 +187,24 @@ async function createView(runtime, source, options) {
 
 export function prepareOwnedView(runtime, source, options, beforeCommit) {
   try {
-    const implementation = unwrap(runtimes, runtime);
+    const factory = typeof runtime === 'function' ? runtime : undefined;
+    const implementation = factory === undefined ? unwrap(runtimes, runtime) : undefined;
     const target = viewTarget(source, options);
-    return async (signal, owner = {}) => viewHandle(await implementation.createView(target, signal, beforeCommit, { ...owner, signal }));
+    return async (signal, owner = {}) => {
+      let engine;
+      try { engine = implementation ?? unwrap(runtimes, factory()); }
+      catch (cause) { throw safeError(cause, 'INVALID_DEFINITION'); }
+      return viewHandle(await engine.createView(target, signal, beforeCommit, { ...owner, signal }));
+    };
   } catch (cause) { throw safeError(cause, 'INVALID_DEFINITION'); }
 }
 
 export function rendererView(view) { return unwrap(views, view); }
 export function disposeRendererRuntime(runtime) { return unwrap(runtimes, runtime).dispose(); }
+export function runtimeOwnsView(runtime, view) {
+  const host = runtimes.get(runtime);
+  return host !== undefined && views.get(view)?.host === host;
+}
 
 export function createRuntime({ registry, resources, componentContracts, functions, stateStore, authorize, ...options } = {}) {
   if (registry !== undefined && [resources, componentContracts, functions].some(value => value !== undefined)) fail('INVALID_DEFINITION');
@@ -172,7 +217,10 @@ export function createRuntime({ registry, resources, componentContracts, functio
     registry: registryHandle(implementation.registry),
     stateStore: storeHandle(implementation.stateStore),
     createView: (source, options) => createView(result, source, options),
-    dispose() { void implementation.dispose(); },
+    async invokeAction(request) {
+      return implementation.invokeAction(actionRequest(request));
+    },
+    dispose: () => implementation.dispose(),
   });
   runtimes.set(result, implementation);
   return result;

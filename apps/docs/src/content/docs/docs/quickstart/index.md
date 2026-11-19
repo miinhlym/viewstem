@@ -15,13 +15,16 @@ In the Vite starter’s `index.html`, replace `<div id="app"></div>` with the el
 
 ## 2. Mount the View
 
-Replace the Vite starter’s `src/main.js` with the code below. In an existing app, run it on the client once the mount target is in the document. `createRenderer()` includes the default catalog, including `shadcn.Button`.
+Replace the Vite starter’s `src/main.js` with the code below. In an existing app, run it on the client once the mount target is in the document. Register the `ui` set to use catalog components such as `shadcn.Button`.
 
 ```js
-import { createRenderer } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
+import { createRuntime } from '@viewstem/core';
+import { createRenderer } from '@viewstem/dom';
+import { ui } from '@viewstem/ui';
 
-const renderer = createRenderer();
+const runtime = createRuntime();
+runtime.registry.registerResourceSet(ui);
+const renderer = createRenderer({ runtime });
 const screen = renderer.mount({
   target: document.getElementById('viewstem'),
   source: {
@@ -32,7 +35,7 @@ const screen = renderer.mount({
     },
   },
 });
-await screen.ready;
+await screen.whenRendered();
 ```
 
 ## 3. Open the app
@@ -41,7 +44,7 @@ await screen.ready;
 npm run dev
 ```
 
-Open the URL printed in the terminal. You should see a **Hello, Viewstem** button. Change `inputs.text` in the View definition to update the label. `screen.ready` waits for the first DOM update. Call `await screen.unmount()` when the screen closes and `await renderer.dispose()` when the app is done with the renderer.
+Open the URL printed in the terminal. You should see a **Hello, Viewstem** button. Change `inputs.text` in the View definition to update the label. Use `await screen.ready` to get the prepared View and `await screen.whenRendered()` to wait for the DOM. Await `screen.unmount()` when the screen closes. On app shutdown, await `renderer.dispose()` and then await `runtime.dispose()`.
 
 ## Next steps
 

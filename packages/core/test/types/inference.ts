@@ -1,10 +1,37 @@
 import { compileCel } from '@viewstem/core/cel';
 import { createHttpExecutor } from '@viewstem/core/http';
-import { createRegistry, createStateStore, createRuntime, mergeOwnedUrl } from '@viewstem/core';
+import { createRegistry, createStateStore, createRuntime, defineResourceSet, mergeOwnedUrl } from '@viewstem/core';
 import type { QuerySpec, QuerySource, ComponentNode, Step, DatasourceSpec, AnyResource, QueryHandle } from '@viewstem/core';
 import { createHttpExecutor as fromHttp } from '@viewstem/core/http';
 
 const registry = createRegistry();
+const codeSet = defineResourceSet({ id: 'native', version: '1', actions: [
+  { definition: { kind: 'Action', id: 'label', spec: {
+    ports: { title: { kind: 'Value', required: true, schema: { type: 'string' } } },
+    output: { schema: { type: 'integer' } },
+  } }, implementation({ inputs }) {
+    // @ts-expect-error The first handler has a required string input.
+    const value: number = inputs.title;
+    return inputs.title.length;
+  } },
+  { definition: { kind: 'Action', id: 'sync', spec: {
+    ports: { count: { kind: 'State', required: true, schema: { type: 'integer' } } },
+  } }, implementation({ inputs }) {
+    inputs.count.write(3);
+    // @ts-expect-error The second handler takes a numeric State handle.
+    inputs.count.write('invalid');
+  } },
+] });
+registry.registerResourceSet(codeSet);
+registry.replaceResource({ action: { definition: { kind: 'Action', id: 'label', spec: {
+  ports: { title: { kind: 'Value', required: true, schema: { type: 'string' } } },
+  output: { schema: { type: 'integer' } },
+} }, implementation: ({ inputs }) => inputs.title.length } });
+defineResourceSet({ id: 'typed', version: '1', actions: [{
+  definition: { kind: 'Action', id: 'bad', spec: { output: { schema: { type: 'boolean' } } } },
+  // @ts-expect-error This code Action declares a boolean output.
+  implementation: () => 1,
+}] });
 registry.registerAction({ kind: 'Action', id: 'inferred-void', spec: {
   ports: {
     count: { kind: 'State', required: true, schema: { type: 'integer' } },
@@ -94,8 +121,8 @@ const href: string = mergeOwnedUrl('https://example.test?a=1', { a: null }); voi
 const stopClock = scope.connectClock(count, { now: () => 123, subscribe: listener => { listener(124); return () => {}; } }); stopClock();
 // @ts-expect-error clocks supply numeric State cells.
 scope.connectClock(scope.registerState<string>('text', { schema: { type: 'string' } }), { now: () => 1, subscribe: () => () => {} });
-const pureRegistry = createRegistry({ functions: [{ name: 'double', inputs: [{ type: 'number' }], output: { type: 'number' }, run: (...args) => Number(args[0]) * 2 }] });
-pureRegistry.registerResources([{ kind: 'Variable', id: 'double', spec: { ports: { n: { kind: 'Value', required: true, schema: { type: 'number' } } }, expression: 'double(n)' } }]);
+const pureRegistry = createRegistry({ functions: [{ name: 'twice', inputs: [{ type: 'number' }], output: { type: 'number' }, run: (...args) => Number(args[0]) * 2 }] });
+pureRegistry.registerResources([{ kind: 'Variable', id: 'double', spec: { ports: { n: { kind: 'Value', required: true, schema: { type: 'number' } } }, expression: 'twice(n)' } }]);
 pureRegistry.updateResource({ kind: 'Variable', id: 'double', spec: { expression: '1' } });
 // @ts-expect-error trusted functions are a readonly registry snapshot.
 pureRegistry.functions.push({ name: 'x', inputs: [], output: true, run: () => 1 });

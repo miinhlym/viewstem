@@ -119,8 +119,8 @@ The generator reads `packages/ui/dist/support.json` and generates 66 detail page
 primary and variant examples. Displayed, copied and executed JSON use the same initial definition.
 
 [DemoWorkbench.svelte](src/components/DemoWorkbench.svelte) owns the example tabs and toolbar.
-[component-demo-ui-runtime.ts](src/examples/component-demo-ui-runtime.ts) attaches core Views
-through `@viewstem/ui`. Sonner registers its host Action against a separate DOM Notifications View.
+[component-demo-ui-runtime.ts](src/examples/component-demo-ui-runtime.ts) registers the `ui` set
+and attaches Core Views with `@viewstem/dom`. Sonner registers its host Action against a separate DOM Notifications View.
 [component-demo-ui-setup.ts](src/examples/component-demo-ui-setup.ts) generates the consumer setup code.
 Tab changes preserve runtime state, and rerunning restores the initial state.
 

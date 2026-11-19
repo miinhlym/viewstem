@@ -198,7 +198,11 @@ Value의 `default`는 키가 생략된 경우에만 적용하므로 TypeScript�
 
 `updateResource()`는 후보 정의와 의존성을 먼저 검증한다. 기존 코드 Action의 포트 이름과 열거 순서, 종류, 필수 여부, 기본값, 해석된 Value·State 스키마 및 출력 유무와 스키마를 보존해야 한다. 기본값은 JSON 값의 배열과 객체 키 순서도 보존한다. 스키마는 `typeRef`를 해석한 구조를 비교하며 객체 키 순서만 무시한다. Type 갱신도 참조하는 모든 코드 Action에 같은 규칙을 적용한다. 표시 이름 변경과 같은 스키마를 가리키는 참조 변경은 허용한다.
 
-후보가 유효해도 계약이 달라지면 `TYPE_CONTRACT_MISMATCH`에 영향을 받는 Action의 `resource`, 변경 위치인 `location` 및 해당 포트의 `input`을 담아 거절한다. Registry 정의와 핸들러, 실행 중인 View와 호출에는 갱신을 적용하지 않는다. 계약 변경 시 공유 Type이 달라지면 새 Type ID를 등록하고, 새 Action ID로 계약과 핸들러를 함께 등록한 뒤 호출 입력과 `actionRef`를 전환한다. 이전 ID를 직접 호출하는 코드 Action의 구현을 교체할 때도 새 ID로 등록한다. 새 View나 `replace()`에서 전환한 구성을 적용한다.
+후보가 유효해도 계약이 달라지면 `TYPE_CONTRACT_MISMATCH`에 영향을 받는 Action의 `resource`, 변경 위치인 `location` 및 해당 포트의 `input`을 담아 거절한다. Registry 정의와 핸들러, 실행 중인 View와 호출에는 갱신을 적용하지 않는다. 계약 변경 시 공유 Type이 달라지면 새 Type ID를 등록하고, 새 Action ID로 계약과 핸들러를 함께 등록한 뒤 호출 입력과 `actionRef`를 전환한다. 새 View나 `replace()`에서 전환한 구성을 적용한다.
+
+**리소스 셋 설계에서 보완한 D154.** 입력·출력 계약과 필수 호스트 기능이 같으면 명시적 교체로 같은 Action ID에 새 함수를 게시할 수 있다. 이 중 하나라도 달라지면 새 Action ID를 사용한다. 게시 시 이미 진행 중인 호출은 시작 당시 함수로 계속 실행하고, 열린 View는 서비스가 교체를 명시적으로 적용할 때까지 기존 함수를 사용한다. 새 View와 교체를 받아들인 View는 새 함수를 사용한다. 열린 View의 교체 적용은 해당 View의 내부 수명을 새로 시작하는 일반 교체 계약을 따른다. [리소스 셋의 교체와 View 적용](12-resource-sets-browser.md#공통-저장소와-view-적용)
+
+**공개 API 후속 결정(D154).** `defineCodeAction({ definition, requires? })`으로 코드 Action의 ID, 입출력 계약과 필수 호스트 기능을 한 번 선언한다. 반환한 계약의 `.implement(handler)`는 그 계약에 맞는 함수로 Action 엔트리를 만든다. 다른 파일에서 가져온 엔트리는 `defineResourceSet({ actions: [...] })`, `registry.registerAction(entry)`, `registry.replaceResource({ action })`에 전달할 수 있다. 세 경로에서 필수 호스트 기능을 함께 유지한다. 기존 정의·함수 두 인자 등록은 호스트 기능 요구가 없는 경우에 사용한다. 같은 ID의 구현 교체에는 같은 계약의 `.implement()`로 새 함수를 연결한다. 리터럴 스키마에서 핸들러의 입력·출력 타입을 추론하며, `typeRef`를 쓰는 계약은 `defineCodeAction<Inputs, Output>()`으로 타입을 명시할 수 있다. Registry는 실제 스키마를 해석하고 등록·교체 계약을 검증한다.
 
 ### 재귀·확장 실행의 경계
 
@@ -224,7 +228,7 @@ on의 Action 호출 연결에는 **선택적 id**를 붙이며 `/actions/id`로 
 
 같은 소유 View/Component 인스턴스 범위에 실제 생성된 호출 연결의 관찰 id가 중복되면 오류다. 슬롯 내용을 여러 번 투영해서 작성자 범위에 같은 id의 연결이 생겨도 자동 공유하지 않고 오류로 처리한다. 서로 다른 Component 인스턴스의 내부 id는 같은 이름을 사용할 수 있다. 연결 제거 후 같은 id로 다시 생성하면 새 연결이며 이전 실행 결과를 이어받지 않는다. 반복 슬롯 투영의 개별 실행 상태 조회 주소는 1차 지원 범위에 추가하지 않는다. [E56]
 
-실행 정보는 런타임이 관리하는 읽기 전용 값이다. status는 idle/running/success/error, running은 status가 running인지 나타낸다. 새 실행이 실제 시작되면 이전 data/error를 비운다. data는 idle·running·실패 및 output 없는 성공에서 null이며, 성공했고 output이 있으면 검증된 실제 반환값이다. 오류가 없으면 error는 null이다. 성공 여부를 data의 truthiness로 판단하지 않는다. 같은 연결이 실행 중일 때의 추가 호출은 무시하고 기존 실행 정보는 유지한다. 큐나 기존 실행의 자동 취소를 추가하지 않는다.
+실행 정보는 런타임이 관리하는 읽기 전용 값이다. status는 idle/running/success/error, running은 status가 running인지 나타낸다. 새 실행이 실제 시작되면 이전 data/error를 비운다. data는 idle·running·실패 및 output 없는 성공에서 null이며, 성공했고 output이 있으면 검증된 실제 반환값이다. 오류가 없으면 error는 null이다. 성공 여부를 data의 truthiness로 판단하지 않는다. 같은 연결이 실행 중일 때의 추가 호출은 무시하고 기존 실행 정보는 유지한다. 성공·실패 통지를 받은 구독자는 같은 연결에서 새 실행을 시작할 수 있다. 큐나 기존 실행의 자동 취소를 추가하지 않는다.
 
 초기화 순서는 **호출 연결 등록 → idle/running:false/data:null/error:null 초기화 → Component inputs 평가**다. 첫 UI 입력에서 `/actions/id/running`을 읽을 수 있어야 하며 JSON 속성 순서에 따라 달라지지 않는다.
 

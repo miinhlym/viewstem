@@ -10,8 +10,9 @@ queries, actions, and views in JSON, then connect them to your application's ren
 | Package | Purpose |
 |---|---|
 | [@viewstem/core](packages/core/README.md) | Validation, values, state, Query/Action execution, and view lifecycles without DOM or framework dependencies |
+| [@viewstem/dom](packages/dom/README.md) | Browser renderer and DOM component connector |
 | [@viewstem/svelte](packages/svelte/README.md) | Svelte 5 client renderer; start with `createRenderer()` and register your components explicitly |
-| [@viewstem/ui](packages/ui/README.md) | Default JSON component catalog and browser DOM renderer |
+| [@viewstem/ui](packages/ui/README.md) | Default browser component catalog and styles |
 
 The packages have been built and tested locally. A package version or local
 verification result does not establish publication on npm. See each package's
@@ -19,19 +20,27 @@ README for its public API, supported behavior, and limitations.
 
 ## Mount a View in the browser
 
-```ts
-import { createRenderer } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
+Install Core, DOM, and UI using the [installation guide](apps/docs/src/content/docs/docs/installation/index.md#build-the-browser-ui-packages). Add `<div id="panel"></div>` to your HTML and run the following code with a browser bundler such as Vite.
 
-const target = document.querySelector<HTMLElement>('#panel')!;
-const renderer = createRenderer();
+```ts
+import { createRuntime } from '@viewstem/core';
+import { createRenderer } from '@viewstem/dom';
+import { ui } from '@viewstem/ui';
+
+const target = document.getElementById('panel');
+if (!target) throw new Error('Missing #panel element');
+
+const runtime = createRuntime();
+runtime.registry.registerResourceSet(ui);
+const renderer = createRenderer({ runtime });
 const screen = renderer.mount({
   target,
   source: { render: { id: 'hello', componentRef: 'shadcn.Badge', inputs: { text: 'Hello' } } },
 });
-await screen.ready;
-// On route exit, call screen.unmount(). On application shutdown, call renderer.dispose().
+await screen.whenRendered();
 ```
+
+On route exit, await `screen.unmount()`. On app shutdown, await `renderer.dispose()` and then await `runtime.dispose()` for the app-owned Runtime.
 
 ## Documentation
 

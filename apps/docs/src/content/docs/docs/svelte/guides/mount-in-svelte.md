@@ -11,6 +11,7 @@ Choose the entry point for your host.
 | --- | --- |
 | A new View in a separate DOM element | [`renderer.mount({ target, source })`](../manage-view-lifecycle/) |
 | An existing View in a separate DOM element | [`renderer.attach(view, target)`](../../renderer/#mount-and-attach) |
+| A standalone screen in an existing Svelte tree | [`<ViewstemView {source} resourceSets={[ui]} />`](../../viewstem-view/) |
 | A new View inside an existing Svelte tree | [`<ViewstemView {renderer} {source} />`](../../viewstem-view/) |
 | An existing View inside an existing Svelte tree | [`<ViewstemView {renderer} {view} />`](../../viewstem-view/#borrowing-a-view) |
 
@@ -50,19 +51,16 @@ If you followed Installation or Quick Start, use this guide's `src/main.ts` inst
 In `label.ts`, give the adapter the ID `Label` and declare its required `text` port. A View can now refer to that ID when the registration is present.
 
 ```ts
-import type { ComponentRegistration } from '@viewstem/svelte';
+import { svelteComponent } from '@viewstem/svelte';
 import Label from './Label.svelte';
 
-export const label: ComponentRegistration = {
-  contract: {
+export const label = svelteComponent({
     kind: 'Component',
     id: 'Label',
     spec: {
       ports: { text: { kind: 'Value', schema: { type: 'string' }, required: true } },
     },
-  },
-  component: Label,
-};
+}, Label);
 ```
 
 ## 2. Create and display the View
@@ -72,10 +70,13 @@ In `App.svelte`, register the adapter and pass a `source`. The component creates
 ```svelte
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { defineResourceSet } from '@viewstem/core';
   import { createRenderer, ViewstemView, type ViewSpec } from '@viewstem/svelte';
   import { label } from './label.js';
 
-  const renderer = createRenderer({ components: [label] });
+  const renderer = createRenderer();
+
+  renderer.runtime.registry.registerResourceSet(defineResourceSet({ id: 'labels', version: '1', components: [label] }));
   const source: ViewSpec = {
     render: {
       id: 'greeting',
@@ -132,12 +133,14 @@ Use your app's current HTML and entry point. Add `Label.svelte` and `label.ts` f
 <!-- Layout.svelte -->
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { defineResourceSet } from '@viewstem/core';
   import { createRenderer } from '@viewstem/svelte';
   import SettingsPage from './SettingsPage.svelte';
   import { label } from './label.js';
 
   let { showSettings }: { showSettings: boolean } = $props();
-  const renderer = createRenderer({ components: [label] });
+  const renderer = createRenderer();
+  renderer.runtime.registry.registerResourceSet(defineResourceSet({ id: 'labels', version: '1', components: [label] }));
   onMount(() => () => { void renderer.dispose().catch(console.error); });
 </script>
 
@@ -165,3 +168,127 @@ Use your app's current HTML and entry point. Add `Label.svelte` and `label.ts` f
 ```
 
 Closing the page cancels pending creation or disposes its View. The layout can reuse the renderer for the next page. If your app calls Svelte's `mount` or `hydrate`, integrate [`transformError`](../../errors/#transformerror) with your existing root error policy. If a framework manages the root, consult its error configuration. The `main.ts` above is for the Vite example that mounts its own root.
+
+<a id="mix-default-ui"></a>
+
+## Mix a default UI button with a Svelte component
+
+Use a Svelte TypeScript client build and install the local Core, DOM, Svelte, and UI packages. Follow the [Svelte build and installation steps](/docs/installation/#build-and-install-the-svelte-packages) and add the UI tarball from the [browser UI build](/docs/installation/#build-the-browser-ui-packages). These files form a standalone example.
+
+`index.html`
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Viewstem counter</title>
+  </head>
+  <body>
+    <main id="app"></main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
+```
+
+`src/counter-contract.ts`
+
+```ts
+import type { ComponentContract } from '@viewstem/core';
+
+export const integer = { type: 'integer' } as const;
+export const counterContract = {
+  kind: 'Component',
+  id: 'demo.Counter',
+  spec: { ports: { count: { kind: 'Value', required: true, schema: integer } } },
+} as const satisfies ComponentContract;
+```
+
+`src/Counter.svelte`
+
+```svelte
+<script lang="ts">
+  import type { ComponentAdapterProps } from '@viewstem/svelte';
+  import type { counterContract } from './counter-contract.js';
+
+  let { node }: ComponentAdapterProps<typeof counterContract> = $props();
+</script>
+
+<output aria-label="Count">
+  {#if node.status === 'ready'}
+    {node.inputs.count.toFixed(0)}
+  {:else}
+    {node.inputs.count ?? '—'}
+  {/if}
+</output>
+```
+
+`src/main.ts`
+
+```ts
+import { defineCodeAction, defineResourceSet, type ViewSpec } from '@viewstem/core';
+import { createRenderer, svelteComponent } from '@viewstem/svelte';
+import { ui } from '@viewstem/ui';
+import Counter from './Counter.svelte';
+import { counterContract, integer } from './counter-contract.js';
+
+const increment = defineCodeAction({
+  definition: {
+    kind: 'Action',
+    id: 'increment',
+    spec: { ports: { count: { kind: 'State', required: true, schema: integer } } },
+  },
+}).implement(({ inputs }) => {
+  inputs.count.write((inputs.count.read() ?? 0) + 1);
+});
+
+const target = document.getElementById('app');
+if (!target) throw new Error('Missing #app');
+
+export const renderer = createRenderer();
+renderer.runtime.registry.registerResourceSet(defineResourceSet({
+  id: 'counter-demo',
+  version: '1',
+  dependencies: [ui],
+  components: [svelteComponent(counterContract, Counter)],
+  actions: [increment],
+}));
+
+const count = { '@path': '/states/count' };
+export const source: ViewSpec = {
+  states: { count: { kind: 'State', schema: integer, initial: 0 } },
+  render: {
+    id: 'card',
+    componentRef: 'shadcn.Card.Root',
+    slots: { default: [
+      { id: 'counter', componentRef: counterContract.id, inputs: { count } },
+      {
+        id: 'plus',
+        componentRef: 'shadcn.Button',
+        inputs: { text: '+1' },
+        on: { click: { actionRef: 'increment', inputs: { count } } },
+      },
+    ] },
+  },
+};
+
+export const screen = renderer.mount({ target, source });
+await screen.whenRendered();
+```
+
+The renderer connects Svelte and DOM in one View. The demo set registers the default UI through `dependencies: [ui]`. Vite bundles the default UI styles with `@viewstem/ui`. The Card supplies a single root and its `default` slot holds both children.
+
+The default `shadcn.Button` emits `click`. Its handler binds `/states/count` to a `State` port, so the Action gets a writable handle. The Svelte component binds the same path to a `Value` port and receives the evaluated number through its typed node.
+
+Run the app. The count starts at 0. Click **+1** to get 1, then press Enter on the focused button to get 2. `screen.whenRendered()` waits for the first display. Use `await screen.ready` if your app also needs the View handle. Call `await screen.unmount()` when closing just this screen, or `await renderer.dispose()` when the app finishes with the renderer.
+
+Change the counter’s input path to `/states/coutn`. The initial mount rejects with this diagnostic before displaying the View. [Error reference](../../errors/#failure-and-recovery)
+
+```json
+{
+  "code": "REFERENCE_NOT_FOUND",
+  "message": "Unknown State \"coutn\".",
+  "location": "/render/slots/default/0/inputs/count/@path",
+  "input": "count"
+}
+```

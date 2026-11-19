@@ -14,13 +14,16 @@ sidebar:
 ## 1. 마운트하고 DOM 반영 기다리기
 
 ```ts
+import { defineResourceSet } from '@viewstem/core';
 import { createRenderer, type ViewSpec } from '@viewstem/svelte';
 import { label } from './label.js';
 
 const target = document.getElementById('app');
 if (!target) throw new Error('#app 요소가 필요합니다.');
 
-const renderer = createRenderer({ components: [label] });
+const renderer = createRenderer();
+
+renderer.runtime.registry.registerResourceSet(defineResourceSet({ id: 'labels', version: '1', components: [label] }));
 
 const spec: ViewSpec = {
   states: {
@@ -41,7 +44,7 @@ await mounted.whenRendered();
 console.log(target.textContent?.trim()); // 저장한 초안
 ```
 
-`ready`는 첫 DOM 반영 뒤 View를 반환합니다. 실행 가능한 최초 Query의 보고와 DOM 반영도 필요하면 `whenSettled(view.initial)`을 호출하세요. State에 쓴 뒤에는 `whenRendered()`로 DOM 반영을 기다립니다. Query 실행과 브라우저 페인트는 이 DOM 대기와 별개입니다.
+`ready`는 View 준비와 표시 연결 뒤 View를 반환합니다. 실행 가능한 최초 Query의 보고와 DOM 반영도 필요하면 `whenSettled(view.initial)`을 호출하세요. State에 쓴 뒤에는 `whenRendered()`로 DOM 반영을 기다립니다. Query 실행과 브라우저 페인트는 이 DOM 대기와 별개입니다.
 
 ## 2. 현재 View를 갱신하고 수명 교체하기
 

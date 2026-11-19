@@ -1,6 +1,6 @@
 # 호스트 등록 · 렌더러 연결
 
-U41 API 정리: JS/TS 루트는 세 팩토리와 URL/Grid 유틸리티만 공개하며 HTTP·CEL 직접 실행기는 subpath로 제공한다. Registry·Store·Runtime·View는 타입과 공개 핸들로 사용하고 내부 엔진·검증기·생성자는 노출하지 않는다. `authorize`의 update owner는 공개 View, invoke owner는 메서드 없는 수명 식별 객체다. 코드 Action의 구현 함수는 권한 콜백에 노출하지 않는다. [변경 안내와 검증](../handoff/public-api-refactor-2026-11-02.md)을 따른다.
+Core JS/TS 루트는 `createRegistry`, `createStateStore`, `createRuntime`, `defineResourceSet`, `defineCodeAction`과 URL·Grid 유틸리티를 공개한다. HTTP·CEL 직접 실행기는 하위 경로에서 제공한다. Registry·Store·Runtime·View는 타입과 공개 핸들로 사용한다. `authorize`의 update owner는 공개 View, invoke owner는 메서드 없는 수명 식별 객체다. 코드 Action의 구현 함수는 권한 콜백에 노출하지 않는다. [U41 변경 안내와 검증](../handoff/public-api-refactor-2026-11-02.md)을 참고한다.
 
 U37 구현: 실제 JS/TS API는 [core README](../../packages/core/README.md)와 [공개 타입](../../packages/core/src/index.d.ts)에 구체화했다. `NodeSnapshot`은 이름별 `slots`와 평탄한 `children`을 함께 제공한다. 기존 화면은 주입한 정의를 유지하고 `replace`/새 createView에서 새 Registry 정의를 주입한다. 아래 예제·SDK 표와 공개 선언은 같은 이름을 사용하며 최소 계약·권한·초기 완료 의미는 그대로 따른다.
 
@@ -13,17 +13,21 @@ U39–U40에서 Svelte 클라이언트 렌더러와 실행 중인 View를 빌리
 
 [명세 시작점](../VIEWSTEM-SPEC.md) · 이 문서는 최종 명세의 주제별 상세다. **확정**과 **구체화 필요/구현 제안/이전 승인 이관**을 구분해 읽는다. JSON은 계약 설명이며 실행 검증 완료를 뜻하지 않는다.
 
+공통 브라우저 기반과 DOM·Svelte 연결자, 리소스 셋의 실행 중 등록 및 View별 적용은 [리소스 셋 명세](12-resource-sets-browser.md)를 따른다. `mount().ready`는 View 준비와 표시 연결 성립을 기다리고 연결별 `whenRendered()`는 렌더 결과를 보고한다.
+
 ## JS/TS 호스트 API · D150
 
 DOM과 Svelte의 명령형 연결을 공통 `createRenderer → mount → unmount`로 이행한다. `mount`는 준비 중에도 해제할 수 있는 화면 핸들을 동기로 반환하고, 기존 View를 빌리는 `attach`는 연결만 소유한다. View에 입력·전체 정의·교체·독립 Action 연산을 둔다. 초기 데이터와 DOM 완료는 지정한 적용을 기준으로 관찰한다.
 
 새 적용은 후보를 준비한 뒤 **Registry·Store·View와 URL 예약을 하나의 동기 구간에서 확정**한다. 구독자에게 그 결과를 함께 보인 뒤 소유 URL 정리 및 연결을 실행한다. URL 후처리 오류는 새 적용의 진단으로 남으며 최초 Query는 정리 및 URL 입력 준비 순서를 따른다. 두 명령형 렌더러는 같은 Core 설치에서 대상 예약을 공유한다.
 
-[구현 계획과 수락 기준](../designs/viewstem-host-api-implementation-2026-11-13.md)에 시그니처, 적용 순서, 호스트 예제를 둔다. 공개 시그니처는 [Core 타입](../../packages/core/src/index.d.ts), [DOM 사용법](../../packages/ui/README.ko.md), [Svelte 사용법](../../packages/svelte/README.ko.md)을 따른다.
+[구현 계획과 수락 기준](../designs/viewstem-resource-sets-implementation-2026-11-16.md)에 적용 순서와 호스트 예제를 둔다. 공개 시그니처는 [Core 타입](../../packages/core/src/index.d.ts), [DOM 사용법](../../packages/dom/README.ko.md), [Svelte 사용법](../../packages/svelte/README.ko.md)을 따른다.
 
 **D151 · Svelte 트리에서 View 생성.** `ViewstemView`는 기존 View를 `view`로 빌리거나 `source`와 초기 `inputs`로 클라이언트에서 새 View를 만든다. 두 방식 모두 부모 context를 상속한다. 소유 View의 최초 설정은 컴포넌트 수명에 고정한다. 새 View는 `{#key}`로 다시 마운트한다. 컴포넌트 제거 또는 렌더러 폐기는 준비를 취소하고 소유 View를 정리한다. 대여 View의 수명은 호스트가 관리한다. `whenRendered()`는 생성과 첫 DOM 반영을 기다리며 Query 보고는 앱이 View를 생성하고 빌려주는 경로에서 관찰한다. [Svelte 레퍼런스](../../apps/docs/src/content/docs/ko/docs/svelte/viewstem-view.md)를 따른다.
 
 소유 View의 생성 설정은 컴포넌트 초기화 시점에 캡처하고, 클라이언트 마운트 뒤 생성한다. 이미 커밋한 State의 알림 중 렌더러를 폐기하면 확정한 Registry 변경은 보존하며 최초 Query를 시작하기 전에 소유 View를 닫는다. 렌더러 폐기 Promise는 소유 View 정리가 끝난 뒤 이행한다. 기존 표시 연결에서 시작한 완료 대기는 교체 또는 폐기에 따라 취소되며, 닫힌 연결의 캐시는 조회할 수 없다.
+
+**D165 · 독립 Svelte 화면의 소유권.** `<ViewstemView {source} resourceSets={[ui]} />`는 클라이언트에서 자체 Runtime·렌더러를 만들고, 첫 설정으로 캡처한 셋을 등록한 뒤 View를 준비한다. 셋 등록이나 준비가 실패하면 준비 진단을 전달하고 실패한 수명을 정리한다. 화면을 제거하면 준비 취소와 전체 정리를 컴포넌트가 관리한다. 여러 화면에서 Runtime을 공유할 때는 앱이 소유한 렌더러를 전달한다. `resourceSets`와 외부 `renderer`는 함께 사용할 수 없으며 `view`는 외부 렌더러를 요구한다. 기본 UI 셋은 직접 전달하거나 다른 셋의 의존성으로 등록한다. `browser` 조건을 선택하는 번들러는 두 경우 모두 `@viewstem/ui`와 함께 기본 CSS를 포함한다. [D170 스타일 로딩 계약](12-resource-sets-browser.md#ui-셋의-스타일-소유권)을 따른다.
 
 **D152 · 소유 View의 실행 차단과 정리.** 브라우저와 Svelte의 `mount()`, Svelte의 `ViewstemView source`는 같은 소유 생성 경로를 쓴다. 후보 View는 참조 해결 전에 소유자에 등록한다. 공개 Core `createView()`와 `replace()`의 준비 신호는 동기 확정 직전까지 유효하다. 호스트의 종료는 View 수명 전체에 적용하며, 확정 후 알림 중에 닫으면 Registry 커밋과 외부 소유 셀을 보존하고 해당 View의 실행을 차단한다.
 
@@ -33,18 +37,25 @@ DOM과 Svelte의 명령형 연결은 종료 호출 즉시 해당 연결에서 �
 
 호스트 타이머와 URL 어댑터에서 돌아온 뒤에도 종료 상태를 확인한다. HTTP 실행기 호출과 URL 복원·쓰기는 해당 수명이 유효할 때만 시작한다. 호환 갱신에서는 유지한 Query 사용과 캐시를 보존한다. Store 알림 중 시작한 갱신·재시도는 최신 Query 설정이 적용된 뒤 판정한다. 닫히거나 교체된 연결에서 진행 중인 표시 대기는 `CANCELLED`로 끝난다.
 
-**D153 · 렌더러와 화면의 오류 관찰.** `mount()`, `attach()`, `ViewstemView`는 렌더러 관찰자 다음에 화면 관찰자를 호출한다. 각 호출 직전에 연결과 관찰자의 수명을 확인한다. 같은 진단 발생에는 연결이나 렌더러를 가로질러 함수 참조당 한 번 전달한다. 새 연결의 현재 노드·Query 오류와 현재 적용의 URL 진단은 발생 당시의 불변 공개 데이터를 사용한다. Query 실행 실패는 다음 실행에 의해 투영에서 가려져도 당시 관찰자에게 전달한다. 연결의 렌더 실패는 해당 연결의 관찰자에게만 전달한다. 관찰자 예외·Promise 거절과 정상 취소는 새 진단을 만들지 않는다.
+**D153 · 렌더러와 화면의 오류 관찰.** `mount()`, `attach()`, `ViewstemView`는 렌더러 관찰자 다음에 화면 관찰자를 호출한다. 각 호출 직전에 연결과 관찰자의 수명을 확인한다. 같은 진단 발생에는 연결이나 렌더러를 가로질러 함수 참조당 한 번 전달한다. 새 연결의 현재 노드·Query 오류와 현재 적용의 URL 진단은 발생 당시의 불변 공개 데이터를 사용한다. Query 실행 실패는 다음 실행에 의해 투영에서 가려져도 당시 관찰자에게 전달한다. 연결의 렌더 실패는 해당 연결의 관찰자에게만 전달한다. 관찰자 예외·Promise 거절과 정상 취소는 새 진단을 만들지 않는다. 자동 표시 및 소유 자원 정리 실패는 `dispose` 진단으로 전달한다. 직접 요청한 정리는 반환 Promise로 실패를 관찰할 수 있다.
+
+화면 갱신 중 자동 정리가 실패하면 실패한 노드 ID를 `dispose` 진단에 담고, 해당 노드의 DOM을 제거한 뒤 나머지 렌더를 계속한다. 표시할 노드가 정상적으로 반영되면 렌더 완료 대기는 성공한다.
+
+명령형 화면과 `ViewstemView`는 공통 표시 연결에서 렌더 호출, 완료 대기, 이벤트 시작과 진단에 실제 View와 연결의 수명을 적용한다. 렌더러 관찰자가 View, Runtime 또는 화면을 닫으면 그 연결의 화면 관찰자에게 같은 갱신 진단을 전달하지 않는다. 대여 표시가 살아 있고 렌더러만 폐기됐다면 화면 관찰자는 계속 진단을 받는다. 프레임워크가 화면을 제거할 때 발생한 연결 자체의 정리 실패는 일반 갱신과 별도로 한 번 보고한다.
 
 ## 10.8 서비스 연결과 에이전트의 같은 경로
 
 아래 예제는 Svelte 앱의 어댑터와 재사용 정의를 등록하고 화면을 연결한다. 저장 서비스는 호스트가 제공한다.
 
 ```js
-import { createRenderer } from '@viewstem/svelte';
+import { defineResourceSet } from '@viewstem/core';
+import { createRenderer, svelteComponent } from '@viewstem/svelte';
 
-const renderer = createRenderer({
-  components: [{ contract: buttonContract, component: ButtonAdapter }],
-});
+const renderer = createRenderer();
+renderer.runtime.registry.registerResourceSet(defineResourceSet({
+  id: 'editor', version: '1',
+  components: [svelteComponent(buttonContract, ButtonAdapter)],
+}));
 renderer.runtime.registry.registerAction(confirmContract, confirmImplementation);
 renderer.runtime.registry.registerResources(resources);
 
@@ -67,28 +78,46 @@ await serviceApi.saveDefinition(view.exportDefinition());
 | 표면 | 계약 |
 |---|---|
 | createRegistry() | 등록 집합 생성. registerResources(resources)는 묶음 전체 구조·참조·순환 검증 후 원자 등록 |
+| defineResourceSet(input) / registry.registerResourceSet(set) | 선언·코드 구현·의존 셋을 담아 검증 후 함께 게시 |
+| defineCodeAction(input).implement(handler) | 코드 Action 계약을 선언하고 셋 등록·교체용 엔트리를 생성 |
+| registry.replaceResource(entry) | 같은 등록 유형의 리소스를 명시적으로 교체. 코드 Action은 입출력과 필수 기능을 보존 |
+| registry.registerAction(entry) | 코드 Action 엔트리 전체 등록. 입력·출력과 구현, 필수 호스트 기능을 함께 보존 |
 | registry.registerAction(definition, implementation) | 코드형 Action의 공개 정의와 실행 함수 등록. 같은 종류 ID 중복 거절. 타입에서 필수인 입력에는 해당 포트와 required:true를 요구 |
-| registry.updateResource(definition) | 의존 정의까지 검증한 뒤 기존 정의를 교체. 등록된 코드 Action의 실행 계약이 직접 또는 Type 갱신으로 바뀌면 원자적으로 거절. 새 계약은 새 Action ID로 등록 |
-| registry.registerComponentContract(contract) | 코드 Component 공개 계약 등록. 실제 렌더러 구현은 같은 ID에 별도 연결 |
+| registry.updateResource(definition) | 의존 정의까지 검증한 뒤 기존 정의를 교체. 등록된 코드 Action이나 바인딩을 유지하는 코드 Component의 계약이 직접 또는 Type 갱신으로 바뀌면 원자적으로 거절. 새 Action 계약은 새 ID로 등록하고 Component 계약은 바인딩과 함께 명시적으로 교체 |
+| registry.registerComponentContract(contract) | 코드 Component의 계약 등록. View에서 곧바로 표시할 때는 해당 ID에 구현 바인딩 필요 |
 | createStateStore() | 서비스가 소유할 core Store 생성. createScope()로 격리된 소유 범위 생성 |
 | createRuntime(options?) | Registry 생략 시 생성, stateStore·requestExecutor·resourceResolver 선택. Store 생략 시 core가 생성·소유하며 주입 Store의 수명은 서비스가 유지. 실제 필요한 의존성이 없을 때만 오류 |
 | runtime.createView(source, options?) | 구조를 확정한 뒤 View 반환. `view.initial`로 최초 적용을 식별 |
-| view.updateDefinition(viewSpec, options?) / view.setInputs(inputs) | 다음 전체 View spec을 원자 reconcile. 같은 owner·노드 ID·대상 정의의 상태 유지. 실패 시 기존 정의·상태 유지 |
+| runtime.invokeAction(request) | View 없이 Runtime 수명 안에서 독립 호출 시작. 선택적 `signal`로 해당 호출 취소 |
+| view.updateDefinition(viewSpec, options?) / view.setInputs(inputs, options?) | 다음 전체 View spec 또는 입력을 원자 reconcile. 같은 owner·노드 ID·대상 정의의 상태 유지. 확정 전 `signal` 취소나 실패 시 기존 정의·상태 유지 |
+| view.applyResourceSets(options) | 현재 수명에서 대상 셋과 의존 셋을 추가하고 전달받은 정의·입력·State와 같이 확정 |
 | view.replace(source, options?) | 같은 View의 내부 수명 교체. 준비 실패는 기존 View를 보존하며 성공은 적용 핸들을 반환 |
 | view.exportDefinition() | 현재 View spec을 반환. 독립 리소스로 저장할 kind/id/name 외피는 서비스가 부여. 자동 저장·runtime snapshot export 아님 |
-| view.dispose() | 소유 실행·내부 상태·구독 정리. 서비스 Store의 외부 소유 셀은 유지. 반복 호출은 안전한 no-op |
-| view.invokeAction({actionRef 또는 action, inputs}) | 독립 명시 호출. owner 수명·공개 대상·권한·입력 검증 후 실행하고 실제 결과/void 또는 공통 오류 반환 |
+| runtime.dispose() / view.dispose() | 소유 실행을 즉시 막고 구조 정리 완료 또는 실패를 Promise로 반환. 서비스 Store의 외부 소유 셀은 유지. 반복 호출은 같은 Promise를 반환 |
+| view.invokeAction({actionRef 또는 action, inputs?, signal?}) | View 수명 안에서 독립 호출 시작. 공개 대상·권한·입력 검증 후 실행하고 실제 결과/void 또는 공통 오류 반환 |
 | context.invokeAction({actionRef 또는 action, inputs}) | 코드 Action의 부모에 연결된 하위 호출. 부모 owner·스택·취소를 상속하며 변경 불가. 명시 입력·대상·권한·출력 검증 후 결과/오류 Promise 반환 [U35] |
 
 변경은 `ViewApplication`을 반환한다. `view.whenSettled(application)`은 `{generation, queryErrors}`를 반환하며 실행 가능한 최초 Query의 개별 오류를 보고에 모은다. 입력 대기는 완료를 막지 않는다. 폐기 또는 다른 적용으로 대체된 미완료 보고는 `CANCELLED`다. 화면과 연결의 `whenSettled(application)`은 동일 적용의 DOM 반영까지 기다린다.
 
 View는 적용 시점의 Registry 정의와 코드 핸들러를 보관한다. 새 View와 `view.replace()`는 최신 Registry를 사용하고 `view.updateDefinition()`은 현재 수명에 주입된 Registry를 사용한다. 코드 Action 갱신의 비교 기준과 이전 절차는 [코드 Action 등록과 갱신](04-action.md#코드-action-등록과-갱신)을 따른다.
 
-View가 투영을 계산·발행하는 중 구독자가 State를 변경하면 재계산 요청을 버리지 않고 기존 microtask 큐에 합친다. 현재 전달 중인 snapshot은 유지하며, 통지를 마친 뒤 후속 투영에서 변경된 입력을 발행한다. 예약된 투영이 남아 있으면 해당 적용의 초기 완료를 먼저 확정하지 않는다. View 폐기 뒤에는 예약 작업이 발행하지 않으며, 교체 뒤에는 현재 정의와 수명으로 계산한다. 일반적인 State 쓰기나 core 이벤트 전체를 별도 비동기 실행 엔진으로 바꾸는 것은 아니다. [D131 구현·회귀 검증](../handoff/view-subscription-projection-fix-2026-11-06.md)을 따른다.
+View가 투영을 계산·발행하는 중 구독자가 State를 변경하면 재계산 요청을 버리지 않고 기존 microtask 큐에 합친다. 현재 전달 중인 snapshot은 유지하며, 통지를 마친 뒤 후속 투영에서 변경된 입력을 발행한다. 통지 중 새 구독은 현재 값을 한 번 읽는다. 최초 콜백이 던지면 구독 등록을 되돌리며, 폐기 뒤 구독하면 값을 재생하지 않는다. 커밋 전의 View 변경은 같은 큐에서 최신 요청으로 대체된다. 예약된 투영이 남아 있으면 해당 적용의 초기 완료를 먼저 확정하지 않는다. View 폐기 뒤에는 예약 작업이 발행하지 않으며, 교체 뒤에는 현재 정의와 수명으로 계산한다. 일반적인 State 쓰기나 core 이벤트 전체를 별도 비동기 실행 엔진으로 바꾸는 것은 아니다. [D131 구현·회귀 검증](../handoff/view-subscription-projection-fix-2026-11-06.md)을 따른다.
 
-update는 유지할 State의 계약과 기존 연결을 새 정의로 재검증하고, 불일치를 조용한 초기화로 숨기지 않는다. 구조 준비와 실제 외부 요청 실행은 구분한다. 구조 준비를 위한 정의 resolver 조회와 달리, 데이터 Query·코드 Action은 구조 검증 전에 선행 실행하지 않는다. native 실행 context는 `{inputs, signal, invokeAction}`이며 State/Query inputs에는 아래 호출 한정 핸들을 넣는다. 전체 runtime·Store는 자동 주입하지 않는다. untrusted 에이전트 입력으로 owner나 권한을 위조할 수 없도록 서비스 연결층이 공개 대상과 호출자 권한을 먼저 확인한다.
+update는 유지할 State의 계약과 기존 연결을 새 정의로 재검증한다. `createView()`와 `replace()`의 구조 준비에서만 누락된 정의를 resolver로 조회한다. Resolver는 미발견을 `undefined`로 반환할 수 있다. `updateDefinition()`·`applyResourceSets()`·독립 Action 실행은 해당 호출이 선택한 Registry의 정의를 사용한다. 데이터 Query·코드 Action은 구조 검증 뒤 실행한다. native 실행 context는 `{inputs, signal, invokeAction, capabilities}`이며 State/Query inputs에는 호출 한정 핸들을 넣는다. `capabilities`에는 Action이 요구하고 Runtime에서 공급한 기능을 담는다. 서비스 연결층이 공개 대상과 호출자 권한을 먼저 확인한다.
 
 U35의 하위 호출은 부모가 끝난 뒤 사용할 수 없고, 대기하지 않은 자손도 부모 종료 시 취소한다. 별도 UI 관찰 id를 받지 않으며 입력·결과의 의미와 신뢰 코드 경계는 [Action 하위 호출 계약](04-action.md#재귀확장-실행의-경계)을 따른다. JS/TS 문맥의 함수명은 `invokeAction`으로 구체화했으며 다른 언어에서도 같은 수명·오류 의미를 유지한다.
+
+### Action 실행 권한
+
+**D159 · 권한 콜백의 Action 식별자.** `authorize`의 `operation: 'invoke'` 컨텍스트는 읽기 전용 `resource`를 받는다. 등록된 Action은 그 호출이 실제 실행에 쓰는 Registry 스냅샷에서 해석한 Action의 `{ kind: 'Action', id }`를 전달한다. 인라인 Action에는 `null`을 전달한다.
+
+View 이벤트, Runtime·View의 직접 호출과 모든 하위 호출에서 이 규칙을 사용한다. 하위 호출의 권한 검사는 그 하위 Action 자체를 식별한다. 이벤트 관찰 ID와 단계 ID는 Action 리소스 ID와 별개다.
+
+### 독립 Action 호출의 취소
+
+**D160 · 호출 단위 취소.** `runtime.invokeAction(request)`와 `view.invokeAction(request)`는 요청 객체에서 선택적 `signal: AbortSignal`을 받는다. 신호가 이미 취소됐으면 권한 검사와 본문 실행 전에 `CANCELLED`로 거절한다. 실행 중에 신호가 취소되면 해당 호출과 그 하위 호출을 취소하고 호출자의 Promise를 `CANCELLED`로 거절한다. 같은 Runtime이나 View의 다른 독립 호출에는 이 취소를 전파하지 않는다.
+
+호출 신호는 Runtime 또는 View의 수명에 따른 기존 취소와 함께 적용한다. 하위 호출은 부모의 취소를 상속한다. 취소 후 도착한 결과는 폐기하며 이미 발생한 State 변경과 외부 효과는 보존한다. [Action 실행 수명](04-action.md#재귀확장-실행의-경계)
 
 ## 상태·Query 핸들과 시계
 
@@ -119,6 +148,6 @@ code는 INVALID_DEFINITION, REFERENCE_NOT_FOUND, TYPE_MISMATCH, TYPE_CONTRACT_MI
 
 ## 컴포넌트 등록
 
-브라우저 기본 UI의 계약은 `@viewstem/ui`의 `registerShadcn(registry)`로 등록한다. 실제 입력·이벤트·슬롯의 범위는 [UI 사용법](../../packages/ui/README.ko.md)과 패키지의 `support.json`을 따른다.
+브라우저 기본 UI는 `@viewstem/ui`의 `ui` 셋을 `registry.registerResourceSet(ui)`로 등록하거나 다른 셋의 의존성으로 제공한다. 실제 입력·이벤트·슬롯의 범위는 [UI 사용법](../../packages/ui/README.ko.md)과 패키지의 `support.json`을 따른다.
 
-호스트는 Core Registry의 `registerComponentContracts(contracts)`로 여러 계약을 등록할 수 있다. Svelte의 `createRenderer({ components })`는 새 Registry에 계약과 구현을 함께 등록한다. 기존 계약에 구현을 연결할 때는 `renderer.bindComponent(id, component)`를 호출한다. [Svelte 등록 API](../../apps/docs/src/content/docs/ko/docs/svelte/renderer.md)를 참고한다.
+코드 Component 셋은 계약, 연결자 ID, 구현을 한 바인딩으로 등록한다. Svelte는 `svelteComponent(contract, component)`로 바인딩을 만들 수 있다. 이미 등록한 코드 Component의 바인딩을 명시적으로 교체하려면 `registry.replaceResource({ component })`를 호출한다. [Svelte 등록 API](../../apps/docs/src/content/docs/ko/docs/svelte/renderer.md)를 참고한다.

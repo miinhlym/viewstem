@@ -33,7 +33,9 @@ const viewExcerpt = `{
   }
 }`;
 
-const integrationExcerpt = `const renderer = createRenderer();
+const integrationExcerpt = `const runtime = createRuntime();
+runtime.registry.registerResourceSet(ui);
+const renderer = createRenderer({ runtime });
 const screen = renderer.mount({
   target,
   source: {

@@ -20,6 +20,8 @@ evaluate({ items: [1, 2] }); // 3 (동기)
 
 호스트 확장은 `functions: [{ name, inputs: Schema[], output: Schema, run(...nativeArgs) }]`다. 콜백은 보호된 공개 값을 받고, 결과는 스키마 검증 후 CEL 값으로 인코딩한다. 비동기·thenable 결과는 `ASYNC_CEL_FUNCTION` 오류다. 확장은 신뢰된 순수 동기 코드여야 하며 임의 JS의 실행시간·부작용을 격리하는 sandbox가 아니다. 콜백이 반환한 잘못된 값·크기 오류는 CEL의 논리 단락으로 숨길 수 없다.
 
+확장 함수 이름은 `[A-Za-z_][A-Za-z0-9_]*` 형식이다. `compileCel`과 Registry 모두 등록 시 중복 이름, CEL 키워드, 표현식 프로필에서 차단한 이름, 내장 함수·네임스페이스 이름을 `INVALID_DEFINITION`으로 거절한다. 수신자 함수와 매크로를 포함한 모든 내장 이름은 등록 인자 개수와 관계없이 예약된다.
+
 ## 값과 스키마
 
 내부 공통 스키마 검증기의 전체 v1 수용 프로필을 사용한다. boolean schema, 로컬 `$ref`/`$defs`, `allOf`/`anyOf`/`oneOf`, `not`, 조건부 schema, union type, 객체 추가 속성, tuple의 `prefixItems`를 실험의 `SCHEMA_OUTSIDE_TYPED_FIXTURE`로 거절하지 않는다. 스키마 admission과 별개로 CEL에서 가능한 실제 연산은 인코딩 타입에 따른다.

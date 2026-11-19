@@ -1,3 +1,4 @@
+import { bindTestComponents } from './fixtures/components.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { setImmediate } from 'node:timers/promises';
@@ -18,9 +19,9 @@ const bounded = async promise => {
 };
 function registry() {
   const registry = createRegistry();
-  registry.registerComponentContract({ kind: 'Component', id: 'Display', spec: { ports: { value: port() } } });
-  registry.registerComponentContract({ kind: 'Component', id: 'Row', spec: { slots: { default: {} } } });
-  registry.registerComponentContract({ kind: 'Component', id: 'Button', spec: { events: { click: { schema: { type: 'object' } } } } });
+  bindTestComponents(registry, [{ kind: 'Component', id: 'Display', spec: { ports: { value: port() } } }]);
+  bindTestComponents(registry, [{ kind: 'Component', id: 'Row', spec: { slots: { default: {} } } }]);
+  bindTestComponents(registry, [{ kind: 'Component', id: 'Button', spec: { events: { click: { schema: { type: 'object' } } } } }]);
   return registry;
 }
 const display = (id = 'display', value = 'static') => ({ id, componentRef: 'Display', inputs: { value } });
@@ -193,8 +194,35 @@ test('Q11/K16 cancelled parent Action propagates to its child refresh waiter whi
   const pending = view.emit(view.getSnapshot().roots[0].children[0], 'click', {}); const rejected = assert.rejects(pending, e => e.code === 'CANCELLED');
   await flush(); assert.equal(f.requests.length, 2); assert.equal(view.getQuery('list').getSnapshot().status, 'running');
   view.getState('show').write(false); await rejected; await assert.rejects(childPromise, e => e.code === 'CANCELLED');
-  await assert.rejects(async () => held.refresh(), e => e.code === 'CANCELLED'); assert.equal(f.requests[1].signal.aborted, false);
+  assert.throws(() => held.getSnapshot(), { code: 'CANCELLED' });
+  await assert.rejects(held.refresh(), { code: 'CANCELLED' });
+  await assert.rejects(held.retry(), { code: 'CANCELLED' });
+  assert.equal(f.requests[1].signal.aborted, false);
   await f.reply(2, 'query-owned'); assert.equal(view.getQuery('list').getSnapshot().data, 'query-owned');
+});
+
+test('a code Action port rejects Query operations as Promises after explicit cancellation', async t => {
+  const { registry, runtime, reply, requests } = controlled(t);
+  const started = deferred(), finish = deferred(), controller = new AbortController();
+  registry.registerAction({ kind: 'Action', id: 'hold-query', spec: { ports: { list: { kind: 'Query', required: true } } } }, ({ inputs }) => {
+    started.resolve(inputs.list);
+    return finish.promise;
+  });
+  t.after(() => finish.resolve());
+  const { view, initialComplete } = await runtime.createView({ view: baseView() });
+  await reply(1, 'initial');
+  await initialComplete;
+  const query = view.getQuery('list');
+  const invocation = view.invokeAction({ actionRef: 'hold-query', inputs: { list: query }, signal: controller.signal });
+  const rejected = assert.rejects(invocation, { code: 'CANCELLED' });
+  const held = await started.promise;
+  controller.abort();
+  await rejected;
+  assert.throws(() => held.getSnapshot(), { code: 'CANCELLED' });
+  await assert.rejects(held.refresh(), { code: 'CANCELLED' });
+  await assert.rejects(held.retry(), { code: 'CANCELLED' });
+  assert.equal(requests.length, 1);
+  assert.equal(query.getSnapshot().data, 'initial');
 });
 
 test('N02 unknown reference without resolver fails clearly; default public native HTTP works without a supplied executor', async t => {

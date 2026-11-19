@@ -7,7 +7,6 @@ import ScrollRegion from './site/ScrollRegion.svelte';
 import DemoWorkbench from './DemoWorkbench.svelte';
 import '../styles/component-demo-theme.css';
 import '../styles/demo-workbench.css';
-import uiStyles from '@viewstem/ui/styles.css?url';
 import { componentSections } from '../examples/component-reference-copy.mjs';
 import { getComponentReference, type getComponentReferenceVariants } from '../examples/component-reference-demos.mjs';
 import { uiDemoSetupSource } from '../examples/component-demo-ui-setup';
@@ -31,7 +30,6 @@ const serialized = source.replace(/</g, '\\u003c');
 const setup = uiDemoSetupSource(view, family);
 const guide = (ko ? '/ko' : '') + '/docs/ui/guides/mount-in-browser/';
 ---
-{!variant && <link rel="stylesheet" href={uiStyles} />}
 <section class:list={['component-demo', { 'component-demo-variant': variant }]} data-component-demo data-demo-lazy={variant ? '' : undefined} data-family={family} data-locale={locale} aria-labelledby={headingId}>
   {variant
     ? <h3 class="component-doc-heading" id={headingId} tabindex="-1">{variant.title}</h3>

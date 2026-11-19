@@ -1,6 +1,7 @@
+import { bindTestComponents } from './fixtures/components.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createRegistry, createRuntime as publicRuntime, createStateStore } from '../src/index.mjs';
+import { createRegistry, createRuntime as publicRuntime, createStateStore, defineResourceSet } from '../src/index.mjs';
 import { runtimeFixture } from './fixtures/runtime-operations.mjs';
 const createRuntime = runtimeFixture(publicRuntime);
 import { createQueryHandle } from '../src/ports.mjs';
@@ -13,7 +14,7 @@ const leaf = { id: 'leaf', componentRef: 'Leaf' };
 const flush = async () => { for (let i = 0; i < 30; i++) await Promise.resolve(); };
 function registry() {
   const result = createRegistry();
-  result.registerComponentContract({ kind: 'Component', id: 'Leaf', spec: { ports: { value: { kind: 'Value', schema: true } } } });
+  bindTestComponents(result, [{ kind: 'Component', id: 'Leaf', spec: { ports: { value: { kind: 'Value', schema: true } } } }], defineResourceSet);
   return result;
 }
 

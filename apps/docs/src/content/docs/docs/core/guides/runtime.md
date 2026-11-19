@@ -14,13 +14,19 @@ Install the local Core package using [Installation](../../../installation/). Sav
 ## Register, execute and observe
 
 ```js title="run-view.mjs"
-import { createRegistry, createRuntime } from '@viewstem/core';
+import { createRegistry, createRuntime, defineResourceSet } from '@viewstem/core';
 
 const registry = createRegistry();
-registry.registerComponentContract({
-  kind: 'Component', id: 'Label',
-  spec: { ports: { text: { kind: 'Value', schema: { type: 'string' }, required: true } } },
-});
+registry.registerResourceSet(defineResourceSet({
+  id: 'projection', version: '1',
+  components: [{
+    contract: {
+      kind: 'Component', id: 'Label',
+      spec: { ports: { text: { kind: 'Value', schema: { type: 'string' }, required: true } } },
+    },
+    connectorId: 'projection-example', implementation: {},
+  }],
+}));
 const runtime = createRuntime({ registry });
 const view = await runtime.createView({
   states: { title: { kind: 'State', schema: { type: 'string' }, initial: 'Hello' } },
@@ -35,10 +41,10 @@ const observed = new Promise(resolve => {
 });
 view.getState('title').write('Updated');
 console.log(await observed); // Updated
-runtime.dispose();
+await runtime.dispose();
 ```
 
-The component contract tells Core that `Label` accepts a required string. A renderer supplies the actual UI implementation; this example inspects the projection instead. The `Hello` and `Updated` log entries confirm that the same State value reaches the node input. `view.subscribe()` emits the current snapshot immediately and returns an unsubscribe function. This short example ends all subscriptions by disposing the runtime; use that returned function to stop an individual observer earlier.
+The projection example supplies a binding because View preparation requires one for a ready code Component. The contract declares a required string for `Label`. No renderer consumes this binding in the example. The `Hello` and `Updated` log entries confirm that the same State value reaches the node input. `view.subscribe()` emits the current snapshot immediately and returns an unsubscribe function. This short example ends all subscriptions by disposing the runtime; use that returned function to stop an individual observer earlier.
 
 ## Change an existing definition
 

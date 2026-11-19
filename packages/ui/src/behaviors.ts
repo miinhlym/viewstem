@@ -3,6 +3,7 @@ import type { NodeSnapshot } from '@viewstem/core';
 import { registerControllers, type Controller } from './basecoat-controllers.js';
 import { emitFrom, readInputs } from './component-context.js';
 import { sliderKeyValue, sliderScale, snapSliderValue } from './slider-values.js';
+import { styleScope } from './style-scope.js';
 
 type Widget = HTMLElement & { _destroy?: () => void; refresh?: () => void; select?: (target: HTMLElement, focus?: boolean) => void; close?: (focus: boolean) => void };
 type Props = NodeSnapshot['inputs'];
@@ -577,7 +578,7 @@ function observeSelect(trigger: HTMLElement, panel: HTMLElement, signal: AbortSi
 export function select(element: Widget, send: Send, signal: AbortSignal): Behavior {
   const control = manage(element, 'select');
   const doc = element.ownerDocument;
-  const hidden = doc.createElement('input');
+  const hidden = styleScope.createElement(doc, 'input');
   hidden.type = 'hidden';
   element.append(hidden);
   let trigger: HTMLButtonElement | null = null;
@@ -638,7 +639,7 @@ export function select(element: Widget, send: Send, signal: AbortSignal): Behavi
         for (const item of (inputs.items ?? []) as { value: string; label: string; disabled?: boolean }[]) {
           if (explicit.has(item.value)) continue;
           explicit.add(item.value);
-          const option = doc.createElement('div');
+          const option = styleScope.createElement(doc, 'div');
           option.setAttribute('role', 'option');
           option.setAttribute('aria-disabled', String(item.disabled === true));
           option.dataset.value = item.value;
@@ -669,26 +670,26 @@ export function select(element: Widget, send: Send, signal: AbortSignal): Behavi
 
 export function combobox(element: Widget, send: Send, signal: AbortSignal): Behavior {
   const doc = element.ownerDocument;
-  const trigger = doc.createElement('button');
+  const trigger = styleScope.createElement(doc, 'button');
   trigger.type = 'button';
   trigger.className = 'btn';
   trigger.dataset.variant = 'outline';
   trigger.setAttribute('aria-haspopup', 'listbox');
-  const value = doc.createElement('span');
+  const value = styleScope.createElement(doc, 'span');
   value.dataset.value = '';
   trigger.append(value);
-  const hidden = doc.createElement('input');
+  const hidden = styleScope.createElement(doc, 'input');
   hidden.type = 'hidden';
-  const popup = doc.createElement('div');
+  const popup = styleScope.createElement(doc, 'div');
   popup.dataset.popover = '';
-  const search = doc.createElement('div');
+  const search = styleScope.createElement(doc, 'div');
   search.className = 'vs-combobox-search';
-  const field = doc.createElement('input');
+  const field = styleScope.createElement(doc, 'input');
   field.setAttribute('role', 'combobox');
-  const list = doc.createElement('div');
+  const list = styleScope.createElement(doc, 'div');
   list.setAttribute('role', 'listbox');
   list.id = uniqueId();
-  const empty = doc.createElement('div');
+  const empty = styleScope.createElement(doc, 'div');
   empty.className = 'vs-combobox-empty';
   empty.setAttribute('role', 'status');
   field.setAttribute('aria-controls', list.id);
@@ -724,7 +725,7 @@ export function combobox(element: Widget, send: Send, signal: AbortSignal): Beha
         optionsSignature = options;
         list.replaceChildren(empty);
         for (const item of inputs.options as readonly { value: string; label: string; disabled?: boolean }[] ?? []) {
-          const option = doc.createElement('div');
+          const option = styleScope.createElement(doc, 'div');
           option.setAttribute('role', 'option');
           option.setAttribute('aria-disabled', String(item.disabled === true));
           option.dataset.value = item.value;
@@ -880,7 +881,7 @@ export function range(element: HTMLInputElement, send: Send, signal: AbortSignal
       else if (typeof value === 'number') element.valueAsNumber = value;
       current = element.valueAsNumber;
       control.init([element]);
-      element.style.setProperty('--slider-value', `${(current - min) / (max - min || 1) * 100}%`);
+      element.style.setProperty(styleScope.localProperty('--slider-value'), `${(current - min) / (max - min || 1) * 100}%`);
     },
     dispose: control.dispose,
   };
@@ -1051,31 +1052,31 @@ export function notifications(element: HTMLElement, send: Send): Behavior {
         remove(item.id);
         finishExit(item.id);
         const doc = element.ownerDocument;
-        const box = doc.createElement('div');
+        const box = styleScope.createElement(doc, 'div');
         box.className = 'toast';
         box.dataset.category = item.kind ?? 'default';
-        const content = doc.createElement('div');
+        const content = styleScope.createElement(doc, 'div');
         content.className = 'toast-content';
-        const section = doc.createElement('section');
-        const heading = doc.createElement('h2');
+        const section = styleScope.createElement(doc, 'section');
+        const heading = styleScope.createElement(doc, 'h2');
         heading.textContent = item.title;
         section.append(heading);
         if (item.description) {
-          const description = doc.createElement('p');
+          const description = styleScope.createElement(doc, 'p');
           description.textContent = item.description;
           section.append(description);
         }
         content.append(section);
         box.append(content);
         if (inputs.closeButton !== false) {
-          const close = doc.createElement('button');
+          const close = styleScope.createElement(doc, 'button');
           close.className = 'btn';
           close.type = 'button';
           close.setAttribute('aria-label', typeof inputs.closeButtonAriaLabel === 'string' ? inputs.closeButtonAriaLabel : 'Close');
           close.textContent = '×';
           close.addEventListener('click', () => dismiss(item.id, 'dismissed'));
           close.dataset.toastCancel = '';
-          const footer = doc.createElement('footer');
+          const footer = styleScope.createElement(doc, 'footer');
           footer.append(close);
           content.append(footer);
         }
@@ -1091,6 +1092,11 @@ export function notifications(element: HTMLElement, send: Send): Behavior {
   };
 }
 
+export function scopeChartColor(color: string) {
+  return color.replace(/(\b[vV][aA][rR]\(\s*)--chart-([1-5])(?=\s*[,)])/g,
+    (_, start, index) => start + styleScope.localProperty(`--chart-${index}`));
+}
+
 export function chart(element: HTMLElement): Behavior {
   type Row = Readonly<Record<string, unknown>>;
   type Series = { id: string; key: string; label?: string; color?: string };
@@ -1098,12 +1104,12 @@ export function chart(element: HTMLElement): Behavior {
   const doc = element.ownerDocument;
   const view = doc.defaultView!;
   const ns = 'http://www.w3.org/2000/svg';
-  const svg = doc.createElementNS(ns, 'svg');
+  const svg = styleScope.createElementNS(doc, ns, 'svg');
   svg.setAttribute('role', 'img');
-  const tooltip = doc.createElement('div');
+  const tooltip = styleScope.createElement(doc, 'div');
   tooltip.className = 'vs-chart-tooltip';
   tooltip.hidden = true;
-  const highlights = doc.createElementNS(ns, 'g');
+  const highlights = styleScope.createElementNS(doc, ns, 'g');
   const events = new AbortController();
   const { signal } = events;
   element.append(svg, tooltip);
@@ -1125,9 +1131,9 @@ export function chart(element: HTMLElement): Behavior {
   let tooltipTimer: number | undefined;
 
   const seriesColor = (color: string | undefined, index: number) => color && view.CSS.supports('color', color)
-    ? color : `var(--chart-${index % 5 + 1}, currentColor)`;
+    ? scopeChartColor(color) : `var(${styleScope.localProperty(`--chart-${index % 5 + 1}`)}, currentColor)`;
   function add(parent: SVGElement, tag: string, attrs: Record<string, string | number>, text?: string) {
-    const shape = doc.createElementNS(ns, tag);
+    const shape = styleScope.createElementNS(doc, ns, tag);
     for (const [key, value] of Object.entries(attrs)) shape.setAttribute(key, String(value));
     if (text !== undefined) shape.textContent = text;
     parent.append(shape);
@@ -1164,20 +1170,20 @@ export function chart(element: HTMLElement): Behavior {
       return;
     }
     if (index !== hoveredIndex) {
-      const title = doc.createElement('div');
+      const title = styleScope.createElement(doc, 'div');
       title.className = 'vs-chart-tooltip-title';
       title.textContent = String(categories[index] ?? '');
-      const rows = doc.createElement('div');
+      const rows = styleScope.createElement(doc, 'div');
       rows.className = 'vs-chart-tooltip-rows';
       for (const { item, color, value } of visible) {
-        const line = doc.createElement('div');
+        const line = styleScope.createElement(doc, 'div');
         line.className = 'vs-chart-tooltip-row';
-        const swatch = doc.createElement('span');
+        const swatch = styleScope.createElement(doc, 'span');
         swatch.className = 'vs-chart-swatch';
         swatch.style.background = color;
-        const name = doc.createElement('span');
+        const name = styleScope.createElement(doc, 'span');
         name.textContent = item.label ?? item.id;
-        const number = doc.createElement('span');
+        const number = styleScope.createElement(doc, 'span');
         number.className = 'vs-chart-tooltip-value';
         number.textContent = value.toLocaleString();
         line.append(swatch, name, number);

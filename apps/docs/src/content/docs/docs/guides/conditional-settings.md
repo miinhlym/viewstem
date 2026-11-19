@@ -8,13 +8,16 @@ sidebar:
 Show the weekly digest options when email notifications are enabled. Start with the workspace setup and `<div id="viewstem"></div>` from the [Quickstart](../../quickstart/), then replace its client entry with this code.
 
 ```js
-import { createRenderer } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
+import { createRuntime } from '@viewstem/core';
+import { createRenderer } from '@viewstem/dom';
+import { ui } from '@viewstem/ui';
 
 const boolean = { type: 'boolean' };
 const enabled = { '@path': '/states/emailEnabled' };
 const target = document.querySelector('#viewstem');
-const renderer = createRenderer();
+const runtime = createRuntime();
+runtime.registry.registerResourceSet(ui);
+const renderer = createRenderer({ runtime });
 const source = {
   states: {
     emailEnabled: { kind: 'State', schema: boolean, initial: false },

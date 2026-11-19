@@ -50,9 +50,13 @@ export interface UrlAdapter {
   read(): string; subscribe(listener: () => void): () => void;
   writeOwned(patch: Readonly<Record<string, string | null>>, context: { readonly mode: 'push' | 'replace'; readonly isCurrent: () => boolean }): Awaitable<void | { readonly applied?: boolean }>;
 }
+export interface UrlDiagnostic extends PublicError {
+  readonly kind: 'connect' | 'restore' | 'write' | 'replace-cleanup' | 'cleanup';
+  readonly key?: string;
+}
 export interface UrlConnection {
   readonly ready: Promise<void>; isReady(): boolean;
-  restore(): void; getDiagnostics(): readonly PublicError[];
+  restore(): void; getDiagnostics(): readonly UrlDiagnostic[];
   removeOwned(selected?: readonly StateHandle<any>[]): Promise<void | { readonly applied?: boolean }>;
   dispose(): void;
 }
@@ -64,7 +68,7 @@ export interface StateStore {
   subscribe(selector: null | StateAddress | readonly StateAddress[], listener: (observation: StoreObservation) => void): () => void;
   writeBatch(changes: readonly (readonly [StateHandle<any>, unknown])[]): void;
   registerReaction(owner: StateScope, reaction: { readonly watch: readonly StateHandle<any>[]; readonly target: StateHandle<any>; readonly value: unknown }): () => void;
-  connectUrl(options: { readonly adapter: UrlAdapter; readonly bindings: readonly { readonly target: StateHandle<any>; readonly key?: string; readonly history?: 'push' | 'replace' }[]; readonly restore?: boolean; readonly limits?: Partial<{ readonly maxOwnedBytes: number; readonly maxValueBytes: number; readonly maxItems: number; readonly maxKeys: number }>; readonly onError?: (error: PublicError) => void }): UrlConnection;
+  connectUrl(options: { readonly adapter: UrlAdapter; readonly bindings: readonly { readonly target: StateHandle<any>; readonly key?: string; readonly history?: 'push' | 'replace' }[]; readonly restore?: boolean; readonly limits?: Partial<{ readonly maxOwnedBytes: number; readonly maxValueBytes: number; readonly maxItems: number; readonly maxKeys: number }>; readonly onError?: (error: UrlDiagnostic) => void }): UrlConnection;
   getDiagnostics(): readonly PublicError[]; dispose(): void;
 }
 export function createStateStore(): StateStore;
@@ -114,7 +118,7 @@ type InputsFromPorts<P> = {
   readonly [K in keyof P as K extends GuaranteedInputKeys<P> ? never : K]?: PortValue<NonNullable<P[K]>>
 };
 export type ChildActionRequest = ReferenceOrInline<'actionRef', 'action', ActionSpec> & { readonly inputs?: Readonly<Record<string, unknown>>; readonly owner?: never; readonly id?: never };
-export interface ActionContext<I> { readonly inputs: DeepReadonly<I>; readonly signal: AbortSignal; readonly invokeAction: (request: ChildActionRequest) => Promise<unknown> }
+export interface ActionContext<I> { readonly inputs: DeepReadonly<I>; readonly signal: AbortSignal; readonly invokeAction: (request: ChildActionRequest) => Promise<unknown>; readonly capabilities: Readonly<Record<string, unknown>> }
 export type ActionHandler<I, O = void> = (context: ActionContext<I>) => [O] extends [void] ? void | Promise<void> : O | Promise<O>;
 export type CodeActionSpec<I, O = void> = ActionPorts<I> & { readonly steps?: never } & ([O] extends [void] ? { readonly output?: never } : { readonly output: TypeContract & { readonly value?: never } });
 export type CodeActionDefinition<I = {}, O = void> = Resource<'Action', CodeActionSpec<I, O>>;
@@ -145,7 +149,21 @@ export interface QueryDefaults { readonly refresh?: boolean; readonly intervalMs
 export type ResourceStateDeclaration = (TypeContract & { readonly kind: 'State'; readonly initial?: ValueExpression }) | (TypeContract & ReferenceOrInline<'variableRef', 'variable', VariableSpec> & { readonly kind: 'Derived'; readonly inputs?: InputExpressions });
 export interface Reaction { readonly watch: readonly [PathExpression, ...PathExpression[]]; readonly target: PathExpression; readonly value: JsonValue }
 export interface ComponentPublicContract { readonly ports?: Readonly<Record<string, Port>>; readonly slots?: Readonly<Record<string, { readonly required?: boolean }>>; readonly events?: Readonly<Record<string, TypeContract>> }
-export type ComponentContract = Resource<'Component', ComponentPublicContract>;
+export type ComponentContract = Resource<'Component', ComponentPublicContract & {
+  readonly render?: never;
+  readonly states?: never;
+  readonly queries?: never;
+  readonly queryDefaults?: never;
+  readonly reactions?: never;
+}>;
+/** Readonly inputs for a ready code Component, inferred from its declared ports. */
+export type ComponentInputs<C extends ComponentContract> = C extends unknown
+  ? C['spec'] extends { readonly ports: infer P }
+    ? DeepReadonly<InputsFromPorts<P>>
+    : 'ports' extends keyof C['spec']
+      ? DeepReadonly<Partial<InputsFromPorts<NonNullable<C['spec']['ports']>>>>
+      : Readonly<Record<never, never>>
+  : never;
 export interface ComponentSpec extends ComponentPublicContract { readonly states?: Readonly<Record<string, ResourceStateDeclaration>>; readonly queries?: Readonly<Record<string, QueryUse>>; readonly queryDefaults?: QueryDefaults; readonly reactions?: readonly Reaction[]; readonly render: ComponentNode }
 export type ViewSpec = Omit<ComponentSpec, 'slots' | 'events'> & { readonly slots?: never; readonly events?: never };
 export type ComponentNode = ReferenceOrInline<'componentRef', 'component', ComponentSpec> & {
@@ -173,10 +191,60 @@ type InferredActionInputs<S extends NativeActionResource['spec']> = S extends un
     : {}
   : never;
 type InferredActionOutput<S> = S extends { readonly output: infer C } ? ContractValue<C> : void;
+export type CodeActionEntry<D extends NativeActionResource = NativeActionResource> = {
+  readonly definition: D & NoInfer<ExactActionFields<D>>;
+  readonly implementation: ActionHandler<NoInfer<InferredActionInputs<D['spec']>>, NoInfer<InferredActionOutput<D['spec']>>>;
+  readonly requires?: readonly string[];
+};
+// Only implement() provides this proof. Spreading an entry drops the private member.
+declare class AuthoredCodeAction {
+  private readonly authoredCodeAction;
+}
+type CodeActionContractInput<D> = { readonly definition: D; readonly requires?: readonly string[] };
+export type ImplementedCodeAction<D, I, O> = AuthoredCodeAction & {
+  readonly definition: D;
+  readonly implementation: ActionHandler<I, O>;
+  readonly requires: readonly string[];
+};
+export type CodeActionContract<D, I, O> = {
+  readonly implement: (handler: ActionHandler<I, O>) => ImplementedCodeAction<D, I, O>;
+};
+export function defineCodeAction<const D extends NativeActionResource>(
+  input: CodeActionContractInput<D & NoInfer<ExactActionFields<D>>>,
+): CodeActionContract<D, InferredActionInputs<D['spec']>, InferredActionOutput<D['spec']>>;
+export function defineCodeAction<I = never, O = void>(
+  input: [I] extends [never] ? never : CodeActionContractInput<NoInfer<CodeActionDefinition<I, O>>>,
+): CodeActionContract<CodeActionDefinition<I, O>, I, O>;
+export interface ComponentBinding<T = unknown> {
+  readonly contract: ComponentContract;
+  readonly connectorId: string;
+  readonly implementation: T;
+}
+declare const resourceSetBrand: unique symbol;
+export interface ResourceSet {
+  readonly [resourceSetBrand]: true;
+  readonly id: string;
+  readonly version: string;
+  readonly dependencies: readonly ResourceSet[];
+  readonly resources: readonly AnyResource[];
+  readonly actions: readonly { readonly definition: NativeActionResource; readonly implementation: ActionHandler<never, unknown>; readonly requires: readonly string[] }[];
+  readonly components: readonly ComponentBinding[];
+}
+type ResourceSetInput = Pick<ResourceSet, 'id' | 'version'> & Partial<Pick<ResourceSet, 'dependencies' | 'resources' | 'components'>>;
+export function defineResourceSet<const Actions extends readonly NativeActionResource[] = readonly []>(input: ResourceSetInput & {
+  readonly actions?: { readonly [K in keyof Actions]: CodeActionEntry<Actions[K]> | AuthoredCodeAction };
+}): ResourceSet;
+export type ReplaceResourceInput<D extends NativeActionResource = NativeActionResource> =
+  | { readonly resource: AnyResource; readonly action?: never; readonly component?: never }
+  | { readonly action: CodeActionEntry<D> | AuthoredCodeAction; readonly resource?: never; readonly component?: never }
+  | { readonly component: ComponentBinding; readonly resource?: never; readonly action?: never };
 export interface Registry {
   readonly [registryBrand]: true;
   registerResources(resources: readonly AnyResource[]): this;
+  registerResourceSet(set: ResourceSet): this;
   updateResource(definition: RegisteredResource): this;
+  replaceResource<const D extends NativeActionResource>(entry: ReplaceResourceInput<D>): this;
+  registerAction<const D extends NativeActionResource>(entry: CodeActionEntry<D> | AuthoredCodeAction): this;
   registerAction<const D extends NativeActionResource>(
     definition: D & NoInfer<ExactActionFields<D>>,
     implementation: ActionHandler<NoInfer<InferredActionInputs<D['spec']>>, NoInfer<InferredActionOutput<D['spec']>>>,
@@ -208,8 +276,12 @@ export interface ViewSnapshot { readonly generation: number; readonly lifetime?:
 export interface RuntimeSettings {
   readonly stateStore?: StateStore;
   readonly requestExecutor?: RequestExecutor;
-  readonly resourceResolver?: (kind: ResourceKind, id: string, context: { readonly signal: AbortSignal }) => Awaitable<AnyResource>;
-  readonly authorize?: (context: { readonly operation: 'invoke'; readonly owner: unknown; readonly definition: unknown } | { readonly operation: 'update'; readonly owner: View; readonly definition: ViewSpec }) => boolean;
+  readonly hostCapabilities?: Readonly<Record<string, unknown>>;
+  readonly resourceResolver?: (kind: ResourceKind, id: string, context: { readonly signal: AbortSignal }) => Awaitable<AnyResource | undefined>;
+  readonly authorize?: (context:
+    | { readonly operation: 'invoke'; readonly owner: unknown; readonly definition: unknown; readonly resource: { readonly kind: 'Action'; readonly id: string } | null }
+    | { readonly operation: 'update'; readonly owner: View; readonly definition: ViewSpec }
+  ) => boolean;
   readonly requestTimeoutMs?: number;
   readonly urlCleanupTimeoutMs?: number;
   readonly clock?: TimerClock;
@@ -222,15 +294,20 @@ export interface Runtime {
   readonly [runtimeBrand]: true;
   readonly registry: Registry; readonly stateStore: StateStore;
   createView(source: ViewSource, options?: ViewOptions): Promise<View>;
-  dispose(): void;
+  invokeAction(request: ActionRequest): Promise<unknown>;
+  dispose(): Promise<void>;
 }
 export function createRuntime(options?: RuntimeOptions): Runtime;
-export type ActionRequest = ReferenceOrInline<'actionRef', 'action', ActionSpec> & { readonly inputs?: Readonly<Record<string, unknown>> };
+export type ActionRequest = ReferenceOrInline<'actionRef', 'action', ActionSpec> & {
+  readonly inputs?: Readonly<Record<string, unknown>>;
+  readonly signal?: AbortSignal;
+};
 export interface View {
   readonly [viewBrand]: true;
   readonly initial: ViewApplication;
-  setInputs(inputs: Readonly<Record<string, unknown>>): Promise<ViewApplication>;
-  updateDefinition(spec: ViewSpec, options?: { readonly inputs?: Readonly<Record<string, unknown>>; readonly states?: Readonly<Record<string, unknown>> }): Promise<ViewApplication>;
+  setInputs(inputs: Readonly<Record<string, unknown>>, options?: { readonly signal?: AbortSignal }): Promise<ViewApplication>;
+  updateDefinition(spec: ViewSpec, options?: { readonly inputs?: Readonly<Record<string, unknown>>; readonly states?: Readonly<Record<string, unknown>>; readonly signal?: AbortSignal }): Promise<ViewApplication>;
+  applyResourceSets(options: { readonly setIds: readonly string[]; readonly definition?: ViewSpec; readonly inputs?: Readonly<Record<string, unknown>>; readonly states?: Readonly<Record<string, unknown>>; readonly signal?: AbortSignal }): Promise<ViewApplication>;
   replace(source: ViewSource, options?: ViewOptions): Promise<ViewApplication>;
   whenSettled(application: ViewApplication): Promise<InitialReport>;
   invokeAction(request: ActionRequest): Promise<unknown>;
@@ -240,7 +317,7 @@ export interface View {
   /** State writes during an active projection queue a follow-up; the delivered snapshot stays unchanged. */
   subscribe(listener: (snapshot: ViewSnapshot) => void): () => void;
   emit(target: string | NodeSnapshot | { readonly address: string; readonly generation: number }, event: string, payload: unknown): Promise<unknown>;
-  dispose(): void;
+  dispose(): Promise<void>;
 }
 
 export type CelValue = null | boolean | number | string | readonly CelValue[] | { readonly [key: string]: CelValue | undefined } | ReadonlySet<CelValue> | ReadonlyMap<string | number, CelValue>;

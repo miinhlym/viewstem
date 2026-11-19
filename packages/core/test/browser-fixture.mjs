@@ -1,13 +1,14 @@
+import { bindTestComponents } from './fixtures/components.mjs';
 // A deliberately small test-only DOM/History adapter; the package has no DOM dependency.
 import { createRegistry, createStateStore, mergeOwnedUrl } from '@viewstem/core';
 import { createRuntime } from './fixtures/runtime-operations.mjs';
 const p=path=>({'@path':path}),integer={type:'integer'},port=(kind,schema=integer)=>({kind,schema,required:true});
 export async function startBrowserFixture() {
  const registry=createRegistry();
- registry.registerComponentContract({kind:'Component',id:'Row',spec:{slots:{default:{}}}});
- registry.registerComponentContract({kind:'Component',id:'Input',spec:{ports:{value:port('Value')},events:{change:{schema:integer}}}});
- registry.registerComponentContract({kind:'Component',id:'Text',spec:{ports:{text:port('Value',{type:'string'})}}});
- registry.registerComponentContract({kind:'Component',id:'Button',spec:{events:{click:{schema:{type:'object'}}}}});
+ bindTestComponents(registry, [{kind:'Component',id:'Row',spec:{slots:{default:{}}}}]);
+ bindTestComponents(registry, [{kind:'Component',id:'Input',spec:{ports:{value:port('Value')},events:{change:{schema:integer}}}}]);
+ bindTestComponents(registry, [{kind:'Component',id:'Text',spec:{ports:{text:port('Value',{type:'string'})}}}]);
+ bindTestComponents(registry, [{kind:'Component',id:'Button',spec:{events:{click:{schema:{type:'object'}}}}}]);
  registry.registerResources([
   {kind:'Variable',id:'double',spec:{ports:{n:port('Value')},expression:'n * 2'}},
   {kind:'Action',id:'set',spec:{ports:{cell:port('State'),value:port('Value')},steps:[{kind:'SetState',target:p('/ports/cell'),value:p('/ports/value')}]}},

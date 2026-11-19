@@ -16,7 +16,7 @@ import type { Renderer, RendererOptions } from '@viewstem/svelte';
 
 **시그니처** · `createRenderer(options?: RendererOptions): Renderer`
 
-`createRenderer()`는 빈 Registry를 가진 Core Runtime을 생성해 소유합니다. 각 렌더러는 자체 Svelte 어댑터를 관리합니다. 첫 어댑터 등록과 Runtime 사용은 [Svelte 앱에 View 마운트하기](../guides/mount-in-svelte/)에서 확인할 수 있습니다.
+`createRenderer()`는 빈 Registry를 가진 Core Runtime을 생성해 소유합니다. Registry는 컴포넌트 구현 연결을 저장합니다. 첫 어댑터 등록과 Runtime 사용은 [Svelte 앱에 View 마운트하기](../guides/mount-in-svelte/)에서 확인할 수 있습니다.
 
 ## RendererOptions
 
@@ -25,7 +25,7 @@ Runtime을 만들거나 기존 Runtime을 주입할 수 있습니다. 두 방식
 | 필드 | 방식 | 의미 |
 | --- | --- | --- |
 | `runtime?: Runtime` | 주입 | 기존 Runtime을 빌려 그 Registry를 사용합니다. Runtime의 소유자는 호스트입니다. |
-| `components?: readonly ComponentRegistration[]` | 생성 | 코드 Component 계약과 Svelte 구현을 함께 등록합니다. 주입 Registry와 함께 전달할 수 없습니다. |
+| `connectors?: readonly ComponentConnector[]` | 공통 | 기본 DOM·Svelte 연결자와 함께 사용할 브라우저 연결자를 추가합니다. |
 | `registry?: Registry` | 생성 | 기존 Core Registry를 사용합니다. 기본값은 `functions`로 설정한 새 Registry입니다. |
 | `stateStore?: StateStore` | 생성 | 호스트 소유 StateStore를 사용합니다. 기본값은 새 Runtime이 소유하는 Store입니다. |
 | `requestExecutor?: RequestExecutor` | 생성 | Query의 HTTP 요청 계획을 주어진 콜백과 중단 신호로 실행합니다. 기본값은 Core의 HTTP 실행기입니다. |
@@ -42,7 +42,7 @@ Runtime 필드에는 [Core 타입](/ko/docs/core/types/)을 사용합니다. `on
 
 ### runtime과 컴포넌트 연결
 
-`renderer.runtime.registry`로 Runtime 레지스트리에 접근합니다. 렌더러 생성 시 `components: [{ contract, component }]`를 제공하거나 기존 코드 Component 계약에 `renderer.bindComponent(id, component)`를 호출합니다.
+`svelteComponent(contract, Adapter)`를 셋에 담아 `renderer.runtime.registry.registerResourceSet(set)`으로 등록합니다.
 
 <a id="mount-and-attach"></a>
 <a id="mount"></a>

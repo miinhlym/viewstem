@@ -7,6 +7,7 @@ import { normalizeProps, spreadProps, VanillaMachine, type Attrs } from '@zag-js
 import { uniqueId, type Behavior, type Send } from './behaviors.js';
 import { emitFrom, readInputs } from './component-context.js';
 import type { Markup } from './dynamic-catalog.js';
+import { styleScope } from './style-scope.js';
 
 export const widgetCatalog: Record<string, Markup> = {
   'Carousel.Root': ['div', 'vs-carousel', { role: 'region', 'aria-roledescription': 'carousel' }],
@@ -159,7 +160,7 @@ function carousel(element: HTMLElement, signal: AbortSignal): Behavior {
 }
 
 function inputOtp(element: HTMLElement, send: Send, signal: AbortSignal): Behavior {
-  const input = element.ownerDocument.createElement('input');
+  const input = styleScope.createElement(element.ownerDocument, 'input');
   input.className = 'vs-otp-input';
   input.type = 'text';
   input.spellcheck = false;
@@ -563,7 +564,7 @@ function navigationMenu(element: HTMLElement, send: Send, signal: AbortSignal): 
   const view = doc.defaultView!;
   const id = uniqueId();
   const bindings = partBindings(id);
-  const generatedViewport = doc.createElement('div');
+  const generatedViewport = styleScope.createElement(doc, 'div');
   generatedViewport.className = 'vs-navigation-viewport';
   const proxies = new Map<HTMLElement, HTMLElement>();
   let inputs: Props = {};
@@ -640,7 +641,7 @@ function navigationMenu(element: HTMLElement, send: Send, signal: AbortSignal): 
         });
         let proxy = proxies.get(item);
         if (!proxy) {
-          proxy = doc.createElement('span');
+          proxy = styleScope.createElement(doc, 'span');
           proxies.set(item, proxy);
           item.append(proxy);
         }

@@ -8,13 +8,19 @@ are shipped in [THIRD-PARTY-NOTICES.txt](dist/THIRD-PARTY-NOTICES.txt).
 This ESM library validates declarative UI definitions and runs their values, state, queries, actions, and view lifecycles. It is independent of the DOM, Svelte, and any business domain.
 
 ```ts
-import { createRegistry, createRuntime } from '@viewstem/core';
+import { createRegistry, createRuntime, defineResourceSet } from '@viewstem/core';
 
 const registry = createRegistry();
-registry.registerComponentContract({
-  kind: 'Component', id: 'Label',
-  spec: { ports: { text: { kind: 'Value', schema: { type: 'string' }, required: true } } },
-});
+registry.registerResourceSet(defineResourceSet({
+  id: 'projection-example', version: '1',
+  components: [{
+    contract: {
+      kind: 'Component', id: 'Label',
+      spec: { ports: { text: { kind: 'Value', schema: { type: 'string' }, required: true } } },
+    },
+    connectorId: 'projection-example', implementation: {},
+  }],
+}));
 const runtime = createRuntime({ registry });
 const view = await runtime.createView({
   states: { title: { kind: 'State', schema: { type: 'string' }, initial: 'Hello' } },
@@ -26,7 +32,7 @@ const stop = view.subscribe(snapshot => {
 });
 view.getState('title').write('Updated');
 stop();
-runtime.dispose();
+await runtime.dispose();
 ```
 
 `view.whenSettled(application)` settles once the initial queries eligible to run for this application of the view have succeeded or failed. The UI can observe parts of the view as they become ready. Unready inputs and closed gates do not delay completion, and query errors appear in `(await view.whenSettled(view.initial)).queryErrors`. DOM paint is outside the scope of this signal.
@@ -35,11 +41,11 @@ runtime.dispose();
 
 - `createRegistry` registers and validates resources by `(kind, id)`, registers code-backed Components and Actions, lists and describes resources, and exports and explicitly replaces definitions.
 - `createStateStore` manages scopes and State, provides `writeBatch` and synchronous `transaction`, exposes stable read snapshots, and supports `registerReaction` and clock and URL integration. Declare Derived values in the `states` of a View or Component. Disposing the runtime preserves an injected store.
-- `createRuntime()` creates a Registry by default. The Runtime exposes `createView(source, options?)`, `registry`, `stateStore`, and `dispose`. A View exposes `setInputs`, `updateDefinition`, `replace`, `invokeAction`, `whenSettled`, `emit`, `getSnapshot`, `subscribe`, `getState`, `getQuery`, and `exportDefinition`.
+- `createRuntime()` creates a Registry by default. The Runtime exposes `createView(source, options?)`, `invokeAction(request)`, `registry`, `stateStore`, and `dispose`. A View exposes `setInputs`, `updateDefinition`, `applyResourceSets`, `replace`, `invokeAction`, `whenSettled`, `emit`, `getSnapshot`, `subscribe`, `getState`, `getQuery`, and `exportDefinition`.
 - `mergeOwnedUrl` lets a host URL adapter merge only the keys it owns.
 - `computeGridLayout` calculates a 12-column layout. Grid UI requires separate registration.
 
-The root entry point has these five runtime exports. Import optional executors from their own entry points.
+The root entry point also exports `defineCodeAction` and `defineResourceSet`. Import optional executors from their own entry points.
 
 ```ts
 import { createHttpExecutor } from '@viewstem/core/http';
@@ -60,11 +66,13 @@ For code Actions, declare every required input with `required: true`. A Value po
 
 If a subscriber writes State while the View is computing or publishing a projection, the runtime queues a follow-up projection. Listeners finish receiving the current immutable snapshot before the new projection is published. Several writes in that interval are combined into one follow-up; writing the same value does not create another State change. Inspect a subsequent snapshot for the resulting node inputs and use the renderer's completion mechanism for DOM updates.
 
-`authorize({operation, owner, definition})` checks permission to execute Actions or modify an existing view through `view.updateDefinition` or `replace`. It grants permission only when it returns `true`. The host configures resource-list visibility, user identity, and persistence permissions. Execution requires its own authorization even when a resource appears in a list.
+`authorize` checks permission to execute Actions or modify an existing View. It grants permission only when it returns `true`. For Action calls, use the readonly `resource` value from the invocation's Registry snapshot to identify a registered Action by `{ kind: 'Action', id }`. An inline Action passes `null`. Each child call identifies its own target. The host configures resource-list visibility, user identity, and persistence permissions.
 
 For `update`, the owner is the same public View object returned by `createView`. For `invoke`, the owner is an opaque identity object used only for comparisons within a lifetime. It exposes no execution methods. Authorization callbacks receive definitions without the implementation functions of registered code-backed Actions.
 
-`context.invokeAction` in a registered code-backed Action inherits the parent's cancellation and recursion stack. Ending the parent also cancels unfinished child invocations. `view.invokeAction(request)` starts an independent invocation owned by that View. A cancelled invocation cannot write State or refresh a Query. Effects that already succeeded persist.
+Use `defineCodeAction({ definition, requires? })` to capture a contract and `.implement(handler)` to create a typed entry. Pass that entry to `defineResourceSet({ actions: [entry], ... })`, or bind a new handler to the same contract and pass the entry to `registry.replaceResource({ action: entry })`. Use `defineCodeAction<Inputs, Output>()` to type referenced schemas.
+
+`runtime.invokeAction(request)` and `view.invokeAction(request)` start independent invocations. Pass `signal: AbortSignal` to cancel that invocation and its descendants. `context.invokeAction` inherits the parent's cancellation and recursion stack. A cancelled invocation rejects with `CANCELLED`, and effects that already succeeded persist.
 
 ## HTTP and URLs
 

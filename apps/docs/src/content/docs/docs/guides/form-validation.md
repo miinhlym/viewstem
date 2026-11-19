@@ -10,14 +10,17 @@ Show a message when a required name is empty or contains only whitespace. Comple
 ## Connect the input and validation message
 
 ```js title="src/main.js"
-import { createRenderer } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
+import { createRuntime } from '@viewstem/core';
+import { createRenderer } from '@viewstem/dom';
+import { ui } from '@viewstem/ui';
 
 const string = { type: 'string' };
 const name = { '@path': '/states/name' };
 
 const target = document.querySelector('#viewstem');
-const renderer = createRenderer();
+const runtime = createRuntime();
+runtime.registry.registerResourceSet(ui);
+const renderer = createRenderer({ runtime });
 const source = {
   states: {
     name: { kind: 'State', schema: string, initial: '' },

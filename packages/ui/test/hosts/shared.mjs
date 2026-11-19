@@ -1,10 +1,14 @@
-import { createRenderer } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
+import { createRuntime } from '@viewstem/core';
+import { createRenderer } from '@viewstem/dom';
+import { ui } from '@viewstem/ui';
 import definition from '../view.json';
 import catalog from '../catalog.json';
 
 export function start(target) {
-  const renderer = createRenderer();
+  target.setAttribute('data-viewstem-ui', '');
+  const runtime = createRuntime();
+  runtime.registry.registerResourceSet(ui);
+  const renderer = createRenderer({ runtime });
   let mounted;
   let view;
   let disposeExample;
@@ -40,6 +44,7 @@ export function start(target) {
     await disposeExample?.();
     await mounted?.detach();
     await renderer.dispose();
-    view?.dispose();
+    runtime.dispose();
+    target.removeAttribute('data-viewstem-ui');
   };
 }

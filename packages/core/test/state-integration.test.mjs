@@ -1,3 +1,4 @@
+import { bindTestComponents } from './fixtures/components.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRegistry, createStateStore } from '@viewstem/core';
@@ -8,7 +9,7 @@ const integer = { type: 'integer' }, string = { type: 'string' }, date = { 'x-vi
 const tick = async () => { for (let i = 0; i < 5; i++) await Promise.resolve(); };
 
 test('C03 expected-kind registry lookup never falls back to Component', () => {
-  const registry = createRegistry(); registry.registerComponentContract({ kind: 'Component', id: 'same', spec: {} });
+  const registry = createRegistry(); bindTestComponents(registry, [{ kind: 'Component', id: 'same', spec: {} }]);
   assert.throws(() => registry.get('Query', 'same'), { code: 'REFERENCE_NOT_FOUND' });
   assert.throws(() => registry.get('Query', 'absent'), { code: 'REFERENCE_NOT_FOUND' });
 });
@@ -22,7 +23,7 @@ test('C06/C13 same cell connects twice; equal local names have independent react
   const store = createStateStore(), scope = store.createScope(), other = store.createScope();
   const one = scope.registerState('value', { schema: integer, initial: 1 }), two = other.registerState('value', { schema: integer, initial: 2 });
   const ports = { one: { kind: 'State', schema: integer }, two: { kind: 'State', schema: integer } };
-  const registry = createRegistry(); registry.registerComponentContract({ kind: 'Component', id: 'Pair', spec: { ports } });
+  const registry = createRegistry(); bindTestComponents(registry, [{ kind: 'Component', id: 'Pair', spec: { ports } }]);
   const runtime = createRuntime({ registry, stateStore: store });
   const { view, initialComplete: initial } = await runtime.createView({ view: { ports, render: { id: 'pair', componentRef: 'Pair', inputs: { one: { '@path': '/ports/one' }, two: { '@path': '/ports/two' } } } }, inputs: { one, two: one } }); await initial;
   const linked = view.getSnapshot().roots[0].inputs;
@@ -48,6 +49,56 @@ test('S02 transaction with no net value change emits no extra snapshot', () => {
   store.subscribe(value.address, payload => snapshots.push(payload)); const before = value.getSnapshot();
   store.transaction(() => { value.write(2); value.write(1); });
   assert.equal(snapshots.length, 1); assert.equal(value.getSnapshot(), before);
+});
+
+test('a transaction publishes final generations and immutable structural changes', () => {
+  const store = createStateStore(), scope = store.createScope();
+  const old = scope.registerState('existing', { schema: integer, initial: 1 });
+  const removed = scope.registerState('removed', { schema: integer, initial: 2 });
+  const observations = [];
+  store.subscribe(null, observation => observations.push(observation));
+  const [replaced, added] = store.transaction(() => {
+    const next = scope.replaceState('existing', { schema: integer, initial: 0 });
+    next.write(1);
+    const fresh = scope.registerState('added', { schema: integer, initial: 0 });
+    fresh.write(3);
+    scope.replaceState('removed', { schema: integer, initial: 0 }).write(7);
+    scope.removeState('removed');
+    scope.registerState('transient', { schema: integer, initial: 0 });
+    scope.removeState('transient');
+    return [next, fresh];
+  });
+  assert.equal(observations.length, 2);
+  assert.deepEqual(observations[1].changes, [
+    { kind: 'replaced', target: old.address, generation: replaced.generation },
+    { kind: 'added', target: added.address, generation: added.generation },
+    { kind: 'removed', target: removed.address, generation: removed.generation },
+  ]);
+  assert.ok(observations[1].changes.every(change => Object.isFrozen(change) && Object.isFrozen(change.target)));
+  assert.deepEqual(Object.values(observations[1].values), [1, 3]);
+  store.dispose();
+});
+
+test('reaction chains use the final explicit transaction values regardless of write order', () => {
+  for (const reverse of [false, true]) {
+    const store = createStateStore(), scope = store.createScope();
+    const source = scope.registerState('source', { schema: integer, initial: 0 });
+    const chosen = scope.registerState('chosen', { schema: integer, initial: 1 });
+    const dependent = scope.registerState('dependent', { schema: integer, initial: 2 });
+    store.registerReaction(scope, { watch: [source], target: chosen, value: 9 });
+    store.registerReaction(scope, { watch: [chosen], target: dependent, value: 8 });
+
+    const writeChoice = () => chosen.reset();
+    const writeSource = () => source.write(1);
+    const writes = reverse ? [writeSource, writeChoice] : [writeChoice, writeSource];
+    store.transaction(() => { for (const write of writes) write(); });
+    assert.deepEqual([chosen.read(), dependent.read()], [1, 2]);
+    store.transaction(() => { source.write(2); source.write(1); });
+    assert.deepEqual([chosen.read(), dependent.read()], [1, 2]);
+    store.transaction(() => { source.write(3); });
+    assert.deepEqual([chosen.read(), dependent.read()], [9, 8]);
+    store.dispose();
+  }
 });
 
 test('S03 subscriber transactions roll back or publish once after earlier queued writes', () => {
@@ -119,7 +170,7 @@ test('V57 registered async Action is executable while function/Promise data rema
   const registry = createRegistry(), store = createStateStore(); let executions = 0;
   const run = async () => { executions++; return 7; };
   registry.registerAction({ kind: 'Action', id: 'code', spec: { output: { schema: integer } } }, run);
-  registry.registerComponentContract({ kind: 'Component', id: 'Leaf', spec: {} });
+  bindTestComponents(registry, [{ kind: 'Component', id: 'Leaf', spec: {} }]);
   const runtime = createRuntime({ registry, stateStore: store });
   const { view, initialComplete: initial } = await runtime.createView({ view: { render: { id: 'leaf', componentRef: 'Leaf' } } }); await initial;
   assert.equal(await runtime.invokeAction({ owner: view, actionRef: 'code' }), 7); assert.equal(executions, 1);
@@ -135,7 +186,7 @@ test('V01/C09/K24 explicit Clock drives dependent CEL only, reset keeps initial 
   const registry = createRegistry({ functions: [
     { name: 'observeDay', inputs: [string], output: string, run: day => { calls++; return day; } },
     { name: 'observeTomorrow', inputs: [string], output: string, run: day => { nextCalls++; return day; } },
-  ] }); registry.registerComponentContract({ kind: 'Component', id: 'Leaf', spec: {} });
+  ] }); bindTestComponents(registry, [{ kind: 'Component', id: 'Leaf', spec: {} }]);
   const runtime = createRuntime({ registry, stateStore: store });
   const { view, initialComplete: initial } = await runtime.createView({ view: {
     ports: { now: { kind: 'State', schema: integer }, zone: { kind: 'State', schema: string } },
@@ -158,6 +209,76 @@ test('V01/C09/K24 explicit Clock drives dependent CEL only, reset keeps initial 
   assert.equal(listeners.size, 1); scope.dispose(); assert.equal(listeners.size, 0); clock.tick(0);
   if (typeof connected === 'function') connected(); else connected?.dispose();
   runtime.dispose(); store.dispose();
+});
+
+test('Clock setup does not publish an initial value when the host subscription fails', () => {
+  const store = createStateStore(), scope = store.createScope();
+  const target = scope.registerState('now', { schema: integer, initial: 0 });
+  const observed = [];
+  store.subscribe(target.address, observation => observed.push(observation));
+  const failure = Error('clock subscription failed');
+  let tick;
+  assert.throws(() => scope.connectClock(target, { now: () => 5, subscribe(listener) {
+    tick = listener;
+    listener(6);
+    throw failure;
+  } }), failure);
+  tick(7);
+  assert.equal(target.read(), 0);
+  assert.equal(observed.length, 1);
+  store.dispose();
+});
+
+test('Clock cleanup follows the owning Scope and the target generation', () => {
+  for (const retire of [scope => scope.removeState('now'), scope => scope.replaceState('now', { schema: integer, initial: 1 }), scope => scope.dispose()]) {
+    const store = createStateStore(), owner = store.createScope(), targetScope = store.createScope();
+    const target = targetScope.registerState('now', { schema: integer, initial: 0 });
+    let tick, stops = 0;
+    const stop = owner.connectClock(target, { now: () => 5, subscribe(listener) {
+      tick = listener;
+      listener(6);
+      return () => stops++;
+    } });
+    assert.equal(target.read(), 6);
+    const rollback = Error('rollback');
+    assert.throws(() => store.transaction(() => { retire(targetScope); throw rollback; }), rollback);
+    assert.equal(stops, 0);
+    tick(7);
+    assert.equal(target.read(), 7);
+    retire(targetScope);
+    assert.equal(stops, 1);
+    assert.doesNotThrow(() => tick(8));
+    owner.dispose();
+    stop();
+    assert.equal(stops, 1);
+    store.dispose();
+  }
+});
+
+test('Clock cleanup is installed before a subscriber can retire the connection', () => {
+  const store = createStateStore(), scope = store.createScope();
+  const target = scope.registerState('now', { schema: integer, initial: 0 });
+  let stops = 0;
+  store.subscribe(target.address, ({ changes }) => { if (changes.length) scope.dispose(); });
+  const stop = scope.connectClock(target, { now: () => 5, subscribe: () => () => stops++ });
+  assert.equal(stops, 1);
+  stop();
+  assert.equal(stops, 1);
+  store.dispose();
+});
+
+test('Clock setup releases a host subscription returned after the owning Scope disposes', () => {
+  const store = createStateStore(), owner = store.createScope();
+  const target = store.createScope().registerState('now', { schema: integer, initial: 0 });
+  let stops = 0;
+  assert.throws(() => owner.connectClock(target, { now: () => 5, subscribe(listener) {
+    owner.dispose();
+    listener(6);
+    return () => stops++;
+  } }), { code: 'CANCELLED' });
+  assert.equal(target.read(), 0);
+  assert.equal(stops, 1);
+  store.dispose();
 });
 test('K33 explicit timezone required definition, waiting input and invalid value remain distinct', () => {
   assert.throws(() => compileCel('localDate(now)', { inputs: { now: integer } }));
@@ -187,7 +308,7 @@ test('V51 negative zero avoids downstream CEL/reaction/Query requests', async ()
   const registry = createRegistry({ functions: [{ name: 'observeNumber', inputs: [{ type: 'number' }], output: { type: 'number' }, run: n => { calculations++; return n; } }] }), store = createStateStore(), scope = store.createScope(), source = scope.registerState('source', { schema: { type: 'number' }, initial: 0 }), selected = scope.registerState('selected', { schema: integer, initial: 9 });
   store.registerReaction(scope, { watch: [source], target: selected, value: 0 });
   registry.registerResources([{ kind: 'Query', id: 'q', spec: { ports: { n: { kind: 'Value', schema: { type: 'number' }, required: true } }, sources: { main: { datasource: { kind: 'Http', baseUrl: 'https://example.test' }, request: { method: 'GET', path: 'items' } } }, transform: { input: { '@path': '/sources/main' } } } }]);
-  registry.registerComponentContract({ kind: 'Component', id: 'Leaf', spec: {} });
+  bindTestComponents(registry, [{ kind: 'Component', id: 'Leaf', spec: {} }]);
   const runtime = createRuntime({ registry, stateStore: store, requestExecutor: async () => { requests++; return { status: 200, headers: {}, body: 1 }; } });
   const { initialComplete: initial } = await runtime.createView({ view: {
     ports: { source: { kind: 'State', schema: { type: 'number' } } },

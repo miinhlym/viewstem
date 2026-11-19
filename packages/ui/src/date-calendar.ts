@@ -3,6 +3,7 @@ import { connect, machine, type Props as ZagProps, type SelectionMode, type Serv
 import { normalizeProps, spreadProps, VanillaMachine, type Attrs } from '@zag-js/vanilla';
 import type { NodeSnapshot } from '@viewstem/core';
 import { uniqueId, type Behavior, type Send } from './behaviors.js';
+import { styleScope } from './style-scope.js';
 
 type Inputs = NodeSnapshot['inputs'];
 type Kind = 'Calendar.Root' | 'RangeCalendar.Root' | 'DatePicker';
@@ -54,24 +55,24 @@ export function dateCalendar(element: HTMLElement, kind: Kind, send: Send, signa
   const view = doc.defaultView!;
   const picker = kind === 'DatePicker';
   const id = uniqueId();
-  const root = doc.createElement('div');
+  const root = styleScope.createElement(doc, 'div');
   root.className = 'vs-date-calendar';
   if (picker) root.dataset.picker = '';
-  const control = doc.createElement('div');
-  const trigger = doc.createElement('button');
+  const control = styleScope.createElement(doc, 'div');
+  const trigger = styleScope.createElement(doc, 'button');
   trigger.className = 'btn vs-date-trigger';
   trigger.dataset.variant = 'outline';
-  const positioner = doc.createElement('div');
-  const panel = doc.createElement('div');
+  const positioner = styleScope.createElement(doc, 'div');
+  const panel = styleScope.createElement(doc, 'div');
   panel.className = 'vs-date-panel';
-  const navigation = doc.createElement('div');
+  const navigation = styleScope.createElement(doc, 'div');
   navigation.className = 'vs-date-navigation';
-  const previous = doc.createElement('button');
-  const next = doc.createElement('button');
+  const previous = styleScope.createElement(doc, 'button');
+  const next = styleScope.createElement(doc, 'button');
   previous.className = next.className = 'btn';
   previous.dataset.variant = next.dataset.variant = 'ghost';
   navigation.append(previous, next);
-  const months = doc.createElement('div');
+  const months = styleScope.createElement(doc, 'div');
   months.className = 'vs-date-months';
   panel.append(navigation, months);
   if (picker) {
@@ -217,22 +218,23 @@ export function dateCalendar(element: HTMLElement, kind: Kind, send: Send, signa
   }
 
   function makeGrid(): Grid {
-    const wrapper = doc.createElement('section');
-    const caption = doc.createElement('div');
+    const wrapper = styleScope.createElement(doc, 'section');
+    const caption = styleScope.createElement(doc, 'div');
     caption.className = 'vs-date-caption';
-    const month = doc.createElement('select');
-    const year = doc.createElement('select');
+    const month = styleScope.createElement(doc, 'select');
+    const year = styleScope.createElement(doc, 'select');
     month.className = year.className = 'select';
-    const table = doc.createElement('table');
-    const head = table.createTHead().insertRow();
+    const table = styleScope.createElement(doc, 'table');
+    const head = styleScope.mark(table.createTHead());
+    const headRow = styleScope.mark(head.insertRow());
     const headings = Array.from({ length: 7 }, () => {
-      const heading = doc.createElement('th');
+      const heading = styleScope.createElement(doc, 'th');
       heading.scope = 'col';
-      head.append(heading);
+      headRow.append(heading);
       return heading;
     });
-    table.createTBody();
-    const heading = doc.createElement('div');
+    styleScope.mark(table.createTBody());
+    const heading = styleScope.createElement(doc, 'div');
     heading.className = 'vs-date-heading';
     heading.append(caption, month, year);
     wrapper.append(heading, table);
@@ -245,7 +247,7 @@ export function dateCalendar(element: HTMLElement, kind: Kind, send: Send, signa
     if (options.length !== select.options.length || options.some(([value, label], index) =>
       select.options[index]?.value !== value || select.options[index]?.textContent !== label)) {
       select.replaceChildren(...options.map(([value, label]) => {
-        const option = doc.createElement('option');
+        const option = styleScope.createElement(doc, 'option');
         option.value = value;
         option.textContent = label;
         return option;
@@ -388,10 +390,10 @@ export function dateCalendar(element: HTMLElement, kind: Kind, send: Send, signa
         row.remove();
       }
       while (body.rows.length < weeks.length) {
-        const row = body.insertRow();
+        const row = styleScope.mark(body.insertRow());
         for (let day = 0; day < 7; day++) {
-          const cell = row.insertCell();
-          const button = doc.createElement('button');
+          const cell = styleScope.mark(row.insertCell());
+          const button = styleScope.createElement(doc, 'button');
           button.type = 'button';
           button.className = 'btn vs-date-day';
           cell.append(button);
@@ -459,7 +461,13 @@ export function dateCalendar(element: HTMLElement, kind: Kind, send: Send, signa
         service = createService();
         unsubscribe = service.subscribe(requestRender);
         render();
+        // Zag appends its announcer to the document body synchronously at startup.
+        const lastChild = doc.body?.lastElementChild;
         service.start();
+        const liveRegion = doc.body?.lastElementChild;
+        if (liveRegion !== lastChild && liveRegion?.matches('span[data-live-announcer="true"]')) {
+          styleScope.mark(liveRegion);
+        }
         if (mode === 'range' && current.length === 1) service.service.context.set('activeIndex', 1);
       } else {
         const changed = signature !== previousExternal && signature !== undefined;

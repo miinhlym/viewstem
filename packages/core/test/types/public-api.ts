@@ -1,6 +1,7 @@
-import { createRegistry, createRuntime, createStateStore, computeGridLayout, mergeOwnedUrl } from '@viewstem/core';
+import { createRegistry, createRuntime, createStateStore, computeGridLayout, defineResourceSet, mergeOwnedUrl } from '@viewstem/core';
+import { count as countContract, countAction, format, formatAction } from './code-action-authoring.js';
 import * as core from '@viewstem/core';
-import type { Registry, Runtime, StateStore, View, ActionHandler, StateHandle } from '@viewstem/core';
+import type { Registry, Runtime, StateStore, View, ActionHandler, StateHandle, ResourceSet, ComponentBinding } from '@viewstem/core';
 import { createHttpExecutor } from '@viewstem/core/http';
 import type { HttpExecutorOptions, RequestExecutor } from '@viewstem/core/http';
 import { compileCel, evaluateCel, defaultCelLimits } from '@viewstem/core/cel';
@@ -90,15 +91,41 @@ import { joinAddress } from '@viewstem/core/http';
 import { Registry as InternalRegistry } from '@viewstem/core/src/registry.mjs';
 
 const registry = createRegistry(), store = createStateStore(), scope = store.createScope();
+const fixture: ComponentBinding<{ label: string }> = {
+  contract: { kind: 'Component', id: 'Fixture', spec: {} }, connectorId: 'test', implementation: { label: 'fixture' },
+};
+const fixtureSet: ResourceSet = defineResourceSet({ id: 'test', version: '1', components: [fixture] });
+registry.registerResourceSet(fixtureSet).replaceResource({ component: fixture });
+registry.registerResourceSet(defineResourceSet({ id: 'authored', version: '1', actions: [countAction, formatAction, {
+  definition: { kind: 'Action', id: 'direct', spec: {
+    ports: { text: { kind: 'Value', required: true, schema: { type: 'string' } } },
+    output: { schema: { type: 'integer' } },
+  } },
+  implementation: ({ inputs }) => inputs.text.length,
+}] }));
+registry.replaceResource({ action: countContract.implement(({ inputs }) => inputs.text.trim().length) });
+registry.replaceResource({ action: format.implement(({ inputs }) => inputs.value.trim().length) });
+// @ts-expect-error The declared result is a number.
+format.implement(({ inputs }) => inputs.value);
+// @ts-expect-error The inferred input is a string.
+countContract.implement(({ inputs }) => inputs.text.toFixed().length);
+// @ts-expect-error Spreading and changing a handler does not preserve the factory's proof.
+registry.replaceResource({ action: { ...countAction, implementation: () => 'wrong' } });
 const count = scope.registerState<number>('count', { schema: { type: 'integer' }, initial: 0 });
 const httpOptions: HttpExecutorOptions = { authorize: ({ destination }) => destination.startsWith('https:') };
 const executor: RequestExecutor = createHttpExecutor(httpOptions);
-const double: CelFunction<[number], number> = { name: 'double', inputs: [{ type: 'number' }], output: { type: 'number' }, run: value => value * 2 };
-const celOptions: CelOptions = { inputs: { n: { type: 'number' } }, functions: [double], limits: { depth: defaultCelLimits.depth } };
-const computed: unknown = compileCel('double(n)', celOptions)({ n: 2 });
+const twice: CelFunction<[number], number> = { name: 'twice', inputs: [{ type: 'number' }], output: { type: 'number' }, run: value => value * 2 };
+const celOptions: CelOptions = { inputs: { n: { type: 'number' } }, functions: [twice], limits: { depth: defaultCelLimits.depth } };
+const computed: unknown = compileCel('twice(n)', celOptions)({ n: 2 });
 const value: CelValue = 2;
 evaluateCel('n', { n: value }, celOptions);
 const runtime = createRuntime({ registry, stateStore: store, requestExecutor: executor });
+createRegistry().registerAction(countAction);
+createRuntime({ resourceResolver: async () => undefined });
+const runtimeCleanup: Promise<void> = runtime.dispose();
+void runtimeCleanup;
+const headlessResult: unknown = await runtime.invokeAction({ actionRef: 'answer' });
+void headlessResult;
 registry.registerComponentContract({ kind: 'Component', id: 'Leaf', spec: {} }).registerResources([]);
 registry.registerComponentContracts([{ kind: 'Component', id: 'Other', spec: {} }] as const).registerResources([]);
 // @ts-expect-error Only Component contracts are accepted by the batch.
@@ -162,6 +189,13 @@ const forgedView: View = fakeView;
 createRuntime({ registry, authorize: context => {
   if (context.operation === 'update') { const samePublicView: View = context.owner; void samePublicView.getSnapshot(); }
   else {
+    if (context.resource) {
+      const kind: 'Action' = context.resource.kind;
+      // @ts-expect-error The resource ID is readonly.
+      context.resource.id = kind;
+    }
+    // @ts-expect-error The resource field is readonly.
+    context.resource = null;
     // @ts-expect-error Invoke authorization receives an opaque owner.
     context.owner.dispose();
     // @ts-expect-error Invoke authorization does not expose native callbacks.
@@ -169,7 +203,8 @@ createRuntime({ registry, authorize: context => {
   }
   return true;
 } });
-await view.invokeAction({ actionRef: 'typed', inputs: { count } });
+await view.invokeAction({ actionRef: 'typed', inputs: { count }, signal: new AbortController().signal });
+await createRuntime({ registry }).invokeAction({ action: { steps: [] }, signal: new AbortController().signal });
 computeGridLayout([{ id: 'leaf' }], [{ id: 'leaf', address: 'node' }]);
 mergeOwnedUrl('https://example.test', { count: '1' });
 void computed;

@@ -16,8 +16,9 @@ Viewstem packages are not published to the public npm registry yet. Install them
 | Your task | Packages |
 |---|---|
 | Use execution, State, and Query without a DOM | `@viewstem/core` |
-| Render the shared catalog in a browser DOM container | `@viewstem/core`, `@viewstem/ui` ([local build and installation](../ui/guides/mount-in-browser/)) |
-| Render with your own Svelte components | `@viewstem/core`, `@viewstem/svelte` |
+| Render a View with DOM components | `@viewstem/core`, `@viewstem/dom` |
+| Render the shared catalog in a browser DOM container | `@viewstem/core`, `@viewstem/dom`, `@viewstem/ui` |
+| Render with your own Svelte components | `@viewstem/core`, `@viewstem/dom`, `@viewstem/svelte` |
 
 ### Install Core only
 
@@ -38,16 +39,16 @@ From the repository root after `npm ci`, run:
 ```sh
 npm run build:ui
 mkdir -p ../viewstem-packages
-npm pack -w @viewstem/core -w @viewstem/ui --pack-destination ../viewstem-packages
+npm pack -w @viewstem/core -w @viewstem/dom -w @viewstem/ui --pack-destination ../viewstem-packages
 ```
 
-Install both tarballs from your app. These paths assume it is next to `viewstem-packages`.
+Install all three tarballs together from your app. These paths assume it is next to `viewstem-packages`.
 
 ```sh
-npm install ../viewstem-packages/viewstem-core-0.1.0.tgz ../viewstem-packages/viewstem-ui-0.1.0.tgz
+npm install ../viewstem-packages/viewstem-core-0.1.0.tgz ../viewstem-packages/viewstem-dom-0.1.0.tgz ../viewstem-packages/viewstem-ui-0.1.0.tgz
 ```
 
-The [Quick Start](../quickstart/) runs in a vanilla Vite app or a connected container in your existing browser app.
+For custom DOM components alone, use `npm run build:dom` and omit the UI workspace and tarball. With the UI catalog installed, continue to the [Quick Start](../quickstart/).
 
 ## Build and install the Svelte packages
 
@@ -56,13 +57,13 @@ From the repository root after `npm ci`, run:
 ```sh
 npm run build:svelte
 mkdir -p ../viewstem-packages
-npm pack -w @viewstem/core -w @viewstem/svelte --pack-destination ../viewstem-packages
+npm pack -w @viewstem/core -w @viewstem/dom -w @viewstem/svelte --pack-destination ../viewstem-packages
 ```
 
-From your Svelte app directory, install both tarballs together.
+From your Svelte app directory, install all three tarballs together.
 
 ```sh
-npm install ../viewstem-packages/viewstem-core-0.1.0.tgz ../viewstem-packages/viewstem-svelte-0.1.0.tgz
+npm install ../viewstem-packages/viewstem-core-0.1.0.tgz ../viewstem-packages/viewstem-dom-0.1.0.tgz ../viewstem-packages/viewstem-svelte-0.1.0.tgz
 ```
 
 Continue with the [Svelte integration guide](../svelte/guides/mount-in-svelte/).

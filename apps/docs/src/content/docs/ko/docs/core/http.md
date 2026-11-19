@@ -25,6 +25,8 @@ import type { HttpExecutorOptions, HttpExecutionPlan, HttpResponse, RequestExecu
 | `resolveSecret` | `(reference, { caller, destination, signal }) => Awaitable<string>` | 이름으로 참조한 비밀값을 해석합니다. 기본은 `EXECUTION_BLOCKED`이며 신뢰하는 서버에 둡니다. |
 | `clock` | `{ now(): number, set(callback, milliseconds): unknown, clear(token): void }` | 제한 시간용 시계입니다. 기본은 performance 시간과 시스템 타이머이며 Runtime의 TimerClock과 메서드 이름이 다릅니다. |
 
+`now()`와 타이머는 함께 전진하는 단조 시계의 밀리초 값을 기준으로 동작해야 합니다. `now()`와 `set()`에서 발생한 예외는 HTTP 오류 규칙을 적용합니다. `clear()`에서 예외가 발생해도 확정한 실행 결과를 반환합니다.
+
 실행 문맥의 선택적 signal은 전체 작업을 취소합니다. 사용자 transport/resolver도 취소 신호를 받아 자신의 작업을 중단해야 합니다. 취소·시간 초과는 각각 `CANCELLED`, `TIMEOUT`으로 거절합니다.
 
 ## HttpExecutionPlan

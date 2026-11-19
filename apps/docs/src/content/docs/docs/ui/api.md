@@ -3,17 +3,19 @@ title: Browser UI API
 description: Register the catalog, attach an existing View, and import styles and support metadata.
 ---
 
-`@viewstem/ui` exports `createRenderer`, `registerShadcn`, and the public types `RendererOptions`, `Renderer`, `MountedView`, `RenderAttachment`, `RendererDiagnostic`, and `RendererErrorListener`.
-
-## Create a renderer
-
-`createRenderer()` creates and owns a Runtime with the default catalog. To configure that Runtime, pass options such as `createRenderer({ requestExecutor, onError })`. To borrow a Runtime, call `createRenderer({ runtime, onError })`.
-
-If the injected Runtime needs the catalog, call `registerShadcn(runtime.registry)` once before creating the View. It registers 357 Component contracts as a batch. A duplicate ID leaves the Registry as it was.
+Register the `ui` set from `@viewstem/ui` with `runtime.registry.registerResourceSet(ui)` before creating the View. Import `createRenderer` from `@viewstem/dom` and pass `{ runtime }`. Browser bundlers such as Vite load the default styles with the set. A conflicting resource ID leaves the Registry as it was.
 
 ## Mount a new View
 
-`renderer.mount({ target, source, inputs?, url?, onError? })` returns a screen immediately. `await screen.ready` returns the View after the first DOM update. Use `await screen.whenRendered()` to inspect the DOM after a State write. To wait for the initial Query report and its DOM update, call `await screen.whenSettled(view.initial)` and inspect `queryErrors`. You can also pass the application handle returned by `setInputs()`, `updateDefinition()`, or `replace()` to `whenSettled()`. `setInputs()` replaces the entire input map. See [View operations](../../core/view/).
+`renderer.mount({ target, source, inputs?, url?, onError? })` returns a screen immediately.
+
+| Wait | Result |
+|---|---|
+| `await screen.ready` | The prepared View after the display connection is established |
+| `await screen.whenRendered()` | DOM update on this display, including the first render or a State update |
+| `await screen.whenSettled(application)` | Initial Query report for that application and DOM update on this display. Inspect `queryErrors`. |
+
+Pass `view.initial` for the first application or use the handle returned by `setInputs()`, `updateDefinition()`, `applyResourceSets()`, or `replace()`. See [View operations](../../core/view/).
 
 `await screen.unmount()` cancels pending work and waits for the owned View and DOM to be cleaned up. Closing before a Query reaches the request executor prevents that request. If the request has started, the executor receives an abort signal and its late result is discarded.
 
@@ -23,20 +25,21 @@ If the injected Runtime needs the catalog, call `registerShadcn(runtime.registry
 
 `renderer.attach(view, target, { onError }?)` returns an attachment with `whenRendered()`, `whenSettled(application)`, and `detach()`. `await attachment.detach()` releases the DOM and subscription. The original owner disposes the borrowed View.
 
-Both paths require a connected, unreserved HTML element. Wait for cleanup before reusing it. `await renderer.dispose()` releases the renderer's screens, attachments, and internally created Runtime. The host manages an injected Runtime.
+Both paths require a connected, unreserved HTML element. Wait for cleanup before reusing it. `await renderer.dispose()` releases the renderer's screens and attachments. The app that owns the injected Runtime then awaits `runtime.dispose()`.
 
 ## Errors and diagnostics
 
 | Situation | Where to handle it |
 | --- | --- |
 | Target is missing, disconnected, or already reserved | Synchronous exception from `mount()` or `attach()` |
-| View preparation or first render fails | `screen.ready` rejects after automatic cleanup. `onError` receives a `prepare` or `render` diagnostic |
-| Initial render of a borrowed View fails during `attach()` | `attach()` throws synchronously |
+| View preparation fails | `screen.ready` rejects after cleanup and `onError` receives a `prepare` diagnostic |
+| A component fails during render | The display’s `whenRendered()` rejects and `onError` receives a `render` diagnostic |
+| A node fails to clean up during a display update | `onError` receives a `dispose` diagnostic with its `nodeId`. Other nodes continue rendering. |
 | Later node, Query, UI event Action, URL, or render error | `onError` diagnostics. Initial Query failures also appear in the `whenSettled()` report's `queryErrors` |
 | A direct `view.invokeAction()` or View change fails | The call's promise rejects |
 | A wait is cancelled by cleanup or a new application | The waiting promise rejects with `CANCELLED` |
 
-`onError` receives `{ phase, error, nodeId?, application? }`. The phases are `prepare`, `node`, `query`, `action`, `url`, and `render`. When a literal Component input fails schema validation, `error.input` identifies the port and `error.resource` identifies the referenced Component when present. The renderer callback runs before the screen or attachment callback. The same function receives a diagnostic occurrence once, even when multiple attachments observe the same View.
+`onError` receives `{ phase, error, nodeId?, application? }`. The phases are `prepare`, `node`, `query`, `action`, `url`, `render`, and `dispose`. When a literal Component input fails schema validation, `error.input` identifies the port and `error.resource` identifies the referenced Component when present. The renderer callback runs before the screen or attachment callback. If it closes the display, any remaining callback for that diagnostic is skipped. The same function receives a diagnostic occurrence once, even when multiple attachments observe the same View.
 
 ## Styles and metadata
 
@@ -45,4 +48,6 @@ Both paths require a connected, unreserved HTML element. Wait for cleanup before
 | `@viewstem/ui/styles.css` | Scoped Basecoat Vega styles with the Neutral palette |
 | `@viewstem/ui/support.json` | Component IDs and their supported input ports, slots, and events |
 
-Import the stylesheet in the browser entry point. Set `.dark` or `data-theme="dark"` on an ancestor of the mount container to use the dark palette. See [Components and JSON support](../components/) for the metadata structure and catalog limits.
+Use the `styles.css` export when your host loads the stylesheet explicitly. Set `.dark` or `data-theme="dark"` on an ancestor of the mount container to use the dark palette. See [Components and JSON support](../components/) for the metadata structure and catalog limits.
+
+Set theme variables such as `--viewstem-primary` and `--viewstem-radius` on an ancestor. An existing `data-viewstem-ui` attribute scopes legacy theme variables. External components inside it keep their own set styles.

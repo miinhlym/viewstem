@@ -12,18 +12,27 @@ HTTP 실행기를 주입하고 앱 함수를 타입이 있는 Action으로 노�
 아래 Node 예제는 로컬 mock transport를 사용하므로 실제 네트워크 요청을 보내지 않습니다. Core를 설치한 프로젝트에 `http-action.mjs`로 저장하고 Node로 실행하세요.
 
 ```js title="http-action.mjs"
-import { createRegistry, createRuntime } from '@viewstem/core';
+import { createRegistry, createRuntime, defineCodeAction, defineResourceSet } from '@viewstem/core';
 import { createHttpExecutor } from '@viewstem/core/http';
 
 const registry = createRegistry();
-registry.registerComponentContract({ kind: 'Component', id: 'Empty', spec: {} });
-registry.registerAction({
-  kind: 'Action', id: 'label',
-  spec: {
-    ports: { name: { kind: 'Value', schema: { type: 'string' }, required: true } },
-    output: { schema: { type: 'string' } },
+registry.registerResourceSet(defineResourceSet({
+  id: 'projection', version: '1',
+  components: [{
+    contract: { kind: 'Component', id: 'Empty', spec: {} },
+    connectorId: 'projection-example', implementation: {},
+  }],
+}));
+const label = defineCodeAction({
+  definition: {
+    kind: 'Action', id: 'label',
+    spec: {
+      ports: { name: { kind: 'Value', schema: { type: 'string' }, required: true } },
+      output: { schema: { type: 'string' } },
+    },
   },
-}, ({ inputs }) => `Hello, ${inputs.name}`);
+});
+registry.registerAction(label.implement(({ inputs }) => `Hello, ${inputs.name}`));
 const execute = createHttpExecutor({
   authorize: ({ destination }) => new URL(destination).origin === 'https://api.example.test',
   transport: async () => new Response(JSON.stringify({ title: 'Project' }), {
@@ -46,10 +55,10 @@ console.log(report.queryErrors.length); // 0
 console.log(view.getQuery('project').getSnapshot().data); // Project
 console.log(await view.invokeAction({ actionRef: 'label', inputs: { name: 'Viewstem' } }));
 // Hello, Viewstem
-runtime.dispose();
+await runtime.dispose();
 ```
 
-Query는 응답 본문을 `Project`로 변환합니다. 코드 Action은 준비된 입력을 받아 스키마로 검증되는 문자열을 반환합니다. 코드 Action은 계약과 구현 함수를 별도로 등록하며 선언에 `steps`나 `output.value`를 넣지 않습니다.
+Query는 응답 본문을 `Project`로 변환합니다. 코드 Action은 준비된 입력을 받아 스키마로 검증되는 문자열을 반환합니다. Action 엔트리는 선언한 계약과 호스트 함수를 결합합니다. 투영 전용 Component는 View 준비에 필요한 바인딩을 제공합니다.
 
 ## 실제 전송 연결하기
 

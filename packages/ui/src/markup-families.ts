@@ -2,6 +2,7 @@ import type { NodeSnapshot } from '@viewstem/core';
 import { uniqueId, type Behavior, type Send } from './behaviors.js';
 import type { Markup } from './dynamic-catalog.js';
 import { readInputs } from './component-context.js';
+import { styleScope } from './style-scope.js';
 
 type Props = NodeSnapshot['inputs'];
 
@@ -299,7 +300,7 @@ const tokenStyles = ['color', 'background-color', 'font-style', 'font-weight', '
 function codeText(element: HTMLElement, name: 'CodeBlock.Content' | 'CodeBlock.Line'): Behavior {
   const doc = element.ownerDocument;
   const host = name === 'CodeBlock.Content' ? element.querySelector('code') ?? element : element;
-  const generated = doc.createElement('span');
+  const generated = styleScope.createElement(doc, 'span');
   generated.dataset.vsCodeText = '';
   const styleParser = doc.createElement('span').style;
   let previous: Props['code'];
@@ -324,7 +325,7 @@ function codeText(element: HTMLElement, name: 'CodeBlock.Content' | 'CodeBlock.L
       if (typeof inputs.code === 'string') {
         if (numbered) {
           generated.replaceChildren(...inputs.code.replace(/\n$/, '').split('\n').map(value => {
-            const line = doc.createElement('span');
+            const line = styleScope.createElement(doc, 'span');
             line.dataset.vsComponent = 'CodeBlock.Line';
             line.textContent = value || '\n';
             return line;
@@ -332,7 +333,7 @@ function codeText(element: HTMLElement, name: 'CodeBlock.Content' | 'CodeBlock.L
         } else generated.textContent = inputs.code || (name === 'CodeBlock.Line' ? '\n' : '');
       } else if (Array.isArray(inputs.code)) {
         generated.replaceChildren(...(inputs.code as Token[]).map(token => {
-          const span = doc.createElement('span');
+          const span = styleScope.createElement(doc, 'span');
           span.textContent = token.content;
           if (token.class) span.className = token.class;
           if (token.style) {
@@ -375,7 +376,7 @@ function copyButton(element: HTMLElement, signal: AbortSignal): Behavior {
   const syncDisabled = disableAction(element, signal);
   const doc = element.ownerDocument;
   const win = doc.defaultView!;
-  const status = doc.createElement('span');
+  const status = styleScope.createElement(doc, 'span');
   status.className = 'vs-code-copy-status';
   status.setAttribute('aria-live', 'polite');
   let reset: number | undefined;

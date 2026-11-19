@@ -115,8 +115,8 @@ node apps/docs/scripts/generate-ui-reference.mjs --check
 화면에 표시·복사·실행하는 JSON은 같은 초기 선언을 사용한다.
 
 [DemoWorkbench.svelte](src/components/DemoWorkbench.svelte)는 탭과 조작부를,
-[component-demo-ui-runtime.ts](src/examples/component-demo-ui-runtime.ts)는 core View와
-`@viewstem/ui.attach` 연결을 담당한다. Sonner의 호스트 Action은 별도 DOM Notifications View에 연결한다.
+[component-demo-ui-runtime.ts](src/examples/component-demo-ui-runtime.ts)는 `ui` 셋을 등록하고
+Core View를 `@viewstem/dom`으로 연결한다. Sonner의 호스트 Action은 별도 DOM Notifications View에 연결한다.
 [component-demo-ui-setup.ts](src/examples/component-demo-ui-setup.ts)는 복사 가능한 앱 연결 코드를 생성한다.
 탭 전환 시 상태를 유지하고 다시 실행하면 초기 상태로 돌아간다.
 

@@ -7,24 +7,25 @@ sidebar:
 
 ## ViewstemView
 
-`@viewstem/svelte`에서 가져와 `renderer`와 `source` 또는 `view` 중 하나를 전달합니다. 두 방식 모두 부모 Svelte context를 상속합니다. [마운트 가이드](../guides/mount-in-svelte/)에 실행 예제가 있습니다.
+`@viewstem/svelte`에서 가져옵니다. `source`만 전달하면 자체 Runtime에서 View를 만들고, `renderer`를 함께 전달하면 그 렌더러를 사용합니다. 앱이 만든 View는 `renderer`와 `view`를 함께 전달합니다. 모든 경로에서 부모 Svelte context를 상속합니다. [마운트 가이드](../guides/mount-in-svelte/)에 실행 예제가 있습니다.
 
 ```svelte
+<ViewstemView {source} resourceSets={[ui]} />
 <ViewstemView {renderer} source={{ ref: 'settings' }} inputs={{ accountId }} />
 <ViewstemView {renderer} view={sharedView} />
 ```
 
 ## ViewstemViewProps
 
-`ViewstemViewProps`는 기존 대여 prop 인터페이스입니다. `ViewstemSourceProps`는 생성 prop을 제공하며 `ViewstemViewComponentProps`와 `ComponentProps<typeof ViewstemView>`는 두 형태를 모두 포함합니다.
+`ViewstemViewProps`는 기존 View 대여의 prop 타입입니다. `ViewstemSourceProps`는 렌더러를 전달하는 생성 방식의 타입입니다. 독립 화면까지 포함한 전체 prop 타입은 `ViewstemViewComponentProps` 또는 `ComponentProps<typeof ViewstemView>`입니다.
 
-`view`와 `source`를 함께 전달하거나 둘 다 생략하면 `INVALID_DEFINITION`입니다. 두 경로에서 `onError`는 렌더러 관찰자에 화면 관찰자를 추가하며, `fallback`은 개별 노드 오류를 표시합니다.
+`view`와 `source` 중 하나를 전달하세요. `view`는 `renderer`를 요구하며 `resourceSets`는 외부 렌더러 없이 `source`를 생성할 때 사용합니다. 잘못된 조합은 `INVALID_DEFINITION`입니다. `onError`는 화면 진단을 관찰하고 `fallback`은 개별 노드 오류를 표시합니다.
 
 ## source로 View 만들기
 
 브라우저에서 마운트된 뒤 View 생성을 시작합니다. 서버와 hydration 직전에는 빈 영역입니다. `source`는 인라인 `ViewSpec` 또는 `{ ref }`입니다. Svelte의 `$state`로 만든 인라인 정의도 전달할 수 있습니다.
 
-컴포넌트가 초기화될 때의 `renderer`, `source`, `inputs`를 캡처하고, 브라우저 마운트 뒤 그 값으로 생성합니다. 이후 `source`나 `inputs`가 바뀌어도 현재 View를 유지합니다. 새 화면을 만들거나 소유 방식 또는 소유 렌더러를 바꾸려면 `{#key}`로 컴포넌트를 다시 만드세요.
+초기화 시 `renderer`, `source`, `inputs`, `resourceSets`를 캡처합니다. 독립 화면에서는 브라우저 마운트 뒤 Runtime과 렌더러를 만들고 셋을 순서대로 등록한 다음 View를 준비합니다. 이후 설정이 바뀌어 새 화면이나 새 소유권이 필요하면 `{#key}`로 컴포넌트를 다시 만드세요.
 
 준비 중에는 `pending` 스니펫을, 실패하면 `prepareError(error)` 스니펫을 표시할 수 있습니다. 준비 실패는 `onError`에 `prepare` 진단으로 전달됩니다. 컴포넌트를 제거하거나 렌더러를 폐기하면 준비를 취소하고 생성한 View를 폐기합니다. 공유 렌더러와 주입 Runtime의 수명은 호스트가 관리합니다.
 
@@ -44,7 +45,7 @@ Query가 요청 실행기에 도달하기 전에 닫으면 요청을 시작하�
 
 View와 렌더러가 같은 Runtime을 사용하면 동일한 Registry를 참조합니다. 호스트가 소유한 Runtime을 공유하려면 `createRenderer({ runtime })`으로 렌더러를 생성하세요.
 
-다른 Runtime의 View라면 참조하는 각 Component ID의 코드형 또는 선언형 종류가 두 Registry에서 일치해야 합니다. 코드형 Component마다 같은 공개 계약과 Svelte 구현을 등록하세요. 렌더러는 자체 Registry와 어댑터 등록을 사용하며 두 Registry의 호환성 검증은 호스트가 담당합니다.
+다른 Runtime의 View를 빌릴 때는 View를 생성하는 Runtime에 컴포넌트를 등록하세요. 렌더러는 View에 연결된 구현을 사용하고 그 구현을 표시할 연결자를 공급합니다. 예를 들어 `svelteComponent()`로 등록된 구현은 렌더러의 기본 Svelte 연결자로 표시할 수 있습니다. 외부 연결자가 필요한 경우 렌더러를 생성할 때 전달하세요.
 
 같은 규칙이 [`renderer.attach`](../renderer/#attach)에도 적용됩니다. Svelte 앱의 자식 컴포넌트로 렌더링하려면 `ViewstemView`를, DOM 요소에 렌더러가 관리하는 루트를 만들려면 `attach`를 사용하세요.
 

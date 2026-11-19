@@ -98,6 +98,36 @@ test('L07 replacement cleanup removes selected exact keys and retains external/p
   const connection = f.store.connectUrl({ adapter: f.adapter, bindings: [{ target: a }, { target: b }] }); await connection.removeOwned([a]);
   const params = new URL(f.read()).searchParams; assert.equal(params.has('p.a'), false); assert.equal(params.get('p.b'), '2'); assert.equal(params.get('p.a.extra'), '3'); assert.equal(params.get('external'), '4'); assert.equal(f.commits[0].mode, 'replace'); connection.dispose();
 });
+
+test('selected removal preserves unrelated pending URL writes and their history mode', async () => {
+  for (const cleanupFails of [false, true]) {
+    const f = fixture(link({ 'p.a': 0, 'p.b': 0, unrelated: true }), { delayed: true });
+    const a = f.scope.registerState('a', { schema: integer, initial: 0 });
+    const b = f.scope.registerState('b', { schema: integer, initial: 0 });
+    const connection = f.store.connectUrl({ adapter: f.adapter, bindings: [{ target: a }, { target: b, history: 'push' }] });
+    f.store.writeBatch([[a, 2], [b, 4]]);
+    assert.deepEqual(await connection.removeOwned([]), { applied: true });
+    assert.equal(f.pending[0].options.isCurrent(), true);
+    const cleanup = connection.removeOwned([a]);
+    assert.equal(f.pending[0].options.isCurrent(), false);
+    assert.deepEqual(f.pending[1].patch, { 'p.a': null });
+    assert.equal(f.pending[1].options.mode, 'replace');
+    if (cleanupFails) f.failNext();
+    f.release(1);
+    assert.deepEqual(await cleanup, { applied: !cleanupFails });
+    assert.equal(f.pending[1].options.mode, 'push');
+    assert.deepEqual(f.pending[1].patch, { 'p.b': '4' });
+    f.release(1);
+    f.release(0);
+    const params = new URL(f.read()).searchParams;
+    assert.equal(params.get('p.a'), cleanupFails ? '0' : null);
+    assert.equal(params.get('p.b'), '4');
+    assert.equal(params.get('unrelated'), 'true');
+    assert.equal(a.read(), 2);
+    assert.equal(b.read(), 4);
+    connection.dispose();
+  }
+});
 test('L08/K18 atomic push+replace batch writes once; same values and restore do not repush', async () => {
   const f = fixture(), org = f.scope.registerState('org', { schema: integer, initial: 1 }), selection = f.scope.registerState('selection', { schema: integer, initial: 7 });
   f.store.registerReaction(f.scope, { watch: [org], target: selection, value: 0 });
@@ -205,4 +235,62 @@ test('disposing a pending URL connection resolves ready even if adapter cleanup 
   await tick();
   assert.equal(target.read(), 3);
   assert.equal(connection.isReady(), false);
+});
+
+test('an initial delayed URL read failure rejects ready and releases the connection', async () => {
+  const f = fixture();
+  const initial = Promise.withResolvers();
+  const cell = f.scope.registerState('value', { schema: integer, pendingInitial: initial.promise });
+  const reported = [];
+  const connection = bind(f, cell, {
+    adapter: { ...f.adapter, read: () => { throw { code: 'HTTP_ERROR' }; } },
+    onError: diagnostic => reported.push(diagnostic),
+  });
+  assert.equal(connection.isReady(), false);
+  const readyRejected = assert.rejects(connection.ready, diagnostic => diagnostic === reported[0] && diagnostic.code === 'HTTP_ERROR' && diagnostic.kind === 'connect');
+  initial.resolve(3);
+  await readyRejected;
+  assert.equal(connection.isReady(), false);
+  assert.equal(cell.read(), 3);
+  assert.deepEqual(connection.getDiagnostics(), reported);
+  assert.equal(f.listeners.size, 0);
+  const next = bind(f, cell);
+  await next.ready;
+  assert.equal(next.isReady(), true);
+  next.dispose();
+  assert.equal(next.isReady(), false);
+});
+
+test('a URL connection started by a subscriber becomes ready after its queued restore', async () => {
+  const f = fixture(link({ 'p.value': 4 }));
+  const target = f.scope.registerState('value', { schema: integer, initial: 0 });
+  const trigger = f.scope.registerState('trigger', { schema: integer, initial: 0 });
+  let connection;
+  let whileNotifying;
+  f.store.subscribe(trigger.address, ({ changes }) => {
+    if (!changes.length) return;
+    connection = bind(f, target);
+    whileNotifying = [connection.isReady(), target.read()];
+  });
+  trigger.write(1);
+  assert.deepEqual(whileNotifying, [false, 0]);
+  await connection.ready;
+  assert.equal(connection.isReady(), true);
+  assert.equal(target.read(), 4);
+  connection.dispose();
+});
+
+test('initial URL restore flushes the latest dirty State once after subscriber writes', async () => {
+  const f = fixture(link({ 'p.a': 4 }));
+  const initial = Promise.withResolvers();
+  const a = f.scope.registerState('a', { schema: integer, initial: 0 });
+  const b = f.scope.registerState('b', { schema: integer, pendingInitial: initial.promise });
+  const connection = f.store.connectUrl({ adapter: f.adapter, bindings: [{ target: a }, { target: b, history: 'push' }] });
+  f.store.subscribe(a.address, ({ changes }) => { if (changes.length) b.write(2); });
+  b.write(1);
+  initial.resolve(0);
+  await connection.ready;
+  assert.deepEqual(f.commits.map(({ mode, patch }) => ({ mode, patch })), [{ mode: 'push', patch: { 'p.b': '2' } }]);
+  assert.equal(b.read(), 2);
+  connection.dispose();
 });

@@ -10,8 +10,9 @@
 | 패키지 | 역할 |
 |---|---|
 | [@viewstem/core](packages/core/README.ko.md) | DOM·프레임워크 의존성 없이 검증, 값, 상태, Query·Action 실행, 화면 수명 관리 |
+| [@viewstem/dom](packages/dom/README.ko.md) | 브라우저 렌더러와 DOM 컴포넌트 연결자 |
 | [@viewstem/svelte](packages/svelte/README.ko.md) | Svelte 5 클라이언트 렌더러. `createRenderer()`로 시작하고 컴포넌트를 명시적으로 등록 |
-| [@viewstem/ui](packages/ui/README.ko.md) | 브라우저에서 실행하는 기본 JSON 컴포넌트 카탈로그 |
+| [@viewstem/ui](packages/ui/README.ko.md) | 브라우저용 기본 컴포넌트 카탈로그와 스타일 |
 
 패키지는 로컬에서 빌드하고 검증했습니다. 패키지 버전이나 로컬 검증 결과가
 npm 공개 발행을 뜻하지는 않습니다. 공개 API, 지원 동작, 제한은 각 패키지의
@@ -19,19 +20,27 @@ README에서 확인하세요.
 
 ## 브라우저에 View 연결하기
 
-```ts
-import { createRenderer } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
+[설치 안내](apps/docs/src/content/docs/ko/docs/installation/index.md#브라우저-ui-패키지-빌드)에 따라 Core, DOM, UI를 설치합니다. HTML에 `<div id="panel"></div>`를 추가하고 Vite 같은 브라우저 번들러로 아래 코드를 실행합니다.
 
-const target = document.querySelector<HTMLElement>('#panel')!;
-const renderer = createRenderer();
+```ts
+import { createRuntime } from '@viewstem/core';
+import { createRenderer } from '@viewstem/dom';
+import { ui } from '@viewstem/ui';
+
+const target = document.getElementById('panel');
+if (!target) throw new Error('Missing #panel element');
+
+const runtime = createRuntime();
+runtime.registry.registerResourceSet(ui);
+const renderer = createRenderer({ runtime });
 const screen = renderer.mount({
   target,
   source: { render: { id: 'hello', componentRef: 'shadcn.Badge', inputs: { text: '안녕하세요' } } },
 });
-await screen.ready;
-// 라우트가 닫히면 screen.unmount(), 앱이 끝나면 renderer.dispose()를 호출합니다.
+await screen.whenRendered();
 ```
+
+화면이 닫히면 `screen.unmount()`를 기다립니다. 앱을 종료할 때는 `renderer.dispose()`를 기다린 뒤 앱이 소유한 Runtime의 `runtime.dispose()`도 기다립니다.
 
 ## 문서
 

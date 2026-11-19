@@ -1,50 +1,130 @@
-import { mount, unmount } from 'svelte';
-import { createRuntime } from '@viewstem/core';
-import { createRendererHost } from '@viewstem/core/renderer';
-import ConnectedView from './ConnectedView.svelte';
-import { failure, rendererStates, transformError, type RendererState } from './connection.js';
-import type { ComponentAdapter, RenderOptions, Renderer, RendererOptions } from './types.js';
+import { mount, tick, unmount } from 'svelte';
+import { createRuntime, type ComponentBinding, type ComponentContract } from '@viewstem/core';
+import { attachHostedView, createRenderError, notifyDiagnostic, runtimeOwnsView } from '@viewstem/core/renderer';
+import type { View } from '@viewstem/core';
+import { createRenderer as createBrowserRenderer, type BrowserDisplayOptions, type ComponentConnector } from '@viewstem/dom';
+import ComponentMount from './ComponentMount.svelte';
+import FallbackMount from './FallbackMount.svelte';
+import { cancelled, failure, rendererStates, transformError } from './lifecycle.js';
+import type { ComponentAdapter, RendererDiagnostic, RendererErrorListener, RenderAttachment, RenderOptions, Renderer, RendererOptions } from './types.js';
 
-export function createRenderer({ runtime: injectedRuntime, onError, components = [], ...runtimeOptions }: RendererOptions = {}): Renderer {
-  if (injectedRuntime && (components.length || Object.keys(runtimeOptions).length)) throw failure('INVALID_DEFINITION', 'Runtime injection and Runtime creation options are mutually exclusive.');
-  const adapters = new Map<string, ComponentAdapter>();
-  for (const { contract, component } of components) {
-    if (contract?.kind !== 'Component' || !contract.id || typeof component !== 'function' || adapters.has(contract.id)) throw failure('INVALID_DEFINITION', 'Each registration requires a distinct Component contract and Svelte implementation.');
-    adapters.set(contract.id, component);
-  }
-  if (runtimeOptions.registry && components.length) throw failure('INVALID_DEFINITION', 'Component contracts cannot be supplied with an injected Registry.');
-  const runtime = injectedRuntime ?? (runtimeOptions.registry
-    ? createRuntime(runtimeOptions as Parameters<typeof createRuntime>[0])
-    : createRuntime({ ...runtimeOptions, registry: undefined, componentContracts: [...(runtimeOptions.componentContracts ?? []), ...components.map(entry => entry.contract)] }));
-  const state: RendererState = { alive: true, adapters, connections: new Set(), ownedViews: new Set(), onError };
-  const host = createRendererHost<RenderOptions>(runtime, {
-    ownsRuntime: !injectedRuntime, onError,
-    async disposeOwned() {
-      const results = await Promise.allSettled([...state.ownedViews].map(stop => stop()));
-      const failed = results.find(result => result.status === 'rejected');
-      if (failed) throw failed.reason;
-    },
-    validateTarget(target: HTMLElement) {
-      const constructor = target?.ownerDocument?.defaultView?.HTMLElement;
-      return !!constructor && target instanceof constructor && target.isConnected;
-    },
-    connect(view, target, options, onRenderError, connection) {
-      const instance = mount(ConnectedView, { target, context: options.context, transformError, props: {
-        view, renderer, forwardRenderError: onRenderError, fallback: options.fallback,
-        isOpen: connection.isOpen, emitFromHost: connection.emit,
-      } });
-      return { whenRendered: () => instance.whenRendered(), dispose: () => unmount(instance) };
-    },
+export const SVELTE_CONNECTOR_ID = 'svelte';
+export function svelteComponent<const C extends ComponentContract>(
+  contract: C, implementation: ComponentAdapter<NoInfer<C>>,
+): ComponentBinding<ComponentAdapter<C>> {
+  if (typeof implementation !== 'function') throw failure('INVALID_DEFINITION', 'A Svelte binding requires a Svelte component.');
+  return { contract, connectorId: SVELTE_CONNECTOR_ID, implementation };
+}
+
+export const svelteConnector: ComponentConnector = Object.freeze<ComponentConnector>({
+  id: SVELTE_CONNECTOR_ID,
+  renderUnready: true,
+  accepts: value => typeof value === 'function',
+  mount(implementation, context) {
+    let failed: ReturnType<typeof createRenderError> | undefined;
+    const mounted = mount(ComponentMount, {
+      target: context.parent, anchor: context.anchor, transformError,
+      ...(context.hostContext instanceof Map ? { context: context.hostContext } : {}),
+      props: {
+        adapter: implementation as ComponentAdapter, initial: context.node, provideSlot: context.provideSlot,
+        emit(event, payload) { const result = context.emit(event, payload); void result.catch(() => {}); return result; },
+        report() {
+          failed = createRenderError(false, {
+            ...(context.node.componentRef === undefined ? {} : { componentId: context.node.componentRef }),
+            ...(context.node.instanceId === undefined ? {} : { instanceId: context.node.instanceId }),
+          });
+          context.invalidate();
+        },
+      },
+    });
+    return {
+      update: node => mounted.update(node),
+      setPending: pending => mounted.setPending(pending),
+      async whenRendered(signal) {
+        await tick();
+        if (signal.aborted) throw cancelled();
+        if (failed) throw failed;
+      },
+      dispose: () => unmount(mounted),
+    };
+  },
+});
+
+function browserOptions({ context, fallback, onError }: RenderOptions = {}): BrowserDisplayOptions & Pick<RenderOptions, 'onError'> {
+  return {
+    hostContext: context,
+    ...(onError ? { onError } : {}),
+    ...(fallback ? { fallback: ({ parent, anchor, node, error }) => {
+      let failed = false;
+      const instance = mount(FallbackMount, {
+        target: parent, anchor, transformError, ...(context ? { context } : {}), props: { node, error, fallback, report() { failed = true; } },
+      });
+      return {
+        update(next) { instance.update(next.node, next.error); },
+        async whenRendered() { await tick(); if (failed) throw createRenderError(false); },
+        dispose: () => unmount(instance),
+      };
+    } } : {}),
+  };
+}
+
+// Preparation and owner cleanup can fail before or after a display connection exists.
+export function reportComponentDiagnostic(renderer: Renderer | undefined, diagnostic: RendererDiagnostic, onError: RendererErrorListener | undefined, isOpen: () => boolean) {
+  const state = renderer && rendererStates.get(renderer);
+  const teardown = diagnostic.phase === 'dispose' && diagnostic.nodeId === undefined;
+  notifyDiagnostic(diagnostic,
+    { listener: state?.onError, isOpen: () => !!state?.alive && (teardown || isOpen()) },
+    { listener: onError, isOpen: () => teardown || isOpen() },
+  );
+}
+
+type ComponentDisplayOptions = Omit<RenderOptions, 'onError'> & {
+  getErrorListener: () => RendererErrorListener | undefined;
+  isOpen: () => boolean;
+  ownsView: boolean;
+};
+export function attachComponentView(renderer: Renderer, view: View, target: HTMLElement,
+  { getErrorListener, isOpen, ownsView, ...options }: ComponentDisplayOptions): RenderAttachment {
+  const state = rendererStates.get(renderer);
+  if (!state?.alive) throw cancelled();
+  return attachHostedView(state.browser, view, target, browserOptions(options), {
+    getErrorListener, isOpen, isRendererOpen: () => state.alive,
+    // An owned source already waits for its display when the component closes.
+    closeWithRenderer: !ownsView && state.ownsRuntime && runtimeOwnsView(state.runtime, view),
   });
+}
+
+export function createRenderer({ runtime: injected, onError, connectors = [], ...runtimeOptions }: RendererOptions = {}): Renderer {
+  if (injected && Object.keys(runtimeOptions).length) throw failure('INVALID_DEFINITION', 'Runtime injection and Runtime options are mutually exclusive.');
+  const runtime = injected ?? createRuntime(runtimeOptions as Parameters<typeof createRuntime>[0]);
+  const browserConnectors = [svelteConnector, ...connectors];
+  const browser = createBrowserRenderer({ runtime, connectors: browserConnectors, ...(onError ? { onError } : {}) });
+  const state = { alive: true, runtime, ownsRuntime: !injected, browser, ownedCleanups: new Set<() => Promise<void>>(), ...(onError ? { onError } : {}) };
+  let cleanup: Promise<void> | undefined;
   const renderer: Renderer = {
-    ...host,
-    bindComponent(id, component) {
-      if (!state.alive || !runtime.registry.isCode('Component', id) || typeof component !== 'function' || state.adapters.has(id)) throw failure('INVALID_DEFINITION', 'Bind one Svelte implementation for an existing code Component.');
-      state.adapters.set(id, component);
+    runtime,
+    mount({ context, fallback, onError, ...options }) {
+      if (!state.alive) throw cancelled();
+      return browser.mount({ ...options, ...browserOptions({ ...(context ? { context } : {}), ...(fallback ? { fallback } : {}), ...(onError ? { onError } : {}) }) });
+    },
+    attach(view, target, options) {
+      if (!state.alive) throw cancelled();
+      return browser.attach(view, target, browserOptions(options));
     },
     dispose() {
+      if (cleanup) return cleanup;
       state.alive = false;
-      return host.dispose();
+      let resolve!: () => void;
+      let reject!: (reason: unknown) => void;
+      cleanup = new Promise<void>((done, failed) => { resolve = done; reject = failed; });
+      const ownedCleanups = [...state.ownedCleanups];
+      const runtimeCleanup = state.ownsRuntime ? runtime.dispose() : undefined;
+      const work = [runtimeCleanup, browser.dispose(), ...ownedCleanups.map(close => close())];
+      void Promise.allSettled(work).then(results => {
+        const failed = results.find(result => result.status === 'rejected');
+        if (failed) reject(failed.reason); else resolve();
+      });
+      return cleanup;
     },
   };
   rendererStates.set(renderer, state);

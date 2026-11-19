@@ -24,6 +24,7 @@ Use this map to find the reference for your task. The language-independent contr
 | Read package guides and API references | [Site documentation research, structure, and verification](handoff/docs-package-reference-2026-11-05.md) (Korean) |
 | Understand resources and execution rules | [Full specification](VIEWSTEM-SPEC.md) and the topic specifications below |
 | Understand the DOM and Svelte host API design | [Host API implementation plan](designs/viewstem-host-api-implementation-2026-11-13.md) (Korean) |
+| Find the resource-set and mixed-rendering design | [Design contract](spec/12-resource-sets-browser.md), [decision history](history/resource-sets-browser-2026-11-16.md), [implementation plan](designs/viewstem-resource-sets-implementation-2026-11-16.md), [handoff](handoff/resource-sets-browser-2026-11-16.md) (Korean) |
 | Modify and verify the existing core | [Current setup procedure](handoff/implementation-start.md#새-채팅에서-시작할-때) |
 | Check support and limits | [Implementation handoff](handoff/core-implementation-2026-11-02.md), [CEL support](handoff/core-cel-support.md) |
 | Find the next implementation tasks | [Remaining work](handoff/open-contracts.md#실제-남은-작업) |

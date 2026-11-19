@@ -2,15 +2,20 @@
 
 English | [한국어](README.ko.md)
 
-Default browser UI for rendering Viewstem JSON into a DOM container. The package depends on `@viewstem/core`. Its renderer uses Basecoat 1.1.0 Vega styles and selected Vanilla JS controllers without a React, Vue, or Svelte runtime. The host supplies a connected element.
+Default UI resource set for Viewstem. Its components use the `@viewstem/dom` connector, Basecoat 1.1.0 Vega styles, and selected Vanilla JS controllers. The host supplies a connected element.
 
 ```js
-import { createRenderer } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
+import { createRuntime } from '@viewstem/core';
+import { createRenderer } from '@viewstem/dom';
+import { ui } from '@viewstem/ui';
 
-const renderer = createRenderer();
+const runtime = createRuntime();
+runtime.registry.registerResourceSet(ui);
+const renderer = createRenderer({ runtime });
+const target = document.querySelector('#app');
+if (!target) throw new Error('Missing #app element');
 const screen = renderer.mount({
-  target: document.querySelector('#app'),
+  target,
   source: {
     render: {
       id: 'save',
@@ -20,15 +25,16 @@ const screen = renderer.mount({
   },
 });
 await screen.ready;
+await screen.whenRendered();
 ```
 
-Call `await screen.unmount()` when the screen closes and `await renderer.dispose()` when the app is done with the renderer. If you need the initial Query report, use `await screen.whenSettled(view.initial)` with the View returned by `screen.ready`.
+Call `await screen.unmount()` when the screen closes. On app shutdown, await `renderer.dispose()` and then await `runtime.dispose()` for the Runtime created above. If you need the initial Query report, use `await screen.whenSettled(view.initial)` with the View returned by `screen.ready`.
 
-`createRenderer()` owns a Runtime initialized with the catalog contracts. To supply an existing Runtime, register the catalog first with `registerShadcn(runtime.registry)`, then pass `{ runtime }`. `renderer.attach(view, target)` borrows a View; call `await attachment.detach()` to release the connection. `whenRendered()` waits for the requested DOM projection. Targets must be connected HTMLElements and can be reused after cleanup completes. `onError` receives `{ phase, error }` diagnostics. Pending or failed nodes are omitted from the DOM.
+Register the exported `ui` resource set before creating a View. A set that includes `ui` in `dependencies` registers it along with its own resources. When a browser bundler selects the `browser` export, the import of `@viewstem/ui` includes its scoped CSS in either case. Hosts that load stylesheets explicitly can use `@viewstem/ui/styles.css`. `renderer.attach(view, target)` borrows a View, and `await attachment.detach()` releases the display. `whenRendered()` waits for the requested DOM projection.
 
 ## Shared JSON catalog
 
-The renderer registers 66 families and 357 JSON Component IDs. Use the generated `@viewstem/ui/support.json` export for the implemented port schemas, slots, and event payloads. The build derives this reference from the package’s `catalog/shadcn-contracts.json` and the supported inputs, slots, and events of the DOM adapters.
+The `ui` set provides 66 families and 357 JSON Component IDs. Use the generated `@viewstem/ui/support.json` export for the implemented port schemas, slots, and event payloads. The build derives this reference from the package’s `catalog/shadcn-contracts.json` and the supported inputs, slots, and events of the DOM adapters.
 
 Dropdown Menu, Context Menu, and Menubar share a Zag Vanilla menu adapter, including nested menus. Hover Card, Navigation Menu, Resizable, and Scroll Area also use Zag Vanilla. Carousel uses Embla 8.6.0. Select scroll buttons extend the existing Select controller. The remaining components use browser DOM controls and CSS.
 
@@ -44,8 +50,10 @@ Calendar, Range Calendar, and Date Picker use Zag Vanilla for date navigation an
 
 Data Table uses TanStack Table Core. The JSON recipe keeps caller-owned sorting, filtering, pagination, and selection state. A page outside the available range is clamped for display, and a page size change starts from the first displayed row. Row IDs may be strings or numbers and must be unique after conversion to strings. `selectedIds` and `selectedIdsChange` use the string form. Selected IDs outside the current data remain in the selection state.
 
-Basecoat styles are scoped to the renderer subtree. Set `.dark` or `data-theme="dark"` on an ancestor to switch themes. Basecoat controllers are registered locally and attached to individual DOM nodes. Their teardown is part of attachment disposal. The build includes the Basecoat license in `dist/BASECOAT-LICENSE.md`.
+Basecoat styles target elements owned by the default UI. Set `.dark` or `data-theme="dark"` on an ancestor to switch themes. Basecoat controllers are registered locally and attached to individual DOM nodes. Their teardown is part of attachment disposal. The build includes the Basecoat license in `dist/BASECOAT-LICENSE.md`.
 
 ## Verify locally
 
-From the workspace root, install the locked dependencies and Chromium, then run `npm run check:ui`. The test installs the core and UI tarballs in an isolated consumer and runs the same [View JSON](test/view.json) in plain JS, React, Vue, and Svelte. The vanilla dependency and bundle checks enforce the framework boundary. The browser suite also mounts the [66 original catalog ViewSpecs](test/fixtures/samples.mjs) and verifies State and Action behavior for the date and table recipes.
+From the workspace root, install the locked dependencies and Chromium, then run `npm run check:ui`. The test installs the Core, DOM, and UI tarballs in an isolated consumer and runs the same [View JSON](test/view.json) in plain JS, React, Vue, and Svelte. The vanilla dependency and bundle checks enforce the framework boundary. The browser suite also mounts the [66 original catalog ViewSpecs](test/fixtures/samples.mjs) and verifies State and Action behavior for the date and table recipes.
+
+Set prefixed theme variables such as `--viewstem-primary` and `--viewstem-radius` on an ancestor. The legacy `data-viewstem-ui` attribute provides a boundary for older theme variables. When sets are mixed, each set's CSS directly styles its own elements.

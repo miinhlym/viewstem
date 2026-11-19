@@ -16,7 +16,7 @@ import type { Renderer, RendererOptions } from '@viewstem/svelte';
 
 **Signature** · `createRenderer(options?: RendererOptions): Renderer`
 
-`createRenderer()` creates and owns a core Runtime with an empty Registry. Each renderer keeps its own Svelte adapters. [Mount a View in a Svelte app](../guides/mount-in-svelte/) shows how to register the first adapter and use the Runtime.
+`createRenderer()` creates and owns a core Runtime with an empty Registry. The Registry stores component bindings. [Mount a View in a Svelte app](../guides/mount-in-svelte/) shows how to register the first adapter and use the Runtime.
 
 ## RendererOptions
 
@@ -25,7 +25,7 @@ Choose Runtime creation or Runtime injection. Both accept `onError`. Providing `
 | Field | Mode | Meaning |
 | --- | --- | --- |
 | `runtime?: Runtime` | Inject | Borrow an existing Runtime and use its Registry. The host owns this Runtime. |
-| `components?: readonly ComponentRegistration[]` | Create | Register code Component contracts and Svelte implementations together. An injected Registry excludes this option. |
+| `connectors?: readonly ComponentConnector[]` | Both | Add browser connectors alongside the included DOM and Svelte connectors. |
 | `registry?: Registry` | Create | Use an existing core Registry. Defaults to a new Registry configured with `functions`. |
 | `stateStore?: StateStore` | Create | Use a host-owned StateStore. Defaults to a store owned by the new Runtime. |
 | `requestExecutor?: RequestExecutor` | Create | Execute HTTP request plans from Queries using the supplied callback and its abort signal. Defaults to core's HTTP executor. |
@@ -42,7 +42,7 @@ The Runtime fields use [core's types](/docs/core/types/). See [diagnostics](../e
 
 ### runtime and component binding
 
-`renderer.runtime.registry` exposes the Runtime registry. Supply `components: [{ contract, component }]` when creating the renderer, or call `renderer.bindComponent(id, component)` for an existing code Component contract.
+Create a binding with `svelteComponent(contract, Adapter)` and register the resource set with `renderer.runtime.registry.registerResourceSet(set)`.
 
 <a id="mount"></a>
 <a id="attach"></a>

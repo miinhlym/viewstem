@@ -11,11 +11,11 @@ PR이나 수동 실행으로 확인합니다.
 
 ## 검사와 환경
 
-- Node 22·24에서 core와 Svelte 어댑터, 브라우저 UI를 빌드하고 core·Svelte 타입과 tarball 소비자를 검사합니다.
-- Chromium에서 core·Svelte 브라우저 테스트와 UI tarball 소비자 테스트를 실행합니다. UI 검사는 순수 JS·React·Vue·Svelte 호스트, 원본 66개 계열의 JSON, 날짜·테이블의 State와 이벤트를 다룹니다.
+- Node 22·24에서 Core·DOM·Svelte·UI를 빌드합니다. 호환성 검사에서는 Core·DOM·Svelte 타입과 설치된 패키지의 소비 경로를 확인합니다. 독립 DOM 설치와 혼합 렌더링도 포함합니다.
+- Chromium에서 Core·DOM·Svelte 브라우저 테스트와 UI tarball 소비자 테스트를 실행합니다. UI 검사는 순수 JS·React·Vue·Svelte 호스트, 원본 66개 계열의 JSON, 날짜·테이블의 State와 이벤트를 다룹니다.
 - **CI complete**는 호환성 검사와 브라우저 검사가 모두 성공해야 통과합니다.
 
-로컬에서는 `npm run check:ui`, `npm run check:svelte`, `npm run test:ci`를 실행합니다. CI 브라우저는 Playwright Chromium의 headless shell을 사용합니다.
+변경한 패키지에 맞춰 로컬 검사를 선택합니다. DOM 렌더러·CSS 변환은 `npm run check:dom`, UI 카탈로그는 `npm run check:ui`, Svelte 렌더러는 `npm run check:svelte`, 릴리스 계획은 `npm run test:ci`로 확인합니다. CI 브라우저는 Playwright Chromium의 headless shell을 사용합니다.
 
 ## npm 릴리스
 
@@ -25,7 +25,7 @@ PR이나 수동 실행으로 확인합니다.
 ### Changeset 작성하기
 
 1. 저장소 루트에서 `npx changeset`을 실행합니다. 영향을 받는 패키지를 선택하고
-   각각의 SemVer 변경 수준을 정합니다. `core`, `svelte`, `ui`의 버전은
+   각각의 SemVer 변경 수준을 정합니다. `core`, `dom`, `svelte`, `ui`의 버전은
    독립적으로 관리합니다.
 2. 패키지 사용자에게 달라지는 점을 변경 이력에 들어갈 짧은 문장으로 씁니다.
    사용자가 알아야 할 변경 이유나 이관 방법을 덧붙이고, 자세한 절차가 필요하면
@@ -54,8 +54,8 @@ PR이나 수동 실행으로 확인합니다.
    `main`에서 `npm ci --ignore-scripts`, `npm run build:svelte && npm run build -w @viewstem/ui`,
    `node .github/scripts/npm-release.mjs pack-initial /tmp/viewstem-release`를
    실행합니다. tarball의 문서 링크는 빌드한 소스 커밋을 가리킵니다.
-2. `npm publish <tarball> --access public`과 대화형 2FA로 core, svelte,
-   ui 순서로 공개합니다. 해당 소스 커밋에 각 패키지 태그를 기록합니다.
+2. `npm publish <tarball> --access public`과 대화형 2FA로 네 패키지를 공개합니다.
+   Core, DOM, Svelte, UI 순서로 발행합니다. 해당 소스 커밋에 각 패키지 태그를 기록합니다.
 3. 각 npm 패키지에 Trusted Publisher를 추가합니다. GitHub 소유자는
    `miinhlym`, 저장소는 `viewstem`, 워크플로 파일은 `core.yml`이고
    직접 `npm publish`를 허용합니다. `core.yml`에서 `npm-release.yml`을

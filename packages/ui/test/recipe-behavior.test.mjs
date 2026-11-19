@@ -10,15 +10,14 @@ import { sampleBySlug } from './fixtures/samples.mjs';
 const workspace = fileURLToPath(new URL('../../../', import.meta.url));
 const bundle = await build({ stdin: { contents: `
   import { createRegistry, createRuntime } from '@viewstem/core';
-  import { registerShadcn } from '@viewstem/ui';
-  import { connect } from './packages/ui/dist/dom.js';
+  import { createRenderer } from '@viewstem/dom';
+  import { observeCatalog } from './packages/ui/test/observe-catalog.mjs';
   window.mountRecipe = async definition => {
     window.errors = [];
     window.calendarEvents = [];
     window.sliderEvents = [];
-    const observe = view => ({
-      ...view,
-      emit(node, event, payload) {
+    const registry = createRegistry();
+    const connector = observeCatalog(registry, (node, event, payload) => {
         if (['shadcn.Calendar.Root', 'shadcn.RangeCalendar.Root'].includes(node.componentRef) &&
             ['valueChange', 'placeholderChange', 'startValueChange', 'endValueChange'].includes(event)) {
           window.calendarEvents.push([event, payload.value]);
@@ -26,18 +25,20 @@ const bundle = await build({ stdin: { contents: `
         if (node.componentRef === 'shadcn.Slider' && ['valueChange', 'valueCommit'].includes(event)) {
           window.sliderEvents.push([event, payload]);
         }
-        return view.emit(node, event, payload);
-      },
     });
-    const registry = createRegistry(); registerShadcn(registry);
     const runtime = createRuntime({ registry });
     const view = await runtime.createView(definition);
-    const attachment = connect(observe(view), document.querySelector('#app'), e => errors.push(String(e.code ?? e)));
-    await view.whenSettled(view.initial);
+    const target = document.querySelector('#app');
+    target.setAttribute('data-viewstem-ui', '');
+    const renderer = createRenderer({ runtime, connectors: [connector] });
+    const attachment = renderer.attach(view, target, { onError: diagnostic => errors.push(diagnostic.error.code) });
+    await attachment.whenSettled(view.initial);
     window.view = view;
-    window.disposeRecipe = () => { attachment.dispose(); view.dispose(); runtime.dispose(); };
+    window.disposeRecipe = async () => { await renderer.dispose(); view.dispose(); runtime.dispose(); };
   };
-`, resolveDir: workspace }, bundle: true, write: false, platform: 'browser', format: 'iife' });
+`, resolveDir: workspace }, outfile: 'bundle.js', bundle: true, write: false, platform: 'browser', format: 'iife' });
+
+const recipeScript = bundle.outputFiles.find(file => file.path.endsWith('.js')).text;
 
 const sample = slug => {
   const result = sampleBySlug.get(slug);
@@ -79,7 +80,7 @@ test('Input and Textarea render numeric State values', { timeout: 30_000 }, asyn
   t.after(() => browser.close());
   const page = await browser.newPage();
   await page.setContent('<!doctype html><main id="app"></main>');
-  await page.addScriptTag({ content: bundle.outputFiles[0].text });
+  await page.addScriptTag({ content: recipeScript });
   const value = { '@path': '/states/quantity' };
   await page.evaluate(definition => window.mountRecipe(definition), {
     states: { quantity: { kind: 'State', schema: { type: 'number' }, initial: 42 } },
@@ -107,14 +108,14 @@ test('Input and Textarea render numeric State values', { timeout: 30_000 }, asyn
 test('Command.Dialog searches and selects commands by keyboard', { timeout: 30_000 }, async t => {
   const browser = await chromium.launch({ headless: true });
   t.after(() => browser.close());
-  const styles = await readFile(new URL('../dist/styles.css', import.meta.url), 'utf8');
+  const styles = bundle.outputFiles.find(file => file.path.endsWith('.css')).text;
   for (const nested of [false, true]) {
     await t.test(nested ? 'explicit Command.Root' : 'direct command slots', async t => {
       const page = await browser.newPage();
       t.after(() => page.close());
       await page.setContent('<!doctype html><main id="app"></main>');
       await page.addStyleTag({ content: styles });
-      await page.addScriptTag({ content: bundle.outputFiles[0].text });
+      await page.addScriptTag({ content: recipeScript });
       const schema = { type: 'string' };
       const command = (id, text, disabled = false) => ({
         id,
@@ -164,6 +165,33 @@ test('Command.Dialog searches and selects commands by keyboard', { timeout: 30_0
   }
 });
 
+test('native Slider and Chart apply local CSS values alongside public theme variables', async t => {
+  const browser = await chromium.launch();
+  t.after(() => browser.close());
+  const page = await browser.newPage();
+  await page.setContent('<main id="app" style="--viewstem-chart-1: rgb(20 30 40); --viewstem-chart-2: rgb(50 60 70)"></main>');
+  const stylesheet = await readFile(new URL('../dist/styles.css', import.meta.url), 'utf8');
+  await page.addStyleTag({ content: stylesheet });
+  await page.addScriptTag({ content: recipeScript });
+  const chart = structuredClone(sample('chart'));
+  const plot = chart.render.slots.default.find(node => node.componentRef === 'shadcn.Chart');
+  delete plot.inputs.series[1].color;
+  await page.evaluate(view => window.mountRecipe(view), chart);
+  const strokes = page.locator('svg path[stroke-width="1"]');
+  await strokes.nth(1).waitFor({ state: 'attached' });
+  assert.deepEqual(await strokes.evaluateAll(nodes => nodes.map(node => getComputedStyle(node).stroke)), ['rgb(20, 30, 40)', 'rgb(50, 60, 70)']);
+  await page.evaluate(() => window.disposeRecipe());
+
+  await page.evaluate(view => window.mountRecipe(view), sample('slider'));
+  const slider = page.getByRole('slider');
+  const sliderVariable = /var\((--[\w-]+-slider-value)\)/.exec(stylesheet)[1];
+  assert.equal(await slider.evaluate((node, name) => getComputedStyle(node).getPropertyValue(name).trim(), sliderVariable), '35%');
+  await slider.press('ArrowRight');
+  await expectState(page, 'level', 40);
+  assert.equal(await slider.evaluate((node, name) => getComputedStyle(node).getPropertyValue(name).trim(), sliderVariable), '40%');
+  await page.evaluate(() => window.disposeRecipe());
+});
+
 test('multi-thumb Slider emits the whole range and accepts external State updates', { timeout: 30_000 }, async t => {
   const browser = await chromium.launch({ headless: true });
   t.after(() => browser.close());
@@ -171,7 +199,7 @@ test('multi-thumb Slider emits the whole range and accepts external State update
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.setContent('<!doctype html><main id="app"></main>');
-  await page.addScriptTag({ content: bundle.outputFiles[0].text });
+  await page.addScriptTag({ content: recipeScript });
   const definition = structuredClone(sample('slider'));
   const numbers = { type: 'array', items: { type: 'number' } };
   Object.assign(definition.states.level, { schema: numbers, initial: [20, 50, 80] });
@@ -222,7 +250,7 @@ test('original catalog recipes preserve State, Actions and calendar events', { t
         } finally { await page.close(); }
       });
       await page.setContent('<!doctype html><html lang="ko"><body><main id="app"></main></body></html>');
-      await page.addScriptTag({ content: bundle.outputFiles[0].text });
+  await page.addScriptTag({ content: recipeScript });
       assert.deepEqual(errors, []);
       await page.evaluate(async view => {
         try { await window.mountRecipe(view); }

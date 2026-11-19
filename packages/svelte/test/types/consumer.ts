@@ -1,10 +1,12 @@
-import { createRenderer, ViewstemView, transformError } from '@viewstem/svelte';
-import type { ComponentRegistration } from '@viewstem/svelte';
+import { createRenderer, svelteComponent, ViewstemView, transformError } from '@viewstem/svelte';
+import { defineResourceSet } from '@viewstem/core';
 import type { ComponentAdapterProps, RendererErrorListener, RenderFallback, RenderAttachment, MountedView, ComponentAdapter, Renderer, RendererOptions, ViewstemViewProps, PublicError, View, ComponentContract, ViewSpec, RequestExecutor, StateHandle, Runtime } from '@viewstem/svelte';
 import type { ActionSnapshot, ActionHandler, ActionContext, CodeActionSpec, CodeActionDefinition, StateScope, CelFunction, CelValue } from '@viewstem/svelte';
 import type { Component, Snippet } from 'svelte';
 import TypedAdapter from './TypedAdapter.svelte';
 import TypedHost from './TypedHost.svelte';
+import ContractAdapter from './ContractAdapter.svelte';
+import { countContract } from './contract.js';
 
 const defaultRenderer = createRenderer();
 const { runtime } = defaultRenderer;
@@ -22,12 +24,55 @@ const requestExecutor: RequestExecutor = async (_plan, { signal }) => ({ status:
 createRenderer({ requestExecutor, stateStore: runtime.stateStore, resourceResolver: async (_kind, id) => ({ kind: 'View', id, spec: { render: { id: 'root', componentRef: 'Explicit' } } }) });
 const contract: ComponentContract = { kind: 'Component', id: 'Explicit', spec: {} };
 const definition: ViewSpec = { render: { id: 'root', componentRef: 'Explicit' } };
-registry.registerComponentContract(contract);
 const sharedRuntime: Runtime = renderer.runtime;
 declare const state: StateHandle<number>;
 void [definition, sharedRuntime, state];
 const adapter: ComponentAdapter = TypedAdapter;
-renderer.bindComponent('Explicit', adapter);
+registry.registerResourceSet(defineResourceSet({ id: 'fixture', version: '1', components: [svelteComponent(contract, adapter)] }));
+const countBinding = svelteComponent(countContract, ContractAdapter);
+registry.registerResourceSet(defineResourceSet({ id: 'typed-fixture', version: '1', components: [countBinding] }));
+svelteComponent(countContract, adapter);
+const textContract = {
+  ...countContract, spec: { ports: { count: { kind: 'Value', schema: { type: 'string' }, required: true } } },
+} as const satisfies ComponentContract;
+// @ts-expect-error The registration contract determines the adapter props.
+svelteComponent(textContract, ContractAdapter);
+declare const typed: ComponentAdapterProps<typeof countContract>;
+// @ts-expect-error Pending inputs may be absent.
+const unchecked: number = typed.node.inputs.count;
+if (typed.node.status === 'ready') {
+  const ready: number = typed.node.inputs.count;
+  // @ts-expect-error Inputs belong to the snapshot and are readonly.
+  typed.node.inputs.count = 9;
+  void ready;
+} else {
+  const incomplete: number | undefined = typed.node.inputs.count;
+  void incomplete;
+}
+const variedContract = {
+  ...countContract,
+  spec: { ports: {
+    optional: { kind: 'Value', schema: { type: 'string' } },
+    cell: { kind: 'State', schema: { type: 'integer' }, required: true },
+    query: { kind: 'Query', required: true },
+    referenced: { kind: 'Value', typeRef: 'CustomType', required: true },
+    config: { kind: 'Value', schema: { type: 'array', items: { type: 'integer' } }, required: true },
+  } },
+} as const satisfies ComponentContract;
+declare const varied: ComponentAdapterProps<typeof variedContract>;
+if (varied.node.status === 'ready') {
+  const text: string | undefined = varied.node.inputs.optional;
+  const state: StateHandle<number> = varied.node.inputs.cell;
+  const value: number | undefined = state.read();
+  const queryStatus: string = varied.node.inputs.query.getSnapshot().status;
+  const config: readonly number[] = varied.node.inputs.config;
+  // @ts-expect-error The literal contract can't resolve Registry Type references.
+  const assumed: number = varied.node.inputs.referenced;
+  // @ts-expect-error Nested snapshot inputs are readonly.
+  varied.node.inputs.config.push(1);
+  void [text, value, queryStatus, config, assumed];
+}
+void unchecked;
 declare const view: View;
 declare const target: HTMLElement;
 declare const fallback: RenderFallback;
@@ -52,9 +97,9 @@ createRenderer({ runtime, requestExecutor });
 // @ts-expect-error Runtime cannot be replaced with a structurally unrelated object.
 createRenderer({ runtime: {} });
 // @ts-expect-error A renderer implementation has to be a Svelte Component.
-renderer.bindComponent('bad', {});
+svelteComponent(contract, {});
 // @ts-expect-error An implementation is bound to its explicit string ID.
-renderer.bindComponent(TypedAdapter);
+svelteComponent(TypedAdapter);
 // @ts-expect-error A real DOM Element is required.
 renderer.mount({ target: {}, source: { ref: 'view' } });
 // @ts-expect-error View target is required.
@@ -111,7 +156,7 @@ registry.registerAction({ kind: 'Action', id: 'inferred', spec: { ports: { title
   return title.length > 0;
 });
 declare const actionSnapshot: ActionSnapshot;
-const celFunction: CelFunction<[number], number> = { name: 'double', inputs: [{ type: 'number' }], output: { type: 'number' }, run: n => n * 2 };
+const celFunction: CelFunction<[number], number> = { name: 'twice', inputs: [{ type: 'number' }], output: { type: 'number' }, run: n => n * 2 };
 const celValue: CelValue = 1;
 createRenderer({ functions: [celFunction] });
 void [stateSnapshot, viewSnapshot, diagnostics, actionSnapshot, celValue];

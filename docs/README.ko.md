@@ -22,6 +22,7 @@
 | 사이트 패키지 가이드·API 레퍼런스 확인 | [공식 문서 조사·페이지 구성·검증](handoff/docs-package-reference-2026-11-05.md) |
 | 리소스와 실행 규칙 이해하기 | [전체 계약](VIEWSTEM-SPEC.md) → 아래 주제별 명세 |
 | DOM·Svelte 호스트 API 설계 이해하기 | [호스트 API 구현 계획](designs/viewstem-host-api-implementation-2026-11-13.md) |
+| 리소스 셋·혼합 렌더링 후속 설계 찾기 | [확정 설계](spec/12-resource-sets-browser.md), [결정 이력](history/resource-sets-browser-2026-11-16.md), [상세 구현 계획](designs/viewstem-resource-sets-implementation-2026-11-16.md), [구현 인계](handoff/resource-sets-browser-2026-11-16.md) |
 | 기존 core를 수정하고 검증하기 | [현재 작업 시작 절차](handoff/implementation-start.md#새-채팅에서-시작할-때) |
 | 지원 범위와 제한 확인하기 | [구현 인수인계](handoff/core-implementation-2026-11-02.md), [CEL 지원 범위](handoff/core-cel-support.md) |
 | 다음 구현 범위 확인하기 | [실제 남은 작업](handoff/open-contracts.md#실제-남은-작업) |

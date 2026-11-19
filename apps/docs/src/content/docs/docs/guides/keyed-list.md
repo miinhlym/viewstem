@@ -8,11 +8,14 @@ sidebar:
 Render a list of projects from one row template. Start with the workspace setup and `<div id="viewstem"></div>` from the [Quickstart](../../quickstart/), then replace its client entry with this code.
 
 ```js
-import { createRenderer } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
+import { createRuntime } from '@viewstem/core';
+import { createRenderer } from '@viewstem/dom';
+import { ui } from '@viewstem/ui';
 
 const target = document.querySelector('#viewstem');
-const renderer = createRenderer();
+const runtime = createRuntime();
+runtime.registry.registerResourceSet(ui);
+const renderer = createRenderer({ runtime });
 const source = {
   render: {
     id: 'projects',

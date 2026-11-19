@@ -1,5 +1,6 @@
-import type { HttpResponse } from '@viewstem/core';
-import { createRenderer } from '@viewstem/ui';
+import { createRuntime, type HttpResponse } from '@viewstem/core';
+import { createRenderer } from '@viewstem/dom';
+import { ui } from '@viewstem/ui';
 import { projectsEndpoint, type ExampleDefinition, type Locale } from './definitions';
 
 export function createExamplePreview(
@@ -9,8 +10,7 @@ export function createExamplePreview(
   onError: NonNullable<Parameters<ReturnType<typeof createRenderer>['attach']>[2]>['onError'],
 ) {
   let requestCount = 0;
-  const renderer = createRenderer({
-    resources: definition.resources,
+  const runtime = createRuntime({
     requestExecutor: ({ datasource, request }): HttpResponse => {
       const method = definition.fixture === 'project-write' ? 'POST' : projectsEndpoint.request.method;
       if (!definition.fixture) throw new Error('No example response is configured.');
@@ -29,6 +29,10 @@ export function createExamplePreview(
       return { status: 200, headers: {}, body: { title: `${title} ${++requestCount}`, code: 'PRJ' } };
     },
   });
+  runtime.registry.registerResourceSet(ui);
+  if (definition.resources) runtime.registry.registerResources(definition.resources);
+  target.setAttribute('data-viewstem-ui', '');
+  const renderer = createRenderer({ runtime });
 
   return {
     async run() {
@@ -38,6 +42,6 @@ export function createExamplePreview(
       const failure = report.queryErrors[0]?.error ?? view.getSnapshot().errors[0];
       if (failure) throw new Error(failure.message);
     },
-    dispose: () => renderer.dispose(),
+    async dispose() { await renderer.dispose(); runtime.dispose(); },
   };
 }

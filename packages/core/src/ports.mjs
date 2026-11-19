@@ -99,8 +99,11 @@ export function createQueryHandle(delegate = {}) {
 }
 export function boundedQuery(baseHandle, guard) {
   if (!queries.has(baseHandle) || typeof guard !== 'function') fail('TYPE_CONTRACT_MISMATCH');
-  const wrapper = {};
-  for (const method of ["getSnapshot", 'refresh', 'retry']) wrapper[method] = (...args) => { guard(method); return baseHandle[method](...args); };
+  const wrapper = {
+    getSnapshot() { guard('getSnapshot'); return baseHandle.getSnapshot(); },
+    async refresh(signal) { guard('refresh'); return baseHandle.refresh(signal); },
+    async retry(signal) { guard('retry'); return baseHandle.retry(signal); },
+  };
   queries.add(wrapper); return Object.freeze(wrapper);
 }
 

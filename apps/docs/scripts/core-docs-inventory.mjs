@@ -4,11 +4,11 @@ import ts from 'typescript';
 import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 export const routes = {
-  registry: 'Registry RegistryOptions createRegistry CodeActionDefinition CodeActionSpec ActionHandler ActionContext ChildActionRequest ComponentContract',
+  registry: 'Registry RegistryOptions createRegistry CodeActionDefinition CodeActionSpec ActionHandler ActionContext ChildActionRequest ComponentContract CodeActionEntry ImplementedCodeAction CodeActionContract defineCodeAction ComponentBinding ResourceSet defineResourceSet ReplaceResourceInput',
   runtime: 'Runtime createRuntime RuntimeOptions RuntimeSettings ViewSource ViewOptions ViewApplication ActionRequest InitialReport PublicError TimerClock',
   view: 'View ViewSnapshot NodeSnapshot QueryHandle QuerySnapshot ActionSnapshot',
   'state-store': 'StateStore createStateStore StateScope StateHandle StateAddress StateDeclaration StoreObservation ValueSnapshot Clock',
-  url: 'UrlAdapter UrlConnection mergeOwnedUrl',
+  url: 'UrlAdapter UrlConnection UrlDiagnostic mergeOwnedUrl',
   http: 'HttpExecutorOptions createHttpExecutor HttpExecutionPlan HttpResponse RequestExecutor',
   cel: 'CelOptions CelLimits CelFunction CelValue compileCel evaluateCel defaultCelLimits',
   utilities: 'GridConfig GridPlacement computeGridLayout',
@@ -20,7 +20,7 @@ export const routes = {
   '../dsl/actions': 'ActionSpec ActionCall Step',
   '../dsl/datasources': 'HttpRequest DatasourceSpec',
   '../dsl/queries': 'QuerySource TransformStep QuerySpec QueryUse QueryDefaults',
-  '../dsl/view-and-component': 'ComponentPublicContract ComponentSpec ViewSpec ComponentNode',
+  '../dsl/view-and-component': 'ComponentPublicContract ComponentSpec ViewSpec ComponentNode ComponentInputs',
 };
 const routeOf = Object.fromEntries(Object.entries(routes).flatMap(([route, names]) => names.split(' ').map(name => [name, route])));
 export function inventory() {

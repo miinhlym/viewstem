@@ -61,7 +61,7 @@ async function verify(locale) {
     await saved.waitFor();
     await editor.fill('{"render":{"id":"bad","componentRef":"unknown"}}');
     await run.click();
-    await page.getByRole('alert').filter({ hasText: 'REFERENCE_NOT_FOUND' }).waitFor();
+    await page.getByRole('alert').filter({ hasText: 'Unknown Component "unknown".' }).waitFor();
     await saved.waitFor();
     await editor.fill(draft);
     await run.click();
