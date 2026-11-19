@@ -4,7 +4,7 @@ import {
 import {
   isTokenAtKeyword, isTokenColon, isTokenComma, isTokenIdent, isTokenString, mutateIdent, tokenize,
 } from '@csstools/css-tokenizer';
-import { Rule, type AtRule, type ChildNode, type Declaration, type Plugin, type Root } from 'postcss';
+import { Rule, type AtRule, type ChildNode, type Container, type Declaration, type Plugin, type Root } from 'postcss';
 import selectorParser from 'postcss-selector-parser';
 import { rewriteAnimation, type AnimationForm } from './styles-animation.js';
 import { cssIdentifier, parseCssValue, renameCssName, valueToken, variableName } from './styles-css-values.js';
@@ -19,6 +19,7 @@ const keyframesRule = /^(?:-webkit-|-moz-|-o-)?keyframes$/;
 const animationProperty = /^(?:-webkit-|-moz-|-o-)?animation(-name)?$/;
 const legacyPseudoElements = new Set([':before', ':after', ':first-letter', ':first-line']);
 const crossingPseudos = new Set(['::part', '::slotted', '::v-deep', ':deep', ':global']);
+const nestedDeclarationGroups = new Set(['media', 'supports', 'container', 'layer', 'starting-style']);
 
 function pseudoName(raw: string): string {
   const colon = raw.startsWith('::') ? '::' : ':';
@@ -26,9 +27,9 @@ function pseudoName(raw: string): string {
   return colon + (name.includes('\\') ? cssIdentifier(name)?.[4].value ?? name : name).toLowerCase();
 }
 
-function guardSelector(rule: Rule, id: string): void {
+function guardedSelector(rule: Rule, id: string): string {
   const guardSyntax = `:where([${styleOwnerAttribute}="${id}"])`;
-  rule.selector = selectorParser(selectors => {
+  return selectorParser(selectors => {
     selectors.walkPseudos(pseudo => {
       const name = pseudoName(pseudo.value);
       if (crossingPseudos.has(name) || name.startsWith('::view-transition')) {
@@ -72,6 +73,59 @@ function guardSelector(rule: Rule, id: string): void {
       }
     }
   }).processSync(rule);
+}
+
+function hasInheritedDeclarations(group: AtRule): boolean {
+  return nestedDeclarationGroups.has(group.name.toLowerCase()) && !!group.nodes?.some(node =>
+    node.type === 'decl' || (node.type === 'atrule' && hasInheritedDeclarations(node)));
+}
+
+function scopeStyleRule(rule: Rule, id: string): void {
+  const owned = guardedSelector(rule, id);
+  if (rule.nodes.every(node => node.type === 'decl' || node.type === 'comment')) {
+    rule.selector = owned;
+    return;
+  }
+
+  // Split declaration runs from nesting contexts in source order. An added `&`
+  // rule would change the specificity and pseudo-element matching of declarations.
+  const fragment = new Rule({ selector: rule.selector, raws: { ...rule.raws } });
+  if (rule.source) fragment.source = rule.source;
+  let block: Rule | undefined;
+  for (const node of [...rule.nodes]) {
+    if (node.type === 'atrule' && hasInheritedDeclarations(node)) {
+      // Keep all contents in one group, including anonymous layers. The copied
+      // rule gives bare declarations and relative selectors their original context.
+      const context = fragment.clone();
+      context.append(node.nodes ?? []);
+      node.append(context);
+      rule.before(node);
+      scopeStyleRule(context, id);
+      block = undefined;
+      continue;
+    }
+    if (node.type === 'comment') {
+      if (block) block.append(node);
+      else rule.before(node);
+      continue;
+    }
+    const selector = node.type === 'decl' ? owned : rule.selector;
+    if (!block || block.selector !== selector) {
+      block = fragment.clone({ selector });
+      rule.before(block);
+    }
+    block.append(node);
+    if (node.type === 'rule') scopeStyleRule(node, id);
+    else if (node.type === 'atrule' && !keyframesRule.test(node.name.toLowerCase())) scopeStyleRules(node, id);
+  }
+  rule.remove();
+}
+
+function scopeStyleRules(container: Container, id: string): void {
+  for (const node of [...container.nodes ?? []]) {
+    if (node.type === 'rule') scopeStyleRule(node, id);
+    else if (node.type === 'atrule' && !keyframesRule.test(node.name.toLowerCase())) scopeStyleRules(node, id);
+  }
 }
 
 function ancestorAtRule(node: ChildNode, isMatch: (name: string) => boolean): boolean {
@@ -221,9 +275,7 @@ export function scopeUiCss(id: string, { publicProperties = [] }: ScopeUiCssOpti
         }
       });
 
-      root.walkRules(rule => {
-        if (!ancestorAtRule(rule, name => keyframesRule.test(name))) guardSelector(rule, id);
-      });
+      scopeStyleRules(root, id);
 
       const animationValues = new Map<Declaration, Set<AnimationForm>>();
       const animationQueue: [Declaration, AnimationForm][] = [];

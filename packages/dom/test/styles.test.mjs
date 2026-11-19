@@ -34,7 +34,7 @@ test('guards the subject of each selector, including nested rules and originatin
   postcss.parse(css).walkRules(rule => { selectors.push(rule.selector); });
   assert.deepEqual(selectors, [
     `.card > header${guard}, svg|svg > svg|circle${guard}, :is(.active, [title="a,b"])${guard}:first-letter`,
-    `.card${guard}`,
+    '.card',
     `> header${guard}, & > aside${guard}::before, .group${guard}::after`,
     `:where(:scope)${guard}`,
     `:scope > a${guard}`,
@@ -128,6 +128,57 @@ test('independently built style sets do not share animation names, layers or pro
   await page.locator('.box').first().evaluate((node, name) => node.style.setProperty(name, '3'),
     createStyleScope('a').localProperty('--b-pulse'));
   assert.deepEqual((await read()).map(node => node.zIndex), ['3', '8']);
+});
+
+test('nested styles cross foreign ancestors and scope each declaration to its owned target', async t => {
+  const browser = await chromium.launch();
+  t.after(() => browser.close());
+  const page = await browser.newPage();
+  await page.setContent(`
+    <section class="theme" id="host" data-vs-ui-owner="other-ui">
+      <div class="badge" id="own" data-vs-ui-owner="${id}"></div>
+      <div class="badge" id="foreign" data-vs-ui-owner="other-ui"></div>
+      <div class="badge" id="plain"></div>
+    </section>
+    <section class="theme" id="local" data-vs-ui-owner="${id}"></section>
+    <section class="theme emphasized" id="specific" data-vs-ui-owner="${id}"></section>
+  `);
+  const css = compile(`
+    .theme, #unused {
+      padding-left: 2px;
+      .badge {
+        border-top: 7px solid red;
+        &::before { content: "owned"; }
+      }
+      @media all {
+        padding-left: 3px;
+        padding-right: 8px;
+        > .badge { padding-top: 5px; }
+      }
+      @layer {
+        padding-bottom: 1px !important;
+        .badge { margin-top: 11px; }
+        padding-bottom: 9px !important;
+      }
+      @scope (&) {
+        .badge { margin-left: 10px; }
+      }
+      padding-left: 4px;
+    }
+    .theme.emphasized { padding-left: 6px; }
+  `);
+  assert.equal(compile(css), css);
+  await page.addStyleTag({ content: css });
+  const read = (selector, prop, pseudo) => page.locator(selector)
+    .evaluateAll((nodes, [property, element]) => nodes.map(node => getComputedStyle(node, element)[property]), [prop, pseudo]);
+  assert.deepEqual(await read('#host, #local, #specific', 'paddingLeft'), ['0px', '4px', '6px']);
+  assert.deepEqual(await read('#host, #local, #specific', 'paddingRight'), ['0px', '8px', '8px']);
+  assert.deepEqual(await read('#host, #local, #specific', 'paddingBottom'), ['0px', '9px', '9px']);
+  assert.deepEqual(await read('.badge', 'borderTopWidth'), ['7px', '0px', '0px']);
+  assert.deepEqual(await read('.badge', 'paddingTop'), ['5px', '0px', '0px']);
+  assert.deepEqual(await read('.badge', 'marginTop'), ['11px', '0px', '0px']);
+  assert.deepEqual(await read('.badge', 'marginLeft'), ['10px', '0px', '0px']);
+  assert.deepEqual(await read('.badge', 'content', '::before'), ['"owned"', 'none', 'none']);
 });
 
 test('applies nested rules and generated content only to owned HTML and SVG elements', async t => {
