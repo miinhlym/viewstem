@@ -21,3 +21,14 @@ test('U10 Grid hidden declarations validate layout but consume no space; unknown
  assert.throws(()=>computeGridLayout(declarations,expanded,{absent:{}}),{code:'INVALID_DEFINITION'});
  assert.throws(()=>computeGridLayout(declarations,expanded,{hidden:{row:1}}),{code:'INVALID_DEFINITION'});
 });
+test('Grid rejects duplicate addresses across fixed and automatic placement', () => {
+  const duplicate = { code: 'INVALID_DEFINITION', message: 'GRID_DUPLICATE_ADDRESS' };
+  const expanded = [item('a', 'shared'), item('b', 'shared')];
+  const declared = [node('a'), node('b')];
+  assert.throws(() => computeGridLayout(declared, expanded), duplicate);
+  assert.throws(() => computeGridLayout(declared, expanded, { b: { row: 1, column: 1 } }), duplicate);
+  assert.throws(() => computeGridLayout(declared, expanded, { a: { row: 1, column: 1 }, b: { row: 1, column: 1 } }), duplicate);
+  const repeated = [{ id: 'row', repeat: {} }];
+  assert.throws(() => computeGridLayout(repeated, [item('row', 'shared'), item('row', 'shared')]), duplicate);
+  assert.deepEqual([...computeGridLayout(repeated, [item('row', 'first'), item('row', 'second')]).keys()], ['first', 'second']);
+});

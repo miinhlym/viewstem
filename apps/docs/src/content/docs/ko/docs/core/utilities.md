@@ -17,7 +17,7 @@ computeGridLayout<A>(
 ): Map<A, GridPlacement>;
 ```
 
-`declarations`는 선언한 자식 노드, `expanded`는 현재 표시·확장된 인스턴스를 렌더링 순서로 담습니다. 반복 선언 하나가 여러 주소를 만들 수 있습니다. `layout`은 선언 ID별 배치 설정이며 기본값은 `{}`입니다. 반환 Map의 키는 확장된 인스턴스의 주소입니다.
+`declarations`는 선언한 자식 노드, `expanded`는 현재 표시·확장된 인스턴스를 렌더링 순서로 담습니다. 반복 선언 하나가 같은 ID로 여러 인스턴스를 만들 수 있습니다. 각 주소는 Map 키 비교 기준으로 고유해야 합니다. 중복 주소는 `INVALID_DEFINITION`과 `GRID_DUPLICATE_ADDRESS` 메시지로 거절합니다. `layout`은 선언 ID별 배치 설정이며 기본값은 `{}`입니다. 반환 Map의 키는 확장된 인스턴스의 주소입니다.
 
 | GridConfig 필드 | 기본값 / 제약 |
 |---|---|

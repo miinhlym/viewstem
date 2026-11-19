@@ -17,7 +17,7 @@ computeGridLayout<A>(
 ): Map<A, GridPlacement>;
 ```
 
-`declarations` contains declared child nodes; `expanded` contains currently visible/expanded instances in rendering order. A repeated declaration can produce several addresses. `layout` maps declaration IDs to placement settings and defaults to `{}`. The returned Map uses each expanded address as its key.
+`declarations` contains declared child nodes. `expanded` contains currently visible/expanded instances in rendering order. A repeated declaration can produce several instances with the same ID. Each address must be unique by Map key equality. Duplicate addresses throw `INVALID_DEFINITION` with the message `GRID_DUPLICATE_ADDRESS`. `layout` maps declaration IDs to placement settings and defaults to `{}`. The returned Map uses each expanded address as its key.
 
 | GridConfig field | Default / constraint |
 |---|---|
