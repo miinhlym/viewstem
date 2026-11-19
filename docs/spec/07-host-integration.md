@@ -27,7 +27,7 @@ DOM과 Svelte의 명령형 연결을 공통 `createRenderer → mount → unmoun
 
 소유 View의 생성 설정은 컴포넌트 초기화 시점에 캡처하고, 클라이언트 마운트 뒤 생성한다. 이미 커밋한 State의 알림 중 렌더러를 폐기하면 확정한 Registry 변경은 보존하며 최초 Query를 시작하기 전에 소유 View를 닫는다. 렌더러 폐기 Promise는 소유 View 정리가 끝난 뒤 이행한다. 기존 표시 연결에서 시작한 완료 대기는 교체 또는 폐기에 따라 취소되며, 닫힌 연결의 캐시는 조회할 수 없다.
 
-**D165 · 독립 Svelte 화면의 소유권.** `<ViewstemView {source} resourceSets={[ui]} />`는 클라이언트에서 자체 Runtime·렌더러를 만들고, 첫 설정으로 캡처한 셋을 등록한 뒤 View를 준비한다. 셋 등록이나 준비가 실패하면 준비 진단을 전달하고 실패한 수명을 정리한다. 화면을 제거하면 준비 취소와 전체 정리를 컴포넌트가 관리한다. 여러 화면에서 Runtime을 공유할 때는 앱이 소유한 렌더러를 전달한다. `resourceSets`와 외부 `renderer`는 함께 사용할 수 없으며 `view`는 외부 렌더러를 요구한다. UI 셋과 스타일은 소비자가 명시적으로 가져온다.
+**D165 · 독립 Svelte 화면의 소유권.** `<ViewstemView {source} resourceSets={[ui]} />`는 클라이언트에서 자체 Runtime·렌더러를 만들고, 첫 설정으로 캡처한 셋을 등록한 뒤 View를 준비한다. 셋 등록이나 준비가 실패하면 준비 진단을 전달하고 실패한 수명을 정리한다. 화면을 제거하면 준비 취소와 전체 정리를 컴포넌트가 관리한다. 여러 화면에서 Runtime을 공유할 때는 앱이 소유한 렌더러를 전달한다. `resourceSets`와 외부 `renderer`는 함께 사용할 수 없으며 `view`는 외부 렌더러를 요구한다. 기본 UI 셋은 직접 전달하거나 다른 셋의 의존성으로 등록한다. `browser` 조건을 선택하는 번들러는 두 경우 모두 `@viewstem/ui`와 함께 기본 CSS를 포함한다. [D170 스타일 로딩 계약](12-resource-sets-browser.md#ui-셋의-스타일-소유권)을 따른다.
 
 **D152 · 소유 View의 실행 차단과 정리.** 브라우저와 Svelte의 `mount()`, Svelte의 `ViewstemView source`는 같은 소유 생성 경로를 쓴다. 후보 View는 참조 해결 전에 소유자에 등록한다. 공개 Core `createView()`와 `replace()`의 준비 신호는 동기 확정 직전까지 유효하다. 호스트의 종료는 View 수명 전체에 적용하며, 확정 후 알림 중에 닫으면 Registry 커밋과 외부 소유 셀을 보존하고 해당 View의 실행을 차단한다.
 

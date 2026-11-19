@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readdir, readFile } from 'node:fs/promises';
 import { createRegistry, createRuntime } from '@viewstem/core';
 import { createHttpExecutor } from '@viewstem/core/http';
-import { registerShadcn } from '@viewstem/ui';
+import { ui } from '@viewstem/ui';
 
 const content = new URL('../src/content/docs/', import.meta.url);
 const badge = { id: 'badge', componentRef: 'shadcn.Badge' };
@@ -10,7 +10,7 @@ const render = { render: badge };
 
 function createDocsRegistry(resources = []) {
   const registry = createRegistry();
-  registerShadcn(registry);
+  registry.registerResourceSet(ui);
   return registry.registerResources(resources);
 }
 
