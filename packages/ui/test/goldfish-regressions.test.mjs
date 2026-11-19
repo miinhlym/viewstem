@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
@@ -7,7 +6,6 @@ import { chromium } from 'playwright';
 import { sampleBySlug } from './fixtures/samples.mjs';
 
 const workspace = fileURLToPath(new URL('../../../', import.meta.url));
-const styles = await readFile(new URL('../dist/styles.css', import.meta.url), 'utf8');
 const bundle = await build({
   stdin: { resolveDir: workspace, contents: `
     import { createRegistry, createRuntime } from '@viewstem/core';
@@ -43,7 +41,7 @@ const bundle = await build({
       return view.getSnapshot().roots.map(node => node.status);
     };
   ` },
-  bundle: true, write: false, platform: 'browser', format: 'iife',
+  outfile: 'bundle.js', bundle: true, write: false, platform: 'browser', format: 'iife',
 });
 
 const string = { type: 'string' };
@@ -105,8 +103,8 @@ async function mount(t, definition, host = '<main id="app"></main>', fixedTime) 
     } finally { await page.close(); }
   });
   await page.setContent('<!doctype html><html lang="en">' + host + '</html>');
-  await page.addStyleTag({ content: styles });
-  await page.addScriptTag({ content: bundle.outputFiles[0].text });
+  await page.addStyleTag({ content: bundle.outputFiles.find(file => file.path.endsWith('.css')).text });
+  await page.addScriptTag({ content: bundle.outputFiles.find(file => file.path.endsWith('.js')).text });
   assert.deepEqual(await page.evaluate(view => window.mount(view), definition), ['ready']);
   return page;
 }

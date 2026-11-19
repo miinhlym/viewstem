@@ -229,7 +229,6 @@ export const counterContract = {
 import { defineCodeAction, defineResourceSet, type ViewSpec } from '@viewstem/core';
 import { createRenderer, svelteComponent } from '@viewstem/svelte';
 import { ui } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
 import Counter from './Counter.svelte';
 import { counterContract, integer } from './counter-contract.js';
 
@@ -277,7 +276,7 @@ export const screen = renderer.mount({ target, source });
 await screen.whenRendered();
 ```
 
-렌더러는 한 View에서 Svelte와 DOM을 연결합니다. 예제 셋의 `dependencies: [ui]`는 기본 UI를 함께 등록합니다. CSS를 가져오면 기본 UI가 소유한 요소에 스타일이 적용됩니다. Card가 단일 루트가 되고 `default` 슬롯에 두 컴포넌트가 들어갑니다.
+렌더러는 한 View에서 Svelte와 DOM을 연결합니다. 예제 셋의 `dependencies: [ui]`는 기본 UI를 함께 등록합니다. Vite는 `@viewstem/ui`와 함께 기본 UI 스타일을 번들링합니다. Card가 단일 루트가 되고 `default` 슬롯에 두 컴포넌트가 들어갑니다.
 
 기본 `shadcn.Button`이 `click`을 보냅니다. 핸들러가 `/states/count`를 Action의 `State` 포트에 연결하므로 Action은 쓰기 가능한 핸들을 받습니다. Svelte 컴포넌트는 같은 경로를 `Value` 포트에 연결해 타입이 추론된 노드에서 숫자를 읽습니다.
 

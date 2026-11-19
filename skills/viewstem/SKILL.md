@@ -28,8 +28,9 @@ user's requested scope and response language.
 
 - Use public factories such as `createRegistry`, `createRuntime`, and
   `createRenderer`; `Registry`, `Runtime`, and `View` are types, not constructors.
-- For the default catalog, call `registerShadcn(registry)` once, import
-  `@viewstem/ui/styles.css`, and use `createRenderer().mount({ target, source })` with a connected DOM container.
+- For the default catalog, import `ui` from `@viewstem/ui` and call
+  `runtime.registry.registerResourceSet(ui)`. Browser bundlers such as Vite include its styles.
+  Use `createRenderer({ runtime }).mount({ target, source })` with a connected DOM container.
   Use the Svelte renderer to register and render app-owned adapters.
 - For an unknown JSON input, slot or event, find the component by `id` in the
   installed support file and inspect the required entries in `ports`, `slots`

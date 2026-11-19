@@ -3,8 +3,6 @@ import { createRenderer } from '@viewstem/dom';
 import { forms } from '@acme/forms';
 import { mount, tick, unmount } from 'svelte';
 import SvelteHost from './SvelteHost.svelte';
-import '@viewstem/ui/styles.css';
-import '@acme/forms/styles.css';
 
 const runtime = createRuntime();
 runtime.registry.registerResourceSet(forms);

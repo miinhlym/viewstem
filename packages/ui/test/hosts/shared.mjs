@@ -1,7 +1,6 @@
 import { createRuntime } from '@viewstem/core';
 import { createRenderer } from '@viewstem/dom';
 import { ui } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
 import definition from '../view.json';
 import catalog from '../catalog.json';
 

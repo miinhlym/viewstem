@@ -109,7 +109,9 @@ Viewstem은 서비스가 신뢰해 직접 가져온 셋·연결자 코드만 실
 
 **D169.** 브라우저 UI 셋은 자신이 만든 DOM에 기본 스타일을 적용한다. 소유 표시가 붙은 조상 아래에 있더라도, 슬롯에 들어온 외부 요소의 기본 외형은 해당 요소의 셋이 정한다. 일반 CSS 상속과 호스트가 서로 연결한 테마 변수는 기존 브라우저 규칙을 따른다.
 
-DOM 작성자는 `@viewstem/dom/styles`의 `createStyleScope(id)`와 `@viewstem/dom/styles/postcss`의 `scopeUiCss(id)`를 같은 셋 식별자로 사용할 수 있다. 도구는 CSS 규칙의 최종 대상에 소유 조건을 적용한다. 앱은 필요한 셋의 CSS를 가져온다. 기존 `data-viewstem-ui`는 이전 테마 변수를 읽는 범위다. [설계 초안](../designs/viewstem-ui-set-policy-review-2026-11-19/design_draft.md)
+DOM 작성자는 `@viewstem/dom/styles`의 `createStyleScope(id)`와 `@viewstem/dom/styles/postcss`의 `scopeUiCss(id)`를 같은 셋 식별자로 사용할 수 있다. 도구는 CSS 규칙의 최종 대상에 소유 조건을 적용한다. 기존 `data-viewstem-ui`는 이전 테마 변수를 읽는 범위다. [설계 초안](../designs/viewstem-ui-set-policy-review-2026-11-19/design_draft.md)
+
+**D170.** `@viewstem/ui`의 `browser` 진입점은 셋과 기본 CSS를 함께 불러온다. 이 조건을 선택하는 브라우저 번들러에서는 다른 셋을 통해 간접으로 가져올 때도 CSS가 포함된다. Node는 셋 정의를 내보내는 JS 진입점을 사용한다. 스타일시트를 직접 불러오는 호스트는 `@viewstem/ui/styles.css`를 사용한다. Registry 등록은 셋의 리소스를 게시한다.
 
 ## Svelte 어댑터 입력 타입
 

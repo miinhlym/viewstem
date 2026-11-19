@@ -238,7 +238,7 @@ try {
 
     target = await open('sonner');
     await target.getByRole('button').first().click();
-    const notification = page.locator('[data-demo-notifications] [data-viewstem-ui]');
+    const notification = page.locator('[data-demo-notifications]');
     await notification.getByText(t('Event has been created', '이벤트를 만들었습니다'), { exact: true }).waitFor();
     interactions.push(`${locale}: Sonner host action targets the retained example`);
 

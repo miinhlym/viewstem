@@ -229,7 +229,6 @@ export const counterContract = {
 import { defineCodeAction, defineResourceSet, type ViewSpec } from '@viewstem/core';
 import { createRenderer, svelteComponent } from '@viewstem/svelte';
 import { ui } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
 import Counter from './Counter.svelte';
 import { counterContract, integer } from './counter-contract.js';
 
@@ -277,7 +276,7 @@ export const screen = renderer.mount({ target, source });
 await screen.whenRendered();
 ```
 
-The renderer connects Svelte and DOM in one View. The demo set registers the default UI through `dependencies: [ui]`. Import the CSS to style the elements owned by the default UI. The Card supplies a single root and its `default` slot holds both children.
+The renderer connects Svelte and DOM in one View. The demo set registers the default UI through `dependencies: [ui]`. Vite bundles the default UI styles with `@viewstem/ui`. The Card supplies a single root and its `default` slot holds both children.
 
 The default `shadcn.Button` emits `click`. Its handler binds `/states/count` to a `State` port, so the Action gets a writable handle. The Svelte component binds the same path to a `Value` port and receives the evaluated number through its typed node.
 

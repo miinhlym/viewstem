@@ -21,7 +21,6 @@ Vite 앱의 `src/main.js`를 아래 코드로 교체하세요. 기존 앱에서�
 import { createRuntime } from '@viewstem/core';
 import { createRenderer } from '@viewstem/dom';
 import { ui } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
 
 const runtime = createRuntime();
 runtime.registry.registerResourceSet(ui);

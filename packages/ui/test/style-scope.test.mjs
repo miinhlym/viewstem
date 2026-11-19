@@ -60,6 +60,7 @@ async function packConsumer(t) {
       },
     }],
   });
+  assert.ok(metafile.inputs['node_modules/@viewstem/ui/dist/browser.js']);
   assert.ok(metafile.inputs['node_modules/@viewstem/ui/dist/styles.css']);
   assert.ok(metafile.inputs['node_modules/@acme/forms/styles.css']);
   assert.ok(metafile.inputs['svelte-source/ViewstemView.svelte']);

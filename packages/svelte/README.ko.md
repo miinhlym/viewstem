@@ -18,7 +18,6 @@ Viewstem View를 Svelte 컴포넌트로 표시합니다. Svelte 5.57.3 이상 5.
 <script lang="ts">
   import { ViewstemView, type ViewSpec } from '@viewstem/svelte';
   import { ui } from '@viewstem/ui';
-  import '@viewstem/ui/styles.css';
 
   const source: ViewSpec = {
     render: { id: 'save', componentRef: 'shadcn.Button', inputs: { text: '저장' } },

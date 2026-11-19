@@ -11,7 +11,6 @@ sidebar:
 import { createRuntime } from '@viewstem/core';
 import { createRenderer } from '@viewstem/dom';
 import { ui } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
 
 const boolean = { type: 'boolean' };
 const enabled = { '@path': '/states/emailEnabled' };

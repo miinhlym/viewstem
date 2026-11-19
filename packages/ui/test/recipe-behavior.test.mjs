@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { build } from 'esbuild';
 import { chromium } from 'playwright';
@@ -36,7 +35,9 @@ const bundle = await build({ stdin: { contents: `
     window.view = view;
     window.disposeRecipe = async () => { await renderer.dispose(); view.dispose(); runtime.dispose(); };
   };
-`, resolveDir: workspace }, bundle: true, write: false, platform: 'browser', format: 'iife' });
+`, resolveDir: workspace }, outfile: 'bundle.js', bundle: true, write: false, platform: 'browser', format: 'iife' });
+
+const recipeScript = bundle.outputFiles.find(file => file.path.endsWith('.js')).text;
 
 const sample = slug => {
   const result = sampleBySlug.get(slug);
@@ -78,7 +79,7 @@ test('Input and Textarea render numeric State values', { timeout: 30_000 }, asyn
   t.after(() => browser.close());
   const page = await browser.newPage();
   await page.setContent('<!doctype html><main id="app"></main>');
-  await page.addScriptTag({ content: bundle.outputFiles[0].text });
+  await page.addScriptTag({ content: recipeScript });
   const value = { '@path': '/states/quantity' };
   await page.evaluate(definition => window.mountRecipe(definition), {
     states: { quantity: { kind: 'State', schema: { type: 'number' }, initial: 42 } },
@@ -106,14 +107,14 @@ test('Input and Textarea render numeric State values', { timeout: 30_000 }, asyn
 test('Command.Dialog searches and selects commands by keyboard', { timeout: 30_000 }, async t => {
   const browser = await chromium.launch({ headless: true });
   t.after(() => browser.close());
-  const styles = await readFile(new URL('../dist/styles.css', import.meta.url), 'utf8');
+  const styles = bundle.outputFiles.find(file => file.path.endsWith('.css')).text;
   for (const nested of [false, true]) {
     await t.test(nested ? 'explicit Command.Root' : 'direct command slots', async t => {
       const page = await browser.newPage();
       t.after(() => page.close());
       await page.setContent('<!doctype html><main id="app"></main>');
       await page.addStyleTag({ content: styles });
-      await page.addScriptTag({ content: bundle.outputFiles[0].text });
+      await page.addScriptTag({ content: recipeScript });
       const schema = { type: 'string' };
       const command = (id, text, disabled = false) => ({
         id,
@@ -170,7 +171,7 @@ test('multi-thumb Slider emits the whole range and accepts external State update
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.setContent('<!doctype html><main id="app"></main>');
-  await page.addScriptTag({ content: bundle.outputFiles[0].text });
+  await page.addScriptTag({ content: recipeScript });
   const definition = structuredClone(sample('slider'));
   const numbers = { type: 'array', items: { type: 'number' } };
   Object.assign(definition.states.level, { schema: numbers, initial: [20, 50, 80] });
@@ -221,7 +222,7 @@ test('original catalog recipes preserve State, Actions and calendar events', { t
         } finally { await page.close(); }
       });
       await page.setContent('<!doctype html><html lang="ko"><body><main id="app"></main></body></html>');
-      await page.addScriptTag({ content: bundle.outputFiles[0].text });
+  await page.addScriptTag({ content: recipeScript });
       assert.deepEqual(errors, []);
       await page.evaluate(async view => {
         try { await window.mountRecipe(view); }

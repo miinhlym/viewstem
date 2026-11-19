@@ -18,7 +18,6 @@ For a standalone screen with `@viewstem/ui` installed, pass the set directly. Th
 <script lang="ts">
   import { ViewstemView, type ViewSpec } from '@viewstem/svelte';
   import { ui } from '@viewstem/ui';
-  import '@viewstem/ui/styles.css';
 
   const source: ViewSpec = {
     render: { id: 'save', componentRef: 'shadcn.Button', inputs: { text: 'Save' } },

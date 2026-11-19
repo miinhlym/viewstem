@@ -11,7 +11,6 @@ Render a list of projects from one row template. Start with the workspace setup 
 import { createRuntime } from '@viewstem/core';
 import { createRenderer } from '@viewstem/dom';
 import { ui } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
 
 const target = document.querySelector('#viewstem');
 const runtime = createRuntime();

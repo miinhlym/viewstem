@@ -3,7 +3,7 @@ title: Browser UI API
 description: Register the catalog, attach an existing View, and import styles and support metadata.
 ---
 
-Register the `ui` set from `@viewstem/ui` with `runtime.registry.registerResourceSet(ui)` before creating the View. Import `createRenderer` from `@viewstem/dom` and pass `{ runtime }`. Import the CSS to style the elements created by the default UI. A conflicting resource ID leaves the Registry as it was.
+Register the `ui` set from `@viewstem/ui` with `runtime.registry.registerResourceSet(ui)` before creating the View. Import `createRenderer` from `@viewstem/dom` and pass `{ runtime }`. Browser bundlers such as Vite load the default styles with the set. A conflicting resource ID leaves the Registry as it was.
 
 ## Mount a new View
 
@@ -47,6 +47,6 @@ Both paths require a connected, unreserved HTML element. Wait for cleanup before
 | `@viewstem/ui/styles.css` | Scoped Basecoat Vega styles with the Neutral palette |
 | `@viewstem/ui/support.json` | Component IDs and their supported input ports, slots, and events |
 
-Import the stylesheet in the browser entry point. Set `.dark` or `data-theme="dark"` on an ancestor of the mount container to use the dark palette. See [Components and JSON support](../components/) for the metadata structure and catalog limits.
+Use the `styles.css` export when your host loads the stylesheet explicitly. Set `.dark` or `data-theme="dark"` on an ancestor of the mount container to use the dark palette. See [Components and JSON support](../components/) for the metadata structure and catalog limits.
 
 Set theme variables such as `--viewstem-primary` and `--viewstem-radius` on an ancestor. An existing `data-viewstem-ui` attribute scopes legacy theme variables. External components inside it keep their own set styles.

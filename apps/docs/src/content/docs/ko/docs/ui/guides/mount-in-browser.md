@@ -22,7 +22,6 @@ description: Core, DOM, UI를 설치하고 브라우저에 View를 마운트합�
 import { createRuntime } from '@viewstem/core';
 import { createRenderer } from '@viewstem/dom';
 import { ui } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
 
 const target = document.getElementById('app');
 if (!target) throw new Error('Missing #app element');

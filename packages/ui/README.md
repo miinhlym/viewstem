@@ -8,7 +8,6 @@ Default browser UI for rendering Viewstem JSON into a DOM container. The package
 import { createRuntime } from '@viewstem/core';
 import { createRenderer } from '@viewstem/dom';
 import { ui } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
 
 const runtime = createRuntime();
 runtime.registry.registerResourceSet(ui);
@@ -31,7 +30,7 @@ await screen.whenRendered();
 
 Call `await screen.unmount()` when the screen closes and `await renderer.dispose()` when the app is done with the renderer. If you need the initial Query report, use `await screen.whenSettled(view.initial)` with the View returned by `screen.ready`.
 
-Register the exported `ui` resource set on the Runtime before creating a View. Mount with `@viewstem/dom` and import the CSS once to style the elements owned by the default UI. `renderer.attach(view, target)` borrows a View, and `await attachment.detach()` releases the display. `whenRendered()` waits for the requested DOM projection.
+Register the exported `ui` resource set on the Runtime before creating a View. Browser bundlers such as Vite include the scoped CSS when they import `@viewstem/ui`. The `@viewstem/ui/styles.css` export is available for hosts that load the stylesheet explicitly. `renderer.attach(view, target)` borrows a View, and `await attachment.detach()` releases the display. `whenRendered()` waits for the requested DOM projection.
 
 ## Shared JSON catalog
 

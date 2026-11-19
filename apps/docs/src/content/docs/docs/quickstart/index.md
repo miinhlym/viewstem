@@ -21,7 +21,6 @@ Replace the Vite starter’s `src/main.js` with the code below. In an existing a
 import { createRuntime } from '@viewstem/core';
 import { createRenderer } from '@viewstem/dom';
 import { ui } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
 
 const runtime = createRuntime();
 runtime.registry.registerResourceSet(ui);

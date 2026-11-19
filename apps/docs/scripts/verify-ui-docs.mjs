@@ -23,7 +23,7 @@ try {
         .map(match => match[1]).find(code => code.includes('const screen = renderer.mount'));
       assert.ok(source, route);
       assert.match(source, /runtime\.registry\.registerResourceSet\(ui\)/);
-      assert.match(source, /import ['"]@viewstem\/ui\/styles\.css['"]/);
+      assert.doesNotMatch(source, /@viewstem\/ui\/styles\.css/);
       const container = markdown.match(new RegExp(`<div id="${target}"[^>]*></div>`))?.[0];
       assert.ok(container, route);
       assert.doesNotMatch(container, /data-viewstem-ui/);

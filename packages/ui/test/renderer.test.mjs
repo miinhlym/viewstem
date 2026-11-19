@@ -70,13 +70,14 @@ test('DOM renderer owns mounted views and borrows attachments', async t => {
         store.dispose();
         return { code, requests, liveStates, empty: target.textContent };
       };
-    ` }, bundle: true, write: false, platform: 'browser', format: 'iife',
+    ` }, outfile: 'bundle.js', bundle: true, write: false, platform: 'browser', format: 'iife',
   });
   const browser = await chromium.launch({ headless: true });
   t.after(() => browser.close());
   const page = await browser.newPage();
   await page.setContent('<main id="left"></main><main id="right"></main>');
-  await page.addScriptTag({ content: bundle.outputFiles[0].text });
+  await page.addStyleTag({ content: bundle.outputFiles.find(file => file.path.endsWith('.css')).text });
+  await page.addScriptTag({ content: bundle.outputFiles.find(file => file.path.endsWith('.js')).text });
   const result = await page.evaluate(async () => {
     let conflict;
     try { createRendererForTest({ runtime: renderer.runtime, resources: [] }); } catch (error) { conflict = error.code; }
@@ -223,7 +224,7 @@ test('a DOM Card, Svelte layout and DOM Button share the same View State and Act
         return { values, tags: [first, second, third], empty: target.childNodes.length === 0 };
       };
     ` },
-    bundle: true, write: false, platform: 'browser', format: 'iife', conditions: ['browser', 'svelte'],
+    outfile: 'bundle.js', bundle: true, write: false, platform: 'browser', format: 'iife', conditions: ['browser', 'svelte'],
     plugins: [{ name: 'svelte', setup(builder) {
       builder.onLoad({ filter: /\.svelte$/ }, async ({ path }) => ({
         contents: compile(await readFile(path, 'utf8'), { filename: path, generate: 'client' }).js.code, loader: 'js',
@@ -234,6 +235,7 @@ test('a DOM Card, Svelte layout and DOM Button share the same View State and Act
   t.after(() => browser.close());
   const page = await browser.newPage();
   await page.setContent('<main data-viewstem-ui></main>');
-  await page.addScriptTag({ content: outputFiles[0].text });
+  await page.addStyleTag({ content: outputFiles.find(file => file.path.endsWith('.css')).text });
+  await page.addScriptTag({ content: outputFiles.find(file => file.path.endsWith('.js')).text });
   assert.deepEqual(await page.evaluate(() => window.run()), { values: ['After', 'After'], tags: ['button', 'a', 'button'], empty: true });
 });

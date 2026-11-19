@@ -1,7 +1,6 @@
 import { defineCodeAction, defineResourceSet, type ViewSpec } from '@viewstem/core';
 import { createRenderer, svelteComponent } from '@viewstem/svelte';
 import { ui } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
 import Counter from './Counter.svelte';
 import { counterContract, integer } from './counter-contract.js';
 

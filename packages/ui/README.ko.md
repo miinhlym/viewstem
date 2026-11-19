@@ -8,7 +8,6 @@
 import { createRuntime } from '@viewstem/core';
 import { createRenderer } from '@viewstem/dom';
 import { ui } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
 
 const runtime = createRuntime();
 runtime.registry.registerResourceSet(ui);
@@ -31,7 +30,7 @@ await screen.whenRendered();
 
 화면이 닫히면 `await screen.unmount()`를, 앱에서 렌더러 사용을 마치면 `await renderer.dispose()`를 호출하세요. 최초 Query 보고까지 필요하면 `await screen.whenSettled(view.initial)`을 사용하세요. 여기서 `view`는 `screen.ready`가 반환한 View입니다.
 
-View를 만들기 전에 Runtime의 Registry에 `ui` 셋을 등록합니다. `@viewstem/dom`으로 마운트하고 CSS를 한 번 가져오면 기본 UI가 만든 요소에 스타일이 적용됩니다. `renderer.attach(view, target)`은 기존 View를 빌리며 `await attachment.detach()`로 연결을 정리합니다. `whenRendered()`는 해당 표시 연결의 DOM 반영을 기다립니다.
+View를 만들기 전에 Runtime의 Registry에 `ui` 셋을 등록합니다. Vite 같은 브라우저 번들러는 `@viewstem/ui`를 가져올 때 기본 UI의 CSS도 포함합니다. 스타일시트를 직접 불러오는 호스트는 `@viewstem/ui/styles.css`를 사용할 수 있습니다. `renderer.attach(view, target)`은 기존 View를 빌리며 `await attachment.detach()`로 연결을 정리합니다. `whenRendered()`는 해당 표시 연결의 DOM 반영을 기다립니다.
 
 Slider의 `type: "multiple"`은 `value`의 숫자마다 손잡이를 만들고, `thumbLabels`로 각 손잡이의 접근성 이름을 지정할 수 있습니다. `valueChange`는 조작 중 값, `valueCommit`은 드래그를 마치거나 키보드로 값을 조절한 뒤의 확정 값을 전달합니다. 이벤트의 `value`는 다중 모드에서 숫자 배열이고 단일 모드에서 숫자입니다.
 

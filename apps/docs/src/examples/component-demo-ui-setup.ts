@@ -59,7 +59,6 @@ export function uiDemoSetupSource(view: ViewSpec, family: string) {
     "import { createRuntime } from '@viewstem/core';",
     "import { createRenderer } from '@viewstem/dom';",
     "import { ui } from '@viewstem/ui';",
-    "import '@viewstem/ui/styles.css';",
     "import view from './view.json';", '',
     'const runtime = createRuntime();',
     'runtime.registry.registerResourceSet(ui);',

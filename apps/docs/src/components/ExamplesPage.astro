@@ -1,5 +1,4 @@
 ---
-import previewStyles from '@viewstem/ui/styles.css?url';
 import SiteHead from './SiteHead.astro';
 import { Icon } from '@astrojs/starlight/components';
 import Button from './site/Button.svelte';
@@ -46,7 +45,6 @@ const navigation = { label: text.stages, title: text.title, home: `${home}exampl
 <!doctype html>
 <html lang={locale}>
   <head>
-    <link rel="stylesheet" href={previewStyles} />
     <SiteHead {locale} title={`${pageTitle} · Viewstem`} fontText={pageTitle} description={lesson ? localize(locale, lesson.explanation) : text.description} />
   </head>
   <body class:list={['examples-page', { 'example-lesson-page': lesson }]}>

@@ -3,7 +3,7 @@ title: 브라우저 UI API
 description: 카탈로그 등록, 기존 View 연결, 스타일과 지원 메타데이터 import를 설명합니다.
 ---
 
-`@viewstem/ui`의 `ui` 셋을 `runtime.registry.registerResourceSet(ui)`로 등록하고 View를 생성합니다. `@viewstem/dom`의 `createRenderer`에 `{ runtime }`을 전달합니다. CSS를 가져오면 기본 UI가 생성한 요소에 스타일이 적용됩니다. 리소스 ID가 충돌하면 기존 Registry가 유지됩니다.
+`@viewstem/ui`의 `ui` 셋을 `runtime.registry.registerResourceSet(ui)`로 등록하고 View를 생성합니다. `@viewstem/dom`의 `createRenderer`에 `{ runtime }`을 전달합니다. Vite 같은 브라우저 번들러는 셋과 함께 기본 스타일을 불러옵니다. 리소스 ID가 충돌하면 기존 Registry가 유지됩니다.
 
 ## 새 View 마운트
 
@@ -47,6 +47,6 @@ description: 카탈로그 등록, 기존 View 연결, 스타일과 지원 메타
 | `@viewstem/ui/styles.css` | 기본 UI 요소에 적용되는 Basecoat Vega 스타일과 Neutral 팔레트 |
 | `@viewstem/ui/support.json` | 컴포넌트 ID별로 지원하는 입력 포트, 슬롯, 이벤트 |
 
-브라우저 진입점에서 스타일시트를 import하세요. 어두운 팔레트는 마운트 컨테이너의 조상 요소에 `.dark` 클래스나 `data-theme="dark"` 속성을 지정해 적용합니다. 메타데이터 구조와 카탈로그의 지원 범위는 [컴포넌트와 JSON 지원](../components/)에서 확인하세요.
+호스트가 스타일시트를 직접 불러올 때는 `styles.css` 진입점을 사용하세요. 어두운 팔레트는 마운트 컨테이너의 조상 요소에 `.dark` 클래스나 `data-theme="dark"` 속성을 지정해 적용합니다. 메타데이터 구조와 카탈로그의 지원 범위는 [컴포넌트와 JSON 지원](../components/)에서 확인하세요.
 
 `--viewstem-primary`, `--viewstem-radius` 같은 테마 변수를 조상에 선언할 수 있습니다. 기존 `data-viewstem-ui`는 기존 테마 변수의 범위를 지정합니다. 이 속성 아래에 놓인 외부 컴포넌트도 자기 셋의 스타일을 사용합니다.

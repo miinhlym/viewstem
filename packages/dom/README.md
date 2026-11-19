@@ -49,4 +49,6 @@ import { scopeUiCss } from '@viewstem/dom/styles/postcss';
 const result = await postcss([scopeUiCss('acme-forms')]).process(css, { from: 'styles.css' });
 ```
 
-Resolve CSS imports before this step and publish the resulting stylesheet. The plugin scopes the final target of each selector and prefixes internal custom properties, layers, and animation names. Use `publicProperties` for custom properties the app can set by name. Consumers import the stylesheet once and register your set as usual.
+Resolve CSS imports before this step and publish the resulting stylesheet. The plugin scopes the final target of each selector and prefixes internal custom properties, layers, and animation names. Use `publicProperties` for custom properties the app can set by name.
+
+To bundle styles with the set, make the package’s `browser` export import the generated CSS and re-export the set from its JavaScript entry. Put the `browser` condition before the normal JavaScript entry in `exports`, and include the browser entry and the CSS in `sideEffects`. Consumers register the set as usual. Export the stylesheet separately for hosts that load CSS explicitly.

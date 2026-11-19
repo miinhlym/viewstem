@@ -22,7 +22,6 @@ Put this code in `main.js`. A button labeled **Save** appears in the container.
 import { createRuntime } from '@viewstem/core';
 import { createRenderer } from '@viewstem/dom';
 import { ui } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
 
 const target = document.getElementById('app');
 if (!target) throw new Error('Missing #app element');

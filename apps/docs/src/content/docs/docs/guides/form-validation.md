@@ -13,7 +13,6 @@ Show a message when a required name is empty or contains only whitespace. Comple
 import { createRuntime } from '@viewstem/core';
 import { createRenderer } from '@viewstem/dom';
 import { ui } from '@viewstem/ui';
-import '@viewstem/ui/styles.css';
 
 const string = { type: 'string' };
 const name = { '@path': '/states/name' };
