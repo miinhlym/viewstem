@@ -30,7 +30,7 @@ See [PublicError](/docs/core/runtime/#authorization) for error fields and [NodeS
 
 `mount`, `attach`, and `ViewstemView` call the renderer's `onError` before the screen's `onError`. The same function receives a diagnostic occurrence once, even when multiple connections observe the same View. A new connection receives active node and Query errors and URL diagnostics for the current application. It shares those diagnostic occurrences with existing observers. Each failed Query execution can produce a new occurrence, including a retry with the same error code.
 
-If an observer closes the connection, the remaining callbacks for that connection are skipped. Disposing a renderer stops its observer. A directly hosted borrowed View can continue delivering to its screen callback while its View and Svelte connection are alive. Observer exceptions and rejected promises are isolated. Normal cancellation produces no diagnostic.
+Before each callback, the renderer checks whether the display connection and its View are still open. If the renderer's observer detaches the display, removes `ViewstemView`, or disposes the View or its Runtime, the screen callback is skipped for that diagnostic. Disposing only the renderer stops its observer. A directly hosted borrowed View can continue delivering to its screen callback while its View and Svelte connection are alive. Observer exceptions and rejected promises are isolated. Normal cancellation produces no diagnostic.
 
 ## RenderFallback
 
@@ -45,8 +45,8 @@ Supply a fallback snippet through `RenderOptions` or `ViewstemViewProps`. It rec
 | Invalid options, registration, or target | The relevant setup call throws synchronously. |
 | View preparation fails during mount | `screen.ready` and `screen.whenRendered()` reject. `onError` receives a `prepare` diagnostic and the target reservation is released. |
 | `ViewstemView` source preparation fails | `prepareError` receives the public error and `onError` receives one `prepare` diagnostic. `whenRendered()` rejects with the same error. |
-| A node fails to clean up during a display update | `onError` receives a `dispose` diagnostic with its `nodeId`. Other nodes keep rendering. If the renderer's observer removes `ViewstemView`, the screen callback for that diagnostic is skipped. |
-| Automatic display or owned resource cleanup fails | `onError` receives a `dispose` diagnostic. Observe the promise when requesting cleanup explicitly. |
+| A node fails to clean up during a display update | `onError` receives a `dispose` diagnostic with its `nodeId`. Other nodes on the live display keep rendering. |
+| Automatic display or owned resource cleanup fails | `onError` receives a `dispose` diagnostic. For example, a failing cleanup can be reported after `ViewstemView` is removed. Observe the promise when requesting cleanup explicitly. |
 | An input fails during node evaluation | `onError` receives a `node` diagnostic. The adapter can display the node's error state, which counts as a completed render. |
 | Eligible initial Query fails | The completion report contains an entry in `queryErrors`. |
 | Svelte implementation is missing or an adapter render fails | The display reports a `render` diagnostic with `REFERENCE_NOT_FOUND` or `INTERNAL_ERROR`, respectively. A live connection can show a fallback and retry on the next projection. |
