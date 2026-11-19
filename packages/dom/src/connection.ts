@@ -250,6 +250,8 @@ class BrowserConnection {
     if (fallback.handle?.update) fallback.handle.update(context);
     else if (!fallback.handle) {
       clearRange(fallback.start, node.end);
+      // Removing fallback DOM can close the display from a custom element callback.
+      if (!this.#canRender(node, work)) return;
       fallback.handle = render(context) ?? undefined;
     }
     if (!this.#canRender(node, work)) return;

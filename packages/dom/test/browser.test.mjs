@@ -258,7 +258,8 @@ globalThis.fallbackTransitions = async updateInPlace => {
 globalThis.closeDuringRender = async phase => {
   const runtime = createRuntime();
   const trace = [];
-  const warm = phase === 'setPending' || phase === 'fallback.update';
+  const detachOnDisconnect = phase === 'fallback.disconnect';
+  const warm = phase === 'setPending' || phase === 'fallback.update' || detachOnDisconnect;
   const withFallback = phase.startsWith('fallback');
   let screen, closing, armed = false;
   function observe(callback) {
@@ -267,6 +268,11 @@ globalThis.closeDuringRender = async phase => {
       trace.push('detach');
       closing = screen.detach();
     }
+  }
+  if (detachOnDisconnect) {
+    customElements.define('viewstem-detach-fallback', class extends HTMLElement {
+      disconnectedCallback() { observe('fallback.disconnect'); }
+    });
   }
   const connector = { id: 'closing', accepts() { observe('accepts'); return true; },
     mount(_implementation, ctx) {
@@ -290,6 +296,7 @@ globalThis.closeDuringRender = async phase => {
   }] }));
   const view = await runtime.createView({
     ports: { value: { kind: 'Value', schema: true } },
+    states: { unrelated: { kind: 'State', schema: { type: 'boolean' }, initial: false } },
     render: { id: 'leaf', componentRef: 'Leaf', inputs: { value: path('/ports/value') } },
   }, { inputs: withFallback ? {} : { value: 'ready' } });
   const mirror = renderer.attach(view, right);
@@ -298,9 +305,10 @@ globalThis.closeDuringRender = async phase => {
   armed = !warm;
   screen = renderer.attach(view, left, { fallback({ parent, anchor }) {
     observe('fallback.mount');
-    const element = document.createElement('span');
+    const element = document.createElement(detachOnDisconnect ? 'viewstem-detach-fallback' : 'span');
     element.textContent = 'fallback';
     parent.insertBefore(element, anchor);
+    if (detachOnDisconnect) return;
     return {
       update() { observe('fallback.update'); },
       whenRendered() { observe('fallback.whenRendered'); },
@@ -311,7 +319,8 @@ globalThis.closeDuringRender = async phase => {
     await screen.whenRendered();
     trace.length = 0;
     armed = true;
-    await view.setInputs(withFallback ? { value: 42 } : {});
+    if (detachOnDisconnect) view.getState('unrelated').write(true);
+    else await view.setInputs(withFallback ? { value: 42 } : {});
   }
   const outcome = await code(screen.whenRendered());
   await closing;
@@ -570,7 +579,7 @@ test('a disposable fallback displays each node status with or without an update 
   });
 });
 
-test('closing a display in a render callback stops later callbacks and releases its target', async t => {
+test('closing a display during rendering stops later callbacks and releases its target', async t => {
   const page = await browserPage(t);
   const cases = [
     ['accepts', ['accepts', 'detach']],
@@ -578,6 +587,7 @@ test('closing a display in a render callback stops later callbacks and releases 
     ['setPending', ['setPending', 'detach', 'dispose']],
     ['fallback.mount', ['fallback.mount', 'detach', 'fallback.dispose']],
     ['fallback.update', ['fallback.update', 'detach', 'fallback.dispose']],
+    ['fallback.disconnect', ['fallback.disconnect', 'detach']],
   ];
   for (const [phase, trace] of cases) await t.test(phase, async () => {
     assert.deepEqual(await page.evaluate(name => globalThis.closeDuringRender(name), phase), {
