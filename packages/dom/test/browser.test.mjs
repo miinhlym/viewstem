@@ -255,6 +255,77 @@ globalThis.fallbackTransitions = async updateInPlace => {
   return { initial, keptWhenUnrelated, error, pendingAgain, ready, mounts, disposals, empty: left.childNodes.length === 0 };
 };
 
+globalThis.closeDuringRender = async phase => {
+  const runtime = createRuntime();
+  const trace = [];
+  const warm = phase === 'setPending' || phase === 'fallback.update';
+  const withFallback = phase.startsWith('fallback');
+  let screen, closing, armed = false;
+  function observe(callback) {
+    trace.push(callback);
+    if (armed && callback === phase) {
+      trace.push('detach');
+      closing = screen.detach();
+    }
+  }
+  const connector = { id: 'closing', accepts() { observe('accepts'); return true; },
+    mount(_implementation, ctx) {
+      const local = ctx.parent === left;
+      if (local) observe('mount');
+      const element = document.createElement('span');
+      element.textContent = ctx.node.inputs.value;
+      ctx.parent.insertBefore(element, ctx.anchor);
+      return {
+        update(next) { element.textContent = next.inputs.value; },
+        setPending(pending) { if (local && pending) observe('setPending'); },
+        whenRendered() { if (local) observe('whenRendered'); },
+        dispose() { if (local) observe('dispose'); element.remove(); },
+      };
+    },
+  };
+  const renderer = createRenderer({ runtime, connectors: [connector] });
+  runtime.registry.registerResourceSet(defineResourceSet({ id: 'close-render', version: '1', components: [{
+    contract: { kind: 'Component', id: 'Leaf', spec: { ports: { value: text } } },
+    connectorId: connector.id, implementation: {},
+  }] }));
+  const view = await runtime.createView({
+    ports: { value: { kind: 'Value', schema: true } },
+    render: { id: 'leaf', componentRef: 'Leaf', inputs: { value: path('/ports/value') } },
+  }, { inputs: withFallback ? {} : { value: 'ready' } });
+  const mirror = renderer.attach(view, right);
+  await mirror.whenRendered();
+  trace.length = 0;
+  armed = !warm;
+  screen = renderer.attach(view, left, { fallback({ parent, anchor }) {
+    observe('fallback.mount');
+    const element = document.createElement('span');
+    element.textContent = 'fallback';
+    parent.insertBefore(element, anchor);
+    return {
+      update() { observe('fallback.update'); },
+      whenRendered() { observe('fallback.whenRendered'); },
+      dispose() { observe('fallback.dispose'); },
+    };
+  } });
+  if (warm) {
+    await screen.whenRendered();
+    trace.length = 0;
+    armed = true;
+    await view.setInputs(withFallback ? { value: 42 } : {});
+  }
+  const outcome = await code(screen.whenRendered());
+  await closing;
+  const closed = { trace: [...trace], outcome, empty: left.childNodes.length === 0 };
+  armed = false;
+  await view.setInputs({ value: 'restored' });
+  const reused = renderer.attach(view, left);
+  await Promise.all([reused.whenRendered(), mirror.whenRendered()]);
+  const result = { ...closed, restored: [left.textContent, right.textContent] };
+  await renderer.dispose();
+  await runtime.dispose();
+  return result;
+};
+
 globalThis.syncPending = async () => {
   const { renderer, runtime, disposed } = fixture();
   const mounted = renderer.mount({ target: left, inputs: { label: 'before' }, source: {
@@ -495,6 +566,22 @@ test('a disposable fallback displays each node status with or without an update 
     assert.deepEqual(await page.evaluate(value => globalThis.fallbackTransitions(value), update), {
       initial: 'pending', keptWhenUnrelated: true, error: ['TYPE_MISMATCH', update], pendingAgain: 'pending', ready: 'ready',
       mounts, disposals: mounts, empty: true,
+    });
+  });
+});
+
+test('closing a display in a render callback stops later callbacks and releases its target', async t => {
+  const page = await browserPage(t);
+  const cases = [
+    ['accepts', ['accepts', 'detach']],
+    ['mount', ['accepts', 'mount', 'detach', 'dispose']],
+    ['setPending', ['setPending', 'detach', 'dispose']],
+    ['fallback.mount', ['fallback.mount', 'detach', 'fallback.dispose']],
+    ['fallback.update', ['fallback.update', 'detach', 'fallback.dispose']],
+  ];
+  for (const [phase, trace] of cases) await t.test(phase, async () => {
+    assert.deepEqual(await page.evaluate(name => globalThis.closeDuringRender(name), phase), {
+      trace, outcome: 'CANCELLED', empty: true, restored: ['restored', 'restored'],
     });
   });
 });

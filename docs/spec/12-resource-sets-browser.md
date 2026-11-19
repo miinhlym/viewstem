@@ -131,3 +131,5 @@ DOM 작성자는 `@viewstem/dom/styles`의 `createStyleScope(id)`와 `@viewstem/
 **D161 · 연결자 렌더 완료 메서드의 선택화.** `MountedComponent.whenRendered(signal)`은 선택 메서드다. 생략하면 렌더러는 연결자 자체의 DOM 반영이 `mount()`, `update()` 또는 `setPending()` 호출에서 동기로 끝났다고 간주한다. 비동기 반영을 하는 연결자는 이 메서드에서 해당 렌더 작업의 완료나 실패를 알린다. 표시 연결의 `whenRendered()`는 연결자 자체의 반영과 실제로 제공된 슬롯 자식의 반영을 기다린다.
 
 `update()`, `setPending()`, `dispose()`는 필수다. 필수 입력이 대기 상태가 되면 같은 인스턴스에 대기 상태를 표시하고, 표시 연결이 끝나면 연결자의 정리 완료를 기다린다.
+
+연결자 또는 fallback의 렌더 콜백에서 표시 연결을 닫으면 다음 렌더 콜백을 시작하지 않는다. 이미 시작한 콜백이 반환한 핸들은 연결 종료 중에 정리한다.

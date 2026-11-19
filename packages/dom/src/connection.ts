@@ -117,6 +117,10 @@ class BrowserConnection {
     return this.#root.isOpen() && this.#work === work && !work.controller.signal.aborted;
   }
 
+  #canRender(node: MountedNode, work: Work) {
+    return this.#current(work) && node.branch.isOpen();
+  }
+
   #fail(work: Work, cause: unknown, nodeId?: string) {
     if (!this.#current(work)) return;
     work.failures.push({ cause: createDiagnostic('render', cause).error, ...(nodeId === undefined ? {} : { nodeId }) });
@@ -233,7 +237,7 @@ class BrowserConnection {
     const previous = node.fallback;
     if (previous?.handle && !previous.handle.update && (previous.status !== status || previous.errorKey !== errorKey)) {
       await this.#removeFallback(node, previous);
-      if (!this.#current(work) || !node.branch.isOpen()) return;
+      if (!this.#canRender(node, work)) return;
     }
     if (!node.fallback) {
       const start = parent.ownerDocument.createComment('viewstem fallback');
@@ -248,6 +252,7 @@ class BrowserConnection {
       clearRange(fallback.start, node.end);
       fallback.handle = render(context) ?? undefined;
     }
+    if (!this.#canRender(node, work)) return;
     const signal = work.controller.signal;
     if (fallback.handle?.whenRendered) await untilAborted(fallback.handle.whenRendered(), signal);
   }
@@ -273,13 +278,13 @@ class BrowserConnection {
     const replacement = this.#createNode(key, snapshot, owner, node.binding, node);
     owner.nodes.set(key, replacement);
     await this.#disposeContents(node, this.host.reportDisposal);
-    if (!this.#current(work) || !owner.isOpen()) return;
+    if (!this.#canRender(replacement, work)) return;
     try { await this.#fallback(replacement, error, work); }
     catch (cause) { this.#fail(work, cause, snapshot.id); }
   }
 
   async #renderNode(node: MountedNode, work: Work) {
-    if (!node.branch.isOpen() || !this.#current(work)) return;
+    if (!this.#canRender(node, work)) return;
     const { snapshot, binding } = node;
     const signal = work.controller.signal;
     const connector = binding && this.connectors.get(binding.connectorId);
@@ -290,9 +295,10 @@ class BrowserConnection {
         try {
           if (!node.pending) node.handle.setPending(true);
           node.pending = true;
+          if (!this.#canRender(node, work)) return;
           if (node.handle.whenRendered) await untilAborted(node.handle.whenRendered(signal), signal);
         } finally { node.acceptingSlots = false; }
-        if (this.#current(work)) await this.#clearRetiredSlots(node);
+        if (this.#canRender(node, work)) await this.#clearRetiredSlots(node);
         return;
       }
       if (snapshot.status === 'error' && !connector?.renderUnready) {
@@ -308,7 +314,7 @@ class BrowserConnection {
       }
       if (node.fallback) {
         await this.#removeFallback(node, node.fallback);
-        if (!this.#current(work)) return;
+        if (!this.#canRender(node, work)) return;
       }
       const id = snapshot.componentRef;
       if (!id || !work.projection.isCodeComponent(id)) {
@@ -325,6 +331,7 @@ class BrowserConnection {
               instanceId: snapshot.instanceId,
             });
           }
+          if (!this.#canRender(node, work)) return;
           const current = () => node.handle !== undefined && node.children.isOpen()
             && this.#work?.projection.componentBinding(id) === binding;
           node.handle = connector.mount(binding.implementation, {
@@ -334,19 +341,22 @@ class BrowserConnection {
             provideSlot: (name, element, before) => this.#provideSlot(node, name, element, before),
           });
         } else node.handle.update(snapshot, signal);
-        if (!this.#current(work)) return;
-        if (node.pending !== waiting) node.handle.setPending(waiting);
-        node.pending = waiting;
+        if (!this.#canRender(node, work)) return;
+        if (node.pending !== waiting) {
+          node.handle.setPending(waiting);
+          node.pending = waiting;
+          if (!this.#canRender(node, work)) return;
+        }
         node.hasRenderedReady ||= snapshot.status === 'ready';
         if (node.handle.whenRendered) await untilAborted(node.handle.whenRendered(signal), signal);
       } finally { node.acceptingSlots = false; }
-      if (!this.#current(work)) return;
+      if (!this.#canRender(node, work)) return;
       await this.#clearRetiredSlots(node);
-      if (!this.#current(work)) return;
+      if (!this.#canRender(node, work)) return;
       await Promise.all([...node.slots].map(([name, slot]) => this.#reconcile(slot.branch, snapshot.slots[name] ?? [], work)));
-      if (this.#current(work)) node.handle.afterChildren?.(snapshot);
+      if (this.#canRender(node, work)) node.handle.afterChildren?.(snapshot);
     } catch (cause) {
-      if (!this.#current(work)) return;
+      if (!this.#canRender(node, work)) return;
       const error = createDiagnostic('render', cause).error;
       this.#fail(work, error, snapshot.id);
       await this.#replaceWithFallback(node, error, work);
