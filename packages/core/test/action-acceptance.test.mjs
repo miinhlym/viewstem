@@ -299,6 +299,46 @@ test('A11/A13/A15 active event connection ignores duplicate while independent sh
   eventGate.resolve(); await flush(); assert.equal(snapshot(f.view).status, 'idle'); assert.equal(snapshot(f.view).data, null); assert.equal(shared.read(), 3);
   assert.equal(await emit(f.view), 'event'); assert.equal(snapshot(f.view).status, 'success'); shared.write(4); assert.equal(shared.read(), 4); scope.dispose();
 });
+
+for (const outcome of ['success', 'error']) {
+  test(`a terminal ${outcome} notification allows the next event on the same connection`, async t => {
+    const r = registry(), release = deferred();
+    let calls = 0;
+    native(r, 'work', { output: { schema: integer } }, () => {
+      const callNumber = ++calls;
+      if (callNumber === 1 && outcome === 'error') throw { code: 'ASSERTION_FAILED' };
+      if (callNumber === 2) return release.promise;
+      return callNumber;
+    });
+    const runtime = createPublicRuntime({ registry: r });
+    t.after(() => runtime.dispose());
+    const view = await runtime.createView(buttonView('work'));
+    let completed, second;
+    const stop = view.subscribe(current => {
+      const action = current.actions.observed;
+      if (completed || action.status !== outcome) return;
+      completed = action;
+      second = view.emit(current.roots[0], 'click', null);
+      void second.catch(() => {});
+    });
+    t.after(stop);
+
+    const first = emit(view);
+    if (outcome === 'error') await assert.rejects(first, { code: 'ASSERTION_FAILED' });
+    else assert.equal(await first, 1);
+    assert.equal(completed.running, false);
+    assert.equal(calls, 2);
+    assert.equal(await emit(view), undefined);
+    assert.equal(calls, 2);
+    assert.deepEqual(snapshot(view), { status: 'running', running: true, data: null, error: null });
+
+    release.resolve(2);
+    assert.equal(await second, 2);
+    assert.deepEqual(snapshot(view), { status: 'success', running: false, data: 2, error: null });
+    assert.equal(await emit(view), 3);
+  });
+}
+
 test('A16 self-removing SetState cancels child steps and normal output evaluation', async t => {
   let children = 0, outputs = 0;
   const r = registry([{ name: 'outputMarker', inputs: [], output: string, run() { outputs++; return 'output'; } }]);

@@ -67,6 +67,15 @@ export class ActionEngine {
         const call = { controller }; active = call;
         const previous = snapshot;
         let cancelledBeforeStart = false;
+        const complete = next => {
+          state.calls.delete(controller);
+          if (active !== call) return;
+          // Publishing the terminal snapshot can synchronously start another call.
+          active = null;
+          if (!alive || !state.isOpen() || !isOpen()) return;
+          snapshot = next;
+          this.#onChange();
+        };
         const promise = this.#invoke(configuration, definition, supplied ?? inputs, owner, controller.signal, [], isOpen, () => {
           if (canStart()) return true;
           cancelledBeforeStart = true;
@@ -76,15 +85,13 @@ export class ActionEngine {
           this.#onChange();
         });
         return promise.then(value => {
-          if (alive && state.isOpen() && isOpen() && active === call) { snapshot = ready(value === undefined ? null : value); this.#onChange(); }
+          complete(ready(value === undefined ? null : value));
           return value;
-        }, error => {
-          if (alive && state.isOpen() && isOpen() && active === call) {
-            snapshot = cancelledBeforeStart ? previous : Object.freeze({ status: 'error', running: false, data: null, error: publicError(error) });
-            this.#onChange();
-          }
-          throw publicError(error);
-        }).finally(() => { state.calls.delete(controller); if (active === call) active = null; });
+        }, cause => {
+          const error = publicError(cause);
+          complete(cancelledBeforeStart ? previous : Object.freeze({ status: 'error', running: false, data: null, error }));
+          throw error;
+        });
       },
       dispose: () => { if (!alive) return; alive = false; active?.controller.abort(); state.connections.delete(connection); if (id !== undefined && state.ids.get(id) === connection) state.ids.delete(id); },
     });

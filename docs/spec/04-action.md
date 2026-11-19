@@ -228,7 +228,7 @@ on의 Action 호출 연결에는 **선택적 id**를 붙이며 `/actions/id`로 
 
 같은 소유 View/Component 인스턴스 범위에 실제 생성된 호출 연결의 관찰 id가 중복되면 오류다. 슬롯 내용을 여러 번 투영해서 작성자 범위에 같은 id의 연결이 생겨도 자동 공유하지 않고 오류로 처리한다. 서로 다른 Component 인스턴스의 내부 id는 같은 이름을 사용할 수 있다. 연결 제거 후 같은 id로 다시 생성하면 새 연결이며 이전 실행 결과를 이어받지 않는다. 반복 슬롯 투영의 개별 실행 상태 조회 주소는 1차 지원 범위에 추가하지 않는다. [E56]
 
-실행 정보는 런타임이 관리하는 읽기 전용 값이다. status는 idle/running/success/error, running은 status가 running인지 나타낸다. 새 실행이 실제 시작되면 이전 data/error를 비운다. data는 idle·running·실패 및 output 없는 성공에서 null이며, 성공했고 output이 있으면 검증된 실제 반환값이다. 오류가 없으면 error는 null이다. 성공 여부를 data의 truthiness로 판단하지 않는다. 같은 연결이 실행 중일 때의 추가 호출은 무시하고 기존 실행 정보는 유지한다. 큐나 기존 실행의 자동 취소를 추가하지 않는다.
+실행 정보는 런타임이 관리하는 읽기 전용 값이다. status는 idle/running/success/error, running은 status가 running인지 나타낸다. 새 실행이 실제 시작되면 이전 data/error를 비운다. data는 idle·running·실패 및 output 없는 성공에서 null이며, 성공했고 output이 있으면 검증된 실제 반환값이다. 오류가 없으면 error는 null이다. 성공 여부를 data의 truthiness로 판단하지 않는다. 같은 연결이 실행 중일 때의 추가 호출은 무시하고 기존 실행 정보는 유지한다. 성공·실패 통지를 받은 구독자는 같은 연결에서 새 실행을 시작할 수 있다. 큐나 기존 실행의 자동 취소를 추가하지 않는다.
 
 초기화 순서는 **호출 연결 등록 → idle/running:false/data:null/error:null 초기화 → Component inputs 평가**다. 첫 UI 입력에서 `/actions/id/running`을 읽을 수 있어야 하며 JSON 속성 순서에 따라 달라지지 않는다.
 
