@@ -8,7 +8,7 @@ import { Rule, type AtRule, type ChildNode, type Declaration, type Plugin, type 
 import selectorParser from 'postcss-selector-parser';
 import { rewriteAnimation, type AnimationForm } from './styles-animation.js';
 import { cssIdentifier, parseCssValue, renameCssName, valueToken, variableName } from './styles-css-values.js';
-import { styleOwnerAttribute, validateStyleScopeId } from './styles-owner.js';
+import { scopedPropertyName, styleOwnerAttribute, styleScopePrefix } from './styles-owner.js';
 
 export interface ScopeUiCssOptions {
   publicProperties?: readonly string[];
@@ -148,8 +148,7 @@ function rewriteVariable(node: ComponentValue, properties: ReadonlyMap<string, s
 
 /** Compile a UI set's assembled CSS for use with createStyleScope(id). */
 export function scopeUiCss(id: string, { publicProperties = [] }: ScopeUiCssOptions = {}): Plugin {
-  validateStyleScopeId(id);
-  const prefix = id + '-';
+  const prefix = styleScopePrefix(id);
   const publicNames = new Set(publicProperties.map(property => {
     const name = cssIdentifier(property)?.[4].value;
     if (!name?.startsWith('--') || name.length < 3) {
@@ -170,7 +169,7 @@ export function scopeUiCss(id: string, { publicProperties = [] }: ScopeUiCssOpti
       function declareProperty(name: string, source: ChildNode): string {
         const existing = properties.get(name);
         if (existing) return existing;
-        const scopedName = publicNames.has(name) || name.startsWith('--' + prefix) ? name : '--' + prefix + name.slice(2);
+        const scopedName = publicNames.has(name) ? name : scopedPropertyName(prefix, name);
         const emitted = renamedSymbol(name, scopedName, 'custom property', source, propertyOutputs);
         properties.set(name, emitted);
         return emitted;

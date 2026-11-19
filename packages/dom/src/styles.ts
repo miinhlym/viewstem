@@ -1,7 +1,9 @@
-import { styleOwnerAttribute, validateStyleScopeId } from './styles-owner.js';
+import { scopedPropertyName, styleOwnerAttribute, styleScopePrefix } from './styles-owner.js';
 
 export interface StyleScope {
   mark<E extends Element>(element: E): E;
+  /** Resolve a local CSS custom property for inline styles. Public properties keep their original names. */
+  localProperty(name: `--${string}`): string;
   createElement<K extends keyof HTMLElementTagNameMap>(document: Document, tag: K, options?: ElementCreationOptions): HTMLElementTagNameMap[K];
   createElement<K extends keyof HTMLElementDeprecatedTagNameMap>(document: Document, tag: K, options?: ElementCreationOptions): HTMLElementDeprecatedTagNameMap[K];
   createElement(document: Document, tag: string, options?: ElementCreationOptions): HTMLElement;
@@ -16,7 +18,14 @@ export interface StyleScope {
 
 /** Mark elements owned by the author of the matching scoped stylesheet. */
 export function createStyleScope(id: string): StyleScope {
-  validateStyleScopeId(id);
+  const prefix = styleScopePrefix(id);
+
+  function localProperty(name: `--${string}`): string {
+    if (typeof name !== 'string' || !name.startsWith('--') || name.length < 3) {
+      throw new TypeError('Expected a CSS custom property name beginning with "--".');
+    }
+    return scopedPropertyName(prefix, name);
+  }
 
   function mark<E extends Element>(element: E): E {
     const owner = element.getAttribute(styleOwnerAttribute);
@@ -31,5 +40,5 @@ export function createStyleScope(id: string): StyleScope {
   const createElementNS = ((document: Document, namespace: string | null, tag: string) =>
     mark(document.createElementNS(namespace, tag))) as StyleScope['createElementNS'];
 
-  return { mark, createElement, createElementNS };
+  return { mark, localProperty, createElement, createElementNS };
 }

@@ -3,7 +3,7 @@ import type { NodeSnapshot } from '@viewstem/core';
 import { registerControllers, type Controller } from './basecoat-controllers.js';
 import { emitFrom, readInputs } from './component-context.js';
 import { sliderKeyValue, sliderScale, snapSliderValue } from './slider-values.js';
-import { styleScope, styleScopeId } from './style-scope.js';
+import { styleScope } from './style-scope.js';
 
 type Widget = HTMLElement & { _destroy?: () => void; refresh?: () => void; select?: (target: HTMLElement, focus?: boolean) => void; close?: (focus: boolean) => void };
 type Props = NodeSnapshot['inputs'];
@@ -881,7 +881,7 @@ export function range(element: HTMLInputElement, send: Send, signal: AbortSignal
       else if (typeof value === 'number') element.valueAsNumber = value;
       current = element.valueAsNumber;
       control.init([element]);
-      element.style.setProperty(`--${styleScopeId}-slider-value`, `${(current - min) / (max - min || 1) * 100}%`);
+      element.style.setProperty(styleScope.localProperty('--slider-value'), `${(current - min) / (max - min || 1) * 100}%`);
     },
     dispose: control.dispose,
   };
@@ -1093,7 +1093,8 @@ export function notifications(element: HTMLElement, send: Send): Behavior {
 }
 
 export function scopeChartColor(color: string) {
-  return color.replace(/(\b[vV][aA][rR]\(\s*)--chart-([1-5])(?=\s*[,)])/g, `$1--${styleScopeId}-chart-$2`);
+  return color.replace(/(\b[vV][aA][rR]\(\s*)--chart-([1-5])(?=\s*[,)])/g,
+    (_, start, index) => start + styleScope.localProperty(`--chart-${index}`));
 }
 
 export function chart(element: HTMLElement): Behavior {
@@ -1130,7 +1131,7 @@ export function chart(element: HTMLElement): Behavior {
   let tooltipTimer: number | undefined;
 
   const seriesColor = (color: string | undefined, index: number) => color && view.CSS.supports('color', color)
-    ? scopeChartColor(color) : `var(--${styleScopeId}-chart-${index % 5 + 1}, currentColor)`;
+    ? scopeChartColor(color) : `var(${styleScope.localProperty(`--chart-${index % 5 + 1}`)}, currentColor)`;
   function add(parent: SVGElement, tag: string, attrs: Record<string, string | number>, text?: string) {
     const shape = styleScope.createElementNS(doc, ns, tag);
     for (const [key, value] of Object.entries(attrs)) shape.setAttribute(key, String(value));

@@ -51,4 +51,6 @@ const result = await postcss([scopeUiCss('acme-forms')]).process(css, { from: 's
 
 CSS import를 먼저 해결한 뒤 이 변환을 적용하고 결과 CSS를 배포합니다. 변환은 각 선택자의 최종 대상을 제한하고 내부 CSS 변수, 레이어, 애니메이션 이름에 접두사를 붙입니다. 앱이 이름으로 재정의할 변수는 `publicProperties`에 지정합니다.
 
+컴포넌트가 내부 변수를 JavaScript에서 갱신할 때는 `forms.localProperty('--progress')`를 `element.style.setProperty()`에 넘깁니다. 빌드가 CSS의 `--progress`에 붙이는 접두사와 같은 이름을 얻습니다.
+
 스타일을 셋과 함께 번들링하려면 패키지의 `browser` 진입점에서 생성한 CSS를 가져오고 JS 진입점의 셋을 다시 내보냅니다. `exports`에서 `browser` 조건을 일반 JS 진입점보다 앞에 두고 브라우저 진입점과 CSS를 `sideEffects`에 넣습니다. 소비자는 셋을 그대로 등록할 수 있고, CSS를 직접 불러오는 호스트에는 별도 스타일시트 경로를 제공할 수 있습니다.

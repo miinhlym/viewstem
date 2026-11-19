@@ -55,7 +55,7 @@ test('namespaces layers, local keyframes, local custom properties and their refe
     .box {
       --accent: blue;
       --public-tone: var(--accent);
-      --acme-forms-gap: 0;
+      --acme-forms--gap: 0;
       --label: "blink once";
       --motion: var(--fallback-motion, "blink once" 1s);
       --motion-alias: var(--motion);
@@ -67,22 +67,22 @@ test('namespaces layers, local keyframes, local custom properties and their refe
     }
     @container style(--accent: blue) { .box { outline: none; } }
   `, options);
-  assert.match(css, /@layer acme-forms-reset, acme-forms-theme\.palette;/);
-  assert.match(css, /@layer acme-forms-theme \{ @layer palette/);
-  assert.match(css, /@property --acme-forms-progress/);
-  assert.match(css, /@property --acme-forms-default-motion \{ [^}]*initial-value: acme-forms-ease;/);
-  assert.match(css, /@-webkit-keyframes "acme-forms-blink once" \{ from \{ opacity: 0; \} 50%, to/);
-  assert.match(css, /@keyframes acme-forms-ease \{ to/);
-  assert.match(css, /--public-tone: var\(--acme-forms-accent\);/);
-  assert.match(css, /--acme-forms-gap: 0;/);
-  assert.match(css, /--acme-forms-label: "blink once";/);
-  assert.match(css, /--acme-forms-motion: var\(--fallback-motion, "acme-forms-blink once" 1s\);/);
-  assert.match(css, /animation: 1s ease, 2s linear acme-forms-ease, var\(--acme-forms-motion-alias\), 1s host-entrance;/);
-  assert.match(css, /-webkit-animation-name: var\(--acme-forms-default-motion\), "acme-forms-blink once";/);
+  assert.match(css, /@layer acme-forms--reset, acme-forms--theme\.palette;/);
+  assert.match(css, /@layer acme-forms--theme \{ @layer palette/);
+  assert.match(css, /@property --acme-forms--progress/);
+  assert.match(css, /@property --acme-forms--default-motion \{ [^}]*initial-value: acme-forms--ease;/);
+  assert.match(css, /@-webkit-keyframes "acme-forms--blink once" \{ from \{ opacity: 0; \} 50%, to/);
+  assert.match(css, /@keyframes acme-forms--ease \{ to/);
+  assert.match(css, /--public-tone: var\(--acme-forms--accent\);/);
+  assert.match(css, /--acme-forms--gap: 0;/);
+  assert.match(css, /--acme-forms--label: "blink once";/);
+  assert.match(css, /--acme-forms--motion: var\(--fallback-motion, "acme-forms--blink once" 1s\);/);
+  assert.match(css, /animation: 1s ease, 2s linear acme-forms--ease, var\(--acme-forms--motion-alias\), 1s host-entrance;/);
+  assert.match(css, /-webkit-animation-name: var\(--acme-forms--default-motion\), "acme-forms--blink once";/);
   assert.match(css, /content: "var\(--accent\)";/);
-  assert.match(css, /color: var\(--host-accent, var\(--acme-forms-accent\)\);/);
-  assert.match(css, /opacity: var\(--acme-forms-progress\);/);
-  assert.match(css, /@container style\(--acme-forms-accent: blue\)/);
+  assert.match(css, /color: var\(--host-accent, var\(--acme-forms--accent\)\);/);
+  assert.match(css, /opacity: var\(--acme-forms--progress\);/);
+  assert.match(css, /@container style\(--acme-forms--accent: blue\)/);
   assert.equal(compile(css, options), css);
 });
 
@@ -94,7 +94,40 @@ test('rejects invalid IDs, unresolved imports and cross-boundary pseudo-elements
   assert.throws(() => compile(String.raw`@i\6d port "vendor.css";`), /Inline @import/);
   assert.throws(() => compile('x-foo::part(chevron) {}'), /originating UI element/);
   assert.throws(() => compile(String.raw`slot::s\6c otted(.header) {}`), /originating UI element/);
-  assert.throws(() => compile('.box { --gap: 1px; --acme-forms-gap: 2px; }'), /same custom property/);
+  assert.throws(() => compile('.box { --gap: 1px; --acme-forms--gap: 2px; }'), /same custom property/);
+});
+
+test('independently built style sets do not share animation names, layers or property registrations', async t => {
+  const stylesheet = (owner, name, opacity, level) => compile(`
+    @property --${name} { syntax: "<integer>"; inherits: false; initial-value: ${level}; }
+    @layer ${name} {
+      @keyframes ${name} { from, to { opacity: ${opacity}; } }
+      .box { animation: ${name} 1s both; z-index: var(--${name}); }
+    }
+  `, undefined, owner);
+  const browser = await chromium.launch();
+  t.after(() => browser.close());
+  const page = await browser.newPage();
+  await page.setContent('<div class="box" data-vs-ui-owner="a"></div><div class="box" data-vs-ui-owner="a-b"></div>');
+  const read = () => page.locator('.box').evaluateAll(nodes => nodes.map(node => {
+    const { opacity, zIndex, animationName } = getComputedStyle(node);
+    return { opacity, zIndex, animationName };
+  }));
+  await page.addStyleTag({ content: stylesheet('a', 'b-pulse', 0.2, 2) });
+  const [first] = await read();
+  assert.equal(first.opacity, '0.2');
+  assert.equal(first.zIndex, '2');
+  await page.addStyleTag({ content: stylesheet('a-b', 'pulse', 0.8, 8) });
+  const [stillFirst, second] = await read();
+  assert.deepEqual(stillFirst, first);
+  assert.equal(second.opacity, '0.8');
+  assert.equal(second.zIndex, '8');
+  assert.notEqual(second.animationName, first.animationName);
+  const layers = await page.evaluate(() => [...document.styleSheets].map(sheet => sheet.cssRules[1].name));
+  assert.notEqual(layers[0], layers[1]);
+  await page.locator('.box').first().evaluate((node, name) => node.style.setProperty(name, '3'),
+    createStyleScope('a').localProperty('--b-pulse'));
+  assert.deepEqual((await read()).map(node => node.zIndex), ['3', '8']);
 });
 
 test('applies nested rules and generated content only to owned HTML and SVG elements', async t => {

@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import postcss from 'postcss';
 import { scopeUiCss } from '@viewstem/dom/styles/postcss';
-import { styleScopeId } from '../dist/style-scope.js';
+import { styleScope, styleScopeId } from '../dist/style-scope.js';
 
 const require = createRequire(import.meta.url);
 const packageRoot = dirname(require.resolve('basecoat-css/package.json'));
@@ -30,7 +30,7 @@ css.walkRules(rule => {
         const name = declaration.prop.slice(2);
         if (name.endsWith('-icon') || name.endsWith('-icon-50')) return;
         palette.add(name);
-        declaration.value = `var(--viewstem-${name}, var(--${styleScopeId}-legacy-${name}, ${declaration.value}))`;
+        declaration.value = `var(--viewstem-${name}, var(${styleScope.localProperty(`--legacy-${name}`)}, ${declaration.value}))`;
       });
       return;
     }
@@ -52,7 +52,7 @@ const result = await postcss([scopeUiCss(styleScopeId)]).process(css, { from: un
 // The old attribute is an explicit palette boundary. It reads the old token
 // names at that boundary and exposes them only under UI-specific names.
 const legacyTheme = postcss.rule({ selector: ':where([data-viewstem-ui])' });
-for (const name of palette) legacyTheme.append({ prop: `--${styleScopeId}-legacy-${name}`, value: `var(--${name})` });
+for (const name of palette) legacyTheme.append({ prop: styleScope.localProperty(`--legacy-${name}`), value: `var(--${name})` });
 result.root.append(legacyTheme);
 
 mkdirSync(outputDir, { recursive: true });

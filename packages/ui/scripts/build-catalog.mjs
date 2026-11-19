@@ -1,14 +1,14 @@
 import { copyFile, readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
-import { styleScopeId } from '../dist/style-scope.js';
+import { styleScope } from '../dist/style-scope.js';
 
 const require = createRequire(import.meta.url);
 const basecoat = dirname(require.resolve('basecoat-css/package.json'));
 const names = ['accordion', 'combobox', 'command', 'drawer', 'range', 'select', 'sidebar', 'tabs'];
 const scripts = await Promise.all(names.map(async name => {
   const source = await readFile(join(basecoat, 'dist/js', name + '.js'), 'utf8');
-  if (name === 'range') return source.replaceAll('--slider-value', `--${styleScopeId}-slider-value`);
+  if (name === 'range') return source.replaceAll('--slider-value', styleScope.localProperty('--slider-value'));
   if (name === 'combobox') {
     // In a button-triggered combobox, the search field does not edit the selection.
     const clearOnInput = "filterOptions(state);\n      if (!state.isMultiple) {\n        state.hiddenInput.value = '';";
