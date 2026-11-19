@@ -25,6 +25,8 @@ Returns `(plan: HttpExecutionPlan, context?: { signal?: AbortSignal }) => Promis
 | `resolveSecret` | `(reference, { caller, destination, signal }) => Awaitable<string>` | Resolve a named secret reference; default rejects with `EXECUTION_BLOCKED`. Keep this on a trusted server. |
 | `clock` | `{ now(): number, set(callback, milliseconds): unknown, clear(token): void }` | Deadline clock; defaults to performance time and system timers. Its method names differ from Runtime's `TimerClock`. |
 
+Use a monotonic millisecond clock whose timers advance with `now()`. Exceptions from `now()` and `set()` use the HTTP error boundary. An exception from `clear()` leaves the settled execution result intact.
+
 The execution context's optional signal aborts the whole operation. Custom transports/resolvers receive cancellation signals; they should stop their own work. An abort or deadline rejects with `CANCELLED` or `TIMEOUT`.
 
 ## HttpExecutionPlan

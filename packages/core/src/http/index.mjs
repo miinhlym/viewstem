@@ -117,6 +117,8 @@ export function createHttpExecutor({
     const controller = new AbortController();
     let timer;
     let terminal;
+    let deadline;
+    let closed = false;
     let rejectStopped;
     const stopped = new Promise((_, reject) => { rejectStopped = reject; });
     function stop(code) {
@@ -126,19 +128,21 @@ export function createHttpExecutor({
       rejectStopped(failure(code));
     }
     const cancelled = () => stop('CANCELLED');
-    const deadline = clock.now() + requestTimeoutMs;
-    const arm = () => {
+    function arm() {
+      if (closed || terminal) return;
       const remaining = deadline - clock.now();
+      if (terminal) return;
       if (remaining <= 0) stop('TIMEOUT');
-      else timer = clock.set(arm, Math.min(remaining, 2147483647));
-    };
+      else timer = { token: clock.set(onTimer, Math.min(remaining, 2147483647)) };
+    }
+    function onTimer() {
+      try { arm(); }
+      catch (error) { if (!terminal) stop(publicErrorCode(error)); }
+    }
     function check() {
       if (!terminal && clock.now() >= deadline) stop('TIMEOUT');
       if (terminal) throw failure(terminal);
     }
-    if (signal?.aborted) cancelled();
-    else signal?.addEventListener('abort', cancelled, { once: true });
-    arm();
     const evaluate = createValueEvaluator(check);
     async function evaluateHeaders(declaration, scope, literal = false) {
       if (declaration === undefined) return;
@@ -201,6 +205,10 @@ export function createHttpExecutor({
       return { status: response.status, headers: Object.fromEntries(response.headers), body: resultBody };
     }
     async function work() {
+      if (signal?.aborted) throw failure('CANCELLED');
+      signal?.addEventListener('abort', cancelled, { once: true });
+      deadline = clock.now() + requestTimeoutMs;
+      arm();
       check();
       if (plan.version !== 1 || plan.datasource?.kind !== 'Http' || !plan.request) invalid();
       recordObject(plan.datasource);
@@ -229,8 +237,10 @@ export function createHttpExecutor({
       const code = terminal ?? publicErrorCode(error);
       throw failure(code);
     } finally {
-      clock.clear(timer);
+      closed = true;
       signal?.removeEventListener('abort', cancelled);
+      try { if (timer) clock.clear(timer.token); }
+      catch { /* Timer cleanup cannot replace the settled execution result. */ }
       controller.abort();
     }
   };

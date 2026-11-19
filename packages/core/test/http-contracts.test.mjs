@@ -1,6 +1,7 @@
 import nodeTest from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
+import { getEventListeners } from 'node:events';
 import { createHttpExecutor as createHttpProbe } from '@viewstem/core/http';
 
 const deferred = () => {
@@ -247,6 +248,67 @@ test('P16-large-timeout-is-chunked', { data: { hold: true } }, async f => {
   assert.equal(f.clock.timers.size, 1); assert.equal([...f.clock.timers.values()][0].ms, 1);
   f.clock.advance(1); errorIs(await pending, 'TIMEOUT');
 });
+test('clock setup failures are sanitized and release the abort listener', {}, async f => {
+  for (const method of ['now', 'set']) {
+    const controller = new AbortController();
+    const clock = { now: f.clock.now, set: f.clock.set, clear: f.clock.clear, [method]() { throw Error(fixtureSecret); } };
+    errorIs(await settle(f.execute({ clock })(f.basePlan(), { signal: controller.signal })), 'HTTP_ERROR');
+    assert.equal(getEventListeners(controller.signal, 'abort').length, 0);
+  }
+  const controller = new AbortController();
+  const clock = { now: f.clock.now, set() { controller.abort(); throw Error(fixtureSecret); }, clear: f.clock.clear };
+  errorIs(await settle(f.execute({ clock })(f.basePlan(), { signal: controller.signal })), 'CANCELLED');
+  assert.equal(getEventListeners(controller.signal, 'abort').length, 0);
+  assert.equal(f.seen.length, 0);
+  assert.equal(f.clock.timers.size, 0);
+});
+test('a clock failure when rearming settles and aborts the outstanding transport', {}, async f => {
+  let sets = 0;
+  const clock = {
+    now: f.clock.now, clear: f.clock.clear,
+    set(callback, ms) {
+      if (++sets > 1) throw Error(fixtureSecret);
+      return f.clock.set(callback, ms);
+    },
+  };
+  const started = deferred(), release = deferred();
+  const pending = settle(f.execute({
+    clock, requestTimeoutMs: 2147483648,
+    transport(_url, { signal }) { started.resolve(signal); return release.promise; },
+  })(f.basePlan()));
+  const signal = await started.promise;
+  f.clock.advance(2147483647);
+  errorIs(await pending, 'HTTP_ERROR');
+  assert.equal(signal.aborted, true);
+  assert.equal(f.clock.timers.size, 0);
+  release.resolve(new Response(null, { status: 204 }));
+});
+for (const outcome of ['success', 'HTTP_ERROR', 'TIMEOUT', 'CANCELLED']) {
+  test(`clock cleanup failures preserve ${outcome} and release execution resources`, {}, async f => {
+    const controller = new AbortController();
+    const started = deferred(), release = deferred();
+    const clock = {
+      now: f.clock.now, set: f.clock.set,
+      clear(token) { f.clock.clear(token); throw Error(fixtureSecret); },
+    };
+    const execute = f.execute({
+      clock, requestTimeoutMs: 1000,
+      transport(_url, { signal }) { started.resolve(signal); return release.promise; },
+    });
+    const pending = settle(execute(f.basePlan(), { signal: controller.signal }));
+    const requestSignal = await started.promise;
+    if (outcome === 'TIMEOUT') f.clock.advance(1000);
+    else if (outcome === 'CANCELLED') controller.abort();
+    else release.resolve(new Response(null, { status: outcome === 'success' ? 204 : 500 }));
+    const result = await pending;
+    if (outcome === 'success') assert.deepEqual(result.value, { status: 204, headers: {}, body: null });
+    else errorIs(result, outcome);
+    assert.equal(requestSignal.aborted, true);
+    assert.equal(getEventListeners(controller.signal, 'abort').length, 0);
+    assert.equal(f.clock.timers.size, 0);
+    release.resolve(new Response(null, { status: 204 }));
+  });
+}
 test('P17-body-encodings', {}, async f => {
   for (const [value, contentType, expected] of [[undefined, undefined, ''], [null, undefined, 'null'], ['abc', undefined, 'abc'], ['abc', 'application/json', '"abc"'], [{ a: ['', '한글'], skip: null }, 'application/x-www-form-urlencoded', 'a=&a=%ED%95%9C%EA%B8%80']]) {
     const plan = f.basePlan(); plan.request.method = 'POST';

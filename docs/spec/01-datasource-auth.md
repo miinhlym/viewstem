@@ -337,6 +337,8 @@ Viewstem 기본 실행기는 API 응답에서 secret과 같은 문자열을 찾�
 | Login | 호출별로 독립 실행하고 진행 중 Login도 공유하지 않음. 완료 토큰 캐시 없음. 실패·잘못된 토큰·취소 시 실제 API 요청을 시작하지 않음 |
 | 시간 제한 | 요청 실행 계획의 Login+실제 HTTP 전체에 기본 30,000ms. 호스트 설정 requestTimeoutMs로 양의 안전 정수 범위에서 변경. 만료 시 TIMEOUT·협력 취소·늦은 결과 폐기. Action 전체나 Datasource의 고정 필드로 확대하지 않음 |
 
+HTTP 실행기에 주입하는 `clock`의 `now()`와 타이머는 같은 단조 시계의 밀리초 값을 기준으로 전진한다. 시간 읽기와 예약 실패는 [공통 HTTP 오류 규칙](07-host-integration.md#공통-오류와-진단)으로 처리한다. 타이머 정리 실패가 발생해도 확정한 실행 결과를 유지하고 취소 연결을 해제한다.
+
 **method·baseUrl·path 평가와 목적지 검사(U27–U28):** 실제 요청과 Login 요청의 method·baseUrl·path를 해당 요청의 값 문맥에서 먼저 평가한다. baseUrl은 요청에 지정한 값을 선택하고, 생략했을 때만 Datasource.baseUrl을 사용한다. 선택하지 않은 fallback은 평가하지 않으며 명시 null·잘못된 타입·누락된 참조를 fallback으로 숨기지 않는다. Login도 baseUrl만 이 생략 fallback을 사용하며 외부 headers·params·auth는 상속하지 않는다. 결과 method는 위 7종 문자열, baseUrl·path는 문자열이어야 한다. 기존 URL 문법·공통 경로 보존·목적지 권한 검사는 평가 후 그대로 적용한다.
 
 평가 후 취소/timeout을 다시 확인하고, 결합된 목적지에 신뢰 caller의 권한 검사를 수행한 뒤에만 headers·params·body 평가용 secret resolver 권한을 제공한다. 목적지가 확정되지 않은 method·주소 평가에는 resolver를 제공하지 않으며 빈 목적지로 조회하지 않는다. params를 붙인 최종 URL도 전송 직전에 재검사한다. 평가된 method를 실제 전송·GET/HEAD 본문 거절·HEAD 응답 처리에 일관되게 사용한다.
