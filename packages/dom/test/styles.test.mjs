@@ -97,6 +97,38 @@ test('rejects invalid IDs, unresolved imports and cross-boundary pseudo-elements
   assert.throws(() => compile('.box { --gap: 1px; --acme-forms--gap: 2px; }'), /same custom property/);
 });
 
+test('rejects document-wide and unclassified at-rules before emitting set CSS', () => {
+  for (const [rule, css] of [
+    ['font-face', String.raw`@f\6f nt-face { font-family: SharedFace; src: local("Arial"); }`],
+    ['font-feature-values', '@font-feature-values SharedFace { @styleset { alternate: 1; } }'],
+    ['font-palette-values', '@FONT-PALETTE-VALUES --palette { font-family: SharedFace; }'],
+    ['counter-style', '@layer base { @media all { @counter-style shared { system: cyclic; symbols: "*"; } } }'],
+    ['position-try', '@position-try --fallback { inset: 0; }'],
+    ['color-profile', '@color-profile --photo { src: url(profile.icc); }'],
+    ['page', '@page { margin: 0; }'],
+    ['view-transition', '@view-transition { navigation: auto; }'],
+    ['custom-media', '@custom-media --layout (width >= 36rem);'],
+    ['future-name-definition', '@future-name-definition label;'],
+  ]) {
+    assert.throws(() => compile('\n' + css), {
+      name: 'CssSyntaxError', line: 2, reason: new RegExp(`@${rule}.*host stylesheet`),
+    });
+  }
+});
+
+test('public theme values are allowed while their global registrations and cross-tree names belong to the host', () => {
+  const options = { publicProperties: ['--shared'] };
+  assert.match(compile('.box { --shared: 7; z-index: var(--shared); }', options), /--shared: 7; z-index: var\(--shared\)/);
+  const registration = String.raw`@property --\73 hared { syntax: "<integer>"; inherits: true; initial-value: 7; }`;
+  assert.throws(() => compile(registration, options), /@property --shared.*host stylesheet/);
+  for (const property of [
+    String.raw`view-transiti\6f n-name`, 'view-transition-class', 'anchor-name', 'anchor-scope',
+    'scroll-timeline', 'scroll-timeline-name', 'view-timeline', 'view-timeline-name', 'timeline-scope',
+  ]) {
+    assert.throws(() => compile(`.box { ${property}: var(--name); }`), /document or tree.*host stylesheet/);
+  }
+});
+
 test('independently built style sets do not share animation names, layers or property registrations', async t => {
   const stylesheet = (owner, name, opacity, level) => compile(`
     @property --${name} { syntax: "<integer>"; inherits: false; initial-value: ${level}; }
@@ -128,6 +160,92 @@ test('independently built style sets do not share animation names, layers or pro
   await page.locator('.box').first().evaluate((node, name) => node.style.setProperty(name, '3'),
     createStyleScope('a').localProperty('--b-pulse'));
   assert.deepEqual((await read()).map(node => node.zIndex), ['3', '8']);
+});
+
+test('two independent resource sets share one View and consume host names without replacing them', async t => {
+  const source = `
+    import { createRuntime, defineResourceSet } from '@viewstem/core';
+    import { createRenderer } from '@viewstem/dom';
+    import { createStyleScope } from '@viewstem/dom/styles';
+    const runtime = createRuntime();
+    const renderer = createRenderer({ runtime });
+    function registerBadge(id, componentId, hasSlot) {
+      const scope = createStyleScope(id);
+      runtime.registry.registerResourceSet(defineResourceSet({ id, version: '1', components: [{
+        contract: { kind: 'Component', id: componentId, spec: hasSlot ? { slots: { default: {} } } : {} },
+        connectorId: 'dom',
+        implementation: { mount({ parent, anchor, provideSlot }) {
+          const badge = scope.createElement(document, 'div');
+          badge.id = id;
+          badge.className = 'badge';
+          badge.textContent = id;
+          parent.insertBefore(badge, anchor);
+          if (hasSlot) provideSlot('default', badge);
+          return { update() {}, setPending() {}, dispose() { badge.remove(); } };
+        } },
+      }] }));
+    }
+    registerBadge('alpha-set', 'AlphaBadge', true);
+    registerBadge('beta-set', 'BetaBadge', false);
+    globalThis.mountSets = async () => {
+      const screen = renderer.mount({
+        target: document.querySelector('main'),
+        source: { render: { id: 'alpha', componentRef: 'AlphaBadge', slots: {
+          default: [{ id: 'beta', componentRef: 'BetaBadge' }],
+        } } },
+      });
+      await screen.whenRendered();
+    };
+  `;
+  const { outputFiles } = await build({
+    stdin: { contents: source, resolveDir: fileURLToPath(new URL('.', import.meta.url)) },
+    bundle: true, write: false,
+  });
+  const browser = await chromium.launch();
+  t.after(() => browser.close());
+  const page = await browser.newPage();
+  await page.setContent('<div id="host" class="badge">Host</div><main></main>');
+  await page.addStyleTag({ content: `
+    @font-face { font-family: SharedFace; src: local("Arial"); }
+    @property --shared { syntax: "<integer>"; inherits: true; initial-value: 7; }
+    .badge { font-family: SharedFace, monospace; order: var(--shared); }
+  ` });
+  const options = { publicProperties: ['--shared'] };
+  function stylesheet(owner, level, opacity, font) {
+    const local = `
+      @property --level { syntax: "<integer>"; inherits: false; initial-value: ${level}; }
+      @layer badge {
+        @keyframes pulse { from, to { opacity: ${opacity}; } }
+        .badge {
+          font-family: SharedFace, monospace;
+          order: var(--shared);
+          z-index: var(--level);
+          animation: pulse 1s both;
+        }
+      }
+    `;
+    assert.throws(() => compile(`@font-face { font-family: SharedFace; src: local("${font}"); }` + local, options, owner),
+      /@font-face.*host stylesheet/);
+    assert.throws(() => compile(`@property --shared { syntax: "<integer>"; inherits: true; initial-value: ${level}; }` + local, options, owner),
+      /@property --shared.*host stylesheet/);
+    return compile(local, options, owner);
+  }
+  const read = selector => page.locator(selector).evaluate(node => {
+    const { fontFamily, opacity, zIndex, order, animationName } = getComputedStyle(node);
+    return { fontFamily, opacity, zIndex, order, animationName };
+  });
+  await page.addStyleTag({ content: stylesheet('alpha-set', 2, 0.2, 'Arial') });
+  await page.addScriptTag({ content: outputFiles[0].text });
+  await page.evaluate(() => globalThis.mountSets());
+  const host = await read('#host');
+  const alpha = await read('#alpha-set');
+  assert.deepEqual(host, { fontFamily: 'SharedFace, monospace', opacity: '1', zIndex: 'auto', order: '7', animationName: 'none' });
+  assert.deepEqual(alpha, { ...host, opacity: '0.2', zIndex: '2', animationName: 'alpha-set--pulse' });
+  await page.addStyleTag({ content: stylesheet('beta-set', 8, 0.8, 'Courier New') });
+  assert.deepEqual(await read('#host'), host);
+  assert.deepEqual(await read('#alpha-set'), alpha);
+  assert.deepEqual(await read('#alpha-set #beta-set'), { ...host, opacity: '0.8', zIndex: '8', animationName: 'beta-set--pulse' });
+  assert.deepEqual(await page.evaluate(() => [...document.fonts].map(face => face.family)), ['SharedFace']);
 });
 
 test('nested styles cross foreign ancestors and scope each declaration to its owned target', async t => {

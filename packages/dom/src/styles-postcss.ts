@@ -20,6 +20,13 @@ const animationProperty = /^(?:-webkit-|-moz-|-o-)?animation(-name)?$/;
 const legacyPseudoElements = new Set([':before', ':after', ':first-letter', ':first-line']);
 const crossingPseudos = new Set(['::part', '::slotted', '::v-deep', ':deep', ':global']);
 const nestedDeclarationGroups = new Set(['media', 'supports', 'container', 'layer', 'starting-style']);
+// These rules either use guarded style rules or have their names rewritten below.
+const scopedAtRules = new Set([...nestedDeclarationGroups, 'scope', 'property']);
+const stylesheetDirectives = new Set(['charset', 'namespace']);
+const hostNameProperties = new Set([
+  'anchor-name', 'anchor-scope', 'scroll-timeline', 'scroll-timeline-name',
+  'view-timeline', 'view-timeline-name', 'timeline-scope',
+]);
 
 function pseudoName(raw: string): string {
   const colon = raw.startsWith('::') ? '::' : ':';
@@ -240,8 +247,9 @@ export function scopeUiCss(id: string, { publicProperties = [] }: ScopeUiCssOpti
         if (name === 'import') {
           throw rule.error('Inline @import before applying scopeUiCss.', { plugin: pluginName });
         }
-        if (name === 'page' || name === 'view-transition') {
-          throw rule.error(`@${name} affects the whole document. Declare it in the host stylesheet.`, { plugin: pluginName });
+        if (stylesheetDirectives.has(name) && rule.parent?.type === 'root' && !rule.nodes) return;
+        if (!scopedAtRules.has(name) && !keyframesRule.test(name)) {
+          throw rule.error(`@${name} is not supported in UI set CSS. Declare document-wide rules in the host stylesheet.`, { plugin: pluginName });
         }
         if (name === 'layer') scopeLayers(rule, prefix);
         if (name === 'scope') makeScopeSubjectsExplicit(rule);
@@ -251,6 +259,9 @@ export function scopeUiCss(id: string, { publicProperties = [] }: ScopeUiCssOpti
             throw rule.error('Expected a CSS custom property name after @property.', { plugin: pluginName });
           }
           const original = token[4].value;
+          if (publicNames.has(original)) {
+            throw rule.error(`@property ${original} registers a public property. Register it in the host stylesheet.`, { plugin: pluginName });
+          }
           const emitted = declareProperty(original, rule);
           if (emitted !== original) {
             mutateIdent(token, emitted);
@@ -290,6 +301,10 @@ export function scopeUiCss(id: string, { publicProperties = [] }: ScopeUiCssOpti
       root.walkDecls(decl => {
         const token = decl.prop.includes('\\') ? cssIdentifier(decl.prop) : undefined;
         const property = token?.[4].value ?? decl.prop;
+        const name = property.toLowerCase();
+        if (hostNameProperties.has(name) || name.startsWith('view-transition-')) {
+          throw decl.error(`${property} controls names in the document or tree. Declare it in the host stylesheet.`, { plugin: pluginName });
+        }
         if (property.startsWith('--')) {
           const emitted = declareProperty(property, decl);
           if (emitted !== property) {
@@ -301,7 +316,7 @@ export function scopeUiCss(id: string, { publicProperties = [] }: ScopeUiCssOpti
           addPropertyValue(property, decl);
         }
         if (keyframes.size) {
-          const animation = animationProperty.exec(property.toLowerCase());
+          const animation = animationProperty.exec(name);
           if (animation) queueAnimation(decl, animation[1] ? 'name' : 'shorthand');
         }
       });
