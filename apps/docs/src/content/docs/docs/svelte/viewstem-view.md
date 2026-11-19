@@ -7,7 +7,7 @@ sidebar:
 
 ## ViewstemView
 
-Import from `@viewstem/svelte` and pass a `renderer` with either a `source` or a `view`. Both inherit the parent Svelte context. See the [mounting guide](../guides/mount-in-svelte/) for a runnable example.
+Import `ViewstemView` from `@viewstem/svelte`. Pass a `source` to create a View with its own Runtime, or supply a `renderer` to use a shared Runtime. To borrow a View, pass both `renderer` and `view`. These forms inherit the parent Svelte context. See the [mounting guide](../guides/mount-in-svelte/) for a runnable example.
 
 ```svelte
 <ViewstemView {source} resourceSets={[ui]} />
