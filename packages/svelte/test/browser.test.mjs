@@ -985,6 +985,47 @@ test('ViewstemView delivers each failed automatic node cleanup and keeps renderi
   ] });
 }));
 
+test('ViewstemView skips its automatic cleanup diagnostic after the renderer observer unmounts it', t => browserTest(t, async page => {
+  const result = await page.evaluate(async () => {
+    const F = Fixture;
+    const runtime = F.publicRuntime();
+    const diagnostics = [];
+    let host, unmounting;
+    const renderer = F.publicRenderer({ runtime, onError(diagnostic) {
+      diagnostics.push(['renderer', diagnostic.phase, diagnostic.nodeId]);
+      unmounting = F.unmount(host);
+    } });
+    runtime.registry.registerResourceSet(F.defineResourceSet({ id: 'cleanup', version: '1', components: [{
+      contract: F.resource('Component', 'Cleanup', {}), connectorId: 'dom',
+      implementation: { mount({ parent, anchor }) {
+        const label = parent.ownerDocument.createElement('span');
+        label.textContent = 'mounted';
+        parent.insertBefore(label, anchor);
+        return { update() {}, setPending() {}, dispose() { throw Error('automatic cleanup failure'); } };
+      } },
+    }] }));
+    const view = await runtime.createView({
+      states: { shown: F.state(true, { type: 'boolean' }) },
+      render: { id: 'leaf', componentRef: 'Cleanup', when: F.p('/states/shown') },
+    });
+    const target = F.target();
+    host = F.mount(F.ViewstemView, { target, props: { view, renderer, onError(diagnostic) {
+      diagnostics.push(['screen', diagnostic.phase, diagnostic.nodeId]);
+    } } });
+    await host.whenRendered();
+    const initial = target.textContent;
+    view.getState('shown').write(false);
+    const outcome = await F.errorOf(() => host.whenRendered());
+    await unmounting;
+    await renderer.dispose();
+    await runtime.dispose();
+    return { initial, outcome: outcome?.code, diagnostics, empty: target.childNodes.length === 0 };
+  });
+  assert.deepEqual(result, {
+    initial: 'mounted', outcome: 'CANCELLED', diagnostics: [['renderer', 'dispose', 'leaf']], empty: true,
+  });
+}));
+
 test('ViewstemView cancels a delayed source on removal and renderer disposal while borrowing stays usable', t => browserTest(t, async page => {
   const result = await page.evaluate(async () => {
     const F = Fixture;

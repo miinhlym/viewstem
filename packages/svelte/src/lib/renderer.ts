@@ -70,10 +70,10 @@ function browserOptions({ context, fallback, onError }: RenderOptions = {}): Bro
 
 export function reportComponentDiagnostic(renderer: Renderer | undefined, diagnostic: RendererDiagnostic, onError: RendererErrorListener | undefined, isOpen: () => boolean) {
   const state = renderer && rendererStates.get(renderer);
-  const disposing = diagnostic.phase === 'dispose';
+  const teardown = diagnostic.phase === 'dispose' && diagnostic.nodeId === undefined;
   notifyDiagnostic(diagnostic,
-    { listener: state?.onError, isOpen: () => !!state?.alive && (disposing || isOpen()) },
-    { listener: onError, isOpen: () => disposing || isOpen() },
+    { listener: state?.onError, isOpen: () => !!state?.alive && (teardown || isOpen()) },
+    { listener: onError, isOpen: () => teardown || isOpen() },
   );
 }
 
@@ -88,15 +88,15 @@ export function attachComponentView(renderer: Renderer, view: View, target: HTML
   if (!state?.alive) throw cancelled();
   const browser = createBrowserRenderer({ runtime: state.runtime, connectors: state.connectors });
   let reportedDisposal = false;
+  let cleanup: Promise<void> | undefined;
   const attachment = browser.attach(view, target, browserOptions({ ...options, onError: report }));
   function report(diagnostic: RendererDiagnostic) {
     if (diagnostic.phase === 'dispose' && diagnostic.nodeId === undefined) {
       if (reportedDisposal) return;
       reportedDisposal = true;
     }
-    reportComponentDiagnostic(renderer, diagnostic, getErrorListener(), isOpen);
+    reportComponentDiagnostic(renderer, diagnostic, getErrorListener(), () => !cleanup && isOpen());
   }
-  let cleanup: Promise<void> | undefined;
   function detach() {
     return cleanup ??= attachment.detach().catch(cause => {
       report(createDiagnostic('dispose', cause));
