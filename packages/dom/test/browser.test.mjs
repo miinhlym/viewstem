@@ -177,6 +177,72 @@ globalThis.syncPending = async () => {
   return { waiting, resumed, disposed, empty: left.childNodes.length === 0 };
 };
 
+globalThis.pendingSlots = async () => {
+  const runtime = createRuntime();
+  const renderer = createRenderer({ runtime });
+  let releaseDisposal, startDisposal, offerSlot, emitOld;
+  let disposed = 0;
+  const disposal = new Promise(resolve => { releaseDisposal = resolve; });
+  const disposing = new Promise(resolve => { startDisposal = resolve; });
+  runtime.registry.registerResourceSet(defineResourceSet({ id: 'pending-slots', version: '1', components: [
+    component('Parent', { ports: { value: text }, slots: { main: {}, aside: {} } }, ctx => {
+      const parent = document.createElement('section');
+      const main = document.createElement('div'), aside = document.createElement('div');
+      parent.append(main, aside);
+      ctx.parent.insertBefore(parent, ctx.anchor);
+      const withdraw = ctx.provideSlot('main', main);
+      ctx.provideSlot('aside', aside);
+      offerSlot = () => ctx.provideSlot('main', main);
+      return { update() {}, setPending(pending) {
+        parent.toggleAttribute('aria-busy', pending);
+        if (pending) withdraw();
+      }, dispose() { parent.remove(); } };
+    }),
+    component('Child', { ports: { label: text }, events: { click: { schema: true } } }, ctx => {
+      const child = document.createElement('button');
+      const label = ctx.node.inputs.label;
+      child.textContent = label;
+      ctx.parent.insertBefore(child, ctx.anchor);
+      if (label === 'main') emitOld ??= () => ctx.emit('click', null);
+      return { update() {}, setPending() {}, async dispose() {
+        if (label === 'main') { disposed++; startDisposal(); await disposal; }
+        child.remove();
+      } };
+    }),
+  ] }));
+  const screen = renderer.mount({ target: left, inputs: { value: 'ready' }, source: {
+    ports: { value: { ...text, required: false } },
+    render: { id: 'parent', componentRef: 'Parent', inputs: { value: path('/ports/value') }, slots: {
+      main: [{ id: 'main', componentRef: 'Child', inputs: { label: 'main' } }],
+      aside: [{ id: 'aside', componentRef: 'Child', inputs: { label: 'aside' } }],
+    } },
+  } });
+  const view = await screen.ready;
+  await screen.whenRendered();
+  const parent = left.querySelector('section');
+  const [main, aside] = parent.querySelectorAll('button');
+  const wasLive = await code(emitOld());
+  const applied = await view.setInputs({});
+  const settled = code(screen.whenSettled(applied));
+  const waited = await Promise.race([disposing.then(() => true), settled.then(() => false)]);
+  const retiredEvent = await code(emitOld());
+  releaseDisposal();
+  const result = await settled;
+  const removed = !main.isConnected && disposed === 1;
+  let offeredWhilePending = true;
+  try { offerSlot(); } catch { offeredWhilePending = false; }
+  await screen.whenRendered();
+  const waiting = [parent.hasAttribute('aria-busy'), left.querySelector('section') === parent,
+    parent.querySelector('button') === aside, parent.textContent];
+  await screen.whenSettled(await view.setInputs({ value: 'resumed' }));
+  const [newMain, sameAside] = parent.querySelectorAll('button');
+  const resumed = [parent.hasAttribute('aria-busy'), newMain !== main, sameAside === aside, parent.textContent, disposed];
+  await screen.unmount();
+  await renderer.dispose();
+  await runtime.dispose();
+  return { wasLive, waited, retiredEvent, result, removed, offeredWhilePending, waiting, resumed, disposed };
+};
+
 globalThis.missingConnector = async () => {
   const runtime = createRuntime();
   runtime.registry.registerResourceSet(defineResourceSet({
@@ -197,7 +263,7 @@ globalThis.missingConnector = async () => {
 };
 `;
 
-test('DOM display reconciles keyed ranges, scopes failures and follows the latest projection', async t => {
+async function browserPage(t) {
   const bundle = await build({ stdin: { resolveDir: fileURLToPath(new URL('../../../', import.meta.url)), contents: source },
     bundle: true, platform: 'browser', format: 'iife', write: false });
   const browser = await chromium.launch();
@@ -205,6 +271,11 @@ test('DOM display reconciles keyed ranges, scopes failures and follows the lates
   const page = await browser.newPage();
   await page.setContent('<main id="left"></main><main id="right"></main>');
   await page.addScriptTag({ content: bundle.outputFiles[0].text });
+  return page;
+}
+
+test('DOM display reconciles keyed ranges, scopes failures and follows the latest projection', async t => {
+  const page = await browserPage(t);
   assert.deepEqual(await page.evaluate(() => globalThis.keyed()), {
     kept: true, replaced: true, children: ['two', 'one'], disposed: ['one', 'two'], preserved: true, empty: true,
   });
@@ -222,4 +293,12 @@ test('DOM display reconciles keyed ranges, scopes failures and follows the lates
   assert.equal(missing.code, 'REFERENCE_NOT_FOUND');
   assert.equal(missing.message, 'Connector "external" is unavailable on this display connection.');
   assert.deepEqual(missing.resource, { kind: 'Component', id: 'Badge' });
+});
+
+test('a pending parent retires withdrawn slots, defers new children and keeps the other slots', async t => {
+  const page = await browserPage(t);
+  assert.deepEqual(await page.evaluate(() => globalThis.pendingSlots()), {
+    wasLive: 'success', waited: true, retiredEvent: 'CANCELLED', result: 'success', removed: true,
+    offeredWhilePending: true, waiting: [true, true, true, 'aside'], resumed: [false, true, true, 'mainaside', 1], disposed: 2,
+  });
 });

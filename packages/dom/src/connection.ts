@@ -184,7 +184,7 @@ class BrowserConnection {
   #provideSlot(node: MountedNode, name: string, host: HTMLElement, before?: Node | null) {
     if (node.lifetime.signal.aborted || !node.branch.isOpen()) return () => {};
     const type = host?.ownerDocument?.defaultView?.HTMLElement;
-    if (!Object.hasOwn(node.snapshot.slots, name) || !type || !(host instanceof type) || host.ownerDocument !== node.start.ownerDocument
+    if (!Object.hasOwn(node.binding?.contract.spec.slots ?? {}, name) || !type || !(host instanceof type) || host.ownerDocument !== node.start.ownerDocument
       || (before && before.parentNode !== host)) {
       throw new TypeError(`Invalid Viewstem slot: ${name}`);
     }
@@ -210,6 +210,13 @@ class BrowserConnection {
 
   #invalidate(node: MountedNode) {
     if (!node.acceptingSlots && !node.lifetime.signal.aborted && node.branch.isOpen() && this.#work) this.#schedule(this.#work.projection);
+  }
+
+  async #clearRetiredSlots(node: MountedNode) {
+    for (const old of node.retiredSlots) {
+      node.retiredSlots.delete(old);
+      await this.#clear(old);
+    }
   }
 
   async #fallback(node: MountedNode, error: PublicError | null, signal: AbortSignal) {
@@ -251,9 +258,13 @@ class BrowserConnection {
     const waiting = snapshot.status === 'pending';
     try {
       if (waiting && node.handle && node.hasRenderedReady) {
-        if (!node.pending) node.handle.setPending(true);
-        node.pending = true;
-        if (node.handle.whenRendered) await untilAborted(node.handle.whenRendered(signal), signal);
+        node.acceptingSlots = true;
+        try {
+          if (!node.pending) node.handle.setPending(true);
+          node.pending = true;
+          if (node.handle.whenRendered) await untilAborted(node.handle.whenRendered(signal), signal);
+        } finally { node.acceptingSlots = false; }
+        if (this.#current(work)) await this.#clearRetiredSlots(node);
         return;
       }
       if (snapshot.status === 'error' && !connector?.renderUnready) {
@@ -306,10 +317,7 @@ class BrowserConnection {
         if (node.handle.whenRendered) await untilAborted(node.handle.whenRendered(signal), signal);
       } finally { node.acceptingSlots = false; }
       if (!this.#current(work)) return;
-      for (const old of node.retiredSlots) {
-        node.retiredSlots.delete(old);
-        await this.#clear(old);
-      }
+      await this.#clearRetiredSlots(node);
       if (!this.#current(work)) return;
       await Promise.all([...node.slots].map(([name, slot]) => this.#reconcile(slot.branch, snapshot.slots[name] ?? [], work)));
       if (this.#current(work)) node.handle.afterChildren?.(snapshot);
