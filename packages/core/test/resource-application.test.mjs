@@ -93,6 +93,66 @@ test('a missing input reference keeps the open View and leaves resolver candidat
   assert.equal(cell.read(), 3);
 });
 
+test('View prepare rejects event paths outside handlers and preserves the current View', async t => {
+  const parent = binding('Parent');
+  parent.contract.spec.slots = { default: {} };
+  const child = binding('Child');
+  child.contract.spec.ports = { label: { kind: 'Value', schema: { type: 'string' }, required: true } };
+  const registry = createRegistry().registerResourceSet(defineResourceSet({ id: 'components', version: '1', components: [parent, child] }));
+  const runtime = createRuntime({ registry });
+  t.after(() => runtime.dispose());
+  const source = definition('Parent');
+  source.render.slots = { default: [{ id: 'label', componentRef: 'Child', inputs: { label: 'keep' } }] };
+  const event = { '@path': '/event' };
+  const cases = [
+    ['inputs/label/@path', node => { node.inputs.label = event; }],
+    ['inputs/@path', node => { node.inputs = event; }],
+    ['inputs/label/args/value', node => { node.inputs.label = { '@call': 'formatString', args: { value: 'received ${/event}' } }; }],
+    ['when/@path', node => { node.when = event; }],
+    ['repeat/items/@path', node => { node.repeat = { items: event, as: 'row', key: { '@path': '/repeat/row' } }; }],
+    ['repeat/key/@path', node => { node.repeat = { items: [1], as: 'row', key: event }; }],
+  ];
+  for (const [field, introduce] of cases) await t.test(field, async () => {
+    const view = await runtime.createView(source);
+    const count = view.getState('count');
+    count.write(7);
+    const originalApplication = view.initial;
+    const originalNode = view.getSnapshot().roots[0].slots.default[0];
+    const invalid = structuredClone(source);
+    introduce(invalid.render.slots.default[0]);
+    const failure = { code: 'REFERENCE_NOT_FOUND', location: `/render/slots/default/0/${field}` };
+    await assert.rejects(view.updateDefinition(invalid, { states: { count: 99 } }), failure);
+    await assert.rejects(runtime.createView(invalid), failure);
+    assert.deepEqual(view.exportDefinition(), source);
+    assert.equal(view.initial, originalApplication);
+    const node = view.getSnapshot().roots[0].slots.default[0];
+    assert.deepEqual([node.generation, node.status, node.inputs.label], [originalNode.generation, 'ready', 'keep']);
+    assert.equal(view.getState('count'), count);
+    assert.equal(count.read(), 7);
+    await view.dispose();
+  });
+});
+
+test('event paths pass payloads through an emit handler and into a View Action', async t => {
+  const registry = createRegistry().registerResourceSet(defineResourceSet({ id: 'relay', version: '1', components: [binding('Base')],
+    resources: [{ kind: 'Component', id: 'Relay', spec: {
+      events: { changed: { schema } },
+      render: { id: 'source', componentRef: 'Base', on: { click: { emit: 'changed', payload: { '@path': '/event/value' } } } },
+    } }],
+    actions: [{ definition: { kind: 'Action', id: 'record', spec: { ports: {
+      value: { kind: 'Value', schema, required: true }, count: { kind: 'State', schema, required: true },
+    } } }, implementation: ({ inputs }) => inputs.count.write(inputs.value) }],
+  }));
+  const runtime = createRuntime({ registry });
+  t.after(() => runtime.dispose());
+  const source = definition('Relay');
+  source.render.on = { changed: { actionRef: 'record', inputs: { value: { '@path': '/event' }, count: { '@path': '/states/count' } } } };
+  const view = await runtime.createView(source);
+  const emitter = view.getSnapshot().roots[0].children[0];
+  await view.emit(emitter, 'click', { value: 17 });
+  assert.equal(view.getState('count').read(), 17);
+});
+
 test('an in-flight Action resolves descendant calls from its starting configuration', async t => {
   let release;
   const held = new Promise(resolve => { release = resolve; });

@@ -605,7 +605,8 @@ export class Registry {
     const ports = optional(spec, 'ports'), states = map(spec.states), queries = map(spec.queries), events = map(spec.events), slots = map(spec.slots);
     if (kind === 'View' && (own(spec, 'events') || own(spec, 'slots'))) invalid();
     const declarations = { ports, states, queries };
-    const roots = ['ports', 'states', 'queries', 'repeat', 'actions', 'event'];
+    const roots = ['ports', 'states', 'queries', 'repeat', 'actions'];
+    const eventRoots = [...roots, 'event'];
     const dependencies = new Map();
     for (const [state, declaration] of Object.entries(states)) {
       const declarationAt = nestedAt(origin, 'states', state);
@@ -715,11 +716,11 @@ export class Registry {
           const forwarded = name(handler.emit);
           if (!own(events, forwarded)) missingReference('event', forwarded, nestedAt(handlerAt, 'emit'));
           if (!own(handler, 'payload')) invalid();
-          this.#expression(handler.payload, roots, local, nestedAt(handlerAt, 'payload'));
+          this.#expression(handler.payload, eventRoots, local, nestedAt(handlerAt, 'payload'));
         } else {
           fields(handler, ['id', 'actionRef', 'action', 'inputs']); if (own(handler, 'id')) name(handler.id);
           const action = this.#pair(handler, 'Action', 'actionRef', 'action', context, handlerAt);
-          this.#inputs(optional(handler, 'inputs'), action, roots, local, nestedAt(handlerAt, 'inputs'));
+          this.#inputs(optional(handler, 'inputs'), action, eventRoots, local, nestedAt(handlerAt, 'inputs'));
         }
       }
     };
