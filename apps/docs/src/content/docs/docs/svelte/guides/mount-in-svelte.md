@@ -15,7 +15,7 @@ Choose the entry point for your host.
 | A new View inside an existing Svelte tree | [`<ViewstemView {renderer} {source} />`](../../viewstem-view/) |
 | An existing View inside an existing Svelte tree | [`<ViewstemView {renderer} {view} />`](../../viewstem-view/#borrowing-a-view) |
 
-This guide uses `ViewstemView` to display a greeting in an existing Svelte tree. Use a Svelte-aware bundler and the packages from [Installation](/docs/installation/#build-and-install-the-svelte-packages).
+This guide uses `ViewstemView` to display a greeting in an existing Svelte tree. Use a Svelte-aware bundler and [install the Svelte renderer and Core from npm](/docs/installation/#install-svelte).
 
 <a id="prepare-entry"></a>
 
@@ -173,7 +173,7 @@ Closing the page cancels pending creation or disposes its View. The layout can r
 
 ## Mix a default UI button with a Svelte component
 
-Use a Svelte TypeScript client build and install the local Core, DOM, Svelte, and UI packages. Follow the [Svelte build and installation steps](/docs/installation/#build-and-install-the-svelte-packages) and add the UI tarball from the [browser UI build](/docs/installation/#build-the-browser-ui-packages). These files form a standalone example.
+Use a Svelte TypeScript client build. After [installing Core and the Svelte renderer](/docs/installation/#install-svelte), run `npm install @viewstem/ui` to add the UI catalog. These files form a standalone example.
 
 `index.html`
 
