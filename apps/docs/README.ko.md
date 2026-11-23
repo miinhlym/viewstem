@@ -36,9 +36,70 @@ npm run preview -w @viewstem/docs -- --port 4323
 `build:docs`는 라이브러리 의존성을 다시 빌드하고 검색 색인을 포함한
 `apps/docs/dist`를 생성한다. `preview:docs`는 Wrangler로 이 결과물을 제공하며
 다시 빌드하지 않는다. 검색·배포용 경로 검사는 최신 빌드에서 수행한다.
-[wrangler.jsonc](wrangler.jsonc)는 Workers Static Assets 설정이다. 위 명령은
-사이트를 공개 배포하지 않는다. 공개 주소와 배포·PR 미리보기 설정은 사이트 계약의
-남은 사항이다. `dist`나 `.astro` 결과물을 직접 수정하거나 커밋하지 않는다.
+[wrangler.jsonc](wrangler.jsonc)는 Workers Static Assets 설정이다. `dist`나
+`.astro` 결과물을 직접 수정하거나 커밋하지 않는다.
+
+## 사이트 배포
+
+[Docs preview 워크플로](../../.github/workflows/docs-preview.yml)는 이 저장소의
+브랜치에서 `main`을 대상으로 연 PR의 head를 빌드한다. 전용 `viewstem-preview`
+Worker에서 PR마다 `pr-<번호>`를 만들고
+`https://pr-<번호>-viewstem-preview.miinhlym.workers.dev`로 제공한다. 공개 주소에서
+이번 빌드가 확인되면 PR별 배포 이력을 남기고, 댓글 하나에 미리보기 링크와 커밋,
+실행 링크를 갱신한다. PR을 닫거나 머지하거나 대상을 `main` 이외로 바꾸면 해당
+프리뷰를 삭제하고 배포를 비활성으로 표시한 뒤 기존 댓글을 갱신한다. PR을 다시
+열거나 대상을 `main`으로 되돌리면 미리보기를 다시 만든다. 포크 PR은 위의 로컬
+미리보기 절차를 사용한다.
+
+삭제에 실패하면 PR이 여전히 닫혀 있거나 대상이 `main` 이외인지 확인한 뒤 실패한
+정리 잡을 재실행한다. PR을 닫을 때 기본 브랜치에 정리 워크플로가 없었다면 관리자가
+저장소 루트에서 `npx --no-install wrangler preview delete --config apps/docs/wrangler.jsonc
+--worker-name viewstem-preview --name pr-<번호>`로 해당 프리뷰를 삭제할 수 있다.
+
+[운영 배포 워크플로](../../.github/workflows/docs-release.yml)는 패키지가
+공개된 뒤 실행한다. 전달받은 `main` 커밋을 체크아웃하고 공개 아카이브를
+확인한 뒤, npm에 발행된 패키지로 빌드한다. 배포 전에 Chromium에서 빌드된
+예제와 Playground의 동작을 검사한다.
+[Astro의 `site` 설정](astro.config.mjs)이 사이트맵에 쓸 공개 주소를 지정한다.
+
+npm 릴리스는 배치 전체를 공개하고 태그를 만든 뒤 운영 워크플로를 호출한다.
+다른 발행 워크플로도 `main`에서 같은 절차를 사용할 수 있다. 레지스트리 공개를
+확인한 뒤 릴리스 커밋에 npm은 `@viewstem/<이름>@<버전>`, pub.dev는
+`pub.dev/<이름>@<버전>` 태그를 만든다. 그 커밋을 `source_sha`로 넘기고,
+`released_packages`에는 `registry`, `name`, `version`을 담은 JSON 배열로 배치의
+모든 패키지를 넘긴다. 각 재사용 워크플로 호출에는
+`CLOUDFLARE_PRODUCTION_API_TOKEN` 시크릿 이름을 명시하고, 값은
+`docs-production` 환경에 둔다. 운영 워크플로는 공개 버전과 태그를 확인하고,
+배포 후 공개 주소에서 빌드의 커밋과 워크플로 실행 정보를 대조한다.
+
+두 워크플로는 `miinhlym.workers.dev`를 소유한 계정의 저장소 변수
+`CLOUDFLARE_ACCOUNT_ID`를 사용한다. 처음 설정할 때 Cloudflare 관리자가
+`viewstem`과 `viewstem-preview`를 먼저 생성한다. 첫 운영 배포 전에는 `viewstem`을
+배포 이력이 없는 상태로 준비한다. 활성 Cloudflare 버전이 있다면 소스 SHA 태그가
+있어야 워크플로가 교체할 수 있다. 운영 Worker에는 `workers.dev` 경로를,
+미리보기 Worker에는 Preview URL을 활성화한다. 토큰은 각각 아래 Worker로 제한한
+**Individual Workers Editor** 권한으로 발급하고 대상 GitHub Actions 환경에 등록한다.
+
+| 환경 | 시크릿 | Cloudflare Worker |
+| --- | --- | --- |
+| `docs-preview` | `CLOUDFLARE_PREVIEW_API_TOKEN` | `viewstem-preview` |
+| `docs-production` | `CLOUDFLARE_PRODUCTION_API_TOKEN` | `viewstem` |
+
+GitHub의 `docs-production` 환경 배포 브랜치 규칙은 `main`만 허용한다.
+
+0.1.0 문서를 처음 공개하려면 GitHub Actions의 **Docs production release**에서
+`main`을 선택하고 **Run workflow**를 실행한다. `bootstrap_0_1_0`을 켜고,
+배포 설정을 포함하며 0.1.0의 패키지 소스가 그대로인 `main` 커밋의 전체 SHA를
+입력한다. `released_packages`에는 공개된 Core, DOM, Svelte, UI의 npm 0.1.0
+항목 네 개를 모두 넣는다. 버전이 계속 최신이면 같은 초기 배포 소스를 재시도할 수 있다.
+
+일반 릴리스를 재시도할 때는 `bootstrap_0_1_0`을 끄고 릴리스 태그의 커밋과
+같은 배치를 지정한다. 요청 버전과 사이트가 사용하는 npm 버전이 각 레지스트리의
+최신 버전이어야 한다. 공개 검사에 실패하면 Actions 실행 요약에서 소스 SHA와
+교체 전후의 Cloudflare 버전 ID를 확인한다. 이전 버전이 있으면 관리자가
+`viewstem` Worker의 **Deployments**에서 복구하고, `/_viewstem-deploy.json`과
+설치 문서에서 복구된 빌드를 확인한다.
+[Cloudflare 롤백 절차](https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/)
 
 ## 수정 위치 찾기
 

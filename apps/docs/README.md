@@ -37,9 +37,78 @@ npm run preview -w @viewstem/docs -- --port 4323
 `build:docs` rebuilds the library dependencies and produces `apps/docs/dist`,
 including the search index. `preview:docs` serves that build through Wrangler;
 it does not rebuild it. Use a fresh build for search and production-route checks.
-[wrangler.jsonc](wrangler.jsonc) configures Workers Static Assets. These commands
-do not publish the site; a public URL and deployment/PR-preview setup remain open
-in the website contract. Do not edit or commit `dist` or `.astro` output.
+[wrangler.jsonc](wrangler.jsonc) configures Workers Static Assets. Do not edit
+or commit `dist` or `.astro` output.
+
+## Deploy the site
+
+The [Docs preview workflow](../../.github/workflows/docs-preview.yml) builds the
+head of each PR from a branch in this repository targeting `main`. Each PR has
+a Cloudflare Preview named `pr-<number>` on `viewstem-preview`, served at
+`https://pr-<number>-viewstem-preview.miinhlym.workers.dev`. After the public
+URL serves the expected build, GitHub Actions records the PR's deployment and
+updates one comment with the preview, source commit, and run links. Closing or
+merging the PR or changing its base away from `main` removes the preview, retires
+its deployment record, and updates the existing comment. Reopening or moving the
+PR back to `main` creates its preview again. Fork PRs use the local workflow above.
+
+If removal fails, rerun the failed cleanup job after confirming the PR is still
+closed or targets a different base branch. If the cleanup workflow was absent
+from the default branch when the PR closed, a maintainer can remove the named
+preview using `npx --no-install wrangler preview delete --config apps/docs/wrangler.jsonc
+--worker-name viewstem-preview --name pr-<number>` from the repository root.
+
+The [production workflow](../../.github/workflows/docs-release.yml) runs
+after a public package release. It checks out the supplied commit from
+`main`, verifies public archives, and builds the examples and Playground
+with the published npm packages. Chromium exercises the built examples and
+Playground before deployment. [Astro's `site` setting](astro.config.mjs)
+sets the public origin for the sitemap.
+
+The npm release workflow calls production after the entire batch is public and
+tagged. Other trusted publishing workflows on `main` can use the same workflow.
+After verifying publication, create each package tag at the release commit.
+Use `@viewstem/<name>@<version>` for npm and `pub.dev/<name>@<version>` for
+pub.dev. Pass the release commit as `source_sha`, all packages in the batch as
+`released_packages` (a JSON array of `registry`, `name`, and `version` objects),
+and forward the named `CLOUDFLARE_PRODUCTION_API_TOKEN` secret through each
+reusable workflow call. Keep its value in the `docs-production` environment.
+Production verifies the tags and the public versions and checks the live build's
+commit and workflow identity after deployment.
+
+Both workflows use the `CLOUDFLARE_ACCOUNT_ID` repository variable for the
+account that owns `miinhlym.workers.dev`. During account setup, a Cloudflare
+administrator creates `viewstem` and `viewstem-preview` before issuing the
+tokens. Start with an empty `viewstem` Worker for the first production
+deployment. An active Cloudflare version must carry its source SHA as a tag
+before it can be replaced by the workflow. Enable the `workers.dev` route for
+production and Preview URLs on the preview Worker. Use separate **Individual
+Workers Editor** tokens scoped to the Workers below and store each token in its
+GitHub Actions environment.
+
+| Environment | Secret | Cloudflare Worker |
+| --- | --- | --- |
+| `docs-preview` | `CLOUDFLARE_PREVIEW_API_TOKEN` | `viewstem-preview` |
+| `docs-production` | `CLOUDFLARE_PRODUCTION_API_TOKEN` | `viewstem` |
+
+Allow only the `main` branch to deploy to `docs-production` in the GitHub
+environment's deployment branch rules.
+
+For the first 0.1.0 documentation deployment, open **Docs production release**
+in GitHub Actions and choose **Run workflow** on `main`. Set `bootstrap_0_1_0`,
+use the full `main` commit that contains the deployment setup and the unchanged
+0.1.0 package sources, and provide all four public npm packages (Core, DOM, Svelte,
+and UI) at `0.1.0` in `released_packages`. After the first deployment, the same
+bootstrap source can be retried while its packages remain current.
+
+To retry a current release, provide its tagged commit and the same package
+batch with `bootstrap_0_1_0` off. The requested versions and the site's npm
+dependencies must still be the registry's latest releases. For recovery after
+a failed public check, the Actions summary records the source SHA and the old
+and new Cloudflare version IDs. If a previous version exists, a maintainer can
+restore it on the `viewstem` Worker's **Deployments** tab and confirm that
+`/_viewstem-deploy.json` and the installation page serve the restored build.
+[Cloudflare rollback procedure](https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/)
 
 ## Find the implementation
 

@@ -1,0 +1,127 @@
+name: Docs preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+  pull_request_target:
+    types: [closed, edited]
+
+permissions:
+  contents: read
+
+env:
+  PREVIEW_WORKER: viewstem-preview
+
+jobs:
+  preview:
+    if: github.repository == 'miinhlym/viewstem' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.base.ref == 'main' && (github.event.action != 'edited' || github.event.changes.base.ref != null)
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      action: ${{ steps.publish.outputs.action }}
+      source_sha: ${{ steps.publish.outputs.source_sha }}
+      run_id: ${{ steps.publish.outputs.run_id }}
+      run_attempt: ${{ steps.publish.outputs.run_attempt }}
+    # Never cancel cleanup or discard its pending slot when an old run is retried.
+    concurrency:
+      group: docs-preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+      queue: max
+    environment:
+      name: docs-preview
+      deployment: false
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.1.0'
+          cache: npm
+      - run: npm ci
+      - run: npm run build:docs
+      - run: node apps/docs/scripts/verify-docs-site.mjs
+      - name: Publish and verify the current PR preview
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PREVIEW_API_TOKEN }}
+          WRANGLER_SEND_METRICS: 'false'
+        run: node .github/scripts/docs-preview.mjs deploy
+
+  cleanup:
+    name: Delete the closed or retargeted PR preview
+    if: github.repository == 'miinhlym/viewstem' && github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == github.repository && (github.event.action == 'closed' || (github.event.pull_request.base.ref != 'main' && github.event.changes.base.ref != null))
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    outputs:
+      action: ${{ steps.remove.outputs.action }}
+      source_sha: ${{ steps.remove.outputs.source_sha }}
+      run_id: ${{ steps.remove.outputs.run_id }}
+      run_attempt: ${{ steps.remove.outputs.run_attempt }}
+    permissions:
+      contents: read
+      pull-requests: read
+    concurrency:
+      group: docs-preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+      queue: max
+    environment:
+      name: docs-preview
+      deployment: false
+    steps:
+      # Retargeting can select an arbitrary base. Cleanup only executes automation
+      # from the trusted default branch, never the PR head or a merge ref.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+          sparse-checkout: .github/scripts
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.1.0'
+      - name: Delete and verify public removal
+        id: remove
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PREVIEW_API_TOKEN }}
+        run: node .github/scripts/docs-preview.mjs cleanup
+
+  metadata:
+    name: Update PR preview history and comment
+    needs: [preview, cleanup]
+    if: ${{ !cancelled() && (needs.preview.outputs.action == 'deploy' || needs.cleanup.outputs.action == 'cleanup') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    permissions:
+      contents: read
+      pull-requests: write
+      deployments: write
+    concurrency:
+      group: docs-preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+      queue: max
+    # No environment secrets, dependency installation, or PR package execution.
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.event.repository.default_branch }}
+          persist-credentials: false
+          sparse-checkout: .github/scripts
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.1.0'
+      - name: Recheck the public artifact and update this PR's metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIEW_METADATA_MODE: ${{ needs.preview.outputs.action == 'deploy' && 'ready' || 'removed' }}
+          PREVIEW_SOURCE_SHA: ${{ needs.preview.outputs.source_sha || needs.cleanup.outputs.source_sha }}
+          PREVIEW_RUN_ID: ${{ needs.preview.outputs.run_id || needs.cleanup.outputs.run_id }}
+          PREVIEW_RUN_ATTEMPT: ${{ needs.preview.outputs.run_attempt || needs.cleanup.outputs.run_attempt }}
+        run: node .github/scripts/docs-preview.mjs "$PREVIEW_METADATA_MODE"
