@@ -74,10 +74,11 @@ npm 릴리스는 배치 전체를 공개하고 태그를 만든 뒤 운영 워�
 
 두 워크플로는 `miinhlym.workers.dev`를 소유한 계정의 저장소 변수
 `CLOUDFLARE_ACCOUNT_ID`를 사용한다. 처음 설정할 때 Cloudflare 관리자가
-`viewstem`과 `viewstem-preview`를 먼저 생성한다. 운영 Worker에는 `workers.dev`
-경로를, 미리보기 Worker에는 Preview URL을 활성화한다. 토큰은 각각 아래 Worker로
-제한한 **Individual Workers Editor** 권한으로 발급하고 대상 GitHub Actions
-환경에 등록한다.
+`viewstem`과 `viewstem-preview`를 먼저 생성한다. 첫 운영 배포 전에는 `viewstem`을
+배포 이력이 없는 상태로 준비한다. 활성 Cloudflare 버전이 있다면 소스 SHA 태그가
+있어야 워크플로가 교체할 수 있다. 운영 Worker에는 `workers.dev` 경로를,
+미리보기 Worker에는 Preview URL을 활성화한다. 토큰은 각각 아래 Worker로 제한한
+**Individual Workers Editor** 권한으로 발급하고 대상 GitHub Actions 환경에 등록한다.
 
 | 환경 | 시크릿 | Cloudflare Worker |
 | --- | --- | --- |

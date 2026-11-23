@@ -79,9 +79,12 @@ commit and workflow identity after deployment.
 Both workflows use the `CLOUDFLARE_ACCOUNT_ID` repository variable for the
 account that owns `miinhlym.workers.dev`. During account setup, a Cloudflare
 administrator creates `viewstem` and `viewstem-preview` before issuing the
-tokens. Enable the `workers.dev` route for production and Preview URLs on the
-preview Worker. Use separate **Individual Workers Editor** tokens scoped to
-the Workers below and store each token in its GitHub Actions environment.
+tokens. Start with an empty `viewstem` Worker for the first production
+deployment. An active Cloudflare version must carry its source SHA as a tag
+before it can be replaced by the workflow. Enable the `workers.dev` route for
+production and Preview URLs on the preview Worker. Use separate **Individual
+Workers Editor** tokens scoped to the Workers below and store each token in its
+GitHub Actions environment.
 
 | Environment | Secret | Cloudflare Worker |
 | --- | --- | --- |
