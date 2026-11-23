@@ -2,9 +2,6 @@ name: npm release
 
 on:
   workflow_call:
-    secrets:
-      CLOUDFLARE_API_TOKEN:
-        required: false
 
 permissions: {}
 
@@ -127,5 +124,3 @@ jobs:
     with:
       source_sha: ${{ github.sha }}
       released_packages: ${{ needs.plan.outputs.released_packages }}
-    secrets:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

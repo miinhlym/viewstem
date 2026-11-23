@@ -94,5 +94,3 @@ jobs:
       pull-requests: write
       id-token: write
     uses: ./.github/workflows/npm-release.yml
-    secrets:
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

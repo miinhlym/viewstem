@@ -36,15 +36,23 @@ jobs:
         id: deploy
         env:
           PREVIEW_NAME: pr-${{ github.event.pull_request.number }}
+          PREVIEW_WORKER: viewstem-docs-preview
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PREVIEW_API_TOKEN }}
           WRANGLER_SEND_METRICS: 'false'
         run: |
           : "${CLOUDFLARE_ACCOUNT_ID:?Set the CLOUDFLARE_ACCOUNT_ID repository variable}"
-          : "${CLOUDFLARE_API_TOKEN:?Set the CLOUDFLARE_API_TOKEN repository secret}"
+          : "${CLOUDFLARE_API_TOKEN:?Set the CLOUDFLARE_PREVIEW_API_TOKEN docs-preview environment secret}"
+          scope_status="$(curl --silent --show-error --max-time 15 --output /dev/null --write-out '%{http_code}' \
+            --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/workers/viewstem")"
+          case "$scope_status" in
+            403|404) ;;
+            *) printf 'Expected the token to be denied access to viewstem. HTTP %s\n' "$scope_status" >&2; exit 1 ;;
+          esac
           export WRANGLER_OUTPUT_FILE_PATH="$RUNNER_TEMP/docs-preview.ndjson"
-          npx --no-install wrangler preview --config apps/docs/wrangler.jsonc --name "$PREVIEW_NAME"
-          url="$(jq -ers --arg host "https://$PREVIEW_NAME-viewstem.miinhlym.workers.dev" '
+          npx --no-install wrangler preview --config apps/docs/wrangler.jsonc --worker-name "$PREVIEW_WORKER" --name "$PREVIEW_NAME"
+          url="$(jq -ers --arg host "https://$PREVIEW_NAME-$PREVIEW_WORKER.miinhlym.workers.dev" '
             map(select(.type == "preview")) | last | .preview_urls[] | select(rtrimstr("/") == $host)
           ' "$WRANGLER_OUTPUT_FILE_PATH")"
           printf 'url=%s\n' "$url" >> "$GITHUB_OUTPUT"

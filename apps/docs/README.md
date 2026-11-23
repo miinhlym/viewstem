@@ -44,14 +44,16 @@ or commit `dist` or `.astro` output.
 
 The [Docs preview workflow](../../.github/workflows/docs-preview.yml) builds
 the head of each pull request from a branch in this repository. It creates or
-updates the Cloudflare Preview named `pr-<number>` and publishes its URL in
+updates the Cloudflare Preview named `pr-<number>` on the dedicated
+`viewstem-docs-preview` Worker and publishes its URL in
 the PR deployment and the Actions run summary. Fork PRs can use the local
 preview instructions above.
 
 The [production workflow](../../.github/workflows/docs-release.yml) runs
 after a public package release. It checks out the supplied commit from
 `main`, verifies public archives, and builds the examples and Playground
-with the published npm packages. [Astro's `site` setting](astro.config.mjs)
+with the published npm packages. Chromium exercises the built examples and
+Playground before deployment. [Astro's `site` setting](astro.config.mjs)
 sets the public origin for the sitemap.
 
 The npm release workflow calls production after the whole release batch is
@@ -61,9 +63,18 @@ published. A future publishing workflow can call the same workflow and pass
 package in the batch. The production workflow verifies the public versions
 again before publishing.
 
-Both workflows use the `CLOUDFLARE_ACCOUNT_ID` repository variable and the
-`CLOUDFLARE_API_TOKEN` Actions secret. The token needs Workers Scripts Write
-for the Cloudflare account that owns `miinhlym.workers.dev`.
+Both workflows use the `CLOUDFLARE_ACCOUNT_ID` repository variable for the
+account that owns `miinhlym.workers.dev`. Use separate Cloudflare account
+API tokens with **Workers Editor** scoped to the specified Worker. Store
+each token in its GitHub Actions environment.
+
+| Environment | Secret | Cloudflare Worker |
+| --- | --- | --- |
+| `docs-preview` | `CLOUDFLARE_PREVIEW_API_TOKEN` | `viewstem-docs-preview` |
+| `docs-production` | `CLOUDFLARE_PRODUCTION_API_TOKEN` | `viewstem` |
+
+Allow only the `main` branch to deploy to `docs-production` in the GitHub
+environment's deployment branch rules.
 
 For an initial production deployment of already published packages, or to
 rerun a release deployment, select **Docs production release** in GitHub

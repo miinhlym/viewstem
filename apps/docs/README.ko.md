@@ -42,13 +42,14 @@ npm run preview -w @viewstem/docs -- --port 4323
 ## 사이트 배포
 
 [Docs preview 워크플로](../../.github/workflows/docs-preview.yml)는 이 저장소
-브랜치에서 열린 각 PR의 head를 빌드한다. `pr-<번호>`로 Cloudflare Preview를
-만들거나 갱신하며, PR의 배포 표시와 Actions 실행 요약에서 주소를 확인할 수
-있다. 포크 PR은 위의 로컬 미리보기 절차를 사용한다.
+브랜치에서 열린 각 PR의 head를 빌드한다. 전용 `viewstem-docs-preview` Worker에서
+`pr-<번호>`로 Cloudflare Preview를 만들거나 갱신한다. PR의 배포 표시와 Actions 실행
+요약에서 주소를 확인할 수 있다. 포크 PR은 위의 로컬 미리보기 절차를 사용한다.
 
 [운영 배포 워크플로](../../.github/workflows/docs-release.yml)는 패키지가
 공개된 뒤 실행한다. 전달받은 `main` 커밋을 체크아웃하고 공개 아카이브를
-확인한 뒤, npm에 발행된 패키지로 예제와 Playground를 빌드한다.
+확인한 뒤, npm에 발행된 패키지로 빌드한다. 배포 전에 Chromium에서 빌드된
+예제와 Playground의 동작을 검사한다.
 [Astro의 `site` 설정](astro.config.mjs)이 사이트맵에 쓸 공개 주소를 지정한다.
 
 npm 릴리스는 배치 전체가 발행된 뒤 운영 워크플로를 호출한다. 새 발행
@@ -58,9 +59,17 @@ npm 릴리스는 배치 전체가 발행된 뒤 운영 워크플로를 호출한
 모든 패키지를 넘긴다. 운영 워크플로는 사이트를 공개하기 직전에 해당
 버전의 공개 상태를 다시 확인한다.
 
-두 워크플로는 저장소 변수 `CLOUDFLARE_ACCOUNT_ID`와 Actions 시크릿
-`CLOUDFLARE_API_TOKEN`을 사용한다. 토큰에는 `miinhlym.workers.dev`를
-소유한 Cloudflare 계정의 Workers Scripts Write 권한이 필요하다.
+두 워크플로는 `miinhlym.workers.dev`를 소유한 계정의 저장소 변수
+`CLOUDFLARE_ACCOUNT_ID`를 사용한다. 각 Cloudflare 계정 API 토큰의
+**Workers Editor** 권한을 표의 Worker로 제한하고 GitHub Actions 환경
+시크릿으로 각각 등록한다.
+
+| 환경 | 시크릿 | Cloudflare Worker |
+| --- | --- | --- |
+| `docs-preview` | `CLOUDFLARE_PREVIEW_API_TOKEN` | `viewstem-docs-preview` |
+| `docs-production` | `CLOUDFLARE_PRODUCTION_API_TOKEN` | `viewstem` |
+
+GitHub의 `docs-production` 환경 배포 브랜치 규칙은 `main`만 허용한다.
 
 이미 발행한 패키지로 운영 사이트를 처음 공개하거나 릴리스를 다시
 배포할 때는 GitHub Actions의 **Docs production release**에서 `main`을
