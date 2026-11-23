@@ -1,69 +1,60 @@
 ---
 title: Installation
-description: Choose the packages for your app and install them from local builds.
+description: Install the Viewstem packages you need from npm.
 ---
 
-Viewstem packages are not published to the public npm registry yet. Install them in your app from locally built package files.
+Run the install command for your use case from your app directory.
 
 ## Requirements
 
-- Git and npm.
-- Node.js 22.12 or later on a supported release line.
-- For rendering in Svelte: Svelte 5.57.3 or later in the 5.x series. Core alone does not require Svelte.
+- npm and Node.js 22.12 or later on a supported release line.
+- For browser examples, use a bundler that handles ESM and CSS imports, such as Vite.
+- For Svelte rendering, use Svelte 5.57.3 or later in the 5.x series.
 
-## Choose your packages
+<a id="install-core"></a>
 
-| Your task | Packages |
-|---|---|
-| Use execution, State, and Query without a DOM | `@viewstem/core` |
-| Render a View with DOM components | `@viewstem/core`, `@viewstem/dom` |
-| Render the shared catalog in a browser DOM container | `@viewstem/core`, `@viewstem/dom`, `@viewstem/ui` |
-| Render with your own Svelte components | `@viewstem/core`, `@viewstem/dom`, `@viewstem/svelte` |
+## Core runtime
 
-### Install Core only
-
-After cloning the repository and running `npm ci`, run these commands from the repository root.
+Use Core directly to run a View and work with State, Queries, and Actions without rendering a screen.
 
 ```sh
-npm run build
-mkdir -p ../viewstem-packages
-npm pack -w @viewstem/core --pack-destination ../viewstem-packages
+npm install @viewstem/core
 ```
 
-From your app directory, install with `npm install /absolute/path/to/viewstem-packages/viewstem-core-0.1.0.tgz`, replacing the path with the generated file location. Continue with the [Core runtime guide](../core/guides/runtime/).
+Continue with the [Core runtime guide](../core/guides/runtime/).
 
-## Build the browser UI packages
+<a id="install-dom"></a>
 
-From the repository root after `npm ci`, run:
+## Custom DOM components
+
+Install the DOM renderer to render a View with components you provide.
 
 ```sh
-npm run build:ui
-mkdir -p ../viewstem-packages
-npm pack -w @viewstem/core -w @viewstem/dom -w @viewstem/ui --pack-destination ../viewstem-packages
+npm install @viewstem/core @viewstem/dom
 ```
 
-Install all three tarballs together from your app. These paths assume it is next to `viewstem-packages`.
+See the [DOM package guide](https://www.npmjs.com/package/@viewstem/dom) for component registration and mounting.
+
+<a id="install-browser-ui"></a>
+
+## Browser UI catalog
+
+Install the Core runtime, DOM renderer, and default UI catalog to run the browser examples.
 
 ```sh
-npm install ../viewstem-packages/viewstem-core-0.1.0.tgz ../viewstem-packages/viewstem-dom-0.1.0.tgz ../viewstem-packages/viewstem-ui-0.1.0.tgz
+npm install @viewstem/core @viewstem/dom @viewstem/ui
 ```
 
-For custom DOM components alone, use `npm run build:dom` and omit the UI workspace and tarball. With the UI catalog installed, continue to the [Quick Start](../quickstart/).
+Continue with [Quick Start](../quickstart/).
 
-## Build and install the Svelte packages
+<a id="install-svelte"></a>
 
-From the repository root after `npm ci`, run:
+## Svelte renderer
+
+Install Core and the Svelte renderer in your Svelte app.
 
 ```sh
-npm run build:svelte
-mkdir -p ../viewstem-packages
-npm pack -w @viewstem/core -w @viewstem/dom -w @viewstem/svelte --pack-destination ../viewstem-packages
+npm install @viewstem/core @viewstem/svelte
 ```
 
-From your Svelte app directory, install all three tarballs together.
-
-```sh
-npm install ../viewstem-packages/viewstem-core-0.1.0.tgz ../viewstem-packages/viewstem-dom-0.1.0.tgz ../viewstem-packages/viewstem-svelte-0.1.0.tgz
-```
-
-Continue with the [Svelte integration guide](../svelte/guides/mount-in-svelte/).
+Continue with the [Svelte mounting guide](../svelte/guides/mount-in-svelte/).

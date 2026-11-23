@@ -7,7 +7,7 @@ Viewstem은 프레임워크에 독립적인 선언형 UI 런타임입니다. JSO
 
 ## 첫 화면 실행하기
 
-[첫 View 예제](../examples/first-view/)는 브라우저에서 바로 실행할 수 있습니다. Svelte 앱에서 실행하려면 [설치](./installation/)를 마친 뒤 [빠른 시작](./quickstart/)을 따라가세요.
+[첫 View 예제](../examples/first-view/)는 브라우저에서 바로 실행할 수 있습니다. 앱에서 실행하려면 [빠른 시작](./quickstart/)을, Svelte 앱에 연결하려면 [Svelte 연결 가이드](./svelte/guides/mount-in-svelte/)를 따라가세요.
 
 <a id="core-concepts"></a>
 

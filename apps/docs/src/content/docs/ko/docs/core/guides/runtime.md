@@ -9,7 +9,7 @@ sidebar:
 
 ## 준비하기
 
-[설치](../../../installation/)에 따라 로컬 Core 패키지를 설치합니다. 소비 프로젝트에 다음 코드를 `run-view.mjs`로 저장하고 `node run-view.mjs`를 실행하세요. DOM이나 Svelte 컴포넌트는 필요하지 않습니다.
+[npm에서 Core를 설치](../../../installation/#install-core)합니다. 소비 프로젝트에 다음 코드를 `run-view.mjs`로 저장하고 `node run-view.mjs`를 실행하세요. DOM이나 Svelte 컴포넌트는 필요하지 않습니다.
 
 ## 등록·실행·관찰하기
 

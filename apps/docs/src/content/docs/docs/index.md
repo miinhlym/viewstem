@@ -7,7 +7,7 @@ Viewstem is a framework-independent declarative UI runtime. Describe screens, st
 
 ## Run your first view
 
-Try the [first View](../examples/first-view/) directly in your browser. To run it in a Svelte app, follow [Installation](./installation/) and then [Quick Start](./quickstart/).
+Try the [first View](../examples/first-view/) directly in your browser, or follow [Quick Start](./quickstart/) to run it in your app. For a Svelte app, follow the [Svelte mounting guide](./svelte/guides/mount-in-svelte/).
 
 <a id="core-concepts"></a>
 

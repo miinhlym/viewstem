@@ -9,7 +9,7 @@ Create a headless View, change its State and observe its projected output.
 
 ## Prepare
 
-Install the local Core package using [Installation](../../../installation/). Save the following as `run-view.mjs` in the consuming project and run `node run-view.mjs`. No DOM or Svelte component is needed.
+[Install Core from npm](../../../installation/#install-core). Save the following as `run-view.mjs` in the consuming project and run `node run-view.mjs`. No DOM or Svelte component is needed.
 
 ## Register, execute and observe
 

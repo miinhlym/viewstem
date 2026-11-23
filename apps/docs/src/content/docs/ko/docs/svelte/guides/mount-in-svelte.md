@@ -15,7 +15,7 @@ sidebar:
 | 기존 Svelte 트리에서 새 View 생성 | [`<ViewstemView {renderer} {source} />`](../../viewstem-view/) |
 | 기존 Svelte 트리에서 이미 만든 View 표시 | [`<ViewstemView {renderer} {view} />`](../../viewstem-view/#borrowing-a-view) |
 
-이 가이드에서는 `ViewstemView`로 기존 Svelte 트리에 인사말을 표시합니다. [설치](/ko/docs/installation/#svelte-패키지-빌드-및-설치)에서 준비한 패키지와 Svelte를 컴파일할 수 있는 번들러가 필요합니다.
+이 가이드에서는 `ViewstemView`로 기존 Svelte 트리에 인사말을 표시합니다. Svelte를 컴파일할 수 있는 번들러를 사용하고 [Svelte 렌더러와 Core를 npm에서 설치](/ko/docs/installation/#install-svelte)하세요.
 
 <a id="prepare-entry"></a>
 
@@ -173,7 +173,7 @@ View를 직접 제어하거나 최초 Query 보고를 기다리려면 [기존 Vi
 
 ## 기본 UI 버튼과 Svelte 컴포넌트 섞기
 
-Svelte TypeScript 클라이언트 빌드와 Core·DOM·Svelte·UI 로컬 패키지가 필요합니다. [Svelte 설치 절차](/ko/docs/installation/#svelte-패키지-빌드-및-설치)를 따른 뒤 [브라우저 UI 빌드](/ko/docs/installation/#브라우저-ui-패키지-빌드)에서 만든 UI tarball도 설치하세요. 다음 파일로 독립 실행할 수 있습니다.
+Svelte TypeScript 클라이언트 빌드를 사용하세요. [Core와 Svelte 렌더러를 설치](/ko/docs/installation/#install-svelte)한 뒤 `npm install @viewstem/ui`로 UI 카탈로그를 추가하세요. 다음 파일로 독립 실행할 수 있습니다.
 
 `index.html`
 

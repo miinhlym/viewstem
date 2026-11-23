@@ -20,7 +20,7 @@ README for its public API, supported behavior, and limitations.
 
 ## Mount a View in the browser
 
-Install Core, DOM, and UI using the [installation guide](apps/docs/src/content/docs/docs/installation/index.md#build-the-browser-ui-packages). Add `<div id="panel"></div>` to your HTML and run the following code with a browser bundler such as Vite.
+Install Core, DOM, and UI using the [installation guide](apps/docs/src/content/docs/docs/installation/index.md#install-browser-ui). Add `<div id="panel"></div>` to your HTML and run the following code with a browser bundler such as Vite.
 
 ```ts
 import { createRuntime } from '@viewstem/core';

@@ -16,7 +16,7 @@ sidebar:
 | `@viewstem/core/cel` | 동기 CEL 표현식 컴파일과 평가 |
 | `@viewstem/core/cel-support.json` | 지원하는 CEL 시그니처의 기계 판독용 목록 |
 
-현재 패키지는 ESM이며 Node에서 사용할 때 Node.js 22 이상이 필요합니다. [설치](../installation/)에 따라 로컬 패키지를 빌드·설치하세요. 이 문서가 npm 발행을 뜻하지는 않습니다. 브라우저에서는 ESM을 처리하는 번들러를 사용합니다. Core 자체는 UI 컴포넌트를 등록하거나 DOM을 그리지 않습니다.
+Core는 ESM 패키지이며 Node에서 사용하려면 Node.js 22 이상이 필요합니다. npm 명령은 [Core 설치](../installation/#install-core)를 참고하세요. 브라우저에서는 ESM을 처리하는 번들러를 사용합니다. Core 자체는 UI 컴포넌트를 등록하거나 DOM을 그리지 않습니다.
 
 ## 앱에서 Core 사용하기
 

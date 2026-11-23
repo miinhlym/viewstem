@@ -3,9 +3,9 @@ title: Mount a View in the browser
 description: Install Core, DOM, and UI and mount a View in a browser host.
 ---
 
-## Build and install
+## Install the packages
 
-Build and install the [Core, DOM, and UI tarballs](../../../installation/#build-the-browser-ui-packages) in your app.
+[Install Core, DOM, and UI from npm](../../../installation/#install-browser-ui) in your app.
 
 ## Render a button
 

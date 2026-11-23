@@ -16,7 +16,7 @@ Run Viewstem definitions without a browser or UI framework. Core validates resou
 | `@viewstem/core/cel` | Compile and evaluate synchronous CEL expressions |
 | `@viewstem/core/cel-support.json` | Machine-readable supported CEL signatures |
 
-The current package is ESM and requires Node.js 22 or later for Node consumers. Build and install the local package using [Installation](../installation/); these docs do not imply an npm release. Browser use is through an ESM-aware bundler. Core does not register UI components or draw a DOM tree.
+Core is an ESM package and requires Node.js 22 or later when used in Node. See [Core installation](../installation/#install-core) for the npm command. Browser use is through an ESM-aware bundler. Core does not register UI components or draw a DOM tree.
 
 ## Use Core in an application
 

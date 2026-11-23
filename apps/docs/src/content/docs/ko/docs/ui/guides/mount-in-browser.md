@@ -3,9 +3,9 @@ title: 브라우저에 View 마운트
 description: Core, DOM, UI를 설치하고 브라우저에 View를 마운트합니다.
 ---
 
-## 빌드 및 설치
+## 패키지 설치
 
-[Core, DOM, UI 패키지 파일](../../../installation/#브라우저-ui-패키지-빌드)을 빌드하고 앱에 설치합니다.
+앱에 [Core, DOM, UI를 npm에서 설치](../../../installation/#install-browser-ui)합니다.
 
 ## 버튼 렌더링
 
