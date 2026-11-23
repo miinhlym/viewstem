@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { appendFile, writeFile } from 'node:fs/promises';
 import { setTimeout } from 'node:timers/promises';
 import { pathToFileURL } from 'node:url';
 
@@ -20,21 +19,41 @@ export function activeVersion(deployments) {
   return version;
 }
 
-export function checkSourceOrder(source, current, bootstrap, isAncestor) {
-  assert.match(source, shaPattern, 'Invalid documentation source SHA');
-  if (current === undefined) return;
-  assert.match(current, shaPattern, 'The active Cloudflare version does not identify its source SHA');
-  if (source === current) return;
-  assert.ok(!bootstrap, 'The 0.1.0 bootstrap can only retry the initial source commit after deployment');
-  assert.ok(isAncestor(current, source), `Refusing to replace ${current} with older or unrelated source ${source}`);
+export function parseDeploymentTag(tag = '') {
+  const parts = tag.split('.');
+  assert.ok(parts.length <= 2 && parts.every(part => shaPattern.test(part)),
+    'The active Cloudflare version does not identify its source commits');
+  const [base, through = base] = parts;
+  return { base, through };
+}
+
+export async function readDeployment(env, request = fetch, includeSource = true) {
+  const { CLOUDFLARE_ACCOUNT_ID: account, CLOUDFLARE_API_TOKEN: token } = env;
+  assert.match(account ?? '', /^[0-9a-f]{32}$/, 'Set the CLOUDFLARE_ACCOUNT_ID repository variable');
+  assert.ok(token, 'Set the CLOUDFLARE_PRODUCTION_API_TOKEN environment secret');
+  const worker = `https://api.cloudflare.com/client/v4/accounts/${account}/workers/scripts/viewstem`;
+  async function read(path) {
+    const response = await request(worker + path, {
+      headers: { authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(15_000),
+    });
+    assert.ok(response.ok, `Cloudflare ${path} returned HTTP ${response.status}`);
+    const payload = await response.json();
+    assert.equal(payload.success, true, `Cloudflare ${path} failed`);
+    return payload.result;
+  }
+  const id = activeVersion((await read('/deployments')).deployments);
+  if (!id) return null;
+  if (!includeSource) return { id };
+  const version = await read(`/versions/${id}`);
+  return { id, ...parseDeploymentTag(version.annotations?.['workers/tag']) };
 }
 
 function deploymentIdentity() {
-  const { DOCS_SOURCE_SHA: sourceSha, GITHUB_RUN_ID: runId, GITHUB_RUN_ATTEMPT: runAttempt } = process.env;
-  assert.match(sourceSha ?? '', shaPattern, 'Invalid documentation source SHA');
+  const { DOCS_BASE_SHA: base, DOCS_THROUGH_SHA: through, GITHUB_RUN_ID: runId, GITHUB_RUN_ATTEMPT: runAttempt } = process.env;
+  const { base: sourceSha, through: docsSha } = parseDeploymentTag(`${base}.${through}`);
   assert.match(runId ?? '', /^\d+$/, 'Missing workflow run ID');
   assert.match(runAttempt ?? '', /^\d+$/, 'Missing workflow run attempt');
-  return { source_sha: sourceSha, run_id: runId, run_attempt: runAttempt };
+  return { source_sha: sourceSha, docs_through_sha: docsSha, run_id: runId, run_attempt: runAttempt };
 }
 
 export async function isLiveBuild(identity, request = fetch) {
@@ -61,22 +80,17 @@ export async function isLiveBuild(identity, request = fetch) {
   return pages.every(page => page?.status === 200);
 }
 
-function isAncestor(current, source) {
-  const result = spawnSync('git', ['merge-base', '--is-ancestor', current, source], { stdio: 'inherit' });
-  if (result.status === 0) return true;
-  if (result.status === 1) return false;
-  throw result.error ?? new Error('Could not compare the active and candidate source commits');
-}
-
 async function main() {
   const command = process.argv[2];
-  if (command === 'active-version') {
-    console.log(activeVersion(JSON.parse(readFileSync(0, 'utf8'))));
-  } else if (command === 'check-order') {
-    const current = process.argv.includes('--first-deployment') ? undefined : process.env.ACTIVE_SOURCE_SHA ?? '';
-    checkSourceOrder(process.env.DOCS_SOURCE_SHA, current, process.env.DOCS_BOOTSTRAP_0_1_0 === 'true', isAncestor);
+  if (command === 'read-active') {
+    const active = await readDeployment(process.env);
+    await appendFile(process.env.GITHUB_OUTPUT, `deployment=${JSON.stringify(active)}\n`);
+  } else if (command === 'assert-active') {
+    const previous = JSON.parse(process.env.DOCS_ACTIVE);
+    const current = await readDeployment(process.env, fetch, false);
+    assert.equal(current?.id, previous?.id, 'The active Cloudflare version changed during this build');
   } else if (command === 'stamp') {
-    writeFileSync(`apps/docs/dist${markerPath}`, JSON.stringify(deploymentIdentity()) + '\n');
+    await writeFile(`apps/docs/dist${markerPath}`, JSON.stringify(deploymentIdentity()) + '\n');
   } else if (command === 'check-live') {
     const identity = deploymentIdentity();
     for (let attempt = 1; attempt <= 10; attempt++) {

@@ -56,11 +56,35 @@ Worker에서 PR마다 `pr-<번호>`를 만들고
 저장소 루트에서 `npx --no-install wrangler preview delete --config apps/docs/wrangler.jsonc
 --worker-name viewstem-preview --name pr-<번호>`로 해당 프리뷰를 삭제할 수 있다.
 
-[운영 배포 워크플로](../../.github/workflows/docs-release.yml)는 패키지가
-공개된 뒤 실행한다. 전달받은 `main` 커밋을 체크아웃하고 공개 아카이브를
-확인한 뒤, npm에 발행된 패키지로 빌드한다. 배포 전에 Chromium에서 빌드된
-예제와 Playground의 동작을 검사한다.
+[운영 배포 워크플로](../../.github/workflows/docs-release.yml)는 패키지 릴리스와
+문서 사이트 전용 PR에서 실행한다. 두 경로 모두 공개 npm 패키지로 빌드하고,
+배포 전에 링크, 예제, Playground 동작을 검사한다.
 [Astro의 `site` 설정](astro.config.mjs)이 사이트맵에 쓸 공개 주소를 지정한다.
+
+### 현재 공개 버전의 문서 수정
+
+문서 사이트 전용 PR이 squash merge되고 `main` CI가 통과하면 운영 배포를 검토한다.
+대상 경로는 `apps/docs/src/`, `apps/docs/public/`, Astro 설정, `components.json`,
+`tsconfig.json`이다. 스타일 CSS와 공개 이미지·폰트만 바뀌면 자동으로 반영한다.
+설치 가이드, API 설명, 레이아웃, 예제, Playground 등 다른 사이트 변경은 현재 공개
+패키지에서 쓸 수 있는지 리뷰하고, 머지 전에 PR에 `docs:publish` 라벨을 붙인다.
+미출시 기능에 맞춰야 하는 변경에는 `docs:next-release`를 붙인다. 두 라벨이 함께
+있으면 다음 릴리스까지 기다린다. 머지 후 라벨 변경은 배포 판정에 반영되지 않는다.
+저장소에 두 라벨이 없다면 위 이름으로 생성한다.
+
+패키지 소스·버전, changeset, 의존성 파일, 검증 스크립트, 배포 설정 또는 저장소 설계
+문서까지 바뀐 PR은 이 경로에서 제외된다. 운영 기준이 이미 있어야 문서 전용 배포를
+할 수 있으므로, 첫 `0.1.0` 배포는 아래 절차를 따른다.
+
+| 상황 | 운영 배포 동작 |
+| --- | --- |
+| `main`에 미출시 패키지 코드나 그 설명이 쌓인 뒤 푸터만 수정 | 지금 서빙 중인 패키지 릴리스 소스에 공개 가능한 사이트 PR의 변경분만 순서대로 적용한다. |
+| 변경분이 아직 공개하지 않은 파일이나 주변 내용에 의존 | 해당 PR을 보류하고 독립적으로 적용할 수 있는 다른 PR은 처리한다. Actions 로그에 보류된 PR이 표시된다. |
+| 문서 갱신 뒤 먼저 머지된 패키지 릴리스의 배포 잡이 도착 | 새 릴리스 소스를 사용하고 그보다 늦게 머지되어 이미 공개한 문서 수정도 다시 적용한다. 이미 공개한 수정과 충돌하면 배포를 중단한다. |
+| 예전 갱신 잡이 늦게 도착하거나 재실행됨 | 운영에 더 새로운 문서 범위가 있으면 건너뛴다. 같은 범위의 실패한 잡은 다시 실행할 수 있다. |
+| 빌드·브라우저 검사 중 실패하거나 Cloudflare 버전이 바뀜 | 새 버전을 올리지 않는다. 배포 후 공개 검사 실패는 아래 버전 복구 절차를 따른다. |
+
+### 패키지 릴리스 및 운영 설정
 
 npm 릴리스는 배치 전체를 공개하고 태그를 만든 뒤 운영 워크플로를 호출한다.
 다른 발행 워크플로도 `main`에서 같은 절차를 사용할 수 있다. 레지스트리 공개를
@@ -69,14 +93,15 @@ npm 릴리스는 배치 전체를 공개하고 태그를 만든 뒤 운영 워�
 `released_packages`에는 `registry`, `name`, `version`을 담은 JSON 배열로 배치의
 모든 패키지를 넘긴다. 각 재사용 워크플로 호출에는
 `CLOUDFLARE_PRODUCTION_API_TOKEN` 시크릿 이름을 명시하고, 값은
-`docs-production` 환경에 둔다. 운영 워크플로는 공개 버전과 태그를 확인하고,
-배포 후 공개 주소에서 빌드의 커밋과 워크플로 실행 정보를 대조한다.
+`docs-production` 환경에 둔다. 운영 워크플로는 공개 버전과 태그를 확인한다.
+패키지 릴리스와 문서 전용 배포는 같은 운영 큐를 사용한다. Cloudflare 버전 태그와
+공개 `/_viewstem-deploy.json`에 패키지 릴리스 소스와 처리한 문서 범위의 끝 커밋을 기록한다.
 
 두 워크플로는 `miinhlym.workers.dev`를 소유한 계정의 저장소 변수
 `CLOUDFLARE_ACCOUNT_ID`를 사용한다. 처음 설정할 때 Cloudflare 관리자가
 `viewstem`과 `viewstem-preview`를 먼저 생성한다. 첫 운영 배포 전에는 `viewstem`을
-배포 이력이 없는 상태로 준비한다. 활성 Cloudflare 버전이 있다면 소스 SHA 태그가
-있어야 워크플로가 교체할 수 있다. 운영 Worker에는 `workers.dev` 경로를,
+배포 이력이 없는 상태로 준비한다. 활성 Cloudflare 버전에는 소스 SHA 태그가 있어야
+워크플로가 교체할 수 있다. 기존 단일 SHA 태그도 읽을 수 있다. 운영 Worker에는 `workers.dev` 경로를,
 미리보기 Worker에는 Preview URL을 활성화한다. 토큰은 각각 아래 Worker로 제한한
 **Individual Workers Editor** 권한으로 발급하고 대상 GitHub Actions 환경에 등록한다.
 
@@ -94,11 +119,13 @@ GitHub의 `docs-production` 환경 배포 브랜치 규칙은 `main`만 허용�
 항목 네 개를 모두 넣는다. 버전이 계속 최신이면 같은 초기 배포 소스를 재시도할 수 있다.
 
 일반 릴리스를 재시도할 때는 `bootstrap_0_1_0`을 끄고 릴리스 태그의 커밋과
-같은 배치를 지정한다. 요청 버전과 사이트가 사용하는 npm 버전이 각 레지스트리의
-최신 버전이어야 한다. 공개 검사에 실패하면 Actions 실행 요약에서 소스 SHA와
+같은 배치를 지정한다. 패키지 릴리스 경로는 요청 버전과 사이트가 사용하는 npm 버전이
+각 레지스트리의 최신 버전이어야 한다. 문서 전용 배포는 운영 소스가 고정한 공개 npm
+버전을 쓴다. 공개 검사에 실패하면 Actions 실행 요약에서 소스 SHA와
 교체 전후의 Cloudflare 버전 ID를 확인한다. 이전 버전이 있으면 관리자가
 `viewstem` Worker의 **Deployments**에서 복구하고, `/_viewstem-deploy.json`과
-설치 문서에서 복구된 빌드를 확인한다.
+설치 문서에서 복구된 빌드를 확인한다. 다음 자동 배포는 복구된 버전에서 시작해
+승인된 문서 PR을 다시 계산하므로, 문제가 있는 변경은 수정 PR로 바로잡는다.
 [Cloudflare 롤백 절차](https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/)
 
 ## 수정 위치 찾기

@@ -59,7 +59,7 @@ function shouldRetry(response) {
   return !response || response.status === 404 || response.status === 429 || response.status >= 500;
 }
 
-export async function isPublicRelease({ registry, name, version }, request = fetch) {
+export async function isPublicRelease({ registry, name, version }, request = fetch, requireLatest = true) {
   const provider = registries[registry];
   const response = await fetchRelease(provider.origin + provider.path(name), 'GET', request);
   if (shouldRetry(response)) return false;
@@ -68,7 +68,7 @@ export async function isPublicRelease({ registry, name, version }, request = fet
   if (!metadata) return false;
   const archive = provider.archive(metadata, version);
   if (!archive) return false;
-  assert.equal(provider.latest(metadata), version, `${name}@${version} has been superseded on ${registry}`);
+  if (requireLatest) assert.equal(provider.latest(metadata), version, `${name}@${version} has been superseded on ${registry}`);
   assert.equal(new URL(archive).origin, provider.origin, `Unexpected archive origin for ${name}`);
   const download = await fetchRelease(archive, 'HEAD', request);
   if (shouldRetry(download)) return false;
@@ -106,7 +106,8 @@ export function verifyReleaseSource(releases, { sourceSha, bootstrap, resolveTag
 }
 
 async function main() {
-  const releases = parseReleasedPackages(process.env.RELEASED_PACKAGES);
+  const docsOnly = process.argv.includes('--docs-only');
+  const releases = docsOnly ? [] : parseReleasedPackages(process.env.RELEASED_PACKAGES);
   if (process.argv.includes('--verify-source')) {
     verifyReleaseSource(releases, {
       sourceSha: git('rev-parse', 'HEAD'),
@@ -141,7 +142,7 @@ async function main() {
   const pending = new Map(expected.map(entry => [`${entry.registry}:${entry.name}@${entry.version}`, entry]));
   const attempts = process.argv.includes('--once') ? 1 : 18;
   for (let attempt = 0; attempt < attempts && pending.size; attempt++) {
-    const states = await Promise.all([...pending].map(async ([key, entry]) => [key, await isPublicRelease(entry)]));
+    const states = await Promise.all([...pending].map(async ([key, entry]) => [key, await isPublicRelease(entry, fetch, !docsOnly)]));
     for (const [key, published] of states) {
       if (!published) continue;
       console.log(`Public release verified: ${key}`);

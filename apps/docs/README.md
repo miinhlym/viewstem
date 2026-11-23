@@ -58,12 +58,38 @@ from the default branch when the PR closed, a maintainer can remove the named
 preview using `npx --no-install wrangler preview delete --config apps/docs/wrangler.jsonc
 --worker-name viewstem-preview --name pr-<number>` from the repository root.
 
-The [production workflow](../../.github/workflows/docs-release.yml) runs
-after a public package release. It checks out the supplied commit from
-`main`, verifies public archives, and builds the examples and Playground
-with the published npm packages. Chromium exercises the built examples and
-Playground before deployment. [Astro's `site` setting](astro.config.mjs)
+The [production workflow](../../.github/workflows/docs-release.yml) runs after
+a public package release or an eligible docs-only PR. Both paths build with
+published npm packages and verify links, examples, and Playground behavior
+before deploy. [Astro's `site` setting](astro.config.mjs)
 sets the public origin for the sitemap.
+
+### Update the site for the current public packages
+
+The workflow considers docs-only PRs after a squash merge and successful `main`
+CI. Eligible paths are `apps/docs/src/`, `apps/docs/public/`, the Astro config,
+`components.json`, and `tsconfig.json`. Changes limited to site CSS and public
+images or fonts can deploy automatically. Review installation instructions, API
+guides, layouts, examples, and other site changes against the current public
+packages, then add `docs:publish` before merging. Use `docs:next-release` to hold
+a change for a package release. It takes precedence over `docs:publish`, and
+label changes after merge have no effect on publication. Create both repository
+labels with these names if they do not already exist.
+
+PRs touching package sources or versions, changesets, dependency files, check
+scripts, deployment configuration, or repository design docs are excluded.
+Docs-only deployment needs a live baseline. Follow the bootstrap instructions
+below for the first `0.1.0` deployment.
+
+| Scenario | Deployment behavior |
+| --- | --- |
+| A footer fix lands after unreleased package code and its docs | Apply only eligible site PR diffs, in merge order, to the release source currently serving production. |
+| A patch needs an unreleased file or surrounding content | Leave that PR for the release and continue with independent patches. The Actions log identifies the deferred PR. |
+| An earlier package release deploys after a site refresh | Build the new release and replay later docs already published. Stop if they cannot be preserved. |
+| A delayed or retried refresh runs | Skip older ranges. A failed job can retry the same range. |
+| Build or browser checks fail, or the active Cloudflare version changes during preparation | Stop before uploading. Use version recovery below if the public check fails after upload. |
+
+### Package releases and production setup
 
 The npm release workflow calls production after the entire batch is public and
 tagged. Other trusted publishing workflows on `main` can use the same workflow.
@@ -73,15 +99,16 @@ pub.dev. Pass the release commit as `source_sha`, all packages in the batch as
 `released_packages` (a JSON array of `registry`, `name`, and `version` objects),
 and forward the named `CLOUDFLARE_PRODUCTION_API_TOKEN` secret through each
 reusable workflow call. Keep its value in the `docs-production` environment.
-Production verifies the tags and the public versions and checks the live build's
-commit and workflow identity after deployment.
+Production verifies the tags and public versions. Both production paths share
+one queue. The Cloudflare version tag and public `/_viewstem-deploy.json`
+identify the package release source and the last documentation commit considered.
 
 Both workflows use the `CLOUDFLARE_ACCOUNT_ID` repository variable for the
 account that owns `miinhlym.workers.dev`. During account setup, a Cloudflare
 administrator creates `viewstem` and `viewstem-preview` before issuing the
 tokens. Start with an empty `viewstem` Worker for the first production
-deployment. An active Cloudflare version must carry its source SHA as a tag
-before it can be replaced by the workflow. Enable the `workers.dev` route for
+deployment. An active Cloudflare version must carry source information in its
+tag. Existing single-SHA tags are accepted. Enable the `workers.dev` route for
 production and Preview URLs on the preview Worker. Use separate **Individual
 Workers Editor** tokens scoped to the Workers below and store each token in its
 GitHub Actions environment.
@@ -103,11 +130,15 @@ bootstrap source can be retried while its packages remain current.
 
 To retry a current release, provide its tagged commit and the same package
 batch with `bootstrap_0_1_0` off. The requested versions and the site's npm
-dependencies must still be the registry's latest releases. For recovery after
+dependencies must be the registry's latest releases for a package release.
+Docs-only updates use the exact public npm versions pinned by the active
+release source. For recovery after
 a failed public check, the Actions summary records the source SHA and the old
 and new Cloudflare version IDs. If a previous version exists, a maintainer can
 restore it on the `viewstem` Worker's **Deployments** tab and confirm that
 `/_viewstem-deploy.json` and the installation page serve the restored build.
+The next deploy reconstructs approved site changes from the restored baseline.
+Correct the problematic change in a follow-up PR.
 [Cloudflare rollback procedure](https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/)
 
 ## Find the implementation
