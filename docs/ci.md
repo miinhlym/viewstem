@@ -51,6 +51,9 @@ be public or appear earlier in the batch. Package tags such as
 `@viewstem/core@0.1.1` and GitHub Releases follow npm publishing, then the docs
 workflow uses those tags to verify the released source.
 
+The site can also deploy after `main` CI passes for an eligible docs-only PR.
+See the [site path and label rules](../apps/docs/README.md#update-the-site-for-the-current-public-packages).
+
 If publishing fails partway through, rerun the failed jobs on that commit
 before proceeding with the next batch. The job skips existing versions if their
 tarball integrity matches. If an out-of-band publication already advanced

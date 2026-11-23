@@ -1,10 +1,26 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
-import { activeVersion, checkSourceOrder, isLiveBuild } from './docs-production.mjs';
+import { activeVersion, isLiveBuild, parseDeploymentTag, readDeployment } from './docs-production.mjs';
 
 const before = 'a'.repeat(40);
 const after = 'b'.repeat(40);
 const version = '12345678-1234-1234-1234-123456789abc';
+
+test('GitHub deployment records require an uploaded, live version verified in the current attempt', async () => {
+  const workflow = await readFile(new URL('../workflows/docs-release.yml', import.meta.url), 'utf8');
+  const [release, record] = workflow.split('\n  record-deployment:\n');
+  assert.match(workflow, /concurrency:\n  group: docs-production/);
+  assert.match(release, /environment:\n      name: docs-production\n      deployment: false/);
+  assert.match(release, /verified_version: \$\{\{ steps\.live\.outputs\.verified_version \}\}/);
+  assert.match(release, /verified_attempt: \$\{\{ steps\.live\.outputs\.verified_attempt \}\}/);
+  const verification = release.slice(release.indexOf('      - name: Check the production site'));
+  assert.match(verification, /if: steps\.source\.outputs\.deploy == 'true'/);
+  assert.match(verification, /DOCS_VERSION_ID: \$\{\{ steps\.publish\.outputs\.version_id \}\}/);
+  assert.match(verification, /check-live\n\s+printf 'verified_attempt=%s\\nverified_version=%s/);
+  assert.match(record, /needs: release\n.*\n\s+if: needs\.release\.outputs\.verified_version != '' && needs\.release\.outputs\.verified_attempt == github\.run_attempt/);
+  assert.match(record, /environment:\n      name: docs-production\n      url:/);
+});
 
 test('production versions are read from the latest Cloudflare deployment', () => {
   assert.equal(activeVersion([]), '');
@@ -16,18 +32,34 @@ test('production versions are read from the latest Cloudflare deployment', () =>
   assert.throws(() => activeVersion([deploy('02', [{ version_id: version, percentage: 50 }])]), /split/);
 });
 
-test('an existing production source may be retried or advanced, and bootstrap may only retry itself', () => {
-  const isAncestor = (older, newer) => older === before && newer === after;
-  checkSourceOrder(before, undefined, true, isAncestor);
-  checkSourceOrder(before, before, true, isAncestor);
-  checkSourceOrder(after, before, false, isAncestor);
-  assert.throws(() => checkSourceOrder(before, after, false, isAncestor), /older or unrelated/);
-  assert.throws(() => checkSourceOrder(after, before, true, isAncestor), /bootstrap/);
-  assert.throws(() => checkSourceOrder(after, '', false, isAncestor), /does not identify/);
+test('Cloudflare production tags identify the release and document commits, including legacy tags', () => {
+  assert.deepEqual(parseDeploymentTag(before), { base: before, through: before });
+  assert.deepEqual(parseDeploymentTag(`${before}.${after}`), { base: before, through: after });
+  assert.throws(() => parseDeploymentTag(), /does not identify/);
+  assert.throws(() => parseDeploymentTag(`${before}.${after}.x`), /does not identify/);
+});
+
+test('the active production source comes from the currently serving Cloudflare version', async () => {
+  const env = { CLOUDFLARE_ACCOUNT_ID: 'a'.repeat(32), CLOUDFLARE_API_TOKEN: 'test-token' };
+  const paths = [];
+  const request = async (url, options) => {
+    const [, path] = url.split('/workers/scripts/viewstem');
+    assert.equal(options.headers.authorization, 'Bearer test-token');
+    paths.push(path);
+    const result = path === '/deployments'
+      ? { deployments: [{ created_on: '2026-11-23T00:00:00Z', versions: [{ version_id: version, percentage: 100 }] }] }
+      : { annotations: { 'workers/tag': `${before}.${after}` } };
+    return Response.json({ success: true, result });
+  };
+  assert.deepEqual(await readDeployment(env, request), { id: version, base: before, through: after });
+  assert.deepEqual(paths, ['/deployments', `/versions/${version}`]);
+  assert.deepEqual(await readDeployment(env, request, false), { id: version });
+  assert.equal(await readDeployment(env, async () => Response.json({ success: true, result: { deployments: [] } })), null);
+  await assert.rejects(readDeployment(env, async () => new Response(null, { status: 403 })), /HTTP 403/);
 });
 
 test('public verification rejects stale artifacts and redirected routes', async () => {
-  const marker = { source_sha: after, run_id: '42', run_attempt: '2' };
+  const marker = { source_sha: before, docs_through_sha: after, run_id: '42', run_attempt: '2' };
   const paths = [];
   const request = ({ current, pageStatus }) => async (url, options) => {
     paths.push(url.pathname);
@@ -40,6 +72,7 @@ test('public verification rejects stale artifacts and redirected routes', async 
   };
   assert.equal(await isLiveBuild(marker, request({ current: { ...marker, run_attempt: '1' }, pageStatus: 200 })), false);
   assert.deepEqual(paths, ['/_viewstem-deploy.json']);
+  assert.equal(await isLiveBuild(marker, request({ current: { ...marker, docs_through_sha: before }, pageStatus: 200 })), false);
   assert.equal(await isLiveBuild(marker, request({ current: marker, pageStatus: 302 })), false);
   assert.equal(await isLiveBuild(marker, request({ current: marker, pageStatus: 200 })), true);
   assert.ok(paths.includes('/sitemap-index.xml') && paths.includes('/ko/docs/installation/'));

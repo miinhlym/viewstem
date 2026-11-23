@@ -154,6 +154,14 @@ test('release callers forward the named token and isolate manual CI from publish
   const docs = release.slice(release.indexOf('\n  docs:'));
   assert.match(docs, /needs: \[plan, publish, tag\]/);
   assert.match(docs, namedSecret);
+  const refresh = release.slice(release.indexOf('\n  docs-refresh:'));
+  assert.match(refresh, /needs: plan\n.*targets == '\[\]'.*docs_publishable == 'true'/);
+  assert.match(refresh, /mode: refresh/);
+  assert.match(refresh, namedSecret);
+  const production = await readFile(new URL('../workflows/docs-release.yml', import.meta.url), 'utf8');
+  assert.match(production, /group: docs-production\n\s+queue: max/);
+  assert.match(production, /verify-docs-release\.mjs" --docs-only --once/);
+  assert.ok(production.indexOf('verify-site-previews.mjs') < production.indexOf('wrangler deploy'));
   const publish = release.slice(release.indexOf('\n  publish:'), release.indexOf('\n  tag:'));
   assert.match(publish, /group: npm-publish\n\s+queue: max/);
   assert.match(publish, /fetch-depth: 0/);

@@ -4,6 +4,7 @@ import { appendFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/pro
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { hasPublishableSiteChanges } from './docs-site-changes.mjs';
 
 const registry = 'https://registry.npmjs.org';
 const packages = ['core', 'dom', 'svelte', 'ui'];
@@ -118,15 +119,16 @@ async function readRegistry(name) {
 }
 
 async function plan() {
-  const { GITHUB_REPOSITORY: repository, GITHUB_SHA: sha } = process.env;
+  const { GITHUB_REPOSITORY: repository, GITHUB_SHA: sha, BEFORE_SHA: before } = process.env;
   const pages = JSON.parse(run('gh', ['api', '--paginate', '--slurp',
     `repos/${repository}/commits/${sha}/pulls`]));
   const release = pages.flat().find(pr => isReleasePullRequest(pr, repository, sha));
   const targets = release ? releaseTargets(readReleaseManifest) : [];
   if (release) assert.ok(targets.length, 'Release PR must bump at least one public package');
   const releasedPackages = targets.map(({ name, version }) => ({ registry: 'npm', name, version }));
+  const docsPublishable = !release && hasPublishableSiteChanges(before, sha, repository);
   await appendFile(process.env.GITHUB_OUTPUT,
-    `targets=${JSON.stringify(targets)}\nreleased_packages=${JSON.stringify(releasedPackages)}\n`);
+    `targets=${JSON.stringify(targets)}\nreleased_packages=${JSON.stringify(releasedPackages)}\ndocs_publishable=${docsPublishable}\n`);
 }
 
 async function pack(target, directory, repository, sha) {
