@@ -36,9 +36,34 @@ npm run preview -w @viewstem/docs -- --port 4323
 `build:docs`는 라이브러리 의존성을 다시 빌드하고 검색 색인을 포함한
 `apps/docs/dist`를 생성한다. `preview:docs`는 Wrangler로 이 결과물을 제공하며
 다시 빌드하지 않는다. 검색·배포용 경로 검사는 최신 빌드에서 수행한다.
-[wrangler.jsonc](wrangler.jsonc)는 Workers Static Assets 설정이다. 위 명령은
-사이트를 공개 배포하지 않는다. 공개 주소와 배포·PR 미리보기 설정은 사이트 계약의
-남은 사항이다. `dist`나 `.astro` 결과물을 직접 수정하거나 커밋하지 않는다.
+[wrangler.jsonc](wrangler.jsonc)는 Workers Static Assets 설정이다. `dist`나
+`.astro` 결과물을 직접 수정하거나 커밋하지 않는다.
+
+## 수동 배포
+
+CI를 통과한 깨끗한 `main` 체크아웃에서 배포한다. Wrangler는 `viewstem` Worker를
+대상으로 하고 [astro.config.mjs](astro.config.mjs)의 `site` 값은 사이트맵의 공개
+주소를 지정한다. `miinhlym.workers.dev`를 소유한 Cloudflare 계정을 사용한다.
+
+저장소 루트에서 의존성을 설치하고 Wrangler 계정과 빌드를 확인한다.
+
+```sh
+npm ci
+npx --no-install wrangler whoami
+npm run build:docs
+node apps/docs/scripts/verify-docs-site.mjs
+npx --no-install wrangler deploy --config apps/docs/wrangler.jsonc --dry-run
+```
+
+Wrangler에 로그인하지 않았다면 `npx --no-install wrangler login`을 실행하고
+계정을 확인한다. 검증한 빌드를 Wrangler로 공개한다.
+
+```sh
+npx --no-install wrangler deploy --config apps/docs/wrangler.jsonc
+```
+
+Wrangler가 출력한 주소에서 홈, 한·영 설치 문서, Playground, `/sitemap-index.xml`을
+확인한다.
 
 ## 수정 위치 찾기
 

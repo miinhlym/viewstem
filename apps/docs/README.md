@@ -37,9 +37,36 @@ npm run preview -w @viewstem/docs -- --port 4323
 `build:docs` rebuilds the library dependencies and produces `apps/docs/dist`,
 including the search index. `preview:docs` serves that build through Wrangler;
 it does not rebuild it. Use a fresh build for search and production-route checks.
-[wrangler.jsonc](wrangler.jsonc) configures Workers Static Assets. These commands
-do not publish the site; a public URL and deployment/PR-preview setup remain open
-in the website contract. Do not edit or commit `dist` or `.astro` output.
+[wrangler.jsonc](wrangler.jsonc) configures Workers Static Assets. Do not edit
+or commit `dist` or `.astro` output.
+
+## Deploy manually
+
+Deploy from a clean checkout of `main` after CI passes. Wrangler targets the
+`viewstem` Worker, and the `site` value in [astro.config.mjs](astro.config.mjs)
+sets the public origin for the sitemap. Use the Cloudflare account that owns
+`miinhlym.workers.dev`.
+
+Run these commands from the repository root to install dependencies, check the
+Wrangler account, and verify the build.
+
+```sh
+npm ci
+npx --no-install wrangler whoami
+npm run build:docs
+node apps/docs/scripts/verify-docs-site.mjs
+npx --no-install wrangler deploy --config apps/docs/wrangler.jsonc --dry-run
+```
+
+If Wrangler reports that you are signed out, run `npx --no-install wrangler login`
+and verify the account. Deploy the verified build with Wrangler.
+
+```sh
+npx --no-install wrangler deploy --config apps/docs/wrangler.jsonc
+```
+
+At the URL printed by Wrangler, check the home page, English and Korean
+installation pages, Playground, and `/sitemap-index.xml`.
 
 ## Find the implementation
 
