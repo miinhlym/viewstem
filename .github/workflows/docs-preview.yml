@@ -87,13 +87,19 @@ jobs:
 
             const marker = '<!-- docs-preview-deployment -->';
             const repoUrl = `${context.serverUrl}/${owner}/${repo}`;
+            const previewUrl = new URL(process.env.PREVIEW_URL);
+            const reviewLinks = [
+              `[Documentation](${new URL('/docs/', previewUrl)})`,
+              `[Examples](${new URL('/examples/', previewUrl)})`,
+              `[Playground](${new URL('/playground/', previewUrl)})`,
+            ];
             const body = [
               marker,
-              '### Docs preview',
+              `**Viewstem preview ready** · [Open site](${previewUrl})`,
               '',
-              `[Open the docs preview](${process.env.PREVIEW_URL}) · [Workflow run](${repoUrl}/actions/runs/${context.runId})`,
+              reviewLinks.join(' · '),
               '',
-              `Deployed commit [\`${deployedSha.slice(0, 7)}\`](${repoUrl}/commit/${deployedSha})`,
+              `<sub>Deployed commit [\`${deployedSha.slice(0, 7)}\`](${repoUrl}/commit/${deployedSha}) · [Build log](${repoUrl}/actions/runs/${context.runId})</sub>`,
             ].join('\n');
 
             const comments = await github.paginate(github.rest.issues.listComments, {
