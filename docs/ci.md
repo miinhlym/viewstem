@@ -3,9 +3,10 @@
 English | [한국어](ci.ko.md)
 
 The [core workflow](../.github/workflows/core.yml) runs on pushes to `main`, pull
-requests, and manual dispatch. A newer run cancels an older run for the same PR
-or branch. Required checks should use **CI complete**, which depends on every
-compatibility and browser job.
+requests, and manual dispatch. A newer run cancels an older run for the same PR.
+Pushes are grouped by commit and manual CI runs have a separate group. Required
+checks should use **CI complete**, which depends on every compatibility and
+browser job.
 Pushes to other branches without a pull request do not run CI automatically;
 use a pull request or manual dispatch to check them.
 
@@ -44,10 +45,18 @@ the Release PR with version bumps, any internal dependency updates, and the
 refreshed npm lockfile.
 A maintainer may need to approve its CI run in GitHub because it was created by
 `GITHUB_TOKEN`. Merge the Release PR after **CI complete**. The same check
-must pass on the merged commit before npm publishing runs. Package tags such as
-`@viewstem/core@0.1.1` and GitHub Releases follow successful npm publishing. If
-publishing fails partway through, rerun the failed jobs on the same commit. The
-job skips existing versions with matching tarball integrity.
+must pass on the merged commit before npm publishing runs. Publishing requires
+the previous package versions to be public. Each internal dependency must already
+be public or appear earlier in the batch. Package tags such as
+`@viewstem/core@0.1.1` and GitHub Releases follow npm publishing, then the docs
+workflow uses those tags to verify the released source.
+
+If publishing fails partway through, rerun the failed jobs on that commit
+before proceeding with the next batch. The job skips existing versions if their
+tarball integrity matches. If an out-of-band publication already advanced
+`latest`, resolve the missing versions at the registry before retrying an older
+batch. A tag or GitHub Release failure can be retried on the same commit before
+the docs workflow begins.
 
 ### First public release
 

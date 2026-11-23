@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { isPublicRelease, parseReleasedPackages } from './verify-docs-release.mjs';
+import { isPublicRelease, parseReleasedPackages, verifyReleaseSource } from './verify-docs-release.mjs';
 
 const npm = { registry: 'npm', name: '@viewstem/core', version: '0.1.0' };
 const dart = { registry: 'pub.dev', name: 'viewstem', version: '0.1.0' };
@@ -52,4 +52,42 @@ test('a Dart release uses pub.dev metadata and checks the public archive', async
     });
   };
   assert.equal(await isPublicRelease(dart, request), true);
+});
+
+test('transport failures during metadata or archive checks return a retriable result', async () => {
+  assert.equal(await isPublicRelease(npm, async () => {
+    throw new DOMException('metadata deadline', 'TimeoutError');
+  }), false);
+  assert.equal(await isPublicRelease(npm, async (_url, options) => {
+    if (options.method === 'HEAD') throw new TypeError('connection reset');
+    return npmMetadata('0.1.0');
+  }), false);
+  assert.equal(await isPublicRelease(npm, async () => ({
+    ok: true, status: 200, async json() { throw new DOMException('body deadline', 'TimeoutError'); },
+  })), false);
+  await assert.rejects(isPublicRelease(npm, async () => new Response(null, { status: 403 })), /HTTP 403/);
+});
+
+const releaseSha = 'a'.repeat(40);
+const docsSha = 'b'.repeat(40);
+const readManifest = directory => ({ name: `@viewstem/${directory.split('/').at(-1)}`, version: '0.1.0' });
+
+test('the automated release requires a tag for the exact source, including a namespaced pub.dev tag', () => {
+  const tags = new Map([['@viewstem/core@0.1.0', releaseSha], ['pub.dev/viewstem@0.1.0', releaseSha]]);
+  const options = { sourceSha: releaseSha, bootstrap: false, resolveTag: tag => tags.get(tag), readManifest };
+  assert.doesNotThrow(() => verifyReleaseSource([npm, dart], options));
+  assert.throws(() => verifyReleaseSource([npm, dart], { ...options, sourceSha: docsSha }), /identify the selected source/);
+  assert.throws(() => verifyReleaseSource([{ ...dart, name: 'http' }], options), /identify the selected source/);
+  assert.throws(() => verifyReleaseSource([{ ...npm, name: 'other' }], options), /Unknown Viewstem npm package/);
+});
+
+test('bootstrap requires the complete 0.1.0 release and identical package trees', () => {
+  const packages = ['core', 'dom', 'svelte', 'ui'].map(name => ({ ...npm, name: `@viewstem/${name}` }));
+  const options = {
+    sourceSha: docsSha, bootstrap: true, resolveTag: () => releaseSha, readManifest,
+    archiveMatches: (published, source) => published === releaseSha && source === docsSha,
+  };
+  assert.doesNotThrow(() => verifyReleaseSource(packages, options));
+  assert.throws(() => verifyReleaseSource([npm, npm, npm, npm], options), /all four/);
+  assert.throws(() => verifyReleaseSource(packages, { ...options, archiveMatches: () => false }), /preserve/);
 });

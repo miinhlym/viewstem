@@ -61,6 +61,50 @@ export function shouldPublish(target, metadata, integrity) {
   return true;
 }
 
+export async function verifyPublishPrerequisites(targets, readManifest, readMetadata) {
+  const metadata = new Map();
+  const getMetadata = async name => {
+    if (!metadata.has(name)) metadata.set(name, await readMetadata(name));
+    return metadata.get(name);
+  };
+  // A failed earlier batch must finish before any newer batch can publish.
+  for (const directory of packages) {
+    const previous = readManifest(directory, true);
+    if (directory === 'dom' && previous === null) continue;
+    assert.ok(previous, `Missing previous manifest for @viewstem/${directory}`);
+    assert.equal(previous.name, `@viewstem/${directory}`);
+    const published = await getMetadata(previous.name);
+    assert.ok(published.versions[previous.version],
+      `Previous release ${previous.name}@${previous.version} is missing on npm; rerun its release before publishing this batch`);
+  }
+  const preceding = new Set();
+  for (const target of targets) {
+    const manifest = readManifest(target.directory, false);
+    assert.equal(manifest.name, target.name);
+    assert.equal(manifest.version, target.version);
+    for (const field of ['dependencies', 'optionalDependencies', 'peerDependencies']) {
+      for (const [name, version] of Object.entries(manifest[field] ?? {})) {
+        if (!name.startsWith('@viewstem/')) continue;
+        assert.ok(packages.some(directory => name === `@viewstem/${directory}`),
+          `Unknown internal dependency ${name}`);
+        assert.match(version, stableVersion, `${manifest.name} must pin ${name} to an exact stable version`);
+        const published = await getMetadata(name);
+        assert.ok(published.versions[version] || preceding.has(`${name}@${version}`),
+          `${manifest.name}@${manifest.version} requires ${name}@${version} on npm or earlier in this release batch`);
+      }
+    }
+    preceding.add(`${target.name}@${target.version}`);
+  }
+  return metadata;
+}
+
+function readReleaseManifest(directory, previous) {
+  const path = `packages/${directory}/package.json`;
+  const ref = previous ? process.env.BEFORE_SHA : process.env.GITHUB_SHA;
+  if (previous && directory === 'dom' && !run('git', ['ls-tree', '--full-tree', ref, '--', path])) return null;
+  return JSON.parse(run('git', ['show', `${ref}:${path}`]));
+}
+
 async function readRegistry(name) {
   const response = await fetch(`${registry}/${encodeURIComponent(name)}`, {
     headers: { accept: 'application/vnd.npm.install-v1+json', 'cache-control': 'no-cache' },
@@ -74,16 +118,11 @@ async function readRegistry(name) {
 }
 
 async function plan() {
-  const { GITHUB_REPOSITORY: repository, GITHUB_SHA: sha, BEFORE_SHA: before } = process.env;
+  const { GITHUB_REPOSITORY: repository, GITHUB_SHA: sha } = process.env;
   const pages = JSON.parse(run('gh', ['api', '--paginate', '--slurp',
     `repos/${repository}/commits/${sha}/pulls`]));
   const release = pages.flat().find(pr => isReleasePullRequest(pr, repository, sha));
-  const targets = release ? releaseTargets((directory, previous) => {
-    const path = `packages/${directory}/package.json`;
-    const ref = previous ? before : sha;
-    if (previous && directory === 'dom' && !run('git', ['ls-tree', '--full-tree', ref, '--', path])) return null;
-    return JSON.parse(run('git', ['show', `${ref}:${path}`]));
-  }) : [];
+  const targets = release ? releaseTargets(readReleaseManifest) : [];
   if (release) assert.ok(targets.length, 'Release PR must bump at least one public package');
   const releasedPackages = targets.map(({ name, version }) => ({ registry: 'npm', name, version }));
   await appendFile(process.env.GITHUB_OUTPUT,
@@ -116,13 +155,14 @@ async function pack(target, directory, repository, sha) {
 }
 
 async function publish(targets) {
+  const metadata = await verifyPublishPrerequisites(targets, readReleaseManifest, readRegistry);
   const directory = await mkdtemp(join(tmpdir(), 'viewstem-npm-release-'));
   try {
     const pending = [];
     for (const target of targets) {
-      const metadata = await readRegistry(target.name);
+      const published = metadata.get(target.name) ?? await readRegistry(target.name);
       const tarball = await pack(target, directory, process.env.GITHUB_REPOSITORY, process.env.GITHUB_SHA);
-      if (shouldPublish(target, metadata, tarball.integrity)) {
+      if (shouldPublish(target, published, tarball.integrity)) {
         pending.push(tarball);
       } else {
         console.log(`Already published ${target.name}@${target.version} with matching contents`);

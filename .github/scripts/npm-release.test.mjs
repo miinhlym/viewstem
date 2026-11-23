@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { isReleasePullRequest, releaseTargets, shouldPublish } from './npm-release.mjs';
+import { readFile } from 'node:fs/promises';
+import { isReleasePullRequest, releaseTargets, shouldPublish, verifyPublishPrerequisites } from './npm-release.mjs';
 
 const repository = 'miinhlym/viewstem';
 const sha = 'tested-merge-commit';
@@ -57,4 +58,104 @@ test('a retry skips matching tarballs and rejects collisions or stale publicatio
   assert.equal(shouldPublish(target, registry('0.1.1', published), integrity), false);
   assert.throws(() => shouldPublish(target, registry('0.1.1', published), 'different'), /different tarball/);
   assert.throws(() => shouldPublish(target, registry('0.1.2'), integrity), /Refusing to move.*back/);
+});
+
+const directories = ['core', 'dom', 'svelte', 'ui'];
+const manifests = version => Object.fromEntries(directories.map(directory => [directory, {
+  name: `@viewstem/${directory}`, version,
+  dependencies: directory === 'core' ? {} : {
+    '@viewstem/core': version,
+    ...(directory === 'dom' ? {} : { '@viewstem/dom': version }),
+  },
+}]));
+const registryVersions = versions => ({
+  'dist-tags': { latest: versions.at(-1) },
+  versions: Object.fromEntries(versions.map(version => [version, { dist: { integrity: 'matching' } }])),
+});
+const fixtures = (previous, current, registry) => ({
+  targets: releaseTargets((directory, before) => (before ? previous : current)[directory] ?? null),
+  readManifest: (directory, before) => (before ? previous : current)[directory] ?? null,
+  readMetadata: async name => registry[name],
+});
+
+test('a partial batch A blocks batch B until A is retried with matching tarballs', async () => {
+  const original = manifests('0.1.0');
+  const batchA = manifests('0.1.1');
+  const batchB = { ...batchA, ui: { ...batchA.ui, version: '0.1.2' } };
+  const registry = Object.fromEntries(directories.map(directory => [
+    `@viewstem/${directory}`, registryVersions(directory === 'core' ? ['0.1.0', '0.1.1'] : ['0.1.0']),
+  ]));
+  const next = fixtures(batchA, batchB, registry);
+  await assert.rejects(verifyPublishPrerequisites(next.targets, next.readManifest, next.readMetadata),
+    /Previous release @viewstem\/dom@0\.1\.1 is missing/);
+  const retry = fixtures(original, batchA, registry);
+  const metadata = await verifyPublishPrerequisites(retry.targets, retry.readManifest, retry.readMetadata);
+  assert.equal(shouldPublish(retry.targets[0], metadata.get('@viewstem/core'), 'matching'), false);
+  for (const target of retry.targets.slice(1)) {
+    assert.equal(shouldPublish(target, metadata.get(target.name), 'matching'), true);
+    registry[target.name] = registryVersions(['0.1.0', '0.1.1']);
+  }
+  await verifyPublishPrerequisites(next.targets, next.readManifest, next.readMetadata);
+  assert.equal(shouldPublish(next.targets[0], registry['@viewstem/ui'], 'matching'), true);
+});
+
+test('every previous main package must exist even when it is unchanged in the new batch', async () => {
+  const previous = manifests('0.1.0');
+  const current = { ...previous, core: { ...previous.core, version: '0.1.1' } };
+  const registry = Object.fromEntries(directories.map(directory => [
+    `@viewstem/${directory}`, registryVersions(directory === 'ui' ? [] : ['0.1.0']),
+  ]));
+  const fixture = fixtures(previous, current, registry);
+  await assert.rejects(verifyPublishPrerequisites(fixture.targets, fixture.readManifest, fixture.readMetadata),
+    /Previous release @viewstem\/ui@0\.1\.0 is missing/);
+});
+
+test('internal dependencies must be public or precede their dependent in the batch', async () => {
+  const previous = manifests('0.1.0');
+  const current = manifests('0.1.1');
+  const registry = Object.fromEntries(directories.map(directory => [
+    `@viewstem/${directory}`, registryVersions(['0.1.0']),
+  ]));
+  const fixture = fixtures(previous, current, registry);
+  await verifyPublishPrerequisites(fixture.targets, fixture.readManifest, fixture.readMetadata);
+  await assert.rejects(verifyPublishPrerequisites(fixture.targets.toReversed(), fixture.readManifest, fixture.readMetadata),
+    /requires @viewstem\/core@0\.1\.1 on npm or earlier/);
+  await assert.rejects(verifyPublishPrerequisites(fixture.targets.slice(2), fixture.readManifest, fixture.readMetadata),
+    /requires @viewstem\/core@0\.1\.1 on npm or earlier/);
+  registry['@viewstem/core'] = registryVersions(['0.1.0', '0.1.1']);
+  registry['@viewstem/dom'] = registryVersions(['0.1.0', '0.1.1']);
+  await verifyPublishPrerequisites(fixture.targets.slice(2), fixture.readManifest, fixture.readMetadata);
+  current.ui.dependencies['@viewstem/core'] = '^0.1.1';
+  await assert.rejects(verifyPublishPrerequisites(fixture.targets, fixture.readManifest, fixture.readMetadata),
+    /must pin @viewstem\/core to an exact stable version/);
+});
+
+test('only the first DOM manifest can be absent from the previous commit', async () => {
+  const previous = manifests('0.1.0');
+  delete previous.dom;
+  const current = manifests('0.1.0');
+  const registry = Object.fromEntries(directories.map(directory => [
+    `@viewstem/${directory}`, registryVersions(['0.1.0']),
+  ]));
+  const fixture = fixtures(previous, current, registry);
+  await verifyPublishPrerequisites(fixture.targets, fixture.readManifest, fixture.readMetadata);
+  delete previous.core;
+  await assert.rejects(verifyPublishPrerequisites(fixture.targets, fixture.readManifest, fixture.readMetadata),
+    /Missing previous manifest for @viewstem\/core/);
+});
+
+test('release callers forward the named token and isolate manual CI from publishing pushes', async () => {
+  const core = await readFile(new URL('../workflows/core.yml', import.meta.url), 'utf8');
+  const release = await readFile(new URL('../workflows/npm-release.yml', import.meta.url), 'utf8');
+  assert.match(core, /group:.*github\.event_name.*github\.event\.pull_request\.number \|\| github\.sha/);
+  const namedSecret = /secrets:\n\s+CLOUDFLARE_PRODUCTION_API_TOKEN: \$\{\{ secrets\.CLOUDFLARE_PRODUCTION_API_TOKEN \}\}/;
+  assert.match(core.slice(core.indexOf('\n  release:')), namedSecret);
+  assert.match(release, /workflow_call:\n\s+secrets:\n\s+CLOUDFLARE_PRODUCTION_API_TOKEN:\n\s+required: true/);
+  const docs = release.slice(release.indexOf('\n  docs:'));
+  assert.match(docs, /needs: \[plan, publish, tag\]/);
+  assert.match(docs, namedSecret);
+  const publish = release.slice(release.indexOf('\n  publish:'), release.indexOf('\n  tag:'));
+  assert.match(publish, /group: npm-publish\n\s+queue: max/);
+  assert.match(publish, /fetch-depth: 0/);
+  assert.match(publish, /BEFORE_SHA: \$\{\{ github\.event\.before \}\}/);
 });

@@ -2,6 +2,9 @@ name: Docs production release
 
 on:
   workflow_call:
+    secrets:
+      CLOUDFLARE_PRODUCTION_API_TOKEN:
+        required: true
     inputs:
       source_sha:
         type: string
@@ -19,6 +22,10 @@ on:
         description: JSON list of public package releases with registry, name, and version
         type: string
         required: true
+      bootstrap_0_1_0:
+        description: First deployment for the four already published npm 0.1.0 packages
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -37,28 +44,32 @@ jobs:
       url: https://viewstem.miinhlym.workers.dev
     env:
       RELEASED_PACKAGES: ${{ inputs.released_packages }}
+      DOCS_SOURCE_SHA: ${{ inputs.source_sha }}
+      DOCS_BOOTSTRAP_0_1_0: ${{ github.event_name == 'workflow_dispatch' && inputs.bootstrap_0_1_0 }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          ref: main
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - name: Check out the released source on main
-        env:
-          SOURCE_SHA: ${{ inputs.source_sha }}
         run: |
-          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
-          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
-          git checkout --detach "$SOURCE_SHA"
+          [[ "$DOCS_SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          git merge-base --is-ancestor "$DOCS_SOURCE_SHA" HEAD
+          # Apply this workflow's policy even when building from an earlier release commit.
+          cp .github/scripts/{verify-docs-release,docs-production}.mjs "$RUNNER_TEMP/"
+          git checkout --detach "$DOCS_SOURCE_SHA"
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: '24.1.0'
           cache: npm
       - name: Wait for the public package releases
-        run: node .github/scripts/verify-docs-release.mjs
+        run: node "$RUNNER_TEMP/verify-docs-release.mjs" --verify-source
       - run: npm ci
       - name: Build with the public npm packages
-        run: node apps/docs/scripts/build-published.mjs
+        run: |
+          node apps/docs/scripts/build-published.mjs
+          node "$RUNNER_TEMP/docs-production.mjs" stamp
       - run: node apps/docs/scripts/verify-docs-site.mjs
       - run: npx --no-install playwright install --with-deps --only-shell chromium
       - name: Check the published build in Chromium
@@ -80,7 +91,7 @@ jobs:
             --output /dev/null "$DOCS_ORIGIN/sitemap-index.xml"
           node apps/docs/scripts/verify-site-previews.mjs
       - name: Verify the packages are still current
-        run: node .github/scripts/verify-docs-release.mjs --once
+        run: node "$RUNNER_TEMP/verify-docs-release.mjs" --once
       - name: Publish the production site
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
@@ -96,8 +107,24 @@ jobs:
             403|404) ;;
             *) printf 'Expected the token to be denied access to viewstem-preview. HTTP %s\n' "$scope_status" >&2; exit 1 ;;
           esac
-          npx --no-install wrangler deploy --config apps/docs/wrangler.jsonc
+          config=apps/docs/wrangler.jsonc
+          deployments="$RUNNER_TEMP/docs-production-deployments.json"
+          npx --no-install wrangler deployments list --config "$config" --name viewstem --json > "$deployments"
+          previous_version="$(node "$RUNNER_TEMP/docs-production.mjs" active-version < "$deployments")"
+          printf '### Production documentation\n\nSource commit `%s`\n\n' "$DOCS_SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
+          if [[ -n "$previous_version" ]]; then
+            printf 'Previous Cloudflare version `%s`\n\n' "$previous_version" >> "$GITHUB_STEP_SUMMARY"
+            version="$RUNNER_TEMP/docs-production-version.json"
+            npx --no-install wrangler versions view --config "$config" --name viewstem "$previous_version" --json > "$version"
+            ACTIVE_SOURCE_SHA="$(jq -er '.annotations["workers/tag"] // ""' "$version")" \
+              node "$RUNNER_TEMP/docs-production.mjs" check-order
+          else
+            printf 'First Cloudflare deployment\n\n' >> "$GITHUB_STEP_SUMMARY"
+            node "$RUNNER_TEMP/docs-production.mjs" check-order --first-deployment
+          fi
+          export WRANGLER_OUTPUT_FILE_PATH="$RUNNER_TEMP/docs-production.ndjson"
+          npx --no-install wrangler deploy --config "$config" --name viewstem --tag "$DOCS_SOURCE_SHA"
+          version_id="$(jq -ers 'map(select(.type == "deploy" and .worker_name == "viewstem")) | last | .version_id | strings' "$WRANGLER_OUTPUT_FILE_PATH")"
+          printf 'Published Cloudflare version `%s`\n\n' "$version_id" >> "$GITHUB_STEP_SUMMARY"
       - name: Check the production site
-        run: |
-          curl --fail --silent --show-error --retry 6 --retry-all-errors --max-time 15 --output /dev/null https://viewstem.miinhlym.workers.dev/ko/docs/installation/
-          curl --fail --silent --show-error --retry 6 --retry-all-errors --max-time 15 --output /dev/null https://viewstem.miinhlym.workers.dev/sitemap-index.xml
+        run: node "$RUNNER_TEMP/docs-production.mjs" check-live
