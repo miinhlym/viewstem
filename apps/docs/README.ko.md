@@ -39,31 +39,34 @@ npm run preview -w @viewstem/docs -- --port 4323
 [wrangler.jsonc](wrangler.jsonc)는 Workers Static Assets 설정이다. `dist`나
 `.astro` 결과물을 직접 수정하거나 커밋하지 않는다.
 
-## 수동 배포
+## 사이트 배포
 
-CI를 통과한 깨끗한 `main` 체크아웃에서 배포한다. Wrangler는 `viewstem` Worker를
-대상으로 하고 [astro.config.mjs](astro.config.mjs)의 `site` 값은 사이트맵의 공개
-주소를 지정한다. `miinhlym.workers.dev`를 소유한 Cloudflare 계정을 사용한다.
+[Docs preview 워크플로](../../.github/workflows/docs-preview.yml)는 이 저장소
+브랜치에서 열린 각 PR의 head를 빌드한다. `pr-<번호>`로 Cloudflare Preview를
+만들거나 갱신하며, PR의 배포 표시와 Actions 실행 요약에서 주소를 확인할 수
+있다. 포크 PR은 위의 로컬 미리보기 절차를 사용한다.
 
-저장소 루트에서 의존성을 설치하고 Wrangler 계정과 빌드를 확인한다.
+[운영 배포 워크플로](../../.github/workflows/docs-release.yml)는 패키지가
+공개된 뒤 실행한다. 전달받은 `main` 커밋을 체크아웃하고 공개 아카이브를
+확인한 뒤, npm에 발행된 패키지로 예제와 Playground를 빌드한다.
+[Astro의 `site` 설정](astro.config.mjs)이 사이트맵에 쓸 공개 주소를 지정한다.
 
-```sh
-npm ci
-npx --no-install wrangler whoami
-npm run build:docs
-node apps/docs/scripts/verify-docs-site.mjs
-npx --no-install wrangler deploy --config apps/docs/wrangler.jsonc --dry-run
-```
+npm 릴리스는 배치 전체가 발행된 뒤 운영 워크플로를 호출한다. 새 발행
+워크플로도 `source_sha`와 `released_packages`를 넘겨 같은 워크플로를
+호출할 수 있다. `released_packages`는 각 항목에 `registry` (`npm` 또는
+`pub.dev`), `name`, `version`을 담은 JSON 배열이다. 릴리스 배치에 속한
+모든 패키지를 넘긴다. 운영 워크플로는 사이트를 공개하기 직전에 해당
+버전의 공개 상태를 다시 확인한다.
 
-Wrangler에 로그인하지 않았다면 `npx --no-install wrangler login`을 실행하고
-계정을 확인한다. 검증한 빌드를 Wrangler로 공개한다.
+두 워크플로는 저장소 변수 `CLOUDFLARE_ACCOUNT_ID`와 Actions 시크릿
+`CLOUDFLARE_API_TOKEN`을 사용한다. 토큰에는 `miinhlym.workers.dev`를
+소유한 Cloudflare 계정의 Workers Scripts Write 권한이 필요하다.
 
-```sh
-npx --no-install wrangler deploy --config apps/docs/wrangler.jsonc
-```
-
-Wrangler가 출력한 주소에서 홈, 한·영 설치 문서, Playground, `/sitemap-index.xml`을
-확인한다.
+이미 발행한 패키지로 운영 사이트를 처음 공개하거나 릴리스를 다시
+배포할 때는 GitHub Actions의 **Docs production release**에서 `main`을
+선택하고 **Run workflow**를 실행한다. 전체 커밋 SHA와 해당 공개 패키지
+목록을 입력한다. 0.1.0 문서의 첫 배포에는 배포 설정까지 포함한 `main`
+커밋과 이미 발행한 네 패키지의 0.1.0 버전을 사용한다.
 
 ## 수정 위치 찾기
 

@@ -132,7 +132,11 @@ JS/TS 브라우저 렌더러의 후속 구조는 [리소스 셋과 브라우저 
 
 공개 문서와 Playground는 **Cloudflare Workers Static Assets**로 배포한다. 첫 버전은 정적 빌드 결과를 Cloudflare에 올리고, Playground의 Viewstem 런타임은 방문자의 브라우저에서 실행한다. 기본 주소는 별도 도메인 구매 없이 `workers.dev`를 사용한다. [D104](history/decision-register.md#a-현재-채택한-결정)
 
-실제 공개 주소와 빌드·PR 미리보기 설정은 사이트 구현 및 배포 단계에서 정한다.
+같은 저장소의 PR은 head 코드로 빌드한 미리보기를 별도 `workers.dev` 주소에 배포한다.
+운영 문서 사이트는 패키지 릴리스에서 전달한 `main` 커밋을 기준으로 하며,
+릴리스 배치 전체가 해당 공개 레지스트리에서 내려받을 수 있는 상태가 된 뒤
+배포한다. 운영 예제와 Playground는 공개된 패키지를 사용한다.
+[배포 설정과 절차](../apps/docs/README.ko.md#사이트-배포)를 따른다. [D171](history/decision-register.md#a-현재-채택한-결정)
 
 공개 Playground는 하나로 제공한다. 브라우저에서 `@viewstem/ui`로 View JSON을 실행하고, 편집한 내용은 사용자가 실행할 때 적용한다. [D144](history/decision-register.md#a-현재-채택한-결정)
 

@@ -40,33 +40,37 @@ it does not rebuild it. Use a fresh build for search and production-route checks
 [wrangler.jsonc](wrangler.jsonc) configures Workers Static Assets. Do not edit
 or commit `dist` or `.astro` output.
 
-## Deploy manually
+## Deploy the site
 
-Deploy from a clean checkout of `main` after CI passes. Wrangler targets the
-`viewstem` Worker, and the `site` value in [astro.config.mjs](astro.config.mjs)
-sets the public origin for the sitemap. Use the Cloudflare account that owns
-`miinhlym.workers.dev`.
+The [Docs preview workflow](../../.github/workflows/docs-preview.yml) builds
+the head of each pull request from a branch in this repository. It creates or
+updates the Cloudflare Preview named `pr-<number>` and publishes its URL in
+the PR deployment and the Actions run summary. Fork PRs can use the local
+preview instructions above.
 
-Run these commands from the repository root to install dependencies, check the
-Wrangler account, and verify the build.
+The [production workflow](../../.github/workflows/docs-release.yml) runs
+after a public package release. It checks out the supplied commit from
+`main`, verifies public archives, and builds the examples and Playground
+with the published npm packages. [Astro's `site` setting](astro.config.mjs)
+sets the public origin for the sitemap.
 
-```sh
-npm ci
-npx --no-install wrangler whoami
-npm run build:docs
-node apps/docs/scripts/verify-docs-site.mjs
-npx --no-install wrangler deploy --config apps/docs/wrangler.jsonc --dry-run
-```
+The npm release workflow calls production after the whole release batch is
+published. A future publishing workflow can call the same workflow and pass
+`source_sha` and `released_packages`, a JSON array whose entries contain
+`registry` (`npm` or `pub.dev`), `name`, and `version`. Pass every
+package in the batch. The production workflow verifies the public versions
+again before publishing.
 
-If Wrangler reports that you are signed out, run `npx --no-install wrangler login`
-and verify the account. Deploy the verified build with Wrangler.
+Both workflows use the `CLOUDFLARE_ACCOUNT_ID` repository variable and the
+`CLOUDFLARE_API_TOKEN` Actions secret. The token needs Workers Scripts Write
+for the Cloudflare account that owns `miinhlym.workers.dev`.
 
-```sh
-npx --no-install wrangler deploy --config apps/docs/wrangler.jsonc
-```
-
-At the URL printed by Wrangler, check the home page, English and Korean
-installation pages, Playground, and `/sitemap-index.xml`.
+For an initial production deployment of already published packages, or to
+rerun a release deployment, select **Docs production release** in GitHub
+Actions and choose **Run workflow** on `main`. Supply the full commit SHA
+and the corresponding public package releases. For the first deployment of
+the 0.1.0 docs, use the `main` commit that includes the deployment setup
+and the four published 0.1.0 package versions.
 
 ## Find the implementation
 

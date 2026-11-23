@@ -85,7 +85,9 @@ async function plan() {
     return JSON.parse(run('git', ['show', `${ref}:${path}`]));
   }) : [];
   if (release) assert.ok(targets.length, 'Release PR must bump at least one public package');
-  await appendFile(process.env.GITHUB_OUTPUT, `targets=${JSON.stringify(targets)}\n`);
+  const releasedPackages = targets.map(({ name, version }) => ({ registry: 'npm', name, version }));
+  await appendFile(process.env.GITHUB_OUTPUT,
+    `targets=${JSON.stringify(targets)}\nreleased_packages=${JSON.stringify(releasedPackages)}\n`);
 }
 
 async function pack(target, directory, repository, sha) {

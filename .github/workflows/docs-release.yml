@@ -1,0 +1,80 @@
+name: Docs production release
+
+on:
+  workflow_call:
+    inputs:
+      source_sha:
+        type: string
+        required: true
+      released_packages:
+        type: string
+        required: true
+    secrets:
+      CLOUDFLARE_API_TOKEN:
+        required: false
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Full main commit SHA for the documentation build
+        type: string
+        required: true
+      released_packages:
+        description: JSON list of public package releases with registry, name, and version
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-production
+  queue: max
+
+jobs:
+  release:
+    if: github.repository == 'miinhlym/viewstem' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: docs-production
+      url: https://viewstem.miinhlym.workers.dev
+    env:
+      RELEASED_PACKAGES: ${{ inputs.released_packages }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check out the released source on main
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+          git checkout --detach "$SOURCE_SHA"
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.1.0'
+          cache: npm
+      - name: Wait for the public package releases
+        run: node .github/scripts/verify-docs-release.mjs
+      - run: npm ci
+      - name: Build with the public npm packages
+        run: node apps/docs/scripts/build-published.mjs
+      - run: node apps/docs/scripts/verify-docs-site.mjs
+      - name: Verify the packages are still current
+        run: node .github/scripts/verify-docs-release.mjs --once
+      - name: Publish the production site
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          WRANGLER_SEND_METRICS: 'false'
+        run: |
+          : "${CLOUDFLARE_ACCOUNT_ID:?Set the CLOUDFLARE_ACCOUNT_ID repository variable}"
+          : "${CLOUDFLARE_API_TOKEN:?Set the CLOUDFLARE_API_TOKEN repository secret}"
+          npx --no-install wrangler deploy --config apps/docs/wrangler.jsonc
+      - name: Check the production site
+        run: |
+          curl --fail --silent --show-error --retry 6 --retry-all-errors --max-time 15 --output /dev/null https://viewstem.miinhlym.workers.dev/ko/docs/installation/
+          curl --fail --silent --show-error --retry 6 --retry-all-errors --max-time 15 --output /dev/null https://viewstem.miinhlym.workers.dev/sitemap-index.xml
