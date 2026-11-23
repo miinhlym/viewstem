@@ -91,10 +91,10 @@ jobs:
           : "${CLOUDFLARE_API_TOKEN:?Set the CLOUDFLARE_PRODUCTION_API_TOKEN docs-production environment secret}"
           scope_status="$(curl --silent --show-error --max-time 15 --output /dev/null --write-out '%{http_code}' \
             --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/workers/vs-docs")"
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/workers/viewstem-preview")"
           case "$scope_status" in
             403|404) ;;
-            *) printf 'Expected the token to be denied access to vs-docs. HTTP %s\n' "$scope_status" >&2; exit 1 ;;
+            *) printf 'Expected the token to be denied access to viewstem-preview. HTTP %s\n' "$scope_status" >&2; exit 1 ;;
           esac
           npx --no-install wrangler deploy --config apps/docs/wrangler.jsonc
       - name: Check the production site

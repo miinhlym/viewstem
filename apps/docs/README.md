@@ -45,9 +45,9 @@ or commit `dist` or `.astro` output.
 The [Docs preview workflow](../../.github/workflows/docs-preview.yml) builds
 the head of each pull request from a branch in this repository. It creates or
 updates the Cloudflare Preview named `pr-<number>` on the dedicated
-`vs-docs` Worker and publishes its URL in
-the PR deployment and the Actions run summary. Fork PRs can use the local
-preview instructions above.
+`viewstem-preview` Worker. The PR deployment and Actions run summary link to
+`https://pr-<number>-viewstem-preview.miinhlym.workers.dev`. Fork PRs can use
+the local preview instructions above.
 
 The [production workflow](../../.github/workflows/docs-release.yml) runs
 after a public package release. It checks out the supplied commit from
@@ -70,7 +70,7 @@ each token in its GitHub Actions environment.
 
 | Environment | Secret | Cloudflare Worker |
 | --- | --- | --- |
-| `docs-preview` | `CLOUDFLARE_PREVIEW_API_TOKEN` | `vs-docs` |
+| `docs-preview` | `CLOUDFLARE_PREVIEW_API_TOKEN` | `viewstem-preview` |
 | `docs-production` | `CLOUDFLARE_PRODUCTION_API_TOKEN` | `viewstem` |
 
 Allow only the `main` branch to deploy to `docs-production` in the GitHub

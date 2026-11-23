@@ -36,7 +36,7 @@ jobs:
         id: deploy
         env:
           PREVIEW_NAME: pr-${{ github.event.pull_request.number }}
-          PREVIEW_WORKER: vs-docs
+          PREVIEW_WORKER: viewstem-preview
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PREVIEW_API_TOKEN }}
           WRANGLER_SEND_METRICS: 'false'

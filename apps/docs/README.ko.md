@@ -42,9 +42,10 @@ npm run preview -w @viewstem/docs -- --port 4323
 ## 사이트 배포
 
 [Docs preview 워크플로](../../.github/workflows/docs-preview.yml)는 이 저장소
-브랜치에서 열린 각 PR의 head를 빌드한다. 전용 `vs-docs` Worker에서
+브랜치에서 열린 각 PR의 head를 빌드한다. 전용 `viewstem-preview` Worker에서
 `pr-<번호>`로 Cloudflare Preview를 만들거나 갱신한다. PR의 배포 표시와 Actions 실행
-요약에서 주소를 확인할 수 있다. 포크 PR은 위의 로컬 미리보기 절차를 사용한다.
+요약에서 `https://pr-<번호>-viewstem-preview.miinhlym.workers.dev` 주소를
+확인할 수 있다. 포크 PR은 위의 로컬 미리보기 절차를 사용한다.
 
 [운영 배포 워크플로](../../.github/workflows/docs-release.yml)는 패키지가
 공개된 뒤 실행한다. 전달받은 `main` 커밋을 체크아웃하고 공개 아카이브를
@@ -66,7 +67,7 @@ npm 릴리스는 배치 전체가 발행된 뒤 운영 워크플로를 호출한
 
 | 환경 | 시크릿 | Cloudflare Worker |
 | --- | --- | --- |
-| `docs-preview` | `CLOUDFLARE_PREVIEW_API_TOKEN` | `vs-docs` |
+| `docs-preview` | `CLOUDFLARE_PREVIEW_API_TOKEN` | `viewstem-preview` |
 | `docs-production` | `CLOUDFLARE_PRODUCTION_API_TOKEN` | `viewstem` |
 
 GitHub의 `docs-production` 환경 배포 브랜치 규칙은 `main`만 허용한다.
