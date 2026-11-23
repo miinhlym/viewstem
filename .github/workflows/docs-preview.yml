@@ -42,8 +42,11 @@ jobs:
         run: |
           : "${CLOUDFLARE_ACCOUNT_ID:?Set the CLOUDFLARE_ACCOUNT_ID repository variable}"
           : "${CLOUDFLARE_API_TOKEN:?Set the CLOUDFLARE_API_TOKEN repository secret}"
-          result="$(npx --no-install wrangler preview --config apps/docs/wrangler.jsonc --name "$PREVIEW_NAME" --json)"
-          url="$(jq -er '.preview.urls[0] | select(startswith("https://"))' <<< "$result")"
+          export WRANGLER_OUTPUT_FILE_PATH="$RUNNER_TEMP/docs-preview.ndjson"
+          npx --no-install wrangler preview --config apps/docs/wrangler.jsonc --name "$PREVIEW_NAME"
+          url="$(jq -ers --arg host "https://$PREVIEW_NAME-viewstem.miinhlym.workers.dev" '
+            map(select(.type == "preview")) | last | .preview_urls[] | select(rtrimstr("/") == $host)
+          ' "$WRANGLER_OUTPUT_FILE_PATH")"
           printf 'url=%s\n' "$url" >> "$GITHUB_OUTPUT"
           printf '[Open the PR preview](%s)\n' "$url" >> "$GITHUB_STEP_SUMMARY"
       - name: Check the preview
