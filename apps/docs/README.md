@@ -46,8 +46,10 @@ The [Docs preview workflow](../../.github/workflows/docs-preview.yml) builds
 the head of each pull request from a branch in this repository. It creates or
 updates the Cloudflare Preview named `pr-<number>` on the dedicated
 `viewstem-preview` Worker. The PR deployment and Actions run summary link to
-`https://pr-<number>-viewstem-preview.miinhlym.workers.dev`. Fork PRs can use
-the local preview instructions above.
+`https://pr-<number>-viewstem-preview.miinhlym.workers.dev`. After the preview
+passes its HTTP check, GitHub Actions posts or updates one PR comment with
+the preview link, deployed commit, and workflow run. Fork PRs can use the local
+preview instructions above.
 
 The [production workflow](../../.github/workflows/docs-release.yml) runs
 after a public package release. It checks out the supplied commit from

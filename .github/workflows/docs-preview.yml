@@ -20,6 +20,8 @@ jobs:
     environment:
       name: docs-preview
       url: ${{ steps.deploy.outputs.url }}
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -61,3 +63,47 @@ jobs:
         env:
           PREVIEW_URL: ${{ steps.deploy.outputs.url }}
         run: curl --fail --silent --show-error --retry 6 --retry-all-errors --max-time 15 --output /dev/null "${PREVIEW_URL%/}/docs/installation/"
+
+  comment:
+    name: Comment with the preview link
+    needs: preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          PREVIEW_URL: ${{ needs.preview.outputs.url }}
+        with:
+          script: |
+            const { owner, repo, number } = context.issue;
+            const deployedSha = context.payload.pull_request.head.sha;
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: number });
+            if (pr.state !== 'open' || pr.head.sha !== deployedSha) {
+              core.notice('The pull request closed or changed after this preview was built.');
+              return;
+            }
+
+            const marker = '<!-- docs-preview-deployment -->';
+            const repoUrl = `${context.serverUrl}/${owner}/${repo}`;
+            const body = [
+              marker,
+              '### Docs preview',
+              '',
+              `[Open the docs preview](${process.env.PREVIEW_URL}) · [Workflow run](${repoUrl}/actions/runs/${context.runId})`,
+              '',
+              `Deployed commit [\`${deployedSha.slice(0, 7)}\`](${repoUrl}/commit/${deployedSha})`,
+            ].join('\n');
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number: number, per_page: 100,
+            });
+            const existing = comments.find(comment =>
+              comment.user?.login === 'github-actions[bot]' && comment.body?.startsWith(marker)
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number: number, body });
+            }

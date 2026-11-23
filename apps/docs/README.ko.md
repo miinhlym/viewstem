@@ -45,7 +45,9 @@ npm run preview -w @viewstem/docs -- --port 4323
 브랜치에서 열린 각 PR의 head를 빌드한다. 전용 `viewstem-preview` Worker에서
 `pr-<번호>`로 Cloudflare Preview를 만들거나 갱신한다. PR의 배포 표시와 Actions 실행
 요약에서 `https://pr-<번호>-viewstem-preview.miinhlym.workers.dev` 주소를
-확인할 수 있다. 포크 PR은 위의 로컬 미리보기 절차를 사용한다.
+확인할 수 있다. 미리보기의 HTTP 검사가 통과하면 GitHub Actions가 PR 댓글 하나에
+미리보기 링크, 배포된 커밋, 워크플로 실행 링크를 게시하거나 갱신한다.
+포크 PR은 위의 로컬 미리보기 절차를 사용한다.
 
 [운영 배포 워크플로](../../.github/workflows/docs-release.yml)는 패키지가
 공개된 뒤 실행한다. 전달받은 `main` 커밋을 체크아웃하고 공개 아카이브를
