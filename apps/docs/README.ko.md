@@ -47,6 +47,8 @@ npm run preview -w @viewstem/docs -- --port 4323
 요약에서 `https://pr-<번호>-viewstem-preview.miinhlym.workers.dev` 주소를
 확인할 수 있다. 미리보기의 HTTP 검사가 통과하면 GitHub Actions가 PR 댓글 하나에
 미리보기 링크, 배포된 커밋, 워크플로 실행 링크를 게시하거나 갱신한다.
+PR을 닫거나 머지하면 해당 Cloudflare Preview를 삭제하고 기존 댓글에 정리 상태를
+표시한다. PR을 다시 열면 미리보기를 다시 만든다.
 포크 PR은 위의 로컬 미리보기 절차를 사용한다.
 
 [운영 배포 워크플로](../../.github/workflows/docs-release.yml)는 패키지가

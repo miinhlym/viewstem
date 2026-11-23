@@ -48,7 +48,9 @@ updates the Cloudflare Preview named `pr-<number>` on the dedicated
 `viewstem-preview` Worker. The PR deployment and Actions run summary link to
 `https://pr-<number>-viewstem-preview.miinhlym.workers.dev`. After the preview
 passes its HTTP check, GitHub Actions posts or updates one PR comment with
-the preview link, deployed commit, and workflow run. Fork PRs can use the local
+the preview link, deployed commit, and workflow run. When the PR closes or is
+merged, the workflow deletes its Cloudflare Preview and updates the existing
+comment. Reopening the PR recreates its preview. Fork PRs can use the local
 preview instructions above.
 
 The [production workflow](../../.github/workflows/docs-release.yml) runs
