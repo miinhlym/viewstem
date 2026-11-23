@@ -2,11 +2,9 @@ name: Docs preview
 
 on:
   pull_request:
-    branches: [main]
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, edited]
   pull_request_target:
-    branches: [main]
-    types: [closed]
+    types: [closed, edited]
 
 permissions:
   contents: read
@@ -14,48 +12,27 @@ permissions:
 env:
   PREVIEW_WORKER: viewstem-preview
 
-concurrency:
-  group: docs-preview-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
-
 jobs:
-  state:
-    if: github.repository == 'miinhlym/viewstem' && github.event.pull_request.head.repo.full_name == github.repository
+  preview:
+    if: github.repository == 'miinhlym/viewstem' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.base.ref == 'main' && (github.event.action != 'edited' || github.event.changes.base.ref != null)
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 12
     permissions:
+      contents: read
       pull-requests: read
     outputs:
-      action: ${{ steps.current.outputs.action }}
-    steps:
-      - name: Check the current pull request state
-        id: current
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          PR_ACTION: ${{ github.event.action }}
-          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" |
-            jq -er --arg action "$PR_ACTION" --arg sha "$PR_HEAD_SHA" '
-              "action=" + (
-                if .state == "closed" and $action == "closed" then "cleanup"
-                elif .state == "open" and $action != "closed" and .head.sha == $sha then "deploy"
-                else "skip" end
-              )
-            ' >> "$GITHUB_OUTPUT"
-
-  preview:
-    needs: state
-    if: github.event_name == 'pull_request' && needs.state.outputs.action == 'deploy'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+      action: ${{ steps.publish.outputs.action }}
+      source_sha: ${{ steps.publish.outputs.source_sha }}
+      run_id: ${{ steps.publish.outputs.run_id }}
+      run_attempt: ${{ steps.publish.outputs.run_attempt }}
+    # Never cancel cleanup or discard its pending slot when an old run is retried.
+    concurrency:
+      group: docs-preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+      queue: max
     environment:
       name: docs-preview
-      url: ${{ steps.deploy.outputs.url }}
-    outputs:
-      url: ${{ steps.deploy.outputs.url }}
+      deployment: false
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -68,123 +45,83 @@ jobs:
       - run: npm ci
       - run: npm run build:docs
       - run: node apps/docs/scripts/verify-docs-site.mjs
-      - name: Publish the PR Preview
-        id: deploy
+      - name: Publish and verify the current PR preview
+        id: publish
         env:
-          PREVIEW_NAME: pr-${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ github.token }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PREVIEW_API_TOKEN }}
           WRANGLER_SEND_METRICS: 'false'
-        run: |
-          : "${CLOUDFLARE_ACCOUNT_ID:?Set the CLOUDFLARE_ACCOUNT_ID repository variable}"
-          : "${CLOUDFLARE_API_TOKEN:?Set the CLOUDFLARE_PREVIEW_API_TOKEN docs-preview environment secret}"
-          scope_status="$(curl --silent --show-error --max-time 15 --output /dev/null --write-out '%{http_code}' \
-            --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/workers/viewstem")"
-          case "$scope_status" in
-            403|404) ;;
-            *) printf 'Expected the token to be denied access to viewstem. HTTP %s\n' "$scope_status" >&2; exit 1 ;;
-          esac
-          export WRANGLER_OUTPUT_FILE_PATH="$RUNNER_TEMP/docs-preview.ndjson"
-          npx --no-install wrangler preview --config apps/docs/wrangler.jsonc --worker-name "$PREVIEW_WORKER" --name "$PREVIEW_NAME"
-          url="$(jq -ers --arg host "https://$PREVIEW_NAME-$PREVIEW_WORKER.miinhlym.workers.dev" '
-            map(select(.type == "preview")) | last | .preview_urls[] | select(rtrimstr("/") == $host)
-          ' "$WRANGLER_OUTPUT_FILE_PATH")"
-          printf 'url=%s\n' "$url" >> "$GITHUB_OUTPUT"
-          printf '[Open the PR preview](%s)\n' "$url" >> "$GITHUB_STEP_SUMMARY"
-      - name: Check the preview
-        env:
-          PREVIEW_URL: ${{ steps.deploy.outputs.url }}
-        run: curl --fail --silent --show-error --retry 6 --retry-all-errors --max-time 15 --output /dev/null "${PREVIEW_URL%/}/docs/installation/"
+        run: node .github/scripts/docs-preview.mjs deploy
 
   cleanup:
-    name: Delete the closed PR preview
-    needs: state
-    if: github.event_name == 'pull_request_target' && needs.state.outputs.action == 'cleanup'
+    name: Delete the closed or retargeted PR preview
+    if: github.repository == 'miinhlym/viewstem' && github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == github.repository && (github.event.action == 'closed' || (github.event.pull_request.base.ref != 'main' && github.event.changes.base.ref != null))
     runs-on: ubuntu-latest
-    timeout-minutes: 3
-    permissions: {}
+    timeout-minutes: 6
+    outputs:
+      action: ${{ steps.remove.outputs.action }}
+      source_sha: ${{ steps.remove.outputs.source_sha }}
+      run_id: ${{ steps.remove.outputs.run_id }}
+      run_attempt: ${{ steps.remove.outputs.run_attempt }}
+    permissions:
+      contents: read
+      pull-requests: read
+    concurrency:
+      group: docs-preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+      queue: max
     environment:
       name: docs-preview
       deployment: false
     steps:
-      - name: Delete the Cloudflare preview
+      # Retargeting can select an arbitrary base. Cleanup only executes automation
+      # from the trusted default branch, never the PR head or a merge ref.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+          sparse-checkout: .github/scripts
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.1.0'
+      - name: Delete and verify public removal
+        id: remove
         env:
-          PREVIEW_NAME: pr-${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ github.token }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PREVIEW_API_TOKEN }}
-        run: |
-          : "${CLOUDFLARE_ACCOUNT_ID:?Set the CLOUDFLARE_ACCOUNT_ID repository variable}"
-          : "${CLOUDFLARE_API_TOKEN:?Set the CLOUDFLARE_PREVIEW_API_TOKEN docs-preview environment secret}"
-          response="$RUNNER_TEMP/docs-preview-delete.json"
-          status="$(curl --silent --show-error --retry 3 --retry-delay 2 --max-time 15 \
-            --request DELETE --output "$response" --write-out '%{http_code}' \
-            --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/workers/$PREVIEW_WORKER/previews/$PREVIEW_NAME")"
-          if [[ "$status" == 2* ]] && jq -e '.success == true' "$response" >/dev/null; then
-            printf 'Deleted the preview %s.\n' "$PREVIEW_NAME"
-          elif jq -e '.success == false and [.errors[]?.code] == [10025]' "$response" >/dev/null; then
-            # Cloudflare error 10025 means the preview was already absent.
-            printf 'The preview %s is already absent.\n' "$PREVIEW_NAME"
-          else
-            printf 'Cloudflare could not delete the preview %s (HTTP %s).\n' "$PREVIEW_NAME" "$status" >&2
-            jq -c '.errors' "$response" >&2
-            exit 1
-          fi
+        run: node .github/scripts/docs-preview.mjs cleanup
 
-  comment:
-    name: Update the preview comment
+  metadata:
+    name: Update PR preview history and comment
     needs: [preview, cleanup]
-    if: ${{ !cancelled() && (needs.preview.result == 'success' || needs.cleanup.result == 'success') }}
+    if: ${{ !cancelled() && (needs.preview.outputs.action == 'deploy' || needs.cleanup.outputs.action == 'cleanup') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 6
     permissions:
+      contents: read
       pull-requests: write
+      deployments: write
+    concurrency:
+      group: docs-preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+      queue: max
+    # No environment secrets, dependency installation, or PR package execution.
     steps:
-      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-        env:
-          PREVIEW_URL: ${{ needs.preview.outputs.url }}
-          PREVIEW_REMOVED: ${{ needs.cleanup.result == 'success' }}
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          script: |
-            const { owner, repo, number } = context.issue;
-            const deployedSha = context.payload.pull_request.head.sha;
-            const removed = process.env.PREVIEW_REMOVED === 'true';
-            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number: number });
-            const matchingState = removed ? pr.state === 'closed' : pr.state === 'open' && pr.head.sha === deployedSha;
-            if (!matchingState) {
-              core.notice('The pull request changed while the preview was being processed.');
-              return;
-            }
-
-            const marker = '<!-- docs-preview-deployment -->';
-            let body = `${marker}\n**Viewstem preview removed**`;
-            if (!removed) {
-              const repoUrl = `${context.serverUrl}/${owner}/${repo}`;
-              const previewUrl = new URL(process.env.PREVIEW_URL);
-              const reviewLinks = [
-                `[Documentation](${new URL('/docs/', previewUrl)})`,
-                `[Examples](${new URL('/examples/', previewUrl)})`,
-                `[Playground](${new URL('/playground/', previewUrl)})`,
-              ];
-              body = [
-                marker,
-                `**Viewstem preview ready** · [Open site](${previewUrl})`,
-                '',
-                reviewLinks.join(' · '),
-                '',
-                `<sub>Deployed commit [\`${deployedSha.slice(0, 7)}\`](${repoUrl}/commit/${deployedSha}) · [Build log](${repoUrl}/actions/runs/${context.runId})</sub>`,
-              ].join('\n');
-            }
-
-            const comments = await github.paginate(github.rest.issues.listComments, {
-              owner, repo, issue_number: number, per_page: 100,
-            });
-            const existing = comments.find(comment =>
-              comment.user?.login === 'github-actions[bot]' && comment.body?.startsWith(marker)
-            );
-            if (existing) {
-              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
-            } else if (!removed) {
-              await github.rest.issues.createComment({ owner, repo, issue_number: number, body });
-            }
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.event.repository.default_branch }}
+          persist-credentials: false
+          sparse-checkout: .github/scripts
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.1.0'
+      - name: Recheck the public artifact and update this PR's metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIEW_METADATA_MODE: ${{ needs.preview.outputs.action == 'deploy' && 'ready' || 'removed' }}
+          PREVIEW_SOURCE_SHA: ${{ needs.preview.outputs.source_sha || needs.cleanup.outputs.source_sha }}
+          PREVIEW_RUN_ID: ${{ needs.preview.outputs.run_id || needs.cleanup.outputs.run_id }}
+          PREVIEW_RUN_ATTEMPT: ${{ needs.preview.outputs.run_attempt || needs.cleanup.outputs.run_attempt }}
+        run: node .github/scripts/docs-preview.mjs "$PREVIEW_METADATA_MODE"
