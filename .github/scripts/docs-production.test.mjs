@@ -1,10 +1,26 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 import { activeVersion, isLiveBuild, parseDeploymentTag, readDeployment } from './docs-production.mjs';
 
 const before = 'a'.repeat(40);
 const after = 'b'.repeat(40);
 const version = '12345678-1234-1234-1234-123456789abc';
+
+test('GitHub deployment records require an uploaded, live version verified in the current attempt', async () => {
+  const workflow = await readFile(new URL('../workflows/docs-release.yml', import.meta.url), 'utf8');
+  const [release, record] = workflow.split('\n  record-deployment:\n');
+  assert.match(workflow, /concurrency:\n  group: docs-production/);
+  assert.match(release, /environment:\n      name: docs-production\n      deployment: false/);
+  assert.match(release, /verified_version: \$\{\{ steps\.live\.outputs\.verified_version \}\}/);
+  assert.match(release, /verified_attempt: \$\{\{ steps\.live\.outputs\.verified_attempt \}\}/);
+  const verification = release.slice(release.indexOf('      - name: Check the production site'));
+  assert.match(verification, /if: steps\.source\.outputs\.deploy == 'true'/);
+  assert.match(verification, /DOCS_VERSION_ID: \$\{\{ steps\.publish\.outputs\.version_id \}\}/);
+  assert.match(verification, /check-live\n\s+printf 'verified_attempt=%s\\nverified_version=%s/);
+  assert.match(record, /needs: release\n.*\n\s+if: needs\.release\.outputs\.verified_version != '' && needs\.release\.outputs\.verified_attempt == github\.run_attempt/);
+  assert.match(record, /environment:\n      name: docs-production\n      url:/);
+});
 
 test('production versions are read from the latest Cloudflare deployment', () => {
   assert.equal(activeVersion([]), '');

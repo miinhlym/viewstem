@@ -44,7 +44,10 @@ jobs:
     timeout-minutes: 15
     environment:
       name: docs-production
-      url: https://viewstem.miinhlym.workers.dev
+      deployment: false
+    outputs:
+      verified_attempt: ${{ steps.live.outputs.verified_attempt }}
+      verified_version: ${{ steps.live.outputs.verified_version }}
     env:
       RELEASED_PACKAGES: ${{ inputs.released_packages }}
       DOCS_SOURCE_SHA: ${{ inputs.source_sha }}
@@ -125,6 +128,7 @@ jobs:
             node "$RUNNER_TEMP/verify-docs-release.mjs" --once
           fi
       - name: Publish the production site
+        id: publish
         if: steps.source.outputs.deploy == 'true'
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
@@ -154,11 +158,33 @@ jobs:
           fi
           export WRANGLER_OUTPUT_FILE_PATH="$RUNNER_TEMP/docs-production.ndjson"
           npx --no-install wrangler deploy --config "$config" --name viewstem --tag "$DOCS_BASE_SHA.$DOCS_THROUGH_SHA"
-          version_id="$(jq -ers 'map(select(.type == "deploy" and .worker_name == "viewstem")) | last | .version_id | strings' "$WRANGLER_OUTPUT_FILE_PATH")"
+          version_id="$(jq -ers 'map(select(.type == "deploy" and .worker_name == "viewstem")) | last | .version_id | strings | select(length > 0)' "$WRANGLER_OUTPUT_FILE_PATH")"
           printf 'Published Cloudflare version `%s`\n\n' "$version_id" >> "$GITHUB_STEP_SUMMARY"
+          printf 'version_id=%s\n' "$version_id" >> "$GITHUB_OUTPUT"
       - name: Check the production site
+        id: live
         if: steps.source.outputs.deploy == 'true'
         env:
           DOCS_BASE_SHA: ${{ steps.source.outputs.base }}
           DOCS_THROUGH_SHA: ${{ steps.source.outputs.through }}
-        run: node "$RUNNER_TEMP/docs-production.mjs" check-live
+          DOCS_VERSION_ID: ${{ steps.publish.outputs.version_id }}
+        run: |
+          node "$RUNNER_TEMP/docs-production.mjs" check-live
+          printf 'verified_attempt=%s\nverified_version=%s\n' "$GITHUB_RUN_ATTEMPT" "$DOCS_VERSION_ID" >> "$GITHUB_OUTPUT"
+
+  record-deployment:
+    name: Record the verified production deployment
+    needs: release
+    # Rerunning only this job must not record a previously verified version as current.
+    if: needs.release.outputs.verified_version != '' && needs.release.outputs.verified_attempt == github.run_attempt
+    permissions: {}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    environment:
+      name: docs-production
+      url: https://viewstem.miinhlym.workers.dev
+    steps:
+      - name: Identify the verified Cloudflare version
+        env:
+          DOCS_VERSION_ID: ${{ needs.release.outputs.verified_version }}
+        run: printf 'Verified Cloudflare version `%s`\n' "$DOCS_VERSION_ID" >> "$GITHUB_STEP_SUMMARY"

@@ -102,6 +102,9 @@ reusable workflow call. Keep its value in the `docs-production` environment.
 Production verifies the tags and public versions. Both production paths share
 one queue. The Cloudflare version tag and public `/_viewstem-deploy.json`
 identify the package release source and the last documentation commit considered.
+GitHub Deployments records production only after the upload and public site
+check succeed. To retry a failed recording job, rerun the whole workflow so it
+verifies the site again.
 
 Both workflows use the `CLOUDFLARE_ACCOUNT_ID` repository variable for the
 account that owns `miinhlym.workers.dev`. During account setup, a Cloudflare

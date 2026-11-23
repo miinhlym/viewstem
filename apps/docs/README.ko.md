@@ -96,6 +96,8 @@ npm 릴리스는 배치 전체를 공개하고 태그를 만든 뒤 운영 워�
 `docs-production` 환경에 둔다. 운영 워크플로는 공개 버전과 태그를 확인한다.
 패키지 릴리스와 문서 전용 배포는 같은 운영 큐를 사용한다. Cloudflare 버전 태그와
 공개 `/_viewstem-deploy.json`에 패키지 릴리스 소스와 처리한 문서 범위의 끝 커밋을 기록한다.
+GitHub Deployments에는 업로드와 공개 사이트 검사가 성공한 운영 배포만 남는다.
+기록 잡이 실패했다면 워크플로 전체를 다시 실행해 공개 사이트를 다시 확인한다.
 
 두 워크플로는 `miinhlym.workers.dev`를 소유한 계정의 저장소 변수
 `CLOUDFLARE_ACCOUNT_ID`를 사용한다. 처음 설정할 때 Cloudflare 관리자가
