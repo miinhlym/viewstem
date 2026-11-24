@@ -3,6 +3,7 @@ import test from 'node:test';
 import { createRegistry, createRuntime, defineResourceSet } from '@viewstem/core';
 import { createRegistry as localRegistry, createRuntime as localRuntime, createStateStore as localStore, rendererView } from '../src/api.mjs';
 import { defineResourceSet as localSet } from '../src/resource-set.mjs';
+import { ajv } from '../src/values.mjs';
 import { memoryUrl, tick } from './fixtures/state/url-adapter.mjs';
 
 const schema = { type: 'integer' };
@@ -14,6 +15,53 @@ const definition = (id = 'Base', initial = 1) => ({
 });
 const code = (id, implementation, requires) => ({ definition: { kind: 'Action', id, spec: { output: { schema } } }, implementation, requires });
 const codeIs = code => failure => failure.code === code;
+
+test('View refresh reuses port compilation and validates current inputs against the applied Type', async t => {
+  const type = pattern => ({ kind: 'Type', id: 'EntryValue', spec: { schema: { type: 'string', pattern } } });
+  const row = binding('Row');
+  row.contract.spec.slots = { default: {} };
+  const registry = localRegistry()
+    .registerResourceSet(localSet({ id: 'components', version: '1', components: [row, binding('Leaf')] }))
+    .registerResources([type('^old-'), {
+      kind: 'Component', id: 'Entry', spec: {
+        ports: { value: { kind: 'Value', typeRef: 'EntryValue', required: true } },
+        render: { id: 'leaf', componentRef: 'Leaf' },
+      },
+    }]);
+  const runtime = localRuntime({ registry });
+  t.after(() => runtime.dispose());
+  const source = {
+    states: { entries: { kind: 'State', schema: { type: 'array' }, initial: [
+      { id: 1, value: 'old-a' }, { id: 2, value: 'old-b' },
+    ] } },
+    render: { id: 'row', componentRef: 'Row', slots: { default: [{
+      id: 'entry', componentRef: 'Entry',
+      repeat: { items: { '@path': '/states/entries' }, as: 'item', key: { '@path': '/repeat/item/id' } },
+      inputs: { value: { '@path': '/repeat/item/value' } },
+    }] } },
+  };
+  const view = await runtime.createView(source);
+  const entries = () => view.getSnapshot().roots[0].children.map(node => [node.status, node.inputs.value, node.error?.code]);
+  assert.deepEqual(entries(), [['ready', 'old-a', undefined], ['ready', 'old-b', undefined]]);
+
+  const update = (first, second) => view.getState('entries').write([{ id: 1, value: first }, { id: 2, value: second }]);
+  const validateSchema = ajv.validateSchema;
+  const validations = t.mock.method(ajv, 'validateSchema', function (schema, ...args) {
+    return validateSchema.call(this, schema, ...args);
+  });
+  update('old-c', 'new-d');
+  update('old-e', 'new-f');
+  assert.deepEqual(entries(), [['ready', 'old-e', undefined], ['error', undefined, 'TYPE_MISMATCH']]);
+  assert.equal(validations.mock.calls.filter(({ arguments: [schema] }) => schema?.pattern === '^old-').length, 0);
+  validations.mock.restore();
+
+  registry.updateResource(type('^new-'));
+  update('old-g', 'new-h');
+  assert.deepEqual(entries(), [['ready', 'old-g', undefined], ['error', undefined, 'TYPE_MISMATCH']]);
+  await view.replace(source);
+  update('old-g', 'new-h');
+  assert.deepEqual(entries(), [['error', undefined, 'TYPE_MISMATCH'], ['ready', 'new-h', undefined]]);
+});
 
 test('sets and definitions apply to one View together and reject invalid State or code bindings atomically', async t => {
   const registry = createRegistry().registerResourceSet(defineResourceSet({ id: 'base', version: '1', components: [binding('Base')] }));
