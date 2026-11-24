@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { isPublicRelease, parseReleasedPackages, verifyReleaseSource } from './verify-docs-release.mjs';
+import { deploymentPackages, isPublicRelease, parseReleasedPackages } from './verify-docs-release.mjs';
 
 const npm = { registry: 'npm', name: '@viewstem/core', version: '0.1.0' };
 const dart = { registry: 'pub.dev', name: 'viewstem', version: '0.1.0' };
@@ -38,7 +38,7 @@ test('an older release or an unexpected download origin cannot deploy the curren
     /Unexpected archive origin/);
 });
 
-test('a docs-only refresh can build against the exact public version even if npm latest advanced', async () => {
+test('a manual deployment can use an exact public version even if npm latest advanced', async () => {
   const request = async (_url, options) => options.method === 'HEAD' ? new Response(null) : npmMetadata('0.1.1');
   assert.equal(await isPublicRelease(npm, request, false), true);
   assert.equal(await isPublicRelease(npm, async () => new Response(null, { status: 404 }), false), false);
@@ -74,26 +74,13 @@ test('transport failures during metadata or archive checks return a retriable re
   await assert.rejects(isPublicRelease(npm, async () => new Response(null, { status: 403 })), /HTTP 403/);
 });
 
-const releaseSha = 'a'.repeat(40);
-const docsSha = 'b'.repeat(40);
-const readManifest = directory => ({ name: `@viewstem/${directory.split('/').at(-1)}`, version: '0.1.0' });
-
-test('the automated release requires a tag for the exact source, including a namespaced pub.dev tag', () => {
-  const tags = new Map([['@viewstem/core@0.1.0', releaseSha], ['pub.dev/viewstem@0.1.0', releaseSha]]);
-  const options = { sourceSha: releaseSha, bootstrap: false, resolveTag: tag => tags.get(tag), readManifest };
-  assert.doesNotThrow(() => verifyReleaseSource([npm, dart], options));
-  assert.throws(() => verifyReleaseSource([npm, dart], { ...options, sourceSha: docsSha }), /identify the selected source/);
-  assert.throws(() => verifyReleaseSource([{ ...dart, name: 'http' }], options), /identify the selected source/);
-  assert.throws(() => verifyReleaseSource([{ ...npm, name: 'other' }], options), /Unknown Viewstem npm package/);
-});
-
-test('bootstrap requires the complete 0.1.0 release and identical package trees', () => {
-  const packages = ['core', 'dom', 'svelte', 'ui'].map(name => ({ ...npm, name: `@viewstem/${name}` }));
-  const options = {
-    sourceSha: docsSha, bootstrap: true, resolveTag: () => releaseSha, readManifest,
-    archiveMatches: (published, source) => published === releaseSha && source === docsSha,
-  };
-  assert.doesNotThrow(() => verifyReleaseSource(packages, options));
-  assert.throws(() => verifyReleaseSource([npm, npm, npm, npm], options), /all four/);
-  assert.throws(() => verifyReleaseSource(packages, { ...options, archiveMatches: () => false }), /preserve/);
+test('the release batch and installed docs pins agree with the checked out manifests', () => {
+  const { name, version } = npm;
+  const manifests = [{ name, version }];
+  const dependencies = { [name]: version, astro: '6.4.8' };
+  assert.deepEqual(deploymentPackages([dart], manifests, dependencies), [dart, npm]);
+  assert.throws(() => deploymentPackages([{ ...npm, version: '0.1.1' }], manifests, dependencies),
+    /workflow commit does not contain/);
+  assert.throws(() => deploymentPackages([npm], manifests, { [name]: '0.1.1' }), /must pin/);
+  assert.throws(() => deploymentPackages([{ ...npm, name: 'other' }], manifests, dependencies), /Unknown Viewstem npm package/);
 });

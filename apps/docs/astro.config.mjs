@@ -2,11 +2,33 @@ import starlight from '@astrojs/starlight';
 import svelte from '@astrojs/svelte';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
+import { fileURLToPath } from 'node:url';
+
+const publishedModules = process.env.VIEWSTEM_PUBLISHED_MODULES;
+const workspacePackages = fileURLToPath(new URL('../../packages/', import.meta.url));
+const publishedPackages = {
+  name: 'verify-published-viewstem-packages',
+  enforce: 'pre',
+  configEnvironment() {
+    return { resolve: { noExternal: [/^@viewstem\//] } };
+  },
+  async resolveId(source, importer, options) {
+    if (!source.startsWith('@viewstem/')) return;
+    const resolved = await this.resolve(source, importer, { ...options, skipSelf: true });
+    if (!resolved || resolved.external || !resolved.id.startsWith(`${publishedModules}/`)) {
+      this.error(`${source} must resolve to a published npm package. Resolved to ${resolved?.id ?? 'nothing'}`);
+    }
+    return resolved;
+  },
+  load(id) {
+    if (id.startsWith(workspacePackages)) this.error(`Production docs cannot use workspace source: ${id}`);
+  },
+};
 
 export default defineConfig({
   site: 'https://viewstem.miinhlym.workers.dev',
   output: 'static',
-  vite: { plugins: [tailwindcss()] },
+  vite: { plugins: [tailwindcss(), ...(publishedModules ? [publishedPackages] : [])] },
   redirects: {
     '/docs/concepts/state-and-actions/': '/docs/concepts/state/',
     '/ko/docs/concepts/state-and-actions/': '/ko/docs/concepts/state/',

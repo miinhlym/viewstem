@@ -1,6 +1,4 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { setTimeout } from 'node:timers/promises';
@@ -76,73 +74,43 @@ export async function isPublicRelease({ registry, name, version }, request = fet
   return true;
 }
 
-const git = (...args) => execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 const packageDirectory = name => `packages/${name.slice('@viewstem/'.length)}`;
 
-export function verifyReleaseSource(releases, { sourceSha, bootstrap, resolveTag, archiveMatches, readManifest }) {
-  if (bootstrap) {
-    assert.ok(releases.length === npmPackages.size && new Set(releases.map(({ name }) => name)).size === npmPackages.size
-      && releases.every(({ registry, name, version }) => registry === 'npm' && npmPackages.has(name) && version === '0.1.0'),
-    'The bootstrap must specify all four Viewstem npm packages at 0.1.0');
+export function deploymentPackages(releases, manifests, dependencies) {
+  const versions = new Map(manifests.map(({ name, version }) => [name, version]));
+  for (const { registry, name, version } of releases) {
+    if (registry !== 'npm') continue;
+    assert.ok(npmPackages.has(name), `Unknown Viewstem npm package: ${name}`);
+    assert.equal(versions.get(name), version, `The workflow commit does not contain ${name}@${version}`);
   }
-
-  const commits = releases.map(({ registry, name, version }) => {
-    if (registry === 'npm') {
-      assert.ok(npmPackages.has(name), `Unknown Viewstem npm package: ${name}`);
-      const manifest = readManifest(packageDirectory(name));
-      assert.equal(manifest.name, name);
-      assert.equal(manifest.version, version, `The source does not contain ${name}@${version}`);
-    }
-    const tag = `${registry === 'npm' ? '' : 'pub.dev/'}${name}@${version}`;
-    return resolveTag(tag);
-  });
-
-  if (bootstrap) {
-    assert.ok(commits.every(sha => sha === commits[0]), 'The bootstrap package tags must point to the same commit');
-    assert.ok(archiveMatches(commits[0], sourceSha), 'The bootstrap source must preserve the 0.1.0 npm package trees');
-  } else {
-    assert.ok(commits.every(sha => sha === sourceSha), 'Every release tag must identify the selected source commit');
+  const runtime = Object.entries(dependencies).filter(([name]) => name.startsWith('@viewstem/'));
+  assert.ok(runtime.length, 'The docs app must declare its Viewstem dependencies');
+  for (const [name, version] of runtime) {
+    assert.ok(npmPackages.has(name), `Unknown documentation dependency: ${name}`);
+    assert.equal(version, versions.get(name), `The docs app must pin ${name} to the workflow commit's package version`);
   }
+  return parseReleasedPackages(JSON.stringify([...releases, ...manifests.map(({ name, version }) => ({
+    registry: 'npm', name, version,
+  }))]));
 }
 
 async function main() {
-  const docsOnly = process.argv.includes('--docs-only');
-  const releases = docsOnly ? [] : parseReleasedPackages(process.env.RELEASED_PACKAGES);
-  if (process.argv.includes('--verify-source')) {
-    verifyReleaseSource(releases, {
-      sourceSha: git('rev-parse', 'HEAD'),
-      bootstrap: process.env.DOCS_BOOTSTRAP_0_1_0 === 'true',
-      resolveTag(tag) {
-        try {
-          return git('rev-parse', '--verify', `refs/tags/${tag}^{commit}`);
-        } catch (error) {
-          if (error.status === 128) throw new Error(`Missing release tag ${tag}`, { cause: error });
-          throw error;
-        }
-      },
-      readManifest: directory => JSON.parse(readFileSync(`${directory}/package.json`, 'utf8')),
-      archiveMatches(published, source) {
-        try {
-          git('merge-base', '--is-ancestor', published, source);
-        } catch (error) {
-          if (error.status === 1) return false;
-          throw error;
-        }
-        return !git('diff', '--name-only', published, source, '--', ...[...npmPackages].map(packageDirectory));
-      },
-    });
-  }
+  const event = process.env.GITHUB_EVENT_NAME;
+  assert.ok(event === 'push' || event === 'workflow_dispatch', 'Unsupported documentation deployment event');
+  const manual = event === 'workflow_dispatch';
+  const releases = manual ? [] : parseReleasedPackages(process.env.RELEASED_PACKAGES);
   const readManifest = async path => JSON.parse(await readFile(path, 'utf8'));
+  const manifests = await Promise.all([...npmPackages].map(async name => {
+    const manifest = await readManifest(`${packageDirectory(name)}/package.json`);
+    assert.equal(manifest.name, name);
+    return manifest;
+  }));
   const { dependencies } = await readManifest('apps/docs/package.json');
-  const svelte = await readManifest('packages/svelte/package.json');
-  const docsPackages = Object.entries({ ...dependencies, [svelte.name]: svelte.version })
-    .filter(([name]) => name.startsWith('@viewstem/'))
-    .map(([name, version]) => ({ registry: 'npm', name, version }));
-  const expected = parseReleasedPackages(JSON.stringify([...releases, ...docsPackages]));
+  const expected = deploymentPackages(releases, manifests, dependencies);
   const pending = new Map(expected.map(entry => [`${entry.registry}:${entry.name}@${entry.version}`, entry]));
   const attempts = process.argv.includes('--once') ? 1 : 18;
   for (let attempt = 0; attempt < attempts && pending.size; attempt++) {
-    const states = await Promise.all([...pending].map(async ([key, entry]) => [key, await isPublicRelease(entry, fetch, !docsOnly)]));
+    const states = await Promise.all([...pending].map(async ([key, entry]) => [key, await isPublicRelease(entry, fetch, !manual)]));
     for (const [key, published] of states) {
       if (!published) continue;
       console.log(`Public release verified: ${key}`);

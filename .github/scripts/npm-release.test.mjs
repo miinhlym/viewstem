@@ -14,7 +14,9 @@ test('only the merged Changesets PR on this commit can publish', () => {
     base: { ref: 'main', repo: { full_name: repository } },
     head: { ref: 'changeset-release/main', repo: { full_name: repository } },
   };
-  assert.ok(isReleasePullRequest(release, repository, sha));
+  assert.ok(isReleasePullRequest(release, repository, sha, 'main'));
+  assert.ok(isReleasePullRequest({ ...release, base: { ...release.base, ref: 'trunk' },
+    head: { ...release.head, ref: 'changeset-release/trunk' } }, repository, sha, 'trunk'));
   for (const override of [
     { merged_at: null },
     { merge_commit_sha: 'different-commit' },
@@ -22,7 +24,7 @@ test('only the merged Changesets PR on this commit can publish', () => {
     { base: { ...release.base, ref: 'another-branch' } },
     { head: { ...release.head, ref: 'ordinary-pr' } },
     { head: { ...release.head, repo: { full_name: 'fork/viewstem' } } },
-  ]) assert.ok(!isReleasePullRequest({ ...release, ...override }, repository, sha));
+  ]) assert.ok(!isReleasePullRequest({ ...release, ...override }, repository, sha, 'main'));
 });
 
 test('selects only bumped packages in dependency order', () => {
@@ -37,16 +39,6 @@ test('selects only bumped packages in dependency order', () => {
     ['@viewstem/core@0.1.1', '@viewstem/dom@0.1.1', '@viewstem/svelte@0.2.1', '@viewstem/ui@0.3.1']);
   assert.deepEqual(targets(before), []);
   assert.throws(() => targets({ ...before, core: '0.0.9' }), /Invalid version bump/);
-});
-
-test('selects the first DOM version when the comparison commit predates its manifest', () => {
-  const previous = { core: '0.1.0', svelte: '0.1.0', ui: '0.1.0' };
-  const current = { ...previous, dom: '0.1.0', svelte: '0.1.1', ui: '0.1.1' };
-  const targets = releaseTargets((directory, before) => {
-    const version = (before ? previous : current)[directory];
-    return version ? { name: `@viewstem/${directory}`, version } : null;
-  });
-  assert.deepEqual(targets.map(({ directory }) => directory), ['dom', 'svelte', 'ui']);
 });
 
 test('a retry skips matching tarballs and rejects collisions or stale publication', () => {
@@ -130,37 +122,41 @@ test('internal dependencies must be public or precede their dependent in the bat
     /must pin @viewstem\/core to an exact stable version/);
 });
 
-test('only the first DOM manifest can be absent from the previous commit', async () => {
+test('a release requires a previous manifest for every published package', async () => {
   const previous = manifests('0.1.0');
   delete previous.dom;
   const current = manifests('0.1.0');
-  const registry = Object.fromEntries(directories.map(directory => [
-    `@viewstem/${directory}`, registryVersions(['0.1.0']),
-  ]));
-  const fixture = fixtures(previous, current, registry);
-  await verifyPublishPrerequisites(fixture.targets, fixture.readManifest, fixture.readMetadata);
-  delete previous.core;
-  await assert.rejects(verifyPublishPrerequisites(fixture.targets, fixture.readManifest, fixture.readMetadata),
-    /Missing previous manifest for @viewstem\/core/);
+  const readManifest = (directory, before) => (before ? previous : current)[directory];
+  assert.throws(() => releaseTargets(readManifest), /Missing previous manifest for @viewstem\/dom/);
+  await assert.rejects(verifyPublishPrerequisites([], readManifest, async () => registryVersions(['0.1.0'])),
+    /Missing previous manifest for @viewstem\/dom/);
 });
 
 test('release callers forward the named token and isolate manual CI from publishing pushes', async () => {
   const core = await readFile(new URL('../workflows/core.yml', import.meta.url), 'utf8');
   const release = await readFile(new URL('../workflows/npm-release.yml', import.meta.url), 'utf8');
   assert.match(core, /group:.*github\.event_name.*github\.event\.pull_request\.number \|\| github\.sha/);
+  assert.match(core, /needs: \[compatibility, ui\]/);
+  assert.match(core, /workflow_dispatch' && 'Manual CI complete' \|\| 'CI complete'/);
+  assert.doesNotMatch(core, /docs-label|unlabeled/);
   const namedSecret = /secrets:\n\s+CLOUDFLARE_PRODUCTION_API_TOKEN: \$\{\{ secrets\.CLOUDFLARE_PRODUCTION_API_TOKEN \}\}/;
   assert.match(core.slice(core.indexOf('\n  release:')), namedSecret);
   assert.match(release, /workflow_call:\n\s+secrets:\n\s+CLOUDFLARE_PRODUCTION_API_TOKEN:\n\s+required: true/);
   const docs = release.slice(release.indexOf('\n  docs:'));
-  assert.match(docs, /needs: \[plan, publish, tag\]/);
+  assert.match(docs, /needs: \[plan, publish\]\n\s+if: needs\.plan\.outputs\.targets != '\[\]'/);
   assert.match(docs, namedSecret);
-  const refresh = release.slice(release.indexOf('\n  docs-refresh:'));
-  assert.match(refresh, /needs: plan\n.*targets == '\[\]'.*docs_publishable == 'true'/);
-  assert.match(refresh, /mode: refresh/);
-  assert.match(refresh, namedSecret);
+  assert.doesNotMatch(release, /docs-refresh|docs_publishable/);
+  assert.match(release, /changeset status --output.*\n.*\.type != "none"/);
   const production = await readFile(new URL('../workflows/docs-release.yml', import.meta.url), 'utf8');
+  assert.match(production, /^name: Deploy docs\n/);
+  assert.match(production, /workflow_dispatch:\n\npermissions:/);
+  assert.match(production, /ref: \$\{\{ github\.sha \}\}/);
+  assert.match(production, /github\.ref == format\('refs\/heads\/\{0\}', github\.event\.repository\.default_branch\)/);
   assert.match(production, /group: docs-production\n\s+queue: max/);
-  assert.match(production, /verify-docs-release\.mjs" --docs-only --once/);
+  assert.match(production, /verify-docs-release\.mjs --once/);
+  assert.doesNotMatch(production, /id-token:|npm publish|verify-source|source_sha:/);
+  assert.ok(production.indexOf('verify-docs-release.mjs') < production.indexOf('build-published.mjs'));
+  assert.ok(production.indexOf('assert-active') < production.indexOf('wrangler deploy'));
   assert.ok(production.indexOf('verify-site-previews.mjs') < production.indexOf('wrangler deploy'));
   const publish = release.slice(release.indexOf('\n  publish:'), release.indexOf('\n  tag:'));
   assert.match(publish, /group: npm-publish\n\s+queue: max/);

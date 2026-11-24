@@ -32,7 +32,7 @@ test('production versions are read from the latest Cloudflare deployment', () =>
   assert.throws(() => activeVersion([deploy('02', [{ version_id: version, percentage: 50 }])]), /split/);
 });
 
-test('Cloudflare production tags identify the release and document commits, including legacy tags', () => {
+test('Cloudflare production tags identify the release and document commits', () => {
   assert.deepEqual(parseDeploymentTag(before), { base: before, through: before });
   assert.deepEqual(parseDeploymentTag(`${before}.${after}`), { base: before, through: after });
   assert.throws(() => parseDeploymentTag(), /does not identify/);
@@ -42,17 +42,20 @@ test('Cloudflare production tags identify the release and document commits, incl
 test('the active production source comes from the currently serving Cloudflare version', async () => {
   const env = { CLOUDFLARE_ACCOUNT_ID: 'a'.repeat(32), CLOUDFLARE_API_TOKEN: 'test-token' };
   const paths = [];
+  let sourceTag = `${before}.${after}`;
   const request = async (url, options) => {
     const [, path] = url.split('/workers/scripts/viewstem');
     assert.equal(options.headers.authorization, 'Bearer test-token');
     paths.push(path);
     const result = path === '/deployments'
       ? { deployments: [{ created_on: '2026-11-23T00:00:00Z', versions: [{ version_id: version, percentage: 100 }] }] }
-      : { annotations: { 'workers/tag': `${before}.${after}` } };
+      : { annotations: { 'workers/tag': sourceTag } };
     return Response.json({ success: true, result });
   };
   assert.deepEqual(await readDeployment(env, request), { id: version, base: before, through: after });
   assert.deepEqual(paths, ['/deployments', `/versions/${version}`]);
+  sourceTag = before;
+  assert.deepEqual(await readDeployment(env, request), { id: version, base: before, through: before });
   assert.deepEqual(await readDeployment(env, request, false), { id: version });
   assert.equal(await readDeployment(env, async () => Response.json({ success: true, result: { deployments: [] } })), null);
   await assert.rejects(readDeployment(env, async () => new Response(null, { status: 403 })), /HTTP 403/);

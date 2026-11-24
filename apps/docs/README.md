@@ -58,93 +58,79 @@ from the default branch when the PR closed, a maintainer can remove the named
 preview using `npx --no-install wrangler preview delete --config apps/docs/wrangler.jsonc
 --worker-name viewstem-preview --name pr-<number>` from the repository root.
 
-The [production workflow](../../.github/workflows/docs-release.yml) runs after
-a public package release or an eligible docs-only PR. Both paths build with
-published npm packages and verify links, examples, and Playground behavior
-before deploy. [Astro's `site` setting](astro.config.mjs)
-sets the public origin for the sitemap.
+[Deploy docs](../../.github/workflows/docs-release.yml) builds the workflow
+commit against the public npm versions pinned in that commit's
+[site manifest](package.json). It installs those packages outside the workspace,
+checks links, and runs the examples and Playground in Chromium before publishing
+to `viewstem`. [Astro's `site` setting](astro.config.mjs) sets the public origin
+for the sitemap.
 
-### Update the site for the current public packages
+### Deploy independently of a package release
 
-The workflow considers docs-only PRs after a squash merge and successful `main`
-CI. Eligible paths are `apps/docs/src/`, `apps/docs/public/`, the Astro config,
-`components.json`, and `tsconfig.json`. Changes limited to site CSS and public
-images or fonts can deploy automatically. Review installation instructions, API
-guides, layouts, examples, and other site changes against the current public
-packages, then add `docs:publish` before merging. Use `docs:next-release` to hold
-a change for a package release. It takes precedence over `docs:publish`, and
-label changes after merge have no effect on publication. Create both repository
-labels with these names if they do not already exist.
-On docs-only PRs that need review, **CI complete** requires one of these labels.
-Adding or removing a PR label reruns the check.
+Merge documentation and related package code to `main` through the usual PRs.
+A documentation-only merge is available for the next package release. For a
+separate site update, choose **Actions → Deploy docs → Run workflow**, then select
+`main`. GitHub fixes the source SHA at dispatch, and the site manifest at that
+SHA supplies the package versions. Selecting the branch is the only input.
 
-PRs touching package sources or versions, changesets, dependency files, check
-scripts, deployment configuration, or repository design docs are excluded.
-Docs-only deployment needs a live baseline. Follow the bootstrap instructions
-below for the first `0.1.0` deployment.
+The active deployment's recorded package release commit is the starting point
+for the safety check. The workflow inspects the entire first-parent history
+from that baseline to the selected commit. It accepts site changes and the named
+CI/deployment maintenance files. It stops on package changes, pending changeset
+commits, root dependency changes, or other paths it cannot classify as safe,
+including package changes that kept the same version or were later reverted.
+If the baseline is missing or the check stops the deployment, wait for the next
+package release and use its documentation job. Review prose against the public
+API before dispatching. Browser tests cover runnable examples and Playground.
 
-| Scenario | Deployment behavior |
-| --- | --- |
-| A footer fix lands after unreleased package code and its docs | Apply only eligible site PR diffs, in merge order, to the release source currently serving production. |
-| A patch needs an unreleased file or surrounding content | Leave that PR for the release and continue with independent patches. The Actions log identifies the deferred PR. |
-| An earlier package release deploys after a site refresh | Build the new release and replay later docs already published. Stop if they cannot be preserved. |
-| A delayed or retried refresh runs | Skip older ranges. A failed job can retry the same range. |
-| Build or browser checks fail, or the active Cloudflare version changes during preparation | Stop before uploading. Use version recovery below if the public check fails after upload. |
+For example, an installation guide fix can deploy with the existing public
+packages if only the site has changed since the baseline. If a Core feature has
+also landed since then, the whole manual deployment stops, even if Core's
+version is unchanged and the examples still pass.
 
 ### Package releases and production setup
 
-The npm release workflow calls production after the entire batch is public and
-tagged. Other trusted publishing workflows on `main` can use the same workflow.
-After verifying publication, create each package tag at the release commit.
-Use `@viewstem/<name>@<version>` for npm and `pub.dev/<name>@<version>` for
-pub.dev. Pass the release commit as `source_sha`, all packages in the batch as
-`released_packages` (a JSON array of `registry`, `name`, and `version` objects),
-and forward the named `CLOUDFLARE_PRODUCTION_API_TOKEN` secret through each
-reusable workflow call. Keep its value in the `docs-production` environment.
-Production verifies the tags and public versions. Both production paths share
-one queue. The Cloudflare version tag and public `/_viewstem-deploy.json`
-identify the package release source and the last documentation commit considered.
-GitHub Deployments records production only after the upload and public site
-check succeed. To retry a failed recording job, rerun the whole workflow so it
-verifies the site again.
+After the complete npm batch is published, the release workflow calls **Deploy
+docs** for the same release commit. Changesets updates the site's pins for
+its dependencies in the release. For example, a UI-only release can move the
+site to `ui@0.1.1` with `core@0.1.0` and `dom@0.1.0`.
+Tags and GitHub Releases record the package release in a separate job.
+Another publishing workflow on the default branch
+can use the same path after successfully publishing at its own workflow SHA.
+Pass all published packages in `released_packages` as objects with `registry`
+(`npm` or `pub.dev`), `name`, and `version`. Forward
+`CLOUDFLARE_PRODUCTION_API_TOKEN` through each reusable call and keep its value
+in the `docs-production` environment.
 
-Both workflows use the `CLOUDFLARE_ACCOUNT_ID` repository variable for the
-account that owns `miinhlym.workers.dev`. During account setup, a Cloudflare
-administrator creates `viewstem` and `viewstem-preview` before issuing the
-tokens. Start with an empty `viewstem` Worker for the first production
-deployment. An active Cloudflare version must carry source information in its
-tag. Existing single-SHA tags are accepted. Enable the `workers.dev` route for
-production and Preview URLs on the preview Worker. Use separate **Individual
-Workers Editor** tokens scoped to the Workers below and store each token in its
-GitHub Actions environment.
+Both entry points share one production queue. Cloudflare version metadata and
+`/_viewstem-deploy.json` record the package release baseline and the exact site
+commit. For the initial `0.1.0` deployment, the single SHA in Cloudflare
+metadata identifies both. An older run skips deployment once a newer commit is
+active. The workflow checks the active Cloudflare version again before uploading.
+GitHub Deployments records the version after the public site check succeeds.
+
+To retry a site failure, open the **original** release run in GitHub Actions and
+select **Re-run jobs** for **Build, verify, and deploy docs**. If only deployment recording
+failed, rerun the preceding docs job to verify the site again. GitHub keeps the
+original commit and successful publishing outputs for job retries. See
+[GitHub's job retry documentation](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/re-run-workflows-and-jobs#re-running-a-specific-job).
+
+Configure `CLOUDFLARE_ACCOUNT_ID` as the repository variable for the account
+that owns `miinhlym.workers.dev`. Allow only the default branch (`main`) in the
+`docs-production` deployment branch rules. Enable GitHub Actions for the
+repository. The **Run workflow** button becomes available once the workflow is
+on the default branch. Separate **Individual Workers Editor** tokens are scoped
+to the corresponding Worker and stored in its GitHub Actions environment.
 
 | Environment | Secret | Cloudflare Worker |
 | --- | --- | --- |
 | `docs-preview` | `CLOUDFLARE_PREVIEW_API_TOKEN` | `viewstem-preview` |
 | `docs-production` | `CLOUDFLARE_PRODUCTION_API_TOKEN` | `viewstem` |
 
-Allow only the `main` branch to deploy to `docs-production` in the GitHub
-environment's deployment branch rules.
-
-For the first 0.1.0 documentation deployment, open **Docs production release**
-in GitHub Actions and choose **Run workflow** on `main`. Set `bootstrap_0_1_0`,
-use the full `main` commit that contains the deployment setup and the unchanged
-0.1.0 package sources, and provide all four public npm packages (Core, DOM, Svelte,
-and UI) at `0.1.0` in `released_packages`. After the first deployment, the same
-bootstrap source can be retried while its packages remain current.
-
-To retry a current release, provide its tagged commit and the same package
-batch with `bootstrap_0_1_0` off. The requested versions and the site's npm
-dependencies must be the registry's latest releases for a package release.
-Docs-only updates use the exact public npm versions pinned by the active
-release source. For recovery after
-a failed public check, the Actions summary records the source SHA and the old
-and new Cloudflare version IDs. If a previous version exists, a maintainer can
-restore it on the `viewstem` Worker's **Deployments** tab and confirm that
-`/_viewstem-deploy.json` and the installation page serve the restored build.
-The next deploy reconstructs approved site changes from the restored baseline.
-Correct the problematic change in a follow-up PR.
-[Cloudflare rollback procedure](https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/)
+If a public check fails after an upload, use the previous Cloudflare version ID
+in the Actions summary to restore the site from the `viewstem` Worker's
+**Deployments** tab. Check `/_viewstem-deploy.json` and the installation page,
+then fix the change in a follow-up PR. [Cloudflare rollback procedure](https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/)
 
 ## Find the implementation
 

@@ -1,4 +1,4 @@
-name: Docs production release
+name: Deploy docs
 
 on:
   workflow_call:
@@ -6,32 +6,13 @@ on:
       CLOUDFLARE_PRODUCTION_API_TOKEN:
         required: true
     inputs:
-      source_sha:
-        type: string
-        required: true
       released_packages:
         type: string
-      mode:
-        type: string
-        default: release
+        required: true
   workflow_dispatch:
-    inputs:
-      source_sha:
-        description: Full main commit SHA for the documentation build
-        type: string
-        required: true
-      released_packages:
-        description: JSON list of public package releases with registry, name, and version
-        type: string
-        required: true
-      bootstrap_0_1_0:
-        description: First deployment for the four already published npm 0.1.0 packages
-        type: boolean
-        default: false
 
 permissions:
   contents: read
-  pull-requests: read
 
 concurrency:
   group: docs-production
@@ -39,7 +20,8 @@ concurrency:
 
 jobs:
   release:
-    if: github.repository == 'miinhlym/viewstem' && github.ref == 'refs/heads/main'
+    name: Build, verify, and deploy docs
+    if: github.repository == 'miinhlym/viewstem' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment:
@@ -50,9 +32,7 @@ jobs:
       verified_version: ${{ steps.live.outputs.verified_version }}
     env:
       RELEASED_PACKAGES: ${{ inputs.released_packages }}
-      DOCS_SOURCE_SHA: ${{ inputs.source_sha }}
-      DOCS_MODE: ${{ inputs.mode || 'release' }}
-      DOCS_BOOTSTRAP_0_1_0: ${{ github.event_name == 'workflow_dispatch' && inputs.bootstrap_0_1_0 }}
+      DOCS_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -68,24 +48,15 @@ jobs:
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PRODUCTION_API_TOKEN }}
-        run: |
-          # Use the policy from this workflow commit after checking out the build source.
-          cp .github/scripts/{verify-docs-release,docs-production}.mjs "$RUNNER_TEMP/"
-          node "$RUNNER_TEMP/docs-production.mjs" read-active
-      - name: Select the released source and apply approved site changes
+        run: node .github/scripts/docs-production.mjs read-active
+      - name: Check that the workflow commit can deploy
         id: source
         env:
           DOCS_ACTIVE: ${{ steps.active.outputs.deployment }}
-          GH_TOKEN: ${{ github.token }}
         run: node .github/scripts/docs-site-changes.mjs
       - name: Wait for the public package releases
         if: steps.source.outputs.deploy == 'true'
-        run: |
-          if [[ "$DOCS_MODE" == refresh ]]; then
-            node "$RUNNER_TEMP/verify-docs-release.mjs" --docs-only
-          else
-            node "$RUNNER_TEMP/verify-docs-release.mjs" --verify-source
-          fi
+        run: node .github/scripts/verify-docs-release.mjs
       - if: steps.source.outputs.deploy == 'true'
         run: npm ci
       - name: Build with the public npm packages
@@ -95,7 +66,7 @@ jobs:
           DOCS_THROUGH_SHA: ${{ steps.source.outputs.through }}
         run: |
           node apps/docs/scripts/build-published.mjs
-          node "$RUNNER_TEMP/docs-production.mjs" stamp
+          node .github/scripts/docs-production.mjs stamp
       - if: steps.source.outputs.deploy == 'true'
         run: node apps/docs/scripts/verify-docs-site.mjs
       - if: steps.source.outputs.deploy == 'true'
@@ -121,12 +92,7 @@ jobs:
           node apps/docs/scripts/verify-site-previews.mjs
       - name: Recheck the public packages
         if: steps.source.outputs.deploy == 'true'
-        run: |
-          if [[ "$DOCS_MODE" == refresh ]]; then
-            node "$RUNNER_TEMP/verify-docs-release.mjs" --docs-only --once
-          else
-            node "$RUNNER_TEMP/verify-docs-release.mjs" --once
-          fi
+        run: node .github/scripts/verify-docs-release.mjs --once
       - name: Publish the production site
         id: publish
         if: steps.source.outputs.deploy == 'true'
@@ -148,9 +114,9 @@ jobs:
             *) printf 'Expected the token to be denied access to viewstem-preview. HTTP %s\n' "$scope_status" >&2; exit 1 ;;
           esac
           config=apps/docs/wrangler.jsonc
-          node "$RUNNER_TEMP/docs-production.mjs" assert-active
+          node .github/scripts/docs-production.mjs assert-active
           previous_version="$(jq -r '.id // empty' <<< "$DOCS_ACTIVE")"
-          printf '### Production documentation\n\nRelease source `%s`\n\nDocumentation through `%s`\n\n' "$DOCS_BASE_SHA" "$DOCS_THROUGH_SHA" >> "$GITHUB_STEP_SUMMARY"
+          printf '### Production documentation\n\nPackage release baseline `%s`\n\nSite source `%s`\n\n' "$DOCS_BASE_SHA" "$DOCS_THROUGH_SHA" >> "$GITHUB_STEP_SUMMARY"
           if [[ -n "$previous_version" ]]; then
             printf 'Previous Cloudflare version `%s`\n\n' "$previous_version" >> "$GITHUB_STEP_SUMMARY"
           else
@@ -169,7 +135,7 @@ jobs:
           DOCS_THROUGH_SHA: ${{ steps.source.outputs.through }}
           DOCS_VERSION_ID: ${{ steps.publish.outputs.version_id }}
         run: |
-          node "$RUNNER_TEMP/docs-production.mjs" check-live
+          node .github/scripts/docs-production.mjs check-live
           printf 'verified_attempt=%s\nverified_version=%s\n' "$GITHUB_RUN_ATTEMPT" "$DOCS_VERSION_ID" >> "$GITHUB_OUTPUT"
 
   record-deployment:
