@@ -5,8 +5,7 @@ English | [한국어](ci.ko.md)
 The [core workflow](../.github/workflows/core.yml) runs on pushes to `main`, pull
 requests, and manual dispatch. A newer run cancels an older run for the same PR.
 Pushes are grouped by commit and manual CI runs have a separate group. Required
-checks should use **CI complete**, which depends on every compatibility and
-browser job.
+checks use **CI complete**. Manual dispatch reports **Manual CI complete**.
 Pushes to other branches without a pull request do not run CI automatically;
 use a pull request or manual dispatch to check them.
 
@@ -14,7 +13,7 @@ use a pull request or manual dispatch to check them.
 
 - Node 22 and 24 build Core, DOM, Svelte, and UI. The compatibility jobs check Core, DOM, and Svelte types and installed-package consumers, including the independent DOM and mixed-rendering fixtures.
 - Chromium runs the Core, DOM, and Svelte browser tests and the UI tarball consumer tests. The UI suite covers plain JS, React, Vue and Svelte hosts, the original JSON for all 66 families, and date and table State and events.
-- **CI complete** requires both compatibility and browser jobs to pass.
+- **CI complete** requires both compatibility and browser jobs to pass. For pull requests, it also requires the [documentation deployment label check](../apps/docs/README.md#update-the-site-for-the-current-public-packages). Adding or removing a PR label reruns CI.
 
 Choose the local check for the packages you change. Run `npm run check:dom` for the DOM renderer and CSS transformer, `npm run check:ui` for the UI catalog, `npm run check:svelte` for the Svelte renderer, and `npm run test:ci` for the release planner. CI uses Playwright Chromium's headless shell.
 

@@ -75,6 +75,8 @@ packages, then add `docs:publish` before merging. Use `docs:next-release` to hol
 a change for a package release. It takes precedence over `docs:publish`, and
 label changes after merge have no effect on publication. Create both repository
 labels with these names if they do not already exist.
+On docs-only PRs that need review, **CI complete** requires one of these labels.
+Adding or removing a PR label reruns the check.
 
 PRs touching package sources or versions, changesets, dependency files, check
 scripts, deployment configuration, or repository design docs are excluded.

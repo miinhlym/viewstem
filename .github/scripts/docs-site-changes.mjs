@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { appendFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
@@ -13,6 +14,21 @@ const git = (...args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer
 export function classifyPaths(paths) {
   if (!paths.length || !paths.every(path => sitePath.test(path) && path !== reservedPath)) return 'release';
   return paths.every(path => automaticPath.test(path)) ? 'automatic' : 'review';
+}
+
+function checkPullRequest(env) {
+  const { number, pull_request: pr } = JSON.parse(readFileSync(env.GITHUB_EVENT_PATH, 'utf8'));
+  if (pr.base.ref !== 'main') return;
+  const paths = git('diff', '--name-only', '--no-renames', '-z', `${pr.base.sha}...${pr.head.sha}`, '--')
+    .split('\0').filter(Boolean);
+  if (classifyPaths(paths) !== 'review') return;
+  const current = JSON.parse(execFileSync('gh', ['api', `repos/${env.GITHUB_REPOSITORY}/pulls/${number}`], { encoding: 'utf8' }));
+  assert.equal(current.head.sha, pr.head.sha, 'The PR head changed. Use the check for the latest commit.');
+  assert.equal(current.base.ref, pr.base.ref, 'The PR base changed. Use the check for the current base.');
+  if (!current.labels.some(({ name }) => name === publishLabel || name === holdLabel)) {
+    console.log(`::error title=Choose a documentation deployment label::Add ${publishLabel} to deploy for the current public packages, or ${holdLabel} to wait for the next package release.`);
+    process.exitCode = 1;
+  }
 }
 
 export function mayPublish(classification, events, sha) {
@@ -134,4 +150,7 @@ export async function prepare(env) {
   await appendFile(GITHUB_OUTPUT, `deploy=true\nbase=${build.base}\nthrough=${build.through}\n`);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await prepare(process.env);
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  if (process.argv[2] === 'check-pr') checkPullRequest(process.env);
+  else await prepare(process.env);
+}

@@ -36,6 +36,65 @@ test('publication uses labels present at merge, with the next-release label taki
   assert.equal(mayPublish('automatic', [merged('other')], 'sha'), false);
 });
 
+test('pre-merge check requires a current label for reviewable site changes only', t => {
+  const dir = mkdtempSync(join(tmpdir(), 'viewstem-docs-label-test-'));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const git = (...args) => execFileSync('git', args, { cwd: dir, encoding: 'utf8' }).trim();
+  git('init', '-b', 'main');
+  git('config', 'user.email', 'docs@example.com');
+  git('config', 'user.name', 'Docs');
+  const commit = (message) => {
+    git('commit', '--allow-empty', '-m', message);
+    return git('rev-parse', 'HEAD');
+  };
+  const write = (name, contents) => {
+    const file = join(dir, name);
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, contents);
+    git('add', '--', name);
+  };
+  const base = commit('Baseline');
+  write(guide, 'Fix the installation guide.\n');
+  const docsHead = commit('Edit guide');
+  write(style, 'footer { color: black; }\n');
+  const styleHead = commit('Edit styles');
+  write(guide, 'Document the new API.\n');
+  write(library, 'export const newApi = true;\n');
+  const mixedHead = commit('Change package and guide');
+  const cli = join(dir, 'gh');
+  writeFileSync(cli, '#!/bin/sh\ntest "$#" = 2 && test "$1" = api && test "$2" = repos/miinhlym/viewstem/pulls/3 || exit 2\nprintf "%s\\n" "$MOCK_PR"\n', { mode: 0o755 });
+  const event = join(dir, 'event.json');
+  const script = fileURLToPath(new URL('./docs-site-changes.mjs', import.meta.url));
+
+  function check(baseSha, headSha, labels, currentHead = headSha) {
+    const base = { ref: 'main', sha: baseSha };
+    // The event still has the label even if the live PR just lost it.
+    writeFileSync(event, JSON.stringify({ number: 3, pull_request: { base, head: { sha: headSha }, labels: [{ name: 'docs:publish' }] } }));
+    const live = labels ? JSON.stringify({ base, head: { sha: currentHead }, labels: labels.map(name => ({ name })) }) : 'unexpected API request';
+    return spawnSync(process.execPath, [script, 'check-pr'], { cwd: dir, encoding: 'utf8', env: {
+      ...process.env, PATH: `${dir}${delimiter}${process.env.PATH}`, MOCK_PR: live,
+      GITHUB_EVENT_PATH: event, GITHUB_REPOSITORY: 'miinhlym/viewstem',
+    } });
+  }
+
+  const missing = check(base, docsHead, ['documentation']);
+  assert.equal(missing.status, 1);
+  assert.match(missing.stdout, /Add docs:publish .* or docs:next-release/);
+  assert.equal(check(base, docsHead, ['docs:publish']).status, 0);
+  assert.equal(check(base, docsHead, ['docs:next-release']).status, 0);
+  assert.match(check(base, docsHead, ['docs:publish'], styleHead).stderr, /The PR head changed/);
+  assert.equal(check(docsHead, styleHead).status, 0);
+  assert.equal(check(styleHead, mixedHead).status, 0);
+});
+
+test('the required CI check handles PR label changes and excludes manual dispatch results', () => {
+  const workflow = readFileSync(new URL('../workflows/core.yml', import.meta.url), 'utf8');
+  assert.match(workflow, /pull_request:\n\s+types: \[[^\n]*\blabeled, unlabeled\]/);
+  assert.match(workflow, /needs: \[docs-label, compatibility, ui\]/);
+  assert.match(workflow, /GITHUB_EVENT_NAME.*pull_request.*DOCS_LABEL_RESULT.*!= success/);
+  assert.match(workflow, /workflow_dispatch' && 'Manual CI complete' \|\| 'CI complete'/);
+});
+
 test('queue ordering preserves published docs across releases, blocks regressions, and supports bootstrap and reruns', () => {
   const history = ['initial', 'old-docs', 'release', 'new-docs'];
   const ancestor = (a, b) => history.includes(a) && history.includes(b) && history.indexOf(a) <= history.indexOf(b);
