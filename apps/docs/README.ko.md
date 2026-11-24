@@ -87,11 +87,15 @@ Chromium에서 실행해 `viewstem`에 배포한다.
 npm 배치 전체의 발행이 성공하면 릴리스 워크플로가 같은 커밋에서 **Deploy docs**를
 호출한다. Changesets는 릴리스에 포함된 사이트 의존성의 고정 버전도 갱신한다.
 예를 들어 UI만 릴리스하면 사이트는 `core@0.1.0`, `dom@0.1.0`과
-`ui@0.1.1`을 함께 사용할 수 있다. 태그와 GitHub Release는 별도 잡에서 발행
-기록으로 남긴다. 다른 레지스트리의 발행 워크플로도 기본 브랜치에서 해당 워크플로
-SHA의 패키지 발행을 완료한 뒤 호출할 수 있다. 공개 배치를 `released_packages`의
-`registry`(`npm` 또는 `pub.dev`), `name`,
-`version` 항목으로 전달한다. 각 재사용 호출에서 `CLOUDFLARE_PRODUCTION_API_TOKEN`
+`ui@0.1.1`을 함께 사용할 수 있다. 두 배포 경로 모두 각 공개 npm 아카이브에 기록된
+소스 커밋의 패키지 트리를 배포 후보와 대조한다. 이번 npm 배치에 포함된 패키지의
+소스는 릴리스 커밋이어야 한다. 미발행 변경이 있으면 해당 패키지 릴리스까지 문서 배포를
+중단한다.
+태그와 GitHub Release는 별도 잡에서 발행 기록으로 남긴다.
+npm 호출자는 공개 배치를 `released_packages`의 `registry`, `name`, `version` 항목으로
+전달한다. 레지스트리 검사는 pub.dev 아카이브도 확인할 수 있다. 저장소에 다른
+레지스트리용 패키지를 추가할 때는 문서 배포 전에 해당 디렉터리의 소스 증명도 연결한다.
+각 재사용 호출에서 `CLOUDFLARE_PRODUCTION_API_TOKEN`
 시크릿 이름을 넘기고, 값은 `docs-production` 환경에 둔다.
 
 자동과 수동 배포는 운영 큐 하나를 공유한다. Cloudflare 버전 메타데이터와 공개
@@ -99,11 +103,15 @@ SHA의 패키지 발행을 완료한 뒤 호출할 수 있다. 공개 배치를 
 최초 `0.1.0` 배포의 Cloudflare 메타데이터에 있는 단일 SHA는 두 커밋을 함께 가리킨다.
 운영에 더 최신 커밋이 있으면 이전 실행을 건너뛰고, 업로드 직전에 활성 Cloudflare
 버전도 확인한다. 공개 사이트 검사에 성공하면 GitHub Deployments에 기록한다.
+활성 Worker 버전에 소스 메타데이터가 없으면 이전에 검증한 메타데이터 포함 버전으로
+복구한 뒤 재시도한다. 배포 순서를 확인하는 데 이 메타데이터가 필요하다.
 
 사이트만 실패하면 기존 릴리스 실행의 **Build, verify, and deploy docs** 잡에서
 **Re-run jobs**를 선택한다.
 배포 기록만 실패한 경우에도 앞선 문서 배포 잡을 실행해 공개 사이트를 다시 확인한다.
 GitHub는 잡 재시도 시 원래 SHA와 이미 성공한 패키지 발행 결과를 사용한다.
+레지스트리의 `latest`가 바뀐 뒤에도 고정된 공개 버전을 사용한다. 운영에 더 최신
+사이트 커밋이 있으면 이 실행은 배포를 건너뛴다.
 [GitHub 잡 재시도 안내](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/re-run-workflows-and-jobs#re-running-a-specific-job)
 
 저장소 변수 `CLOUDFLARE_ACCOUNT_ID`에는 `miinhlym.workers.dev`를 소유한 계정을

@@ -92,7 +92,7 @@ jobs:
           node apps/docs/scripts/verify-site-previews.mjs
       - name: Recheck the public packages
         if: steps.source.outputs.deploy == 'true'
-        run: node .github/scripts/verify-docs-release.mjs --once
+        run: node .github/scripts/verify-docs-release.mjs --availability-only
       - name: Publish the production site
         id: publish
         if: steps.source.outputs.deploy == 'true'

@@ -32,16 +32,15 @@ test('npm metadata is insufficient until the version archive is publicly availab
   }
 });
 
-test('an older release or an unexpected download origin cannot deploy the current site', async () => {
-  await assert.rejects(isPublicRelease(npm, async () => npmMetadata('0.1.1')), /superseded/);
+test('release archives must have the expected registry origin', async () => {
   await assert.rejects(isPublicRelease(npm, async () => npmMetadata('0.1.0', 'https://invalid.example/core.tgz')),
     /Unexpected archive origin/);
 });
 
-test('a manual deployment can use an exact public version even if npm latest advanced', async () => {
+test('an exact public version remains valid for docs if npm latest advanced', async () => {
   const request = async (_url, options) => options.method === 'HEAD' ? new Response(null) : npmMetadata('0.1.1');
-  assert.equal(await isPublicRelease(npm, request, false), true);
-  assert.equal(await isPublicRelease(npm, async () => new Response(null, { status: 404 }), false), false);
+  assert.equal(await isPublicRelease(npm, request), true);
+  assert.equal(await isPublicRelease(npm, async () => new Response(null, { status: 404 })), false);
 });
 
 test('a Dart release uses pub.dev metadata and checks the public archive', async () => {

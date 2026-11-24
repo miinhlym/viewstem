@@ -155,7 +155,7 @@ test('release callers forward the named token and isolate manual CI from publish
   assert.match(production, /ref: \$\{\{ github\.sha \}\}/);
   assert.match(production, /github\.ref == format\('refs\/heads\/\{0\}', github\.event\.repository\.default_branch\)/);
   assert.match(production, /group: docs-production\n\s+queue: max/);
-  assert.match(production, /verify-docs-release\.mjs --once/);
+  assert.match(production, /verify-docs-release\.mjs --availability-only/);
   assert.doesNotMatch(production, /id-token:|npm publish|verify-source|source_sha:/);
   assert.ok(production.indexOf('verify-docs-release.mjs') < production.indexOf('build-published.mjs'));
   assert.ok(production.indexOf('assert-active') < production.indexOf('wrangler deploy'));

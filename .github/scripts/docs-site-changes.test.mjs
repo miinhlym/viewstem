@@ -70,26 +70,33 @@ function repository(t) {
   function mockRegistry() {
     write('mock-registry.mjs', `
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 globalThis.fetch = async (url, { method }) => {
   const endpoint = new URL(url);
   assert.equal(endpoint.origin, 'https://registry.npmjs.org');
-  if (method === 'HEAD') {
-    return new Response(null, { status: endpoint.pathname.includes('core-0.1.1')
-      ? Number(process.env.ARCHIVE_STATUS) : 200 });
+  if (endpoint.pathname.endsWith('.tgz')) {
+    const name = endpoint.pathname.split('/-/')[0].split('/').at(-1);
+    const status = endpoint.pathname.includes('core-0.1.1') ? Number(process.env.ARCHIVE_STATUS) : 200;
+    const archives = JSON.parse(process.env.MOCK_ARCHIVES);
+    return new Response(method === 'GET' && status === 200 ? readFileSync(archives[name]) : null, { status });
   }
   const name = decodeURIComponent(endpoint.pathname.slice(1));
-  const version = name === '@viewstem/core' && process.env.GITHUB_EVENT_NAME === 'push'
-    && process.env.MOCK_PUBLISH_STATUS === undefined ? '0.1.1' : '0.1.0';
-  return Response.json({ 'dist-tags': { latest: version }, versions: {
-    [version]: { dist: { tarball: \`\${endpoint.origin}/\${name}/-/\${name.split('/').at(-1)}-\${version}.tgz\` } },
-  } });
+  const versions = process.env.MOCK_PUBLISH_STATUS === undefined ? ['0.1.0', '0.1.1'] : ['0.1.0'];
+  return Response.json({ 'dist-tags': { latest: process.env.MOCK_LATEST || versions.at(-1) },
+    versions: Object.fromEntries(versions.map(version => [version, {
+      dist: { tarball: \`\${endpoint.origin}/\${name}/-/\${name.split('/').at(-1)}-\${version}.tgz\` },
+    }])),
+  });
 };
 `);
     return ['--import', join(dir, 'mock-registry.mjs')];
   }
-  function verify(event, batch, archiveStatus) {
+  function verify(event, batch, archiveStatus, { latest = '', sources = {} } = {}) {
+    const sha = git('rev-parse', 'HEAD');
+    const archives = Object.fromEntries(packages.map(name => [name, packSource(name, sources[name] ?? base)]));
     return run(verifyRegistry, {
-      GITHUB_EVENT_NAME: event, RELEASED_PACKAGES: batch, ARCHIVE_STATUS: archiveStatus,
+      GITHUB_EVENT_NAME: event, RELEASED_PACKAGES: batch, ARCHIVE_STATUS: archiveStatus, MOCK_LATEST: latest,
+      GITHUB_SHA: sha, GITHUB_REPOSITORY: repo, MOCK_ARCHIVES: JSON.stringify(archives),
     }, mockRegistry(), ['--once']);
   }
   function publish(sha, before, targets, status) {
@@ -108,6 +115,12 @@ esac
   }
   function verifyPlan(sha, before) {
     return run(planRelease, { GITHUB_SHA: sha, BEFORE_SHA: before }, [], ['verify-plan']);
+  }
+  function packSource(name, sha) {
+    write('package/README.md', `[Source and documentation for this version](https://github.com/${repo}/blob/${sha}/docs/README.md)\n`);
+    const archive = join(dir, `${name}.tgz`);
+    execFileSync('tar', ['-czf', archive, '-C', dir, 'package/README.md']);
+    return archive;
   }
   const manifest = (name, version = '0.1.0') => JSON.stringify({ name: `@viewstem/${name}`, version });
   const docsManifest = (core = '0.1.0') =>
@@ -200,8 +213,7 @@ assert.equal(installedApi(), 'ready');\n`);
   const candidate = commit({ [guide]: 'Try the new unpublishedApi function. Fix a typo.\n' });
   assert.equal(git('diff', '--name-only', base, candidate, '--', ':(glob)**/package.json'), '');
   execFileSync(process.execPath, [example], { cwd: dir });
-  const publishedVersions = verify('workflow_dispatch', '', 200);
-  assert.equal(publishedVersions.status, 0, publishedVersions.stderr);
+  assert.match(verify('workflow_dispatch', '', 200).stderr, /@viewstem\/core@0.1.0 has unpublished changes/);
   const blocked = select(candidate, { base, through: base });
   assert.equal(blocked.status, 1);
   assert.match(blocked.stderr, /Wait for the next package release/);
@@ -209,6 +221,30 @@ assert.equal(installedApi(), 'ready');\n`);
   assert.equal(blocked.output, '');
   const reverted = commit({ [packageSource]: git('show', `${base}:${packageSource}`) + '\n' });
   assert.equal(select(reverted, { base, through: base }).status, 1);
+});
+
+test('a UI-only release cannot hide pending Core changes, and a later Core release can recover', t => {
+  const { base, commit, select, verify, manifest, docsManifest } = repository(t);
+  const live = { base, through: base };
+  const batch = name => JSON.stringify([{ registry: 'npm', name: `@viewstem/${name}`, version: '0.1.1' }]);
+  commit({ [packageSource]: 'export const unpublishedApi = () => "new";\n', [guide]: 'Try the unreleased Core API.\n' });
+  const ui = commit({ 'packages/ui/package.json': manifest('ui', '0.1.1') });
+  assert.equal(select(ui, live, 'push').status, 0);
+  const failed = verify('push', batch('ui'), 200, { sources: { ui } });
+  assert.match(failed.stderr, /@viewstem\/core@0.1.0 has unpublished changes/);
+  assert.equal(select(ui, live).status, 1);
+  assert.match(verify('workflow_dispatch', '', 200, { sources: { ui } }).stderr, /@viewstem\/core@0.1.0 has unpublished changes/);
+
+  const core = commit({ 'packages/core/package.json': manifest('core', '0.1.1'), 'apps/docs/package.json': docsManifest('0.1.1') });
+  const resumed = select(core, live, 'push');
+  assert.equal(resumed.status, 0, resumed.stderr);
+  assert.equal(resumed.output, `deploy=true\nbase=${core}\nthrough=${core}\n`);
+  const verified = verify('push', batch('core'), 200, { sources: { core, ui } });
+  assert.equal(verified.status, 0, verified.stderr);
+
+  const changedUi = commit({ 'packages/ui/src/index.mjs': 'export const notInPublicUI = true;\n' });
+  const blocked = verify('push', batch('core'), 200, { sources: { core: changedUi, ui } });
+  assert.match(blocked.stderr, /@viewstem\/ui@0.1.1 has unpublished changes/);
 });
 
 test('a release uses its exact commit and requires public archive availability without Git tags', t => {
@@ -226,11 +262,13 @@ test('a release uses its exact commit and requires public archive availability w
   const published = publish(sha, base, targets, 0);
   assert.equal(published.status, 0, published.stderr);
   const first = select(sha, { base, through: base }, 'push');
+  assert.equal(first.status, 0, first.stderr);
   assert.equal(first.output, `deploy=true\nbase=${sha}\nthrough=${sha}\n`);
-  const unavailable = verify('push', batch, 404);
+  const unavailable = verify('push', batch, 404, { sources: { core: sha } });
   assert.equal(unavailable.status, 1);
   assert.match(unavailable.stderr, /Public packages unavailable.*@viewstem\/core@0\.1\.1/);
-  assert.equal(verify('push', batch, 200).status, 0);
+  assert.equal(verify('push', batch, 200, { sources: { core: sha } }).status, 0);
+  assert.match(verify('push', batch, 200).stderr, /was not published from the release commit/);
 
   const newer = commit({ [guide]: 'Later unpublished docs change\n' });
   assert.match(publish(sha, base, targets, 0).stderr, /checkout does not match the release commit/);
@@ -239,7 +277,8 @@ test('a release uses its exact commit and requires public archive availability w
   assert.equal(retry.status, 0, retry.stderr);
   assert.equal(retry.output, first.output);
   assert.equal(git('rev-parse', 'HEAD'), sha);
-  assert.equal(verify('push', batch, 200).status, 0);
+  const advanced = verify('push', batch, 200, { latest: '0.2.0', sources: { core: sha } });
+  assert.equal(advanced.status, 0, advanced.stderr);
   assert.equal(readFileSync(join(dir, 'publications'), 'utf8'), `${sha}\n${sha}\n`);
   const outdated = select(sha, { base: sha, through: newer }, 'push');
   assert.equal(outdated.status, 0, outdated.stderr);
