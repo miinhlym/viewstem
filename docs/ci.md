@@ -43,7 +43,12 @@ the Release PR with version bumps, any internal dependency updates, and the
 refreshed npm lockfile.
 A maintainer may need to approve its CI run in GitHub because it was created by
 `GITHUB_TOKEN`. Merge the Release PR after **CI complete**. The same check
-must pass on the merged commit before npm publishing runs. Publishing requires
+must pass on the merged commit before npm publishing runs. Release PR CI and
+the publishing workflow regenerate the Changesets output from the PR base and
+the pre-merge commit, respectively, in a temporary directory. They compare all
+generated files, including manifests, changelogs, and consumed changesets, with
+the candidate commit. npm validates the lockfile separately. Changed input
+blocks stale release output. Publishing requires
 the previous package versions to be public. Each internal dependency must already
 be public or appear earlier in the batch. After npm publishing succeeds, the
 documentation job verifies the public versions and deploys the same commit.

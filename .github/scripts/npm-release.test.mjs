@@ -137,6 +137,7 @@ test('release callers forward the named token and isolate manual CI from publish
   const release = await readFile(new URL('../workflows/npm-release.yml', import.meta.url), 'utf8');
   assert.match(core, /group:.*github\.event_name.*github\.event\.pull_request\.number \|\| github\.sha/);
   assert.match(core, /needs: \[compatibility, ui\]/);
+  assert.match(core, /BEFORE_SHA: \$\{\{ github\.event\.pull_request\.base\.sha \}\}\n\s+run: node \.github\/scripts\/npm-release\.mjs verify-plan/);
   assert.match(core, /workflow_dispatch' && 'Manual CI complete' \|\| 'CI complete'/);
   assert.doesNotMatch(core, /docs-label|unlabeled/);
   const namedSecret = /secrets:\n\s+CLOUDFLARE_PRODUCTION_API_TOKEN: \$\{\{ secrets\.CLOUDFLARE_PRODUCTION_API_TOKEN \}\}/;
@@ -147,6 +148,7 @@ test('release callers forward the named token and isolate manual CI from publish
   assert.match(docs, namedSecret);
   assert.doesNotMatch(release, /docs-refresh|docs_publishable/);
   assert.match(release, /changeset status --output.*\n.*\.type != "none"/);
+  assert.match(release, /BEFORE_SHA: \$\{\{ github\.event\.before \}\}\n\s+run: node \.github\/scripts\/npm-release\.mjs verify-plan/);
   const production = await readFile(new URL('../workflows/docs-release.yml', import.meta.url), 'utf8');
   assert.match(production, /^name: Deploy docs\n/);
   assert.match(production, /workflow_dispatch:\n\npermissions:/);

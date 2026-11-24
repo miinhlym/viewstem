@@ -1,14 +1,14 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { appendFile, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { appendFile, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const registry = 'https://registry.npmjs.org';
 const packages = ['core', 'dom', 'svelte', 'ui'];
 const stableVersion = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
-const run = (command, args) => execFileSync(command, args, { encoding: 'utf8' }).trim();
+const run = (command, args, options) => execFileSync(command, args, { encoding: 'utf8', ...options }).trim();
 
 export function isReleasePullRequest(pr, repository, sha, branch) {
   return pr.merged_at && pr.merge_commit_sha === sha
@@ -97,6 +97,36 @@ function readReleaseManifest(directory, previous) {
   const path = `packages/${directory}/package.json`;
   const ref = previous ? process.env.BEFORE_SHA : process.env.GITHUB_SHA;
   return JSON.parse(run('git', ['show', `${ref}:${path}`]));
+}
+
+async function verifyChangesetsPlan() {
+  const { BEFORE_SHA: before, GITHUB_SHA: sha } = process.env;
+  assert.equal(run('git', ['rev-parse', 'HEAD']), sha, 'The checkout does not match the release commit');
+  assert.equal(run('git', ['status', '--porcelain', '--untracked-files=no']), '', 'Expected a clean release checkout');
+  run('git', ['merge-base', '--is-ancestor', before, sha]);
+  assert.ok(releaseTargets(readReleaseManifest).length, 'Release PR must bump at least one public package');
+  const { baseBranch, commit } = JSON.parse(run('git', ['show', `${before}:.changeset/config.json`]));
+  assert.equal(commit, false, 'Changesets version generation must leave changes uncommitted');
+  const cli = fileURLToPath(import.meta.resolve('@changesets/cli/bin.js'));
+  const directory = await mkdtemp(join(tmpdir(), 'viewstem-changesets-plan-'));
+  try {
+    // Run the same generator against the original inputs without changing the tested checkout.
+    const objects = run('git', ['rev-parse', '--path-format=absolute', '--git-path', 'objects']);
+    const options = { cwd: directory, env: { ...process.env, GIT_ALTERNATE_OBJECT_DIRECTORIES: objects } };
+    const snapshot = (...args) => run('git', args, options);
+    snapshot('init', '--quiet', '--template=', '--initial-branch', baseBranch);
+    snapshot('switch', '--quiet', '-C', baseBranch, before);
+    await symlink(fileURLToPath(new URL('../../node_modules/', import.meta.url)), join(directory, 'node_modules'), 'dir');
+    run(process.execPath, [cli, 'version'], options);
+    snapshot('add', '--all', '--', '.', ':(exclude)node_modules');
+    const generated = snapshot('write-tree');
+    // npm ci checks the lockfile against the generated manifests without resolving versions again.
+    const differences = snapshot('diff', '--name-only', '--no-renames', generated, sha, '--',
+      '.', ':(exclude)package-lock.json');
+    assert.equal(differences, '', `Release PR differs from Changesets output at the base commit:\n${differences}`);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 }
 
 async function readRegistry(name) {
@@ -197,6 +227,7 @@ async function createReleases(targets) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const command = process.argv[2];
   if (command === 'plan') await plan();
+  else if (command === 'verify-plan') await verifyChangesetsPlan();
   else if (command === 'publish') await publish(JSON.parse(process.env.RELEASE_TARGETS));
   else if (command === 'tag') await createReleases(JSON.parse(process.env.RELEASE_TARGETS));
   else throw new Error(`Unknown release command: ${command}`);

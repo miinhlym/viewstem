@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { delimiter, dirname, join } from 'node:path';
 import { test } from 'node:test';
@@ -28,9 +28,16 @@ function repository(t) {
   }
   function commit(files) {
     for (const [name, content] of Object.entries(files)) {
-      write(name, content);
-      git('add', '--', name);
+      if (content === null) {
+        git('rm', '--', name);
+      } else {
+        write(name, content);
+        git('add', '--', name);
+      }
     }
+    return saveRevision();
+  }
+  function saveRevision() {
     git('commit', '-m', 'Test revision');
     const sha = git('rev-parse', 'HEAD');
     git('update-ref', 'refs/remotes/origin/main', sha);
@@ -99,9 +106,16 @@ esac
       PATH: `${dir}${delimiter}${process.env.PATH}`, MOCK_PUBLISH_STATUS: status, MOCK_PUBLISH_LOG: join(dir, 'publications'),
     }, mockRegistry(), ['publish']);
   }
+  function verifyPlan(sha, before) {
+    return run(planRelease, { GITHUB_SHA: sha, BEFORE_SHA: before }, [], ['verify-plan']);
+  }
   const manifest = (name, version = '0.1.0') => JSON.stringify({ name: `@viewstem/${name}`, version });
-  const docsManifest = (core = '0.1.0') => JSON.stringify({ dependencies: { '@viewstem/core': core } });
+  const docsManifest = (core = '0.1.0') =>
+    JSON.stringify({ name: '@viewstem/docs', private: true, dependencies: { '@viewstem/core': core } });
   const base = commit({
+    'package.json': JSON.stringify({ name: 'viewstem-fixture', private: true, workspaces: ['packages/*', 'apps/docs'] }),
+    'package-lock.json': '{"lockfileVersion": 3}\n',
+    '.changeset/config.json': JSON.stringify({ baseBranch: 'main', commit: false, changelog: '@changesets/cli/changelog' }),
     ...Object.fromEntries(packages.map(name => [`packages/${name}/package.json`, manifest(name)])),
     'apps/docs/package.json': docsManifest(),
     [packageSource]: 'export const installedApi = () => "ready";\n',
@@ -109,8 +123,51 @@ esac
     'packages/core/README.ko.md': 'Core\n',
     [guide]: 'Use the installed API\n',
   });
-  return { base, commit, dir, git, select, plan, verify, publish, manifest, docsManifest };
+  function generateRelease() {
+    const modules = fileURLToPath(new URL('../../node_modules/', import.meta.url));
+    symlinkSync(modules, join(dir, 'node_modules'), 'dir');
+    execFileSync(process.execPath, [join(modules, '@changesets/cli/bin.js'), 'version'], { cwd: dir, stdio: 'pipe' });
+    git('add', '--all', '--', '.changeset', 'packages', 'apps');
+    return saveRevision();
+  }
+  return { base, commit, dir, git, select, plan, verify, verifyPlan, generateRelease, publish, manifest, docsManifest };
 }
+
+test('the merged release must match Changesets on the pre-merge commit', t => {
+  const { base, commit, git, manifest, verifyPlan, generateRelease } = repository(t);
+  const intended = commit({ '.changeset/core-feature.md': '---\n"@viewstem/core": patch\n---\n\nUpdate Core.\n' });
+  const genuine = generateRelease();
+  git('switch', '--detach', genuine);
+  git('branch', '-D', 'main');
+  const accepted = verifyPlan(genuine, intended);
+  assert.equal(accepted.status, 0, accepted.stderr);
+  assert.equal(git('rev-parse', 'HEAD'), genuine);
+  assert.equal(git('for-each-ref', 'refs/heads'), '');
+
+  git('switch', '--detach', base);
+  const withdrawn = commit({ '.changeset/empty.md': '---\n---\n\nNo release.\n' });
+  const stale = commit({ 'packages/core/package.json': manifest('core', '0.1.1') });
+  assert.match(verifyPlan(stale, withdrawn).stderr, /Release PR differs from Changesets output/);
+  assert.equal(git('rev-parse', 'HEAD'), stale);
+
+  git('switch', '--detach', intended);
+  const larger = commit({ '.changeset/core-feature.md': '---\n"@viewstem/core": minor\n---\n\nUpdate Core.\n' });
+  const wrongVersion = commit({ 'packages/core/package.json': manifest('core', '0.1.1') });
+  assert.match(verifyPlan(wrongVersion, larger).stderr, /packages\/core\/package.json/);
+
+  git('switch', '--detach', base);
+  const replaced = commit({ '.changeset/replacement.md': '---\n"@viewstem/core": patch\n---\n\nReplace Core change.\n' });
+  const sameBump = commit({ 'packages/core/package.json': manifest('core', '0.1.1') });
+  assert.match(verifyPlan(sameBump, replaced).stderr, /\.changeset\/replacement.md/);
+
+  git('switch', '--detach', intended);
+  const revised = commit({ '.changeset/core-feature.md': '---\n"@viewstem/core": patch\n---\n\nRevised summary.\n' });
+  const sameId = commit({ 'packages/core/package.json': git('show', `${genuine}:packages/core/package.json`) + '\n',
+    'apps/docs/package.json': git('show', `${genuine}:apps/docs/package.json`) + '\n',
+    'packages/core/CHANGELOG.md': git('show', `${genuine}:packages/core/CHANGELOG.md`) + '\n',
+    '.changeset/core-feature.md': null });
+  assert.match(verifyPlan(sameId, revised).stderr, /packages\/core\/CHANGELOG.md/);
+});
 
 test('a docs-only commit does not publish packages and can deploy as the exact manual SHA', t => {
   const { base, commit, git, select, plan, verify } = repository(t);
