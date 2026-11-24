@@ -1,3 +1,4 @@
+import { unified } from '@astrojs/markdown-remark';
 import starlight from '@astrojs/starlight';
 import svelte from '@astrojs/svelte';
 import tailwindcss from '@tailwindcss/vite';
@@ -28,6 +29,8 @@ const publishedPackages = {
 export default defineConfig({
   site: 'https://viewstem.miinhlym.workers.dev',
   output: 'static',
+  compressHTML: true,
+  markdown: { processor: unified() },
   vite: { plugins: [tailwindcss(), ...(publishedModules ? [publishedPackages] : [])] },
   redirects: {
     '/docs/concepts/state-and-actions/': '/docs/concepts/state/',
