@@ -33,13 +33,6 @@ export function ownsDeployment(deployment, number) {
     Number(deployment.payload?.pull_request) === number;
 }
 
-export function legacyDeployment(deployment, status, url) {
-  // The previous native environment integration has no per-PR payload. Never
-  // infer ownership from a SHA, branch, or a substring (e.g. pr-6 vs pr-60).
-  return deployment.environment === 'docs-preview' && deployment.task === 'deploy' &&
-    status?.environment_url?.replace(/\/$/, '') === url;
-}
-
 export async function verifyPublic(fetchImpl, url, identity, removed, { attempts = 10, pause = sleep } = {}) {
   let lastError;
   for (let attempt = 0; attempt < attempts; attempt++) {
@@ -187,11 +180,8 @@ export async function reconcile(mode, env, event, { fetchImpl = fetch, publish =
     }
   }
   for (const deployment of deployments) {
-    if (deployment.id === activeId) continue;
-    // Legacy records need exact URL evidence before touching their state.
-    if (!ownsDeployment(deployment, number) && !(deployment.environment === 'docs-preview' && deployment.task === 'deploy')) continue;
+    if (deployment.id === activeId || !ownsDeployment(deployment, number)) continue;
     const [status] = await api.request(`/deployments/${deployment.id}/statuses?per_page=1`);
-    if (!ownsDeployment(deployment, number) && !legacyDeployment(deployment, status, url)) continue;
     // A state change between creating a record and its first status can leave
     // an owned record with no status; cleanup must retire that record too.
     if (status && !['success', 'queued', 'pending', 'in_progress'].includes(status.state)) continue;

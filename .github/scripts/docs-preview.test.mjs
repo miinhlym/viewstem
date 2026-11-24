@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { EventEmitter } from 'node:events';
-import { artifactIdentity, desiredAction, legacyDeployment, ownsDeployment, reconcile, runWrangler, verifyPublic } from './docs-preview.mjs';
+import { artifactIdentity, desiredAction, ownsDeployment, reconcile, runWrangler, verifyPublic } from './docs-preview.mjs';
 
 const sha = 'a'.repeat(40);
 const repository = 'miinhlym/viewstem';
@@ -95,7 +95,7 @@ test('ready history and comment follow public artifact verification, without cro
   assert.match(mutations.at(-1).body.body, /Viewstem preview ready/);
 });
 
-test('cleanup covers retarget-away and updates only owned native or explicit deployment records', async () => {
+test('retarget-away cleanup retires only records explicitly owned by the PR', async () => {
   const { calls, options } = harness({ live: pr({ base: { ref: 'release' } }), deployments: [
     { id: 1, task: 'deploy', environment: 'docs-preview' },
     { id: 2, task: 'deploy', environment: 'docs-preview' },
@@ -106,7 +106,9 @@ test('cleanup covers retarget-away and updates only owned native or explicit dep
   assert.equal(await reconcile('cleanup', env, event, options), 'cleanup');
   assert.deepEqual(writes(calls), []);
   assert.equal(await reconcile('removed', env, event, options), 'cleanup');
-  assert.deepEqual(writes(calls).map((call) => call.path), ['/deployments/1/statuses', '/deployments/4/statuses', '/issues/comments/11']);
+  assert.deepEqual(writes(calls).map((call) => call.path), ['/deployments/4/statuses', '/issues/comments/11']);
+  assert.deepEqual(calls.filter(call => call?.path?.endsWith('/statuses?per_page=1')).map(call => call.path),
+    ['/deployments/3/statuses?per_page=1', '/deployments/4/statuses?per_page=1']);
   assert.ok(calls.indexOf('delete') < calls.findIndex((call) => call?.verified === 'removed'));
   assert.match(writes(calls).at(-1).body.body, /preview removed/);
 });
@@ -152,9 +154,9 @@ test('public deletion requires both paths to become 404/410; redirects, errors, 
   await verifyPublic(async () => ({ status: 404 }), url, {}, true);
 });
 
-test('ownership requires the exact per-PR task/payload or native public alias', () => {
+test('ownership requires the exact per-PR task and payload', () => {
   assert.equal(ownsDeployment({ environment: 'docs-preview', task: 'docs-preview-pr-6', payload: { pull_request: 60 } }, 6), false);
-  assert.equal(legacyDeployment({ environment: 'docs-preview', task: 'deploy' }, { environment_url: `${url}/other` }, url), false);
+  assert.equal(ownsDeployment({ environment: 'docs-preview', task: 'deploy', payload: { pull_request: 6 } }, 6), false);
 });
 
 test('workflow handles base edits without branch filters and keeps cleanup on trusted code and queued jobs', async () => {
