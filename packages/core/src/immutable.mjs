@@ -1,4 +1,5 @@
 const known = new WeakSet();
+export const isProtected = value => known.has(value);
 const readonly = () => { throw Object.assign(new Error('READ_ONLY'), { code: 'READ_ONLY' }); };
 
 export function trustedCopies(input) {

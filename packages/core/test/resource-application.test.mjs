@@ -60,6 +60,85 @@ test('View refresh reuses port compilation and validates current inputs against 
   assert.deepEqual(entries(), [['error', undefined, 'TYPE_MISMATCH'], ['ready', 'new-h', undefined]]);
 });
 
+test('refresh reuses a stable repeat and still evaluates leaves that read another Query', async t => {
+  const p = path => ({ '@path': path });
+  const row = binding('Row');
+  row.contract.spec.slots = { default: {} };
+  const option = binding('Option');
+  option.contract.spec.ports = { label: { kind: 'Value', schema: { type: 'string' }, required: true } };
+  const registry = localRegistry().registerResourceSet(localSet({
+    id: 'components', version: '1', components: [row, option, binding('Button')],
+  }));
+  const seen = [];
+  registry.registerAction({
+    kind: 'Action', id: 'capture', spec: { ports: { label: option.contract.spec.ports.label } },
+  }, ({ inputs }) => { seen.push(inputs.label); });
+  let items = [{ id: 1, name: 'One' }, { id: 2, name: 'Two' }], summary = 'Before';
+  const requests = [];
+  const runtime = localRuntime({ registry, requestExecutor({ request }) {
+    requests.push(request.path);
+    return { status: 200, headers: {}, body: request.path === '/items' ? items : summary };
+  } });
+  t.after(() => runtime.dispose());
+  const query = path => ({ query: {
+    sources: { value: {
+      datasource: { kind: 'Http', baseUrl: 'https://example.test' }, request: { method: 'GET', path },
+    } },
+    transform: { input: p('/sources/value') },
+  } });
+  const repeated = (id, label) => ({
+    id, componentRef: 'Option', inputs: { label },
+    repeat: { items: p('/queries/items/data'), as: 'item', key: p('/repeat/item/id') },
+  });
+  const source = {
+    queries: { items: query('/items'), summary: query('/summary') },
+    render: { id: 'row', componentRef: 'Row', slots: { default: [
+      repeated('stable', p('/repeat/item/name')),
+      repeated('dependent', p('/queries/summary/data')),
+      { ...repeated('literal', p('/repeat/item/name')), repeat: {
+        items: [{ id: 1, name: 'Literal' }], as: 'item', key: p('/repeat/item/id'),
+      } },
+      { ...repeated('dynamicArray', p('/repeat/item/current')), repeat: {
+        items: [{ id: 1, current: p('/queries/summary/data') }], as: 'item', key: p('/repeat/item/id'),
+      } },
+      { id: 'button', componentRef: 'Button', on: {
+        click: { actionRef: 'capture', inputs: { label: p('/queries/summary/data') } },
+      } },
+    ] } },
+  };
+  const view = await runtime.createView(source);
+  await view.whenSettled(view.initial);
+  const children = () => view.getSnapshot().roots[0].children;
+  const labels = () => children().slice(0, 4).map(node => node.inputs.label);
+  const before = children();
+  assert.deepEqual(labels(), ['One', 'Two', 'Before', 'Before']);
+
+  const prepare = t.mock.method(rendererView(view), 'prepareInputs');
+  const countStable = () => prepare.mock.calls.filter(({ arguments: [, inputs] }) =>
+    inputs?.label?.['@path'] === '/repeat/item/name').length;
+  summary = 'After';
+  await view.getQuery('summary').refresh();
+  await tick();
+  assert.deepEqual(labels(), ['One', 'Two', 'After', 'After']);
+  assert.deepEqual(children().slice(4, 6).map(node => node.inputs.label), ['Literal', 'After']);
+  assert.equal(countStable(), 0);
+  assert.deepEqual(requests, ['/items', '/summary', '/summary']);
+  await view.emit(before.at(-1), 'click', null);
+  assert.deepEqual(seen, ['After']);
+
+  items = [{ id: 2, name: 'Updated two' }, { id: 1, name: 'One' }];
+  await view.getQuery('items').refresh();
+  await tick();
+  assert.deepEqual(labels(), ['Updated two', 'One', 'After', 'After']);
+  assert.deepEqual(children().slice(0, 2).map(node => node.generation), [before[1].generation, before[0].generation]);
+  assert.ok(countStable() >= 2);
+
+  const next = structuredClone(source);
+  next.render.slots.default[0].inputs.label = 'Reconfigured';
+  await view.whenSettled(await view.updateDefinition(next));
+  assert.deepEqual(labels(), ['Reconfigured', 'Reconfigured', 'After', 'After']);
+});
+
 test('State writes publish owning and connected Views and follow State port replacement', async t => {
   const p = value => ({ '@path': value });
   const number = binding('Number');
