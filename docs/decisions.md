@@ -1,0 +1,276 @@
+# 결정 등록부
+
+기준: 2026-10-28 [통합 명세 원본](https://chatgpt.com/space/page_7842bb8bff0c8191be6cd5831e7e375f), 2026-10-29 기존 승인 누락 복원 및 사용자 개선 요청에 따른 명확화. [E번호·U01과 실제 메시지 ID](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/history/evidence-index.md)를 함께 읽는다. 아래 ‘이유’는 근거와 최신 명세에 기초한 설계 목적의 요약이며 새 사용자 발언을 재구성한 것이 아니다.
+
+**확정 / 대체 / 보류 / 구체화 필요 / 이전 확정·이관 필요**를 구분한다. 짧은 수락을 직전 제안보다 넓게 해석하지 않는다. 원문 전체 대화의 축어록이 아니라 결정 추적 문서다.
+
+## A. 채택한 결정과 변경 이력
+
+<a id="a-현재-채택한-결정"></a>
+
+현재 규범은 [제품 명세](VIEWSTEM-SPEC.md)와 각 운영 안내를 따른다. 결정 행의 실험·초기 구현은 해당 시점에 완료한 범위를 나타낸다. 대체된 행은 후속 결정을 함께 표시한다.
+
+### 기본 계약과 값
+
+| ID | 의제·결정 | 이유·경계 | 근거 |
+|---|---|---|---|
+| D01 | 서비스 선언 화면과 에이전트 변경은 같은 엔진 | 별도 상태/조회 모델의 중복 방지; 에이전트 없이 실행 | E03, E05, E20 |
+| D02 | 언어 독립 계약 / JS core / 렌더러 분리 | DOM 종속 방지; Dart는 후속 별도 구현 | E04, E41 |
+| D03 | 개인 core는 도메인 중립, 회사 확장은 별도 | 회사→core 단방향 의존, 업무 로직 유출 방지 | E41 |
+| D04 | Datasource·Query·Variable·Action·Component·View·Type 7종 | 데이터·계산·동작·화면·타입의 재사용 경계 | E06–E10 |
+| D05 | 독립 리소스 kind/id/name?/spec, 내부 평탄화 | 실제 리소스 경계만 spec; 표시 name은 참조키 아님 | E25→E27, E33 |
+| D06 | 독립 참조 xxxRef 문자열 ID | 일반 type과 구분, 대상 종류 검증 가능 | E12, E39 |
+| D07 | Value/State/Query ports → 사용처 inputs → /ports/name | 값과 쓰기 셀 및 Query 인스턴스 정체성을 구분 | E32, E34 |
+| D08 | Query/Variable Value만; Action/Component/View 세 kind; 나머지 ports 없음 | 계산 입력과 변경 가능한 대상의 명시적 전달 | E34 |
+| D09 | State/Derived, 소유자별 수명, 명시 공유 | 같은 정의의 두 사용은 기본 독립; Derived 쓰기 금지; 같은 Store·같은 대상 reaction 중복 거절 | E07, E11, E24→E33, E44 |
+| D10 | 인스턴스 이름 공간은 View/재사용 Component | 시각 컨테이너 이동과 수명 구분; repeat는 안정 key | E14, E41 |
+| D11 | Query sources 맵 + transform 단일 구조 | 단일/복합 소비 계약 동일; 내부 source 우회 주입 금지; Concat.with 순서 보존 | E06, E29, E49, 통합 명세 §10.2 |
+| D12 | CRUD Query 허용, Action에서 명시 실행 | 메서드가 부작용/보안의 판별 기준은 아님 | E29 |
+| D13 | 현재 리소스 기반 요청, 직접 실행/필요시 서버 중계 | 미저장·동적 리소스도 실행; secret 사용권한과 목적지 검증 | E23 |
+| D14 | secrets 별칭 + @path, Login만 auth kind | 기존 API Key/Bearer 기능을 일반 header/params로 표현 | E28 |
+| D15 | CEL/spec.expression과 @path/@call 유지 | 계산 언어와 동적 연결 문법은 별개 | E21, E22, E31 |
+| D16 | JSON Schema 또는 typeRef, 포트 required 분리 | 입력 존재와 객체 필수 속성을 혼동하지 않음 | E38→E39, E41 |
+| D17 | 순차 Action·실패 중단·입력 스냅샷 | 실행 중 입력 변화와 후속 단계의 의미 안정화 | E16 |
+| D18 | Query/Action/Variable/SetState/RefreshQuery/If/Assert | If.condition·필수 then/선택 else, Assert.condition·message 오류; 일반 RefreshQuery는 refresh:false 존중; 외부 효과 롤백 없음 | E29–E31, E41, E48, E50 |
+| D19 | output.schema 또는 typeRef + 선언형 value | 코드 함수 반환과 선언형 평가가 같은 검증 실제값을 제공 | E42 |
+| D20 | output 없음=void, false는 성공값, null은 명시 타입 | truthiness·UI 빈값·단계 결과 부재 혼동 방지 | E42, 통합 명세 §7.1 |
+| D21 | 코드 Component/Action 등록 | UI/알림/이동 등의 호스트 기능을 리소스 호출에 연결 | E41, E42 |
+| D22 | 실제 호출 연결 제거 또는 소유자 폐기 시 후속/하위 Action·늦은 결과 폐기 | View가 살아 있어도 연결 제거면 적용; native 협력 취소·호출 핸들 차단; 공유 대상 자체 파괴 아님 | E43, E42 |
+| D23 | View/Component 단일 render 루트 + 트리 | 화면 진입점/재사용 단위와 레이아웃 책임 분리 | E41 |
+| D24 | slots만 사용, 슬롯별 순서 있는 배열/전체 슬롯 전달 | 다중 영역과 forwarding의 한 문법; 작성자 scope 보존 | E41 |
+| D25 | slots의 복수 노드는 수신 컴포넌트 DOM/CSS로 배치 | 암묵 Column 또는 일률 max1 강제 없음 | E41, 통합 명세 §10.6 |
+| D26 | events 공개 계약, on은 Action 호출 또는 Component emit | payload 명시 연결; 전역 버스나 자동 bubbling 아님 | E41 |
+| D27 | when false는 부재/폐기, repeat stablekey | 숨김과 수명 분리; reorder 시 코어 상태 보존 | E41 |
+| D28 | Grid.inputs.layout에 직접 노드/템플릿 ID | 공통 node.layout/필수 GridItem 없이 배치 분리 | E41 |
+| D29 | 상태·현재 구성·공용 정의 변경과 저장 분리 | 현재 화면 수정이 공용 원본 자동 수정 아님 | E17, E19 |
+| D30 | 코어 소유 State+구성 일괄 검증·원자 적용 | 일부 적용 금지; 외부 DB/API 트랜잭션은 아님 | E18 |
+| D31 | 저장된 공용 정의 자동 추종 없음 | 명시 주입/업데이트만 실행 화면에 반영 | E19 |
+| D32 | 브랜드 Viewstem | 10/27 최종 명칭 수락; scope 확보와 별개 | E41 |
+| D33 | StateStore 전체·단일·묶음 관찰, values/changes | 초기 통지·원자 변경당 1회·범위 제한·removed/null·같은 값의 replaced·해제 | E45 |
+| D34 | 라이브러리 생성 Store의 서비스 소유·주입 | 임의 외부 Store는 별도 확장; 공개/내부 등록 분리; 쓰기가 소유권을 바꾸지 않음 | E51 |
+| D35 | opt-in URL·고정 baseline·소유 key·실패 분리 | 승인 타입/JSON codec·정확한 key·유한 제한; 쓰기 실패에도 State 유지; 기본값과 같다는 이유의 자동 생략 금지; 모든 초기값의 URL 기록 의무는 아님; 연결 해제와 교체 정리 구별 | E46 |
+| D36 | Query 서비스 콜백 직전 컬렉션 변환 | 라이브러리가 재귀 Set→배열·Map→쌍 배열 변환; 원본 유지; 모든 export/DTO 직렬화 확정 아님 | E47 |
+| D37 | 등록 집합의 독립 정의는 (kind, id)로 식별 | 이번 개선 요청에 따른 명확화. 같은 종류 중복 거절·다른 종류 같은 ID 허용; 코드형/선언형 Component 및 Action은 각 종류 안에서 통합; xxxRef는 기대 종류만 조회 | U01 |
+| D38 | Query 실패 범위·위치 정보 | 기존 승인 복원. 필요한 source/단계 실패는 전체 실패·부분 성공값 금지·정상 빈 결과 성공·실패 source/단계 식별; DTO 상세는 미결 | E52 |
+| D39 | 시간 의존 계산과 Variable 결과 재사용 | CEL 도입이 현재 시각 공급·시간 변화 재평가·명시 inputs 재사용을 없애지 않음; clock API·빈도는 구체화 | E53 |
+| D40 | literal/escape 기본 의미 | 일반 path/call은 데이터, 동적 영역의 실제 @ 키는 @@ escape; A2UI 전체와 재귀/허용 위치 상세는 별개 | E54 |
+| D41 | RefreshQuery 불가 종료·fresh 완료 | 실행 조건 불가면 이유를 알리고 Action 중단; active 뒤 실제 새 요청 완료 대기; refresh:false 제외 결과는 별개 | E55 |
+| D42 | 호출 관찰 ID·입력 진단 | 선택 ID·owner 내 중복 오류·다른 인스턴스 동명 허용·ID 없이 연결별 재호출 제한; 입력 실패 원인/문제 입력 식별 | E56, E57 |
+| D43 | 타입별 동등성·격리·snapshot | 객체/배열 내용·배열 순서, Set native membership, Map string/number 키·재귀 값 비교; 원본 비동결 격리·안정 읽기/과거 snapshot | E58, E59 |
+| D44 | 날짜 계산·YY 경계·형식 | 정수 add 입력·YY00–68/69–99와 승인 패턴 보존; 모든 내부/전송 codec의 단일 형식을 강제하지 않음 | E60 |
+| D45 | 초기 적용 완료·서비스 연결 선택성 | 준비된 UI 점진 표시·실행 가능한 최초 처리 정리 후 완료·외부 입력 대기 비차단·적용 구조/타입 실패 보존; 정적 실행 콜백 불필요 | E61, E68 |
+| D46 | 선택 차트의 범위·데이터 소유·검증 | 엔진 선택/전환 제외, 입력 순서/중복X, 안정 series ID·option.series/series.data 금지, 세 차트 number/명시null | E62, E63, E65, E66 |
+| D47 | 동적 fanout 제외 한정·State 비롤백 | 여러 명시 Query/배열 inputs 허용; 목록 기반 자동 생성만 제외. 후속 실패가 완료한 SetState를 되돌리지 않음 | E64, E67 |
+| D48 | 자동 결합의 입력 변경 대기 | 입력 불변의 유효 결과 재사용, 변경된 입력 결과 준비 후 결합, 기존 조합을 이전 결과임을 구별한 갱신 중 상태로 유지. 실패 후 보존 정책의 승인은 별도 확인 | E69 |
+| D49 | State 값 전체에 명시적으로 undefined를 저장하는 쓰기 거절 | 초기값 미지정과 구별; 기존 값 유지·삭제로 해석하지 않음. null은 타입 허용 시 실제 값이며 코드 Action의 void는 별개. 객체 속성은 D50, 배열 원소는 D51, Set 원소는 D52, Map 값은 D53, 초기값 없는 State 읽기는 D54 | U02 |
+| D50 | 객체 속성의 undefined 입력 허용·필드 생략 정규화 | 정규화 후 필수 속성 검증; null·빈 객체·원본 보존, 저장값 비교는 정규화 기준. 키 존재를 열 정보로 쓰는 호스트는 정규화 전 별도 보존 필요. 배열 원소는 D51, Set 원소는 D52, Map 값은 D53. [값 상세](spec/10-value-contracts.md#객체-속성의-undefined-정규화) | U03 |
+| D51 | 배열 원소의 undefined와 빈 슬롯 거절 | 자동 원소 제거·null 치환 금지; 명시 null은 원소 타입이 허용할 때 보존. 배열 안 객체의 속성 정규화는 D50 유지. [값 상세](spec/10-value-contracts.md#배열-원소의-undefined와-빈-슬롯) | U04 |
+| D52 | Set 원소 자체의 undefined 거절 | 자동 원소 제거·null 치환 금지; 실패 시 기존 State·원본 Set 유지. 객체 원소 속성의 정규화와 native membership은 유지. [값 상세](spec/10-value-contracts.md#set-원소의-undefined) | U05 |
+| D53 | Map 값 자체의 undefined 거절 | 자동 엔트리 제거·null 치환 금지; 실패 시 기존 State·원본 Map 유지. 객체 값의 속성 정규화 후에도 엔트리 보존, key는 기존 string/number 제한 유지. [값 상세](spec/10-value-contracts.md#map-값의-undefined) | U06 |
+| D54 | 초기값 없는 State는 missing, JS 읽기는 undefined | 등록된 미지정 State·명시 null·미등록 State를 구분; 미등록 이름은 참조 오류. 읽은 undefined의 명시 쓰기는 D49에 따라 거절. SDK 이름·Dart/전송 표현은 별도. [값 상세](spec/10-value-contracts.md#초기값-없는-state-읽기) | U07 |
+| D55 | core 데이터의 숫자는 유한한 수만 허용 | NaN·Infinity·-Infinity 거절; 중첩 값·Map 숫자 key·수용할 계산 결과에도 적용. 자동 치환·제거 금지, State 쓰기 실패 시 기존 값·원본 유지. integer 범위는 D56, number 표현은 D57. [값 상세](spec/10-value-contracts.md#유한-숫자만-허용) | U08 |
+| D56 | integer는 JS 안전 정수 범위만 허용 | 양 끝을 포함한 -(2^53-1)부터 2^53-1까지의 유한한 정수. 범위 밖·소수·문자열 입력은 오류; 자동 반올림·문자열 변환 없음. 큰 정수 식별자는 처음부터 string으로 선언. [값 상세](spec/10-value-contracts.md#integer의-안전-정수-범위) | U09 |
+| D57 | number는 binary64, 추가 자동 반올림 없음 | JS Number와 같은 표현에 유한성 검증 적용. 입력·중첩 숫자·Map 숫자 key·수용할 계산 결과를 임의 자릿수로 보정하지 않음. 이진 근사 자체는 존재하며 반올림·표시는 호출자가 명시. -0 정규화는 D58. [값 상세](spec/10-value-contracts.md#number의-표현과-자동-반올림-금지) | U10 |
+| D58 | 음수 0은 양의 0으로 정규화 | number·integer 및 중첩 숫자·Map 숫자 key·수용할 계산 결과에 적용. 정규화 후 스키마 검증·변경 비교, 기존 0에 -0을 써도 값 변경 없음. 원본 보호, 작은 음수·문자열은 그대로. [값 상세](spec/10-value-contracts.md#음수-0의-정규화) | U11 |
+| D59 | 위임에 따른 값 검증 기본 규칙 일괄 확정 | 데이터의 BigInt·Symbol·함수·Promise·WeakMap·WeakSet과 순환 구조 거절, 비순환 공유 허용. 검증 시 coercion·default 주입·불허 속성 자동 제거 금지. 정규화→검증→변경 비교·반영, 유한 숫자 정확 비교·객체 속성 순서 무시. [값 상세](spec/10-value-contracts.md#값-검증의-공통-기본-규칙) | U12: 담당자 판단 위임 |
+
+### 계약 구체화와 최초 실험
+
+| ID | 의제·결정 | 이유·경계 | 근거 |
+|---|---|---|---|
+| D60 | 인라인·입력 기본값의 현행 문법 | 사용 위치별 ref/인라인 본문 XOR, Value 리터럴 default·required 배타·명시 missing/pending 보존. [기본 명세](VIEWSTEM-SPEC.md#411-인라인-정의의-사용-위치) | U13 |
+| D61 | State 포트의 선언 계약 일치 | 현재 값만으로 연결하지 않으며 typeRef·로컬 참조 해석 후 검증 구조 일치 확인. 일반 논리 포함 추론 제외, 매 쓰기 권한·타입·수명 검증 | U13 |
+| D62 | Query 순환·Action 재귀 거절 | 미사용·인라인·조건 분기까지 정적 그래프 검사, core 경유 동적 Action 호출 스택 보호. 코드 함수 자체의 강제 종료 보장은 아님 | U13 |
+| D63 | 스키마·값 평가·읽기 프로필 | JSON Schema 2020-12 subset과 native 확장, 동적 영역·한 번 평가·concat/formatString, missing/pending/ready/error snapshot. [Type](spec/03-variable-type.md#v1-스키마-프로필)·[값](spec/10-value-contracts.md#동적-값-평가-프로필) | U13 |
+| D64 | Query 변환·갱신·관찰 구체화 | Join 필드·순서, Concat 빈 with, queryDefaults·status/stale·대기 결합·refresh 제외 오류·명시 retry. 당시 남긴 실패 뒤 data 보존은 후속 D68로 확정 | U13 |
+| D65 | HTTP 프로필·현재 실행 계획 | 헤더/params/body·주소·응답·독립 Login·설정 가능한 timeout, HttpExecutionPlan·executeRequest·secret resolver. [현재 HTTP](spec/01-datasource-auth.md#http-전송-프로필과-현재-요청-dto) | U13 |
+| D66 | 최소 SDK·오류·Store·URL·Clock | 적용 commit/initial 분리·호출별 핸들·정제 오류, 주소/준비 관찰·reaction 매핑·URL 제한과 commit 유효성. 실제 어댑터는 T1–T4 검증 | U13 |
+| D67 | repeat 확장 뒤 항목별 when | key 전체 검증 후 when·inputs 평가. 중첩 as shadowing 거절·형제 별칭 허용, 반복 전체 gate는 바깥 노드 | U13 |
+| D68 | 자동 조회 실패 후 마지막 전체 성공 보존 | data·dataInputs 보존과 error/stale 표시, 첫 성공 전 missing, 새 성공의 원자 교체. 부분 성공·명시 Action Query의 캐시 대체 없음. [Query](spec/02-query.md#실패-후-마지막-성공-결과의-보존) | U14: Q1 추천 수락 |
+| D69 | 날짜 문자열·명시 업무 시간대 | date/time/datetime 구별, datetime offset 필수·UTC 밀리초 정규화, 서비스의 명시 IANA Value 입력. 일반 문자열 추정·ambient 시간대 없음. [날짜](spec/10-value-contracts.md#날짜-값과-전송-형식) | U14: Q2 추천 수락; 세부 프로필은 U12/U13 위임 |
+| D70 | v1 선언형 복구 제외·코드 Action 복구 | Try/Catch/Finally 미지원 등록 오류, 기본 실패 중단·비롤백. 등록한 코드 Action에서 명시 복구·정리하되 취소 수명 준수. [Action](spec/04-action.md#v1-오류-복구의-범위) | U14: Q3 추천 수락 |
+| D71 | T1 독립 실험과 후보 판정 (당시 실험) | [실험 결과](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t1-experiment-2026-10-29.md)에 따라 Ajv를 JSON 검증의 다음 우선 후보로 둠. CEL 최종 채택은 비용 계량·날짜/함수 경계·Dart 차이 때문에 보류. 실험 함수를 공개 SDK로 승격하지 않음 | U15: 실험 실행 승인 |
+| D72 | cel-js의 계산 제한·날짜를 패치하는 전제로 진행 (당시 도입 전제) | `@marcbachmann/cel-js` 8.0.0을 검토 기준으로 두 문제의 대응 방향을 닫고 다음 논의로 이동. [현재 패치 범위](spec/03-variable-type.md#cel-패치-전제)를 따르며 실제 수정·보안/적합성 검증·배포 방식은 후속 작업. D71의 미검증 결과를 통과로 바꾸거나 core 본 구현을 승인하는 결정은 아님 | U16: 패치 전제 수락 |
+| D73 | T2 Query 경합 독립 실험의 부분 검증 | [실험 결과](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-query-races-2026-10-29.md)에 지연 응답·fresh 대기·취소·교체·timeout의 프로토타입 증거를 보존. 현재 계약 유지, T2 전체·실제 core/HTTP/URL/renderer 완료로 확대하지 않음 | U17: 후속 실험 진행 승인 |
+| D74 | T2 URL commit 경계의 부분 검증 | [실험 결과](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-url-races-2026-10-29.md)에 Node/실제 Chromium의 지연 쓰기·복원·소유 key·history/한도 증거를 보존. 현재 계약 유지, core/renderer·날짜·실제 HTTP·전체 브라우저 적합성은 후속 | U18: URL 실험 검증 승인 |
+| D75 | 연속 검증의 첫 문제에서 중단 | U19의 중단 조건에 따라 [HTTP Host 헤더의 브라우저 경계 누락](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-http-boundary-2026-10-29.md)을 재현한 뒤 후속 검증·수정 중단. 정책 보완은 권고이며 미확정, 잔여 검증 완료로 처리하지 않음 | U19: 연속 검증 및 조건부 중단 요청 |
+| D76 | 전송 계층 관리 헤더의 공통 거절 | U20 수락으로 [HTTP 헤더 프로필](spec/01-datasource-auth.md#http-전송-프로필과-현재-요청-dto)을 보완. 직접/서버/Login에 같은 이름 제한을 적용하고 null·병합 우회도 전송 전에 INVALID_DEFINITION으로 거절. 기존 Host 실패 증거 보존, 독립 guard 검증 후 연속 검증 재개. core 본 구현·CEL 패치 보류는 유지 | U20: 헤더 거절 권고 수락 |
+| D77 | API 응답 내용과 실행기 내부 인증정보의 책임 분리 | [U21 책임 경계](spec/01-datasource-auth.md#비밀정보의-책임-경계): API의 응답 body/headers 내용은 API 책임. Viewstem의 기본 secret 문자열 검사·마스킹·응답 전체 거절을 요구하지 않음. 실행기는 내부 credential/로그인 응답의 직접 혼입 방지·평가 문맥 분리·신뢰 권한 검사 유지. U20 P21 결함 판정과 필터 권고를 철회하고 테스트 정정 | U21: 책임 구분 확정·후속 검증 요청 |
+| D78 | auth.token의 Login 응답 전용 평가 문맥 | [U22 읽기 문맥](spec/01-datasource-auth.md#1018-공통-값-문법과-서버-전용-평가-문맥): /response만 제공하고 요청 구성용 secret 해석 권한을 전달하지 않음. 중첩 표현에도 동일 제한, 금지 참조 시 추가 secret 조회·API 시작 금지. 독립 실험의 수정·회귀 검증이며 core 본 구현 승인 아님 | U22: 토큰 문맥 수정·검증 재개 요청 |
+| D79 | 오류 정제 중 추가 예외 격리 | [U23 오류 정제](spec/07-host-integration.md#공통-오류와-진단): 외부 예외의 직접 저장된 알려진 문자열 코드만 사용. getter·상속·형 변환을 실행하지 않고 속성 검사 실패도 HTTP_ERROR로 정제하며 확정된 TIMEOUT/CANCELLED 유지. HTTP 독립 실험의 보완이며 core 전체 구현 승인 아님 | U23: 오류 정제 수정·검증 재개 요청 |
+| D80 | 배열 크기 계산과 원소 경로의 구분 | [U24 CEL 크기](spec/03-variable-type.md#배열-크기-계산): size(items)/items.size()로 개수 계산, 안전 정수 결과 어댑터 유지. [배열 경로](spec/10-value-contracts.md#동적-값-평가-프로필)는 존재하는 정수 인덱스만 허용하며 일반 객체의 length 필드는 유지. 독립 실험의 수정·검증이며 core 본 구현 승인 아님 | U24: CEL 크기 검증·배열 경로 수정·연속 검증 요청 |
+| D81 | params 객체의 병합 전 검사 | [U25 params 검사](spec/01-datasource-auth.md#http-전송-프로필과-현재-요청-dto): Datasource·요청·Login params를 각각 평가한 뒤 일반 객체인지 검사하고 병합. 생략은 허용, 명시 null·배열·스칼라·native 컬렉션은 거절. 요청 우선·키 제거·반복 배열 값 유지. 독립 실험 보완이며 core 본 구현 승인 아님 | U25: params 검사 수정·문서 반영·연속 검증 요청 |
+| D82 | headers 전체 @path와 금지 헤더 검사 유지 | [U26 동적 headers](spec/01-datasource-auth.md#http-전송-프로필과-현재-요청-dto): 정적 이름과 객체 참조 구분. 정적 금지 이름은 Login 전에, 참조 결과의 객체/이름/값/금지/중복은 해당 요청 전·각 선언별 병합 전에 검사. null 제거·반환 데이터 비재평가 유지. 독립 실험 보완이며 core 본 구현 승인 아님 | U26: headers 객체 참조 수정·금지 헤더 유지·연속 검증 요청 |
+| D83 | request.path의 선평가와 주소·권한 검사 유지 | [U27 path 평가](spec/01-datasource-auth.md#http-전송-프로필과-현재-요청-dto): 경로 평가 후 기존 문자열/주소 문법·공통 경로·목적지 권한 검사. 목적지 확정 전에는 secret resolver 권한 없음. 최종 query URL 재검사와 취소/timeout 유지. 독립 실험 보완이며 core 본 구현 승인 아님 | U27: request.path 수정·주소/권한 유지·연속 검증 요청 |
+| D84 | HTTP 동적 값 전체 적용과 확정 계약 버그의 자율 수정 | [U28 전체 경로 점검](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-path-audit-2026-10-30.md): baseUrl·method·Login request 전체·공통 표현식 문법/escape/문맥을 기존 계약에 맞게 보완. 현재 HTTP의 17개 위치와 미구현 core 범위를 구분. 첫 버그마다 멈추지 않고 확정 계약 위반은 수정·검증하며 실제 선택이 필요한 경우만 논의. 주소/권한/금지 헤더·API 책임·core 구현 보류 유지 | U28: baseUrl 수정·@path 전체 검사·기존 계약 버그 자율 해결 요청 |
+| D85 | 복합 Query·완료 주기 계약의 실행 연결과 오류/수명 보완 | [U30 검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-composite-polling-2026-10-30.md): 하위 입력별 재사용과 전체 성공 반영, fresh 구분, source/transform 위치·정제 cause, owner cache 해제·전체 완료 후 polling 예약. 기존 계약 위반을 수정한 실험 증거이며 private metadata/캐시 전략·재개 deadline·production core를 새 공개 계약으로 승인하지 않음 | U30: 복합 Query/polling 검증·버그 자율 수정·문서화 요청 |
+| D86 | autoRefreshWhen 재개 시 즉시 갱신과 완료 기준 새 주기 | [U31 재개 계약](spec/02-query.md#완료-기준-주기-실행): false→true에서 조건을 만족하면 즉시 fresh 한 번, active 중이면 최신 pending 한 건으로 결합. 완료 뒤 새 interval을 시작하며 예전 완료 시각은 복원하지 않음. 재중단 시 주기 의도만 제거하고 입력·수동 요청 보존. [실험 검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-polling-resume-2026-10-30.md)과 core 구현을 구별 | U31: 재개 정책 수락·문서/실험 수정·결합 검증 요청 |
+| D87 | 연속 경계 검증과 기존 계약 위반 보완 | [U32 후속 기록](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/boundary-followup-2026-10-30.md): 복합 null/escape/Concat·취소, URL baseline/사전 검증/옛 cleanup 무효화, 날짜 스키마/UTC 범위 검증. 실제 결과·수정 전 증거를 구별하며 production core 완료로 확대하지 않음 | U32: 앞선 방식으로 검증 계속 요청 |
+| D88 | View 교체 중 URL 정리 실패의 처리 | [U33 URL 실패 정책](spec/09-state-store-and-url.md#쓰기실패정리): 유효한 새 화면 교체는 완료하고 새 초기값 유지, URL 동기화 오류 보고. 옛 URL을 복원해 덮거나 정리 성공으로 표시하지 않음. 사전 설정 오류는 기존 View 보존, obsolete 교체는 CANCELLED 유지 | U33: 새 화면 교체 완료·URL 오류 보고 선택 |
+| D89 | 전 범위 검증의 지속·완료 기준 | [U34 진행표](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/verification-ledger.md): 224개 인수 기대값에 실제 증거를 대응하고 실행 가능한 미검증 경계를 계속 검사. 부분 suite 통과로 종료하지 않으며 계약 버그는 자율 수정. 실제 제품 선택이 필요한 경우만 질문 | U34: 전체 검증 완료까지 지속 요청 |
+| D90 | 날짜 Map key 정규화 충돌 | 서로 다른 string key가 날짜 정규화 후 같은 key가 되면 값 수용 전체 거절. 엔트리 선택/덮어쓰기로 데이터 유실하지 않음. [값 계약](spec/10-value-contracts.md#날짜-값과-전송-형식), U34 실험 회귀 | U12/U13 위임에 따른 U34 기술 보완 |
+| D91 | 코드 Action 하위 호출의 부모 수명 연결 | 문맥 invokeAction은 부모 스택·취소를 상속하고 외부 runtime 호출은 독립 유지. 명시 입력·권한·출력 검증과 비롤백 유지. 부모 종료 뒤 새 하위 호출 및 남은 자손 실행은 취소. [하위 호출](spec/04-action.md#재귀확장-실행의-경계) | U35: 내부 호출 함께 취소 추천 수락; 종료 정리는 U12/U13 기술 위임 |
+| D92 | 구현 착수 인계와 문서·실험 커밋 | U35 이전 선택 대기 표기를 최신 계약으로 정리하고 검증 기준선을 로컬 커밋. 새 채팅은 저장소 문서·실험을 읽고 JS/TS core 구현 요청에 따라 진행. [시작 절차](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/implementation-start.md#새-채팅에서-시작할-때) | U36: 새 채팅 준비·문서 및 실험 커밋 요청 |
+
+### 제품 구현과 공개 API
+
+| ID | 의제·결정 | 이유·경계 | 근거 |
+|---|---|---|---|
+| D93 | JS/TS core 구현·실제 패키지 검증 | U37에서 기존 구현 보류 해제. 단일 StateStore에 Registry·Query·Action·headless View 연결, 실제 패키지 인수 216개, 타입·고정 CEL 빌드·브라우저·tarball 검증. SDK·패키지 구조·추가 CEL 수정 패치는 기술 위임에 따른 구체화이며 기존 실험 보존. Svelte/Dart/차트·공개 발행은 후속. [제품 인계](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/core-implementation-2026-11-02.md) | U37: 실제 구현과 검증 요청 |
+| D94 | 바닐라 core playground (당시 구현 · D103에서 제거) | JSON 편집·실행, 화면 미리보기, State·Query·Action 관찰을 제공하는 로컬 개발 도구. 실제 공개 core를 사용하고 DOM·HTTP fixture는 playground가 소유. 새 실행의 초기화·잘못된 구성의 기존 화면 보존·분할 화면은 요청을 구현하는 기술 구체화다. Svelte renderer·선택 차트·공개 배포는 후속. [구현 인계](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/playground-implementation-2026-11-02.md) | U38: 바닐라 playground 구현과 작업 공간 중심 UI 요청 |
+| D95 | Svelte 5 클라이언트 렌더러 | core 공개 API를 소비하고 호스트가 Component 계약과 Svelte 구현을 명시 등록. 자동 기본 UI·Action·테마 없음. projection·slots·이벤트·수명과 DOM 완료, 실제 패키지 소비 검증. API 시그니처와 오류 root 연결은 기존 계약의 기술 구체화. [구현 인계](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/svelte-implementation-2026-11-02.md) | U39: Svelte 구현 요청과 기본 등록 경계 확인 |
+| D96 | Svelte 단일 import와 간결한 API | `@viewstem/svelte`의 `createRenderer()`가 빈 Registry·Runtime을 생성·소유. `Renderer`·`Adapter`·`transformError` 등 중복 프레임워크 명칭을 제거하고 core 공통 타입을 재노출. 기존 Runtime 주입·외부 Store 소유권을 유지. core를 내부 dependency로 제공하며 UI 자동 등록은 없음. 옵션 혼용 거절·재진입 정리·로컬 소비자 설치는 요청에 따른 기술 구체화. [U40 인계](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/svelte-implementation-2026-11-02.md#u40-단일-패키지-진입점) | U40: core 직접 import 제거와 Svelte 명칭 생략 요청 |
+| D97 | 사용자용 공개 API와 내부 엔진 분리 (U41 당시 API) | core 루트는 5개 실행 API, HTTP/CEL은 subpath, Svelte는 기존 3개 실행 API를 유지. 클래스 생성자·검증/실행 엔진·타입 추론 구현을 숨기고 동일 런타임에 위임하는 공개 핸들을 반환. 외부 Store 소유권·취소·공유 타입을 유지. 기존 내부 사용과 호환되지 않는 import/API 변경을 [U41 변경 안내](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/public-api-refactor-2026-11-02.md)에 기록 | U41: 공개 API 축소 검토 후 리팩토링 요청 |
+| D98 | 사용자용 공개 API 이름 정렬 (U42 당시 API) | U42에서 네이밍 검토의 P1/P2 권고 전체를 적용. Registry 계약 등록·core View 생성·완료 Promise·snapshot/diagnostic getter·정의 export·Store 쓰기/반응 등록과 공개 타입을 명확히 하고 이전 별칭 제거. JSON State initial과 수명·취소·DOM 완료 의미 유지. 예제·playground·타입·패키지 검증을 [이행 인계](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/public-api-naming-2026-11-02.md)에 기록 | U42: 권고 네이밍 적용과 통합 검증 요청 |
+| D101 | 오픈소스 라이선스·기여·운영 정책 | 자체 코드·예제·문서는 [MIT](../LICENSE), 저작권 표기는 miinhlym. 외부 고지는 유지. 기여 장벽을 낮추기 위해 외부 Issue·PR, 영·한 소통, 별도 CLA/DCO 의무 없는 동일 라이선스 기여를 채택하고 maintainer가 최종 병합·릴리스 판단. 새 커뮤니티 문서는 영어 기준. [기여](../CONTRIBUTING.md)·[지원](../SUPPORT.md)·[보안](../SECURITY.md)·[행동강령](../CODE_OF_CONDUCT.md)이 현재 정책을 소유하며 npm 발행 승인은 포함하지 않음 | 2026-11-03: 사용자가 MIT·계정명과 3–7번 권고를 수락하고 비공개 신고 이메일을 제공 |
+| D102 | 사용자 문서의 영문 기본·한국어 병행 | 루트·패키지·예제·플레이그라운드 README와 문서 안내는 기본 파일을 영어로 제공하고 같은 경로의 `*.ko.md`와 상호 연결. 패키지에 한국어 README도 포함. 기여·지원·보안·행동강령 문서는 영어로 제공. 상세 명세·인수인계·과거 증거는 기존 언어·기준 위치를 유지하고 영문 안내에서 링크 언어를 표시. 라이선스 원문은 유지. 범위와 동시 갱신 규칙은 [기여 안내](../CONTRIBUTING.md#documentation-languages)가 소유 | 2026-11-03: 사용자가 실제 사용자용 페이지의 영문 기본·별도 KR 문서를 요청. 2026-11-24: 커뮤니티 문서 4종의 한국어 번역 삭제를 요청 |
+| D103 | 임시 playground·shadcn 갤러리 제거 | U46에서 임시 확인용 앱·편집기·서버·사용자 실행 안내를 제거한다. 패키지 공개 계약과 shadcn 지원은 유지하고, 제품 동작 검사는 직접 마운트하는 내부 fixture로 이관한다. 폐기한 도구 전용 검사는 제품 검증과 구분하고 기존 증거를 보존한다. D94의 상시 개발 도구 제공과 D100의 사용자 갤러리 안내 부분을 대체한다. [제거·검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/temporary-tools-removal-2026-11-04.md) | 2026-11-04: 사용자가 임시 확인용 playground·갤러리 제거를 요청 |
+| D104 | 공개 문서·Playground의 정적 배포 | Cloudflare Workers Static Assets와 `workers.dev` 기본 주소를 선택한다. 첫 버전은 정적 파일을 배포하고 Viewstem을 브라우저에서 실행한다. [현재 명세](VIEWSTEM-SPEC.md#34-공개-문서와-playground-배포) | 2026-11-04: 사용자가 Workers 배포 방식을 확정 |
+| D105 | 단일 공개 Playground | 첫 버전은 하나의 공개 Playground를 제공한다. [현재 명세](VIEWSTEM-SPEC.md#34-공개-문서와-playground-배포) | 2026-11-04: 사용자가 첫 버전의 Playground 구성을 확정 |
+
+### 문서 사이트와 도구
+
+| ID | 의제·결정 | 이유·경계 | 근거 |
+|---|---|---|---|
+| D106 | 공개 문서 사이트 기술 스택 | Astro와 Starlight로 영·한 문서 사이트를 구축하고, 같은 사이트의 `/playground/`에 Svelte 편집·실행 화면을 제공한다. [현재 명세](VIEWSTEM-SPEC.md#34-공개-문서와-playground-배포) | 2026-11-04: 사용자가 Astro + Starlight 조합을 확정 |
+| D107 | 공개 홈의 섹션과 문서 진입 | 제품 소개, 고객 목록 실행 흐름, 주요 특징, Svelte 연동, 폼·대시보드 가이드, 문서 진입 순으로 구성한다. 주 버튼은 Quickstart로 연결한다. [현재 명세](VIEWSTEM-SPEC.md#34-공개-문서와-playground-배포) | 2026-11-04: 사용자가 홈 최종 구성안을 수락하고 전체 구현을 요청 |
+| D108 | 공개 문서의 탐색 골격 | 영·한 문서를 시작하기, 핵심 개념, 가이드, 레퍼런스로 나눈다. 주제별 페이지, 본문 목차, Pagefind 검색으로 탐색한다. [현재 명세](VIEWSTEM-SPEC.md#34-공개-문서와-playground-배포) | 2026-11-05: 사용자가 문서 본문을 채우기 전에 검색과 좌측 메뉴를 갖춘 골격을 요청 |
+| D109 | 공개 문서 시작하기의 순서 | 개요, 설치, 빠른 시작을 별도 페이지로 둔다. 브라우저 체험과 Svelte 앱 설치·첫 실행을 연결한다. [현재 명세](VIEWSTEM-SPEC.md#34-공개-문서와-playground-배포) | 2026-11-05: 사용자가 다른 오픈소스 문서의 초반 구조를 조사하고 적용하도록 요청 |
+| D110 | 핵심 개념의 학습 순서와 본문 구성 | React·XState·TanStack Query·JSON Forms 공식 문서의 페이지 분리와 설명 방식을 참고해 영·한 핵심 개념을 9개 페이지로 나눈다. 정의·코드·결과를 본문에 제공하고 예제 링크는 실습을 보충한다. D108의 문서 골격을 구체화하며 이전 네 페이지 순서를 대체한다. [조사·범위·페이지 구성](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/docs-core-concepts-2026-11-05.md), [현재 명세](VIEWSTEM-SPEC.md#34-공개-문서와-playground-배포) | 2026-11-05: 사용자가 상용 환경에서 쓰이는 오픈소스 문서를 먼저 조사하고 핵심 개념 메뉴·페이지·표현과 링크 방식을 재구성하도록 요청 |
+| D111 | 사이트 공통 헤더 | 홈·예제·Playground·문서가 같은 헤더와 반응형 스타일을 재사용한다. 문서에만 검색과 모바일 문서 메뉴를 더하고 언어 전환은 현재 페이지를 유지한다. 모바일 문서 도구는 공통 탐색 아래에 배치한다. [구현·검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/docs-shared-header-2026-11-05.md), [현재 명세](VIEWSTEM-SPEC.md#34-공개-문서와-playground-배포) | 2026-11-05: 사용자가 사이트 전체 헤더를 통일하고 문서에만 검색·모바일 문서 메뉴를 추가하도록 요청 |
+| D112 | 사이트 공통 서체 | 한글·영문 UI와 본문은 Pretendard, 코드는 D2Coding을 사용하고 코드 합자는 비활성화한다. Noto Sans Symbols 2로 누락 기호를 보완하고 OS 컬러 이모지와 SVG 아이콘을 유지한다. 웹폰트·라이선스를 사이트에 포함한다. [구현·검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/docs-typography-2026-11-05.md) | 2026-11-05: 사용자가 제안된 폰트 구성을 수락하고 사이트 전체 적용·문자 표시 검증을 요청 |
+| D113 | 사이트 장식 간소화 | 설명용 뱃지·반복 카드를 덜어내고 제목·여백·구분선으로 정보 위계를 만든다. 홈의 흐름·특징·예제와 문서 이전·다음 탐색을 열린 목록으로 표현하고 메뉴 선택은 밑줄·세로선으로 표시한다. 실행·코드 영역과 컴포넌트 예제의 기능적 표현은 보존한다. [구현·검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/docs-design-simplification-2026-11-05.md) | 2026-11-05: 사용자가 불필요한 뱃지와 카드 디자인을 줄이고 디자인 개선을 요청 |
+| D114 | 이해를 돕는 사이트 모션 | 상태 변경·탐색 방향·메뉴 열림을 짧은 모션으로 보조한다. 주요 영역의 진입은 한 번만 실행하고 실제 상태 갱신은 지연시키지 않는다. 기본 콘텐츠는 항상 보이며 모션 감소 설정과 빠른 연속 입력을 처리한다. [구현·검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/docs-motion-2026-11-05.md) | 2026-11-05: 사용자가 과도하지 않게 요소별 애니메이션으로 가독성·이해·품질 개선을 요청 |
+| D115 | 사이트 탐색·실습 흐름 일관성 | 문서와 예제의 방향별 탐색을 공유하고 모바일 중복 목록을 제거한다. 실행 결과 아래에서 다음 실습으로 이동하며 Playground의 첫 실행·초안 보존·미실행 변경 상태와 한국어 검색/복사 안내를 제공한다. [검토·검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/docs-site-consistency-2026-11-05.md) | 2026-11-05: 사용자가 홈·문서·예제·플레이그라운드 전체의 디자인·사용 흐름 검토와 어색한 부분 수정을 요청 |
+| D116 | 패키지 가이드와 공개 API 레퍼런스 | 기존 학습 문서에 DSL 레퍼런스와 Core·Svelte 패키지 메뉴를 추가한다. 실제 공개 API와 지원 메타데이터를 근거로 한·영 사용 가이드와 상세 계약을 본문에 제공한다. [조사·구성·검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/docs-package-reference-2026-11-05.md) | 2026-11-05: 사용자가 공식 레퍼런스 조사 후 패키지별 가이드·상세 레퍼런스의 한·영 작성과 사이트 적용을 요청 |
+| D117 | 문서 사이트의 독자 흐름과 테마 | EGM 독립 리뷰와 공식 레퍼런스 비교를 바탕으로 사용 예제 우선, 상세 API 위치·인접 탐색, 제목 계층, 큰 입력 계약의 펼침 표시, 전체 사이트의 테마 선택·동기화를 적용한다. [사이트 리뷰와 검증](../apps/docs/review/2026-11-05/review.md) | 2026-11-05: 사용자가 라이브러리 사이트 문서의 가독성·이해 흐름과 테마 UX 검토·개선을 요청 |
+| D118 | 사이트 폰트 로딩의 위치 안정성 | D112의 서체·글리프 파일은 유지한다. 페이지 제목·메뉴에 해당하는 Pretendard 부분 파일과 기본 D2Coding을 선로딩하고 본문·코드에는 optional 표시 정책을 적용한다. 시스템 문자 폰트를 기호 폰트보다 먼저 두어 공백도 안정적으로 처리한다. 느린 연결에서 현재 화면의 대체 폰트를 유지하며 페이지 전체를 숨기지 않는다. [검증 기록](../apps/docs/review/2026-11-05/font-loading.md) | 2026-11-05: 사용자가 페이지 이동 직후 글자 떨림의 원인 확인 후 해결을 요청 |
+| D119 | 외부 앱 개발용 공통 스킬의 Codex·Claude Code 첫 지원 (D129로 대체) | **동시 첫 지원 조건은 D129에서 대체.** 당시에는 두 에이전트를 처음부터 동등한 지원 대상으로 정했다. 라이브러리 계약·예제·작업 흐름은 공통으로 관리하고 실제 에이전트별 설치·발견·호출·도구 연결 차이만 분리한다. 각 환경의 검증을 별도로 확보하며 실행 환경·설치 배포 정책·나머지 설계 제안·구현 발행 승인은 포함하지 않는다. [현재 계약](VIEWSTEM-SPEC.md#85-외부-앱-개발용-공통-스킬)·[설계](../skills/README.md#지원-및-설치) | 2026-11-05: 사용자가 Codex와 Claude Code를 처음부터 지원하고 특정 에이전트에 종속되지 않는 공통 스킬과 에이전트별 차이 분리를 확정 |
+| D120 | 공통 스킬의 실행 환경을 파일 접근·Node.js 실행으로 정의 | 로컬·클라우드 위치로 구분하지 않고 프로젝트 파일 접근과 Node.js 실행이 가능한 환경을 첫 지원 범위로 한다. 파일·실행 도구가 없는 대화 환경을 위한 원격 계약 조회는 첫 범위에서 제외한다. 설치·배포 정책이나 실제 지원 검증 완료를 뜻하지 않는다. [현재 계약](VIEWSTEM-SPEC.md#85-외부-앱-개발용-공통-스킬)·[설계](../skills/README.md#지원-및-설치) | 2026-11-05: 사용자가 로컬·클라우드 구분 없이 프로젝트 파일 접근과 Node.js 실행이 가능한 환경으로 확정 |
+| D121 | 라이브러리와 공통 스킬의 별도 설치 | 라이브러리와 스킬을 별도로 명시 설치한다. 라이브러리 설치가 스킬 설치·에이전트 설정 변경을 자동 수행하지 않으며 통합 설치 흐름은 제공 범위에서 제외한다. 실제 설치·발행이나 구체적인 설치 도구의 검증 완료를 의미하지 않는다. [현재 계약](VIEWSTEM-SPEC.md#85-외부-앱-개발용-공통-스킬)·[설계](../skills/README.md#지원-및-설치) | 2026-11-05: 사용자가 별도 설치를 선택 |
+| D122 | 전체 UI 메뉴와 실행 미리보기 | D117의 현재 계열만 노출하는 방식을 대체한다. 지원하는 66개 shadcn 계열을 좌측 메뉴에 모두 표시하고 한·영 상세 페이지마다 실제 UI·동일 View JSON·등록 코드를 함께 제공한다. 미리보기는 공개 패키지와 해당 정의가 참조하는 계열만 사용한다. [구현·검증](../apps/docs/review/2026-11-05/component-previews.md) | 2026-11-05: 사용자가 모든 지원 컴포넌트의 좌측 메뉴 노출과 실행 UI·JSON 동시 제공을 요청 |
+| D123 | 소비자 스킬 최종 리뷰 보완과 최소 구현·초기 평가 | 최종 EGM F1–F7을 실행 계약에 반영한다. 공통 최소 스킬과 Codex 초기 비교부터 구현하고, 참조와 UI helper는 관찰 근거에 따라 추가한다. Claude Code는 이번 실행에서는 준비만 수행하고 미실행으로 기록한다. 지원 목표나 공개 릴리스 완료를 뜻하지 않는다. [실행 계획](../skills/README.md#검증-및-공개)·[초기 결과](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/viewstem-skills-initial-2026-11-05.md)·[후속 확장 검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/viewstem-skills-extended-2026-11-05.md) | 2026-11-05: 사용자가 리뷰 보완의 설계·실행 계획 반영과 최소 스킬·초기 비교 실행을 요청하고 Claude Code는 준비만 하도록 지정 |
+| D124 | 주요 옵션·선언·실행 UI·레퍼런스 연결 | ECharts의 필드 조작과 공유 예제를 참고해 8개 주요 UI 계열에 한·영 옵션 편집을 제공한다. 표시·복사·실행 JSON을 일치시키고 실행 State와 선언을 분리한다. 현재 설정 재실행과 기본 예제 복원은 별도 동작이며 전체 필드 자동 폼이나 ECharts의 병합 갱신 계약을 도입하지 않는다. [조사](../apps/docs/review/2026-11-05/controls-review/echarts.md)·[구현·검증](../apps/docs/review/2026-11-05/controls-review/implementation.md) | 2026-11-05: 사용자가 ECharts 참고사항을 반영한 주요 옵션·JSON·실제 UI·상세 설명 연결과 한·영·모바일·테마·초기화 확인을 요청 |
+| D127 | 사이트 기본 UI를 공식 React shadcn/ui로 통일 (D130으로 대체) | **프레임워크 선택은 D130에서 대체.** 공식 Astro 통합으로 별도 사이트 컴포넌트를 설치한다. 홈·문서·예제·Playground의 탐색과 조작부에 적용하고, 실제 선언형 실행 영역은 사이트 UI와 별개로 관리한다. 기본 Neutral과 기존 서체를 공유한다. D125의 사이트 옵션 조작부는 이 결정으로 대체한다. [범위·검증](../apps/docs/review/2026-11-05/site-shadcn.md) | 2026-11-05: 사용자가 공식 Astro 설치 문서를 지정하고 사이트 전체에 디자인 적용을 요청 |
+| D128 | 컴포넌트 문서의 미리보기·옵션·JSON 작업 영역 | Mantine configurator, Storybook Controls와 shadcn 문서 패턴을 참고해 넓은 화면은 미리보기/JSON과 옵션을 나란히 배치하고, 좁은 화면은 세 탭으로 제공한다. 옵션 상세 정보는 펼침으로 제공하며 미리보기 DOM과 실행 상태는 탭 전환 시 유지한다. [설계·검증](../apps/docs/review/2026-11-05/component-workbench.md) | 2026-11-05: 사용자가 긴 한 열 배치와 미완성처럼 보이는 옵션 조작부를 지적하고 레퍼런스 기반 개선을 요청 |
+| D129 | 소비자 스킬의 현재 지원을 Codex로 한정 | Claude Code CLI를 제거하고 현재 지원·실행 검증 및 첫 배포 필수 조건에서 제외한다. D119의 두 호스트 동시 첫 지원 조건을 대체하며, 공통 본문·호스트 차이 분리와 D120·D121은 유지한다. Claude 준비 자료는 미검증 참고 자료로 보존한다. Codex의 실제 검증 범위, 런타임 미해결 문제와 공개 ref 조건은 별도로 유지한다. [현재 명세](VIEWSTEM-SPEC.md#85-외부-앱-개발용-공통-스킬)·[설치 제거와 현재 범위](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/viewstem-skills-scope-2026-11-06.md) | 2026-11-06: 사용자가 CLI 제거와 Claude Code 제외를 요청 |
+| D130 | 사이트 기본 UI를 공식 shadcn-svelte로 통일 | D127의 React 구현 선택을 대체한다. 사이트용 공식 원본 부품을 직접 설치하고 React 런타임·Astro 통합·관련 의존성을 제거한다. 사이트 UI와 선언형 라이브러리 실행 영역의 경계, 기존 디자인 및 D128 작업 영역을 유지한다. 한영·모바일·테마·사이드바 스크롤·전체 미리보기 회귀를 검증한다. [현재 명세](VIEWSTEM-SPEC.md#34-공개-문서와-playground-배포)·[구현·검증](../apps/docs/review/2026-11-06/site-svelte.md) | 2026-11-06: 사용자가 사이트 UI 전체의 공식 shadcn-svelte 통일, React 의존성 제거와 회귀 검증을 요청 |
+| D131 | View 투영 중 재진입 State 변경의 후속 갱신 | 진행 중인 투영에서 구독자가 State를 쓰면 재계산 요청을 기존 microtask 큐에 합친다. 현재 snapshot 통지를 마친 뒤 현재 View 수명으로 갱신하고, 예약 갱신이 남으면 초기 완료를 먼저 확정하지 않는다. 폐기·교체·같은 값 쓰기 회귀와 원본 실패 앱의 수정 core 패키지 검증을 완료했다. [현재 계약](spec/07-host-integration.md)·[원인·수정·검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/view-subscription-projection-fix-2026-11-06.md) | 2026-11-06: 사용자가 정확한 원인 확인, 런타임 수정, 재현 회귀 테스트와 수정 패키지로 원본 앱 재검증을 요청 |
+
+### 릴리스·UI와 패키지 구성
+
+| ID | 의제·결정 | 이유·경계 | 근거 |
+|---|---|---|---|
+| D132 | 패키지별 버전과 Release PR 기반 npm 발행 | 당시 세 공개 패키지의 버전을 Changesets로 독립 관리하기로 정했다. 현재는 [네 npm 패키지](releasing.md#writing-a-changeset)를 관리한다. 보호된 `main`에 Release PR을 병합하고 해당 커밋의 CI가 통과하면 GitHub Actions와 npm OIDC로 발행한다. 발행 확인 후 패키지별 Git 태그와 GitHub Release를 생성한다. 첫 공개와 Trusted Publisher 연결은 [npm 릴리스 절차](releasing.md#npm-releases)를 따른다 | 2026-11-09: 사용자가 조합, 패키지별 버전, Release PR 발행과 main 보호 설정을 확정 |
+| D133 | 프레임워크 런타임 독립 브라우저 UI 프로토타입 | 공개 core View에 DOM 렌더러를 연결하고 Button·Card·Input·Checkbox·Dialog의 초기 JSON 지원 범위를 둔다. 스타일은 shadcn Neutral을 따르고 동작은 표준 HTML에 기반한다. 순수 JS·React·Vue·Svelte가 동일한 JSON을 설치된 tarball로 실행하는지 검증한다. [프로토타입 계약·검증 명령](../packages/ui/README.md) | 2026-11-09 사용자가 프레임워크 런타임 없는 프로토타입과 네 호스트 검증 요청 |
+| D134 | Basecoat Nova를 적용한 공통 UI 카탈로그 | 브라우저 DOM 렌더러가 Basecoat Nova 스타일과 Vanilla JS 컨트롤러를 사용한다. 초기 42개 계열의 JSON 지원 범위를 생성된 지원표에 기록한다. [패키지 계약](../packages/ui/README.md) | 2026-11-09 사용자가 Basecoat 적용과 공통 계열 비교를 요청 |
+| D135 | 공통 날짜·테이블 JSON 어댑터 | Data Table은 TanStack Table Core를 사용한다. Calendar·Range Calendar·Date Picker는 Zag Vanilla에 연결하고 날짜 문자열과 범위 이벤트를 기존 JSON 형식으로 반환한다. 네 계열의 기존 JSON fixture를 검증에 사용한다. [패키지 계약](../packages/ui/README.md) | 2026-11-09 사용자가 네 계열의 구현, 원본 JSON 검증, 임시 비교 페이지 추가를 요청 |
+| D136 | 브라우저 DOM의 전체 JSON 카탈로그 등록 | 66개 계열과 JSON Component ID 357개를 등록한다. 중첩 메뉴는 Zag Vanilla, Carousel은 Embla를 사용하고 브라우저 DOM 어댑터가 기존 JSON과 이벤트 연결을 맡는다. 추가 범위의 원본 fixture 23개로 검증한다. [패키지 계약](../packages/ui/README.md) | 2026-11-09 사용자가 남은 20개 계열과 하위 부품 6개 및 원본 비교를 요청 |
+| D137 | 달력 이벤트와 차트 축의 렌더러 호환 | Calendar는 월 뷰의 기준 일자로 이동한다. Range Calendar는 최종 범위에서 실제로 바뀐 시작일과 종료일을 한 번씩 전달한다. 브라우저 Chart는 D3 스케일로 축 눈금과 보조선 배치를 계산한다. | 2026-11-09 사용자가 달력 보조 이벤트와 차트 축의 일관성을 요청 |
+| D138 | 브라우저 UI 기본 스타일을 Vega로 전환 | DOM 패키지는 Basecoat 1.1.0의 Vega CSS를 사용한다. Neutral 색상과 기존 JSON 계약을 유지한다. D134의 Nova 선택을 대체한다. | 2026-11-11 사용자가 Vega 전환을 요청 |
+| D139 | 브라우저 UI 패키지 문서를 사이트에 추가 | 한·영 문서 탐색에 @viewstem/ui 개요, 로컬 설치와 브라우저 마운트 가이드, 등록·연결 API, JSON 지원 안내를 추가한다. 공통 컴포넌트 예제는 기존 카탈로그를 가리키고 DOM 지원 메타데이터를 별도로 안내한다. | 2026-11-11 사용자가 문서 페이지에 @viewstem/ui 추가를 요청 |
+| D140 | 브라우저 UI의 66개 상세 레퍼런스와 직접 미리보기 | D139의 카탈로그 연결을 전용 상세 페이지로 확장한다. 한·영에서 기존 66개 예제 JSON을 수정 없이 공유하고 @viewstem/ui의 registerShadcn·attach로 직접 실행한다. 지원 메타데이터 기반 입력·슬롯·이벤트 표, 앱 연결 코드, 옵션 편집, 현재 메뉴 및 인접 페이지 이동을 제공한다. Sonner의 호스트 Action은 DOM Notifications View에 연결한다. | 2026-11-11 사용자가 UI에도 66개 상세 페이지와 직접 조작하는 미리보기를 요청 |
+| D141 | 컴포넌트 상세 문서에서 공식 예제 구성 비교 | 66개 계열 상세 페이지에 공식 기본 예제를 참고한 실행 예제와 일부 변형을 추가한다. 공식 예제 링크와 선택한 View JSON을 표시한다. [비교 범위](../apps/docs/review/2026-11-11/shadcn-example-comparison.md) | 2026-11-11 사용자가 Chrome에서 shadcn-svelte의 디자인·동작·예제 구조를 비교해 수정해 달라고 요청 |
+| D142 | 계열 상세 문서에 대표 예제 하나만 표시 | 한·영 컴포넌트 상세 페이지에 대표 예제 하나를 미리보기·JSON 탭으로 제공한다. 표시·복사·실행은 같은 초기 JSON을 사용하며 탭 전환은 실행 상태를 보존한다. 별도 실습·옵션 편집·변형 선택과 공식 예제 링크를 제거한다. 상세 페이지에서 D124·D128·D141의 예제 구성을 대체한다. | 2026-11-11 사용자가 기존 실습과 공식 링크를 제거하고 탭이 있는 예제 하나만 남기도록 요청 |
+| D143 | 기본 예제 아래에 설명할 변형 표시 | D142의 상단 기본 예제와 미리보기·JSON 탭을 두고, 설명할 차이가 있는 변형에 목차에서 연결한다. Button에 스타일·크기 비교 묶음과 로딩 예제를 먼저 적용한다. 각 예제의 표시·복사·실행 JSON을 공유하고 하단 미리보기는 화면에 들어올 때 실행한다. [검토 결과](../apps/docs/review/2026-11-11/component-example-variants/concepts_brief.md#goldfish-검토-종합) | 2026-11-11 사용자가 Goldfish 검토 결과에 따라 Button 문서에 적용 요청 |
+| D144 | 기본 컴포넌트와 브라우저 JSON 실행을 @viewstem/ui로 통일 | @viewstem/ui에서 66개 계열, 357개 JSON ID의 지원 계약과 테스트 ViewSpec을 관리한다. 문서·Examples·Playground는 DOM 렌더러를 사용한다. @viewstem/svelte는 앱 자체 컴포넌트 연결용으로 유지한다. D105·D116·D122·D138·D140·D143의 실행 경로를 이 결정으로 갱신한다. | 2026-11-11 사용자가 프레임워크별 기본 UI 제거와 기존 JSON의 브라우저 검증을 요청 |
+| D145 | UI 변형 예제를 66개 계열로 확장 | 한·영 상세 문서마다 기본 예제에서 보여주지 않는 입력·상태·슬롯 조합을 하단에 추가한다. 각 변형은 목차에서 바로 접근하고 독립적으로 실행하며, 미리보기와 표시·복사 JSON은 같은 정의를 사용한다. | 2026-11-11 사용자가 모든 계열에 필요한 변형 예제 추가 요청 |
+| D146 | 컴포넌트 상세 문서의 읽기 순서와 제목 통일 | 이름과 역할 설명 뒤에 기본 예제, 사용법, 추가 예제, JSON 레퍼런스를 배치하고 목차도 같은 순서를 따른다. 66개 계열의 한·영 설명을 제공한다. JSON 타입의 제약은 해당 타입 아래에 두고 기존 섹션 링크를 유지한다. | 2026-11-11 사용자가 상세 문서 디자인·순서·타이포그래피·용어 검토 및 개선 요청 |
+| D147 | 기본 실행 코드와 추가 예제의 코드 배치 | 사용법에 기본 예제의 setup.ts를 바로 표시하고 헤더에서 복사할 수 있게 한다. 추가 예제의 실행 코드는 미리보기·JSON과 함께 세 번째 탭에 두고, 복사 버튼은 선택한 소스 탭의 내용을 복사한다. | 2026-11-11 사용자가 기본 실행 코드 노출과 복사 버튼, 추가 예제의 실행 코드 탭을 요청 |
+| D148 | 다중 손잡이 Slider | 단일 모드는 네이티브 입력을 유지한다. 다중 모드는 Zag Vanilla로 배열의 손잡이를 표시하고 `thumbLabels`로 각각 이름을 붙인다. 값 변경과 확정은 전체 배열로 전달한다. 한·영 상세 문서에 최소·최대 범위 예제를 제공한다. | 2026-11-11 사용자가 다중 손잡이 동작과 범위 예제를 요청 |
+| D149 | 브라우저 UI의 상태 전환과 값 정규화 | `Command.Dialog`에 Escape 닫힘을 전달하는 `openChange`를 추가한다. 제어형 Popover·Tooltip은 입력값이 반영된 전환을 완료로 알린다. Slider의 배열 `step`은 선택 가능한 값 목록이다. Date Picker는 범위 안의 날짜를 표시하고, Data Table은 숫자 행 ID도 문자열로 연결한다. [패키지 계약](../packages/ui/README.ko.md) | 2026-11-11 사용자가 Goldfish 결함 19개 수정과 원본 JSON 브라우저 회귀 검증을 요청 |
+
+### 호스트 및 브라우저 연결
+
+| ID | 의제·결정 | 이유·경계 | 근거 |
+|---|---|---|---|
+| D150 | DOM·Svelte 명령형 API와 화면 수명 통일 | 공통 `createRenderer → mount → unmount`, 동기 화면 핸들, 기존 View 대여, View 단위 상태·정의·Action 호출을 채택한다. 공유 Registry·Store·View는 동기로 함께 확정하고 URL은 해당 적용의 후처리로 실행한다. 같은 Core 설치의 명령형 DOM 대상 점유를 공유한다. [구현 계획](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/designs/viewstem-host-api-implementation-2026-11-13.md) | 2026-11-13 사용자가 API 방향을 승인하고 구현 전 커밋·대상 소유권 및 검증 계획의 구체화를 요청 |
+| D151 | 기존 ViewstemView에서 소유 View 생성 | `source` 또는 `view`로 수명을 선택한다. 기존 대여 prop 인터페이스를 유지한다. 컴포넌트 초기화에서 생성 설정을 캡처해 클라이언트에서 사용한다. 컴포넌트나 렌더러 폐기는 준비를 중단하고 소유 View를 정리한다. [호스트 명세](spec/07-host-integration.md#jsts-호스트-api--d150) | 사용자가 EGM 리뷰에서 정리한 단일 컴포넌트 계약 구현과 폐기·완료 경계 보완을 요청 |
+| D152 | 소유 View 생성과 종료의 공통 경계 | 명령형·선언형 소유 View는 후보 생성 때 소유자를 연결한다. 전체 종료는 실행 자격을 먼저 닫고, Store 알림·트랜잭션을 넘겨 구조를 정리한다. Query와 URL은 외부 효과 직전에 소유 수명을 확인한다. 공개 준비 신호의 효력은 동기 확정 직전까지다. [호스트 명세](spec/07-host-integration.md#jsts-호스트-api--d150) | 사용자가 EGM 수명 설계에 따라 수정 요청 |
+| D153 | 렌더러·화면 진단을 함께 전달 | 공통 표시 연결이 명령형·선언형의 관찰자 순서와 View·연결 수명을 검사한다. 표시 갱신과 연결 자체의 정리 실패를 구분한다. 활성 오류의 초기 전달과 실시간 전달은 같은 발생을 공유한다. Query 실패는 실행 결과 시점에 기록한다. [호스트 명세](spec/07-host-integration.md#jsts-호스트-api--d150) | 사용자가 EGM 오류 전달 설계와 반복된 종료 경계의 구조 개선을 요청 |
+| D154 | 코드 Action의 필수 포트와 등록 계약 보존 | 타입의 필수 입력에 포트와 `required: true`를 요구하고 생략 기본값은 선택으로 추론한다. `updateResource()`는 참조 Type까지 포함한 실행 계약을 검사한다. 계약이 달라지면 새 Action ID에 핸들러와 함께 등록한다. 후속 셋 설계에서 입출력과 필수 호스트 기능이 같을 때 동일 ID의 명시적 함수 교체를 허용했다. 공개 API 후속 논의에서 `defineCodeAction().implement()`를 채택해 파일을 나눠도 등록과 교체에서 핸들러 타입을 유지하고, `typeRef`의 입출력 타입을 명시할 수 있게 했다. [Action 명세](spec/04-action.md#코드-action-등록과-갱신) · [교체 결정](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/history/resource-sets-browser-2026-11-16.md#코드-action-함수의-동일-id-교체-결정) | EGM 설계 검토, 구현 계획 재리뷰, 2026-11-18 공개 API 후속 논의에서 사용자 결정 |
+| D155 | 구독 중 트랜잭션의 원자 공개 | 구독 콜백에서 동기로 후보를 읽고 변경한다. 실패한 후보는 폐기한다. 성공한 후보의 변경만 다음 트랜잭션 하나로 공개한다. [Store 명세](spec/09-state-store-and-url.md#store-주소관찰reaction의-현행-매핑) | 사용자가 EGM 최종 검토의 세 가지 수정안을 승인 |
+| D156 | 연결 종료와 이벤트 시작 권한 | 공통 호스트 연결이 이벤트 시작을 허가한다. 종료는 즉시 시작 권한을 닫고 DOM·구독 정리와 분리한다. [호스트 명세](spec/07-host-integration.md#jsts-호스트-api--d150) | 같은 요청 |
+| D157 | 한 스냅샷에서 슬롯 노드 공유 | 동일 인스턴스의 불변 NodeSnapshot을 한 번 만들고 slots와 children이 함께 참조한다. [호스트 명세](spec/07-host-integration.md) | 같은 요청 |
+| D158 | URL 예약과 활성 연결의 수명 통합 | 연결 객체가 커밋부터 키와 Store 관찰을 소유한다. 이전 키 정리와 새 어댑터 구독 중에도 실제 State 변경을 모으고, 활성화 시 최신 변경을 반영한다. 초기화와 복원을 변경 수집에서 제외해 history 중복을 막는다. [URL 명세](spec/09-state-store-and-url.md#쓰기실패정리) | 사용자가 반복된 URL 인계 결함의 EGM 권고안을 승인하고 구현과 회귀 검증을 요청 |
+| D159 | 권한 콜백에서 Action 식별 | `authorize`의 실행 컨텍스트에 실제 실행에 쓰는 Registry 스냅샷에서 해석한 Action의 읽기 전용 `resource: { kind: 'Action', id }`를 제공한다. 인라인에는 `null`을 전달하고 하위 호출은 자기 대상을 식별한다. [호스트 명세](spec/07-host-integration.md#action-실행-권한) | 2026-11-18 공개 API 후속 논의에서 사용자 결정 |
+| D160 | 독립 Action 호출의 선택적 취소 신호 | Runtime·View의 `invokeAction()` 요청에 선택적 `AbortSignal`을 받는다. 이미 취소됐으면 권한 검사 전에 `CANCELLED`로 거절한다. 실행 중의 취소는 그 호출과 하위 호출에만 전파하고 늦은 결과를 폐기하며 이미 발생한 효과는 보존한다. [호스트 명세](spec/07-host-integration.md#독립-action-호출의-취소) | 2026-11-18 공개 API 후속 논의에서 사용자 결정 |
+| D161 | 연결자 자체의 렌더 완료 대기 선택화 | `MountedComponent.whenRendered(signal)`을 선택으로 둔다. 생략한 연결자는 자체 DOM을 동기로 반영하고, 표시 연결은 슬롯 자식까지 기다린다. `update()`, `dispose()`, `setPending()`은 필수다. [브라우저 명세](spec/12-resource-sets-browser.md#연결자-자체의-렌더-완료) | 2026-11-18 공개 API 후속 논의에서 사용자 결정 |
+| D162 | 등록 계약에서 Svelte 입력 타입 추론 | `ComponentAdapterProps<typeof contract>`로 포트 타입을 추론하고 `svelteComponent()`에서 같은 계약으로 어댑터 타입을 검사한다. `ready`에서는 필수 Value가 존재한다. `pending`에서는 값이 없거나 이전에 표시한 값이 남을 수 있다. [브라우저 명세](spec/12-resource-sets-browser.md#svelte-어댑터-입력-타입) | 2026-11-18 혼합 View 공개 API 리뷰 후 사용자 결정 |
+| D163 | 선언에 없는 참조와 State 값 대기의 구분 | 선언에 없는 참조는 준비 단계에서 위치와 함께 오류를 반환한다. 열린 View에서는 후보를 거절하고 기존 화면과 State를 유지한다. 노드가 필요로 하는 선언된 State의 값이 아직 없으면 해당 노드를 대기 상태로 둔다. [브라우저 명세](spec/12-resource-sets-browser.md#실패-경계) | 2026-11-18 혼합 View 공개 API 리뷰 후 사용자 결정 |
+| D164 | 첫 버전의 단일 View 루트 유지 | 여러 컴포넌트를 호스트 요소의 직접 자식으로 배치해야 하는 사용 사례가 생기면 `ViewSpec.render` 배열을 검토한다. [View 명세](spec/05-component-view.md#106-view-화면-구성과-인스턴스) | 2026-11-18 혼합 View 공개 API 리뷰 후 사용자 결정 |
+| D165 | Svelte 독립 화면이 셋과 Runtime 소유 | `ViewstemView`의 `source`와 `resourceSets`로 독립 화면을 만든다. 클라이언트에서 초기 셋을 등록하고 컴포넌트가 정리를 맡는다. 공유 화면은 전달받은 렌더러를 사용한다. [호스트 명세](spec/07-host-integration.md) | EGM 공개 API 재리뷰의 사용성 권고에 따른 사용자 구현 요청 |
+| D166 | 등록 엔트리와 코드 바인딩의 계약 보존 | `registerAction(entry)`도 필수 호스트 기능을 보존한다. 코드 Component 바인딩을 유지할 때 포트·슬롯·이벤트를 보호하고 계약과 구현은 명시적으로 함께 교체할 수 있다. [Action 명세](spec/04-action.md) · [브라우저 명세](spec/12-resource-sets-browser.md) | 공개 등록 경로 차이와 호환되지 않는 계약 갱신 재현 |
+| D167 | 정리 완료와 관찰 수명 | Core Runtime과 View의 `dispose()`에서 정리를 기다릴 수 있다. 자동 정리 실패는 렌더러·화면의 오류 관찰 경로로 전달한다. 투영·View 구독은 최초 콜백 실패를 되돌리고 폐기 후 재생을 멈춘다. [호스트 명세](spec/07-host-integration.md) | EGM 공개 API 재리뷰의 종료 및 구독 재현 |
+| D168 | URL 준비 실패와 선택 제거의 관찰 | 지연된 초기 준비 실패는 `ready` 거절과 URL 진단으로 관찰하고, 선택 제거는 나머지 키의 대기 쓰기를 보존한다. [URL 명세](spec/09-state-store-and-url.md) | EGM 공개 API 재리뷰의 지연 어댑터 재현 |
+| D169 | UI 셋 스타일의 DOM과 CSS 이름 소유권 | 셋의 기본 스타일을 소유 DOM에 적용한다. 같은 셋 ID를 DOM 생성과 CSS 빌드에서 사용하며, 빌드가 격리할 수 있는 전역 이름에 접두사를 붙인다. 호스트가 공유 이름을 등록한다. `data-viewstem-ui`는 이전 테마 지정 범위로 사용한다. [브라우저 명세](spec/12-resource-sets-browser.md#ui-셋의-스타일-소유권) | 혼합 UI의 CSS 리셋과 독립 셋의 글꼴 이름 충돌 재현. 선택자 검사만으로는 문서 이름을 격리할 수 없어 빌드에서 지원 규칙을 제한하기로 함 |
+| D170 | 브라우저 UI 스타일 기본 로딩 | `@viewstem/ui`의 `browser` 진입점에서 기본 CSS를 가져온다. Node용 JS와 직접 불러올 수 있는 `styles.css`도 제공한다. [브라우저 명세](spec/12-resource-sets-browser.md#ui-셋의-스타일-소유권) | 상위 셋만 등록하는 앱이 의존 셋의 CSS 경로를 따로 관리할 필요를 없애기로 결정 |
+
+### 문서 배포
+
+| ID | 의제·결정 | 이유·경계 | 근거 |
+|---|---|---|---|
+| D171 | PR 미리보기와 공개 패키지 릴리스 기반 문서 배포 | PR 미리보기는 전용 Worker에서 브랜치 코드를 검증하고 PR별 배포 상태로 추적한다. 각 토큰은 담당 Worker로 제한한다. 운영 문서는 공개 레지스트리에서 릴리스 배치 전체를 확인한다. 소스 검증 방식은 D174를 따른다. 공개 패키지로 예제와 Playground를 빌드해 배포 전에 브라우저에서 검사하고, 배포 후 공개 주소에서 빌드를 식별한다. [사이트 명세](VIEWSTEM-SPEC.md#34-공개-문서와-playground-배포) | 2026-11-23 사용자 결정 및 구현 요청. EGM 검토에서 재실행, 릴리스 순서와 배포 확인 절차를 보완 |
+| D172 | 공개 패키지 기준의 문서 사이트 전용 배포 (D174로 대체) | `main`의 문서 사이트 전용 PR 가운데 현재 공개 버전에 적용할 변경을 운영 릴리스 소스 위에 PR 단위로 반영한다. 경로와 머지 시점 라벨로 대상을 판정한다. 두 운영 배포는 같은 큐를 쓰고 패키지 기준과 처리한 문서 범위를 함께 기록한다. 다음 패키지 릴리스가 이미 공개한 문서 수정을 보존한다. [당시 구현](https://github.com/miinhlym/viewstem/commit/1336d79bf14b611e90697b9370c7babcfddc4712) | 미출시 패키지와 그 설명이 `main`에 쌓인 동안 독립적인 사이트 수정도 공개한다는 사용자 결정 |
+| D173 | 문서 배포 라벨 선택을 필수 CI에서 확인 (D174로 대체) | `main`에 머지할 문서 사이트 전용 PR 중 공개 여부를 리뷰해야 하는 PR은 `docs:publish` 또는 `docs:next-release`를 요구한다. 라벨 변경 시 CI를 다시 실행한다. [당시 제안](https://github.com/miinhlym/viewstem/commit/0d020383610997080c1c0a2d913582ec58741294) | 머지 전에 운영 반영 여부를 빠뜨리지 않도록 한다는 사용자 결정 |
+| D174 | 단일 기본 브랜치의 문서 운영 배포 | 정식 패키지 발행에 성공한 릴리스 SHA를 배포한다. 사이트만 별도로 공개할 때는 기본 브랜치의 고정 SHA로 수동 실행하며, 운영 기준 이후 미발행 변경이 의심되면 중단한다. 고정된 공개 아카이브를 기준으로 패키지별 소스 확인과 사이트 검사를 공유하고 사이트 잡을 독립 재시도한다. [배포 절차](releasing.md#deploy-independently-of-a-package-release) | 기능과 문서를 함께 머지하고, 공개 결정은 검증된 릴리스 또는 의도적 수동 실행으로 처리한다는 2026-11-24 사용자 결정. D171의 태그 일치 조건과 D172·D173을 대체. 부분 릴리스가 배치 밖 미발행 기능을 사이트에 노출하는 사례는 패키지별 소스 검증으로 차단한다. |
+
+리소스 셋과 혼합 렌더링의 후속 선택은 [별도 결정 이력](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/history/resource-sets-browser-2026-11-16.md)에 있다. D144의 패키지 역할에서 바뀌는 부분과 D150–D158의 현재 호스트 구현 기준을 함께 확인할 수 있다.
+
+## B. 대체·기각된 방향
+
+| 이전 | 현재 / 대체 이유 | 근거 |
+|---|---|---|
+| Widget/Dashboard 별도 체계 | Component/View로 일반화; 옛 요구 자체 삭제 아님 | E09 |
+| Channel / 서비스 채널 무조건 readonly | StateStore; 소유권과 쓰기 권한 분리 | E07 |
+| Calculation·DataPipeline 별도 리소스 | Variable·복합 Query에 책임 배치 | E06, E08, 통합 명세 §4 |
+| 전체 리소스 외피 평탄화 | 최상위 spec 유지, 내부만 불필요 중첩 제거 | E25→E27 |
+| bare query/component 등 참조 | queryRef/componentRef 등으로 변경 | E39 |
+| 공통 ref:{kind,id} 객체 강제 | 필드별 종류 + 문자열 ID | E12, E39 |
+| State/Derived 내부 spec | 평탄한 kind·initial 또는 variableRef·inputs | E24→E33 |
+| Ref/refType/QueryInstance 포트, 별도 targets/bindings | Value/State/Query와 inputs로 통합 | E32 |
+| 수신 경로 /inputs/name | 수신 `/ports/name`; inputs는 호출 위치 연결 | 통합 명세 §5.1 |
+| 저장 원본 target{kind,id,path} 재조회가 필수 | 현재 리소스로 요청 구성; 옛 방식은 선택 서비스의 참고 이력 | E15→E23 |
+| 전용 Bearer/ApiKey auth kind, auth.secret | secrets/@path/headers/params; 기능은 보존 | E28 |
+| Login tokenPath/apply/내부 secrets | 공통 secrets, token @path, /auth/token 적용 | E28 |
+| Request/Composite Query 분리, Http/Mutation Action 구분 | 통합 Query와 Action의 Query 단계 | E29, E30 |
+| returns/outputType/bare output 표현식 | output 타입 계약 + 선언형 output.value | E42 |
+| children와 slots 병행 | slots만 지원 | E41 |
+| 필수 GridItem, x/y/w/h 표기 | Grid.inputs.layout, row/column/rowSpan/columnSpan | E41 |
+| renderer 재사용 금지 / 배치 ID 없음 | setResource 허용 / 명시적 인스턴스 식별 | 부록 A, E14 |
+| CEL이 다시 후보라는 중간 설명 | CEL 승인 유지. 실행기는 이후 JS cel-js 패치 경로 U16/U34, Dart 별도 | E21, U16/U34 |
+| A2UI 전체 적용을 제거했으므로 @path도 폐기 | 표현 문법은 자체 계약으로 유지 | E22, E31 |
+
+## C. 보류 또는 1차 제외
+
+| 항목 | 지금 하지 않을 일 | 근거 |
+|---|---|---|
+| Port access | public 필드로 추가하지 않음; 실제 대상 권한 검증은 유지 | E32 |
+| Action EmitEvent / 전역 이벤트 버스 | on.emit과 혼동하지 않음 | E41, 통합 명세 §7·13 |
+| Theme 독립 리소스, Bundle 독립 종류 | Theme 필수 제외; 전달은 리소스 배열 | E10 |
+| scoped slot 데이터·동적 슬롯 이름 | 단순 UI 영역 전달까지만 | E41 |
+| Grid drag·항목별 고정 repeat·내용 기반 자동 높이 | 초기 배치 의미에 몰래 추가하지 않음 | E41 |
+| 모든 리소스의 코드형 확장 | Component/Action 등록을 전 리소스로 확대하지 않음 | E42 |
+| 선언형 Try/Catch/Finally | v1 제외, 업무별 복구·보상·정리는 등록한 코드 Action에서 명시 | U14, D70 |
+| OAuth/MFA/쿠키세션/토큰 캐시 | 제한된 Login을 전체 인증 플랫폼으로 확대하지 않음 | E28 |
+| Flutter 구현·Rust/WASM 통합 코어 | 우선 JS/Svelte; 전자는 후속, 후자는 현재 경로 아님 | E04 |
+
+## D. 현재 남은 논의와 기술 검증
+
+U13에서 [O01–O16 전체 현황](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/open-contracts.md#o01o16-전체-처리-현황)을 대조해 D60–D67을 위임에 따른 현재 결정으로 기록했다. 기존 U02–U12의 값 계약도 유지한다. 과거 미결 목록을 현재의 사용자 승인 대기 목록으로 다시 사용하지 않는다.
+
+- Q1–Q3은 U14의 사용자 수락으로 D68–D70에 확정했다. 이 세 항목의 추가 승인을 기다리지 않는다. U35 코드 하위 호출도 확정됐으며 [현행 연결 계약](spec/07-host-integration.md)은 실제 JS/TS 진입점을 안내한다.
+- 기술 검증 T1–T4는 U34–U35에서 독립 실험 범위를 완료했다. 실제 라이브러리에 이식할 때 같은 기대값으로 재검증한다. 담당자가 기술 세부를 정하며 사용자에게 패키지·필드 선택을 대신 요구하지 않는다.
+- 초기 설계 정리에서 npm scope·라이선스·배포/CI 등 운영 사항은 범위 밖이었다. 이후 D101에서 MIT와 커뮤니티 정책을 확정했다. npm scope 권한·발행은 별도이며 설계 위임이나 패키지 명명은 공개·배포 승인이 아니다.
+
+세 결정과 남은 영향은 [논의 결과](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/open-contracts.md#중요한-논의-사항)에 있다. 현재 독립 실험의 실제 결과는 [검증 진행표](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/verification-ledger.md)를 따른다. U36의 문서·실험 커밋이 실제 core 구현이나 배포 완료를 뜻하지 않는다.
+
+## E. 2026-10-29 의미 복원 기록
+
+U34의 자율 버그 수정에서는 `states`가 이름별 맵이라는 기존 계약에 따라 초기값을 의존 순서로 평가하도록 명확히 했다. JSON에서 뒤에 나열된 State를 참조했다는 이유만으로 비순환 초기값을 거절하지 않는다. 새 제품 기능 선택이 아니라 선언 순서에 따른 실험 제한의 제거이며, 순환·없는 참조·암묵 부모 캡처 거절은 유지한다. 실행 증거는 [U34 진행표](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/verification-ledger.md)를 따른다.
+
+적대적 리뷰에서 통합 요약의 누락·축소 9건을 확인했다. E43–E51로 실제 제안·수락을 추가 대조하고 [현재 명세](VIEWSTEM-SPEC.md), [이전 승인 상세](spec/09-state-store-and-url.md), [인수 목록](acceptance.md)에 복원했다. 위 D33–D36은 새 기능 선택이 아니라 기존 승인 의미를 찾기 쉽게 등록한 것이다. Join 전체 문법·새 SDK/DTO·CEL 및 부재 원문을 추정 확정하지 않았다. [복원 범위와 실제 검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/semantic-review-2026-10-29.md)은 이전 파일 이관 검사와 별도다.
+
+추가 재평가 후 사용자 개선 요청에 따라 D38의 Query 실패 의미를 E52로 복원하고, D37의 등록 식별 범위를 U01로 명확히 했다. D37을 과거 승인 복원으로 소급하지 않는다. 전역 id 유일성을 새로 강제하거나 참조 객체·버전 접두사를 추가하지 않는다. [추가 보완과 검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/semantic-review-2026-10-29.md#추가-재평가-후-두-항목-보완)을 따른다.
+
+전체 원문 감사에서 추가로 확인한 승인 의미는 D39–D48/E53–E69에 보존했다. 과거 미수록 9개와 초기 완료 승인은 부모가 방 기록에서 직접 회수했으며, 로컬에는 요약/명시 인용을 원 transcript와 구별해 추가했다. 공개 계약·이유·예외·대체 관계와 인수 위치의 [전체 대응표](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/source-contract-matrix.md)를 유지한다. HTTP의 최초 승인 미확인 회고는 확정으로 올리지 않는다.

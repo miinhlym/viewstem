@@ -34,7 +34,7 @@ Node 22.21.1과 24.19.0에서 대표 사례 **36/36**, 보호 장치 제거 대�
 - 같은 시각의 timeout/응답은 가짜 시계에 등록된 순서로 처리한다. 특정 벽시계 시각의 우선순위를 새 공개 계약으로 정하지 않는다.
 - 제작 중 입력 변경 직후 stale 표시 누락을 찾고 수정했다. 수정 전 결과는 `results/development-failure.json`, 수정 후는 `results/latest.json`이며 소스 해시가 다르다. 실패 기록은 최종 코드의 실패가 아니다.
 
-[현재 Query 계약](../../docs/spec/02-query.md), [상세 결과·남은 작업](../../docs/handoff/t2-query-races-2026-10-29.md)을 함께 읽는다. 이 성공을 T2 전체 또는 core 인수 테스트 통과로 처리하지 않는다.
+[현재 Query 계약](../../docs/spec/02-query.md), [상세 결과·남은 작업](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-query-races-2026-10-29.md)을 함께 읽는다. 이 성공을 T2 전체 또는 core 인수 테스트 통과로 처리하지 않는다.
 
 ## 후속 실제 HTTP 연결
 
@@ -46,4 +46,4 @@ U29의 [별도 연결 실험](../t2-query-http/README.md)은 이 스케줄러를
 
 ## U31 재개 대기 결합 후 회귀
 
-[재개 계약](../../docs/handoff/t2-polling-resume-2026-10-30.md)을 연결하며 pending의 주기 의도를 입력 변경/수동 호출과 구분했다. Node 22/24 각각 기존 36/36·고의 결함 4/4·100/100 seed를 유지했다. [U30 최종 소스·결과](../t2-query-polling/archive/u30-before-resume/README.md)를 보존하며 재개 타이밍 검증은 polling/복합 실험이 담당한다.
+[재개 계약](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-polling-resume-2026-10-30.md)을 연결하며 pending의 주기 의도를 입력 변경/수동 호출과 구분했다. Node 22/24 각각 기존 36/36·고의 결함 4/4·100/100 seed를 유지했다. [U30 최종 소스·결과](../t2-query-polling/archive/u30-before-resume/README.md)를 보존하며 재개 타이밍 검증은 polling/복합 실험이 담당한다.

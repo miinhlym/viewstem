@@ -7,12 +7,16 @@ import { parse } from 'parse5';
 const app = fileURLToPath(new URL('../', import.meta.url));
 const dist = path.join(app, 'dist');
 const content = path.join(app, 'src/content/docs');
+const { dependencies } = JSON.parse(fs.readFileSync(path.join(app, 'package.json'), 'utf8'));
+const expectedInstall = `npm install ${['@viewstem/core', '@viewstem/dom', '@viewstem/ui'].map(name => `${name}@${dependencies[name]}`).join(' ')}`;
+const text = node => node.nodeName === '#text' ? node.value : (node.childNodes ?? []).map(text).join('');
 const walk = dir => fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => entry.isDirectory() ? walk(path.join(dir, entry.name)) : [path.join(dir, entry.name)]);
 const pages = new Map();
 const errors = [];
 for (const file of walk(dist).filter(file => file.endsWith('.html'))) {
   const ids = new Set();
   const links = [];
+  let browserInstall;
   const visit = (node, sidebar = false) => {
     const attrs = Object.fromEntries((node.attrs ?? []).map(({ name, value }) => [name, value]));
     if (attrs.id) {
@@ -21,10 +25,11 @@ for (const file of walk(dist).filter(file => file.endsWith('.html'))) {
     }
     sidebar ||= attrs.id === 'starlight__sidebar';
     if (node.tagName === 'a' && attrs.href) links.push({ ...attrs, sidebar });
+    if (node.tagName === 'pre' && attrs['aria-labelledby'] === 'site-build-versions') browserInstall = text(node).trim();
     for (const child of node.childNodes ?? []) visit(child, sidebar);
   };
   visit(parse(fs.readFileSync(file, 'utf8')));
-  pages.set(file, { ids, links });
+  pages.set(file, { ids, links, browserInstall });
 }
 let checkedLinks = 0;
 let familyPages = 0;
@@ -57,6 +62,12 @@ for (const [file, { links }] of pages) {
       if (adjacent.length !== 1 || relative.startsWith('ko/') !== adjacent[0]?.href.startsWith('/ko/')) errors.push(`${relative}: wrong ${rel} locale or count`);
     }
   }
+}
+for (const locale of ['', 'ko/']) {
+  const installation = pages.get(path.join(dist, locale, 'docs/installation/index.html'));
+  assert.equal(installation?.browserInstall, expectedInstall, `${locale}installation must show the browser build's npm pins`);
+  const reference = pages.get(path.join(dist, locale, 'docs/reference/index.html'));
+  assert.ok(reference?.links.some(link => link.sidebar && link.href === `/${locale}docs/dom/`), `${locale}DOM reference must be reachable from the sidebar`);
 }
 const localizedFiles = prefix => walk(path.join(content, prefix)).filter(file => /\.mdx?$/.test(file)).map(file => path.relative(path.join(content, prefix), file)).sort();
 const en = localizedFiles('docs');

@@ -1,6 +1,6 @@
 # 리소스 셋과 브라우저 렌더링
 
-2026-11-16 이관 기준의 확정 설계다. 패키지 역할과 공개 계약이 지켜야 할 의미를 다룬다. 현재 사용 가능한 API는 [호스트 연결 명세](07-host-integration.md), 선택의 배경은 [결정 이력](../history/resource-sets-browser-2026-11-16.md), 코드 기준점과 미결 사항은 [구현 인계](../handoff/resource-sets-browser-2026-11-16.md)를 따른다.
+2026-11-16 이관 기준의 확정 설계다. 패키지 역할과 공개 계약이 지켜야 할 의미를 다룬다. 현재 사용 가능한 API는 [호스트 연결 명세](07-host-integration.md), 선택의 배경은 [결정 이력](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/history/resource-sets-browser-2026-11-16.md), 코드 기준점과 미결 사항은 [구현 인계](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/resource-sets-browser-2026-11-16.md)를 따른다.
 
 ## 제품과 패키지 역할
 
@@ -20,13 +20,13 @@ Viewstem은 개인 프로젝트인 범용 선언형 UI 런타임이다. Core는 
 
 기본 UI는 일반 리소스 셋의 등록 규칙을 따른다. 서비스가 `@viewstem/ui` 셋을 직접 등록하거나, 이를 의존성으로 선언한 다른 셋을 등록할 때 함께 등록된다.
 
-Svelte가 DOM 위에서 동작한다는 표현에서 DOM은 공통 브라우저 기반을 가리킨다. Svelte 코드는 Svelte 연결자가 맡고, 바닐라 DOM 코드는 DOM 연결자가 맡는다. 단일 View에서 DOM·Svelte·React 리소스를 섞는 것이 구조적 목표다. 사용하려는 리소스에 맞는 연결자와 구현이 등록되어야 하며 혼합 렌더링의 실행 적합성은 별도 검증이 필요하다.
+Svelte가 DOM 위에서 동작한다는 표현에서 DOM은 공통 브라우저 기반을 가리킨다. Svelte 코드는 Svelte 연결자가 맡고, 바닐라 DOM 코드는 DOM 연결자가 맡는다. 단일 View에서 DOM·Svelte·React 리소스를 섞는 것이 구조적 목표다. 사용하려는 리소스에 맞는 연결자와 구현이 등록되어야 하며 혼합 렌더링의 React 연결자는 설계 목표다. 실제 검증은 [설치 패키지의 DOM·Svelte·제삼자 연결자 혼합 테스트](../../packages/dom/test/public-consumer.test.mjs)에서 확인한다.
 
 ## 셋 식별과 등록
 
-- 셋 ID와 개별 리소스 ID는 별개다. 작성자가 리소스 ID를 명시하며 셋 이름 prefix를 자동 강제하지 않는다. 현행 Registry의 정의 식별은 [(kind, id)](../VIEWSTEM-SPEC.md#41-정의와-인스턴스)다. 셋 identity, 정의 계약의 identity, 구현 binding의 identity 및 관계는 일관되게 구체화한다.
+- 셋 ID와 개별 리소스 ID는 별개다. 작성자가 리소스 ID를 명시하며 셋 이름 prefix를 자동 강제하지 않는다. 현행 Registry의 정의 식별은 [(kind, id)](../VIEWSTEM-SPEC.md#41-정의와-인스턴스)다. JS/TS Registry는 셋 객체의 동일성을 등록 재사용 기준으로 삼는다.
 - 셋은 이미 가져온 의존 셋을 참조할 수 있다. 상위 셋을 등록할 때 참조한 의존 셋을 순회해 함께 등록한다. 의존 참조는 런타임 다운로드나 설치를 요청하지 않는다.
-- 같은 의존 셋을 여러 경로에서 만나면 한 번 등록하고 재사용한다. 같은 저장소에서 서로 다른 정의가 같은 `(kind, id)`를 사용하면 충돌 오류다. 서로 다른 종류의 정의는 같은 ID를 사용할 수 있다. 조용한 덮어쓰기, 마지막 등록 우선, 호환되지 않는 셋 버전의 임의 선택은 허용하지 않는다. 동일 셋의 판정, 버전 호환의 해석과 순환 검출 방식은 구현 설계에서 정한다.
+- 같은 의존 셋을 여러 경로에서 만나면 한 번 등록하고 재사용한다. 같은 저장소에서 서로 다른 정의가 같은 `(kind, id)`를 사용하면 충돌 오류다. 서로 다른 종류의 정의는 같은 ID를 사용할 수 있다. 조용한 덮어쓰기, 마지막 등록 우선, 호환되지 않는 셋 버전의 임의 선택은 허용하지 않는다. 같은 셋 객체는 재사용한다. 동일 ID의 새 객체는 version이 같아도 충돌한다. 의존 셋은 명시한 객체를 순회하며 순환을 거절한다. 버전 범위 해석은 제공하지 않는다.
 - 중복·교체는 모든 리소스에 적용하는 공통 계약이다. DOM Button의 중복 등록과 독립 Query·Action 등록도 같은 규칙을 따른다. 첫 버전에서는 같은 저장소의 코드형 컴포넌트 ID 하나에 구현 하나를 연결한다. DOM 구현과 Svelte 구현을 함께 제공하려면 서로 다른 컴포넌트 ID로 등록한다. 같은 컴포넌트 ID에 서로 다른 구현을 일반 추가 등록으로 연결하려 하면 충돌 오류다.
 - 의도적 교체는 `registry.replaceResource()`로 요청한다. 코드 Action의 동일 ID 교체는 입출력 계약과 필수 호스트 기능을 보존해야 한다. 일반적인 수정·삭제·hot-swap의 의미는 별도 범위다. [코드 Action의 교체 계약](04-action.md#코드-action-등록과-갱신)
 - 등록 시도 전체를 원자적으로 공개한다. 의존 셋, 정의, 코드 Action과 컴포넌트 구현 연결 정보를 모두 검증하고 한꺼번에 게시한다. 실패하면 이번 시도가 추가한 항목은 하나도 남기지 않으며 이미 등록한 항목은 유지한다.
@@ -38,7 +38,7 @@ Svelte가 DOM 위에서 동작한다는 표현에서 DOM은 공통 브라우저 
 
 새 View는 생성 시 사용 가능한 리소스와 구현 설정을 기본으로 사용한다. 열린 View는 새 셋 등록에 자동 반응하지 않는다. 서비스가 적용 대상을 지정할 수 있어야 한다. 예를 들어 A View에 새 설정을 적용해도 B View는 자신이 사용 중인 설정을 유지한다. View가 사용하는 정의, 해당 컴포넌트 구현 및 코드 Action 함수는 함께 일관된 구성을 이뤄야 한다. 이전 정의를 사용하는 View가 공유 저장소에서 최신 구현 함수만 다시 조회해서는 안 된다.
 
-열린 View에 리소스를 추가 적용할 때 기존 수명과 현재 State를 보존한다. 현재와 같은 정의 및 구현을 사용하는 노드는 기존 인스턴스를 유지한다. 적용 후보가 기존 정의·구현 또는 코드 Action 함수 연결의 변경을 요구하면 준비 단계에서 추가 적용을 거절한다.
+열린 View에 추가할 셋은 Registry에 먼저 등록하고 `view.applyResourceSets({ setIds })`로 지정한다. 이때 기존 수명과 현재 State를 보존한다. 현재와 같은 정의 및 구현을 사용하는 노드는 기존 인스턴스를 유지한다. 적용 후보가 기존 정의·구현 또는 코드 Action 함수 연결의 변경을 요구하면 준비 단계에서 추가 적용을 거절한다.
 
 추가 적용 시점에 이미 실행 중인 Query와 Action은 시작 당시의 리소스 정의와 구현으로 계속 실행한다. 추가 적용 뒤 새로 시작하는 독립 실행은 적용된 구성을 사용한다.
 
@@ -78,7 +78,7 @@ View 설정의 준비·검증을 위해 호출한 콜백에서 Action을 요청�
 
 렌더 실패를 특정 컴포넌트로 좁힐 수 있으면 영향은 해당 컴포넌트와 그 슬롯에 의존하는 자식에 한정한다. 독립적인 컴포넌트는 계속 렌더링한다. 실패한 표시 연결의 렌더 완료 대기에는 실패를 보고한다.
 
-외부 API 호출의 효과는 위 원자성 범위에 속하지 않는다. 구체적 API와 적용 단위의 snapshot·version·buffer 방식, 렌더 오류 복구 전략은 [구현 인계](../handoff/resource-sets-browser-2026-11-16.md#미결-사항)에 남긴다.
+외부 API 호출의 효과는 원자 적용 범위 밖이다. 현재 API와 완료·취소는 [호스트 계약](07-host-integration.md#최소-sdk와-적용-완료)을 따른다. 당시 설계·구현 과제는 [구현 인계](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/resource-sets-browser-2026-11-16.md#미결-사항)에 남긴다.
 
 ## Headless 실행과 호스트 기능
 
@@ -88,7 +88,7 @@ View 설정의 준비·검증을 위해 호출한 콜백에서 Action을 요청�
 
 셋은 외부 기능에 대한 요구를 선언하고 서비스가 실제 router·API·데이터·인증 연결을 공급한다. 예를 들어 발전소 상세로 이동하는 Action은 routing capability를 요구하고 실제 router·경로·백엔드는 서비스가 연결한다.
 
-호스트 기능이 아직 공급되지 않은 셋도 등록할 수 있다. Action 시작 직전에 그 Action이 요구하는 필수 호스트 기능을 확인하고, 빠진 기능이 있으면 실행 전에 오류를 반환한다. capability의 공개 표기와 서비스 주입 방식은 구현 설계에서 정한다.
+호스트 기능이 아직 공급되지 않은 셋도 등록할 수 있다. Action 시작 직전에 그 Action이 요구하는 필수 호스트 기능을 확인하고, 빠진 기능이 있으면 실행 전에 오류를 반환한다. JS/TS에서는 `defineCodeAction({ definition, requires })`로 요구를 선언하고 `createRuntime({ hostCapabilities })`로 제공한다. [코드 Action 계약](04-action.md#코드-action-등록과-갱신)을 따른다.
 
 Viewstem은 서비스가 신뢰해 직접 가져온 셋·연결자 코드만 실행한다. View JSON의 코드형 리소스 참조는 이미 등록된 구현으로 해석한다. 해당 구현이 미등록이면 실패 경계에 따라 오류를 반환한다. 선언형 정의의 resolver 경로는 현행 호스트 계약을 따른다. [실패 경계](#실패-경계) · [호스트 설정과 resolver](07-host-integration.md#최소-sdk와-적용-완료)
 
@@ -102,7 +102,7 @@ Viewstem은 서비스가 신뢰해 직접 가져온 셋·연결자 코드만 실
 - 대기 중에 철회되거나 교체된 슬롯의 자식 정리도 렌더 완료 대기에 포함한다. 대기 중 새 슬롯 제공은 기억하고, 입력이 준비된 뒤 그 슬롯의 자식을 마운트한다.
 - 컴포넌트 이벤트로 Action을 시작하려는 시점에, 이벤트를 보낸 표시 연결과 렌더 인스턴스가 여전히 유효하고 이벤트의 노드 수명과 구현 연결이 현재 View와 일치해야 한다.
 - 한 core View의 State·Action·이벤트 공유와 프레임워크 native context 전파는 계약이 다르다. DOM 경계를 넘는 Svelte native context 전파는 미확정이며 향후 지원 여부도 열려 있다.
-- 1차 검증은 Svelte Layout 안의 DOM Button, DOM Card 안의 Svelte PlantMap 또는 Chart를 기준으로 한다. 임의 중첩과 프레임워크별 기능 전체의 지원은 이 사례에서 일반화하지 않는다. Menu·Trigger의 결합, `table`·`select`의 DOM 의미, 직접 자식 CSS와 wrapper, portal, SSR·hydration, context·transition의 상세 동작은 별도 범위다. [수락 시나리오](../handoff/resource-sets-browser-2026-11-16.md#후속-수락-시나리오)
+- 1차 검증은 Svelte Layout 안의 DOM Button, DOM Card 안의 Svelte PlantMap 또는 Chart를 기준으로 한다. 임의 중첩과 프레임워크별 기능 전체의 지원은 이 사례에서 일반화하지 않는다. Menu·Trigger의 결합, `table`·`select`의 DOM 의미, 직접 자식 CSS와 wrapper, portal, SSR·hydration, context·transition의 상세 동작은 별도 범위다. [수락 시나리오](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/resource-sets-browser-2026-11-16.md#후속-수락-시나리오)
 
 코드 Component의 구현 바인딩을 보존하는 갱신은 포트·슬롯·이벤트의 해석된 계약을 유지한다. 직접 계약 변경과 참조 Type 변경에 같은 기준을 적용한다. 다른 계약에 맞춘 새 구현을 게시하려면 계약과 바인딩을 `replaceResource({ component })`로 함께 교체한다. 새 View와 명시적으로 교체를 적용한 열린 View에 새 조합을 사용한다.
 
@@ -112,7 +112,7 @@ Viewstem은 서비스가 신뢰해 직접 가져온 셋·연결자 코드만 실
 
 **D169.** 브라우저 UI 셋은 자신이 만든 DOM에 기본 스타일을 적용한다. 소유 표시가 붙은 조상 아래에 있더라도, 슬롯에 들어온 외부 요소의 기본 외형은 해당 요소의 셋이 정한다. 일반 CSS 상속과 호스트가 서로 연결한 테마 변수는 기존 브라우저 규칙을 따른다.
 
-DOM 작성자는 `@viewstem/dom/styles`의 `createStyleScope(id)`와 `@viewstem/dom/styles/postcss`의 `scopeUiCss(id)`를 같은 셋 식별자로 사용할 수 있다. 도구는 CSS 규칙의 최종 대상에 소유 조건을 적용한다. 중첩 선택자의 조상 조건은 그대로 유지하며, 조상에 직접 적용되는 선언은 그 조상이 해당 셋 소유일 때만 적용한다. 기존 `data-viewstem-ui`는 이전 테마 변수를 읽는 범위다. [설계 배경](../designs/viewstem-ui-set-policy-review-2026-11-19/design_draft.md)
+DOM 작성자는 `@viewstem/dom/styles`의 `createStyleScope(id)`와 `@viewstem/dom/styles/postcss`의 `scopeUiCss(id)`를 같은 셋 식별자로 사용할 수 있다. CSS 소유 ID는 소문자 영문으로 시작하는 소문자·숫자 slug다. 구간 사이에는 하이픈 하나를 사용할 수 있다. 이 제약은 일반 Registry 셋 ID와 별개다. 도구는 CSS 규칙의 최종 대상에 소유 조건을 적용한다. 중첩 선택자의 조상 조건은 그대로 유지하며, 조상에 직접 적용되는 선언은 그 조상이 해당 셋 소유일 때만 적용한다. 기존 `data-viewstem-ui`는 이전 테마 변수를 읽는 범위다. [설계 배경](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/designs/viewstem-ui-set-policy-review-2026-11-19/design_draft.md)
 
 서로 다른 셋 ID로 빌드한 스타일은 CSS 레이어, 애니메이션, 내부 CSS 변수 이름을 공유하지 않는다. `publicProperties`로 지정한 테마 변수는 원래 이름을 유지한다. 컴포넌트가 JavaScript에서 내부 CSS 변수를 갱신할 때는 `createStyleScope(id).localProperty(name)`으로 빌드와 같은 이름을 얻는다.
 

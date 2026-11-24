@@ -1,7 +1,7 @@
 import {readFile,access} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 const root=new URL('../../../',import.meta.url),read=async path=>JSON.parse(await readFile(new URL(path,root),'utf8'));
-const coverage=await read('docs/handoff/core-acceptance-coverage.json'),seen=new Set(),reports=[];
+const coverage=await read('docs/core-acceptance-coverage.json'),seen=new Set(),reports=[];
 for(const path of process.argv.slice(2))reports.push(await read(path));
 const problems=[];
 if(!reports.length)problems.push('at least one executed test report is required');

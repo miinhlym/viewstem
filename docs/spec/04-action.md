@@ -120,7 +120,7 @@
 
 ### SetState의 교체·검증·실패 범위
 
-SetState.target의 `@path`는 명시적으로 연결된 기존 State 하나를 쓰기 대상으로 해석하고, value의 값으로 **그 State의 값 전체를 교체**한다. 예를 들어 기존 값이 `{"a":1,"b":2}`이고 새 값이 `{"a":3}`이면 결과는 `{"a":3}`이다. 객체를 자동 병합하거나 전체 StateStore를 교체하지 않으며, 없는 State를 자동 생성하지 않는다. 대상 미연결·쓰기 권한 없음·Derived·타입 불일치는 오류다. Query data·일반 입력값·계산 결과도 쓰기 대상이 될 수 없다. 쓰기는 기존 StateStore의 검증·변경·reaction 처리 경로를 따른다. [E31, E67]
+선언형 `SetState.target`은 같은 Action의 State 포트를 가리키는 `{"@path":"/ports/<이름>"}`다. `RefreshQuery.target`은 같은 형태의 Query 포트를 가리킨다. SetState는 명시적으로 연결된 기존 State 하나를 쓰기 대상으로 해석하고, value의 값으로 **그 State의 값 전체를 교체**한다. 예를 들어 기존 값이 `{"a":1,"b":2}`이고 새 값이 `{"a":3}`이면 결과는 `{"a":3}`이다. 객체를 자동 병합하거나 전체 StateStore를 교체하지 않으며, 없는 State를 자동 생성하지 않는다. 대상 미연결·쓰기 권한 없음·Derived·타입 불일치는 오류다. Query data·일반 입력값·계산 결과도 쓰기 대상이 될 수 없다. 쓰기는 기존 StateStore의 검증·변경·reaction 처리 경로를 따른다. [E31, E67]
 
 **완료된 SetState의 변경은 뒤 단계나 output이 실패해도 유지한다.** 예를 들어 선택 State를 바꾼 뒤 Query 또는 Assert가 실패하면 Action은 오류로 끝나지만 앞서 기록한 선택값을 자동 복원하지 않는다. 각 쓰기의 검증과 코어 State·구성 변경 묶음의 원자성은 Action.steps 전체의 자동 롤백을 뜻하지 않는다. 이미 성공한 외부 API 변경에도 같은 비롤백 원칙을 적용한다. [E67]
 
@@ -203,6 +203,8 @@ Value의 `default`는 키가 생략된 경우에만 적용하므로 TypeScript�
 **리소스 셋 설계에서 보완한 D154.** 입력·출력 계약과 필수 호스트 기능이 같으면 명시적 교체로 같은 Action ID에 새 함수를 게시할 수 있다. 이 중 하나라도 달라지면 새 Action ID를 사용한다. 게시 시 이미 진행 중인 호출은 시작 당시 함수로 계속 실행하고, 열린 View는 서비스가 교체를 명시적으로 적용할 때까지 기존 함수를 사용한다. 새 View와 교체를 받아들인 View는 새 함수를 사용한다. 열린 View의 교체 적용은 해당 View의 내부 수명을 새로 시작하는 일반 교체 계약을 따른다. [리소스 셋의 교체와 View 적용](12-resource-sets-browser.md#공통-저장소와-view-적용)
 
 **공개 API 후속 결정(D154).** `defineCodeAction({ definition, requires? })`으로 코드 Action의 ID, 입출력 계약과 필수 호스트 기능을 한 번 선언한다. 반환한 계약의 `.implement(handler)`는 그 계약에 맞는 함수로 Action 엔트리를 만든다. 다른 파일에서 가져온 엔트리는 `defineResourceSet({ actions: [...] })`, `registry.registerAction(entry)`, `registry.replaceResource({ action })`에 전달할 수 있다. 세 경로에서 필수 호스트 기능을 함께 유지한다. 기존 정의·함수 두 인자 등록은 호스트 기능 요구가 없는 경우에 사용한다. 같은 ID의 구현 교체에는 같은 계약의 `.implement()`로 새 함수를 연결한다. 리터럴 스키마에서 핸들러의 입력·출력 타입을 추론하며, `typeRef`를 쓰는 계약은 `defineCodeAction<Inputs, Output>()`으로 타입을 명시할 수 있다. Registry는 실제 스키마를 해석하고 등록·교체 계약을 검증한다.
+
+호스트는 `createRuntime({ hostCapabilities })`로 실제 기능을 제공한다. 핸들러의 `context.capabilities`에는 `requires`로 선언한 이름만 전달한다. 기능이 빠지면 핸들러 실행 전에 `REFERENCE_NOT_FOUND`와 `/capabilities/<이름>` 위치가 보고된다.
 
 ### 재귀·확장 실행의 경계
 

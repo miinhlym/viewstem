@@ -48,7 +48,7 @@ npm run test:browser
 
 U37–U55에서 baseline -0 정규화·격리, encoded 중복 key, 묶음 쓰기 원자성, 새 소유자/ABA 뒤 옛 cleanup 차단, 교체 후보 사전 검증·격리, cleanup 실패 후 새 연결 완료/진단/후속 쓰기, opaque 예외와 비동기 준비 실패를 확인했다. 고의 결함에 baseline 정규화 생략·새 소유자의 cleanup 무효화 생략·cleanup 오류 보고 누락을 추가해 총 9개를 탐지한다. 정상 사례 뒤 구독·Store/key 소유권·교체 기록이 남지 않는다.
 
-[기존 36개 통과 소스](archive/u18-before-boundaries/README.md), [경계 수정 전 41/47](archive/u32-boundaries-before-fix/README.md), [정리 실패 정책 선택 전 관찰](archive/u32-cleanup-policy/README.md), [비동기 prepare 수정 전 60/61](archive/u33-preparation-before-fix/README.md)을 보존한다. 현재 계약과 전체 결과는 [후속 기록](../../docs/handoff/boundary-followup-2026-10-30.md)을 따른다.
+[기존 36개 통과 소스](archive/u18-before-boundaries/README.md), [경계 수정 전 41/47](archive/u32-boundaries-before-fix/README.md), [정리 실패 정책 선택 전 관찰](archive/u32-cleanup-policy/README.md), [비동기 prepare 수정 전 60/61](archive/u33-preparation-before-fix/README.md)을 보존한다. 현재 계약과 전체 결과는 [후속 기록](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/boundary-followup-2026-10-30.md)을 따른다.
 
 `node replacement-failure.mjs replacement-failure-node24.json`은 일반 쓰기 실패와 교체 정리 실패의 U33 동작을 별도로 검사한다. Node 22에서는 해당 바이너리와 `replacement-failure-node22.json`을 사용한다. 새 연결은 유지되지만 옛 URL key가 남을 수 있음을 결과에 기록하며 정리 성공으로 표시하지 않는다. 이 별도 검사는 위 63개에 더해 전체 인수 완료로 합산하지 않는다.
 
@@ -58,4 +58,4 @@ U37–U55에서 baseline -0 정규화·격리, encoded 중복 key, 묶음 쓰기
 
 bytes는 실제 percent-encoded query 부분의 UTF-8 크기로 검사하며 값 한도는 encoded value, 소유 합계는 key=value 조각과 그 사이 `&`를 센다. 읽기 한도는 JSON 파싱 전에, 출력 한도는 최신 URL 병합 후 실제 commit 전에 확인한다. 도메인 전체 URL 길이나 다른 소유자의 값은 이 연결의 한도로 자르지 않는다.
 
-Chromium 한 엔진의 로컬 History 검증이다. Firefox·WebKit·Dart, 서비스 router, 브라우저 보안 정책 전체에 대한 적합성 증거로 확대하지 않는다. [현재 URL 계약](../../docs/spec/09-preserved-contracts.md#url-동기화의-확정-의미), [실험 판단·남은 작업](../../docs/handoff/t2-url-races-2026-10-29.md)을 따른다.
+Chromium 한 엔진의 로컬 History 검증이다. Firefox·WebKit·Dart, 서비스 router, 브라우저 보안 정책 전체에 대한 적합성 증거로 확대하지 않는다. [현재 URL 계약](../../docs/spec/09-state-store-and-url.md#url-동기화의-확정-의미), [실험 판단·남은 작업](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-url-races-2026-10-29.md)을 따른다.

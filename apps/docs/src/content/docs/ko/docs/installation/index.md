@@ -3,7 +3,7 @@ title: 설치
 description: 앱에 필요한 Viewstem 패키지를 npm에서 설치합니다.
 ---
 
-앱 디렉터리에서 용도에 맞는 설치 명령을 실행하세요.
+앱 디렉터리에서 용도에 맞는 설치 명령을 실행하세요. 버전을 생략하면 npm의 현재 릴리스가 설치됩니다. 설치한 버전의 문서는 패키지 README의 소스 및 문서 링크에서 확인하세요.
 
 ## 요구 사항
 
@@ -33,7 +33,7 @@ npm install @viewstem/core
 npm install @viewstem/core @viewstem/dom
 ```
 
-컴포넌트 등록과 마운트는 [DOM 패키지 가이드](https://www.npmjs.com/package/@viewstem/dom)를 참고하세요.
+컴포넌트 등록과 마운트는 [DOM 패키지 가이드](../dom/)를 참고하세요.
 
 <a id="install-browser-ui"></a>
 

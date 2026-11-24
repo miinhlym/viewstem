@@ -1,7 +1,5 @@
 # Code of Conduct
 
-English | [한국어](CODE_OF_CONDUCT.ko.md)
-
 Everyone participating in Viewstem is expected to treat others with respect,
 regardless of background, identity, experience, or language. This applies to
 issues, pull requests, reviews, project communication, and public activity while

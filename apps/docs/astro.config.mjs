@@ -119,6 +119,10 @@ export default defineConfig({
           ],
         },
         {
+          label: '@viewstem/dom',
+          items: ['docs/dom'],
+        },
+        {
           label: '@viewstem/ui',
           collapsed: true,
           items: [

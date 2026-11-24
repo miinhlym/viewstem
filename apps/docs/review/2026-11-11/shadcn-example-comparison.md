@@ -1,6 +1,6 @@
 # shadcn-svelte 컴포넌트 예제 비교
 
-아래는 D141 적용 시점의 기록이다. 이후 [D142](../../../../docs/history/decision-register.md#a-현재-채택한-결정)에서 대표 예제 하나를 미리보기·JSON 탭에 남겼다.
+아래는 D141 적용 시점의 기록이다. 이후 [D142](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/history/decision-register.md#a-현재-채택한-결정)에서 대표 예제 하나를 미리보기·JSON 탭에 남겼다.
 
 Chrome에서 [공식 컴포넌트 목록](https://www.shadcn-svelte.com/docs/components)을 열고 66개 상세 경로를 순회했다. 인라인 미리보기 438개의 구성과 추가 예제 제목을 확인했다. Sidebar는 별도 iframe의 아이콘 축소 예제를 확인했다. 아래 수치는 페이지에서 관찰한 인라인 미리보기 수다.
 

@@ -4,6 +4,8 @@
 
 [명세 시작점](../VIEWSTEM-SPEC.md) · 이 문서는 최종 명세의 주제별 상세다. **확정**과 **구체화 필요/구현 제안/이전 승인 이관**을 구분해 읽는다. JSON은 계약 설명이며 실행 검증 완료를 뜻하지 않는다.
 
+[비밀정보의 책임 경계](#비밀정보의-책임-경계) · [HTTP 전송과 실행 계획](#http-전송-프로필과-현재-요청-dto)
+
 **예시 해석:** 아래 발전소·날씨·협력사 등의 명칭은 이전 논의의 설명용 예시다. `example.com` 계열 주소와 임의 ID만 사용하며 실제 회사 API·비밀값·기본 등록 리소스가 아니다. core는 이 도메인에 의존하지 않는다.
 
 ## 10.1 Datasource와 HTTP 인증 구성
@@ -19,7 +21,7 @@
 | spec.secrets | 로컬 별칭 → 서비스 서버가 해석할 비밀값 참조 | 선택. 실제 비밀값 저장 금지 |
 | spec.auth | 실제 요청 전에 토큰을 얻는 인증 과정 | 선택. 1차 Login |
 | auth.request | 독립된 로그인 HTTP 요청 | Login에서 사용 |
-| auth.token | 로그인 응답에서 토큰을 추출하는 @path 표현식 | Login에서 사용 |
+| auth.token | `/response`만 읽어 문자열 토큰을 얻는 값 표현식 | Login에서 사용 |
 
 **10월 26일 추가 확정:** Datasource 공통 headers·params에 Query 요청의 같은 키가 있으면 Query 값이 우선한다. 인증 처리에서 만든 값도 이 병합 규칙의 대상이다. baseUrl의 공통 경로는 유지하고 request.path를 슬래시 경계에서 이어 붙인다. 실제 인증정보 사용·목적지 권한 검사는 별도로 유지한다. 문자열 조합 @call은 [동적 값 평가 프로필](10-value-contracts.md#동적-값-평가-프로필)의 U13을 따른다.
 
@@ -177,7 +179,7 @@ Bearer 기능을 제거하는 것이 아니라 일반 헤더 구성으로 표현
 }
 ```
 
-로그인은 auth.partner.example.com에, 실제 데이터 요청은 api.partner.example.com에 보낸다. 로그인 응답 본문의 data.accessToken을 추출해 /auth/token에 보관한다. 이 값은 서버의 요청 실행 내부 값이며 UI 상태나 Query 데이터로 반환하지 않는다. concat 호출 표기는 10.1.4와 동일한 초안이다.
+로그인은 auth.partner.example.com에, 실제 데이터 요청은 api.partner.example.com에 보낸다. 로그인 응답 본문의 data.accessToken을 추출해 /auth/token에 보관한다. 이 값은 서버의 요청 실행 내부 값이며 UI 상태나 Query 데이터로 반환하지 않는다. 토큰은 `concat`으로 Bearer 헤더에 연결한다.
 
 ## 10.1.6 같은 서버에서 얻은 토큰을 사용자 정의 헤더로 전달
 
@@ -288,9 +290,9 @@ Login으로 얻은 토큰도 /auth/token을 params에서 읽어 적용한다. �
 
 Login 실행 순서는 **로그인 요청 → 응답에서 문자열 토큰 추출 → 실제 요청의 headers·params 구성 → 실제 요청 실행**이다. 로그인 요청에는 아직 /auth/token이 없으며, 바깥 Datasource의 headers·params·auth를 자동 상속하지 않는다. auth.request.baseUrl만 생략 시 Datasource.baseUrl을 사용한다. 로그인 요청의 HTTP path와 @path 값 참조는 서로 다른 개념이다.
 
-**auth.token의 읽기 문맥(U22):** auth.token 평가는 해당 호출의 Login 응답인 `/response`만 읽는다. `/secrets`, `/ports`, `/states`, `/auth`, 다른 호출의 응답에는 접근할 수 없다. 허용된 순수 함수의 인자나 중첩 표현에서도 같은 제한을 유지한다. 요청 구성 평가에 제공하는 secret resolver 권한을 토큰 추출 단계에 전달하지 않으며, 빈 목적지를 넣어 resolver를 호출하는 대체 경로도 두지 않는다. 금지된 루트 참조는 REFERENCE_NOT_FOUND로 거절하고 그 평가로 인한 secret 조회·후속 API 요청을 시작하지 않는다. 경로 문법은 기존 JSON Pointer 계약을 따르며 잘못된 문법은 INVALID_EXPRESSION이다. 정상 Login 응답의 문자열 토큰 추출과 요청 단계의 승인된 secret 사용은 유지한다.
+**auth.token의 읽기 문맥(U22):** auth.token 평가는 해당 호출의 Login 응답인 `/response`만 읽는다. 응답은 `{status, headers, body}` 형태다. `/secrets`, `/ports`, `/states`, `/auth`, 다른 호출의 응답에는 접근할 수 없다. 허용된 순수 함수의 인자나 중첩 표현에서도 같은 제한을 유지한다. 요청 구성 평가에 제공하는 secret resolver 권한을 토큰 추출 단계에 전달하지 않으며, 빈 목적지를 넣어 resolver를 호출하는 대체 경로도 두지 않는다. 금지된 루트 참조는 REFERENCE_NOT_FOUND로 거절하고 그 평가로 인한 secret 조회·후속 API 요청을 시작하지 않는다. 경로 문법은 기존 JSON Pointer 계약을 따르며 잘못된 문법은 INVALID_EXPRESSION이다. 정상 Login 응답의 문자열 토큰 추출과 요청 단계의 승인된 secret 사용은 유지한다.
 
-secrets 맵은 별칭을 서버 참조와 연결하는 선언이고 실제 값을 가지는 전역 저장소가 아니다. Query·Action이 직접 비밀값을 필요로 하는 요청 실행에도 같은 선언·읽기 원칙을 적용한다. 다만 Datasource의 별칭을 모든 Query·Action에 전역 공개하거나 임의로 병합하지 않는다. 각 리소스의 실행 범위와 서버 전달 계약을 명시적으로 연결해야 한다. 이 원칙 때문에 새 Secret 독립 리소스를 추가하지 않는다.
+현행 비밀 참조 선언은 `Datasource.spec.secrets`에 둔다. 맵은 로컬 별칭을 서비스의 비밀 참조에 연결한다. 향후 Query·Action 자체에 비밀 참조가 필요하면 리소스 범위와 전달 정책을 명시한다. 다른 리소스에 별칭을 전역 공개하지 않는다. [E47]
 
 시크릿을 처리하는 @call은 서버에서 허용된 순수 함수에 한정한다. 비밀값을 임의 사용자 콜백에 전달하거나 클라이언트에서 평가하지 않는다. 참조 누락·로그인 실패·유효한 문자열 토큰 추출 실패 시 실제 요청을 진행하지 않는다. 실행기 내부의 비밀값·Login 응답·추출 토큰을 일반 결과·디버깅 출력·에이전트 컨텍스트에 덧붙이지 않는 경계를 유지한다. 클라이언트 선언은 사용 허가증이 아니므로 서버는 호출자의 비밀값 사용 권한과 실제 목적지를 확인한다.
 
@@ -345,13 +347,13 @@ HTTP 실행기에 주입하는 `clock`의 `now()`와 타이머는 같은 단조 
 
 **Login request 전체 참조(U28):** auth.request 전체도 동적 값이다. 전체 @path의 결과는 요청 객체로 검사하고 각 필드의 전송 타입·헤더·주소·권한 검사를 적용한다. 반환된 객체 안의 @path/@call·@@ 키를 다시 실행하거나 해제하지 않는다. 반면 원래 선언한 요청 객체의 동적 필드는 재귀 평가한다. 일반 데이터 request 컨테이너 전체를 동적 영역으로 새로 확대하는 규칙은 아니다.
 
-**실행 전 문법 검사(U28):** 원래 선언의 동적 영역에 있는 혼합 표현식·잘못된 Pointer·미지원 함수/인자 형식·정적 formatString 보간 문법은 Login·secret 조회 전에 거절한다. 동적 참조 결과의 타입·내용은 해당 단계에서 검사한다. 참조 결과에 표현식처럼 보이는 데이터가 있어도 문법 트리로 다시 해석하지 않는다. 현재 실험의 17개 적용 위치·검증과 미구현 범위는 [전체 경로 점검 기록](../handoff/t2-path-audit-2026-10-30.md)을 따른다.
+**실행 전 문법 검사(U28):** 원래 선언의 동적 영역에 있는 혼합 표현식·잘못된 Pointer·미지원 함수/인자 형식·정적 formatString 보간 문법은 Login·secret 조회 전에 거절한다. 동적 참조 결과의 타입·내용은 해당 단계에서 검사한다. 참조 결과에 표현식처럼 보이는 데이터가 있어도 문법 트리로 다시 해석하지 않는다. 현재 실험의 17개 적용 위치·검증과 미구현 범위는 [전체 경로 점검 기록](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-path-audit-2026-10-30.md)을 따른다.
 
 **params 객체 검사(U25):** Datasource·실제 요청·Login 요청의 params를 각각 평가한 직후, 병합 전에 일반 객체인지 검사한다. 선언 생략은 허용하지만 명시 null·배열·문자열·숫자·boolean·native Map/Set/Date는 params 객체로 취급하지 않고 INVALID_DEFINITION으로 거절한다. 실험의 일반 객체 판정은 Object.prototype 또는 null prototype이며 배열 인덱스나 문자열 문자를 키로 자동 변환하지 않는다. 뒤의 정상 선언·키 제거가 앞의 잘못된 컨테이너를 감추지 못한다. 요청 우선 병합·값 null의 키 제거·배열 값의 순서 있는 반복 인코딩은 유지한다. 이는 params 컨테이너 검사이며 전체 리소스 등록 검증·표현식 구현 완료를 뜻하지 않는다.
 
 params/form의 스칼라 문자화는 이 전송 경계에 명시된 인코딩이며 core 저장값의 암묵 타입 변환을 허용하는 것이 아니다. 숫자·-0·중첩 값 검증은 인코딩보다 먼저 수행한다. 헤더 키 비교의 기준은 [HTTP field names](https://www.rfc-editor.org/rfc/rfc9110.html#name-field-names)이며 위 지원 범위·기본값·null 처리 자체는 프로젝트 선택이다.
 
-**전송 계층 관리 헤더 거절(U20):** U19에서 [Chromium의 명시 Host 무시](../handoff/t2-http-boundary-2026-10-29.md)를 확인했고, 사용자가 명시 거절 권고를 수락했다. v1 직접 실행·서버 실행·Login에 같은 규칙을 적용한다.
+**전송 계층 관리 헤더 거절(U20):** U19에서 [Chromium의 명시 Host 무시](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-http-boundary-2026-10-29.md)를 확인했고, 사용자가 명시 거절 권고를 수락했다. v1 직접 실행·서버 실행·Login에 같은 규칙을 적용한다.
 
 - 이름은 ASCII 대소문자를 무시한다. `Accept-Charset`, `Accept-Encoding`, `Access-Control-Request-Headers`, `Access-Control-Request-Method`, `Connection`, `Content-Length`, `Cookie`, `Cookie2`, `Date`, `DNT`, `Expect`, `Host`, `Keep-Alive`, `Origin`, `Referer`, `Set-Cookie`, `TE`, `Trailer`, `Transfer-Encoding`, `Upgrade`, `Via` 및 `Proxy-`·`Sec-` 접두사의 이름은 리소스 headers에 선언할 수 없다. 기준은 [Fetch 금지 요청 헤더](https://fetch.spec.whatwg.org/#forbidden-request-header)이며, 런타임마다 목록을 달리하거나 표준 변경을 자동으로 계약에 반영하지 않는다.
 - v1은 추가로 `User-Agent`, `X-HTTP-Method`, `X-HTTP-Method-Override`, `X-Method-Override`를 값에 관계없이 거절한다. 전자는 클라이언트 식별을 전송 계층에 맡기고, 후자는 선언한 method 밖의 우회 의미를 기본 프로필에 넣지 않기 위한 프로젝트 선택이다. Fetch가 이 네 이름을 전부 무조건 금지한다는 뜻은 아니다.
@@ -360,15 +362,26 @@ params/form의 스칼라 문자화는 이 전송 경계에 명시된 인코딩�
 
 **headers 객체 전체의 @path(U26):** `headers: {"@path":"/ports/requestHeaders"}`는 헤더 이름 선언이 아니라 객체 참조 표현식이다. 사전 검사는 정확한 @path 표현식과 정적 헤더 객체를 구분하고, 정적 이름의 금지/중복 검사는 기존처럼 secret 해석·Login 전에 수행한다. 전체 참조는 해당 요청 문맥에서 한 번 평가한 뒤 일반 객체 여부와 이름·값·금지 이름·대소문자 중복을 **각 선언별 병합 전에** 검사한다. 참조 결과 안의 데이터는 표현식으로 다시 실행하지 않는다. null 제거 표시는 병합까지 보존하고, 뒤의 덮어쓰기로 금지 헤더를 감출 수 없다. 동적 결과가 금지되면 해당 요청을 전송하지 않는다. 최종 데이터 요청의 동적 헤더를 확인하기 전에 필요한 Login은 이미 수행됐을 수 있으며, 정적 금지 이름의 Login 전 거절과 구별한다.
 
-이 규칙은 **명시한 리소스 헤더**의 지원 범위다. Host 등 실제 전송에 필요한 헤더는 전송 계층이 생성하며, 목적지는 baseUrl/path와 기존 서버 정책으로 결정한다. 자동 생성 헤더의 바이트 단위 동일성, CORS 허용, 모든 브라우저 지원을 보장하지 않는다. 실행 증거와 남은 범위는 [HTTP 실험 기록](../handoff/t2-http-boundary-2026-10-29.md)에 둔다.
+이 규칙은 **명시한 리소스 헤더**의 지원 범위다. Host 등 실제 전송에 필요한 헤더는 전송 계층이 생성하며, 목적지는 baseUrl/path와 기존 서버 정책으로 결정한다. 자동 생성 헤더의 바이트 단위 동일성, CORS 허용, 모든 브라우저 지원을 보장하지 않는다. 실행 증거와 남은 범위는 [HTTP 실험 기록](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-http-boundary-2026-10-29.md)에 둔다.
 
-서버 전달은 `HttpExecutionPlan`으로 고정한다: `version:1`, 호출별 `requestId`, 현재 `datasource` Http spec, 현재 source의 `request` 템플릿, 확정된 Value 입력 snapshot인 `inputs`. 저장 원본 ID 재조회나 View 전체 전송은 요구하지 않는다. inputs의 Set/Map은 기존 E47 콜백 변환을 거치고, 선언된 날짜 값은 [U14의 정규 문자열](10-value-contracts.md#날짜-값과-전송-형식)로 전달한다. 일반 문자열의 날짜 추정이나 timestamp 변환은 하지 않는다. 리소스 위치는 진단용 선택 필드이며 권한 증명이 아니다.
+서버 전달은 `HttpExecutionPlan`으로 고정한다: `version:1`, 호출별 `requestId`, 현재 `datasource` Http spec, 현재 source의 `request` 템플릿, 확정된 Value 입력 snapshot인 `inputs`. 저장 원본 ID 재조회나 View 전체 전송은 요구하지 않는다. inputs의 Set/Map은 기존 E47 콜백 변환을 거치고, 선언된 날짜 값은 [U14의 정규 문자열](10-value-contracts.md#날짜-값과-전송-형식)로 전달한다. 일반 문자열의 날짜 추정이나 timestamp 변환은 하지 않는다. 리소스 내 위치는 [공개 오류의 `location`](07-host-integration.md#공통-오류와-진단)에서 보고한다.
 
-실행기 인터페이스는 `executeRequest(plan, {signal}) -> Promise<{status, headers, body}>`다. 직접 실행과 서버 실행 모두 같은 계획을 해석하되 비밀값이 필요한 계획은 서버 경로로 보낸다. 서버는 요청 템플릿의 /ports를 전달 inputs에만 바인딩한다. 승인된 요청 구성 단계에 /secrets, Login 후 데이터 요청에 /auth/token을 제공하며, auth.token 추출에는 해당 Login의 /response만 제공한다. 승인된 표현식/함수만 평가하고 최종 목적지·비밀 참조·호출자 권한을 재검증한다. 실행기 내부의 실제 secret·Login 응답·추출 토큰을 계획 inputs나 클라이언트 결과에 덧붙이지 않는다. 최종 API 응답 자체의 내용은 위 U21 책임 구분을 따른다. 요청 우선 병합은 최종 전송 전에 적용한다.
+Core Runtime은 기본 HTTP 실행기를 사용하며, 호스트는 `createRuntime({ requestExecutor })`에 자체 실행기나 `@viewstem/core/http`의 `createHttpExecutor(options)`를 주입할 수 있다. 실행기는 `(plan, { signal }) => Promise<{ status, headers, body }>` 형태다. 비밀 참조가 필요한 계획의 서버 중계는 호스트가 명시적으로 연결한다. 직접 실행에서 권한이나 비밀 해석 연결이 누락되면 실행이 막힌다.
 
-서버의 secret resolver는 `resolveSecret(reference, {caller, destination, signal})`로 정의하고 서비스가 구현한다. caller·허용 destination 정책은 서버가 신뢰할 수 있는 실행 문맥에서 제공하며 클라이언트 DTO 값을 그대로 권한으로 채택하지 않는다. 클라이언트에 돌아오는 오류는 [공통 오류 계약](07-host-integration.md#공통-오류와-진단)으로 정제한다. 실제 전송 어댑터의 timeout·취소·권한 검증은 구현 검증 과제로 남으며 이번 문서 작성이 실행 검증을 대신하지 않는다.
+서버는 `authorize`와 `resolveSecret(reference, { caller, destination, signal })`에 신뢰할 호출 문맥을 공급한다. 요청 입력은 `/ports`, 승인된 요청 구성은 `/secrets`, 로그인 후 데이터 요청은 `/auth/token`, 토큰 추출은 해당 Login의 `/response`를 사용한다. 공개 오류는 [공통 오류 계약](07-host-integration.md#공통-오류와-진단)으로 정제한다. 내부 비밀값과 Login 응답을 최종 API 응답에 덧붙이지 않는다.
 
-**U20 판정 정정(U21):** [독립 HTTP 실험](../handoff/t2-http-boundary-2026-10-29.md)의 P21은 API가 의도적으로 반환한 합성 키를 전달한 사례였다. 이를 Viewstem 결함으로 분류하고 응답 전체의 secret 문자열 차단을 권고한 판정을 철회한다. 원래 관찰·이력은 보존하고, 현재 테스트는 API 응답 전달과 실행기 내부 정보의 비노출을 별개 기대값으로 검증한다.
+내장 HTTP 실행기가 지원하는 `@call`은 `concat`과 `formatString`이다. Registry에 등록한 사용자 정의 함수는 일반 Core 값 평가에서 사용할 수 있지만 내장 HTTP에서는 지원하지 않는다. 해당 함수를 쓴 HTTP 템플릿은 등록되더라도 내장 실행 시 전송 전에 `INVALID_EXPRESSION`이 발생한다. [값 표현 계약](10-value-contracts.md#동적-값-평가-프로필)
 
+HTTP 실험에서 수정한 동적 평가·오류 정제와 당시 실행 결과는 [HTTP 경계 실험](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-http-boundary-2026-10-29.md), [동적 경로 점검](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-path-audit-2026-10-30.md)에 있다.
 
-**U21 문제의 수정·검증(U22):** [HTTP 실험의 P30–P33](../handoff/t2-http-boundary-2026-10-29.md)에서 auth.token의 secret 접근을 차단하고, 중첩 표현·잘못된 경로 거절과 정상 Login 응답 추출을 확인했다. 호출별 요청 평가에만 secret 해석 권한을 주므로 토큰 추출에서 빈 목적지의 resolver 호출이 사라졌다. 이후 발견한 오류 정제의 추가 예외도 U23에서 보완·검증했다. [현재 실험 기록](../handoff/t2-http-boundary-2026-10-29.md)의 Node/Chromium 전송 대조와 [U24 배열 경로 수정](10-value-contracts.md#동적-값-평가-프로필)을 구별한다. U24의 P46 params 컨테이너 문제는 U25에서 각 평가 결과를 병합 전에 검사하도록 수정했고, 기존 반복 키 인코딩도 유지·검증했다. U25의 P51은 U26에서 전체 @path를 구분하고 참조 결과에도 금지 헤더 검사를 적용하도록 수정·검증했다. U26의 P61은 U27에서 경로 평가 후 기존 주소·목적지 검사를 연결하도록 수정·검증했다. 이후 P71에서 발견한 Datasource.baseUrl 평가 누락은 U28에서 수정했다. [U28 전체 점검](../handoff/t2-path-audit-2026-10-30.md)은 method·Login request 전체·공통 경로 문법까지 보완해 현재 HTTP/Login의 동적 값 17개 위치를 검증했다. 실제 core·State/Action/renderer 연결은 아직 구현하지 않았다.
+## Query 서비스 콜백의 컬렉션 변환
+
+**확정 경계:** Query 서비스 콜백을 호출하기 전에 라이브러리가 inputs를 JSON 전송 가능한 값으로 재귀 변환한다. 서비스가 같은 변환을 다시 구현할 책임을 지지 않으며 원본 State의 native Set/Map은 보존한다. [E47]
+
+| 런타임 입력 | 콜백에 전달하는 전송용 값 |
+|---|---|
+| new Set(["a", "b"]) | ["a", "b"] |
+| new Map([["a", 1], ["b", 2]]) | [["a", 1], ["b", 2]] |
+| 객체·배열 안의 중첩 Set/Map | 같은 규칙으로 재귀 변환한 복사 값 |
+
+변환된 inputs에서 Map을 임의 객체로 바꾸지 않는다. 이후 API별 요청 body/params 형태로 가공하는 것은 별도다. 이 승인은 StateStore 관찰값·정의/State export·CEL 값 표현·Dart 내부 표현이나 **새 서버 DTO 전체**의 직렬화를 확정하지 않는다. 현재 콜백 경계는 `HttpExecutionPlan.inputs`다.

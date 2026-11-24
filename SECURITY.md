@@ -1,7 +1,5 @@
 # Security policy
 
-English | [한국어](SECURITY.ko.md)
-
 ## Report privately
 
 Use [GitHub private vulnerability reporting](https://github.com/miinhlym/viewstem/security/advisories/new)
@@ -37,7 +35,7 @@ integration is involved.
 
 The [host contract](docs/spec/07-host-integration.md),
 [HTTP and authentication contract](docs/spec/01-datasource-auth.md), and
-[CEL support limits](docs/handoff/core-cel-support.md) describe these boundaries
+[CEL support limits](docs/core-cel.md) describe these boundaries
 (these detailed documents are in Korean).
 Viewstem does not sandbox arbitrary host callbacks. Test only systems and data
 you are authorized to use; the sample applications do not grant permission to

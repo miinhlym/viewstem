@@ -51,10 +51,10 @@ C28–C30에서 재개와 입력 변경의 동시 반영이 자식 모두를 fre
 
 ## U32 후속 경계
 
-[후속 검증 기록](../../docs/handoff/boundary-followup-2026-10-30.md)에 따라 C31–C36/S12–S17을 추가했다. 명시 null을 생략으로 처리하던 3개 위치, escaped 필수 입력 이름, 많은 배열의 Concat을 수정했다. [수정 전 60/65 결과·소스](archive/u32-boundaries-before-fix/README.md)를 보존하며 현재 Node 22/24 결과는 65/65다. 150,000개 배열 사례는 JS 함수 인자 개수에 의존하지 않는지 확인하는 기능 검사이고 운영 예산·성능 보장이 아니다.
+[후속 검증 기록](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/boundary-followup-2026-10-30.md)에 따라 C31–C36/S12–S17을 추가했다. 명시 null을 생략으로 처리하던 3개 위치, escaped 필수 입력 이름, 많은 배열의 Concat을 수정했다. [수정 전 60/65 결과·소스](archive/u32-boundaries-before-fix/README.md)를 보존하며 현재 Node 22/24 결과는 65/65다. 150,000개 배열 사례는 JS 함수 인자 개수에 의존하지 않는지 확인하는 기능 검사이고 운영 예산·성능 보장이 아니다.
 
 ## 한계
 
 JSON 형태 fixture 중심이며 전체 JSON Schema·포트 기본값/타입 검증·native 값/Dart·등록/교체 원자성·예산 제한·CEL·StateStore·Action·renderer는 범위 밖이다. 추가 변환 종류나 선택 항목별 자동 Query fanout은 만들지 않았다. 기존 Query 모형의 안전용 timeout을 전체 복합 Query의 새 공개 deadline으로 해석하지 않는다. HTTP 계획의 deadline은 기존 HTTP 실행기 계약을 따른다.
 
-재사용에 대한 구조/입력 정의는 실험 시작 시 복사하며 동적 definition 편집 API는 제공하지 않는다. 실제 브라우저와 다른 언어에서 이 결합을 실행하지 않았다. 모든 가능한 그래프·실행 순서·운영 부하를 검증했다는 뜻이 아니다. [전체 판단과 문서 대응](../../docs/handoff/t2-composite-polling-2026-10-30.md)을 따른다.
+재사용에 대한 구조/입력 정의는 실험 시작 시 복사하며 동적 definition 편집 API는 제공하지 않는다. 실제 브라우저와 다른 언어에서 이 결합을 실행하지 않았다. 모든 가능한 그래프·실행 순서·운영 부하를 검증했다는 뜻이 아니다. [전체 판단과 문서 대응](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-composite-polling-2026-10-30.md)을 따른다.

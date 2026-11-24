@@ -6,7 +6,7 @@ body:
       value: |
         Discuss substantial features and public API changes before implementing them.
         A proposal does not imply an implementation or delivery commitment.
-        [한국어 기여 안내](https://github.com/miinhlym/viewstem/blob/main/CONTRIBUTING.ko.md)
+        See the [contribution guide](https://github.com/miinhlym/viewstem/blob/main/CONTRIBUTING.md).
   - type: textarea
     id: problem
     attributes:

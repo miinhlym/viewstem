@@ -23,7 +23,7 @@ Call `store.connectUrl(options)` after creating writable State handles. It retur
 
 One store can have one active connection. A binding must reference a writable cell in that store. Targets and keys cannot repeat. Connections sharing an adapter cannot claim the same key concurrently.
 
-Values are encoded as JSON and then URL-encoded; a string therefore keeps its JSON quotes. Sets use their supported array representation. Supported State shapes are string, number, boolean, and arrays/Sets of strings or numbers; a nullable scalar follows its schema. Objects, Maps, tuple arrays and ambiguous unions are not URL profiles. A missing key restores the baseline. Invalid input is reported through connection diagnostics; inspect the resulting State snapshot rather than assuming a URL value was accepted.
+Values are encoded as JSON and then URL-encoded; a string therefore keeps its JSON quotes. Sets use their supported array representation. Supported State shapes are string, number, boolean, date, time, datetime, and arrays/Sets of strings or numbers; a nullable scalar follows its schema. Objects, Maps, tuple arrays and ambiguous unions are not URL profiles. A missing key restores the baseline. Invalid input is reported through connection diagnostics; inspect the resulting State snapshot rather than assuming a URL value was accepted.
 
 ## UrlAdapter
 
