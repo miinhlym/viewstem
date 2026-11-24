@@ -20,7 +20,7 @@ test('DOM renderer owns mounted views and borrows attachments', async t => {
       window.renderer = createRenderer({ runtime });
       window.source = {
         states: { label: { kind: 'State', schema: { type: 'string' }, initial: 'Draft' } },
-        render: { id: 'label', componentRef: 'shadcn.Badge', inputs: { text: { '@path': '/states/label' } } },
+        render: { id: 'label', componentRef: 'shadcn.Badge', inputs: { text: { '@path': '/states/label' }, title: 'Status' } },
       };
       window.clickAndDetach = async (left, right) => {
         const runtime = createRuntime();
@@ -91,9 +91,20 @@ test('DOM renderer owns mounted views and borrows attachments', async t => {
     const view = await screen.ready;
     const attachment = renderer.attach(view, right);
     await attachment.whenRendered();
+    const badge = left.querySelector('[data-vs-component="Badge"]');
+    let managedChanges = 0;
+    const attributes = new MutationObserver(records => { managedChanges += records.length; });
+    attributes.observe(badge, { attributes: true, attributeFilter: ['data-vs-managed'] });
     view.getState('label').write('Saved');
     await Promise.all([screen.whenRendered(), attachment.whenRendered()]);
     const before = [left.textContent, right.textContent];
+    const stableAttributes = [badge.getAttribute('title'), managedChanges + attributes.takeRecords().length];
+    attributes.disconnect();
+    const next = structuredClone(source);
+    delete next.render.inputs.title;
+    await view.updateDefinition(next);
+    await Promise.all([screen.whenRendered(), attachment.whenRendered()]);
+    const titleRemoved = badge === left.querySelector('[data-vs-component="Badge"]') && !badge.hasAttribute('title');
     await attachment.detach();
     const after = [left.textContent, right.textContent];
     await screen.unmount();
@@ -109,7 +120,7 @@ test('DOM renderer owns mounted views and borrows attachments', async t => {
     await renderer.dispose();
     const publication = await mountDuringPublication(left);
     const detachedClick = await clickAndDetach(left, right);
-    return { conflict, duplicate, disconnected, before, after, invalidInput, diagnostics, publication, detachedClick,
+    return { conflict, duplicate, disconnected, before, after, stableAttributes, titleRemoved, invalidInput, diagnostics, publication, detachedClick,
       sharedDiagnostic: central.length === 1 && central[0] === diagnostics[0], empty: left.textContent,
     };
   });
@@ -120,6 +131,8 @@ test('DOM renderer owns mounted views and borrows attachments', async t => {
   assert.match(result.disconnected.message, /connected HTMLElement/);
   assert.deepEqual(result.before, ['Saved', 'Saved']);
   assert.deepEqual(result.after, ['Saved', '']);
+  assert.deepEqual(result.stableAttributes, ['Status', 0]);
+  assert.equal(result.titleRemoved, true);
   assert.equal(result.invalidInput.code, 'INVALID_DEFINITION');
   assert.equal(result.invalidInput.input, 'text');
   assert.deepEqual(result.invalidInput.resource, { kind: 'Component', id: 'shadcn.Button' });
