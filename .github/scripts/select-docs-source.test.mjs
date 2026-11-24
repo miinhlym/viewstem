@@ -6,9 +6,9 @@ import { delimiter, dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-const selectSource = fileURLToPath(new URL('./docs-site-changes.mjs', import.meta.url));
+const selectSource = fileURLToPath(new URL('./docs-deploy/select-docs-source.mjs', import.meta.url));
 const planRelease = fileURLToPath(new URL('./npm-release.mjs', import.meta.url));
-const verifyRegistry = fileURLToPath(new URL('./verify-docs-release.mjs', import.meta.url));
+const verifyRegistry = fileURLToPath(new URL('./docs-deploy/verify-published-packages.mjs', import.meta.url));
 const guide = 'apps/docs/src/content/docs/docs/installation/index.md';
 const packageSource = 'packages/core/src/index.mjs';
 const packages = ['core', 'dom', 'svelte', 'ui'];
@@ -187,6 +187,14 @@ test('a docs-only commit does not publish packages and can deploy as the exact m
   const sha = commit({
     [guide]: 'Fix an installation typo\n',
     '.github/scripts/docs-preview.mjs': '// Remove a retired preview-record format.\n',
+    '.github/workflows/docs-preview.yml': 'name: Docs preview\n',
+    '.changeset/README.md': 'Changeset instructions\n',
+    'AGENTS.md': 'Repository documentation entry point\n',
+    'docs/README.md': 'Documentation map\n',
+    'docs/architecture.md': 'Implementation boundaries\n',
+    'docs/releasing.md': 'Release procedure\n',
+    'docs/verification.md': 'Verification commands\n',
+    'skills/README.md': 'Skill maintenance guide\n',
   });
   const releasePlan = plan(sha, base, false);
   assert.equal(releasePlan.status, 0, releasePlan.stderr);
@@ -198,6 +206,93 @@ test('a docs-only commit does not publish packages and can deploy as the exact m
   assert.equal(published.status, 0, published.stderr);
   assert.equal(git('rev-parse', 'HEAD'), sha);
   assert.equal(git('tag', '--list'), '');
+});
+
+test('manual deployment allows deletion of baseline reports without admitting later edits or additions', t => {
+  const { base, commit, select } = repository(t);
+  const report = 'docs/designs/old-review.md';
+  const release = commit({ [report]: 'Old design evidence\n' });
+  const removed = commit({ [report]: null });
+
+  const accepted = select(removed, { base: release, through: release });
+  assert.equal(accepted.status, 0, accepted.stderr);
+  assert.match(accepted.output, /deploy=true/);
+
+  const addedThenRemoved = select(removed, { base, through: base });
+  assert.equal(addedThenRemoved.status, 1);
+  assert.ok(addedThenRemoved.stderr.includes(report));
+
+  const edited = commit({ [report]: 'New design evidence\n' });
+  const restored = select(edited, { base: release, through: release });
+  assert.equal(restored.status, 1);
+  assert.ok(restored.stderr.includes(report));
+});
+
+test('manual deployment recognizes the moved maintainer docs without allowing arbitrary docs paths', t => {
+  const { commit, select } = repository(t);
+  const base = commit({
+    'docs/handoff/acceptance-matrix.md': 'Acceptance expectations\n',
+    'docs/handoff/core-acceptance-coverage.json': '{}\n',
+    'docs/handoff/core-cel-support.md': 'CEL reference\n',
+    'docs/spec/09-preserved-contracts.md': 'State and URL\n',
+  });
+  const sha = commit({
+    'docs/handoff/acceptance-matrix.md': null,
+    'docs/handoff/core-acceptance-coverage.json': null,
+    'docs/handoff/core-cel-support.md': null,
+    'docs/spec/09-preserved-contracts.md': null,
+    'docs/acceptance.md': 'Acceptance expectations\n',
+    'docs/core-acceptance-coverage.json': '{}\n',
+    'docs/core-cel.md': 'CEL reference\n',
+    'docs/follow-up.md': 'Follow-up scope\n',
+    'docs/spec/04-action.md': 'Action contract\n',
+    'docs/spec/06-composition-examples.md': 'Composition examples\n',
+    'docs/spec/09-state-store-and-url.md': 'State and URL\n',
+    'experiments/t3-application/README.md': 'Historical reproduction instructions\n',
+  });
+  const active = { base, through: base };
+  const allowed = select(sha, active);
+  assert.equal(allowed.status, 0, allowed.stderr);
+  assert.equal(allowed.output, `deploy=true\nbase=${base}\nthrough=${sha}\n`);
+
+  const unknown = commit({ 'docs/unclassified.md': 'Unknown file\n' });
+  const blocked = select(unknown, active);
+  assert.notEqual(blocked.status, 0);
+  assert.match(blocked.stderr, /docs\/unclassified\.md/);
+});
+
+test('manual deployment accepts workflow and script moves after the active release and rejects unknown paths', t => {
+  const { base, commit, select } = repository(t);
+  const oldScript = '.github/scripts/docs-site-changes.mjs';
+  const oldTest = '.github/scripts/docs-site-changes.test.mjs';
+  const ci = 'name: CI\n';
+  const deploy = 'name: Deploy docs\n';
+  commit({
+    '.github/workflows/core.yml': ci,
+    '.github/workflows/docs-release.yml': deploy,
+    [oldScript]: 'export const select = true;\n',
+    [oldTest]: '// Source test\n',
+  });
+  const moved = commit({
+    '.github/workflows/core.yml': null,
+    '.github/workflows/docs-release.yml': null,
+    '.github/workflows/ci.yml': ci,
+    '.github/workflows/docs-deploy.yml': deploy,
+    [oldScript]: null,
+    [oldTest]: null,
+    '.github/scripts/docs-deploy/select-docs-source.mjs': 'export const select = true;\n',
+    '.github/scripts/select-docs-source.test.mjs': '// Source test\n',
+  });
+  const active = { base, through: base };
+  const result = select(moved, active);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.output, `deploy=true\nbase=${base}\nthrough=${moved}\n`);
+
+  const unexpected = '.github/scripts/docs-deploy/new-deployment-script.mjs';
+  const blocked = select(commit({ [unexpected]: '// Unknown script\n' }), active);
+  assert.equal(blocked.status, 1);
+  assert.ok(blocked.stderr.includes(unexpected));
+  assert.equal(blocked.output, '');
 });
 
 test('an unversioned feature blocks manual deployment even if a hosted example still passes', t => {

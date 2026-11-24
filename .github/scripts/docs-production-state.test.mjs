@@ -1,14 +1,37 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
+import { access, readFile } from 'node:fs/promises';
 import { test } from 'node:test';
-import { activeVersion, isLiveBuild, parseDeploymentTag, readDeployment } from './docs-production.mjs';
+import { activeVersion, isLiveBuild, parseDeploymentTag, readDeployment } from './docs-deploy/docs-production-state.mjs';
 
 const before = 'a'.repeat(40);
 const after = 'b'.repeat(40);
 const version = '12345678-1234-1234-1234-123456789abc';
 
+test('the production workflow calls the deployment scripts at their repository paths', async () => {
+  const workflow = await readFile(new URL('../workflows/docs-deploy.yml', import.meta.url), 'utf8');
+  const scripts = new Set(Array.from(workflow.matchAll(/\bnode (\.github\/scripts\/\S+\.mjs)\b/g), match => match[1]));
+  assert.deepEqual(scripts, new Set([
+    '.github/scripts/docs-deploy/docs-production-state.mjs',
+    '.github/scripts/docs-deploy/select-docs-source.mjs',
+    '.github/scripts/docs-deploy/verify-published-packages.mjs',
+  ]));
+  await Promise.all([...scripts].map(path => access(new URL(`../../${path}`, import.meta.url))));
+});
+
+test('manual deploys on other refs report the default branch and fail', async () => {
+  const workflow = await readFile(new URL('../workflows/docs-deploy.yml', import.meta.url), 'utf8');
+  const guard = workflow.split('\n  reject-manual-ref:\n')[1].split('\n  release:\n')[0];
+  assert.match(guard, /github.event_name == 'workflow_dispatch' &&\n\s+github.ref != format\('refs\/heads\/\{0\}', github.event.repository.default_branch\)/);
+  assert.doesNotMatch(guard, /environment:|secrets\./);
+  const command = guard.split('run: |\n')[1];
+  const result = spawnSync('bash', ['-c', command], { encoding: 'utf8', env: { ...process.env, DEFAULT_BRANCH: 'main' } });
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /::error::Run Deploy docs on the default branch \(main\)/);
+});
+
 test('GitHub deployment records require an uploaded, live version verified in the current attempt', async () => {
-  const workflow = await readFile(new URL('../workflows/docs-release.yml', import.meta.url), 'utf8');
+  const workflow = await readFile(new URL('../workflows/docs-deploy.yml', import.meta.url), 'utf8');
   const [release, record] = workflow.split('\n  record-deployment:\n');
   assert.match(workflow, /concurrency:\n  group: docs-production/);
   assert.match(release, /environment:\n      name: docs-production\n      deployment: false/);

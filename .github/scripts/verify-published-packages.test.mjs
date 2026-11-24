@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { deploymentPackages, isPublicRelease, parseReleasedPackages } from './verify-docs-release.mjs';
+import { deploymentPackages, isPublicRelease, parseReleasedPackages } from './docs-deploy/verify-published-packages.mjs';
 
 const npm = { registry: 'npm', name: '@viewstem/core', version: '0.1.0' };
 const dart = { registry: 'pub.dev', name: 'viewstem', version: '0.1.0' };

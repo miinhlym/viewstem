@@ -19,6 +19,23 @@ concurrency:
   queue: max
 
 jobs:
+  reject-manual-ref:
+    name: Report an unsupported deployment branch
+    if: >-
+      github.repository == 'miinhlym/viewstem' &&
+      github.event_name == 'workflow_dispatch' &&
+      github.ref != format('refs/heads/{0}', github.event.repository.default_branch)
+    permissions: {}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Show the required branch
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          printf '::error::Run Deploy docs on the default branch (%s).\n' "$DEFAULT_BRANCH"
+          exit 1
+
   release:
     name: Build, verify, and deploy docs
     if: github.repository == 'miinhlym/viewstem' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
@@ -48,15 +65,15 @@ jobs:
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PRODUCTION_API_TOKEN }}
-        run: node .github/scripts/docs-production.mjs read-active
+        run: node .github/scripts/docs-deploy/docs-production-state.mjs read-active
       - name: Check that the workflow commit can deploy
         id: source
         env:
           DOCS_ACTIVE: ${{ steps.active.outputs.deployment }}
-        run: node .github/scripts/docs-site-changes.mjs
+        run: node .github/scripts/docs-deploy/select-docs-source.mjs
       - name: Wait for the public package releases
         if: steps.source.outputs.deploy == 'true'
-        run: node .github/scripts/verify-docs-release.mjs
+        run: node .github/scripts/docs-deploy/verify-published-packages.mjs
       - if: steps.source.outputs.deploy == 'true'
         run: npm ci
       - name: Build with the public npm packages
@@ -66,7 +83,7 @@ jobs:
           DOCS_THROUGH_SHA: ${{ steps.source.outputs.through }}
         run: |
           node apps/docs/scripts/build-published.mjs
-          node .github/scripts/docs-production.mjs stamp
+          node .github/scripts/docs-deploy/docs-production-state.mjs stamp
       - if: steps.source.outputs.deploy == 'true'
         run: node apps/docs/scripts/verify-docs-site.mjs
       - if: steps.source.outputs.deploy == 'true'
@@ -92,7 +109,7 @@ jobs:
           node apps/docs/scripts/verify-site-previews.mjs
       - name: Recheck the public packages
         if: steps.source.outputs.deploy == 'true'
-        run: node .github/scripts/verify-docs-release.mjs --availability-only
+        run: node .github/scripts/docs-deploy/verify-published-packages.mjs --availability-only
       - name: Publish the production site
         id: publish
         if: steps.source.outputs.deploy == 'true'
@@ -114,7 +131,7 @@ jobs:
             *) printf 'Expected the token to be denied access to viewstem-preview. HTTP %s\n' "$scope_status" >&2; exit 1 ;;
           esac
           config=apps/docs/wrangler.jsonc
-          node .github/scripts/docs-production.mjs assert-active
+          node .github/scripts/docs-deploy/docs-production-state.mjs assert-active
           previous_version="$(jq -r '.id // empty' <<< "$DOCS_ACTIVE")"
           printf '### Production documentation\n\nPackage release baseline `%s`\n\nSite source `%s`\n\n' "$DOCS_BASE_SHA" "$DOCS_THROUGH_SHA" >> "$GITHUB_STEP_SUMMARY"
           if [[ -n "$previous_version" ]]; then
@@ -135,7 +152,7 @@ jobs:
           DOCS_THROUGH_SHA: ${{ steps.source.outputs.through }}
           DOCS_VERSION_ID: ${{ steps.publish.outputs.version_id }}
         run: |
-          node .github/scripts/docs-production.mjs check-live
+          node .github/scripts/docs-deploy/docs-production-state.mjs check-live
           printf 'verified_attempt=%s\nverified_version=%s\n' "$GITHUB_RUN_ATTEMPT" "$DOCS_VERSION_ID" >> "$GITHUB_OUTPUT"
 
   record-deployment:
