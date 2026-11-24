@@ -60,6 +60,47 @@ test('View refresh reuses port compilation and validates current inputs against 
   assert.deepEqual(entries(), [['error', undefined, 'TYPE_MISMATCH'], ['ready', 'new-h', undefined]]);
 });
 
+test('State writes publish owning and connected Views and follow State port replacement', async t => {
+  const p = value => ({ '@path': value });
+  const number = binding('Number');
+  number.contract.spec.ports = { value: { kind: 'Value', schema, required: true } };
+  const registry = localRegistry().registerResourceSet(localSet({
+    id: 'components', version: '1', components: [number],
+  }));
+  const store = localStore();
+  const runtime = localRuntime({ registry, stateStore: store });
+  t.after(async () => { await runtime.dispose(); await store.dispose(); });
+  const source = initial => ({
+    states: { value: { kind: 'State', schema, initial } },
+    render: { id: 'number', componentRef: 'Number', inputs: { value: p('/states/value') } },
+  });
+  const own = await runtime.createView(source(1));
+  const unrelated = await runtime.createView(source(2));
+  const first = own.getState('value'), second = unrelated.getState('value');
+  const connected = await runtime.createView({
+    ports: { value: { kind: 'State', schema, required: true } },
+    render: { id: 'number', componentRef: 'Number', inputs: { value: p('/ports/value') } },
+  }, { inputs: { value: first } });
+  await tick();
+  const numbers = view => {
+    const values = [];
+    view.subscribe(snapshot => values.push(snapshot.roots[0].inputs.value));
+    return values;
+  };
+  const ownValues = numbers(own), otherValues = numbers(unrelated), connectedValues = numbers(connected);
+  first.write(3);
+  assert.deepEqual(ownValues, [1, 3]);
+  assert.deepEqual(otherValues, [2]);
+  assert.deepEqual(connectedValues, [1, 3]);
+  await connected.setInputs({ value: second });
+  await tick();
+  const previous = connectedValues.length;
+  first.write(4);
+  assert.equal(connectedValues.length, previous);
+  second.write(5);
+  assert.deepEqual(connectedValues.slice(previous), [5]);
+});
+
 test('sets and definitions apply to one View together and reject invalid State or code bindings atomically', async t => {
   const registry = createRegistry().registerResourceSet(defineResourceSet({ id: 'base', version: '1', components: [binding('Base')] }));
   const runtime = createRuntime({ registry });

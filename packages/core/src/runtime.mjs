@@ -1,6 +1,6 @@
 import { Registry, actionDeclarations, missingReference } from './registry.mjs';
 import { prepareUrlConnection } from './url.mjs';
-import { StateStore, createStateStore } from './state.mjs';
+import { StateStore, createStateStore, keyOf } from './state.mjs';
 import { compilePorts, expression, createQueryHandle, sameContract, stateRoot } from './ports.mjs';
 import { compileSchema, equal } from './schema.mjs';
 import { protect, trustedCopies } from './immutable.mjs';
@@ -191,6 +191,7 @@ export class View {
     const runtime=execution;this.host=host;this.runtime=runtime;this.owner=owner;this.generation=0;this.instances=new Map();this.owners=new Map();this.connections=new Map();this.listeners=new Map();this.diagnostics=[];this.planning=false;this.queued=false;
     this.lifetime = new AbortController();
     this.queryUses = new Set();
+    this.stateAddresses = new Set();
     this.renderWaiters = new Set();
     this.closeListeners = new Set();
     this.diagnosticListeners = new Set();
@@ -200,7 +201,9 @@ export class View {
     this.published = 0;
     this.projectionWaiters = new Set();
     this.renderListeners = new Map();
-    this.unsubscribe = runtime.stateStore.observe(() => this.refresh());
+    this.unsubscribe = runtime.stateStore.observe(addresses => {
+      if (addresses.some(address => this.stateAddresses.has(address))) this.refresh();
+    });
   }
   get alive() { return !this.disposal && this.host.alive && !this.owner?.signal.aborted && (this.owner?.isOpen?.() ?? true); }
   prepareApplication() {
@@ -544,7 +547,18 @@ export class View {
         this.instances = next;
         this.owners = owners;
         this.connections = connections;
-        this.queryUses = new Set([...owners.values()].flatMap(owner => [...owner.queries.values()]));
+        const queryUses = new Set(), stateAddresses = new Set();
+        for (const owner of owners.values()) {
+          for (const handle of owner.states.values()) stateAddresses.add(keyOf(handle.address));
+          for (const name in owner.ports) {
+            if (owner.spec.ports[name].kind !== 'State') continue;
+            const handle = owner.ports[name];
+            if (handle) stateAddresses.add(keyOf(handle.address));
+          }
+          for (const item of owner.queries.values()) queryUses.add(item);
+        }
+        this.stateAddresses = stateAddresses;
+        this.queryUses = queryUses;
         plan.connections = null;
         return () => {
           const retained = new Set([...connections.values()].map(entry => entry.connection));
