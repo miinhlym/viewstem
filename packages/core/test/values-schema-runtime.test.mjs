@@ -1,6 +1,7 @@
 // Expectations promoted from experiments/t1-values/schema-runtime-tests.mjs; execution uses production modules only.
 import assert from 'node:assert/strict';
 import { compileSchema, equal } from '../src/schema.mjs';
+import { copy, freeze } from '../src/definition.mjs';
 import { ajv, normalize } from '../src/values.mjs';
 import { schemaCases } from './fixtures/state/schema-cases.mjs';
 import test from 'node:test';
@@ -126,6 +127,22 @@ await test('admission/annotation-accessor', () => {
   let calls = 0; const schema = Object.defineProperty({}, 'default', { enumerable: true, get() { calls++; return 1; } });
   assert.throws(() => compileSchema(schema), /INVALID_SCHEMA/); assert.equal(calls, 0);
 });
+await test('compilation reuses definition snapshots and resnapshots host-owned schemas', () => {
+  const item = { type: 'integer' };
+  const supplied = Object.freeze({ type: 'object', properties: { item } });
+  const snapshot = freeze(copy(supplied));
+  const cached = compileSchema(snapshot);
+  const before = compileSchema(supplied);
+
+  item.type = 'string';
+  const after = compileSchema(supplied);
+  assert.equal(compileSchema(snapshot), cached);
+  assert.equal(cached.accept({ item: 7 }).item, 7);
+  assert.equal(before.accept({ item: 7 }).item, 7);
+  assert.throws(() => after.accept({ item: 7 }), /SCHEMA/);
+  assert.equal(after.accept({ item: 'new' }).item, 'new');
+});
+
 await test('admission/long-reference-chain', () => {
   const $defs = { n100: true }; for (let i = 99; i >= 0; i--) $defs[`n${i}`] = { $ref: `#/$defs/n${i + 1}` };
   assert.throws(() => compileSchema({ $defs, $ref: '#/$defs/n0' }), /LIMIT_EXCEEDED/);

@@ -369,7 +369,7 @@ export class Registry {
     this.revision++;
   }
   #validateAll() {
-    const context = { active: new Set(), done: new WeakMap() };
+    const context = { active: new Set(), done: new WeakMap(), types: this.types() };
     for (const { kind, id, spec } of this.#definitions.values()) {
       this.#validate(kind, spec, context, this.isCode(kind, id), resourceRoot(kind, id));
     }
@@ -377,7 +377,7 @@ export class Registry {
   validateDefinition(kind, spec, resourceId) {
     if (!kinds.has(kind)) invalid(); json(spec);
     try {
-      this.#validate(kind, spec, { active: new Set(), done: new WeakMap() }, false,
+      this.#validate(kind, spec, { active: new Set(), done: new WeakMap(), types: this.types() }, false,
         resourceId === undefined ? documentRoot : resourceRoot(kind, resourceId));
     } catch (error) { throw safeError(error, 'INVALID_DEFINITION'); }
     return spec;
@@ -463,7 +463,7 @@ export class Registry {
         missingReference('Type', contract.typeRef, nestedAt(contractAt, 'typeRef'));
       }
     }
-    compilePorts({ resourceKind: kind, ports: optional(spec, 'ports'), types: this.types() });
+    compilePorts({ resourceKind: kind, ports: optional(spec, 'ports'), types: context.types });
     if (kind === 'Type') { if (!own(spec, 'schema')) invalid(); compileSchema(spec.schema); }
     else if (kind === 'Variable') {
       if (typeof spec.expression !== 'string' || !spec.expression) invalid();

@@ -1,5 +1,6 @@
 import { ajv, normalize, normalizeDate } from './values.mjs';
 import { profileGuard, resolveRef, assertSchemaLimits } from './schema-profile.mjs';
+import { isDefinitionSnapshot } from './definition.mjs';
 
 const own = (value, key) => Object.hasOwn(value, key);
 const fail = code => { throw Error(code); };
@@ -20,7 +21,23 @@ export function equal(a, b) {
   return false;
 }
 
+const compiledDefinitions = new WeakMap();
+const compiledBooleans = new Map();
+
 export function compileSchema(declaration) {
+  // Host-owned objects may change between calls, including inside shallow-frozen schemas.
+  const cache = typeof declaration === 'boolean' ? compiledBooleans
+    : isDefinitionSnapshot(declaration) ? compiledDefinitions : undefined;
+  if (!cache) return compile(declaration);
+  let compiled = cache.get(declaration);
+  if (!compiled) {
+    compiled = compile(declaration);
+    cache.set(declaration, compiled);
+  }
+  return compiled;
+}
+
+function compile(declaration) {
   // Snapshot the schema separately. Annotations remain data, not schemas.
   assertSchemaLimits(declaration);
   const root = structuredClone(declaration);

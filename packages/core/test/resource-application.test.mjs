@@ -3,7 +3,7 @@ import test from 'node:test';
 import { createRegistry, createRuntime, defineResourceSet } from '@viewstem/core';
 import { createRegistry as localRegistry, createRuntime as localRuntime, createStateStore as localStore, rendererView } from '../src/api.mjs';
 import { defineResourceSet as localSet } from '../src/resource-set.mjs';
-import { ajv } from '../src/values.mjs';
+import { Registry } from '../src/registry.mjs';
 import { memoryUrl, tick } from './fixtures/state/url-adapter.mjs';
 
 const schema = { type: 'integer' };
@@ -45,15 +45,12 @@ test('View refresh reuses port compilation and validates current inputs against 
   assert.deepEqual(entries(), [['ready', 'old-a', undefined], ['ready', 'old-b', undefined]]);
 
   const update = (first, second) => view.getState('entries').write([{ id: 1, value: first }, { id: 2, value: second }]);
-  const validateSchema = ajv.validateSchema;
-  const validations = t.mock.method(ajv, 'validateSchema', function (schema, ...args) {
-    return validateSchema.call(this, schema, ...args);
-  });
+  const typeLookups = t.mock.method(Registry.prototype, 'types');
   update('old-c', 'new-d');
   update('old-e', 'new-f');
   assert.deepEqual(entries(), [['ready', 'old-e', undefined], ['error', undefined, 'TYPE_MISMATCH']]);
-  assert.equal(validations.mock.calls.filter(({ arguments: [schema] }) => schema?.pattern === '^old-').length, 0);
-  validations.mock.restore();
+  assert.equal(typeLookups.mock.callCount(), 0);
+  typeLookups.mock.restore();
 
   registry.updateResource(type('^new-'));
   update('old-g', 'new-h');
