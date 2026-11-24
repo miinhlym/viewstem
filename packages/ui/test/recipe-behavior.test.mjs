@@ -34,6 +34,7 @@ const bundle = await build({ stdin: { contents: `
     const attachment = renderer.attach(view, target, { onError: diagnostic => errors.push(diagnostic.error.code) });
     await attachment.whenSettled(view.initial);
     window.view = view;
+    window.whenRecipeRendered = () => attachment.whenRendered();
     window.disposeRecipe = async () => { await renderer.dispose(); view.dispose(); runtime.dispose(); };
   };
 `, resolveDir: workspace }, outfile: 'bundle.js', bundle: true, write: false, platform: 'browser', format: 'iife' });
@@ -74,6 +75,70 @@ function resizableTable() {
   };
   return view;
 }
+
+test('DataTable retains rows and focus when another input changes and still accepts controlled updates', { timeout: 30_000 }, async t => {
+  const browser = await chromium.launch({ headless: true });
+  t.after(() => browser.close());
+  const page = await browser.newPage();
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.setContent('<!doctype html><main id="app"></main>');
+  await page.addScriptTag({ content: recipeScript });
+  const definition = resizableTable();
+  definition.states.summary = { kind: 'State', schema: { type: 'string' }, initial: 'Before' };
+  definition.states.rows = {
+    kind: 'State', schema: { type: 'array', items: { type: 'object' } },
+    initial: definition.queries.metrics.query.transform.input,
+  };
+  definition.queries = {};
+  definition.render.inputs.data = { '@path': '/states/rows' };
+  definition.render = { id: 'root', componentRef: 'shadcn.Field.Group', slots: { default: [
+    definition.render,
+    { id: 'summary', componentRef: 'shadcn.Typography', inputs: { text: { '@path': '/states/summary' } } },
+  ] } };
+  await page.evaluate(view => window.mountRecipe(view), definition);
+
+  const stable = await page.evaluate(async () => {
+    const oldRows = [...document.querySelectorAll('tbody tr')];
+    const oldHeaders = [...document.querySelectorAll('thead th')];
+    const prior = window.view.getSnapshot().roots[0].children[0].inputs;
+    const focused = document.querySelector('tbody input');
+    focused.focus();
+    window.view.getState('summary').write('After');
+    await window.whenRecipeRendered();
+    const next = window.view.getSnapshot().roots[0].children[0].inputs;
+    return {
+      rows: [...document.querySelectorAll('tbody tr')].every((node, index) => node === oldRows[index]),
+      headers: [...document.querySelectorAll('thead th')].every((node, index) => node === oldHeaders[index]),
+      focused: document.activeElement === focused,
+      sameData: prior.data === next.data,
+      freshColumns: prior.columns !== next.columns,
+    };
+  });
+  assert.deepEqual(stable, { rows: true, headers: true, focused: true, sameData: true, freshColumns: true });
+  await page.getByText('After', { exact: true }).waitFor();
+
+  await page.getByRole('button', { name: '처리량' }).click();
+  await expectState(page, 'sorting', [{ id: 'count', desc: true }], 'data-table-1-sortingChange');
+  assert.deepEqual(await page.getByRole('cell').filter({ hasText: /^\d월$/ }).allTextContents(), ['4월', '2월']);
+  await page.getByRole('checkbox', { name: 'Select row d' }).check();
+  await expectState(page, 'selected', ['d'], 'data-table-1-selectedIdsChange');
+  await page.getByRole('combobox', { name: 'Rows per page' }).selectOption('10');
+  await expectState(page, 'pageSize', 10, 'data-table-1-pageSizeChange');
+  await page.getByRole('cell', { name: '1월' }).waitFor();
+  await page.getByRole('searchbox', { name: 'Filter rows' }).fill('1월');
+  await expectState(page, 'filter', '1월', 'data-table-1-filterChange');
+  assert.deepEqual(await page.getByRole('cell').filter({ hasText: /^\d월$/ }).allTextContents(), ['1월']);
+  await page.evaluate(async () => {
+    const rows = window.view.getState('rows');
+    rows.write(rows.read().map(row => ({ ...row, month: row.id === 'a' ? '1월 수정' : row.month })));
+    await window.whenRecipeRendered();
+  });
+  await page.getByRole('cell', { name: '1월 수정', exact: true }).waitFor();
+  assert.deepEqual(await page.evaluate(() => [window.errors, window.view.getSnapshot().errors]), [[], []]);
+  assert.deepEqual(errors, []);
+  await page.evaluate(() => window.disposeRecipe());
+});
 
 test('Input and Textarea render numeric State values', { timeout: 30_000 }, async t => {
   const browser = await chromium.launch({ headless: true });
