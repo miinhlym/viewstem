@@ -150,11 +150,17 @@ export class StateStore {
 
   computed(handle, dependencies, compute, { recompute = true } = {}) {
     const cell = this.#cellFor(handle), previous = {...cell};
+    const next = dependencies.map(handle => this.#cellFor(handle));
+    const graphChanged = next.length !== previous.dependencies.length ||
+      next.some((dependency, index) => dependency !== previous.dependencies[index]);
     cell.derived = true; cell.computeSnapshot = compute;
-    cell.dependencies = dependencies.map(handle => this.#cellFor(handle));
+    cell.dependencies = next;
     // Rebinding an unchanged runtime owner keeps its latest context without
-    // re-evaluating an otherwise unchanged dependency graph.
-    try { this.#order(); if(recompute)this.recompute(); } catch (caught) { Object.assign(cell,previous); throw caught; }
+    // walking an otherwise unchanged dependency graph. Recompute orders the graph itself.
+    try {
+      if (recompute) this.recompute();
+      else if (graphChanged) this.#order();
+    } catch (caught) { Object.assign(cell, previous); throw caught; }
   }
   recompute() { this.#structuralCommit([]); }
   baseline(handle) { return this.#cellFor(handle).baseline; }

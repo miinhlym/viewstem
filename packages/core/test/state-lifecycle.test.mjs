@@ -13,6 +13,25 @@ const tick = async () => { await Promise.resolve(); await Promise.resolve(); };
 function rejectedWrite(cell, value) { const before = cell.getSnapshot(); assert.throws(() => cell.write(value)); assert.equal(cell.getSnapshot(), before); }
 const plain = value => JSON.parse(JSON.stringify(value));
 
+await test('computed rebind uses the latest callback and rejects a changed dependency cycle', () => {
+  const { store, scope } = fixture();
+  const source = scope.registerState('source', { schema: integer, initial: 1 });
+  const first = scope.registerState('first', { schema: integer });
+  const second = scope.registerState('second', { schema: integer });
+  const ready = value => ({ status: 'ready', value });
+
+  store.computed(first, [source], () => ready(source.read() + 1));
+  store.computed(second, [first], () => ready(first.read() + 1));
+  store.computed(first, [source], () => ready(source.read() + 10), { recompute: false });
+  assert.equal(second.read(), 3);
+  assert.throws(() => store.computed(first, [second], () => ready(0), { recompute: false }), { code: 'INVALID_DEFINITION' });
+
+  source.write(2);
+  assert.equal(first.read(), 12);
+  assert.equal(second.read(), 13);
+  store.dispose();
+});
+
 await test('V31-V35/missing-null-falsy-reference', () => {
   const { scope } = fixture(), cell = scope.registerState('value', { schema: true });
   assert.equal(cell.read(), undefined); assert.deepEqual(cell.getSnapshot(), { status: 'missing' });
