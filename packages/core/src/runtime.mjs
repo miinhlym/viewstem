@@ -70,7 +70,8 @@ export class Runtime {
       onChange:()=>{for(const view of this.views)view.refresh();}});
   }
   execution(registry) {
-    const execution=Object.create(this);execution.registry=registry;return execution;
+    // Each execution owns a registry snapshot, including the Types its ports resolve.
+    return Object.assign(Object.create(this), { registry, portCompilers: new WeakMap() });
   }
   variable(use,inputs={},registry=this.registry) {
     const spec=typeof use==='string'?registry.get('Variable',use).spec:use;
@@ -359,8 +360,16 @@ export class View {
     return inputs;
   }
   prepareInputs(spec, templates, context, mode = 'automatic', literal = false, kind = 'Component', runtime = this.runtime) {
-    const inputs = this.bindInputs(spec, templates, context, literal, runtime.registry);
-    return compilePorts({resourceKind:kind,ports:spec.ports,types:runtime.registry.types(),store:runtime.stateStore}).prepare(inputs,{mode});
+    const { registry, stateStore, portCompilers } = runtime;
+    const inputs = this.bindInputs(spec, templates, context, literal, registry);
+    let byKind = portCompilers.get(spec);
+    if (!byKind) portCompilers.set(spec, byKind = new Map());
+    let compiled = byKind.get(kind);
+    if (!compiled) {
+      compiled = compilePorts({ resourceKind: kind, ports: spec.ports, types: registry.types(), store: stateStore });
+      byKind.set(kind, compiled);
+    }
+    return compiled.prepare(inputs, { mode });
   }
   makeOwner(spec,ports,id,previous,created,runtime,plan) {
     const { stateStore: store, registry } = runtime;
