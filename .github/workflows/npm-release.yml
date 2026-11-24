@@ -10,7 +10,7 @@ permissions: {}
 
 jobs:
   plan:
-    name: Identify package releases and docs-only updates
+    name: Identify package releases
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -19,10 +19,10 @@ jobs:
     outputs:
       targets: ${{ steps.plan.outputs.targets }}
       released_packages: ${{ steps.plan.outputs.released_packages }}
-      docs_publishable: ${{ steps.plan.outputs.docs_publishable }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
@@ -32,8 +32,16 @@ jobs:
         id: plan
         env:
           BEFORE_SHA: ${{ github.event.before }}
+          RELEASE_BRANCH: ${{ github.event.repository.default_branch }}
           GH_TOKEN: ${{ github.token }}
         run: node .github/scripts/npm-release.mjs plan
+      - if: steps.plan.outputs.targets != '[]'
+        run: npm ci --ignore-scripts
+      - name: Match the merged versions to the pre-merge Changesets plan
+        if: steps.plan.outputs.targets != '[]'
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: node .github/scripts/npm-release.mjs verify-plan
 
   version:
     name: Update the Release PR
@@ -50,12 +58,14 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Check for pending changesets on the current main
+      - name: Check for pending changesets on the current default branch
         id: pending
+        env:
+          RELEASE_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
-          main_sha="$(git ls-remote origin refs/heads/main | cut -f1)"
-          test -n "$main_sha"
-          if [ "$GITHUB_SHA" = "$main_sha" ] && compgen -G '.changeset/*.md' | grep -Fxv '.changeset/README.md' > /dev/null; then
+          branch_sha="$(git ls-remote origin "refs/heads/$RELEASE_BRANCH" | cut -f1)"
+          test -n "$branch_sha"
+          if [ "$GITHUB_SHA" = "$branch_sha" ] && compgen -G '.changeset/*.md' | grep -Fxv '.changeset/README.md' > /dev/null; then
             echo 'exists=true' >> "$GITHUB_OUTPUT"
           fi
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
@@ -64,7 +74,16 @@ jobs:
           node-version: '24.1.0'
       - if: steps.pending.outputs.exists == 'true'
         run: npm ci --ignore-scripts
-      - if: steps.pending.outputs.exists == 'true'
+      - name: Check for public package version bumps
+        if: steps.pending.outputs.exists == 'true'
+        id: version-plan
+        run: |
+          plan="$RUNNER_TEMP/npm-release-plan.json"
+          npx --no-install changeset status --output "$plan"
+          if jq -e 'any(.releases[]; .type != "none" and (.name | IN("@viewstem/core", "@viewstem/dom", "@viewstem/svelte", "@viewstem/ui")))' "$plan" > /dev/null; then
+            echo 'exists=true' >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.version-plan.outputs.exists == 'true'
         uses: changesets/action/version@198f833dd7d863100ea6e28967bc9a9fdefadb0a # v2.1.0
         with:
           script: npm run release:version
@@ -86,6 +105,7 @@ jobs:
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
+          ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
@@ -122,28 +142,12 @@ jobs:
 
   docs:
     name: Deploy the documentation for the npm release
-    needs: [plan, publish, tag]
+    needs: [plan, publish]
     if: needs.plan.outputs.targets != '[]'
     permissions:
       contents: read
-      pull-requests: read
     uses: ./.github/workflows/docs-release.yml
     secrets:
       CLOUDFLARE_PRODUCTION_API_TOKEN: ${{ secrets.CLOUDFLARE_PRODUCTION_API_TOKEN }}
     with:
-      source_sha: ${{ github.sha }}
       released_packages: ${{ needs.plan.outputs.released_packages }}
-
-  docs-refresh:
-    name: Deploy documentation for the current public packages
-    needs: plan
-    if: needs.plan.outputs.targets == '[]' && needs.plan.outputs.docs_publishable == 'true'
-    permissions:
-      contents: read
-      pull-requests: read
-    uses: ./.github/workflows/docs-release.yml
-    secrets:
-      CLOUDFLARE_PRODUCTION_API_TOKEN: ${{ secrets.CLOUDFLARE_PRODUCTION_API_TOKEN }}
-    with:
-      mode: refresh
-      source_sha: ${{ github.sha }}

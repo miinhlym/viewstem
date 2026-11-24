@@ -5,8 +5,7 @@ English | [한국어](ci.ko.md)
 The [core workflow](../.github/workflows/core.yml) runs on pushes to `main`, pull
 requests, and manual dispatch. A newer run cancels an older run for the same PR.
 Pushes are grouped by commit and manual CI runs have a separate group. Required
-checks should use **CI complete**, which depends on every compatibility and
-browser job.
+checks use **CI complete**. Manual dispatch reports **Manual CI complete**.
 Pushes to other branches without a pull request do not run CI automatically;
 use a pull request or manual dispatch to check them.
 
@@ -20,9 +19,8 @@ Choose the local check for the packages you change. Run `npm run check:dom` for 
 
 ## npm releases
 
-The [first public release](#first-public-release) uses the version in each
-package's `package.json`. Add a changeset when a PR has a change to ship in a
-new version of a published package.
+Add a changeset when a PR has a change to ship in a new version of a published
+package.
 
 ### Writing a changeset
 
@@ -40,40 +38,40 @@ View.” See the [Changesets writing guide](https://changesets.dev/faq#how-do-i-
 
 ### Release PR
 
-When `main` CI passes and changesets are pending, Changesets opens or updates
+When `main` CI passes and pending changesets include a public package bump, Changesets opens or updates
 the Release PR with version bumps, any internal dependency updates, and the
 refreshed npm lockfile.
 A maintainer may need to approve its CI run in GitHub because it was created by
 `GITHUB_TOKEN`. Merge the Release PR after **CI complete**. The same check
-must pass on the merged commit before npm publishing runs. Publishing requires
+must pass on the merged commit before npm publishing runs. Release PR CI and
+the publishing workflow regenerate the Changesets output from the PR base and
+the pre-merge commit, respectively, in a temporary directory. They compare all
+generated files, including manifests, changelogs, and consumed changesets, with
+the candidate commit. npm validates the lockfile separately. Changed input
+blocks stale release output. Publishing requires
 the previous package versions to be public. Each internal dependency must already
-be public or appear earlier in the batch. Package tags such as
-`@viewstem/core@0.1.1` and GitHub Releases follow npm publishing, then the docs
-workflow uses those tags to verify the released source.
+be public or appear earlier in the batch. After npm publishing succeeds, the
+documentation job verifies the public versions and deploys the same commit.
+A separate job records package tags such as `@viewstem/core@0.1.1` and GitHub Releases.
 
-The site can also deploy after `main` CI passes for an eligible docs-only PR.
-See the [site path and label rules](../apps/docs/README.md#update-the-site-for-the-current-public-packages).
+Merge documentation-only changes through the regular PR process without a
+changeset. To publish a separate site update, run **Deploy docs** manually.
+See the [deployment procedure](../apps/docs/README.md#deploy-independently-of-a-package-release).
 
 If publishing fails partway through, rerun the failed jobs on that commit
 before proceeding with the next batch. The job skips existing versions if their
 tarball integrity matches. If an out-of-band publication already advanced
 `latest`, resolve the missing versions at the registry before retrying an older
-batch. A tag or GitHub Release failure can be retried on the same commit before
-the docs workflow begins.
+batch. If publishing succeeded and the site failed, rerun the docs job in the
+original workflow. Retry tag or GitHub Release failures in the record job.
 
-### First public release
+### Trusted Publishing setup
 
-1. Confirm publishing rights in the npm `@viewstem` scope. From a clean, verified
-   `main` checkout, run `npm ci --ignore-scripts`, `npm run build:svelte && npm run build -w @viewstem/ui`,
-   then `node .github/scripts/npm-release.mjs pack-initial /tmp/viewstem-release`.
-   The tarballs include documentation links pinned to the source commit.
-2. Publish the four tarballs with interactive 2FA and `npm publish <tarball> --access public`.
-   Publish Core first, then DOM, then Svelte and UI. Record their package tags on that commit.
-3. Add a Trusted Publisher for each npm package. Use GitHub owner `miinhlym`,
-   repository `viewstem`, and workflow filename `core.yml`, with direct
-   `npm publish` allowed. `core.yml` calls `npm-release.yml`. Set up trust when
-   ready to validate the first OIDC publish within npm's two-day window.
-   See [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/).
+Each public npm package uses a Trusted Publisher for GitHub owner `miinhlym`,
+repository `viewstem`, and workflow filename `core.yml`, with direct
+`npm publish` allowed. `core.yml` calls `npm-release.yml`. When setting up trust,
+plan to validate the first OIDC publish within npm's two-day window.
+[npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/).
 
 The repository's Actions settings must allow GitHub Actions to create PRs.
 The workflow grants PR write access only to the Release PR job. The npm publish

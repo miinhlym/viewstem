@@ -1,25 +1,23 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { setTimeout } from 'node:timers/promises';
 
 const stableVersion = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
 const npmPackages = new Set(['core', 'dom', 'svelte', 'ui'].map(name => `@viewstem/${name}`));
+const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim();
 const registries = {
   npm: {
     origin: 'https://registry.npmjs.org',
     name: /^(?:@[a-z\d][a-z\d._-]*\/)?[a-z\d][a-z\d._-]*$/,
     path: name => '/' + name.replace('/', '%2f'),
-    latest: metadata => metadata['dist-tags']?.latest,
     archive: (metadata, version) => metadata.versions?.[version]?.dist?.tarball,
   },
   'pub.dev': {
     origin: 'https://pub.dev',
     name: /^[a-z][a-z\d_]*$/,
     path: name => '/api/packages/' + name,
-    latest: metadata => metadata.latest?.version,
     archive: (metadata, version) => metadata.versions?.find(entry => entry.version === version)?.archive_url,
   },
 };
@@ -59,90 +57,100 @@ function shouldRetry(response) {
   return !response || response.status === 404 || response.status === 429 || response.status >= 500;
 }
 
-export async function isPublicRelease({ registry, name, version }, request = fetch, requireLatest = true) {
+async function publicArchive({ registry, name, version }, request) {
   const provider = registries[registry];
   const response = await fetchRelease(provider.origin + provider.path(name), 'GET', request);
-  if (shouldRetry(response)) return false;
+  if (shouldRetry(response)) return;
   assert.ok(response.ok, `Could not read ${registry} metadata for ${name}: HTTP ${response.status}`);
   const metadata = await readNetwork(() => response.json());
-  if (!metadata) return false;
+  if (!metadata) return;
   const archive = provider.archive(metadata, version);
-  if (!archive) return false;
-  if (requireLatest) assert.equal(provider.latest(metadata), version, `${name}@${version} has been superseded on ${registry}`);
+  if (!archive) return;
   assert.equal(new URL(archive).origin, provider.origin, `Unexpected archive origin for ${name}`);
+  return archive;
+}
+
+export async function isPublicRelease(pkg, request = fetch, source) {
+  const archive = await publicArchive(pkg, request);
+  if (!archive) return false;
+  if (source && pkg.registry === 'npm') return verifyNpmSource(pkg, archive, source, request);
   const download = await fetchRelease(archive, 'HEAD', request);
   if (shouldRetry(download)) return false;
-  assert.ok(download.ok, `Could not access ${name}@${version} on ${registry}: HTTP ${download.status}`);
+  assert.ok(download.ok, `Could not access ${pkg.name}@${pkg.version} on ${pkg.registry}: HTTP ${download.status}`);
   return true;
 }
 
-const git = (...args) => execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+async function verifyNpmSource({ name, version }, archive, { sha, repository, released, history }, request) {
+  const response = await fetchRelease(archive, 'GET', request);
+  if (shouldRetry(response)) return false;
+  assert.ok(response?.ok, `Could not download ${name}@${version} to verify its source`);
+  const body = await readNetwork(() => response.arrayBuffer());
+  if (!body) return false;
+  const readme = execFileSync('tar', ['-xOzf', '-', 'package/README.md'], {
+    input: Buffer.from(body), encoding: 'utf8', timeout: 15_000,
+  });
+  // pack() appends an immutable link to the exact checkout used for the tarball.
+  const prefix = `[Source and documentation for this version](https://github.com/${repository}/blob/`;
+  const suffix = '/docs/README.md)';
+  const link = readme.trimEnd().split('\n').at(-1);
+  assert.ok(link?.startsWith(prefix) && link.endsWith(suffix), `Missing release source link for ${name}@${version}`);
+  const publishedSha = link.slice(prefix.length, -suffix.length);
+  assert.ok(history.has(publishedSha), `The public source for ${name}@${version} is outside the candidate history`);
+  if (released.has(name)) assert.equal(publishedSha, sha, `${name}@${version} was not published from the release commit`);
+  const path = packageDirectory(name);
+  assert.equal(git('rev-parse', `${publishedSha}:${path}`), git('rev-parse', `${sha}:${path}`),
+    `${name}@${version} has unpublished changes. Wait for the affected package to be released before deploying docs.`);
+  return true;
+}
+
 const packageDirectory = name => `packages/${name.slice('@viewstem/'.length)}`;
 
-export function verifyReleaseSource(releases, { sourceSha, bootstrap, resolveTag, archiveMatches, readManifest }) {
-  if (bootstrap) {
-    assert.ok(releases.length === npmPackages.size && new Set(releases.map(({ name }) => name)).size === npmPackages.size
-      && releases.every(({ registry, name, version }) => registry === 'npm' && npmPackages.has(name) && version === '0.1.0'),
-    'The bootstrap must specify all four Viewstem npm packages at 0.1.0');
+export function deploymentPackages(releases, manifests, dependencies) {
+  const versions = new Map(manifests.map(({ name, version }) => [name, version]));
+  for (const { registry, name, version } of releases) {
+    if (registry !== 'npm') continue;
+    assert.ok(npmPackages.has(name), `Unknown Viewstem npm package: ${name}`);
+    assert.equal(versions.get(name), version, `The workflow commit does not contain ${name}@${version}`);
   }
-
-  const commits = releases.map(({ registry, name, version }) => {
-    if (registry === 'npm') {
-      assert.ok(npmPackages.has(name), `Unknown Viewstem npm package: ${name}`);
-      const manifest = readManifest(packageDirectory(name));
-      assert.equal(manifest.name, name);
-      assert.equal(manifest.version, version, `The source does not contain ${name}@${version}`);
-    }
-    const tag = `${registry === 'npm' ? '' : 'pub.dev/'}${name}@${version}`;
-    return resolveTag(tag);
-  });
-
-  if (bootstrap) {
-    assert.ok(commits.every(sha => sha === commits[0]), 'The bootstrap package tags must point to the same commit');
-    assert.ok(archiveMatches(commits[0], sourceSha), 'The bootstrap source must preserve the 0.1.0 npm package trees');
-  } else {
-    assert.ok(commits.every(sha => sha === sourceSha), 'Every release tag must identify the selected source commit');
+  const runtime = Object.entries(dependencies).filter(([name]) => name.startsWith('@viewstem/'));
+  assert.ok(runtime.length, 'The docs app must declare its Viewstem dependencies');
+  for (const [name, version] of runtime) {
+    assert.ok(npmPackages.has(name), `Unknown documentation dependency: ${name}`);
+    assert.equal(version, versions.get(name), `The docs app must pin ${name} to the workflow commit's package version`);
   }
+  return parseReleasedPackages(JSON.stringify([...releases, ...manifests.map(({ name, version }) => ({
+    registry: 'npm', name, version,
+  }))]));
 }
 
 async function main() {
-  const docsOnly = process.argv.includes('--docs-only');
-  const releases = docsOnly ? [] : parseReleasedPackages(process.env.RELEASED_PACKAGES);
-  if (process.argv.includes('--verify-source')) {
-    verifyReleaseSource(releases, {
-      sourceSha: git('rev-parse', 'HEAD'),
-      bootstrap: process.env.DOCS_BOOTSTRAP_0_1_0 === 'true',
-      resolveTag(tag) {
-        try {
-          return git('rev-parse', '--verify', `refs/tags/${tag}^{commit}`);
-        } catch (error) {
-          if (error.status === 128) throw new Error(`Missing release tag ${tag}`, { cause: error });
-          throw error;
-        }
-      },
-      readManifest: directory => JSON.parse(readFileSync(`${directory}/package.json`, 'utf8')),
-      archiveMatches(published, source) {
-        try {
-          git('merge-base', '--is-ancestor', published, source);
-        } catch (error) {
-          if (error.status === 1) return false;
-          throw error;
-        }
-        return !git('diff', '--name-only', published, source, '--', ...[...npmPackages].map(packageDirectory));
-      },
-    });
-  }
+  const { GITHUB_EVENT_NAME: event, GITHUB_SHA: sha, GITHUB_REPOSITORY: repository } = process.env;
+  assert.ok(event === 'push' || event === 'workflow_dispatch', 'Unsupported documentation deployment event');
+  const manual = event === 'workflow_dispatch';
+  const releases = manual ? [] : parseReleasedPackages(process.env.RELEASED_PACKAGES);
   const readManifest = async path => JSON.parse(await readFile(path, 'utf8'));
+  const manifests = await Promise.all([...npmPackages].map(async name => {
+    const manifest = await readManifest(`${packageDirectory(name)}/package.json`);
+    assert.equal(manifest.name, name);
+    return manifest;
+  }));
   const { dependencies } = await readManifest('apps/docs/package.json');
-  const svelte = await readManifest('packages/svelte/package.json');
-  const docsPackages = Object.entries({ ...dependencies, [svelte.name]: svelte.version })
-    .filter(([name]) => name.startsWith('@viewstem/'))
-    .map(([name, version]) => ({ registry: 'npm', name, version }));
-  const expected = parseReleasedPackages(JSON.stringify([...releases, ...docsPackages]));
+  const expected = deploymentPackages(releases, manifests, dependencies);
+  assert.equal(git('rev-parse', 'HEAD'), sha, 'The checkout does not match the documentation commit');
+  const directories = git('ls-tree', '-d', '--name-only', `${sha}:packages`).split('\n');
+  assert.deepEqual(directories.sort(), [...npmPackages].map(name => name.split('/')[1]).sort(),
+    'Set up published source verification for the current package directories before deploying docs');
+  const availabilityOnly = process.argv.includes('--availability-only');
+  // The first pass checks source in the downloaded archives. The last pass
+  // only rechecks availability because immutable versions were already verified.
+  const source = availabilityOnly ? undefined : {
+    sha, repository, released: new Set(releases.filter(pkg => pkg.registry === 'npm').map(pkg => pkg.name)),
+    history: new Set(git('rev-list', '--first-parent', sha).split('\n')),
+  };
   const pending = new Map(expected.map(entry => [`${entry.registry}:${entry.name}@${entry.version}`, entry]));
-  const attempts = process.argv.includes('--once') ? 1 : 18;
+  const attempts = availabilityOnly || process.argv.includes('--once') ? 1 : 18;
   for (let attempt = 0; attempt < attempts && pending.size; attempt++) {
-    const states = await Promise.all([...pending].map(async ([key, entry]) => [key, await isPublicRelease(entry, fetch, !docsOnly)]));
+    const states = await Promise.all([...pending].map(async ([key, entry]) => [key, await isPublicRelease(entry, fetch, source)]));
     for (const [key, published] of states) {
       if (!published) continue;
       console.log(`Public release verified: ${key}`);

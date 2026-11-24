@@ -23,6 +23,7 @@ export function parseDeploymentTag(tag = '') {
   const parts = tag.split('.');
   assert.ok(parts.length <= 2 && parts.every(part => shaPattern.test(part)),
     'The active Cloudflare version does not identify its source commits');
+  // The initial 0.1.0 Cloudflare build records one SHA for both roles.
   const [base, through = base] = parts;
   return { base, through };
 }

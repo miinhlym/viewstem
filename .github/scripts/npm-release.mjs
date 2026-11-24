@@ -1,21 +1,20 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { appendFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { appendFile, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
-import { hasPublishableSiteChanges } from './docs-site-changes.mjs';
+import { join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const registry = 'https://registry.npmjs.org';
 const packages = ['core', 'dom', 'svelte', 'ui'];
 const stableVersion = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
-const run = (command, args) => execFileSync(command, args, { encoding: 'utf8' }).trim();
+const run = (command, args, options) => execFileSync(command, args, { encoding: 'utf8', ...options }).trim();
 
-export function isReleasePullRequest(pr, repository, sha) {
+export function isReleasePullRequest(pr, repository, sha, branch) {
   return pr.merged_at && pr.merge_commit_sha === sha
     && pr.user.login === 'github-actions[bot]'
-    && pr.base.ref === 'main' && pr.base.repo.full_name === repository
-    && pr.head.ref === 'changeset-release/main' && pr.head.repo?.full_name === repository;
+    && pr.base.ref === branch && pr.base.repo.full_name === repository
+    && pr.head.ref === `changeset-release/${branch}` && pr.head.repo?.full_name === repository;
 }
 
 function compareVersions(left, right) {
@@ -36,10 +35,6 @@ export function releaseTargets(readManifest) {
     assert.equal(current.name, `@viewstem/${directory}`);
     assert.ok(!current.private, `${current.name} must be public`);
     const target = { directory, name: current.name, version: current.version };
-    if (directory === 'dom' && previous === null) {
-      assert.match(current.version, stableVersion);
-      return [target];
-    }
     assert.ok(previous, `Missing previous manifest for ${current.name}`);
     assert.equal(previous.name, current.name);
     if (current.version === previous.version) return [];
@@ -71,7 +66,6 @@ export async function verifyPublishPrerequisites(targets, readManifest, readMeta
   // A failed earlier batch must finish before any newer batch can publish.
   for (const directory of packages) {
     const previous = readManifest(directory, true);
-    if (directory === 'dom' && previous === null) continue;
     assert.ok(previous, `Missing previous manifest for @viewstem/${directory}`);
     assert.equal(previous.name, `@viewstem/${directory}`);
     const published = await getMetadata(previous.name);
@@ -102,8 +96,37 @@ export async function verifyPublishPrerequisites(targets, readManifest, readMeta
 function readReleaseManifest(directory, previous) {
   const path = `packages/${directory}/package.json`;
   const ref = previous ? process.env.BEFORE_SHA : process.env.GITHUB_SHA;
-  if (previous && directory === 'dom' && !run('git', ['ls-tree', '--full-tree', ref, '--', path])) return null;
   return JSON.parse(run('git', ['show', `${ref}:${path}`]));
+}
+
+async function verifyChangesetsPlan() {
+  const { BEFORE_SHA: before, GITHUB_SHA: sha } = process.env;
+  assert.equal(run('git', ['rev-parse', 'HEAD']), sha, 'The checkout does not match the release commit');
+  assert.equal(run('git', ['status', '--porcelain', '--untracked-files=no']), '', 'Expected a clean release checkout');
+  run('git', ['merge-base', '--is-ancestor', before, sha]);
+  assert.ok(releaseTargets(readReleaseManifest).length, 'Release PR must bump at least one public package');
+  const { baseBranch, commit } = JSON.parse(run('git', ['show', `${before}:.changeset/config.json`]));
+  assert.equal(commit, false, 'Changesets version generation must leave changes uncommitted');
+  const cli = fileURLToPath(import.meta.resolve('@changesets/cli/bin.js'));
+  const directory = await mkdtemp(join(tmpdir(), 'viewstem-changesets-plan-'));
+  try {
+    // Run the same generator against the original inputs without changing the tested checkout.
+    const objects = run('git', ['rev-parse', '--path-format=absolute', '--git-path', 'objects']);
+    const options = { cwd: directory, env: { ...process.env, GIT_ALTERNATE_OBJECT_DIRECTORIES: objects } };
+    const snapshot = (...args) => run('git', args, options);
+    snapshot('init', '--quiet', '--template=', '--initial-branch', baseBranch);
+    snapshot('switch', '--quiet', '-C', baseBranch, before);
+    await symlink(fileURLToPath(new URL('../../node_modules/', import.meta.url)), join(directory, 'node_modules'), 'dir');
+    run(process.execPath, [cli, 'version'], options);
+    snapshot('add', '--all', '--', '.', ':(exclude)node_modules');
+    const generated = snapshot('write-tree');
+    // npm ci checks the lockfile against the generated manifests without resolving versions again.
+    const differences = snapshot('diff', '--name-only', '--no-renames', generated, sha, '--',
+      '.', ':(exclude)package-lock.json');
+    assert.equal(differences, '', `Release PR differs from Changesets output at the base commit:\n${differences}`);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 }
 
 async function readRegistry(name) {
@@ -112,23 +135,23 @@ async function readRegistry(name) {
     signal: AbortSignal.timeout(30_000),
   });
   if (response.status === 404) {
-    throw new Error(`${name} is missing on npm. Complete the initial 2FA publish and Trusted Publisher setup first.`);
+    throw new Error(`${name} is missing on npm. Verify the package's public registry record before retrying.`);
   }
   if (!response.ok) throw new Error(`Could not read ${name} from npm (HTTP ${response.status})`);
   return response.json();
 }
 
 async function plan() {
-  const { GITHUB_REPOSITORY: repository, GITHUB_SHA: sha, BEFORE_SHA: before } = process.env;
+  const { GITHUB_REPOSITORY: repository, GITHUB_SHA: sha, RELEASE_BRANCH: branch } = process.env;
+  assert.ok(branch, 'The repository default branch is required');
   const pages = JSON.parse(run('gh', ['api', '--paginate', '--slurp',
     `repos/${repository}/commits/${sha}/pulls`]));
-  const release = pages.flat().find(pr => isReleasePullRequest(pr, repository, sha));
+  const release = pages.flat().find(pr => isReleasePullRequest(pr, repository, sha, branch));
   const targets = release ? releaseTargets(readReleaseManifest) : [];
   if (release) assert.ok(targets.length, 'Release PR must bump at least one public package');
   const releasedPackages = targets.map(({ name, version }) => ({ registry: 'npm', name, version }));
-  const docsPublishable = !release && hasPublishableSiteChanges(before, sha, repository);
   await appendFile(process.env.GITHUB_OUTPUT,
-    `targets=${JSON.stringify(targets)}\nreleased_packages=${JSON.stringify(releasedPackages)}\ndocs_publishable=${docsPublishable}\n`);
+    `targets=${JSON.stringify(targets)}\nreleased_packages=${JSON.stringify(releasedPackages)}\n`);
 }
 
 async function pack(target, directory, repository, sha) {
@@ -157,6 +180,7 @@ async function pack(target, directory, repository, sha) {
 }
 
 async function publish(targets) {
+  assert.equal(run('git', ['rev-parse', 'HEAD']), process.env.GITHUB_SHA, 'The checkout does not match the release commit');
   const metadata = await verifyPublishPrerequisites(targets, readReleaseManifest, readRegistry);
   const directory = await mkdtemp(join(tmpdir(), 'viewstem-npm-release-'));
   try {
@@ -200,23 +224,10 @@ async function createReleases(targets) {
   }
 }
 
-async function packInitialRelease(output) {
-  assert.ok(output, 'Pass a directory for the release tarballs');
-  assert.equal(run('git', ['status', '--porcelain']), '', 'Pack the initial release from a clean checkout');
-  const destination = resolve(output);
-  const sha = run('git', ['rev-parse', 'HEAD']);
-  await mkdir(destination, { recursive: true });
-  for (const directory of packages) {
-    const { name, version } = JSON.parse(await readFile(`packages/${directory}/package.json`, 'utf8'));
-    const tarball = await pack({ directory, name, version }, destination, 'miinhlym/viewstem', sha);
-    console.log(join(destination, tarball.filename));
-  }
-}
-
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const command = process.argv[2];
-  if (command === 'pack-initial') await packInitialRelease(process.argv[3]);
-  else if (command === 'plan') await plan();
+  if (command === 'plan') await plan();
+  else if (command === 'verify-plan') await verifyChangesetsPlan();
   else if (command === 'publish') await publish(JSON.parse(process.env.RELEASE_TARGETS));
   else if (command === 'tag') await createReleases(JSON.parse(process.env.RELEASE_TARGETS));
   else throw new Error(`Unknown release command: ${command}`);

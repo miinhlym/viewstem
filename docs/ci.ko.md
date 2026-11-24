@@ -4,9 +4,8 @@
 
 [core 워크플로](../.github/workflows/core.yml)는 `main` push, PR, 수동 실행에서
 동작합니다. 같은 PR의 새 실행은 이전 실행을 취소합니다. Push는 커밋별로 묶고
-수동 CI는 별도 그룹을 사용합니다.
-필수 검사는 모든 호환성 작업과 브라우저 검증에 의존하는
-**CI complete**를 사용합니다.
+수동 CI는 별도 그룹을 사용하고 **Manual CI complete**로 결과를 표시합니다.
+필수 검사는 **CI complete**를 사용합니다.
 PR이 없는 다른 브랜치의 push는 CI를 자동 실행하지 않습니다. 해당 브랜치는
 PR이나 수동 실행으로 확인합니다.
 
@@ -20,8 +19,7 @@ PR이나 수동 실행으로 확인합니다.
 
 ## npm 릴리스
 
-[첫 공개 발행](#첫-공개-발행)은 각 패키지의 `package.json`에 적힌 버전을 사용합니다.
-이미 공개한 패키지의 새 버전에 반영할 변경이 있는 PR부터 changeset을 추가합니다.
+공개 패키지의 새 버전에 반영할 변경이 있으면 PR에 changeset을 추가합니다.
 
 ### Changeset 작성하기
 
@@ -39,39 +37,38 @@ PR이나 수동 실행으로 확인합니다.
 
 ### Release PR
 
-`main` CI가 성공하고 대기 중인 changeset이 있으면 Changesets가 Release PR을 열거나
+`main` CI가 성공하고 대기 중인 changeset에 공개 패키지 버전 변경이 있으면 Changesets가 Release PR을 열거나
 갱신합니다. Release PR에는 새 버전, 필요한 내부 의존성 변경, 갱신한 npm lockfile이
 포함됩니다.
 `GITHUB_TOKEN`으로 만든 PR의 CI는 GitHub에서 관리자가 실행을 승인해야
 할 수 있습니다. **CI complete** 통과 후 Release PR을 병합합니다.
-병합 커밋에서도 같은 검사가 통과하면 npm에 발행합니다. 이전 패키지 버전은
+병합 커밋에서도 같은 검사가 통과하면 npm 발행을 준비합니다. Release PR CI와
+발행 워크플로는 각각 PR 기준 커밋과 병합 직전 커밋에서 Changesets 결과를 임시
+디렉터리에 다시 생성합니다. 매니페스트, 변경 이력, 소비된 changeset 등 생성된 파일을
+후보 커밋과 대조하고 npm은 lockfile을 별도로 검증합니다. 이미 낡은 릴리스 결과는
+발행을 차단합니다. 이전 패키지 버전은
 모두 공개돼 있어야 합니다. 내부 의존성 버전은 이미 공개됐거나 같은 배치에서
-먼저 발행돼야 합니다. npm 발행이 성공하면 `@viewstem/core@0.1.1`과 같은
-패키지 태그와 GitHub Release를 만들고, 문서 워크플로가 태그로 릴리스 소스를
-확인한 뒤 배포합니다.
+먼저 발행돼야 합니다. npm 발행이 성공하면 문서 잡은 공개 버전을 확인하고 같은
+커밋을 배포합니다. `@viewstem/core@0.1.1`과 같은 패키지 태그와 GitHub Release는
+별도 잡에서 기록합니다.
 
-운영 문서는 현재 공개 버전에 적용 가능한 문서 사이트 전용 PR의 `main` CI가
-통과했을 때도 배포할 수 있습니다. [사이트 경로와 라벨 규칙](../apps/docs/README.ko.md#현재-공개-버전의-문서-수정)을 따릅니다.
+문서만 바뀐 PR은 changeset 없이 평소처럼 머지합니다. 사이트를 별도로 공개하려면
+**Deploy docs**를 수동으로 실행합니다. [배포 절차](../apps/docs/README.ko.md#패키지-릴리스와-별도로-문서-배포)를 따릅니다.
 
 일부 발행에 실패하면 다음 배치를 진행하기 전에 같은 커밋의 실패한 잡을
 재실행합니다. 이미 발행된 버전의 tarball 무결성이 일치하면 건너뜁니다.
 별도 발행으로 이미 `latest`가 앞섰다면 이전 배치를 재시도하기 전에
-레지스트리에서 누락 버전을 복구합니다. 태그나 GitHub Release 생성에 실패한
-경우에도 같은 커밋의 해당 잡을 다시 실행한 뒤 문서 배포를 이어갑니다.
+레지스트리에서 누락 버전을 복구합니다. 발행에 성공하고 사이트만 실패했다면
+원래 실행의 문서 잡을 재시도합니다. 태그나 GitHub Release 생성 실패는
+해당 기록 잡에서 재시도합니다.
 
-### 첫 공개 발행
+### Trusted Publishing 설정
 
-1. npm `@viewstem` 스코프에 발행 권한이 있는지 확인합니다. 깨끗한 검증 완료
-   `main`에서 `npm ci --ignore-scripts`, `npm run build:svelte && npm run build -w @viewstem/ui`,
-   `node .github/scripts/npm-release.mjs pack-initial /tmp/viewstem-release`를
-   실행합니다. tarball의 문서 링크는 빌드한 소스 커밋을 가리킵니다.
-2. `npm publish <tarball> --access public`과 대화형 2FA로 네 패키지를 공개합니다.
-   Core, DOM, Svelte, UI 순서로 발행합니다. 해당 소스 커밋에 각 패키지 태그를 기록합니다.
-3. 각 npm 패키지에 Trusted Publisher를 추가합니다. GitHub 소유자는
-   `miinhlym`, 저장소는 `viewstem`, 워크플로 파일은 `core.yml`이고
-   직접 `npm publish`를 허용합니다. `core.yml`에서 `npm-release.yml`을
-   호출합니다. npm의 2일 이내 검증 기간에 맞춰 첫 OIDC 발행 직전에
-   연결합니다. [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/)
+공개 npm 패키지마다 GitHub 소유자 `miinhlym`, 저장소 `viewstem`,
+워크플로 파일 `core.yml`을 Trusted Publisher로 지정하고 직접 `npm publish`를
+허용합니다. `core.yml`은 `npm-release.yml`을 호출합니다. 새 연결은 npm의
+2일 이내 검증 기간에 맞춰 첫 OIDC 발행 직전에 설정합니다.
+[npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/)
 
 저장소 Actions 설정에서 GitHub Actions의 PR 생성을 허용해야 합니다.
 Release PR 잡에 PR 쓰기 권한을 주고, npm 발행 잡과 태깅 잡에는 각각
