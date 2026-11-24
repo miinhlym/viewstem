@@ -15,28 +15,38 @@ const wrap = (error, location, resource) => at(error, { location, ...(resource ?
 
 export function joinRows(left, right, step) {
   if (!Array.isArray(left) || !Array.isArray(right) || !left.every(isRecord) || !right.every(isRecord)) fail('TYPE_MISMATCH');
-  const keys = (rows, side) => rows.map(row => step.on.map(pair => {
-    if (!own(row, pair[side])) fail('REFERENCE_NOT_FOUND');
-    const key = row[pair[side]];
-    if (key !== null && (!['string', 'number', 'boolean'].includes(typeof key) || (typeof key === 'number' && !Number.isFinite(key)))) fail('TYPE_MISMATCH');
-    return key;
-  }));
-  const lk = keys(left, 'left'), rk = keys(right, 'right');
-  const matches = (a, b) => a.every((v, i) => v !== null && b[i] !== null && typeof v === typeof b[i] && v === b[i]);
-  const result = [], mode = step.mode === undefined ? 'left' : step.mode;
-  if (mode === 'right') {
-    right.forEach((r, ri) => {
-      let found = false;
-      left.forEach((l, li) => { if (matches(lk[li], rk[ri])) { result.push({ ...l, ...r }); found = true; } });
-      if (!found) result.push({ ...r });
+  const keys = (rows, side) => rows.map(row => {
+    const tuple = step.on.map(pair => {
+      if (!own(row, pair[side])) fail('REFERENCE_NOT_FOUND');
+      const key = row[pair[side]];
+      if (key !== null && (!['string', 'number', 'boolean'].includes(typeof key) || (typeof key === 'number' && !Number.isFinite(key)))) fail('TYPE_MISMATCH');
+      return key;
     });
-  } else {
-    left.forEach((l, li) => {
-      let found = false;
-      right.forEach((r, ri) => { if (matches(lk[li], rk[ri])) { result.push({ ...l, ...r }); found = true; } });
-      if (!found && mode === 'left') result.push({ ...l });
-    });
-  }
+    if (tuple.length === 1) return tuple[0];
+    // JSON preserves the type and order of the validated primitive keys.
+    return tuple.includes(null) ? null : JSON.stringify(tuple);
+  });
+  const leftKeys = keys(left, 'left'), rightKeys = keys(right, 'right');
+  const result = [], rightFirst = step.mode === 'right';
+  const includeUnmatched = rightFirst || step.mode === 'left' || step.mode === undefined;
+  const indexedRows = rightFirst ? left : right;
+  const indexedKeys = rightFirst ? leftKeys : rightKeys;
+  const index = new Map();
+  indexedRows.forEach((row, i) => {
+    const key = indexedKeys[i];
+    if (key === null) return;
+    const bucket = index.get(key);
+    if (bucket) bucket.push(row); else index.set(key, [row]);
+  });
+  const outerRows = rightFirst ? right : left;
+  const outerKeys = rightFirst ? rightKeys : leftKeys;
+  outerRows.forEach((row, i) => {
+    const key = outerKeys[i];
+    const matches = key === null ? undefined : index.get(key);
+    if (matches) {
+      for (const match of matches) result.push(rightFirst ? { ...match, ...row } : { ...row, ...match });
+    } else if (includeUnmatched) result.push({ ...row });
+  });
   return result;
 }
 
