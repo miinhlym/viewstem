@@ -15,11 +15,30 @@ const own=(object,key)=>Object.hasOwn(object,key);
 const tuple=JSON.stringify;
 let nextLifetime=0,nextInstance=0;
 const idle=Object.freeze({status:'idle',running:false,data:null,error:null});
+const waitingQuery = Object.freeze({ status: 'waiting', data: undefined, error: null,
+  dataInputs: undefined, stale: false, waitingReason: 'INPUT_NOT_READY' });
+
 function staticTemplate(value) {
   if (Array.isArray(value)) return value.every(staticTemplate);
   if (!isRecord(value)) return value === null || ['string', 'number', 'boolean'].includes(typeof value);
   return Object.entries(value).every(([key, child]) =>
     (!key.startsWith('@') || key.startsWith('@@')) && staticTemplate(child));
+}
+
+function readQuery(handle, plan, field) {
+  let snapshot;
+  try { snapshot = handle.getSnapshot(); }
+  catch (cause) {
+    if (plan) plan.queryReads = null;
+    throw cause;
+  }
+  const reads = plan?.queryReads;
+  if (reads) {
+    let fields = reads.get(handle);
+    if (!fields) reads.set(handle, fields = new Map());
+    if (!fields.has(field)) fields.set(field, field === undefined ? snapshot : snapshot[field]);
+  }
+  return snapshot;
 }
 
 function stableItemInputs(node, spec, functions) {
@@ -215,7 +234,10 @@ export class View {
     this.lifetime = new AbortController();
     this.queryUses = new Set();
     this.leafRepeats = new Map();
+    this.nodeSnapshots = new WeakMap();
     this.stateAddresses = new Set();
+    this.treeQueryReads = this.configuredQueryReads = null;
+    this.forceRefresh = false;
     this.renderWaiters = new Set();
     this.closeListeners = new Set();
     this.diagnosticListeners = new Set();
@@ -289,7 +311,7 @@ export class View {
     yield* this.urlDiagnostics ?? [];
   }
   queryChanged(item, snapshot, failedRun) {
-    this.schedule();
+    this.schedule(true);
     if (!this.alive || !this.queryUses.has(item)) return;
     const failure = snapshot.error;
     if (snapshot.status !== 'error' || !failure || failure.code === 'CANCELLED') {
@@ -355,9 +377,15 @@ export class View {
       } else if(root==='ports') {
         if(!own(owner.spec.ports??{},name))fail('REFERENCE_NOT_FOUND');
         value=owner.ports[name];
-        if(!target){const kind=owner.spec.ports[name].kind;if(kind==='State')value=value?readSnapshot(value.getSnapshot()):undefined;else if(kind==='Query')value=value?.getSnapshot();}
+        if (!target) {
+          const kind = owner.spec.ports[name].kind;
+          if (kind === 'State') value = value ? readSnapshot(value.getSnapshot()) : undefined;
+          else if (kind === 'Query' && value) value = readQuery(value, plan, keys[2]);
+        }
       } else if(root==='queries') {
-        const item=owner.queries.get(name);if(!item)fail('REFERENCE_NOT_FOUND');value=target?item.handle:item.usage?.getSnapshot()??{status:'waiting',data:undefined,error:null,dataInputs:undefined,stale:false,waitingReason:'INPUT_NOT_READY'};
+        const item = owner.queries.get(name);
+        if (!item) fail('REFERENCE_NOT_FOUND');
+        value = target ? item.handle : readQuery(item.handle, plan, keys[2]);
       } else if(root==='actions') {
         let connection=[...(plan?.connections??this.connections).values()].find(item=>item.owner.id===owner.id&&item.handler.id===name);
         if(!connection&&plan?.connections){
@@ -416,7 +444,7 @@ export class View {
       const old=previous?.queries.get(name),identity=use.queryRef?`Query:${use.queryRef}`:tuple(use.query);
       const item=old?.identity===identity?{...old,use,owner}: {use,owner,identity,usage:null,handle:null};
       if(!item.handle)item.handle=createQueryHandle({
-        getSnapshot:()=>item.usage?.getSnapshot()??{status:'waiting',data:undefined,error:null,dataInputs:undefined,stale:false,waitingReason:'INPUT_NOT_READY'},
+        getSnapshot:()=>item.usage?.getSnapshot()??waitingQuery,
         refresh:signal=>this.requestQuery(item,'refresh',signal),retry:signal=>this.requestQuery(item,'retry',signal),
       });
       // Preserve the object referenced by the handle; owner/use are assigned after commit.
@@ -425,6 +453,8 @@ export class View {
     for(const name of validateInitials(spec,registry.functions)) {
       const declaration=spec.states[name],handle=owner.states.get(name),context=this.context(owner, {}, plan);
       if(declaration.kind==='Derived') {
+        // The Store can run this computation outside the current build.
+        plan.queryReads = null;
         const paths=pathsIn(declaration.inputs??{},registry.functions);
         const portNames=new Set(paths.filter(keys=>keys[0]==='ports').flatMap(keys=>keys.length===1?Object.keys(spec.ports??{}):[keys[1]]));
         const dependencies=[...paths.filter(keys=>keys[0]==='states').map(keys=>owner.states.get(keys[1])),
@@ -467,7 +497,7 @@ export class View {
     const oldOwners=this.owners;let oldInstances=replace?new Map():this.instances,availableConnections=replace?new Map():this.connections;
     const previousRepeats = commit ? undefined : this.leafRepeats;
     const leafRepeats = new Map();
-    const plan = { connections };
+    const plan = { connections, queryReads: runtime.functions.length ? null : new Map() };
     let root,roots;
     const prepare = run => commit ? this.host.prepare(run) : run();
     try {
@@ -608,6 +638,8 @@ export class View {
         this.owners = owners;
         this.connections = connections;
         this.leafRepeats = leafRepeats;
+        this.treeQueryReads = plan.queryReads;
+        plan.queryReads = null;
         const queryUses = new Set(), stateAddresses = new Set();
         for (const owner of owners.values()) {
           for (const handle of owner.states.values()) stateAddresses.add(keyOf(handle.address));
@@ -659,9 +691,10 @@ export class View {
   configureQueries() {
     const generation = this.generation;
     const current = () => this.alive && generation === this.generation;
+    const plan = { queryReads: this.runtime.functions.length ? null : new Map() };
     for(const owner of this.owners.values())for(const [name,item] of owner.queries) {
       if(!current())return;
-      const use=item.use,spec=use.query??this.runtime.registry.get('Query',use.queryRef).spec,context=this.context(owner);
+      const use=item.use,spec=use.query??this.runtime.registry.get('Query',use.queryRef).spec,context=this.context(owner, {}, plan);
       let preparedInputs,ready=true,executeWhen=true,autoRefreshWhen=true,inputError;
       try {
         preparedInputs=this.prepareInputs(spec,use.inputs??{},context,'automatic',false,'Query');
@@ -687,8 +720,23 @@ export class View {
       }
       else item.usage.update(settings);
     }
+    if (current()) this.configuredQueryReads = plan.queryReads;
   }
-  refresh() {
+  queryReadsUnchanged() {
+    if (!this.treeQueryReads || !this.configuredQueryReads) return false;
+    for (const reads of [this.treeQueryReads, this.configuredQueryReads]) {
+      for (const [handle, fields] of reads) {
+        let snapshot;
+        try { snapshot = handle.getSnapshot(); }
+        catch { return false; }
+        for (const [field, value] of fields) {
+          if (!Object.is(value, field === undefined ? snapshot : snapshot[field])) return false;
+        }
+      }
+    }
+    return true;
+  }
+  refresh(queryOnly = false) {
     if(!this.alive||!this.root)return;
     this.requested++;
     // A subscriber can commit State while project() is publishing this plan.
@@ -696,13 +744,40 @@ export class View {
     // a newer snapshot to listeners still receiving the current one.
     if(this.planning){this.schedule();return;}
     this.planning=true;
-    try{this.build(this.spec,this.inputs);this.configureQueries();this.project();}catch(caught){this.diagnostics.push(safeError(caught));this.project();}finally{this.planning=false;}
+    try {
+      // Publish every Query status as before. Rebuild only when a tracked read
+      // changed or a State, Action, URL or application requires reconciliation.
+      if (!queryOnly || !this.queryReadsUnchanged()) {
+        this.build(this.spec, this.inputs);
+        this.configureQueries();
+      }
+      this.project();
+    } catch (caught) {
+      this.treeQueryReads = this.configuredQueryReads = null;
+      this.diagnostics.push(safeError(caught));
+      this.project();
+    } finally { this.planning = false; }
   }
-  schedule(){if(!this.alive)return;this.requested++;if(this.queued)return;this.queued=true;queueMicrotask(()=>{this.queued=false;this.refresh();});}
+  schedule(queryOnly = false) {
+    if (!this.alive) return;
+    this.requested++;
+    this.forceRefresh ||= !queryOnly;
+    if (this.queued) return;
+    this.queued = true;
+    queueMicrotask(() => {
+      const queryOnly = !this.forceRefresh;
+      this.forceRefresh = false;
+      this.queued = false;
+      this.refresh(queryOnly);
+    });
+  }
   project() {
     if(!this.alive)return;
     const generation = this.generation, snapshot = this.getSnapshot();
-    this.updateNodeDiagnostics(snapshot);
+    if (this.diagnosedRoots !== this.roots) {
+      this.updateNodeDiagnostics(snapshot);
+      this.diagnosedRoots = this.roots;
+    }
     const diagnosticListeners = [...this.diagnosticListeners];
     const registry = this.runtime.registry;
     this.published = this.requested;
@@ -982,17 +1057,21 @@ export class View {
   getSnapshot() {
     if (this.stagingSnapshot) return this.stagingSnapshot;
     const serialize = instance => {
+      const cached = this.nodeSnapshots.get(instance);
+      if (cached) return cached;
       const entries = Object.entries(instance.slots ?? {});
       const slots = Object.freeze(Object.fromEntries(entries.map(([name, nodes]) =>
         [name, Object.freeze(nodes.map(serialize))])));
       // Code Components expose the same slot children in two forms.
       const children = entries.length ? Object.values(slots).flat() : instance.children.map(serialize);
-      return Object.freeze({
+      const snapshot = Object.freeze({
         id: instance.id, instanceId: instance.owner?.id, address: instance.address,
         generation: instance.generation, componentRef: instance.source?.componentRef,
         status: instance.status, error: instance.error ?? null, inputs: instance.inputs,
         children: Object.freeze(children), slots,
       });
+      this.nodeSnapshots.set(instance, snapshot);
+      return snapshot;
     };
     const states=Object.create(null),queries=Object.create(null),actions=Object.create(null);
     for(const [name,handle] of this.root?.states??[])states[name]=handle.getSnapshot();

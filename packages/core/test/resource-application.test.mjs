@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createRegistry, createRuntime, defineResourceSet } from '@viewstem/core';
 import { createRegistry as localRegistry, createRuntime as localRuntime, createStateStore as localStore, rendererView } from '../src/api.mjs';
+import { boundedQuery } from '../src/ports.mjs';
 import { defineResourceSet as localSet } from '../src/resource-set.mjs';
 import { Registry } from '../src/registry.mjs';
 import { memoryUrl, tick } from './fixtures/state/url-adapter.mjs';
@@ -137,6 +138,77 @@ test('refresh reuses a stable repeat and still evaluates leaves that read anothe
   next.render.slots.default[0].inputs.label = 'Reconfigured';
   await view.whenSettled(await view.updateDefinition(next));
   assert.deepEqual(labels(), ['Reconfigured', 'Reconfigured', 'After', 'After']);
+});
+
+test('Query status publishes when shared result consumers can reuse the current tree', async t => {
+  const p = value => ({ '@path': value });
+  const number = binding('Number');
+  number.contract.spec.ports = { value: { kind: 'Value', schema, required: true } };
+  const registry = localRegistry().registerResourceSet(localSet({
+    id: 'components', version: '1', components: [number],
+  })).registerResources([{
+    kind: 'Component', id: 'Consumer', spec: {
+      ports: { result: { kind: 'Query', required: true } },
+      render: { id: 'number', componentRef: 'Number', inputs: { value: p('/ports/result/data') } },
+    },
+  }]);
+  let value = 7;
+  let release;
+  let started;
+  const runtime = localRuntime({ registry, requestExecutor() {
+    if (!started) return { status: 200, headers: {}, body: value };
+    return new Promise(resolve => { release = () => resolve({ status: 200, headers: {}, body: value }); started(); });
+  } });
+  t.after(() => runtime.dispose());
+  const source = {
+    queries: { result: { query: {
+      sources: { value: {
+        datasource: { kind: 'Http', baseUrl: 'https://example.test' }, request: { method: 'GET', path: '/value' },
+      } },
+      transform: { input: p('/sources/value') },
+    } } },
+    render: { id: 'consumer', componentRef: 'Consumer', inputs: { result: p('/queries/result') } },
+  };
+  const view = await runtime.createView(source);
+  await view.whenSettled(view.initial);
+  await tick();
+  const build = t.mock.method(rendererView(view), 'build');
+  const observed = [];
+  view.subscribe(snapshot => observed.push([snapshot.queries.result.status, snapshot.roots[0].children[0].inputs.value]));
+  async function refresh() {
+    const entered = new Promise(resolve => { started = resolve; });
+    const ticket = view.getQuery('result').refresh();
+    await entered;
+    await tick();
+    release();
+    await ticket;
+    await tick();
+  }
+  await refresh();
+  assert.deepEqual(observed, [['success', 7], ['running', 7], ['success', 7]]);
+  assert.equal(build.mock.callCount(), 0);
+
+  value = 8;
+  await refresh();
+  assert.deepEqual(observed.slice(-2), [['running', 7], ['success', 8]]);
+  assert.equal(build.mock.callCount(), 1);
+
+  let open = true;
+  const borrowed = boundedQuery(view.getQuery('result'), () => {
+    if (!open) throw { code: 'CANCELLED' };
+  });
+  started = undefined;
+  const borrower = await runtime.createView({
+    ...source,
+    ports: { borrowed: { kind: 'Query', required: true } },
+    render: { ...source.render, inputs: { result: p('/ports/borrowed') } },
+  }, { inputs: { borrowed } });
+  await borrower.whenSettled(borrower.initial);
+  assert.equal(borrower.getSnapshot().roots[0].children[0].inputs.value, 8);
+  open = false;
+  await borrower.getQuery('result').refresh();
+  await tick();
+  assert.equal(borrower.getSnapshot().roots[0].children[0].error.code, 'CANCELLED');
 });
 
 test('State writes publish owning and connected Views and follow State port replacement', async t => {
