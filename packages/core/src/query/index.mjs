@@ -15,6 +15,7 @@ const wrap = (error, location, resource) => at(error, { location, ...(resource ?
 
 export function joinRows(left, right, step) {
   if (!Array.isArray(left) || !Array.isArray(right) || !left.every(isRecord) || !right.every(isRecord)) fail('TYPE_MISMATCH');
+  const compoundKeys = new Map();
   const keys = (rows, side) => rows.map(row => {
     const tuple = step.on.map(pair => {
       if (!own(row, pair[side])) fail('REFERENCE_NOT_FOUND');
@@ -23,8 +24,16 @@ export function joinRows(left, right, step) {
       return key;
     });
     if (tuple.length === 1) return tuple[0];
-    // JSON preserves the type and order of the validated primitive keys.
-    return tuple.includes(null) ? null : JSON.stringify(tuple);
+    if (tuple.includes(null)) return null;
+    // Intern each primitive part without copying long strings into a serialized key.
+    // The final Map identifies the complete tuple for the row index below.
+    let key = compoundKeys;
+    for (const part of tuple) {
+      let next = key.get(part);
+      if (!next) key.set(part, next = new Map());
+      key = next;
+    }
+    return key;
   });
   const leftKeys = keys(left, 'left'), rightKeys = keys(right, 'right');
   const result = [], rightFirst = step.mode === 'right';

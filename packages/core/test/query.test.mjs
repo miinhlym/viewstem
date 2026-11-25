@@ -169,6 +169,16 @@ test('Join indexes compound keys strictly while preserving duplicate order and r
   assert.deepEqual({ left, right }, original);
   assert.deepEqual(joinRows([{ a: -0 }], [{ a: 0, matched: true }], { on: [{ left: 'a', right: 'a' }] }), [{ a: 0, matched: true }]);
 });
+test('Join matches long repeated compound key parts without materializing a combined string', () => {
+  const key = '\u0000'.repeat(1_000_000);
+  const on = Array.from({ length: 100 }, () => ({ left: 'key', right: 'key' }));
+  const left = [{ key, left: 1 }], right = [{ key, right: 2 }];
+  const result = joinRows(left, right, { mode: 'inner', on });
+  assert.equal(result.length, 1);
+  assert.equal(result[0].key, key);
+  assert.equal(result[0].left, 1);
+  assert.equal(result[0].right, 2);
+});
 test('direct independent execution never uses a usage cache', async () => {
   let calls = 0; const queries = definitions();
   const engine = createQueryEngine({ registry: { get: (_, id) => queries[id] }, requestExecutor: async () => ({ body: ++calls }) });
