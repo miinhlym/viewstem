@@ -23,7 +23,7 @@
     "@viewstem/core": "0.1.0",
     "@viewstem/dom": "0.1.0",
     "@viewstem/ui": "0.1.0",
-    "astro": "7.2.10",
+    "astro": "7.4.7",
     "clsx": "^2.1.1",
     "cn": "^0.5.0",
     "codemirror": "6.0.2",
