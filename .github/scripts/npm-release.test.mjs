@@ -93,7 +93,7 @@ test('release notes preserve the Markdown of the matching changelog entry', () =
     '',
     '```markdown',
     '## 0.1.0',
-    '```',
+    '  ```',
     '',
     '- Updated dependencies',
     '  - @viewstem/dom@0.1.1',
@@ -101,6 +101,17 @@ test('release notes preserve the Markdown of the matching changelog entry', () =
   const history = ['# @viewstem/ui', '', '## 0.1.10', '', 'A newer patch.', '', '## 0.1.1', '',
     ...entry, '', '## 0.1.0', '', 'Initial release.'].join('\r\n');
   assert.equal(releaseNotes(history, target), entry.join('\n'));
+});
+
+test('release notes stop at the next version after an indented code fence in a change', async () => {
+  const target = { name: '@viewstem/ui', version: '0.1.2' };
+  const config = JSON.parse(await readFile(new URL('../../.changeset/config.json', import.meta.url), 'utf8'));
+  const change = await changelog.getReleaseLine({
+    summary: 'Document the migration.\n\n```markdown\n## 0.1.0\n  ```',
+  }, 'patch', config.changelog[1]);
+  const entry = `### Patch Changes\n\n${change.trim()}`;
+  const history = `# @viewstem/ui\n\n## 0.1.2\n\n${entry}\n\n## 0.1.1\n\n- Previous release.\n`;
+  assert.equal(releaseNotes(history, target), entry);
 });
 
 test('release notes preserve dependency-only entries and reject missing or empty entries', () => {

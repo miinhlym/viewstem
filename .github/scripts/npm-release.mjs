@@ -58,7 +58,9 @@ export function releaseNotes(changelog, { name, version }) {
       }
       continue;
     }
-    if (marker) {
+    // Changesets indents code examples inside list items, so their contents
+    // cannot match an unindented version heading.
+    if (marker && line.startsWith(marker[1])) {
       fence = marker[1];
       continue;
     }
