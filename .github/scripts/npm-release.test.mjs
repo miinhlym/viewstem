@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { readFile } from 'node:fs/promises';
 import changelog from '../../.changeset/changelog.mjs';
-import { isReleasePullRequest, releaseTargets, shouldPublish, verifyPublishPrerequisites } from './npm-release.mjs';
+import { isReleasePullRequest, releaseNotes, releaseTargets, shouldPublish, verifyPublishPrerequisites } from './npm-release.mjs';
 
 const repository = 'miinhlym/viewstem';
 const sha = 'tested-merge-commit';
@@ -82,6 +82,45 @@ test('selects only bumped packages in dependency order', () => {
     ['@viewstem/core@0.1.1', '@viewstem/dom@0.1.1', '@viewstem/svelte@0.2.1', '@viewstem/ui@0.3.1']);
   assert.deepEqual(targets(before), []);
   assert.throws(() => targets({ ...before, core: '0.0.9' }), /Invalid version bump/);
+});
+
+test('release notes preserve the Markdown of the matching changelog entry', () => {
+  const target = { name: '@viewstem/ui', version: '0.1.1' };
+  const entry = [
+    '### Patch Changes',
+    '',
+    `- Keep DataTable rows and focus. ([#10](https://github.com/${repository}/pull/10))`,
+    '',
+    '```markdown',
+    '## 0.1.0',
+    '  ```',
+    '',
+    '- Updated dependencies',
+    '  - @viewstem/dom@0.1.1',
+  ];
+  const history = ['# @viewstem/ui', '', '## 0.1.10', '', 'A newer patch.', '', '## 0.1.1', '',
+    ...entry, '', '## 0.1.0', '', 'Initial release.'].join('\r\n');
+  assert.equal(releaseNotes(history, target), entry.join('\n'));
+});
+
+test('release notes stop at the next version after an indented code fence in a change', async () => {
+  const target = { name: '@viewstem/ui', version: '0.1.2' };
+  const config = JSON.parse(await readFile(new URL('../../.changeset/config.json', import.meta.url), 'utf8'));
+  const change = await changelog.getReleaseLine({
+    summary: 'Document the migration.\n\n```markdown\n## 0.1.0\n  ```',
+  }, 'patch', config.changelog[1]);
+  const entry = `### Patch Changes\n\n${change.trim()}`;
+  const history = `# @viewstem/ui\n\n## 0.1.2\n\n${entry}\n\n## 0.1.1\n\n- Previous release.\n`;
+  assert.equal(releaseNotes(history, target), entry);
+});
+
+test('release notes preserve dependency-only entries and reject missing or empty entries', () => {
+  const target = { name: '@viewstem/svelte', version: '0.1.1' };
+  const entry = '### Patch Changes\n\n- Updated dependencies\n  - @viewstem/core@0.1.1';
+  assert.equal(releaseNotes(`# @viewstem/svelte\n\n## 0.1.1\n\n${entry}\n`, target), entry);
+  for (const history of ['## 0.1.10\n\nNewer patch.', '## 0.1.1\n\n## 0.1.0\n\nInitial release.']) {
+    assert.throws(() => releaseNotes(history, target), /Missing changelog entry for @viewstem\/svelte@0\.1\.1/);
+  }
 });
 
 test('a retry skips matching tarballs and rejects collisions or stale publication', () => {
