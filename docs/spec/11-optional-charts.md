@@ -2,9 +2,11 @@
 
 기준일: 2026-10-29 · 이전 승인 의미의 공개 문서 복원
 
-[명세 시작점](../VIEWSTEM-SPEC.md) · [이전 승인 이관](09-preserved-contracts.md) · [결정 근거](../history/evidence-index.md)
+[명세 시작점](../VIEWSTEM-SPEC.md) · [이전 승인 이관](09-state-store-and-url.md) · [결정 근거](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/history/evidence-index.md)
 
 이 문서는 선택 UI 모듈로 제공할 차트의 승인 의미를 보존한다. 차트는 서비스가 코드 Component로 명시 등록하며 core의 기본 리소스가 아니다. 아래 계약을 보존한다는 사실은 모듈 구현·JSON Schema 검증·렌더링 테스트 완료를 뜻하지 않는다. 과거 위젯 명칭과 API는 현재 Component 계약에 맞춰 이관하며, 새 SDK 이름을 이 문서에서 확정하지 않는다.
+
+이 계약은 승인된 미출시 선택 차트 모듈을 위한 것이다. 현재 `@viewstem/ui`에서 제공하는 D3 기반 [Chart 카탈로그](../../apps/docs/src/content/docs/docs/ui/components/chart.md)는 자체 입력과 동작을 정의한다.
 
 ## 차트 종류와 엔진 범위
 
@@ -52,7 +54,7 @@ U34의 [독립 T4 실험](../../experiments/t4-charts/README.md)은 ECharts 6.1.
 
 ## 선택 모듈 인수 백로그
 
-**상태: U34 독립 실험에서 X01–X08을 실행했다.** Node 22/24는 각각 139/139, Chromium은 각 173/173이며 모형과 실제 renderer의 범위는 위 T4 링크를 따른다. 실제 core/SDK/Svelte 모듈의 전체 적합성과 구별한다. 엔진별 지원 목록 밖의 옵션을 모두 구현하라는 요구가 아니다.
+**상태: U34 독립 실험에서 X01–X08을 실행했다.** 실행 결과와 조건은 [T4 보고서](../../experiments/t4-charts/README.md)에서 확인한다. 제품 모듈 검증에는 실제 공개 SDK와 renderer가 필요하다.
 
 | ID | 입력/행동 | 기대 결과 | 근거 |
 |---|---|---|---|

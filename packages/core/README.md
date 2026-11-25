@@ -52,7 +52,7 @@ import { createHttpExecutor } from '@viewstem/core/http';
 import { compileCel, evaluateCel, defaultCelLimits } from '@viewstem/core/cel';
 ```
 
-`Registry`, `StateStore`, `Runtime`, and `View` are type-only exports. The factories return objects containing public methods only. Use resource declarations to execute `@path`, `@call`, Query, and Variable. If you used the former constructors or engine exports, follow the [public API migration guide (Korean)](../../docs/handoff/public-api-refactor-2026-11-02.md) for the same revision.
+`Registry`, `StateStore`, `Runtime`, and `View` are type-only exports. The factories return objects containing public methods only. Use resource declarations to execute `@path`, `@call`, Query, and Variable. If you used the former constructors or engine exports, follow the [public API migration guide (Korean)](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/public-api-refactor-2026-11-02.md) for the same revision.
 
 For exact types and fields, see `dist/index.d.ts`, `dist/http.d.ts`, and `dist/cel.d.ts` in the package. Use the Registry, Store, View, State, and Query handles issued by the library directly. Serializing them as JSON or recreating them as plain objects is unsupported. The runtime isolates Value inputs from their originals and delivers them as read-only values. Sets and maps retain native identity and equality semantics. Conversion to arrays or entry pairs happens only in HTTP plan inputs.
 
@@ -94,9 +94,9 @@ Read the following links in the **source repository at the same revision**. The 
 
 - The [specification and documentation map](../../docs/README.md) points to resource contracts and verification procedures.
 - [Schema profile (Korean)](../../docs/spec/03-variable-type.md) and [values, dates, and snapshots (Korean)](../../docs/spec/10-value-contracts.md).
-- [Host integration, permissions, and initial completion (Korean)](../../docs/spec/07-host-integration.md) and [store, reactions, and URLs (Korean)](../../docs/spec/09-preserved-contracts.md).
-- [CEL semantics and limits (Korean)](../../docs/handoff/core-cel-support.md) and [patches and reproducible builds](vendor/README.md).
-- [Verification after the public API refactor](../../docs/handoff/public-api-verification-results.json), [initial product verification](../../docs/handoff/core-verification-results.json), and [remaining work (Korean)](../../docs/handoff/open-contracts.md#실제-남은-작업).
+- [Host integration, permissions, and initial completion (Korean)](../../docs/spec/07-host-integration.md) and [store, reactions, and URLs (Korean)](../../docs/spec/09-state-store-and-url.md).
+- [CEL semantics and limits (Korean)](../../docs/core-cel.md) and [patches and reproducible builds](vendor/README.md).
+- [Verification after the public API refactor](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/public-api-verification-results.json), [initial product verification](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/core-verification-results.json), and [remaining work (Korean)](../../docs/follow-up.md#실제-남은-작업).
 
 Published tarballs link to the documentation at their source commit.
 
@@ -116,4 +116,4 @@ Verification uses Node 22.21.1 and 24.1.0 and Chromium from Playwright 1.62.1. U
 
 The build prepares all three entry points, the required type declarations, and the shared module chunks before replacing `dist`. Replacing the directory clears obsolete build artifacts. `npm run check` treats `skip` and `todo` as failures. Acceptance comparisons require a report from an actual run.
 
-See the [U42 migration table (Korean)](../../docs/handoff/public-api-naming-2026-11-02.md) for public naming changes. Use `registerComponentContract`, `exportResource`, `writeBatch`, `registerReaction`, `getSnapshot`, and `getDiagnostics`. Previous names have no aliases. JSON State declarations still use `initial`.
+The [November 2 U42 migration table (Korean)](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/public-api-naming-2026-11-02.md) records that API transition. Use the [current Core reference](https://viewstem.miinhlym.workers.dev/docs/core/) for current methods and types. JSON State declarations still use `initial`.

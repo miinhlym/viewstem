@@ -23,7 +23,7 @@ Node 22 실행 파일로 같은 명령을 실행하고 결과 이름을 `node22.
 | [run.mjs](run.mjs) | 전체 실행·정리·고의 결함 탐지·실제 환경/소스 SHA-256 기록 |
 | [Node 22 결과](results/node22.json), [Node 24 결과](results/node24.json) | 실행 결과·snapshot/예약/tick trace·고의 결함의 assertion 실패·실제 timer 관찰 |
 
-검증 계약은 [Query 사용 설정](../../docs/spec/02-query.md#사용-설정상태대기-호출의-구체-계약)과 [완료 후 주기 지연](../../docs/spec/09-preserved-contracts.md#함께-보존할-실행api-이력)을 따른다.
+검증 계약은 [Query 사용 설정](../../docs/spec/02-query.md#사용-설정상태대기-호출의-구체-계약)과 [완료 후 주기 지연](../../docs/spec/02-query.md#실행-정책-이관)을 따른다.
 
 | 사례 | 확인하는 동작 |
 |---|---|
@@ -58,6 +58,6 @@ PollingHost는 `mount(name, {intervalMs, ...QueryOptions})`에서 기존 Query �
 
 공유 Query의 pending에서 주기 의도를 입력 변경·수동 대기자와 구분했다. 다시 false가 되면 주기 의도만 제거하며 이미 시작된 실행과 다른 실행 계기는 보존한다. 입력/gate/준비와 재개를 같은 configure에서 반영할 때 중복 실행하지 않는다. 이 필드/hook은 private 구현 선택이다.
 
-[U30 최종 소스·결과](archive/u30-before-resume/README.md)는 별도 보존하며 현재 결과 파일은 U31 소스 해시와 결과다. [U31 전체 증거](../../docs/handoff/t2-polling-resume-2026-10-30.md)에 복합 Query·공유 스케줄러·Query–HTTP 회귀 범위를 함께 기록했다.
+[U30 최종 소스·결과](archive/u30-before-resume/README.md)는 별도 보존하며 현재 결과 파일은 U31 소스 해시와 결과다. [U31 전체 증거](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-polling-resume-2026-10-30.md)에 복합 Query·공유 스케줄러·Query–HTTP 회귀 범위를 함께 기록했다.
 
-동시 wall-clock timer의 우선순위, 브라우저 background throttling, Dart, 실제 StateStore/renderer·설정 상속·등록/스키마 검증·일반 Query DSL은 포함하지 않는다. timer 최대 분할 검사는 제어 clock에서 수행했으며 수십 일의 실제 벽시계를 기다린 결과가 아니다. 이 실험은 production 구현 완료를 뜻하지 않으며, 현재 구현 시작·커밋 범위는 [U36 인수인계](../../docs/handoff/implementation-start.md#새-채팅에서-시작할-때)를 따른다.
+동시 wall-clock timer의 우선순위, 브라우저 background throttling, Dart, 실제 StateStore/renderer·설정 상속·등록/스키마 검증·일반 Query DSL은 포함하지 않는다. timer 최대 분할 검사는 제어 clock에서 수행했으며 수십 일의 실제 벽시계를 기다린 결과가 아니다. 이 실험은 production 구현 완료를 뜻하지 않으며, 현재 구현 시작·커밋 범위는 [U36 인수인계](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/implementation-start.md#새-채팅에서-시작할-때)를 따른다.

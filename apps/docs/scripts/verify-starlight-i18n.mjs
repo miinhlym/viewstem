@@ -1,11 +1,9 @@
 import assert from 'node:assert/strict';
-import { createRequire } from 'node:module';
-import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 
-// Exercise the installed dependency, so reinstalling without the patch fails this check.
-const require = createRequire(import.meta.url);
-const entry = join(dirname(require.resolve('@astrojs/starlight')), 'utils/i18n.ts');
+// Exercise the i18n converter from the installed Starlight release.
+const entry = fileURLToPath(new URL('utils/i18n.js', import.meta.resolve('@astrojs/starlight')));
 const { outputFiles } = await build({
   entryPoints: [entry], bundle: true, write: false, platform: 'node', format: 'esm',
 });

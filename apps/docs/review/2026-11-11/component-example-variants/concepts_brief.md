@@ -6,7 +6,7 @@
 
 ## 검토 대상
 
-상세 페이지를 열자마자 해당 컴포넌트를 조작해 보고, 원하는 변형의 View JSON을 찾아 복사할 수 있어야 한다. 상세 문서는 대표 JSON 하나를 미리보기·JSON 탭에서 보여 준다. 탭을 바꿔도 입력·선택 등 실행 상태가 유지된다. [현재 결정 D142](../../../../../docs/history/decision-register.md#a-현재-채택한-결정)
+상세 페이지를 열자마자 해당 컴포넌트를 조작해 보고, 원하는 변형의 View JSON을 찾아 복사할 수 있어야 한다. 상세 문서는 대표 JSON 하나를 미리보기·JSON 탭에서 보여 준다. 탭을 바꿔도 입력·선택 등 실행 상태가 유지된다. [현재 결정 D142](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/history/decision-register.md#a-현재-채택한-결정)
 
 shadcn-svelte Button 페이지는 첫 화면에 외곽선 버튼과 아이콘 버튼을 제시한다. 아래에서 크기를 한 줄로 비교하고, 외곽선·보조·위험 스타일과 로딩·버튼 그룹·링크 사용법을 목차에서 찾아갈 수 있는 예제로 설명한다. 로딩과 버튼 그룹은 입력값 외에도 자식 컴포넌트나 구조가 바뀐다. [shadcn-svelte Button](https://www.shadcn-svelte.com/docs/components/button)
 

@@ -1,8 +1,10 @@
 # T4 선택 차트 독립 실험
 
-[X01–X08](../../docs/spec/11-optional-charts.md)의 현재 계약을 검증하는 **폐기 가능한 실험**이다. 작은 직접 Canvas renderer와 Apache ECharts 6.1.0의 실제 SVG renderer를 사용한다. Viewstem core·공개 SDK·Svelte Component 구현이 아니며 자동 등록·자동 엔진 선택 기능을 추가하지 않는다. 이 실험은 production 구현 완료를 뜻하지 않으며, 현재 구현 시작·커밋 범위는 [U36 인수인계](../../docs/handoff/implementation-start.md#새-채팅에서-시작할-때)를 따른다.
+[X01–X08](../../docs/spec/11-optional-charts.md)의 현재 계약을 검증하는 **폐기 가능한 실험**이다. 작은 직접 Canvas renderer와 Apache ECharts 6.1.0의 실제 SVG renderer를 사용한다. Viewstem core·공개 SDK·Svelte Component 구현이 아니며 자동 등록·자동 엔진 선택 기능을 추가하지 않는다. 제품 모듈의 완료 기준은 [선택 차트 계약](../../docs/spec/11-optional-charts.md#모듈-등록과-지원표-검증)에 있다.
 
 Node 22.21.1·24.19.0 각각 계약 검사 **139/139**, 실제 Chromium 151.0.7922.34에서는 각각 **동일 계약 139/139 + 실제 렌더링 33/33 + 브라우저 오류 검사 1/1**이다. 같은 검사를 환경 수만큼 별도 계약으로 합산하지 않는다. 결과·소스 SHA-256·결과 SHA-256·테스트별 대응은 [coverage.json](coverage.json), 실제 데이터·SVG 경로·Canvas 명령·픽셀 증거는 [Chromium 22](results/chromium22.json), [Chromium 24](results/chromium24.json)에 있다. [스크린샷](results/chromium22.png)은 실제 실행한 각 fixture를 표시한다. 마지막 여섯 State 연결 패널은 renderer 폐기 직전 실제 그림을 캡처해 표시한다. 각 JSON의 `ORACLE.mutation-detection`은 정렬·중복 제거·null→0·데이터 교체·숨은 엔진 변경의 5개 고의 결함을 탐지한다.
+
+[실험 기준 리비전 `10a326b9`](https://github.com/miinhlym/viewstem/tree/10a326b9c623aaf2763375b8628635dd70ba65d8)을 별도 디렉터리에 풀고 그 루트에서 아래 명령을 실행한다. 이 리비전에 보고서가 해시로 기록한 명세와 실행 코드가 있다. 현재 제품 검사는 [검증 안내](../../docs/verification.md)를 따른다.
 
 ```sh
 npm ci --prefix experiments/t4-charts --ignore-scripts --no-audit --no-fund

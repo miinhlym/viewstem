@@ -2,7 +2,9 @@
 
 기준일: 2026-10-29 · 기존 승인 의미 복원과 프로젝트 계약 구체화
 
-[명세 시작점](../VIEWSTEM-SPEC.md) · [Variable·Type](03-variable-type.md) · [이전 승인 이관](09-preserved-contracts.md)
+[값 정규화](#초기값-없는-state-읽기) · [값 표현](#값-표현과-literal-데이터) · [날짜와 시간](#날짜-값과-전송-형식)
+
+[명세 시작점](../VIEWSTEM-SPEC.md) · [Variable·Type](03-variable-type.md) · [StateStore와 URL](09-state-store-and-url.md)
 
 이 문서는 이미 승인한 값 계약을 현재 Variable·Type·StateStore 모델에서 읽을 수 있도록 풀어 쓴다. 새 코드·SDK·스키마 구현이나 실행한 테스트 결과가 아니다. 과거 Channel·Dashboard·compute·DateTransform 등의 이름을 현행 API로 복원하지 않는다. 현재 선언은 `spec.expression`, `variableRef`와 `inputs`, View/Component의 `states` 및 StateStore 계약을 따른다.
 
@@ -77,7 +79,7 @@ U07은 초기값을 생략한 State의 읽기 결과를 정한다. pending/error
 
 객체 원소의 속성 정규화와 Set 원소 자체의 거절은 구별한다. 속성을 생략한 뒤 두 객체의 내용이 같아져도 기존 native membership 기준을 유지하며, 별개의 객체 원소를 내용 비교로 합치지 않는다. 입력 격리 후의 객체 참조 의미는 아래 기존 계약을 따른다. [U03, E58, E59]
 
-이 결정은 집합 구성과 크기가 암묵적으로 달라지는 것을 막고, 이미 확정된 [Query 서비스 콜백 전 Set→배열 변환](09-preserved-contracts.md#query-서비스-콜백의-컬렉션-변환)에서도 배열 원소 계약과 일관된 값을 전달하기 위한 것이다. Map 값은 아래 U06을 따르며, 새 Set 변경 API를 함께 확정하는 결정은 아니다. [U05, E47]
+이 결정은 집합 구성과 크기가 암묵적으로 달라지는 것을 막고, 이미 확정된 [Query 서비스 콜백 전 Set→배열 변환](01-datasource-auth.md#query-서비스-콜백의-컬렉션-변환)에서도 배열 원소 계약과 일관된 값을 전달하기 위한 것이다. Map 값은 아래 U06을 따르며, 새 Set 변경 API를 함께 확정하는 결정은 아니다. [U05, E47]
 
 ## Map 값의 undefined
 
@@ -92,7 +94,7 @@ Map key는 기존 계약대로 string 또는 number만 허용하므로 `undefine
 | `new Map([["a", null]])` | null을 허용하는 값 타입이면 키와 명시 null 보존; 허용하지 않으면 타입 오류 |
 | `new Map([["a", { name: undefined }]])` | `new Map([["a", {}]])`로 정규화; 빈 객체를 허용하는 값 타입이어야 수용 |
 
-이 결정은 `has(key)`와 `size`로 관찰하는 엔트리 존재 의미를 보존하기 위한 것이다. 객체의 선택 속성 생략 규칙을 Map 엔트리 제거로 확대하지 않는다. [Query 서비스 콜백 전 Map→쌍 배열 변환](09-preserved-contracts.md#query-서비스-콜백의-컬렉션-변환)에서도 승인된 배열 원소 계약과 일관된 값을 전달한다. 초기값 없는 State 읽기는 U07을 따르며, 새 Map 변경 API는 이번 결정으로 확정하지 않는다. [U06, E47, E58]
+이 결정은 `has(key)`와 `size`로 관찰하는 엔트리 존재 의미를 보존하기 위한 것이다. 객체의 선택 속성 생략 규칙을 Map 엔트리 제거로 확대하지 않는다. [Query 서비스 콜백 전 Map→쌍 배열 변환](01-datasource-auth.md#query-서비스-콜백의-컬렉션-변환)에서도 승인된 배열 원소 계약과 일관된 값을 전달한다. 초기값 없는 State 읽기는 U07을 따르며, 새 Map 변경 API는 이번 결정으로 확정하지 않는다. [U06, E47, E58]
 
 ## 유한 숫자만 허용
 
@@ -201,18 +203,14 @@ JS의 JSON 직렬화가 음수 0을 `0`으로 기록하고 native Set·Map도 �
 
 @path는 [JSON Pointer](https://www.rfc-editor.org/rfc/rfc6901.html)의 절대 경로 표기를 사용하고 `~0`·`~1`로 키의 ~·/를 이스케이프한다. 현재 문맥이 허용하는 /ports·/states·/queries·/steps·/event·/repeat·/actions 등의 루트만 읽으며 /secrets와 /auth/token은 승인된 HTTP 요청 구성 문맥으로 제한한다. auth.token 추출은 해당 Login 응답 /response만 읽으며 요청 입력이나 secret 문맥을 공유하지 않는다. 객체의 own 속성과 배열의 존재하는 정수 인덱스만 순회하고 prototype 탐색은 하지 않는다. Set/Map 원소를 문자열 경로로 암묵 조회하지 않는다. 등록하지 않은 리소스·State·단계 이름은 참조 오류이고, 유효한 데이터 객체의 없는 선택 속성은 missing이다. 중간 값이 null이거나 잘못된 컨테이너이면 경로 타입 오류다.
 
-**배열의 경로와 크기(U24):** 배열 경로의 인덱스는 `0` 또는 0으로 시작하지 않는 십진 정수 표기이며 실제 원소가 존재해야 한다. `/length`·사용자 추가 속성·`01`·음수·소수·범위 밖 인덱스는 배열 원소로 읽지 않는다. 일반 객체의 `length`나 `01` 데이터 키는 이 배열 전용 제한을 받지 않는다. 배열 크기는 [Variable의 CEL `size` 계산](03-variable-type.md#배열-크기-계산)을 사용한다. U23의 P41 실패는 U24에서 실험 평가기의 배열/객체 분기를 수정하고 Node/실제 Chromium에서 검증했다. [수정 전 증거와 현재 결과](../handoff/t2-http-boundary-2026-10-29.md)는 보존하며 core 전체 표현식 구현 완료로 확대하지 않는다.
+**배열의 경로와 크기(U24):** 배열 경로의 인덱스는 `0` 또는 0으로 시작하지 않는 십진 정수 표기이며 실제 원소가 존재해야 한다. `/length`·사용자 추가 속성·`01`·음수·소수·범위 밖 인덱스는 배열 원소로 읽지 않는다. 일반 객체의 `length`나 `01` 데이터 키는 이 배열 전용 제한을 받지 않는다. 배열 크기는 [Variable의 CEL `size` 계산](03-variable-type.md#배열-크기-계산)을 사용한다. U23의 P41 실패는 U24에서 실험 평가기의 배열/객체 분기를 수정하고 Node/실제 Chromium에서 검증했다. [수정 전 증거와 현재 결과](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-http-boundary-2026-10-29.md)는 보존하며 core 전체 표현식 구현 완료로 확대하지 않는다.
 
-**U25 문제의 수정·검증(U26):** headers 객체 전체 @path를 정적 헤더 이름으로 오인하던 P51은 [HTTP 헤더 계약](01-datasource-auth.md#http-전송-프로필과-현재-요청-dto)에 맞게 수정했다. 정적 금지 이름은 Login 전에, 동적 참조 결과는 해당 요청 전·병합 전에 검사하며 반환 데이터를 재평가하지 않는다. Node/실제 Chromium에서 정상 참조·금지 이름·중복·제거를 검증했다.
-
-**U26 문제의 수정·검증(U27):** request.path의 @path를 평가하지 않던 P61은 [HTTP 주소 계약](01-datasource-auth.md#http-전송-프로필과-현재-요청-dto)에 맞게 수정했다. 평가한 문자열에 기존 주소 문법·공통 경로·목적지 권한 검사를 적용하고, 목적지 확정 전에는 secret resolver를 제공하지 않는다. Node/실제 Chromium에서 정상 경로·금지 주소·권한 거절을 확인했다.
-
-**U28 전체 경로 점검:** P71의 Datasource.baseUrl과 method·Login request 전체의 평가 누락을 고쳤다. 공통 평가기로 엄격한 표현식 형태, @@ 한 번 해제, 재귀 평가와 반환 데이터 비재실행, JSON Pointer·허용 문맥·타입 구분, concat/formatString을 연결했다. [검사 위치 17개와 실행 증거](../handoff/t2-path-audit-2026-10-30.md)는 HTTP 독립 실험의 범위다. State·Action·UI의 동적 영역, 대상 핸들, 반응형 snapshot·추가 함수 등록은 미구현이며 이 결과를 core 전체 통과로 확대하지 않는다.
+동적 HTTP에서 주소·헤더·Login 문맥 검사는 [HTTP 전송 계약](01-datasource-auth.md#http-전송-프로필과-현재-요청-dto)을 따른다. 앞선 검증의 수정 내역은 [독립 HTTP 경로 감사](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-path-audit-2026-10-30.md)에 있다.
 
 **HTTP 명시 실행의 경로 오류(U28):** 잘못된 Pointer·표현식 형태는 INVALID_EXPRESSION, 허용되지 않은 루트·선언되지 않은 포트·잘못된 배열 인덱스는 REFERENCE_NOT_FOUND다. 유효한 데이터 객체의 없는 선택 속성은 missing이므로 현재 값을 요구하는 HTTP 실행에서는 INPUT_NOT_READY로 거절한다. null·스칼라·native 컬렉션 내부를 객체처럼 순회하면 TYPE_MISMATCH다. 문자열로 강제 변환하거나 빈 값으로 전송하지 않는다. Login 응답의 토큰 속성이 없는 경우도 INPUT_NOT_READY로 후속 API를 막는다. 이는 State의 missing 읽기·자동 Query의 waiting을 오류로 바꾸는 규칙이 아니다.
 
 
-v1 @call 기본 함수는 `concat`과 `formatString`으로 고정한다. concat은 문자열 args 배열을 받아 순서대로 이어 붙이며 빈 배열은 빈 문자열이다. formatString은 `{value: 문자열}`을 받고 `${/절대/경로}`를 문자열·유한 숫자·boolean·null의 문자 표현으로 치환한다. `$$`는 리터럴 `$`이고 잘못된 보간식·객체/컬렉션 보간은 오류다. missing/pending/error는 문자열 "undefined"나 빈 문자열로 숨기지 않고 입력 준비·실패 규칙을 따른다. 추가 순수 함수는 이름·인자·결과 스키마를 명시 등록하고, 미등록 함수나 인자 형태 불일치는 오류다. 이 concat 함수와 Query의 Concat 단계는 별개다.
+v1 @call 기본 함수는 `concat`과 `formatString`으로 고정한다. concat은 문자열 args 배열을 받아 순서대로 이어 붙이며 빈 배열은 빈 문자열이다. formatString은 `{value: 문자열}`을 받고 `${/절대/경로}`를 문자열·유한 숫자·boolean·null의 문자 표현으로 치환한다. `$$`는 리터럴 `$`이고 잘못된 보간식·객체/컬렉션 보간은 오류다. missing/pending/error는 문자열 "undefined"나 빈 문자열로 숨기지 않고 입력 준비·실패 규칙을 따른다. Registry에 이름·인자·결과 스키마를 등록한 순수 함수는 일반 Core 평가에서 사용할 수 있다. 내장 HTTP 실행기는 등록한 함수를 전달받지 않으며 `concat`과 `formatString`만 지원한다. 세부 오류는 [HTTP 전송 계약](01-datasource-auth.md#http-전송-프로필과-현재-요청-dto)을 따른다. 이 concat 함수와 Query의 Concat 단계는 별개다.
 
 ### 값 준비 상태의 읽기
 
@@ -258,7 +256,7 @@ JS의 간단 읽기는 ready의 값, missing의 undefined를 반환하고, pendi
 
 객체 Set 설명은 보호된 읽기 Set에서 `delete` 같은 변이를 허용한다는 뜻이 아니다. 실제 변경은 허용된 State 변경 경로를 거쳐야 하고, 잘못된 직접 변이는 오류로 드러낸다. 고정된 snapshot과 같은 참조의 안정 읽기를 함께 만족시키는 복사·proxy·자료구조 선택은 구현 상세다. 매 읽기 전체 deep copy나 특정 freeze/proxy 기법을 계약으로 강제하지 않는다.
 
-StateStore 관찰값도 이 런타임 값·보호 정책을 따른다. [Query 서비스 콜백 전 Set/Map 재귀 변환](09-preserved-contracts.md#query-서비스-콜백의-컬렉션-변환)은 별도 전송 경계이며, 관찰값을 전송용 배열로 바꾸거나 과거 snapshot을 변경하는 근거가 아니다. [E45, E47]
+StateStore 관찰값도 이 런타임 값·보호 정책을 따른다. [Query 서비스 콜백 전 Set/Map 재귀 변환](01-datasource-auth.md#query-서비스-콜백의-컬렉션-변환)은 별도 전송 경계이며, 관찰값을 전송용 배열로 바꾸거나 과거 snapshot을 변경하는 근거가 아니다. [E45, E47]
 
 ## 날짜 계산과 포맷의 보존 경계
 
@@ -289,7 +287,7 @@ E60에서 합의한 datetime 패턴은 `YYYY-MM-DD[T]HH:mm:ss.SSS[Z]`다. E60만
 
 이 규칙은 `x-viewstem-type`으로 선언한 날짜 값과 명시적 날짜 변환 함수의 결과에만 적용한다. 일반 string·HTTP의 미지정 응답 문자열을 날짜처럼 보인다는 이유로 변환하지 않는다. 선언된 날짜는 수용 경계에서 형식 검사·정규화한 뒤 나머지 검증·변경 비교·commit을 수행한다. 같은 시점을 다른 offset으로 입력해도 정규 값이 같으면 실제 State 변경이 아니다. 기존 const/enum·포트 default 같은 스키마 상수는 정규 형식으로 작성하며 검증 중 상수를 자동 고치지 않는다. 날짜 정규화가 있는 스키마 조합은 단일 정규 값을 결정할 수 있어야 한다. 이를 위해 같은 값 위치에서 문자열을 허용하는 모든 분기는 같은 날짜 종류를 선언해야 한다. 날짜와 null의 anyOf는 허용하지만 날짜와 일반 string의 혼합처럼 분기별 정규화가 달라지는 조합은 등록 오류다.
 
-U32의 [직접 날짜 어댑터 후속 검증](../handoff/boundary-followup-2026-10-30.md)에서 정규화 후 const/enum/pattern/길이 검사를 생략하던 문제와 지역 시각 변환 결과의 연도 범위 검사를 보완했다. CEL 내부 날짜 함수나 전체 스키마 조합의 적합성으로 확대하지 않는다.
+U32의 [직접 날짜 어댑터 후속 검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/boundary-followup-2026-10-30.md)에서 정규화 후 const/enum/pattern/길이 검사를 생략하던 문제와 지역 시각 변환 결과의 연도 범위 검사를 보완했다. CEL 내부 날짜 함수나 전체 스키마 조합의 적합성으로 확대하지 않는다.
 
 **U34 기술 보완:** Map의 string key에 날짜 스키마를 적용하여 서로 다른 입력 key가 같은 정규 문자열이 되면 해당 값 수용 전체를 거절한다. 먼저/나중 엔트리를 선택해 값을 잃게 하지 않는다. native JS Map이 입력 시점에 이미 합친 숫자 -0/0과 달리, 이 경우는 core 정규화에서 발생한 충돌이다. 위임된 값 수용 경계의 보완이며 Map 객체 원소의 내용 동등성 규칙을 바꾸지 않는다.
 
@@ -303,7 +301,7 @@ date/time 저장·검증과 offset 있는 datetime의 UTC 정규화에는 업무
 
 달력상의 하루 증감과 24시간의 경과량 증가는 서로 다른 연산이다. 업무 시간대의 다음 날 경계를 구할 때 고정 86,400,000ms를 더하지 않는다. DST 때문에 존재하지 않거나 두 번 존재하는 지역 날짜·시각을 datetime으로 변환할 때는 임의 offset을 고르지 않고 오류로 처리한다. 이미 offset이 명시된 datetime은 절대 시점이므로 이 모호성이 없다. 시간대 데이터 버전 차이에 따른 JS/Dart 결과도 T1의 적합성 대상으로 기록한다.
 
-## 근거와 남은 구현 상세
+## 근거와 언어별 검증
 
 | 근거 | 승인 연결 |
 |---|---|
@@ -313,4 +311,4 @@ date/time 저장·검증과 offset 있는 datetime의 UTC 정규화에는 업무
 | E59 입력 격리·안정 읽기 | 10/12 `Sentinel_de1085b747648191b1a0ec44192810b4` 제안 → 사용자 `Sentinel_4919af5980208191b2636a469a87c7c4` 수락. `Sentinel_dcfbfb044a7c8191b9ed26e5aa0f77e9` 확인 |
 | E60 날짜 | 10/12 `Sentinel_69783f3c0c5c81919890d2346578a126` 제안 → 사용자 `Sentinel_48724c8802888191bbeb75871975b389` 수락. `Sentinel_cb3c1c6a54788191bd1dc62ff7bc0f38` 확인 |
 
-읽기 보호·CEL/native/Dart 어댑터의 실제 구현은 T1–T3에 남는다. 날짜 표현·업무 시간대·codec은 U14, 스키마 프로필·Clock·읽기 snapshot·서버 DTO·오류는 U13과 후속 보완을 따른다. 날짜 함수의 구체 API·실행기 선정은 확정 의미에 맞춰 담당자가 검증한다. 구현 파일·fixture·실행 명령·실제 결과를 연결하기 전에는 테스트 통과로 표시하지 않는다.
+JS/TS Core는 읽기 보호와 native 값·날짜 및 CEL 어댑터를 구현한다. [Core CEL 지원 범위](../core-cel.md)와 [제품 인수 기대값](../acceptance.md)에서 실제 검사 범위를 확인한다. Dart 실행기와 언어 간 값·날짜 적합성은 [후속 범위](../follow-up.md)다.

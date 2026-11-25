@@ -11,6 +11,8 @@ sidebar:
 
 먼저 [예제 진입점 준비](../mount-in-svelte/#prepare-entry)에 따라 `index.html`을 `/src/main.ts`와 `id="app"`에 연결하세요. 아래 예제는 기존 `src/main.ts`를 교체합니다.
 
+DOM 렌더러와 공유하는 계약은 [런타임과 렌더링 수명](../../../guides/runtime-and-rendering/)을 참고하세요.
+
 ## 1. 마운트하고 DOM 반영 기다리기
 
 ```ts

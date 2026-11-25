@@ -1,5 +1,6 @@
 ---
 import DefaultMarkdownContent from '@astrojs/starlight/components/MarkdownContent.astro';
+import { dependencies } from '../../../package.json';
 import ComponentDemo from '../ComponentDemo.astro';
 import { componentSections } from '../../examples/component-reference-copy.mjs';
 import { getComponentReferenceVariants } from '../../examples/component-reference-demos.mjs';
@@ -8,6 +9,9 @@ const component = entry.id.match(/(?:^|\/)docs\/ui\/components\/([^/]+)$/);
 const locale = lang === 'ko' ? 'ko' : 'en';
 const variants = component ? getComponentReferenceVariants(component[1], locale) : [];
 const examples = componentSections[locale].examples;
+const installation = entry.id === 'docs/installation' || entry.id === 'ko/docs/installation';
+const browserPackages = ['@viewstem/core', '@viewstem/dom', '@viewstem/ui'] as const;
+const installCommand = `npm install ${browserPackages.map(name => `${name}@${dependencies[name]}`).join(' ')}`;
 ---
 {component ? (
   <div class="component-detail">
@@ -20,7 +24,19 @@ const examples = componentSections[locale].examples;
     )}
     <DefaultMarkdownContent><slot /></DefaultMarkdownContent>
   </div>
-) : <DefaultMarkdownContent><slot /></DefaultMarkdownContent>}
+) : (
+  <DefaultMarkdownContent>
+    {installation && (
+      <>
+        <p id="site-build-versions">{locale === 'ko'
+          ? '이 리비전의 운영 브라우저 예제와 같은 버전으로 설치하려면 다음 명령을 사용하세요.'
+          : 'Install the versions pinned for this revision of the production browser examples.'}</p>
+        <pre role="region" aria-labelledby="site-build-versions" tabindex="0"><code>{installCommand}</code></pre>
+      </>
+    )}
+    <slot />
+  </DefaultMarkdownContent>
+)}
 
 <style>
   .component-detail { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(2.25rem, 4vw, 3.25rem); min-width: 0; }

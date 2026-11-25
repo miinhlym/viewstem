@@ -1,10 +1,8 @@
 # Contributing to Viewstem
 
-English | [한국어](CONTRIBUTING.ko.md)
-
 Issues and pull requests are welcome. You can write them in English or Korean.
-User-facing guides use English as their reference language and provide Korean
-translations. Existing design specifications remain in Korean. Participation follows our
+Project and package guides use English as their reference language and provide
+Korean translations. Design specifications are in Korean. Participation follows our
 [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Before starting
@@ -36,15 +34,15 @@ npm ci --ignore-scripts
 npx playwright install chromium
 ```
 
-Use a Node.js version from the [CI matrix](.github/workflows/core.yml). The
-[workspace scripts](package.json) and [verification table](#verification) describe
+Use a Node.js version from the [CI matrix](.github/workflows/ci.yml). The
+[workspace scripts](package.json) and [verification table](docs/verification.md#choose-checks-by-change) describe
 the package checks relevant to your change.
 
 ## Working with the project contracts
 
-Start with the [documentation map](docs/README.md) and follow the specifications
-for the area you change. The [implementation guide (Korean)](docs/handoff/implementation-start.md)
-explains how contracts, acceptance mappings, and verification evidence are maintained.
+Use the [documentation map](docs/README.md) to find the owner of the area you
+are changing. The [architecture guide (Korean)](docs/architecture.md) explains
+the implementation boundaries and links to the current contracts.
 
 - Keep core independent of DOM, frameworks, and application-specific business rules.
 - Preserve cancellation, ownership, validation, and authorization boundaries.
@@ -60,11 +58,11 @@ explains how contracts, acceptance mappings, and verification evidence are maint
 
 ## Documentation languages
 
-The root, package, and example READMEs, documentation guide, and
-community policies use English in the default file and Korean in a sibling
-`*.ko.md` file. Each pair links to the other language at the top. Keep both
-versions aligned in the same change, including examples, commands, and support
-limits. Link to the matching language when a translation exists.
+Repository README files may have a paired `README.ko.md`. Keep commands,
+examples, and support limits aligned between each pair. Other repository
+Markdown files have a single source language. Link to that source from both
+documentation maps. The site maintains its English and Korean pages under
+the [site content routes](apps/docs/README.md#hand-authored-documentation).
 
 Design specifications, implementation handoffs, and historical verification
 records retain their existing language and ownership. Mark links to Korean-only
@@ -74,27 +72,7 @@ their original form.
 
 ## Verification
 
-Run checks that cover the changed behavior. CI checks Node compatibility on both
-configured versions and runs the full browser suite on one representative version.
-See the [CI guide](docs/ci.md) for jobs and the time budget. The
-commands below identify the relevant local gates.
-
-| Change | Checks |
-|---|---|
-| Core behavior or contracts | `npm run check`; add `npm run test:browser` for browser behavior |
-| Core package contents, declarations, or package README | `npm run build` then `npm run test:package` |
-| DOM renderer, connectors, or CSS scoping | `npm run check:dom`. For package exports or independent consumers, build all four packages and run `npm run test:dom:package`. |
-| Svelte renderer or its example | `npm run check:svelte` |
-| Browser UI catalog, generated contracts, styles, or fixtures | `npm run check:ui` |
-| Website UI, content, navigation, or examples | Follow the [website maintenance guide](apps/docs/README.md#choose-checks-by-the-changed-boundary) for source owners and targeted checks |
-| CI configuration | `npm run test:ci`; validate workflow syntax and run the affected browser checks described in the [CI guide](docs/ci.md) |
-| Package metadata or license files only | Build the affected package and run its installed-package check. Use `npm run test:package` for Core, `npm run test:dom:package` for DOM (after building all four packages), or `npm run test:svelte:package` for Svelte. For UI, run `npm run check:ui` and inspect `npm pack --dry-run -w @viewstem/ui`. |
-| Community documentation or templates only | Check links, examples, JSON/YAML syntax where applicable, and `git diff --check` |
-
-Tests that render Svelte or UI components consume built package exports. Rebuild
-the affected packages before running a browser test directly. Report the commands
-and results in your pull request, including any checks you could not run. Do not
-describe a skipped check or a written scenario as a passing test.
+Use the [verification guide](docs/verification.md#choose-checks-by-change) to choose checks for your change. Include the executed commands and results in your PR.
 
 ## Pull requests
 
@@ -112,7 +90,7 @@ The submitter must understand the change, verify its behavior, check its sources
 and submission rights, and respond to review feedback. Do not submit unreviewed
 generated changes or claim checks that were not run.
 
-For npm package changes, see [Writing a changeset](docs/ci.md#writing-a-changeset)
+For npm package changes, see [Writing a changeset](docs/releasing.md#writing-a-changeset)
 for when to add a changeset and what to include.
 
 ## Contribution licensing

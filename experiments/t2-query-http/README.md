@@ -41,12 +41,12 @@ macOS arm64의 Node 22.21.1·24.19.0에서 각각 **39/39 통과, 고의 결함 
 
 요청과 응답은 실제 네트워크를 거치지만 시간은 주입한 clock으로 제어한다. 운영 네트워크의 지연·부하·성능·모든 순서 조합을 증명하지 않는다. 이미 진행 중인 계획을 gate 변경 때 반드시 물리적으로 중단한다는 새 계약을 만들지 않으며, 결과 게시/후속 pending 실행을 차단하는 기존 의미를 검증한다.
 
-[계약별 결과와 남은 범위](../../docs/handoff/t2-query-http-2026-10-30.md)를 따른다. 이 실험은 production 구현 완료를 뜻하지 않으며, 현재 구현 시작·커밋 범위는 [U36 인수인계](../../docs/handoff/implementation-start.md#새-채팅에서-시작할-때)를 따른다.
+[계약별 결과와 남은 범위](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-query-http-2026-10-30.md)를 따른다. 이 실험은 production 구현 완료를 뜻하지 않으며, 현재 구현 시작·커밋 범위는 [U36 인수인계](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/implementation-start.md#새-채팅에서-시작할-때)를 따른다.
 
 ## U30 공유 스케줄러 변경 후 회귀
 
-[복합 Query·polling 보완](../../docs/handoff/t2-composite-polling-2026-10-30.md)에서 공유 Query 스케줄러에 fresh metadata·정제 오류 위치/resource·owner 해제 hook이 추가돼 이 연결 검사를 다시 실행했다. Node 22/24 각각 39/39·고의 결함 4/4를 유지한다. 현재 결과는 U30 소스 해시이며 [U29 당시 소스·결과](../t2-composite-query/archive/u30-development/README.md)도 보존했다.
+[복합 Query·polling 보완](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-composite-polling-2026-10-30.md)에서 공유 Query 스케줄러에 fresh metadata·정제 오류 위치/resource·owner 해제 hook이 추가돼 이 연결 검사를 다시 실행했다. Node 22/24 각각 39/39·고의 결함 4/4를 유지한다. 현재 결과는 U30 소스 해시이며 [U29 당시 소스·결과](../t2-composite-query/archive/u30-development/README.md)도 보존했다.
 
 ## U31 공유 Query 회귀
 
-[재개 계약](../../docs/handoff/t2-polling-resume-2026-10-30.md)의 pending 의도 구분으로 공유 Query 소스가 바뀌어 Node 22/24 각각 39/39·고의 결함 4/4를 재실행했다. HTTP 실행기는 바꾸지 않았다. 현재 결과는 U31 공유 소스 해시를 담으며 [U30 최종 소스·결과](../t2-query-polling/archive/u30-before-resume/README.md)는 별도 보존한다. 이 suite 자체는 polling 타이밍 검사와 구별한다.
+[재개 계약](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-polling-resume-2026-10-30.md)의 pending 의도 구분으로 공유 Query 소스가 바뀌어 Node 22/24 각각 39/39·고의 결함 4/4를 재실행했다. HTTP 실행기는 바꾸지 않았다. 현재 결과는 U31 공유 소스 해시를 담으며 [U30 최종 소스·결과](../t2-query-polling/archive/u30-before-resume/README.md)는 별도 보존한다. 이 suite 자체는 polling 타이밍 검사와 구별한다.

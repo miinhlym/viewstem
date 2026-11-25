@@ -7,23 +7,18 @@
 라이브러리 사용 문서는 [src/content/docs](src/content/docs)에 있으며, 이 안내는
 사이트 자체를 유지보수하는 기여자를 위한 것이다.
 
-제품 결정의 기준은 [사이트 계약](../../docs/VIEWSTEM-SPEC.md#34-공개-문서와-playground-배포)과
-[결정 이력](../../docs/history/decision-register.md)이다. 이 안내는 그 결정을
-구현 위치와 검증에 연결한다. 라이브러리 명세를 대체하거나 과거 리뷰 결과를
-현재의 보장으로 취급하지 않는다.
+사이트 동작은 아래 계약을 따릅니다. 미리보기와 운영 배포는 [릴리스 안내](../../docs/releasing.md#deploy-the-site)에서 관리합니다.
 
 ## 로컬 실행
 
-지원 중인 Node.js 릴리스 계열의 22.12 이상을 사용한다. 저장소 루트에서 실행한다.
+Node.js 22.23.4 이상의 22.x 계열 또는 24 이상을 사용한다. 저장소 루트에서 실행한다.
 
 ```sh
 npm ci
 npm run dev:docs
 ```
 
-`predev`가 미리보기에 쓰는 라이브러리 패키지를 빌드한다. `npm ci`는 저장소의
-[의존성 패치](../../patches)도 적용한다. `--ignore-scripts`로 설치했다면 타입
-검사 전에 `npx patch-package --error-on-fail`을 실행한다. 포트가 사용 중이면
+`predev`가 미리보기에 쓰는 라이브러리 패키지를 빌드한다. 포트가 사용 중이면
 달라질 수 있으므로 Astro가 출력한 주소를 확인한다. 작업을 마치면 자신이 실행한
 서버를 Ctrl+C로 종료한다.
 
@@ -39,96 +34,49 @@ npm run preview -w @viewstem/docs -- --port 4323
 [wrangler.jsonc](wrangler.jsonc)는 Workers Static Assets 설정이다. `dist`나
 `.astro` 결과물을 직접 수정하거나 커밋하지 않는다.
 
+## 사이트 동작 계약
+
+공개 문서 사이트는 **Astro와 Starlight**로 구축한다. Starlight가 영·한 문서 탐색과 검색을 맡고, 같은 사이트의 `/playground/`에서 Svelte로 만든 편집·실행 화면을 제공한다. [D106](../../docs/decisions.md#a-현재-채택한-결정)
+
+공개 문서의 좌측 메뉴는 시작하기, 핵심 개념, 가이드, 레퍼런스 안내, DSL 레퍼런스, @viewstem/core, @viewstem/dom, @viewstem/ui, @viewstem/svelte로 구성한다. 핵심 개념은 View와 Component, 값과 입력, State, 계산된 값, 이벤트와 Action, Query와 데이터, 조건과 목록, Component 재사용, 리소스와 타입의 9개 페이지로 구성한다. 각 페이지에서 정의·최소 코드·예상 결과·주요 실행 의미를 설명하고 대표 실습을 연결한다. 읽기 순서는 좌측 메뉴와 하단 이전·다음 탐색으로 제공하며, 개념 설명을 예제 링크 목록으로 대체하지 않는다. [조사와 페이지별 구성](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/docs-core-concepts-2026-11-05.md), [D110](../../docs/decisions.md#a-현재-채택한-결정)을 따른다. 문서 본문의 제목에서 페이지 목차를 만들고, 정적 빌드에서 Pagefind 검색 색인을 생성한다. [D108](../../docs/decisions.md#a-현재-채택한-결정)
+
+패키지 문서는 개요 → 작업별 사용 가이드 → 상세 API 레퍼런스 순서로 구성한다. 공개 export·타입·구현을 기준으로 시그니처, 옵션·기본값, 반환값, 오류와 수명을 한국어·영어로 제공한다. DSL은 리소스와 표현식의 필드 계약을 별도로 설명한다. `@viewstem/ui`는 한·영 개요, 브라우저 마운트 가이드, API와 66개 계열 상세 페이지를 제공한다. 입력·슬롯·이벤트 표는 UI 패키지의 지원 메타데이터에서 생성한다. [D144](../../docs/decisions.md#a-현재-채택한-결정)
+
+공개 문서의 상세 API 페이지는 상위 경로와 현재 메뉴 위치를 표시한다. UI의 지원 계열 66개를 좌측 컴포넌트 메뉴에 모두 나열하고, 현재 항목 표시·같은 언어의 인접 계열 이동을 제공한다. 각 계열 상세 페이지에는 실제 공개 렌더러로 실행되는 미리보기와 동일한 View JSON, 앱 등록 예제를 함께 제공한다. [D122](../../docs/decisions.md#a-현재-채택한-결정)를 따른다. 제목 크기는 h1 → h2 → h3 → h4 순서를 유지하고, 참조 표보다 목적·사용 예제를 먼저 설명한다. 일반 HTML·SVG 입력과 큰 중첩 타입은 펼침 영역으로 분리하되 지원 계약을 생략하지 않는다. 공통 헤더의 테마 선택은 밝게·어둡게·시스템 설정을 지원하며 모든 사이트 진입점에서 같은 선택을 적용한다. [D117](../../docs/decisions.md#a-현재-채택한-결정), [사이트 리뷰](review/2026-11-05/review.md)를 따른다.
+
+`@viewstem/ui`의 계열 상세 페이지는 컴포넌트 이름과 역할 설명에 이어 기본 예제, 사용법, 추가 예제, JSON 레퍼런스 순서로 제공한다. 목차는 본문 순서를 따른다. 사용법에 기본 예제의 View JSON과 짝을 이루는 실행 코드를 바로 표시하고 코드 블록 헤더에서 복사할 수 있게 한다. 추가 예제는 미리보기·JSON·실행 코드 탭에서 조작·확인·복사한다. 참조 표의 제약은 해당 타입 아래에 표시한다. 미리보기는 Vega·Neutral 스타일로 실행한다. [D142·D146·D147](../../docs/decisions.md#a-현재-채택한-결정), [공식 예제 조사](review/2026-11-11/shadcn-example-comparison.md)를 따른다.
+
+설명할 차이가 있는 변형은 기본 예제 아래에 별도 제목으로 제공하고 목차에서 바로 연결한다. 66개 계열의 한·영 상세 문서에 기본 예제에서 다루지 않는 입력·상태·조합을 보여 준다. 같은 입력의 차이는 비교 묶음으로, 구조나 조작이 달라지는 경우는 독립 예제로 제공한다. 각 묶음은 하나의 View JSON으로 실행·표시·복사하며, 하단 미리보기는 화면에 들어올 때 실행한다. [D143·D145](../../docs/decisions.md#a-현재-채택한-결정), [검토 결과](review/2026-11-11/component-example-variants/concepts_brief.md#goldfish-검토-종합)를 따른다.
+
+`shadcn.Slider`의 다중 모드는 `value` 배열의 숫자마다 손잡이를 렌더링한다. 손잡이는 오름차순을 유지하고 `thumbLabels`로 각각 이름을 붙일 수 있다. `valueChange`와 `valueCommit`은 다중 모드에서 전체 배열을, 단일 모드에서 숫자를 전달한다. [D148](../../docs/decisions.md#a-현재-채택한-결정)을 따른다.
+
+사이트 자체의 기본 UI는 공식 Astro 설치 방식의 shadcn-svelte로 통일한다. 공식 CLI가 생성한 원본 부품을 사용하고 React 런타임·통합·관련 의존성은 포함하지 않는다. `apps/docs/src/components/ui`의 사이트용 컴포넌트와 Neutral 테마를 사용하고, 헤더·검색·사이드바·목차·메뉴·페이지 탐색·예제 파일 탭·Playground 조작부를 포함한다. 문서·Examples·Playground에서 선언형 JSON을 실행하는 영역은 `@viewstem/ui`를 사용한다. CodeMirror 편집기와 문서 본문은 각각 편집·읽기 역할을 유지하며 사이트 테마 토큰을 따른다. D127의 React 구현 선택을 대체하며 기존 디자인·한영·모바일·테마·사이드바 스크롤 및 D142 예제 탭의 동작은 유지한다. [D130](../../docs/decisions.md#a-현재-채택한-결정), [적용 범위·검증](review/2026-11-06/site-svelte.md)을 따른다.
+
+미리보기·JSON 탭은 같은 예제를 표시한다. 탭을 전환해도 실행 상태는 보존되고, 다시 실행하면 초기 상태로 돌아간다. JSON 탭과 복사 버튼은 초기 선언을 사용한다. JavaScript 없이도 초기 JSON과 앱 연결 코드를 읽을 수 있다. [D142](../../docs/decisions.md#a-현재-채택한-결정)를 따른다.
+
+
+홈·예제·Playground·문서는 동일한 공통 헤더를 사용한다. 로고, 문서·예제·Playground 탐색, GitHub, 현재 페이지를 유지하는 언어 전환을 공유하고 문서에만 검색과 모바일 문서 메뉴를 추가한다. 모바일에서는 공통 탐색 아래에 문서 도구 행을 둔다. [D111](../../docs/decisions.md#a-현재-채택한-결정)
+
+사이트 전체의 한글·영문 제목·본문·UI는 Pretendard, 코드와 편집기는 D2Coding을 사용하며 코드 합자는 끈다. 기본 서체에 없는 기호는 Noto Sans Symbols 2로 보완하고 이모지는 운영체제 컬러 이모지, UI 아이콘은 SVG를 사용한다. 웹폰트와 라이선스는 사이트에 포함하며 이 선택은 라이브러리 소비자의 폰트를 강제하지 않는다. 페이지 제목·공통 메뉴에 필요한 Pretendard 부분 파일과 기본 코드 폰트를 미리 요청하고, 본문·코드 폰트가 늦게 도착하면 현재 화면에서 대체 폰트를 유지해 읽는 중 위치가 바뀌지 않게 한다. 보조 기호 폰트는 시스템 문자 폰트 뒤에서 누락 기호를 보완한다. [D118](../../docs/decisions.md#a-현재-채택한-결정) [D112](../../docs/decisions.md#a-현재-채택한-결정)
+
+사이트의 설명과 탐색에는 장식용 뱃지·반복 카드를 사용하지 않고 제목, 여백, 필요한 구분선으로 위계를 표현한다. 홈의 실행 흐름은 순서 목록, 특징은 열린 단락, 예제 진입은 텍스트 링크 목록으로 구성한다. 문서의 이전·다음 탐색은 구분선 아래 방향별 링크로 제공한다. 실행 화면·코드·팝오버의 기능적 경계와 라이브러리 사용법을 보여 주는 예제의 Card·Badge는 유지한다. [D113](../../docs/decisions.md#a-현재-채택한-결정)
+
+사이트 모션은 상태 변화와 탐색 방향을 이해하도록 보조한다. 홈의 일부 주요 영역에 한 번만 진입 효과를 적용하고 필터 변경, 실행 결과 교체, 메뉴·검색 열림, 앵커 목적지에 짧은 피드백을 제공한다. 상태 변경·입력·탐색은 애니메이션 완료를 기다리지 않으며, 본문을 기본적으로 숨기거나 모든 문단에 반복 진입 효과를 적용하지 않는다. `prefers-reduced-motion`에서는 모션을 생략하고 실행 중인 자체 모션도 취소한다. [D114](../../docs/decisions.md#a-현재-채택한-결정)
+
+문서와 예제의 이전·다음은 같은 방향별 탐색 표현을 사용하며 모바일 예제는 실행 결과 아래에서 다음 실습으로 이어진다. 모바일 예제 목록은 본문에서 한 번만 제공한다. Playground는 빈 상태의 첫 예제·시작 문서 연결, 수동 실행 안내와 미실행 변경 표시, 같은 탭의 언어 전환에도 보존되는 초안을 제공한다. 복원한 초안은 자동 실행하지 않는다. 한국어 문서 검색·코드 복사 UI도 한국어로 제공한다. [D115](../../docs/decisions.md#a-현재-채택한-결정), [검토·검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/docs-site-consistency-2026-11-05.md)을 따른다.
+
+시작하기의 문서 순서는 개요, 설치, 빠른 시작이다. 개요와 빠른 시작에서 브라우저 예제로 갈 수 있다. 설치에서 패키지 준비를 다루고, 빠른 시작에서는 브라우저에서 `@viewstem/ui`로 첫 View를 실행한다. [D109](../../docs/decisions.md#a-현재-채택한-결정)
+
+공개 Playground는 하나로 제공한다. 브라우저에서 `@viewstem/ui`로 View JSON을 실행하고, 편집한 내용은 사용자가 실행할 때 적용한다. [D144](../../docs/decisions.md#a-현재-채택한-결정)
+
+공개 홈은 제품 소개, 고객 목록 실행 흐름, 주요 특징, 브라우저 UI 연동, 폼·대시보드 가이드, 문서 진입 순으로 구성한다. 주 버튼은 첫 View를 실행하는 Quickstart로 연결한다. [D107](../../docs/decisions.md#a-현재-채택한-결정)
+
 ## 사이트 배포
 
-[Docs preview 워크플로](../../.github/workflows/docs-preview.yml)는 이 저장소의
-브랜치에서 `main`을 대상으로 연 PR의 head를 빌드한다. 전용 `viewstem-preview`
-Worker에서 PR마다 `pr-<번호>`를 만들고
-`https://pr-<번호>-viewstem-preview.miinhlym.workers.dev`로 제공한다. 공개 주소에서
-이번 빌드가 확인되면 PR별 배포 이력을 남기고, 댓글 하나에 미리보기 링크와 커밋,
-실행 링크를 갱신한다. PR을 닫거나 머지하거나 대상을 `main` 이외로 바꾸면 해당
-프리뷰를 삭제하고 배포를 비활성으로 표시한 뒤 기존 댓글을 갱신한다. PR을 다시
-열거나 대상을 `main`으로 되돌리면 미리보기를 다시 만든다. 포크 PR은 위의 로컬
-미리보기 절차를 사용한다.
+PR 미리보기와 운영 배포는 [릴리스 안내](../../docs/releasing.md#deploy-the-site)를 따릅니다.
 
-삭제에 실패하면 PR이 여전히 닫혀 있거나 대상이 `main` 이외인지 확인한 뒤 실패한
-정리 잡을 재실행한다. PR을 닫을 때 기본 브랜치에 정리 워크플로가 없었다면 관리자가
-저장소 루트에서 `npx --no-install wrangler preview delete --config apps/docs/wrangler.jsonc
---worker-name viewstem-preview --name pr-<번호>`로 해당 프리뷰를 삭제할 수 있다.
-
-[Deploy docs](../../.github/workflows/docs-release.yml)는 실행 커밋의
-[사이트 매니페스트](package.json)에 고정된 정확한 공개 npm 버전으로 빌드한다.
-패키지를 워크스페이스 바깥에 설치하고 링크를 검사한 뒤, 예제와 Playground를
-Chromium에서 실행해 `viewstem`에 배포한다.
-[Astro의 `site` 설정](astro.config.mjs)이 사이트맵에 쓸 공개 주소를 지정한다.
-
-### 패키지 릴리스와 별도로 문서 배포
-
-문서와 관련 패키지 코드는 평소처럼 PR을 통해 `main`에 머지한다. 문서만 머지한
-변경은 다음 패키지 릴리스에 포함된다. 사이트를 별도로 배포하려면 **Actions → Deploy docs
-→ Run workflow**에서 `main`을 선택한다. GitHub가 요청 시점의 소스 SHA를 고정하고,
-그 커밋의 사이트 매니페스트에서 패키지 버전을 읽는다. 실행할 때는 브랜치만 선택한다.
-
-현재 운영 배포에 기록된 패키지 릴리스 커밋은 안전성 검사의 시작점이다.
-그 기준부터 후보 커밋까지 첫 번째 부모 이력을 전부 확인한다. 사이트 변경과 범위가
-명시된 CI·배포 유지보수 파일을 허용한다.
-패키지 변경, changeset 추가, 루트 의존성 변경, 안전성을 입증할 수 없는 경로가 있으면
-중단한다. 패키지 버전이 그대로거나 변경을 나중에 되돌려도 이력을 검사한다.
-운영 기준이 없거나 검사에 막혔다면 다음 패키지 릴리스의 문서 잡을 사용한다.
-실행 전에 공개 API로 설명할 수 있는 문서인지 리뷰한다. 브라우저 검사는 실행 가능한
-예제와 Playground를 확인한다.
-
-예를 들어 기준 이후 사이트만 바뀌었다면 설치 가이드 수정은 기존 공개 패키지로
-배포할 수 있다. 그 사이 Core 기능 코드도 머지됐다면, Core 버전이 그대로이고
-예제가 통과하더라도 수동 배포 전체를 중단한다.
-
-### 패키지 릴리스 및 운영 설정
-
-npm 배치 전체의 발행이 성공하면 릴리스 워크플로가 같은 커밋에서 **Deploy docs**를
-호출한다. Changesets는 릴리스에 포함된 사이트 의존성의 고정 버전도 갱신한다.
-예를 들어 UI만 릴리스하면 사이트는 `core@0.1.0`, `dom@0.1.0`과
-`ui@0.1.1`을 함께 사용할 수 있다. 두 배포 경로 모두 각 공개 npm 아카이브에 기록된
-소스 커밋의 패키지 트리를 배포 후보와 대조한다. 이번 npm 배치에 포함된 패키지의
-소스는 릴리스 커밋이어야 한다. 미발행 변경이 있으면 해당 패키지 릴리스까지 문서 배포를
-중단한다.
-태그와 GitHub Release는 별도 잡에서 발행 기록으로 남긴다.
-npm 호출자는 공개 배치를 `released_packages`의 `registry`, `name`, `version` 항목으로
-전달한다. 레지스트리 검사는 pub.dev 아카이브도 확인할 수 있다. 저장소에 다른
-레지스트리용 패키지를 추가할 때는 문서 배포 전에 해당 디렉터리의 소스 증명도 연결한다.
-각 재사용 호출에서 `CLOUDFLARE_PRODUCTION_API_TOKEN`
-시크릿 이름을 넘기고, 값은 `docs-production` 환경에 둔다.
-
-자동과 수동 배포는 운영 큐 하나를 공유한다. Cloudflare 버전 메타데이터와 공개
-`/_viewstem-deploy.json`에 패키지 릴리스 기준과 실제 사이트 커밋을 기록한다.
-최초 `0.1.0` 배포의 Cloudflare 메타데이터에 있는 단일 SHA는 두 커밋을 함께 가리킨다.
-운영에 더 최신 커밋이 있으면 이전 실행을 건너뛰고, 업로드 직전에 활성 Cloudflare
-버전도 확인한다. 공개 사이트 검사에 성공하면 GitHub Deployments에 기록한다.
-활성 Worker 버전에 소스 메타데이터가 없으면 이전에 검증한 메타데이터 포함 버전으로
-복구한 뒤 재시도한다. 배포 순서를 확인하는 데 이 메타데이터가 필요하다.
-
-사이트만 실패하면 기존 릴리스 실행의 **Build, verify, and deploy docs** 잡에서
-**Re-run jobs**를 선택한다.
-배포 기록만 실패한 경우에도 앞선 문서 배포 잡을 실행해 공개 사이트를 다시 확인한다.
-GitHub는 잡 재시도 시 원래 SHA와 이미 성공한 패키지 발행 결과를 사용한다.
-레지스트리의 `latest`가 바뀐 뒤에도 고정된 공개 버전을 사용한다. 운영에 더 최신
-사이트 커밋이 있으면 이 실행은 배포를 건너뛴다.
-[GitHub 잡 재시도 안내](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/re-run-workflows-and-jobs#re-running-a-specific-job)
-
-저장소 변수 `CLOUDFLARE_ACCOUNT_ID`에는 `miinhlym.workers.dev`를 소유한 계정을
-설정한다. `docs-production` 환경의 배포 브랜치 규칙에서는 기본 브랜치(`main`)만
-허용한다. 저장소에서 GitHub Actions를 활성화한다. 워크플로가 기본 브랜치에 들어간
-뒤 **Run workflow**가 표시된다. **Individual Workers Editor** 토큰은 각각 아래
-Worker에 대한 권한으로 제한하고 대상 GitHub Actions 환경에 둔다.
-
-| 환경 | 시크릿 | Cloudflare Worker |
-| --- | --- | --- |
-| `docs-preview` | `CLOUDFLARE_PREVIEW_API_TOKEN` | `viewstem-preview` |
-| `docs-production` | `CLOUDFLARE_PRODUCTION_API_TOKEN` | `viewstem` |
-
-업로드 이후 공개 검사에 실패하면 Actions 실행 요약에 있는 이전 Cloudflare 버전 ID로
-`viewstem` Worker의 **Deployments**에서 사이트를 복구한다. `/_viewstem-deploy.json`과
-설치 페이지에서 확인한 뒤 수정 PR을 머지한다.
-[Cloudflare 롤백 절차](https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/)
+<a id="패키지-릴리스와-별도로-문서-배포"></a>
+<a id="패키지-릴리스-및-운영-설정"></a>
 
 ## 수정 위치 찾기
 

@@ -7,6 +7,8 @@ sidebar:
 
 A View is one executing screen with its own State, Query and event lifetimes. Obtain it from `runtime.createView()`; a renderer builds a UI from its snapshots.
 
+See [Runtime and rendering lifetimes](../../guides/runtime-and-rendering/) for display ownership, completion, and cancellation.
+
 ## Observe a View
 
 | Method | Signature and behavior |

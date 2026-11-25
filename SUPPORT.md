@@ -1,7 +1,5 @@
 # Support
 
-English | [한국어](SUPPORT.ko.md)
-
 Use [GitHub Issues](https://github.com/miinhlym/viewstem/issues) for usage questions,
 bug reports, and feature proposals. English and Korean are both welcome. Search
 existing discussions in issues before opening another one. For a bug, include the
@@ -33,7 +31,7 @@ Use the relevant package's documentation for its public contract and limitations
 - [Svelte](packages/svelte/README.md): Svelte 5 client renderer and explicit registration.
 - [UI](packages/ui/README.md): browser renderer and default JSON component catalog.
 
-The [CI workflow](.github/workflows/core.yml) defines the tested Node matrix.
+The [CI workflow](.github/workflows/ci.yml) defines the tested Node matrix.
 Current browser evidence covers Chromium. It does not establish Firefox, WebKit,
 SSR/hydration, or real mobile gesture support. See the
 [documentation map](docs/README.md) for current verification records.

@@ -4,11 +4,10 @@
 
 ## 먼저 읽을 문서
 
-1. `docs/README.md`: 문서 지도와 읽는 순서.
-2. `docs/VIEWSTEM-SPEC.md`: 현재 설계 계약. 세부 계약은 여기에서 연결하는 `docs/spec/` 문서를 따른다.
-3. `docs/handoff/`: 구현 상태, 남은 구체화 사항, 단계별 검증 기준.
-4. `docs/history/`: 결정 배경과 기각·대체된 안. 과거 안을 현재 계약으로 복원하지 않는다.
-5. `context-archive/`: 로컬에 보존한 관련 대화 및 원본 스냅샷. 존재할 경우 상세 근거 확인에 사용한다. 공개 문서만으로도 현재 계약을 이해할 수 있어야 한다.
+1. `docs/README.md`: 패키지 사용과 저장소 변경의 문서 진입점.
+2. `docs/architecture.md`: 구현 경계. `docs/VIEWSTEM-SPEC.md`와 연결된 명세에서 현재 제품 계약을 확인한다.
+3. `docs/verification.md`: 변경 범위별 검사와 검증 자료의 재현 기준.
+4. `docs/releasing.md`: 패키지 및 사이트 배포 절차. 사이트 내용과 동작은 `apps/docs/README.md`에서 시작한다.
 
 ## 설계와 구현 원칙
 

@@ -76,7 +76,7 @@ U25의 P51은 U26에서 수정했다. 전체 @path를 정적 이름과 구분하
 
 U26의 P61은 U27에서 수정했다. path 평가 후 기존 주소 문법·공통 경로·목적지 권한 검사를 거친다. 주소 확정 전에는 secret resolver를 제공하지 않고 승인된 목적지를 요청 구성용 resolver에 전달하며 최종 query URL도 재검사한다. Node 22/24 각각 HTTP 260/260, Node/Chromium 전송 대조 146/146을 통과했다.
 
-U27의 P71은 U28에서 수정했다. baseUrl·method·Login request 전체 평가와 공통 표현식의 형태·@@ escape·formatString·경로 오류 구분을 보완했다. 기존 주소/권한/헤더/취소 검사와 반환 데이터 비재실행을 유지한다. [17개 위치 전체 점검과 남은 범위](../../docs/handoff/t2-path-audit-2026-10-30.md)에 근거를 기록했다. 기존 계약 위반은 추가 질문 없이 수정·검증하고 실제 선택이 필요한 경우만 논의한다.
+U27의 P71은 U28에서 수정했다. baseUrl·method·Login request 전체 평가와 공통 표현식의 형태·@@ escape·formatString·경로 오류 구분을 보완했다. 기존 주소/권한/헤더/취소 검사와 반환 데이터 비재실행을 유지한다. [17개 위치 전체 점검과 남은 범위](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-path-audit-2026-10-30.md)에 근거를 기록했다. 기존 계약 위반은 추가 질문 없이 수정·검증하고 실제 선택이 필요한 경우만 논의한다.
 
 ## 후속 Query 연결
 

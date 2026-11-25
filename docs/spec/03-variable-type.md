@@ -6,7 +6,7 @@
 
 **예시 해석:** 아래 발전소·날씨·협력사 등의 명칭은 이전 논의의 설명용 예시다. `example.com` 계열 주소와 임의 ID만 사용하며 실제 회사 API·비밀값·기본 등록 리소스가 아니다. core는 이 도메인에 의존하지 않는다.
 
-값 연결용 `@path/@call`과 Variable 내부의 CEL은 별도 역할이다. CEL 및 `spec.expression`은 확정이고, 라이브러리 구현체·지원 함수 목록·직렬화 세부는 미결이다.
+값 연결용 `@path/@call`과 Variable 내부의 CEL은 별도 역할이다. Variable은 `spec.expression`에서 CEL을 사용한다. JS/TS 실행기·함수·값 변환의 지원 범위는 [Core CEL](../core-cel.md)을 따른다.
 
 2026-10-29 복원한 [값 표현·시간·비교·읽기 보호·날짜 상세](10-value-contracts.md)는 이 문서의 계약에 포함된다. 이미 승인한 의미와 CEL/JSON/JS/Dart에 연결할 구현 상세를 구별한다.
 
@@ -42,13 +42,13 @@
 
 **확정·검증(U24):** 배열 크기는 Variable의 CEL에서 `size(items)` 또는 `items.size()`로 계산한다. 여기서 items는 Value 포트 이름이며 `/ports/items/length`로 JS 속성을 읽는 방식으로 대체하지 않는다. 목록 개수 표시에는 `size(items)`, 빈 목록 판정에는 `size(items) == 0`, 선택 수 제한에는 `size(items) <= 2`처럼 사용한다. 이는 [CEL의 표준 목록 연산](https://github.com/cel-expr/cel-spec/blob/master/doc/langdef.md#list-operators)이며 새 커스텀 함수가 필요하지 않다.
 
-고정된 `@marcbachmann/cel-js@8.0.0`에서 두 호출 문법·빈 배열·중복/null 원소·중첩/객체 배열·필터 결과·조건식을 [독립 실행](../../experiments/t1-values/array-size-tests.mjs)했다. Node 22.21.1·24.19.0 각각 18/18 통과했고, count의 CEL int 결과(BigInt)를 기존 안전 정수 어댑터로 JS number에 변환했다. 10,000개 입력은 기능 사례이며 성능·비용 상한 증거가 아니다. [실험 기록](../handoff/t2-http-boundary-2026-10-29.md)을 따르며 실제 Variable/Derived 연결·Dart·브라우저 CEL·native Set/Map 지원까지 이 검사로 입증하지 않는다.
+고정된 `@marcbachmann/cel-js@8.0.0`에서 두 호출 문법·빈 배열·중복/null 원소·중첩/객체 배열·필터 결과·조건식을 [독립 실행](../../experiments/t1-values/array-size-tests.mjs)했다. Node 22.21.1·24.19.0 각각 18/18 통과했고, count의 CEL int 결과(BigInt)를 기존 안전 정수 어댑터로 JS number에 변환했다. 10,000개 입력은 기능 사례이며 성능·비용 상한 증거가 아니다. [실험 기록](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-http-boundary-2026-10-29.md)을 따르며 실제 Variable/Derived 연결·Dart·브라우저 CEL·native Set/Map 지원까지 이 검사로 입증하지 않는다.
 
 ### 시간 의존 계산과 다른 Variable 재사용
 
 **보존할 확정 의미:** 현재 시각을 계산 입력으로 공급하고, 그 시간이 바뀌면 의존 계산을 다시 평가하는 기능은 CEL 도입 뒤에도 유지한다. 시간도 명시적인 Value 입력 연결로 전달하며 CEL이 주변 Store나 숨은 전역 clock을 읽는 두 번째 계산 모델을 만들지 않는다. 공급 API는 U13의 Clock 계약을 따르고 주기는 명시 공급자가 소유한다. 시간대·달력 경계는 [U14의 명시 업무 시간대](10-value-contracts.md#명시-업무-시간대와-달력-연산)를 따른다. 이 결정으로 서비스가 관리하는 선택 날짜/시간이나 LIVE 상태를 core가 자동 변경한다고 해석하지 않는다. [E53]
 
-다른 Variable의 계산 결과를 `inputs`로 전달해 재사용하는 연결도 유지한다. CEL 식 안의 중첩 연산이 리소스 ID 참조를 자동 해결하는 것은 아니다. 정의 참조와 입력 연결은 Viewstem이, 전달된 값의 계산은 CEL이 담당한다. 자세한 [시간 입력과 재평가 경계](10-value-contracts.md#시간-입력과-재평가)를 따른다. [E53]
+예를 들어 Derived `count`가 계산한 값을 다른 Variable 사용의 `inputs: { total: { "@path": "/states/count" } }`로 전달한다. 두 번째 Variable은 `total` Value 포트를 선언한다. CEL 식 안의 중첩 연산이 리소스 ID 참조를 자동 해결하는 것은 아니다. 정의 참조와 입력 연결은 Viewstem이, 전달된 값의 계산은 CEL이 담당한다. 자세한 [시간 입력과 재평가 경계](10-value-contracts.md#시간-입력과-재평가)를 따른다. [E53]
 
 ## 10.7 Type: 선택적 공통 데이터 형태
 
@@ -79,7 +79,7 @@
 }
 ```
 
-포트의 required:boolean은 입력 존재 여부, schema 안의 required:string[]은 객체의 필수 속성을 뜻한다. schema/typeRef와 포트 kind를 분리하여 충돌을 없앤다. typeRef는 독립 Type ID이고 JSON Schema 내부 $ref와 혼합하지 않는다. schema.default는 초기화 명령이 아니며 readOnly는 실행 권한이 아니다. native Set/Map·날짜와 JSON/CEL/JS/Dart 간 변환은 기존 요구를 보존하며 적합성으로 검증한다. 단, [Query 서비스 콜백 직전 Set/Map 재귀 변환의 형태와 책임](09-preserved-contracts.md#query-서비스-콜백의-컬렉션-변환)은 이미 확정된 경계이며 다시 미결로 돌리지 않는다. [E47]
+포트의 required:boolean은 입력 존재 여부, schema 안의 required:string[]은 객체의 필수 속성을 뜻한다. schema/typeRef와 포트 kind를 분리하여 충돌을 없앤다. typeRef는 독립 Type ID이고 JSON Schema 내부 $ref와 혼합하지 않는다. schema.default는 초기화 명령이 아니며 readOnly는 실행 권한이 아니다. native Set/Map·날짜와 JSON/CEL/JS/Dart 간 변환은 기존 요구를 보존하며 적합성으로 검증한다. 단, [Query 서비스 콜백 직전 Set/Map 재귀 변환의 형태와 책임](01-datasource-auth.md#query-서비스-콜백의-컬렉션-변환)은 이미 확정된 경계이며 다시 미결로 돌리지 않는다. [E47]
 
 State의 missing 읽기·undefined 처리·숫자 범위·표현·정규화, 미지원 값·순환 데이터 거절과 검증 순서, 타입별 변경 동등성, 격리된 읽기 참조와 snapshot, 정수 날짜 add·YY 경계·합의된 datetime 포맷 의미는 [값 계약 상세](10-value-contracts.md)에 명시한다. 이 의미를 직렬화 프로필이나 실행기 선택과 함께 통째로 미결로 돌리지 않는다. JSON Schema의 데이터 형태 선언만으로 이 런타임 의미가 자동 구현되는 것도 아니다. 스키마 검증 중 타입 강제 변환·default 자동 주입·불허 속성 제거를 하지 않는 U12의 공통 규칙도 적용한다. [E58–E60, U02, U03, U04, U05, U06, U07, U08, U09, U10, U11, U12]
 
@@ -107,25 +107,18 @@ Set/Map과 날짜의 논리 타입은 다음 Viewstem 확장으로 선언한다.
 | `x-viewstem-type: "map"` | keys와 values 스키마 필수, minItems/maxItems 선택. key는 string/number 범위 안에서만 검증 |
 | `x-viewstem-type: "date" / "time" / "datetime"` | [U14의 문자열·형식 검사·정규화](10-value-contracts.md#날짜-값과-전송-형식). 일반 string 자동 판별·JS Date 저장·시간대 추측 없음 |
 
-확장 값은 core 전용 검증을 거쳐야 하며, 확장 키를 모르는 일반 JSON Schema 검증기를 통과한 것으로 적합성을 주장하지 않는다. `$defs`·typeRef와 확장을 함께 사용하는 구체 컴파일은 구현 검증 과제다. 입력값 수용 및 변경 비교에는 U02–U12를 먼저 적용하고, 이 스키마 프로필이 그 의미를 완화하지 않는다.
+확장 값은 core 전용 검증을 거쳐야 하며, 확장 키를 모르는 일반 JSON Schema 검증기를 통과한 것으로 적합성을 주장하지 않는다. JS/TS Core는 Ajv로 스키마 정의를 검사하고 Viewstem 검증기로 값을 정규화·검증한다. `$defs`와 `typeRef`를 해석한 뒤 확장 타입 계약을 적용한다. 입력값 수용 및 변경 비교에는 U02–U12를 먼저 적용하고, 이 스키마 프로필이 그 의미를 완화하지 않는다.
 
 표준의 어휘·로컬 참조·annotation과 assertion 구분은 [JSON Schema Core](https://json-schema.org/draft/2020-12/json-schema-core), [Validation](https://json-schema.org/draft/2020-12/json-schema-validation)을 기준으로 확인했다. 위 subset과 native 확장은 프로젝트의 위임된 선택이며 표준 자체의 요구라고 표현하지 않는다.
 
 ## CEL 실행기 선정과 어댑터 검증
 
-CEL 언어 선택은 유지한다. 실행기는 제품 의사결정이 아닌 기술 검증으로 선정하며, JS/Dart에서 같은 입력 fixture·결과/오류·비용 제한을 재현하는지 확인하기 전에는 특정 패키지를 확정 의존성으로 표시하지 않는다. U15의 [T1 실험](../handoff/t1-experiment-2026-10-29.md)에서 JS 2종·Dart 1종의 대표 식과 값 경계를 실행했다. 이 U15 후보 판정 뒤 U16에서 JS는 cel-js 패치 경로를 선택했고 U34에서 아래 고정 패치의 독립 검증을 수행했다. Dart CEL 후보는 여전히 부적합이며 JS 판단과 구별한다. 생산 의존성과 공개 지원 목록은 검증된 코드가 전달되도록 구현 단계에서 고정한다. JSON 데이터 검증의 다음 구현 우선 후보는 Ajv이며 전체 native/교차 언어 적합성 완료와 구별한다.
+JS/TS Core는 검증한 `cel-js@8.0.0` 수정본을 vendoring해 npm 패키지에 포함한다. [Core CEL 레퍼런스](../core-cel.md)에서 카탈로그, 타입 어댑터와 평가 제한을 확인할 수 있다. Dart 실행기와 교차 적합성은 [후속 범위](../follow-up.md)다.
 
 v1 계산에 네트워크·임의 JS 실행·숨은 전역 상태나 clock 접근을 추가하지 않는다. 미준비 입력이 실제로 필요한 평가 경로의 대기·오류를 검증하며, 선택 포트라는 이유로 임의 null을 주입하지 않는다. 미등록 함수는 컴파일/등록 오류이고 host 확장은 명시 등록한 순수 함수만 허용한다. missing/pending/error 입력은 CEL에 undefined/null로 밀어 넣지 않고 평가 전 준비 상태로 처리한다. native Set/Map·날짜의 CEL 어댑터는 타입 의미를 유지해야 하며, E47의 HTTP 콜백 변환을 CEL 변환으로 재사용한다고 가정하지 않는다. CEL 숫자 종류·오버플로·결과 수용을 [언어 정의](https://github.com/cel-expr/cel-spec/blob/master/doc/langdef.md)와 core 숫자 계약 양쪽으로 검증한다. 비용 계량·중단을 제공하지 못하는 실행기는 무제한 실행으로 대신 채택하지 않는다. [U13]
 
 ### CEL 패치 전제
 
-**진행 전제 확정(U16):** JS 실행기는 `@marcbachmann/cel-js`를 사용하면서 계산 제한과 잘못된 날짜 수용을 패치로 보완하는 방향으로 다음 논의를 진행한다. 검토 기준 버전은 8.0.0이다. 두 문제의 대응 방향은 확정됐다. U16 당시에는 패치 미구현이었으나 아래 U34에서 실제 패치·독립 검증을 수행했다. production 통합과 배포 적합성은 실제 라이브러리 구현 단계의 검증 대상이다.
+현재 엔진은 평가별 비용·입출력 제한과 엄격한 `timestamp(string)` 검증을 적용한다. 공개 날짜 정밀도와 내장 함수 범위는 [Core CEL 레퍼런스](../core-cel.md)를 따른다. CEL `matches`에는 RE2 의미를 적용한다. JSON Schema의 `pattern`은 ECMAScript 기준을 유지한다.
 
-- 계산 제한은 평가별 비용 예산과 중단을 실행기에 추가하고, 예산 초과가 일반 CEL 오류 처리나 논리식에 의해 무시되지 않게 한다. Worker 종료는 호스트 연결층의 보조 장치이며 비용 계량을 대체하거나 완전한 보안 격리를 보장하지 않는다. 기존 식 크기 제한과 입력·출력 크기 제한도 함께 검증한다.
-- 날짜는 기본 `timestamp(string)`에서 형식·실제 달력 날짜·시간·오프셋을 검사한 뒤 값을 생성한다. 별도 함수만 추가해 기존 함수로 우회할 수 있게 두지 않는다. JS Date의 밀리초 표현과 전체 CEL timestamp 적합성은 별도 검증 대상이며, 이 수정만으로 전체 날짜 규격 충족을 주장하지 않는다.
-
-실험에서는 고정 버전의 수정분을 `.patch`로 보존하고, 패치 적용 실패 시 검증을 중단한다. 소비자에게 배포할 때는 수정된 upstream 버전 또는 관리하는 수정 패키지 등으로 동일 코드가 전달되는지 확인한다. 최종 배포 방식은 후속 기술 작업이다. 제한 우회·정상/비정상 날짜·기존 CEL 동작 회귀와 브라우저 적용을 검증한 현재 범위는 아래 U34 실험과 최종 진행표를 따른다. [D72](../history/decision-register.md), [실험 증거](../handoff/t1-experiment-2026-10-29.md)
-
-**U34 실제 패치 실험:** [고정 버전 patch](../../experiments/t1-cel-patch/README.md)를 별도 복사본에 적용해 Node/Chromium에서 비용 초과 비회복·기본 timestamp 엄격 검증을 실행했다. 추가로 발견한 정수/기간 연산·동시 parsed 평가·시간대 getter 결함도 같은 독립 실험에서 보완했다. 원본 패키지와 과거 T1 후보 결과는 유지한다. 기본 timestamp의 검증 프로필은 Viewstem의 밀리초 범위이며 전체 CEL nanosecond timestamp 지원이 아니다.
-
-CEL의 matches는 [언어 명세의 RE2 의미](https://github.com/cel-expr/cel-spec/blob/master/doc/langdef.md#regular-expressions)를 따른다. U34에서 JS RegExp 한 번의 backtracking이 AST 예산으로 제한되지 않는 실패를 재현했고, 실험 패치에서는 고정 `re2js@2.9.1`의 RE2 모드와 컴파일 프로그램 크기×입력 길이 비용을 사용한다. 이 변경은 JSON Schema의 ECMAScript pattern 계약을 RE2로 바꾸지 않는다. 수치 한도·입력/출력·함수 카탈로그·Dart 값 교차의 [완료된 독립 검증과 제한](../handoff/verification-ledger.md)을 따른다. Dart CEL 후보의 불일치와 전체 함수 적합성을 완료 처리하지 않는다.
+[T1 후보 비교](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t1-experiment-2026-10-29.md), [독립 패치 검증](../../experiments/t1-cel-patch/README.md)과 [생산 재현 절차](../../packages/core/vendor/README.md)에서 선택 이유와 각 검증 범위를 확인할 수 있다.

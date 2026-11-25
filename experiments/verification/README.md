@@ -1,8 +1,19 @@
-# 전체 검증 추적
+# 구현 전 실험 검증 기록
+
+과거 감사는 [기준 리비전 `10a326b9`](https://github.com/miinhlym/viewstem/tree/10a326b9c623aaf2763375b8628635dd70ba65d8)에서 재현합니다. 이 리비전은 기록된 224개 계약 행의 위치와 본문을 보존합니다. 감사에는 해당 리비전의 명세, 보고서와 실험 소스를 함께 사용하세요. 현재 제품 테스트의 실행 경로는 [검증 안내](../../docs/verification.md)를 따릅니다.
+
+기준 리비전을 별도 디렉터리에 풀고 저장소 루트에서 다음 명령을 실행합니다. 의존성 파일도 보고서의 해시와 비교하므로 각 실험의 lockfile을 사용합니다.
+
+```sh
+for area in t1-cel-patch t4-charts verification t2-url-races; do
+  npm ci --prefix "experiments/$area" --ignore-scripts --no-audit --no-fund || exit 1
+done
+node experiments/verification/audit-evidence.mjs
+```
 
 [coverage.json](coverage.json)은 현재 인수 216개와 선택 차트 8개의 원문 위치·검증 상태를 추적한다. `needs-evidence-audit`는 미검증 판정이 아니라 기존 증거와의 항목별 대조가 아직 끝나지 않았다는 뜻이다. 임의로 모든 항목을 통과로 채우지 않는다.
 
-상태는 `needs-evidence-audit`, `pending`, `partial`, `verified-experiment`, `decision-needed`로 구분한다. verified-experiment도 실제 core/renderer 구현의 통과를 의미하지 않는다. 증거에는 실행 파일·시나리오·결과 파일·남은 제한을 연결한다. [진행 순서와 완료 기준](../../docs/handoff/verification-ledger.md)을 따른다.
+상태는 `needs-evidence-audit`, `pending`, `partial`, `verified-experiment`, `decision-needed`로 구분한다. verified-experiment도 실제 core/renderer 구현의 통과를 의미하지 않는다. 증거에는 실행 파일·시나리오·결과 파일·남은 제한을 연결한다. [진행 순서와 완료 기준](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/verification-ledger.md)을 따른다.
 
 `node experiments/verification/audit-evidence.mjs`는 224개 ID·계약 원문 줄·증거 경로·정확한 테스트 ID·실제 판정·현재 소스 hash를 대조하고 `evidence-integrity.json`을 갱신한다. 통과해도 항목의 모든 의미를 검사했다는 증명이 아니므로 시나리오 내용 대조와 구별한다. `earlierAudits`는 직접 실행 증거를 아직 찾지 못했던 이전 조사 기록이며 현재 통과 증거에 합산하지 않는다.
 

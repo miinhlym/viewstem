@@ -64,6 +64,9 @@ and completion checks. The archive report records the source commit, archive
 hash, changed tracked files outside `bench/`, and package source and build
 fingerprints.
 
+The [performance audit](../docs/performance-audit-2026-11-24.md) records the
+revisions, inputs, and results for the comparison above.
+
 | Area | Examples and completion checks |
 | --- | --- |
 | Core registry and resources | Batch registration, updates, a resource set and reference resolution |
