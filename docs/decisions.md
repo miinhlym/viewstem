@@ -205,6 +205,7 @@
 | D168 | URL 준비 실패와 선택 제거의 관찰 | 지연된 초기 준비 실패는 `ready` 거절과 URL 진단으로 관찰하고, 선택 제거는 나머지 키의 대기 쓰기를 보존한다. [URL 명세](spec/09-state-store-and-url.md) | EGM 공개 API 재리뷰의 지연 어댑터 재현 |
 | D169 | UI 셋 스타일의 DOM과 CSS 이름 소유권 | 셋의 기본 스타일을 소유 DOM에 적용한다. 같은 셋 ID를 DOM 생성과 CSS 빌드에서 사용하며, 빌드가 격리할 수 있는 전역 이름에 접두사를 붙인다. 호스트가 공유 이름을 등록한다. `data-viewstem-ui`는 이전 테마 지정 범위로 사용한다. [브라우저 명세](spec/12-resource-sets-browser.md#ui-셋의-스타일-소유권) | 혼합 UI의 CSS 리셋과 독립 셋의 글꼴 이름 충돌 재현. 선택자 검사만으로는 문서 이름을 격리할 수 없어 빌드에서 지원 규칙을 제한하기로 함 |
 | D170 | 브라우저 UI 스타일 기본 로딩 | `@viewstem/ui`의 `browser` 진입점에서 기본 CSS를 가져온다. Node용 JS와 직접 불러올 수 있는 `styles.css`도 제공한다. [브라우저 명세](spec/12-resource-sets-browser.md#ui-셋의-스타일-소유권) | 상위 셋만 등록하는 앱이 의존 셋의 CSS 경로를 따로 관리할 필요를 없애기로 결정 |
+| D175 | Derived와 View 적용을 같은 State 후보에서 확정 | 동적 경로가 새로 선택한 셀을 먼저 계산한다. Reaction이 노드의 존재를 바꾸면 명시적 State 입력과 후보에 남은 Reaction으로 다시 계산한다. State 값과 노드 구성이 일치할 때만 함께 공개하고, 후보가 반복되면 적용을 취소한다. [Store 명세](spec/09-state-store-and-url.md#store-주소관찰reaction의-현행-매핑) | 동적 경로가 직전 Derived 값을 읽거나 제거될 노드의 Reaction이 첫 화면과 State에 남는 사례를 EGM 검토에서 재현 |
 
 ### 문서 배포
 
