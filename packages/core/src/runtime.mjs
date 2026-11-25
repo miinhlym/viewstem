@@ -483,7 +483,8 @@ export class View {
       if(declaration.kind==='Derived') {
         // The Store can run this computation outside the current build.
         plan.queryReads = null;
-        const paths=pathsIn(declaration.inputs??{},registry.functions);
+        let dynamicPath = false;
+        const paths=pathsIn(declaration.inputs??{},registry.functions,()=>{dynamicPath=true;});
         const portNames=new Set(paths.filter(keys=>keys[0]==='ports').flatMap(keys=>keys.length===1?Object.keys(spec.ports??{}):[keys[1]]));
         const dependencies=[...paths.filter(keys=>keys[0]==='states').map(keys=>owner.states.get(keys[1])),
           ...[...portNames].filter(name=>spec.ports?.[name]?.kind==='State').map(name=>ports[name])].filter(Boolean).map(handle=>stateRoot(handle,store));
@@ -500,7 +501,7 @@ export class View {
         const prior=previous?.computations?.get(name);
         // Reuse only the explicit State/port connections tracked here. Other
         // context roots must keep their existing conservative refresh behavior.
-        const tracked=paths.every(keys=>keys[0]==='ports'||keys[0]==='states'&&keys.length>1);
+        const tracked=!dynamicPath&&paths.every(keys=>keys[0]==='ports'||keys[0]==='states'&&keys.length>1);
         const unchanged=tracked&&prior&&equal(prior.declaration,declaration)&&equal(prior.variable,variable)&&equal(prior.values,values)
           &&dependencies.length===prior.dependencies.length&&dependencies.every((handle,index)=>handle===prior.dependencies[index]);
         owner.computations.set(name,{declaration,variable,values,dependencies});

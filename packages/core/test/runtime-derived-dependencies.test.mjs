@@ -95,6 +95,27 @@ test('reconnecting the same State through an expired capability cannot reuse a r
   assert.equal(output.read(), 1); source.write(2); assert.equal(output.read(), 2);
 });
 
+test('Derived refreshes a State path read through a dynamic formatString template', async t => {
+  const f = fixture(t), string = { type: 'string' };
+  const spec = {
+    ports: { template: { kind: 'Value', schema: string, required: true } },
+    states: {
+      source: { kind: 'State', schema: integer, initial: 1 },
+      computed: { kind: 'Derived', schema: string,
+        variable: { ports: { text: { kind: 'Value', schema: string, required: true } }, expression: 'text' },
+        inputs: { text: { '@call': 'formatString', args: { value: path('/ports/template') } } },
+      },
+    },
+    render: leaf,
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec, inputs: { template: '${/states/source}' } });
+  await initialComplete;
+  const output = view.getState('computed');
+  assert.equal(output.read(), '1');
+  view.getState('source').write(2);
+  assert.equal(output.read(), '2');
+});
+
 test('Derived Query-port values refresh through a retained owner and conditional removal cancels old cells', async t => {
   let result = 1;
   const f = fixture(t, { requestExecutor: async () => ({ status: 200, headers: {}, body: result }) });
