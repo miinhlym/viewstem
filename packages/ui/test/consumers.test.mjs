@@ -61,9 +61,10 @@ test('packed UI renders the same View JSON in four browser hosts', async t => {
   const lock = JSON.parse(await readFile(join(directory, 'package-lock.json'), 'utf8'));
   assert.deepEqual(Object.keys(lock.packages).filter(path => frameworkModule.test(path)), []);
   const uiPackage = JSON.parse(await readFile(join(directory, 'node_modules/@viewstem/ui/package.json'), 'utf8'));
+  const [corePack, domPack] = packs;
   assert.deepEqual(uiPackage.dependencies, {
-    '@viewstem/core': '0.1.0',
-    '@viewstem/dom': '0.1.0',
+    '@viewstem/core': corePack.version,
+    '@viewstem/dom': domPack.version,
     '@internationalized/date': '3.12.0',
     '@tanstack/table-core': '9.0.0',
     '@zag-js/date-picker': '1.47.0',
