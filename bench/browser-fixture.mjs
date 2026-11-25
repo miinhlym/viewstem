@@ -5,6 +5,7 @@ import { createStyleScope } from '@viewstem/dom/styles';
 import { samples } from '../packages/ui/test/fixtures/samples.mjs';
 import * as F from '../packages/svelte/test/browser-fixture.mjs';
 import { sampleQueryProjection } from './query-projection.mjs';
+import { tableUpdate } from './follow-up.mjs';
 
 const target = () => {
   const el = document.createElement('main');
@@ -108,6 +109,9 @@ function domSetup(custom = false) {
 }
 window.bench = {
   slugs: samples.map((s) => s.slug),
+  unrelatedTable(tables) {
+    return tableUpdate({ createRuntime, defineResourceSet, createRenderer: dom, ui }, tables);
+  },
   async queryProjection(size) {
     const text = (tag) => ({
       mount(context) {

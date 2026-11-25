@@ -89,6 +89,12 @@ export async function benchmarkBrowser(measure) {
         workload: `Render one HTTP Query response alongside ${size} unchanged keyed options`,
         sample: () => page.evaluate((count) => window.bench.queryProjection(count), size),
       });
+    for (const tables of [1, 4])
+      await run({
+        id: `ui.unrelated-table.${tables}`,
+        workload: `Render one summary Query response alongside ${tables} unchanged 1000-row DataTables with 100 visible rows each`,
+        sample: () => page.evaluate((count) => window.bench.unrelatedTable(count), tables),
+      });
     for (const operation of ['mount', 'update', 'replace', 'unmount', 'mixed'])
       await run({
         id: `svelte.${operation}`,

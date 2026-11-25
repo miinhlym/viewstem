@@ -14,6 +14,7 @@ import { createStateStore as createInternalStateStore } from '../packages/core/s
 import { joinRows } from '../packages/core/src/query/index.mjs';
 import { FakeClock, flush } from '../packages/core/test/query-fixtures.mjs';
 import { sampleQueryProjection } from './query-projection.mjs';
+import { borrowedQuery, crossView, fanOut, queryBurst, storeSubscribers } from './follow-up.mjs';
 
 const integer = { type: 'integer' };
 const path = (value) => ({ '@path': value });
@@ -73,6 +74,43 @@ const definition = (count) => ({
 });
 
 export async function benchmarkCore(measure) {
+  const api = { createRuntime, createStateStore, defineResourceSet };
+  for (const count of [0, 6]) {
+    await measure({
+      id: `core.state.cross-view.${count}`,
+      workload: `Write one State shared with a second View beside ${count} unrelated Views with 500 nodes each`,
+      sample: () => crossView(api, count),
+    });
+  }
+  for (const count of [0, 256]) {
+    await measure({
+      id: `core.state.scoped-subscribers.${count}`,
+      workload: `Write one of 1,200 States beside ${count} unrelated address subscriptions`,
+      sample: () => storeSubscribers(api, count),
+    });
+  }
+  for (const fromState of [false, true]) {
+    for (const stagger of [false, true]) {
+      await measure({
+        id: `core.query.burst.${fromState ? 'state.' : ''}${stagger ? 'separated' : 'same-turn'}`,
+        workload: `Apply six mock Query responses ${stagger ? 'in separate projections' : 'in one turn'} beside 1,000 ${fromState ? 'State' : 'literal'} repeat items`,
+        sample: () => queryBurst(api, stagger, fromState),
+      });
+    }
+  }
+  for (const [mode, count] of [['own', 8], ['shared', 8], ['shared50', 50], ['shared500', 500]]) {
+    const own = mode === 'own';
+    await measure({
+      id: `core.query.component.${own ? 'own' : 'shared'}.${count}`,
+      workload: own ? `Settle ${count} independent Query usages` : `Refresh the same value for ${count} Query port consumers`,
+      sample: () => fanOut(api, mode),
+    });
+  }
+  await measure({
+    id: 'core.query.borrowed-view',
+    workload: 'Close a Query gate and observe waiting in a second View connected by a Query port',
+    sample: () => borrowedQuery(api),
+  });
   for (const size of [50, 1000]) {
     await measure({
       id: `core.view.query-projection.${size}`,

@@ -26,7 +26,10 @@ response beside 50 or 1,000 unchanged options from a second Query. The fixture
 checks that the catalog is fetched once, the summary updates, and option identity
 is preserved.
 
-A sample that misses a completion signal records the failed
+The State, Query, and DataTable follow-up cases report observations alongside
+elapsed time. These include View publications, source requests, and retained DOM
+rows. Use `--match='cross-view|scoped-subscribers|borrowed-view|burst|component[.]shared|unrelated-table'`
+to run those cases. A sample that misses a completion signal records the failed
 phase. Use `--timeout-ms` to set the per-sample limit, which defaults to 60,000 ms.
 
 | Area | Examples and completion checks |

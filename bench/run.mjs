@@ -113,19 +113,25 @@ async function measure({ id, workload, sample, recover }) {
   ids.add(id);
   if (!match.test(id)) return;
   const durations = [];
+  const observations = [];
   try {
     for (let i = 0; i < warmup + samples; i++) {
       const controller = new AbortController();
-      const elapsed = await withDeadline(
+      const result = await withDeadline(
         Promise.resolve().then(() => sample({ signal: controller.signal })),
         id + ' sample ' + (i + 1),
         timeoutMs,
         () => controller.abort(),
       );
+      const elapsed = typeof result === 'number' ? result : result?.ms;
       if (typeof elapsed !== 'number' || !Number.isFinite(elapsed) || elapsed < 0) {
         throw new Error(`Invalid duration for ${id}: ${elapsed}`);
       }
       durations.push(elapsed);
+      if (result !== null && typeof result === 'object') {
+        const { ms, ...observation } = result;
+        observations.push(observation);
+      } else observations.push(null);
     }
     const measured = durations.slice(warmup);
     const ordered = [...measured].sort((a, b) => a - b);
@@ -138,11 +144,19 @@ async function measure({ id, workload, sample, recover }) {
       samples: measured,
       median,
       max: ordered.at(-1),
+      ...(observations.some((observation) => observation !== null)
+        ? {
+            observations: {
+              warmup: observations.slice(0, warmup),
+              samples: observations.slice(warmup),
+            },
+          }
+        : {}),
     });
     console.log(`${id}  ${median.toFixed(2)} ms (max ${ordered.at(-1).toFixed(2)})`);
   } catch (error) {
     const reason = describeError(error);
-    report.failures.push({ id, workload, durations, reason });
+    report.failures.push({ id, workload, durations, observations, reason });
     console.error(`${id}  ${reason}`);
     // Persist the failure before a browser recovery or cleanup can fail.
     await save();
