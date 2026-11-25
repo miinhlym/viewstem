@@ -7,7 +7,7 @@ import { safeError, at } from './errors.mjs';
 const own = (object, key) => Object.hasOwn(object, key);
 const fail = (code, input) => { throw Object.assign(new Error(code), { code, ...(input === undefined ? {} : { input }) }); };
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
-const expressions = new WeakMap(), queries = new WeakSet(), stateWrappers = new WeakMap();
+const expressions = new WeakMap(), queries = new WeakMap(), stateWrappers = new WeakMap();
 const inputError = (error, input) => at(error,{input});
 const annotations = new Set('$schema title description default examples readOnly writeOnly deprecated $comment'.split(' '));
 const schemaMaps = new Set(['properties']);
@@ -87,15 +87,31 @@ export function boundedState(baseHandle, guard) {
   for (const method of ['read', "getSnapshot", 'write', 'reset']) wrapper[method] = (...args) => { guard(method); return baseHandle[method](...args); };
   stateWrappers.set(wrapper, { base: baseHandle }); return Object.freeze(wrapper);
 }
-export function createQueryHandle(delegate = {}) {
+export function createQueryHandle(delegate = {}, source) {
   if (!record(delegate)) fail('INVALID_DEFINITION');
+  const channel = source === undefined ? { listeners: new Set() } : queries.get(source);
+  if (!channel) fail('TYPE_CONTRACT_MISMATCH');
   for (const method of ["getSnapshot", 'refresh', 'retry']) if (own(delegate, method) && typeof delegate[method] !== 'function') fail('INVALID_DEFINITION');
   const handle = {};
   for (const method of ["getSnapshot", 'refresh', 'retry']) handle[method] = (...args) => {
     if (typeof delegate[method] !== 'function') fail('INVALID_DEFINITION');
     return delegate[method](...args);
   };
-  queries.add(handle); return Object.freeze(handle);
+  queries.set(handle, channel);
+  return Object.freeze(handle);
+}
+export function observeQueryHandle(handle, listener) {
+  const { listeners, check } = queries.get(handle);
+  const deliver = check ? event => {
+    try { check(); }
+    catch { return; }
+    listener(event);
+  } : listener;
+  listeners.add(deliver);
+  return () => listeners.delete(deliver);
+}
+export function notifyQueryHandle(handle, event) {
+  for (const listener of queries.get(handle).listeners) listener(event);
 }
 export function boundedQuery(baseHandle, guard) {
   if (!queries.has(baseHandle) || typeof guard !== 'function') fail('TYPE_CONTRACT_MISMATCH');
@@ -104,7 +120,9 @@ export function boundedQuery(baseHandle, guard) {
     async refresh(signal) { guard('refresh'); return baseHandle.refresh(signal); },
     async retry(signal) { guard('retry'); return baseHandle.retry(signal); },
   };
-  queries.add(wrapper); return Object.freeze(wrapper);
+  const { listeners, check } = queries.get(baseHandle);
+  queries.set(wrapper, { listeners, check() { guard('getSnapshot'); check?.(); } });
+  return Object.freeze(wrapper);
 }
 
 export function compilePorts({ resourceKind, ports = {}, types = {}, store }) {

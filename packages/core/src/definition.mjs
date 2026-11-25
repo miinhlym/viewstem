@@ -6,7 +6,16 @@ export const record = value => value !== null && typeof value === 'object' && [n
 export const object = value => { if (!record(value)) invalid(); return value; };
 export const name = value => { if (typeof value !== 'string' || !value) invalid(); return value; };
 export const fields = (value, allowed) => { object(value); if (Object.keys(value).some(item => !allowed.includes(item))) invalid(); };
-export const freeze = value => { if (value && typeof value === 'object') { for (const child of Object.values(value)) freeze(child); Object.freeze(value); } return value; };
+const definitionSnapshots = new WeakSet();
+export const isDefinitionSnapshot = value => definitionSnapshots.has(value);
+export function freeze(value) {
+  if (value && typeof value === 'object' && !definitionSnapshots.has(value)) {
+    for (const child of Object.values(value)) freeze(child);
+    Object.freeze(value);
+    definitionSnapshots.add(value);
+  }
+  return value;
+}
 
 // Definitions are JSON declarations. Reject accessors, functions, native values,
 // sparse arrays and cycles before copying or inspecting expression syntax.

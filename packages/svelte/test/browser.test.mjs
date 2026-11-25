@@ -433,6 +433,37 @@ test('State and Query handles cross explicit ports and stay usable from adapter 
   assert.equal(JSON.parse(await page.locator('[data-query]').textContent()).data, false);
 }));
 
+test('a Query handle prop updates a Svelte adapter during and after a delayed refresh', t => browserTest(t, async page => {
+  await page.evaluate(async () => {
+    const F = Fixture;
+    window.e = F.controlled();
+    e.rendering = await e.renderer.mount({ target: e.target, view: {
+      queries: { result: { queryRef: 'one' } },
+      render: F.probe('query', 'handle', { inputs: { value: 'handle', query: F.p('/queries/result') } }),
+    } });
+  });
+  await page.waitForFunction(() => e.requests.length === 1);
+  await page.evaluate(async () => {
+    e.reply(0, 'Before');
+    await e.rendering.initialComplete;
+    await e.rendering.whenRendered();
+    e.refresh = e.rendering.view.getQuery('result').refresh();
+    void e.refresh.catch(() => {});
+  });
+  await page.waitForFunction(() => e.requests.length === 2);
+  await page.evaluate(() => e.rendering.whenRendered());
+  const read = async () => JSON.parse(await page.locator('[data-query]').textContent());
+  assert.equal((await read()).status, 'running');
+  assert.equal((await read()).data, 'Before');
+  await page.evaluate(async () => {
+    e.reply(1, 'After');
+    await e.refresh;
+    await e.rendering.whenRendered();
+  });
+  assert.equal((await read()).status, 'success');
+  assert.equal((await read()).data, 'After');
+}));
+
 test('named and empty forwarded slots preserve order and author scope; host context reaches adapters', t => browserTest(t, async page => {
   await page.evaluate(async () => {
     const F = Fixture; window.e = F.environment();

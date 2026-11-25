@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createRegistry, createRuntime, defineResourceSet } from '@viewstem/core';
 import { createRegistry as localRegistry, createRuntime as localRuntime, createStateStore as localStore, rendererView } from '../src/api.mjs';
+import { boundedQuery } from '../src/ports.mjs';
 import { defineResourceSet as localSet } from '../src/resource-set.mjs';
+import { Registry } from '../src/registry.mjs';
 import { memoryUrl, tick } from './fixtures/state/url-adapter.mjs';
 
 const schema = { type: 'integer' };
@@ -14,6 +16,300 @@ const definition = (id = 'Base', initial = 1) => ({
 });
 const code = (id, implementation, requires) => ({ definition: { kind: 'Action', id, spec: { output: { schema } } }, implementation, requires });
 const codeIs = code => failure => failure.code === code;
+
+test('View refresh reuses port compilation and validates current inputs against the applied Type', async t => {
+  const type = pattern => ({ kind: 'Type', id: 'EntryValue', spec: { schema: { type: 'string', pattern } } });
+  const row = binding('Row');
+  row.contract.spec.slots = { default: {} };
+  const registry = localRegistry()
+    .registerResourceSet(localSet({ id: 'components', version: '1', components: [row, binding('Leaf')] }))
+    .registerResources([type('^old-'), {
+      kind: 'Component', id: 'Entry', spec: {
+        ports: { value: { kind: 'Value', typeRef: 'EntryValue', required: true } },
+        render: { id: 'leaf', componentRef: 'Leaf' },
+      },
+    }]);
+  const runtime = localRuntime({ registry });
+  t.after(() => runtime.dispose());
+  const source = {
+    states: { entries: { kind: 'State', schema: { type: 'array' }, initial: [
+      { id: 1, value: 'old-a' }, { id: 2, value: 'old-b' },
+    ] } },
+    render: { id: 'row', componentRef: 'Row', slots: { default: [{
+      id: 'entry', componentRef: 'Entry',
+      repeat: { items: { '@path': '/states/entries' }, as: 'item', key: { '@path': '/repeat/item/id' } },
+      inputs: { value: { '@path': '/repeat/item/value' } },
+    }] } },
+  };
+  const view = await runtime.createView(source);
+  const entries = () => view.getSnapshot().roots[0].children.map(node => [node.status, node.inputs.value, node.error?.code]);
+  assert.deepEqual(entries(), [['ready', 'old-a', undefined], ['ready', 'old-b', undefined]]);
+
+  const update = (first, second) => view.getState('entries').write([{ id: 1, value: first }, { id: 2, value: second }]);
+  const typeLookups = t.mock.method(Registry.prototype, 'types');
+  update('old-c', 'new-d');
+  update('old-e', 'new-f');
+  assert.deepEqual(entries(), [['ready', 'old-e', undefined], ['error', undefined, 'TYPE_MISMATCH']]);
+  assert.equal(typeLookups.mock.callCount(), 0);
+  typeLookups.mock.restore();
+
+  registry.updateResource(type('^new-'));
+  update('old-g', 'new-h');
+  assert.deepEqual(entries(), [['ready', 'old-g', undefined], ['error', undefined, 'TYPE_MISMATCH']]);
+  await view.replace(source);
+  update('old-g', 'new-h');
+  assert.deepEqual(entries(), [['error', undefined, 'TYPE_MISMATCH'], ['ready', 'new-h', undefined]]);
+});
+
+test('refresh reuses a stable repeat and still evaluates leaves that read another Query', async t => {
+  const p = path => ({ '@path': path });
+  const row = binding('Row');
+  row.contract.spec.slots = { default: {} };
+  const option = binding('Option');
+  option.contract.spec.ports = { label: { kind: 'Value', schema: { type: 'string' }, required: true } };
+  const registry = localRegistry().registerResourceSet(localSet({
+    id: 'components', version: '1', components: [row, option, binding('Button')],
+  }));
+  const seen = [];
+  registry.registerAction({
+    kind: 'Action', id: 'capture', spec: { ports: { label: option.contract.spec.ports.label } },
+  }, ({ inputs }) => { seen.push(inputs.label); });
+  let items = [{ id: 1, name: 'One' }, { id: 2, name: 'Two' }], summary = 'Before';
+  const requests = [];
+  const runtime = localRuntime({ registry, requestExecutor({ request }) {
+    requests.push(request.path);
+    return { status: 200, headers: {}, body: request.path === '/items' ? items : summary };
+  } });
+  t.after(() => runtime.dispose());
+  const query = path => ({ query: {
+    sources: { value: {
+      datasource: { kind: 'Http', baseUrl: 'https://example.test' }, request: { method: 'GET', path },
+    } },
+    transform: { input: p('/sources/value') },
+  } });
+  const repeated = (id, label) => ({
+    id, componentRef: 'Option', inputs: { label },
+    repeat: { items: p('/queries/items/data'), as: 'item', key: p('/repeat/item/id') },
+  });
+  const source = {
+    queries: { items: query('/items'), summary: query('/summary') },
+    render: { id: 'row', componentRef: 'Row', slots: { default: [
+      repeated('stable', p('/repeat/item/name')),
+      repeated('dependent', p('/queries/summary/data')),
+      { ...repeated('literal', p('/repeat/item/name')), repeat: {
+        items: [{ id: 1, name: 'Literal' }], as: 'item', key: p('/repeat/item/id'),
+      } },
+      { ...repeated('dynamicArray', p('/repeat/item/current')), repeat: {
+        items: [{ id: 1, current: p('/queries/summary/data') }], as: 'item', key: p('/repeat/item/id'),
+      } },
+      { id: 'button', componentRef: 'Button', on: {
+        click: { actionRef: 'capture', inputs: { label: p('/queries/summary/data') } },
+      } },
+    ] } },
+  };
+  const view = await runtime.createView(source);
+  await view.whenSettled(view.initial);
+  const children = () => view.getSnapshot().roots[0].children;
+  const labels = () => children().slice(0, 4).map(node => node.inputs.label);
+  const before = children();
+  assert.deepEqual(labels(), ['One', 'Two', 'Before', 'Before']);
+
+  const prepare = t.mock.method(rendererView(view), 'prepareInputs');
+  const countStable = () => prepare.mock.calls.filter(({ arguments: [, inputs] }) =>
+    inputs?.label?.['@path'] === '/repeat/item/name').length;
+  summary = 'After';
+  await view.getQuery('summary').refresh();
+  await tick();
+  assert.deepEqual(labels(), ['One', 'Two', 'After', 'After']);
+  assert.deepEqual(children().slice(4, 6).map(node => node.inputs.label), ['Literal', 'After']);
+  assert.equal(countStable(), 0);
+  assert.deepEqual(requests, ['/items', '/summary', '/summary']);
+  await view.emit(before.at(-1), 'click', null);
+  assert.deepEqual(seen, ['After']);
+
+  items = [{ id: 2, name: 'Updated two' }, { id: 1, name: 'One' }];
+  await view.getQuery('items').refresh();
+  await tick();
+  assert.deepEqual(labels(), ['Updated two', 'One', 'After', 'After']);
+  assert.deepEqual(children().slice(0, 2).map(node => node.generation), [before[1].generation, before[0].generation]);
+  assert.ok(countStable() >= 2);
+
+  const next = structuredClone(source);
+  next.render.slots.default[0].inputs.label = 'Reconfigured';
+  await view.whenSettled(await view.updateDefinition(next));
+  assert.deepEqual(labels(), ['Reconfigured', 'Reconfigured', 'After', 'After']);
+});
+
+test('Query status publishes when shared result consumers can reuse the current tree', async t => {
+  const p = value => ({ '@path': value });
+  const number = binding('Number');
+  number.contract.spec.ports = { value: { kind: 'Value', schema, required: true } };
+  const registry = localRegistry().registerResourceSet(localSet({
+    id: 'components', version: '1', components: [number],
+  })).registerResources([{
+    kind: 'Component', id: 'Consumer', spec: {
+      ports: { result: { kind: 'Query', required: true } },
+      render: { id: 'number', componentRef: 'Number', inputs: { value: p('/ports/result/data') } },
+    },
+  }]);
+  let value = 7;
+  let release;
+  let started;
+  const runtime = localRuntime({ registry, requestExecutor() {
+    if (!started) return { status: 200, headers: {}, body: value };
+    return new Promise(resolve => { release = () => resolve({ status: 200, headers: {}, body: value }); started(); });
+  } });
+  t.after(() => runtime.dispose());
+  const source = {
+    queries: { result: { query: {
+      sources: { value: {
+        datasource: { kind: 'Http', baseUrl: 'https://example.test' }, request: { method: 'GET', path: '/value' },
+      } },
+      transform: { input: p('/sources/value') },
+    } } },
+    render: { id: 'consumer', componentRef: 'Consumer', inputs: { result: p('/queries/result') } },
+  };
+  const view = await runtime.createView(source);
+  await view.whenSettled(view.initial);
+  await tick();
+  const build = t.mock.method(rendererView(view), 'build');
+  const observed = [];
+  view.subscribe(snapshot => observed.push([snapshot.queries.result.status, snapshot.roots[0].children[0].inputs.value]));
+  async function refresh() {
+    const entered = new Promise(resolve => { started = resolve; });
+    const ticket = view.getQuery('result').refresh();
+    await entered;
+    await tick();
+    release();
+    await ticket;
+    await tick();
+  }
+  await refresh();
+  assert.deepEqual(observed, [['success', 7], ['running', 7], ['success', 7]]);
+  assert.equal(build.mock.callCount(), 0);
+
+  value = 8;
+  await refresh();
+  assert.deepEqual(observed.slice(-2), [['running', 7], ['success', 8]]);
+  assert.equal(build.mock.callCount(), 1);
+
+  let open = true;
+  const borrowed = boundedQuery(view.getQuery('result'), () => {
+    if (!open) throw { code: 'CANCELLED' };
+  });
+  started = undefined;
+  const borrower = await runtime.createView({
+    ...source,
+    ports: { borrowed: { kind: 'Query', required: true } },
+    render: { ...source.render, inputs: { result: p('/ports/borrowed') } },
+  }, { inputs: { borrowed } });
+  await borrower.whenSettled(borrower.initial);
+  assert.equal(borrower.getSnapshot().roots[0].children[0].inputs.value, 8);
+  open = false;
+  await borrower.getQuery('result').refresh();
+  await tick();
+  assert.equal(borrower.getSnapshot().roots[0].children[0].error.code, 'CANCELLED');
+});
+
+test('State writes publish owning and connected Views and follow State port replacement', async t => {
+  const p = value => ({ '@path': value });
+  const number = binding('Number');
+  number.contract.spec.ports = { value: { kind: 'Value', schema, required: true } };
+  const registry = localRegistry().registerResourceSet(localSet({
+    id: 'components', version: '1', components: [number],
+  }));
+  const store = localStore();
+  const runtime = localRuntime({ registry, stateStore: store });
+  t.after(async () => { await runtime.dispose(); await store.dispose(); });
+  const source = initial => ({
+    states: { value: { kind: 'State', schema, initial } },
+    render: { id: 'number', componentRef: 'Number', inputs: { value: p('/states/value') } },
+  });
+  const own = await runtime.createView(source(1));
+  const unrelated = await runtime.createView(source(2));
+  const first = own.getState('value'), second = unrelated.getState('value');
+  const connected = await runtime.createView({
+    ports: { value: { kind: 'State', schema, required: true } },
+    render: { id: 'number', componentRef: 'Number', inputs: { value: p('/ports/value') } },
+  }, { inputs: { value: first } });
+  await tick();
+  const numbers = view => {
+    const values = [];
+    view.subscribe(snapshot => values.push(snapshot.roots[0].inputs.value));
+    return values;
+  };
+  const ownValues = numbers(own), otherValues = numbers(unrelated), connectedValues = numbers(connected);
+  first.write(3);
+  assert.deepEqual(ownValues, [1, 3]);
+  assert.deepEqual(otherValues, [2]);
+  assert.deepEqual(connectedValues, [1, 3]);
+  await connected.setInputs({ value: second });
+  await tick();
+  const previous = connectedValues.length;
+  first.write(4);
+  assert.equal(connectedValues.length, previous);
+  second.write(5);
+  assert.deepEqual(connectedValues.slice(previous), [5]);
+});
+
+test('a Query port observes another View and stops following it after port replacement', async t => {
+  const p = value => ({ '@path': value });
+  const status = binding('Status');
+  status.contract.spec.ports = { value: { kind: 'Value', schema: { type: 'string' }, required: true } };
+  const registry = localRegistry().registerResourceSet(localSet({
+    id: 'components', version: '1', components: [status],
+  }));
+  const runtime = localRuntime({ registry });
+  t.after(() => runtime.dispose());
+  const node = value => ({ id: 'status', componentRef: 'Status', inputs: { value: p(value) } });
+  const source = () => runtime.createView({
+    states: { open: { kind: 'State', schema: { type: 'boolean' }, initial: true } },
+    queries: { result: { query: { sources: {}, transform: { input: 1 } }, executeWhen: p('/states/open') } },
+    render: node('/queries/result/status'),
+  });
+  const first = await source(), second = await source();
+  await Promise.all([first.whenSettled(first.initial), second.whenSettled(second.initial)]);
+  const handle = first.getQuery('result');
+  let open = true;
+  const borrowed = boundedQuery(handle, () => {
+    if (!open) throw { code: 'CANCELLED' };
+  });
+  const consumer = async query => {
+    const view = await runtime.createView({
+      ports: { result: { kind: 'Query', required: true } },
+      queries: { dependent: {
+        query: { sources: {}, transform: { input: 2 } },
+        executeWhen: p('/ports/result/stale'),
+      } },
+      render: node('/ports/result/status'),
+    }, { inputs: { result: query } });
+    await view.whenSettled(view.initial);
+    return view;
+  };
+  const direct = await consumer(handle), wrapped = await consumer(borrowed);
+  const state = view => view.getSnapshot().roots[0].inputs.value;
+  assert.deepEqual([state(direct), state(wrapped)], ['success', 'success']);
+  assert.equal(direct.getQuery('dependent').getSnapshot().waitingReason, 'EXECUTION_BLOCKED');
+  first.getState('open').write(false);
+  assert.equal(handle.getSnapshot().status, 'waiting');
+  assert.deepEqual([state(direct), state(wrapped)], ['waiting', 'waiting']);
+  await direct.getQuery('dependent').refresh();
+  assert.equal(direct.getQuery('dependent').getSnapshot().data, 2);
+
+  await direct.setInputs({ result: second.getQuery('result') });
+  await tick();
+  open = false;
+  const observed = [], wrappedPublications = [];
+  direct.subscribe(snapshot => observed.push(snapshot.roots[0].inputs.value));
+  wrapped.subscribe(snapshot => wrappedPublications.push(snapshot.roots[0].inputs.value));
+  first.getState('open').write(true);
+  await tick();
+  assert.deepEqual(observed, ['success']);
+  assert.deepEqual(wrappedPublications, ['waiting']);
+  await wrapped.dispose();
+  second.getState('open').write(false);
+  assert.equal(observed.at(-1), 'waiting');
+});
 
 test('sets and definitions apply to one View together and reject invalid State or code bindings atomically', async t => {
   const registry = createRegistry().registerResourceSet(defineResourceSet({ id: 'base', version: '1', components: [binding('Base')] }));

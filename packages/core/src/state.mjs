@@ -150,11 +150,17 @@ export class StateStore {
 
   computed(handle, dependencies, compute, { recompute = true } = {}) {
     const cell = this.#cellFor(handle), previous = {...cell};
+    const next = dependencies.map(handle => this.#cellFor(handle));
+    const graphChanged = next.length !== previous.dependencies.length ||
+      next.some((dependency, index) => dependency !== previous.dependencies[index]);
     cell.derived = true; cell.computeSnapshot = compute;
-    cell.dependencies = dependencies.map(handle => this.#cellFor(handle));
+    cell.dependencies = next;
     // Rebinding an unchanged runtime owner keeps its latest context without
-    // re-evaluating an otherwise unchanged dependency graph.
-    try { this.#order(); if(recompute)this.recompute(); } catch (caught) { Object.assign(cell,previous); throw caught; }
+    // walking an otherwise unchanged dependency graph. Recompute orders the graph itself.
+    try {
+      if (recompute) this.recompute();
+      else if (graphChanged) this.#order();
+    } catch (caught) { Object.assign(cell, previous); throw caught; }
   }
   recompute() { this.#structuralCommit([]); }
   baseline(handle) { return this.#cellFor(handle).baseline; }
@@ -509,19 +515,32 @@ export class StateStore {
     } finally { this.#draining = false; }
   }
   #payload(selector, changes) {
-    const includes = cell => selector === null || selector.has(keyOf(cell.address));
     const values = Object.create(null), states = Object.create(null);
-    for (const cell of this.#cells.values()) if (includes(cell)) {
-      const key = keyOf(cell.address); states[key] = cell.state; values[key] = cell.state.status === 'ready' ? cell.state.value : undefined;
+    const append = (key, cell) => {
+      states[key] = cell.state;
+      values[key] = cell.state.status === 'ready' ? cell.state.value : undefined;
+    };
+    if (selector?.size === 1) {
+      const [key] = selector;
+      const cell = this.#cells.get(key);
+      if (cell) append(key, cell);
+    } else if (!selector || selector.size) {
+      for (const [key, cell] of this.#cells) if (!selector || selector.has(key)) append(key, cell);
     }
-    return Object.freeze({ values: Object.freeze(values), states: Object.freeze(states), changes: Object.freeze(changes.filter(change => selector === null || selector.has(keyOf(change.target)))) });
+    return Object.freeze({ values: Object.freeze(values), states: Object.freeze(states), changes: Object.freeze(changes) });
   }
   #notify(changes) {
     if (!changes.length) return;
     if (this.#transaction) { this.#transaction.push(...changes); return; }
+    const keyed = changes.map(change => [keyOf(change.target), change]);
     let urlChanges;
-    const notifications = [...this.#subscribers].map(subscriber => [subscriber, this.#payload(subscriber.selector,
-      subscriber.url ? (urlChanges ??= changes.filter(change => this.#urlChanges.has(change))) : changes)]).filter(([, payload]) => payload.changes.length);
+    const notifications = [];
+    for (const subscriber of this.#subscribers) {
+      const source = subscriber.url ? (urlChanges ??= keyed.filter(([, change]) => this.#urlChanges.has(change))) : keyed;
+      const selected = !subscriber.url && !subscriber.selector ? changes
+        : source.filter(([key]) => !subscriber.selector || subscriber.selector.has(key)).map(([, change]) => change);
+      if (selected.length) notifications.push([subscriber, this.#payload(subscriber.selector, selected)]);
+    }
     this.#notifying = true;
     try {
       for (const [subscriber, payload] of notifications) if (this.#subscribers.has(subscriber)) {
@@ -531,7 +550,8 @@ export class StateStore {
     const wasPublishing = this.#publishing;
     this.#publishing = true;
     try {
-      for(const listener of this.#settledListeners)try{listener();}catch(caught){this.#diagnostics.push(safeError(caught));}
+      const addresses = keyed.map(([key]) => key);
+      for(const listener of this.#settledListeners)try{listener(addresses);}catch(caught){this.#diagnostics.push(safeError(caught));}
     } finally { this.#publishing = wasPublishing; }
   }
   observe(listener) { this.#settledListeners.add(listener);return ()=>this.#settledListeners.delete(listener); }

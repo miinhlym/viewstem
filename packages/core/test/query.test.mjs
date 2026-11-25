@@ -156,6 +156,29 @@ test('Concat preserves order/duplicates and Join preserves strict keys/cartesian
   const result = await engine.execute({ sources: {}, transform: { input: [1], steps: [{ kind: 'Concat', with: [[1, { label: 'x' }], [null]] }] } });
   assert.deepEqual(plain(result), [1, 1, { label: 'x' }, null]);
 });
+test('Join indexes compound keys strictly while preserving duplicate order and right field precedence', () => {
+  const left = [{ a: 1, b: 'x', l: 1, shared: 'left' }, { a: 1, b: 'x', l: 2 }, { a: '1', b: 'x', l: 3 }, { a: null, b: 'x', l: 4 }];
+  const right = [{ a: 1, b: 'x', r: 1, shared: 'right' }, { a: 1, b: 'x', r: 2 }, { a: 1, b: true, r: 3 }, { a: null, b: 'x', r: 4 }];
+  const original = structuredClone({ left, right });
+  const on = [{ left: 'a', right: 'a' }, { left: 'b', right: 'b' }];
+  const inner = joinRows(left, right, { mode: 'inner', on });
+  assert.deepEqual(inner.map(row => [row.l, row.r]), [[1, 1], [1, 2], [2, 1], [2, 2]]);
+  assert.equal(inner[0].shared, 'right');
+  assert.deepEqual(joinRows(left, right, { mode: 'left', on }).map(row => [row.l, row.r]), [[1, 1], [1, 2], [2, 1], [2, 2], [3, undefined], [4, undefined]]);
+  assert.deepEqual(joinRows(left, right, { mode: 'right', on }).map(row => [row.l, row.r]), [[1, 1], [2, 1], [1, 2], [2, 2], [undefined, 3], [undefined, 4]]);
+  assert.deepEqual({ left, right }, original);
+  assert.deepEqual(joinRows([{ a: -0 }], [{ a: 0, matched: true }], { on: [{ left: 'a', right: 'a' }] }), [{ a: 0, matched: true }]);
+});
+test('Join matches long repeated compound key parts without materializing a combined string', () => {
+  const key = '\u0000'.repeat(1_000_000);
+  const on = Array.from({ length: 100 }, () => ({ left: 'key', right: 'key' }));
+  const left = [{ key, left: 1 }], right = [{ key, right: 2 }];
+  const result = joinRows(left, right, { mode: 'inner', on });
+  assert.equal(result.length, 1);
+  assert.equal(result[0].key, key);
+  assert.equal(result[0].left, 1);
+  assert.equal(result[0].right, 2);
+});
 test('direct independent execution never uses a usage cache', async () => {
   let calls = 0; const queries = definitions();
   const engine = createQueryEngine({ registry: { get: (_, id) => queries[id] }, requestExecutor: async () => ({ body: ++calls }) });

@@ -19,6 +19,7 @@ type Row = Record<string, unknown>;
 const rowKey = (value: unknown) => typeof value === 'string' || typeof value === 'number' ? String(value) : '';
 type Column = { id: string; accessorKey: string; label: string; sortable?: boolean; filterable?: boolean };
 type Labels = Partial<Record<'filter' | 'select' | 'selectRow' | 'noRows' | 'previous' | 'next' | 'page' | 'rowsPerPage', string>>;
+const emptyRows: readonly Row[] = Object.freeze([]);
 
 export function dataTable(element: HTMLElement, send: Send, signal: AbortSignal): Behavior {
   const doc = element.ownerDocument;
@@ -57,13 +58,28 @@ export function dataTable(element: HTMLElement, send: Send, signal: AbortSignal)
   let setFilter = (_value: string) => {};
   let setPage = (_offset: number) => {};
   let setSize = (_value: number) => {};
-  filter.addEventListener('input', () => setFilter(filter.value), { signal });
+  let renderedData: readonly Row[] | undefined;
+  let renderedSettings: string | undefined;
+  let resetForm: HTMLFormElement | null = null;
+  const onReset = (event: Event) => {
+    if (event.target === resetForm) renderedData = undefined;
+  };
+  filter.addEventListener('input', () => { renderedData = undefined; setFilter(filter.value); }, { signal });
   previous.addEventListener('click', () => setPage(-1), { signal });
   next.addEventListener('click', () => setPage(1), { signal });
-  size.addEventListener('change', () => setSize(Number(size.value)), { signal });
+  size.addEventListener('change', () => { renderedData = undefined; setSize(Number(size.value)); }, { signal });
 
   return { sync(inputs) {
-    const data = (inputs.data ?? []) as Row[];
+    // Sync runs after insertion. Listen on the form because reset events
+    // stay within their DOM tree, including inside a ShadowRoot.
+    const form = filter.form;
+    if (form !== resetForm) {
+      resetForm?.removeEventListener('reset', onReset, true);
+      resetForm = form;
+      resetForm?.addEventListener('reset', onReset, { capture: true, signal });
+      renderedData = undefined;
+    }
+    const data = (inputs.data ?? emptyRows) as readonly Row[];
     const columns = (inputs.columns ?? []) as Column[];
     const sorting = (inputs.sorting ?? []) as SortingState;
     const pageIndex = (inputs.pageIndex ?? 0) as number;
@@ -78,6 +94,15 @@ export function dataTable(element: HTMLElement, send: Send, signal: AbortSignal)
       previous: labels.previous ?? 'Previous', next: labels.next ?? 'Next',
       page: labels.page ?? 'Page {page} of {pages}', rowsPerPage: labels.rowsPerPage ?? 'Rows per page',
     };
+    // Core protects input data deeply. Compare its identity without walking every
+    // row, while allowing freshly evaluated, equivalent small settings objects.
+    const settings = JSON.stringify([
+      columns.map(column => [column.id, column.accessorKey, column.label, column.sortable, column.filterable]),
+      sorting.map(column => [column.id, column.desc]), selectedIds,
+      pageIndex, pageSize, filterValue, rowId, text,
+    ]);
+    if (data === renderedData && settings === renderedSettings) return;
+    renderedData = undefined;
     const seenRows = new Set<string>();
     const safeRows = data.filter(row => {
       if (!row || !Object.hasOwn(row, rowId)) return false;
@@ -186,7 +211,7 @@ export function dataTable(element: HTMLElement, send: Send, signal: AbortSignal)
       checkbox.dataset.vsRowId = String(row.original[rowId]);
       if (focusedRow === checkbox.dataset.vsRowId) restoreFocus = checkbox;
       checkbox.setAttribute('aria-label', text.selectRow.replaceAll('{id}', () => String(row.original[rowId])));
-      checkbox.addEventListener('change', () => row.toggleSelected(checkbox.checked));
+      checkbox.addEventListener('change', () => { renderedData = undefined; row.toggleSelected(checkbox.checked); });
       td.append(checkbox); tr.append(td);
       for (const cell of row.getAllCells()) {
         const cellElement = styleScope.createElement(doc, 'td');
@@ -211,5 +236,7 @@ export function dataTable(element: HTMLElement, send: Send, signal: AbortSignal)
     }
     size.value = String(pageSize);
     restoreFocus?.focus();
+    renderedData = Object.isFrozen(data) ? data : undefined;
+    renderedSettings = settings;
   } };
 }

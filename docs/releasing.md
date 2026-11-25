@@ -12,14 +12,19 @@ package.
 1. Run `npx changeset` from the repository root. Select the affected packages
    and choose a SemVer bump for each. Changesets tracks `core`, `dom`, `svelte`,
    and `ui` independently.
-2. Write a short changelog entry that describes what changes for users of the
-   package. Add why it matters or how to migrate when users need that context.
-   Link to an existing guide if the migration needs more detail.
-3. Review the package names, bumps, and summary in the generated
+2. The summary appears in the package changelog. Name the affected feature
+   and describe what changes for package users. For a routine patch, aim for
+   one short sentence. Keep implementation details and full benchmark results
+   in the PR.
+3. Explain why the change matters when it helps users understand the impact.
+   When users need to update their code, include migration steps and link to
+   an existing guide if the steps need more detail.
+4. Review the package names, bumps, and summary in the generated
    `.changeset/*.md` file and commit it with the PR.
 
-A patch summary could read “Preserve unrelated URL parameters when replacing a
-View.” See the [Changesets writing guide](https://changesets.dev/faq#how-do-i-add-a-changeset).
+A patch summary could read “Preserve unrelated URL parameters when replacing a View.”
+or “Keep DataTable rows and focus during unrelated View updates.”
+[Changesets writing guide](https://changesets.dev/guide/writing-changesets)
 
 ### Release PR
 

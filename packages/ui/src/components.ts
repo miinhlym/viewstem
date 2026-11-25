@@ -296,17 +296,23 @@ export function catalogComponent(name: string): DomComponent {
       const combined = [node.slots.child?.length && (modalParts.test(name) || (/^(?:DropdownMenu|HoverCard|Tooltip|Popover)\.Trigger$/.test(name) || name === 'Popover.Close')) ? 'vs-ui-transparent' : className,
         inputs.class, activeCommand && 'active'].filter(Boolean).join(' ');
       if (control.className !== combined) control.className = combined;
+      const managed: string[] = [];
       for (const key of attributes) {
         if (key === 'class' || !Object.hasOwn(inputs, key)) continue;
+        managed.push(key);
         const value = key === 'href' || key === 'src' ? safeUrl(control, inputs[key], name === 'Attachment.Action' && key === 'href' && (inputs.download === true || typeof inputs.download === 'string')) : inputs[key];
         if (name === 'Avatar.Image' && key === 'src' && control.getAttribute('src') !== value) delete control.dataset.vsLoaded;
         setAttribute(control, key, value, defaults?.[key]);
       }
-      for (const key of attributes) {
-        if (key === 'class' || Object.hasOwn(inputs, key)) continue;
-        if (entry.control.dataset.vsManaged?.split(' ').includes(key)) setAttribute(control, key, undefined, defaults?.[key]);
+      const nextManaged = managed.join(' '), previousManaged = control.dataset.vsManaged;
+      if (previousManaged !== nextManaged) {
+        for (const key of previousManaged?.split(' ') ?? []) {
+          if (key !== 'class' && attributes.has(key) && !Object.hasOwn(inputs, key)) {
+            setAttribute(control, key, undefined, defaults?.[key]);
+          }
+        }
+        control.dataset.vsManaged = nextManaged;
       }
-      control.dataset.vsManaged = [...attributes].filter(key => key !== 'class' && Object.hasOwn(inputs, key)).join(' ');
 
       if (control.localName === 'button') {
         const button = control as HTMLButtonElement;

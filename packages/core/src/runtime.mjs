@@ -1,9 +1,9 @@
 import { Registry, actionDeclarations, missingReference } from './registry.mjs';
 import { prepareUrlConnection } from './url.mjs';
-import { StateStore, createStateStore } from './state.mjs';
-import { compilePorts, expression, createQueryHandle, sameContract, stateRoot } from './ports.mjs';
+import { StateStore, createStateStore, keyOf } from './state.mjs';
+import { compilePorts, expression, createQueryHandle, notifyQueryHandle, observeQueryHandle, sameContract, stateRoot } from './ports.mjs';
 import { compileSchema, equal } from './schema.mjs';
-import { protect, trustedCopies } from './immutable.mjs';
+import { isProtected, protect, trustedCopies } from './immutable.mjs';
 import { evaluate, evaluateSnapshot, readSnapshot, pathsIn, validateInitials, pointerKeys, isRecord, expressionKind, dataEntries } from './expressions.mjs';
 import { compileCel } from './cel/index.mjs';
 import { createQueryEngine } from './query/index.mjs';
@@ -15,6 +15,48 @@ const own=(object,key)=>Object.hasOwn(object,key);
 const tuple=JSON.stringify;
 let nextLifetime=0,nextInstance=0;
 const idle=Object.freeze({status:'idle',running:false,data:null,error:null});
+const waitingQuery = Object.freeze({ status: 'waiting', data: undefined, error: null,
+  dataInputs: undefined, stale: false, waitingReason: 'INPUT_NOT_READY' });
+
+function staticTemplate(value) {
+  if (Array.isArray(value)) return value.every(staticTemplate);
+  if (!isRecord(value)) return value === null || ['string', 'number', 'boolean'].includes(typeof value);
+  return Object.entries(value).every(([key, child]) =>
+    (!key.startsWith('@') || key.startsWith('@@')) && staticTemplate(child));
+}
+
+function readQuery(handle, plan, field) {
+  let snapshot;
+  try { snapshot = handle.getSnapshot(); }
+  catch (cause) {
+    if (plan) plan.queryReads = null;
+    throw cause;
+  }
+  const reads = plan?.queryReads;
+  if (reads) {
+    let fields = reads.get(handle);
+    if (!fields) reads.set(handle, fields = new Map());
+    if (!fields.has(field)) fields.set(field, field === undefined ? snapshot : snapshot[field]);
+  }
+  return snapshot;
+}
+
+function stableItemInputs(node, spec, functions) {
+  // These leaves have no state or connections to reconcile. Their inputs and
+  // keys can be reused while the same immutable items array is available.
+  if (own(node, 'when') || node.on || node.slots || spec.render
+    || [spec.states, spec.queries, spec.slots].some(value => Object.keys(value ?? {}).length)
+    || spec.reactions?.length || Object.values(spec.ports ?? {}).some(port => port.kind !== 'Value')) return false;
+  const fromItem = value => {
+    if (expressionKind(value, functions) !== 'path') return false;
+    const [root, alias] = pointerKeys(value['@path']);
+    return root === 'repeat' && alias === node.repeat.as;
+  };
+  const inputs = node.inputs ?? {};
+  return fromItem(node.repeat.key) && isRecord(inputs) && !expressionKind(inputs, functions)
+    && Object.values(inputs).every(value => value === null || ['string', 'number', 'boolean'].includes(typeof value)
+      || fromItem(value));
+}
 const deferred = () => {
   let resolve, reject;
   const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
@@ -70,7 +112,8 @@ export class Runtime {
       onChange:()=>{for(const view of this.views)view.refresh();}});
   }
   execution(registry) {
-    const execution=Object.create(this);execution.registry=registry;return execution;
+    // Each execution owns a registry snapshot, including the Types its ports resolve.
+    return Object.assign(Object.create(this), { registry, portCompilers: new WeakMap() });
   }
   variable(use,inputs={},registry=this.registry) {
     const spec=typeof use==='string'?registry.get('Variable',use).spec:use;
@@ -190,6 +233,12 @@ export class View {
     const runtime=execution;this.host=host;this.runtime=runtime;this.owner=owner;this.generation=0;this.instances=new Map();this.owners=new Map();this.connections=new Map();this.listeners=new Map();this.diagnostics=[];this.planning=false;this.queued=false;
     this.lifetime = new AbortController();
     this.queryUses = new Set();
+    this.queryPortObservers = new Map();
+    this.leafRepeats = new Map();
+    this.nodeSnapshots = new WeakMap();
+    this.stateAddresses = new Set();
+    this.treeQueryReads = this.configuredQueryReads = null;
+    this.forceRefresh = false;
     this.renderWaiters = new Set();
     this.closeListeners = new Set();
     this.diagnosticListeners = new Set();
@@ -199,7 +248,18 @@ export class View {
     this.published = 0;
     this.projectionWaiters = new Set();
     this.renderListeners = new Map();
-    this.unsubscribe = runtime.stateStore.observe(() => this.refresh());
+    this.unsubscribe = runtime.stateStore.observe(addresses => {
+      if (!addresses.some(address => this.stateAddresses.has(address))) return;
+      if (!this.queryUses.size) {
+        this.refresh();
+        return;
+      }
+      const event = { handles: new Set(), views: new Set([this]) };
+      this.refresh(false, event.handles);
+      // A State write has always settled dependent View gates synchronously.
+      // Propagate changed Query ports after the owning View has published.
+      for (const handle of event.handles) notifyQueryHandle(handle, event);
+    });
   }
   get alive() { return !this.disposal && this.host.alive && !this.owner?.signal.aborted && (this.owner?.isOpen?.() ?? true); }
   prepareApplication() {
@@ -261,8 +321,9 @@ export class View {
     yield* this.urlDiagnostics ?? [];
   }
   queryChanged(item, snapshot, failedRun) {
-    this.schedule();
     if (!this.alive || !this.queryUses.has(item)) return;
+    this.schedule(true);
+    this.stateQueryChanges?.add(item.handle);
     const failure = snapshot.error;
     if (snapshot.status !== 'error' || !failure || failure.code === 'CANCELLED') {
       item.diagnostic = undefined;
@@ -275,6 +336,23 @@ export class View {
     queueMicrotask(() => {
       if (this.queryUses.has(item)) this.publishDiagnostic(diagnostic, listeners);
     });
+  }
+  observeQueryPorts(ports, uses) {
+    for (const item of uses) ports.delete(item.handle);
+    for (const [handle, stop] of this.queryPortObservers) {
+      if (ports.has(handle)) continue;
+      stop();
+      this.queryPortObservers.delete(handle);
+    }
+    for (const handle of ports) {
+      if (!this.queryPortObservers.has(handle)) {
+        this.queryPortObservers.set(handle, observeQueryHandle(handle, event => {
+          if (event.views.has(this)) return;
+          event.views.add(this);
+          this.refresh(true, event.handles);
+        }));
+      }
+    }
   }
   projection() {
     return { generation: this.generation, requested: this.requested, published: this.published };
@@ -327,9 +405,15 @@ export class View {
       } else if(root==='ports') {
         if(!own(owner.spec.ports??{},name))fail('REFERENCE_NOT_FOUND');
         value=owner.ports[name];
-        if(!target){const kind=owner.spec.ports[name].kind;if(kind==='State')value=value?readSnapshot(value.getSnapshot()):undefined;else if(kind==='Query')value=value?.getSnapshot();}
+        if (!target) {
+          const kind = owner.spec.ports[name].kind;
+          if (kind === 'State') value = value ? readSnapshot(value.getSnapshot()) : undefined;
+          else if (kind === 'Query' && value) value = readQuery(value, plan, keys[2]);
+        }
       } else if(root==='queries') {
-        const item=owner.queries.get(name);if(!item)fail('REFERENCE_NOT_FOUND');value=target?item.handle:item.usage?.getSnapshot()??{status:'waiting',data:undefined,error:null,dataInputs:undefined,stale:false,waitingReason:'INPUT_NOT_READY'};
+        const item = owner.queries.get(name);
+        if (!item) fail('REFERENCE_NOT_FOUND');
+        value = target ? item.handle : readQuery(item.handle, plan, keys[2]);
       } else if(root==='actions') {
         let connection=[...(plan?.connections??this.connections).values()].find(item=>item.owner.id===owner.id&&item.handler.id===name);
         if(!connection&&plan?.connections){
@@ -359,8 +443,16 @@ export class View {
     return inputs;
   }
   prepareInputs(spec, templates, context, mode = 'automatic', literal = false, kind = 'Component', runtime = this.runtime) {
-    const inputs = this.bindInputs(spec, templates, context, literal, runtime.registry);
-    return compilePorts({resourceKind:kind,ports:spec.ports,types:runtime.registry.types(),store:runtime.stateStore}).prepare(inputs,{mode});
+    const { registry, stateStore, portCompilers } = runtime;
+    const inputs = this.bindInputs(spec, templates, context, literal, registry);
+    let byKind = portCompilers.get(spec);
+    if (!byKind) portCompilers.set(spec, byKind = new Map());
+    let compiled = byKind.get(kind);
+    if (!compiled) {
+      compiled = compilePorts({ resourceKind: kind, ports: spec.ports, types: registry.types(), store: stateStore });
+      byKind.set(kind, compiled);
+    }
+    return compiled.prepare(inputs, { mode });
   }
   makeOwner(spec,ports,id,previous,created,runtime,plan) {
     const { stateStore: store, registry } = runtime;
@@ -380,7 +472,7 @@ export class View {
       const old=previous?.queries.get(name),identity=use.queryRef?`Query:${use.queryRef}`:tuple(use.query);
       const item=old?.identity===identity?{...old,use,owner}: {use,owner,identity,usage:null,handle:null};
       if(!item.handle)item.handle=createQueryHandle({
-        getSnapshot:()=>item.usage?.getSnapshot()??{status:'waiting',data:undefined,error:null,dataInputs:undefined,stale:false,waitingReason:'INPUT_NOT_READY'},
+        getSnapshot:()=>item.usage?.getSnapshot()??waitingQuery,
         refresh:signal=>this.requestQuery(item,'refresh',signal),retry:signal=>this.requestQuery(item,'retry',signal),
       });
       // Preserve the object referenced by the handle; owner/use are assigned after commit.
@@ -389,6 +481,8 @@ export class View {
     for(const name of validateInitials(spec,registry.functions)) {
       const declaration=spec.states[name],handle=owner.states.get(name),context=this.context(owner, {}, plan);
       if(declaration.kind==='Derived') {
+        // The Store can run this computation outside the current build.
+        plan.queryReads = null;
         const paths=pathsIn(declaration.inputs??{},registry.functions);
         const portNames=new Set(paths.filter(keys=>keys[0]==='ports').flatMap(keys=>keys.length===1?Object.keys(spec.ports??{}):[keys[1]]));
         const dependencies=[...paths.filter(keys=>keys[0]==='states').map(keys=>owner.states.get(keys[1])),
@@ -429,7 +523,9 @@ export class View {
     const { registry, stateStore: store } = runtime;
     const created=[],newConnections=[],next=new Map(),owners=new Map(),connections=new Map(),aliases=new Set();
     const oldOwners=this.owners;let oldInstances=replace?new Map():this.instances,availableConnections=replace?new Map():this.connections;
-    const plan = { connections };
+    const previousRepeats = commit ? undefined : this.leafRepeats;
+    const leafRepeats = new Map();
+    const plan = { connections, queryReads: runtime.functions.length ? null : new Map() };
     let root,roots;
     const prepare = run => commit ? this.host.prepare(run) : run();
     try {
@@ -455,14 +551,47 @@ export class View {
         const expand=(node,author,extra={},trail=[],repeated=false)=>{
           const context=this.context(author,extra,plan);
           if(node.repeat&&!repeated) {
-            const snapshot=evaluateSnapshot(node.repeat.items,context);if(snapshot.status!=='ready')return [{id:node.id,status:snapshot.status,error:snapshot.error,children:[],inputs:{}}];
-            if(!Array.isArray(snapshot.value))fail('TYPE_MISMATCH');const seen=new Set();
-            const entries=snapshot.value.map(item=>{
+            const group = tuple([author.id, node.id, trail]);
+            const previous = previousRepeats?.get(group);
+            let items = previous?.source === node && previous.literal ? previous.items : undefined;
+            if (!items) {
+              const snapshot = evaluateSnapshot(node.repeat.items, context);
+              if (snapshot.status !== 'ready') return [{ id: node.id, status: snapshot.status, error: snapshot.error, children: [], inputs: {} }];
+              items = snapshot.value;
+              if (!Array.isArray(items)) fail('TYPE_MISMATCH');
+            }
+            if (previous?.source === node && previous.items === items) {
+              for (const instance of previous.instances) {
+                if (next.has(instance.address)) fail('INVALID_DEFINITION');
+                next.set(instance.address, instance);
+                owners.set(instance.owner.id, instance.owner);
+              }
+              leafRepeats.set(group, previous);
+              return previous.instances;
+            }
+            const seen=new Set();
+            const entries=items.map(item=>{
               const childExtra={...extra,repeat:{...extra.repeat,[node.repeat.as]:item}},value=evaluate(node.repeat.key,this.context(author,childExtra,plan));
               if(typeof value!=='string'&&!(typeof value==='number'&&Number.isFinite(value)))fail('TYPE_MISMATCH');
               const key=tuple([typeof value,Object.is(value,-0)?0:value]);if(seen.has(key))fail('INVALID_DEFINITION');seen.add(key);return {childExtra,key};
             });
-            return entries.flatMap(({childExtra,key})=>expand(node,author,childExtra,[...trail,[node.id,key]],true));
+            const instances = entries.flatMap(({childExtra,key})=>expand(node,author,childExtra,[...trail,[node.id,key]],true));
+            const protectedItems = isProtected(items);
+            if ((protectedItems || Array.isArray(node.repeat.items)) && instances.length
+              && stableItemInputs(node, instances[0].spec, runtime.functions)
+              && instances.every(instance => instance.status === 'ready')) {
+              const literal = !protectedItems && staticTemplate(node.repeat.items);
+              if (literal || protectedItems) {
+                // These leaves have no event bindings or child templates.
+                // Keep their prepared inputs without retaining the old author tree.
+                for (const instance of instances) {
+                  instance.author = undefined;
+                  instance.extra = undefined;
+                }
+                leafRepeats.set(group, { source: node, items: protect(items), instances, literal });
+              }
+            }
+            return instances;
           }
           if(own(node,'when')) {
             const snapshot=evaluateSnapshot(node.when,context);if(snapshot.status!=='ready')return [{id:node.id,status:snapshot.status,error:snapshot.error,children:[],inputs:{}}];
@@ -504,11 +633,12 @@ export class View {
           const changed=[];
           for(const [id,owner] of previousOwners)if(!owners.has(id))for(const stop of owner.reactions)stop();
           for(const owner of owners.values()) {
+            const previous=previousOwners.get(owner.id)?.reactionDefinitions??[];
+            if (!previous.length && !owner.spec.reactions?.length) continue;
             const definitions=owner.suspended?[]:(owner.spec.reactions??[]).map(reaction=>({
               watch:reaction.watch.map(value=>stateRoot(evaluate(value,this.context(owner,{},plan),{target:true}),store)),
               target:stateRoot(evaluate(reaction.target,this.context(owner,{},plan),{target:true}),store),value:reaction.value
             }));
-            const previous=previousOwners.get(owner.id)?.reactionDefinitions??[];
             const unchanged=definitions.length===previous.length&&definitions.every((item,index)=>item.target===previous[index].target&&item.watch.length===previous[index].watch.length&&item.watch.every((handle,i)=>handle===previous[index].watch[i])&&equal(item.value,previous[index].value));
             owner.reactionDefinitions=definitions;
             if(!unchanged){for(const stop of owner.reactions)stop();owner.reactions=[];changed.push(owner);}
@@ -522,7 +652,7 @@ export class View {
           // State and reaction values are now final. Reconcile their dependent tree
           // before committing observers, requests or cancellation of old connections.
           const stagedOwners=new Map(owners);oldInstances=new Map([...oldInstances,...next]);availableConnections=new Map([...availableConnections,...connections]);
-          next.clear();owners.clear();connections.clear();aliases.clear();owners.set(root.id,root);
+          next.clear();owners.clear();connections.clear();aliases.clear();leafRepeats.clear();owners.set(root.id,root);
           roots=expand(spec.render,root);reconcileReactions(stagedOwners);
         }
         for(const owner of new Set([...oldOwners.values(),...created]))if(!owners.has(owner.id))owner.scope.dispose();
@@ -535,7 +665,31 @@ export class View {
         this.instances = next;
         this.owners = owners;
         this.connections = connections;
-        this.queryUses = new Set([...owners.values()].flatMap(owner => [...owner.queries.values()]));
+        this.leafRepeats = leafRepeats;
+        const queryUses = new Set(), queryPorts = new Set(), stateAddresses = new Set();
+        for (const owner of owners.values()) {
+          for (const handle of owner.states.values()) stateAddresses.add(keyOf(handle.address));
+          for (const name in owner.ports) {
+            const handle = owner.ports[name];
+            if (owner.spec.ports[name].kind === 'State' && handle) stateAddresses.add(keyOf(handle.address));
+            if (owner.spec.ports[name].kind !== 'Query' || !handle) continue;
+            queryPorts.add(handle);
+            // Code adapters can read any Query field through the handle. A new
+            // snapshot must reach them even without a declarative field read.
+            const componentRef = owner.instance?.source.componentRef;
+            if (componentRef && plan.queryReads && !plan.queryReads.get(handle)?.has(undefined)
+              && registry.isCode('Component', componentRef)) {
+              try { readQuery(handle, plan, undefined); }
+              catch { /* The failed read disabled reuse. The adapter owns the error. */ }
+            }
+          }
+          for (const item of owner.queries.values()) queryUses.add(item);
+        }
+        this.stateAddresses = stateAddresses;
+        this.queryUses = queryUses;
+        this.observeQueryPorts(queryPorts, queryUses);
+        this.treeQueryReads = plan.queryReads;
+        plan.queryReads = null;
         plan.connections = null;
         return () => {
           const retained = new Set([...connections.values()].map(entry => entry.connection));
@@ -575,9 +729,10 @@ export class View {
   configureQueries() {
     const generation = this.generation;
     const current = () => this.alive && generation === this.generation;
+    const plan = { queryReads: this.runtime.functions.length ? null : new Map() };
     for(const owner of this.owners.values())for(const [name,item] of owner.queries) {
       if(!current())return;
-      const use=item.use,spec=use.query??this.runtime.registry.get('Query',use.queryRef).spec,context=this.context(owner);
+      const use=item.use,spec=use.query??this.runtime.registry.get('Query',use.queryRef).spec,context=this.context(owner, {}, plan);
       let preparedInputs,ready=true,executeWhen=true,autoRefreshWhen=true,inputError;
       try {
         preparedInputs=this.prepareInputs(spec,use.inputs??{},context,'automatic',false,'Query');
@@ -603,8 +758,23 @@ export class View {
       }
       else item.usage.update(settings);
     }
+    if (current()) this.configuredQueryReads = plan.queryReads;
   }
-  refresh() {
+  queryReadsUnchanged() {
+    if (!this.treeQueryReads || !this.configuredQueryReads) return false;
+    for (const reads of [this.treeQueryReads, this.configuredQueryReads]) {
+      for (const [handle, fields] of reads) {
+        let snapshot;
+        try { snapshot = handle.getSnapshot(); }
+        catch { return false; }
+        for (const [field, value] of fields) {
+          if (!Object.is(value, field === undefined ? snapshot : snapshot[field])) return false;
+        }
+      }
+    }
+    return true;
+  }
+  refresh(queryOnly = false, stateQueryChanges) {
     if(!this.alive||!this.root)return;
     this.requested++;
     // A subscriber can commit State while project() is publishing this plan.
@@ -612,13 +782,44 @@ export class View {
     // a newer snapshot to listeners still receiving the current one.
     if(this.planning){this.schedule();return;}
     this.planning=true;
-    try{this.build(this.spec,this.inputs);this.configureQueries();this.project();}catch(caught){this.diagnostics.push(safeError(caught));this.project();}finally{this.planning=false;}
+    this.stateQueryChanges = stateQueryChanges;
+    try {
+      // Publish every Query status as before. Rebuild only when a tracked read
+      // changed or a State, Action, URL or application requires reconciliation.
+      if (!queryOnly || !this.queryReadsUnchanged()) {
+        this.build(this.spec, this.inputs);
+        this.configureQueries();
+      }
+      this.project();
+    } catch (caught) {
+      this.treeQueryReads = this.configuredQueryReads = null;
+      this.diagnostics.push(safeError(caught));
+      this.project();
+    } finally {
+      this.stateQueryChanges = undefined;
+      this.planning = false;
+    }
   }
-  schedule(){if(!this.alive)return;this.requested++;if(this.queued)return;this.queued=true;queueMicrotask(()=>{this.queued=false;this.refresh();});}
+  schedule(queryOnly = false) {
+    if (!this.alive) return;
+    this.requested++;
+    this.forceRefresh ||= !queryOnly;
+    if (this.queued) return;
+    this.queued = true;
+    queueMicrotask(() => {
+      const queryOnly = !this.forceRefresh;
+      this.forceRefresh = false;
+      this.queued = false;
+      this.refresh(queryOnly);
+    });
+  }
   project() {
     if(!this.alive)return;
     const generation = this.generation, snapshot = this.getSnapshot();
-    this.updateNodeDiagnostics(snapshot);
+    if (this.diagnosedRoots !== this.roots) {
+      this.updateNodeDiagnostics(snapshot);
+      this.diagnosedRoots = this.roots;
+    }
     const diagnosticListeners = [...this.diagnosticListeners];
     const registry = this.runtime.registry;
     this.published = this.requested;
@@ -898,17 +1099,21 @@ export class View {
   getSnapshot() {
     if (this.stagingSnapshot) return this.stagingSnapshot;
     const serialize = instance => {
+      const cached = this.nodeSnapshots.get(instance);
+      if (cached) return cached;
       const entries = Object.entries(instance.slots ?? {});
       const slots = Object.freeze(Object.fromEntries(entries.map(([name, nodes]) =>
         [name, Object.freeze(nodes.map(serialize))])));
       // Code Components expose the same slot children in two forms.
       const children = entries.length ? Object.values(slots).flat() : instance.children.map(serialize);
-      return Object.freeze({
+      const snapshot = Object.freeze({
         id: instance.id, instanceId: instance.owner?.id, address: instance.address,
         generation: instance.generation, componentRef: instance.source?.componentRef,
         status: instance.status, error: instance.error ?? null, inputs: instance.inputs,
         children: Object.freeze(children), slots,
       });
+      this.nodeSnapshots.set(instance, snapshot);
+      return snapshot;
     };
     const states=Object.create(null),queries=Object.create(null),actions=Object.create(null);
     for(const [name,handle] of this.root?.states??[])states[name]=handle.getSnapshot();
@@ -964,6 +1169,8 @@ export class View {
       this.nextJob?.cancel();
       this.nextJob = null;
       this.unsubscribe();
+      for (const stop of this.queryPortObservers.values()) stop();
+      this.queryPortObservers.clear();
       this.owner?.signal.removeEventListener('abort', this.disposeOnAbort);
       cleanup(() => this.urlTransition?.dispose());
       cleanup(() => this.url?.dispose());
