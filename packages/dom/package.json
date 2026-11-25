@@ -26,6 +26,6 @@
     "@csstools/css-tokenizer": "4.0.3",
     "@viewstem/core": "0.1.0",
     "postcss": "8.5.8",
-    "postcss-selector-parser": "7.1.1"
+    "postcss-selector-parser": "7.2.1"
   }
 }
