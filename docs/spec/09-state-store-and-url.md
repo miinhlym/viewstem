@@ -42,6 +42,8 @@ View/Component의 `spec.reactions`는 `{watch:[상태 @path, ...], target:상태
 
 watch의 실제 값 변경으로만 작동하며 초기화·URL 복원은 reaction 실행을 만들지 않는다. 같은 원자 변경 묶음의 명시적 쓰기가 target에 있으면 그 값을 우선한다. reaction 연쇄와 Derived 의존을 함께 검증해 순환을 거절하고, 값 확정 뒤 Query 실행 판단으로 넘어간다. 일반적인 Action 오류 복구나 이벤트 버스로 이 구조를 확대하지 않는다.
 
+동적 보간이 같은 변경 묶음에서 다른 State나 Derived를 선택하면, 새로 읽는 셀의 값을 그 묶음 안에서 확정한다. Reaction 판단과 구독 통지는 확정된 값을 사용한다. 값 계산 중 발견된 순환 읽기는 Derived 오류로 처리한다.
+
 ## URL 동기화의 확정 의미
 
 ### 연결 범위와 지원 값

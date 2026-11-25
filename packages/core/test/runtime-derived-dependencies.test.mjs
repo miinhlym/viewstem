@@ -116,10 +116,80 @@ test('Derived refreshes a State path read through a dynamic formatString templat
   };
   const { view, initialComplete } = await f.runtime.createView({ view: spec, inputs: { template: '${/states/source}' } });
   await initialComplete;
-  const output = view.getState('computed');
-  assert.equal(output.read(), '1');
-  view.getState('source').write(2);
-  assert.equal(output.read(), '2');
+  const output = view.getState('computed'), source = view.getState('source');
+  const observed = [];
+  t.after(f.store.subscribe([source.address, output.address], () => observed.push([source.read(), output.read()])));
+  source.write(2);
+  assert.deepEqual(observed, [[1, '1'], [2, '2']]);
+});
+
+test('dynamic Derived writes settle the newly selected dependency before reactions publish', async t => {
+  const f = fixture(t), string = { type: 'string' };
+  const text = { kind: 'Value', schema: string, required: true };
+  const state = initial => ({ kind: 'State', schema: string, initial });
+  const derive = (input, expression = 'text') => ({
+    kind: 'Derived', schema: string, variable: { ports: { text }, expression }, inputs: { text: input },
+  });
+  const { view, initialComplete } = await f.runtime.createView({ view: {
+    states: {
+      template: state('${/states/fallback}'),
+      fallback: state('new'),
+      computed: derive({ '@call': 'formatString', args: { value: path('/states/template') } }),
+      peer: derive(path('/states/template'), "text.contains('peer') ? 'new' : 'before'"),
+      reactionTarget: state('unfired'),
+    },
+    reactions: [{ watch: [path('/states/computed')], target: path('/states/reactionTarget'), value: 'fired' }],
+    render: leaf,
+  } });
+  await initialComplete;
+  const names = ['template', 'computed', 'peer', 'reactionTarget'];
+  const handles = names.map(name => view.getState(name));
+  const observed = [];
+  t.after(f.store.subscribe(handles.map(handle => handle.address), ({ changes }) => {
+    observed.push([handles.map(handle => handle.read()), changes.map(change => change.target.name)]);
+  }));
+  handles[0].write('${/states/peer}');
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(observed, [
+    [['${/states/fallback}', 'new', 'before', 'unfired'], []],
+    [['${/states/peer}', 'new', 'new', 'unfired'], ['template', 'peer']],
+  ]);
+});
+
+test('dynamic Deriveds recover from a cycle in the State write that breaks it', async t => {
+  const f = fixture(t), string = { type: 'string' };
+  const text = { kind: 'Value', schema: string, required: true };
+  const fromTemplate = template => ({
+    kind: 'Derived', schema: string, variable: { ports: { text }, expression: 'text' },
+    inputs: { text: { '@call': 'formatString', args: { value: path(template) } } },
+  });
+  const { view, initialComplete } = await f.runtime.createView({
+    view: {
+      ports: { peerTemplate: text },
+      states: {
+        selector: { kind: 'State', schema: string, initial: '${/states/source}' },
+        source: { kind: 'State', schema: string, initial: 'value' },
+        computed: fromTemplate('/states/selector'),
+        peer: fromTemplate('/ports/peerTemplate'),
+      },
+      render: leaf,
+    },
+    inputs: { peerTemplate: '${/states/computed}' },
+  });
+  await initialComplete;
+  const selector = view.getState('selector'), computed = view.getState('computed'), peer = view.getState('peer');
+  const observed = [];
+  t.after(f.store.subscribe([selector.address, computed.address, peer.address], () => {
+    observed.push([computed.getSnapshot(), peer.getSnapshot()].map(value => value.error?.code ?? value.value));
+  }));
+  selector.write('${/states/peer}');
+  selector.write('${/states/source}');
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(observed, [
+    ['value', 'value'],
+    ['INVALID_DEFINITION', 'INVALID_DEFINITION'],
+    ['value', 'value'],
+  ]);
 });
 
 test('Derived Query-port values refresh through a retained owner and conditional removal cancels old cells', async t => {

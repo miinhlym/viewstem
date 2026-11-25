@@ -522,7 +522,7 @@ export class View {
             if(inputs.status==='waiting')return {status:'pending'};
             return {status:'ready',value:runtime.variable(variable,inputs.ports)};
           }catch(caught){return {status:'error',error:safeError(caught)};}
-        },{recompute:!unchanged,externalChanged});
+        },{recompute:!unchanged,externalChanged,trackDependencies:dynamicPath});
       } else if(own(declaration,'initial')) {
         let snapshot=evaluateSnapshot(declaration.initial,context,{roots:['states','ports','queries']});
         if(snapshot.status==='missing')snapshot={status:'pending'};

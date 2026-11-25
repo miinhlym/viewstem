@@ -7,6 +7,7 @@ const fail = code => { throw coreError(({READ_ONLY:'TYPE_MISMATCH',DUPLICATE_STA
 export const keyOf = address => JSON.stringify([address.scopeId, address.name]);
 const missing = Object.freeze({ status: 'missing' });
 const pending = Object.freeze({ status: 'pending' });
+const dependencyCycle = Symbol();
 const errorState = error => Object.freeze({ status: 'error', error: safeError(error) });
 const same = (a, b) => a.status === b.status && (a.status === 'ready' ? equal(a.value, b.value) : a.status !== 'error' || a.error.code === b.error.code);
 const changedValue = (before, after) => after.status === 'ready' && (before.status !== 'ready' || !equal(before.value, after.value));
@@ -27,6 +28,7 @@ export class StateStore {
   #diagnostics = [];
   #transaction = null;
   #readingStage = null;
+  #settleRead;
   #scopes = new Set();
   #scopeLifetimes = new WeakMap();
   #url = null;
@@ -148,18 +150,19 @@ export class StateStore {
     else for (const listener of this.#baselineListeners) listener();
   }
 
-  computed(handle, dependencies, compute, { recompute = true, externalChanged } = {}) {
+  computed(handle, dependencies, compute, { recompute = true, externalChanged, trackDependencies = false } = {}) {
     const cell = this.#cellFor(handle), previous = {...cell};
     const next = dependencies.map(handle => this.#cellFor(handle));
     const graphChanged = next.length !== previous.dependencies.length ||
       next.some((dependency, index) => dependency !== previous.dependencies[index]);
     cell.derived = true; cell.computeSnapshot = compute; cell.externalChanged = externalChanged;
     cell.dependencies = next;
+    cell.dynamicDependencies = trackDependencies ? { reads: [], blocked: [] } : undefined;
     // Rebinding an unchanged runtime owner keeps its latest context without
     // walking an otherwise unchanged dependency graph.
     try {
-      const order = graphChanged ? this.#order() : undefined;
-      if (recompute) this.#structuralCommit([], { recompute: cell, order });
+      if (graphChanged) this.#validateDependencyGraph({ observed: false });
+      if (recompute) this.#structuralCommit([], { recompute: cell });
     } catch (caught) { Object.assign(cell, previous); throw caught; }
   }
   baseline(handle) { return this.#cellFor(handle).baseline; }
@@ -298,6 +301,11 @@ export class StateStore {
 
   #lookup(address) { return this.#cells.get(keyOf(address)) ?? fail('REFERENCE_NOT_FOUND'); }
   #current(cell) { if (this.#cells.get(keyOf(cell.address)) !== cell) fail('CANCELLED'); }
+  #snapshot(cell) {
+    this.#current(cell);
+    this.#settleRead?.(cell);
+    return this.#readingStage?.get(cell) ?? cell.state;
+  }
   #afterCommit(cleanup) {
     if (this.#transaction) { this.#transaction.cleanup.push(cleanup); return; }
     const wasNotifying = this.#notifying;
@@ -319,7 +327,7 @@ export class StateStore {
     if (!declaration || typeof declaration !== 'object' || !Object.hasOwn(declaration, 'schema')) fail('INVALID_DEFINITION');
     let validator;try { validator = compileSchema(declaration.schema); } catch(caught) { throw safeError(caught,'INVALID_DEFINITION'); }
     const cell = { address, generation: ++nextGeneration, validator, schema: structuredClone(declaration.schema), initialSettled: Object.hasOwn(declaration, 'initial'), state: missing, baseline: missing, writes: 0, clockSubscriptions: new Set(),
-      derived: declaration.derived, computeSnapshot: undefined, externalChanged: undefined,
+      derived: declaration.derived, computeSnapshot: undefined, externalChanged: undefined, dynamicDependencies: undefined,
       dependencies: (declaration.dependencies ?? []).map(handle => this.#cellFor(handle)) };
     if (cell.derived && typeof cell.derived !== 'function') fail('INVALID_DEFINITION');
     // Async initialization is distinct from ordinary stored data.
@@ -330,8 +338,8 @@ export class StateStore {
     } else if (Object.hasOwn(declaration, 'initial')) cell.state = cell.baseline = this.#accept(cell, declaration.initial);
     const store = this;
     cell.handle = Object.freeze({ address, generation: cell.generation,
-      read() { store.#current(cell); const snapshot = store.#readingStage?.get(cell) ?? cell.state; if (snapshot.status === 'pending') fail('VALUE_PENDING'); if (snapshot.status === 'error') throw snapshot.error; return snapshot.status === 'ready' ? snapshot.value : undefined; },
-      getSnapshot() { store.#current(cell); return store.#readingStage?.get(cell) ?? cell.state; },
+      read() { const snapshot = store.#snapshot(cell); if (snapshot.status === 'pending') fail('VALUE_PENDING'); if (snapshot.status === 'error') throw snapshot.error; return snapshot.status === 'ready' ? snapshot.value : undefined; },
+      getSnapshot() { return store.#snapshot(cell); },
       write(value) { store.writeBatch([[cell.handle, value]]); },
       reset() {
         store.assertCanWrite();
@@ -425,29 +433,85 @@ export class StateStore {
       for (const dependency of watched) this.#current(dependency);
       if (this.#reactions.has(cell)) fail('DUPLICATE_REACTION');
       this.#reactions.set(cell, reaction);
-      try { this.#order(); } catch (error) { this.#reactions.delete(cell); throw error; }
+      try { this.#validateDependencyGraph(); } catch (error) { this.#reactions.delete(cell); throw error; }
     });
     return () => this.#mutate(() => { if (this.#reactions.get(cell) === reaction) this.#reactions.delete(cell); });
   }
-  #order() {
-    const result = [], active = new Set(), done = new Set();
+  #validateDependencyGraph({ observed = true } = {}) {
+    const active = new Set(), done = new Set();
     const visit = cell => {
       if (this.#cells.get(keyOf(cell.address)) !== cell) return;
       if (active.has(cell)) fail('DEPENDENCY_CYCLE');
       if (done.has(cell)) return;
       active.add(cell);
-      for (const dependency of [...cell.dependencies, ...(this.#reactions.get(cell)?.watch ?? [])]) visit(dependency);
-      active.delete(cell); done.add(cell); result.push(cell);
+      for (const dependency of cell.dependencies) visit(dependency);
+      if (observed && cell.dynamicDependencies) for (const dependency of cell.dynamicDependencies.reads) visit(dependency);
+      for (const dependency of this.#reactions.get(cell)?.watch ?? []) visit(dependency);
+      active.delete(cell); done.add(cell);
     };
     for (const cell of this.#cells.values()) visit(cell);
-    return result;
   }
-  #calculate(cell, staged) {
+  #settle(staged, changed, { affected, first, applyReaction } = {}) {
+    const active = new Set(), done = new Set();
+    // Previously observed reads are invalidation hints. A changed input can
+    // redirect a dynamic path, so validate the actual read during evaluation.
+    const observedChanged = dependency => {
+      try { settle(dependency); }
+      catch (caught) { if (caught === dependencyCycle) return true; throw caught; }
+      return changed(dependency);
+    };
+    const settle = cell => {
+      if (!staged.has(cell) || done.has(cell)) return;
+      if (active.has(cell)) throw dependencyCycle;
+      active.add(cell);
+      try {
+        for (const dependency of cell.dependencies) settle(dependency);
+        const reaction = this.#reactions.get(cell);
+        if (reaction) for (const dependency of reaction.watch) settle(dependency);
+        if (cell.derived && (affected?.has(cell) || cell.dependencies.some(changed)
+          || cell.dynamicDependencies?.reads.some(observedChanged)
+          || cell.dynamicDependencies?.blocked.some(observedChanged))) {
+          staged.set(cell, this.#calculate(cell, staged, settle));
+        }
+        if (reaction) applyReaction?.(cell, reaction);
+        done.add(cell);
+      } finally { active.delete(cell); }
+    };
+    try {
+      if (first) settle(first);
+      for (const cell of staged.keys()) settle(cell);
+    } catch (caught) {
+      if (caught === dependencyCycle) fail('DEPENDENCY_CYCLE');
+      throw caught;
+    }
+    return done;
+  }
+  #calculate(cell, staged, settle) {
     if (cell.dependencies.some(item => this.#cells.get(keyOf(item.address)) !== item)) return errorState({ code: 'CANCELLED' });
     if (cell.computeSnapshot) {
-      const previous=this.#readingStage;this.#readingStage=staged;
-      try { const result=cell.computeSnapshot();return result.status === 'ready' ? this.#accept(cell,result.value) : result; }
-      catch(caught){return errorState(caught);}finally{this.#readingStage=previous;}
+      const previous=this.#readingStage, previousRead=this.#settleRead;
+      this.#readingStage=staged;
+      const observed = cell.dynamicDependencies && { reads: [], blocked: [] };
+      this.#settleRead = observed && (dependency => {
+        try { settle(dependency); }
+        catch (caught) {
+          if (caught !== dependencyCycle) throw caught;
+          // Remember the failed read for recovery, without adding a cycle
+          // to the valid dependency graph.
+          if (!observed.blocked.includes(dependency)) observed.blocked.push(dependency);
+          fail('DEPENDENCY_CYCLE');
+        }
+        if (!cell.dependencies.includes(dependency) && !observed.reads.includes(dependency)) observed.reads.push(dependency);
+      });
+      try {
+        const result=cell.computeSnapshot();
+        return result.status === 'ready' ? this.#accept(cell,result.value) : result;
+      } catch(caught) { return errorState(caught); }
+      finally {
+        this.#readingStage=previous;
+        this.#settleRead=previousRead;
+        if (observed) cell.dynamicDependencies=observed;
+      }
     }
     const snapshots = cell.dependencies.map(item => staged.get(item) ?? missing);
     const error = snapshots.find(item => item.status === 'error'); if (error) return error;
@@ -456,24 +520,25 @@ export class StateStore {
     try { return this.#accept(cell, cell.derived(...snapshots.map(item => item.value))); }
     catch (error) { return errorState(error); }
   }
-  #structuralCommit(changes, { added, retired = [], recompute, order } = {}) {
+  #structuralCommit(changes, { added, retired = [], recompute } = {}) {
     // A dependency is a generation-bound cell, never an automatic name rebind.
-    const changed = new Set(retired);
+    const removed = new Set(retired);
     const affected = new Set();
     if (added?.derived) affected.add(added);
     if (recompute) affected.add(recompute);
     for (const cell of this.#cells.values()) {
-      if (cell.derived && (cell.dependencies.some(dependency => changed.has(dependency))
-        || cell.externalChanged?.())) affected.add(cell);
+      if (cell.derived && (cell.externalChanged?.() || removed.size && (
+        cell.dependencies.some(dependency => removed.has(dependency))
+        || cell.dynamicDependencies?.reads.some(dependency => removed.has(dependency))
+        || cell.dynamicDependencies?.blocked.some(dependency => removed.has(dependency))))) affected.add(cell);
     }
     if (affected.size) {
       const staged = new Map([...this.#cells.values()].map(cell => [cell, cell.state]));
-      for (const cell of order ?? this.#order()) {
-        if (!cell.derived || !affected.has(cell) && !cell.dependencies.some(dependency => changed.has(dependency))) continue;
-        const snapshot = this.#calculate(cell, staged);
+      const changed = cell => removed.has(cell) || !same(cell.state, staged.get(cell) ?? cell.state);
+      const settled = this.#settle(staged, changed, { affected, first: recompute });
+      for (const cell of settled) {
+        const snapshot = staged.get(cell);
         if (same(cell.state, snapshot)) continue;
-        staged.set(cell, snapshot);
-        changed.add(cell);
         this.#transaction?.reactionBaseline.delete(cell);
         cell.state = snapshot;
         if (cell !== added) changes.push(this.#change(cell, 'updated'));
@@ -487,13 +552,14 @@ export class StateStore {
     const deferReactions = origin === 'explicit' && !baseline && this.#transaction;
     if (deferReactions) for (const cell of explicit) deferReactions.explicitWrites.add(cell);
     for (const [cell, snapshot] of prepared) staged.set(cell, snapshot);
-    for (const cell of this.#order()) {
-      if (!staged.has(cell)) continue;
-      if (cell.derived && cell.dependencies.some(item => !same(before.get(item) ?? missing, staged.get(item) ?? missing))) staged.set(cell, this.#calculate(cell, staged));
-      const reaction = this.#reactions.get(cell);
-      if (reaction && origin === 'explicit' && !deferReactions && !explicit.has(cell)
-        && reaction.watch.some(item => changedValue(baseline?.get(item) ?? before.get(item) ?? missing, staged.get(item) ?? missing))) staged.set(cell, reaction.value);
-    }
+    const changed = cell => !same(before.get(cell) ?? missing, staged.get(cell) ?? missing);
+    const applyReaction = origin === 'explicit' && !deferReactions ? (cell, reaction) => {
+      if (!explicit.has(cell) && reaction.watch.some(item =>
+        changedValue(baseline?.get(item) ?? before.get(item) ?? missing, staged.get(item) ?? missing))) {
+        staged.set(cell, reaction.value);
+      }
+    } : undefined;
+    this.#settle(staged, changed, { applyReaction });
     const changes = [];
     for (const [cell, snapshot] of staged) if (!same(cell.state, snapshot)) {
       if (deferReactions && !deferReactions.reactionBaseline.has(cell)) deferReactions.reactionBaseline.set(cell, cell.state);
