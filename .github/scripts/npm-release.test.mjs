@@ -1,10 +1,52 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { readFile } from 'node:fs/promises';
+import changelog from '../../.changeset/changelog.mjs';
 import { isReleasePullRequest, releaseTargets, shouldPublish, verifyPublishPrerequisites } from './npm-release.mjs';
 
 const repository = 'miinhlym/viewstem';
 const sha = 'tested-merge-commit';
+
+test('dependency changelog groups unique source PRs and falls back to commit links', async t => {
+  const token = process.env.GITHUB_TOKEN;
+  process.env.GITHUB_TOKEN = 'changelog-test-token';
+  t.after(() => {
+    if (token === undefined) delete process.env.GITHUB_TOKEN;
+    else process.env.GITHUB_TOKEN = token;
+  });
+
+  const url = `https://github.com/${repository}`;
+  const commitInfo = (commit, pull) => ({
+    commitUrl: `${url}/commit/${commit}`,
+    associatedPullRequests: {
+      nodes: pull ? [{ number: pull, url: `${url}/pull/${pull}` }] : [],
+    },
+  });
+  const fetch = t.mock.method(globalThis, 'fetch', async () => Response.json({
+    data: {
+      repo__0: {
+        commit__aaaaaaa: commitInfo('aaaaaaa', 17),
+        commit__bbbbbbb: commitInfo('bbbbbbb', 10),
+        commit__ccccccc: commitInfo('ccccccc', 10),
+        commit__ddddddd: commitInfo('ddddddd'),
+      },
+    },
+  }));
+  const options = { repo: repository };
+  const changesets = ['aaaaaaa', 'bbbbbbb', 'ccccccc', 'ddddddd'].map(commit => ({ commit }));
+  assert.equal(await changelog.getDependencyReleaseLine(changesets, [], options), '');
+  assert.equal(fetch.mock.callCount(), 0);
+
+  const dependencies = [
+    { name: '@viewstem/dom', newVersion: '0.1.1' },
+    { name: '@viewstem/core', newVersion: '0.1.1' },
+  ];
+  assert.equal(await changelog.getDependencyReleaseLine(changesets, dependencies, options), [
+    `- Updated dependencies ([#10](${url}/pull/10), [#17](${url}/pull/17), [\`ddddddd\`](${url}/commit/ddddddd))`,
+    '  - @viewstem/dom@0.1.1',
+    '  - @viewstem/core@0.1.1',
+  ].join('\n'));
+});
 
 test('only the merged Changesets PR on this commit can publish', () => {
   const release = {
@@ -143,7 +185,9 @@ test('CI tests automation on Node 24 and calls the release workflow only from de
   const releasePlanCondition = ci.split('CHECK_RELEASE_PLAN:')[1].split('\n    steps:')[0];
   assert.match(releasePlanCondition, /github\.event\.pull_request\.head\.ref == format\('changeset-release\/\{0\}', github\.event\.repository\.default_branch\)/);
   assert.doesNotMatch(releasePlanCondition, /user\.login/);
-  assert.match(ci, /BEFORE_SHA: \$\{\{ github\.event\.pull_request\.base\.sha \}\}\n\s+RELEASE_PR_AUTHOR: \$\{\{ github\.event\.pull_request\.user\.login \}\}\n\s+run: node \.github\/scripts\/npm-release\.mjs verify-plan/);
+  const compatibility = ci.slice(ci.indexOf('\n  compatibility:'), ci.indexOf('\n  ui:'));
+  assert.match(compatibility, /permissions:\n\s+contents: read\n\s+pull-requests: read/);
+  assert.match(compatibility, /BEFORE_SHA: \$\{\{ github\.event\.pull_request\.base\.sha \}\}\n\s+RELEASE_PR_AUTHOR: \$\{\{ github\.event\.pull_request\.user\.login \}\}\n\s+GITHUB_TOKEN: \$\{\{ github\.token \}\}\n\s+run: node \.github\/scripts\/npm-release\.mjs verify-plan/);
   assert.match(ci, /workflow_dispatch' && 'Manual CI complete' \|\| 'CI complete'/);
   const caller = ci.slice(ci.indexOf('\n  release:'));
   assert.match(caller, /needs: complete\n\s+if: github\.event_name == 'push' && github\.ref == format\('refs\/heads\/\{0\}', github\.event\.repository\.default_branch\)/);
@@ -170,7 +214,7 @@ test('release PR creation uses the App and production docs depend on publishing'
   assert.match(version, /run: test "\$APP_SLUG" = viewstem-release/);
   assert.match(version, /github-token: \$\{\{ steps\.release-app\.outputs\.token \}\}/);
   assert.doesNotMatch(release.slice(release.indexOf('\n  publish:')), /RELEASE_APP_PRIVATE_KEY/);
-  assert.match(release, /BEFORE_SHA: \$\{\{ github\.event\.before \}\}\n\s+run: node \.github\/scripts\/npm-release\.mjs verify-plan/);
+  assert.match(release, /BEFORE_SHA: \$\{\{ github\.event\.before \}\}\n\s+GITHUB_TOKEN: \$\{\{ github\.token \}\}\n\s+run: node \.github\/scripts\/npm-release\.mjs verify-plan/);
   const publish = release.slice(release.indexOf('\n  publish:'), release.indexOf('\n  tag:'));
   assert.match(publish, /group: npm-publish\n\s+queue: max/);
   assert.match(publish, /fetch-depth: 0/);

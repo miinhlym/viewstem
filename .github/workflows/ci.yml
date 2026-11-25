@@ -18,6 +18,9 @@ jobs:
     name: Node compatibility (${{ matrix.node }})
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
     strategy:
       fail-fast: false
       matrix:
@@ -44,6 +47,7 @@ jobs:
         env:
           BEFORE_SHA: ${{ github.event.pull_request.base.sha }}
           RELEASE_PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: node .github/scripts/npm-release.mjs verify-plan
       - name: Build all packages once
         run: npm run build:dom && npm run build -w @viewstem/ui && npm run build -w @viewstem/svelte

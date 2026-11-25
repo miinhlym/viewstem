@@ -32,12 +32,18 @@ When `main` CI passes and pending changesets include a public package bump,
 Changesets uses the GitHub App installation token to open or update the Release
 PR as `viewstem-release[bot]`. The PR contains the version bumps, internal
 dependency updates, and refreshed npm lockfile. GitHub starts CI automatically.
+The changelog and PR body link each change to its source PR or commit.
+Each package groups its internal dependency updates under a single entry
+with links to the source PRs and commit links for changes without a PR.
 **CI complete** must pass on the PR and on the merged commit before publishing.
 Release PR CI and the publishing workflow regenerate the Changesets output from the PR base and
 the pre-merge commit, respectively, in a temporary directory. They compare all
 generated files, including manifests, changelogs, and consumed changesets, with
-the candidate commit. npm validates the lockfile separately. Changed input
-blocks stale release output. Merge the Release PR after **CI complete**.
+the candidate commit. npm validates the lockfile separately. Both replays use a
+read-only GitHub token to resolve changelog links. For local generation, set
+`GITHUB_TOKEN` to a token with read access to the repository and its pull
+requests. Changed input blocks stale release output. Merge the Release PR
+after **CI complete**.
 Publishing requires the previous versions to be public. Each internal dependency must already
 be public or appear earlier in the batch. After npm publishing succeeds, the
 documentation job verifies the public versions and deploys the same commit.
