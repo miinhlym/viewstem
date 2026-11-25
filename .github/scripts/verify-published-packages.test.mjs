@@ -96,14 +96,15 @@ test('a delayed archive can become public after three minutes without rechecking
   assert.deepEqual(archiveChecks.at(-1), { url: npmArchive, elapsed: 240_000 });
 });
 
-test('a missing archive stops after ten minutes including request time', async () => {
+test('a missing archive reports both stages and stops after ten minutes including request time', async () => {
   let elapsed = 0;
   const archiveChecks = [];
+  const messages = [];
   await assert.rejects(waitForPublicReleases([npm], {
     source: {},
     now: () => elapsed,
     wait: async delay => { elapsed += delay; },
-    log: () => {},
+    log: message => messages.push(message),
     request: async url => {
       if (elapsed === 0) {
         elapsed += 4_000;
@@ -113,9 +114,13 @@ test('a missing archive stops after ten minutes including request time', async (
       archiveChecks.push(elapsed);
       return new Response(null, { status: 404 });
     },
-  }), /Public packages unavailable: npm:@viewstem\/core@0\.1\.0/);
+  }), /Public packages unavailable: npm:@viewstem\/core@0\.1\.0 \(Archive download .*HTTP 404\)/);
   assert.equal(elapsed, 600_000);
   assert.equal(archiveChecks.at(-1), 594_000);
+  assert.deepEqual(messages, [
+    'Waiting for npm:@viewstem/core@0.1.0: Registry metadata for @viewstem/core: HTTP 429',
+    'Waiting for npm:@viewstem/core@0.1.0: Archive download for @viewstem/core@0.1.0: HTTP 404',
+  ]);
 });
 
 test('the release batch and installed docs pins agree with the checked out manifests', () => {

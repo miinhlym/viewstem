@@ -39,56 +39,63 @@ export function parseReleasedPackages(input) {
   return packages;
 }
 
-async function readNetwork(read) {
+async function readNetwork(read, stage, reportPending) {
   try {
     return await read();
   } catch (error) {
     // Fetch rejects on transport errors, including failures before an HTTP status exists.
-    if (error instanceof TypeError || error.name === 'TimeoutError' || error.name === 'AbortError') return null;
-    throw error;
+    if (!(error instanceof TypeError) && error.name !== 'TimeoutError' && error.name !== 'AbortError') throw error;
+    reportPending(`${stage}: ${error.cause?.code ?? error.name}`);
+    return null;
   }
 }
 
-function fetchRelease(url, method, request, signal) {
+async function fetchRelease(url, method, stage, { request, signal, reportPending }) {
   const requestTimeout = AbortSignal.timeout(15_000);
-  return readNetwork(() => request(url, {
-    method, headers: { 'cache-control': 'no-cache' },
+  const response = await readNetwork(() => request(url, {
+    method,
+    headers: { 'cache-control': 'no-cache' },
     signal: signal ? AbortSignal.any([signal, requestTimeout]) : requestTimeout,
-  }));
+  }), stage, reportPending);
+  if (!response) return;
+  const { status } = response;
+  if (status === 404 || status === 429 || status >= 500) {
+    reportPending(`${stage}: HTTP ${status}`);
+    return;
+  }
+  assert.ok(response.ok, `${stage}: HTTP ${status}`);
+  return response;
 }
 
-function shouldRetry(response) {
-  return !response || response.status === 404 || response.status === 429 || response.status >= 500;
-}
-
-async function publicArchive({ registry, name, version }, request, signal) {
+async function publicArchive({ registry, name, version }, options) {
   const provider = registries[registry];
-  const response = await fetchRelease(provider.origin + provider.path(name), 'GET', request, signal);
-  if (shouldRetry(response)) return;
-  assert.ok(response.ok, `Could not read ${registry} metadata for ${name}: HTTP ${response.status}`);
-  const metadata = await readNetwork(() => response.json());
+  const stage = `Registry metadata for ${name}`;
+  const response = await fetchRelease(provider.origin + provider.path(name), 'GET', stage, options);
+  if (!response) return;
+  const metadata = await readNetwork(() => response.json(), stage, options.reportPending);
   if (!metadata) return;
   const archive = provider.archive(metadata, version);
-  if (!archive) return;
+  if (!archive) {
+    options.reportPending(`${stage}: no archive listed for ${version}`);
+    return;
+  }
   assert.equal(new URL(archive).origin, provider.origin, `Unexpected archive origin for ${name}`);
   return archive;
 }
 
-export async function isPublicRelease(pkg, request = fetch, source, signal) {
-  const archive = await publicArchive(pkg, request, signal);
+export async function isPublicRelease(pkg, request = fetch, source, { signal, reportPending = () => {} } = {}) {
+  const options = { request, signal, reportPending };
+  const archive = await publicArchive(pkg, options);
   if (!archive) return false;
-  if (source && pkg.registry === 'npm') return verifyNpmSource(pkg, archive, source, request, signal);
-  const download = await fetchRelease(archive, 'HEAD', request, signal);
-  if (shouldRetry(download)) return false;
-  assert.ok(download.ok, `Could not access ${pkg.name}@${pkg.version} on ${pkg.registry}: HTTP ${download.status}`);
-  return true;
+  if (source && pkg.registry === 'npm') return verifyNpmSource(pkg, archive, source, options);
+  return Boolean(await fetchRelease(archive, 'HEAD', `Archive availability for ${pkg.name}@${pkg.version}`, options));
 }
 
-async function verifyNpmSource({ name, version }, archive, { sha, repository, released, history }, request, signal) {
-  const response = await fetchRelease(archive, 'GET', request, signal);
-  if (shouldRetry(response)) return false;
-  assert.ok(response?.ok, `Could not download ${name}@${version} to verify its source`);
-  const body = await readNetwork(() => response.arrayBuffer());
+async function verifyNpmSource({ name, version }, archive, { sha, repository, released, history }, options) {
+  const stage = `Archive download for ${name}@${version}`;
+  const response = await fetchRelease(archive, 'GET', stage, options);
+  if (!response) return false;
+  const body = await readNetwork(() => response.arrayBuffer(), stage, options.reportPending);
   if (!body) return false;
   const readme = execFileSync('tar', ['-xOzf', '-', 'package/README.md'], {
     input: Buffer.from(body), encoding: 'utf8', timeout: 15_000,
@@ -130,12 +137,19 @@ export function deploymentPackages(releases, manifests, dependencies) {
 export async function waitForPublicReleases(packages, {
   source, once = false, request = fetch, now = () => performance.now(), wait = setTimeout, log = console.log,
 } = {}) {
-  const pending = new Map(packages.map(pkg => [`${pkg.registry}:${pkg.name}@${pkg.version}`, pkg]));
+  const pending = new Map(packages.map(pkg => [`${pkg.registry}:${pkg.name}@${pkg.version}`, { pkg, reason: '' }]));
   const deadline = now() + publicReleaseWaitMs;
   const signal = AbortSignal.timeout(publicReleaseWaitMs);
   while (pending.size && now() < deadline) {
-    await Promise.all([...pending].map(async ([key, pkg]) => {
-      if (await isPublicRelease(pkg, request, source, signal)) {
+    await Promise.all([...pending].map(async ([key, entry]) => {
+      const published = await isPublicRelease(entry.pkg, request, source, {
+        signal,
+        reportPending(reason) {
+          if (entry.reason !== reason) log(`Waiting for ${key}: ${reason}`);
+          entry.reason = reason;
+        },
+      });
+      if (published) {
         log(`Public release verified: ${key}`);
         pending.delete(key);
       }
@@ -144,7 +158,8 @@ export async function waitForPublicReleases(packages, {
     if (once || !pending.size || remaining <= 0) break;
     await wait(Math.min(retryIntervalMs, remaining));
   }
-  assert.equal(pending.size, 0, `Public packages unavailable: ${[...pending.keys()].join(', ')}`);
+  const unavailable = [...pending].map(([key, { reason }]) => `${key} (${reason})`);
+  assert.equal(pending.size, 0, `Public packages unavailable: ${unavailable.join(', ')}`);
 }
 
 async function main() {
