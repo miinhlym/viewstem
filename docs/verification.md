@@ -11,6 +11,7 @@ use a pull request or manual dispatch to check them.
 
 - Node 22 and 24 build Core, DOM, Svelte, and UI. The compatibility jobs check Core, DOM, and Svelte types and installed-package consumers, including the independent DOM and mixed-rendering fixtures.
 - Chromium runs the Core, DOM, and Svelte browser tests and the UI tarball consumer tests. The UI suite covers plain JS, React, Vue and Svelte hosts, the original JSON for all 66 families, and date and table State and events.
+- Node 24 also runs the release and deployment automation tests.
 - **CI complete** requires both compatibility and browser jobs to pass.
 
 CI uses Playwright Chromium’s headless shell.

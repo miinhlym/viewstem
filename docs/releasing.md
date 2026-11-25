@@ -23,15 +23,12 @@ View.” See the [Changesets writing guide](https://changesets.dev/faq#how-do-i-
 
 ### Release PR
 
-When `main` CI passes and pending changesets include a public package bump, Changesets opens or updates
-the Release PR with version bumps, any internal dependency updates, and the
-refreshed npm lockfile.
-Changesets opens and updates the PR as `viewstem-release[bot]` using a GitHub
-App installation token. These pull request events start **CI complete**
-automatically. A maintainer reviews and merges the PR after CI passes.
-The same check must pass on the merged commit before npm publishing runs.
-Release PR CI and
-the publishing workflow regenerate the Changesets output from the PR base and
+When `main` CI passes and pending changesets include a public package bump,
+Changesets uses the GitHub App installation token to open or update the Release
+PR as `viewstem-release[bot]`. The PR contains the version bumps, internal
+dependency updates, and refreshed npm lockfile. GitHub starts CI automatically.
+**CI complete** must pass on the PR and on the merged commit before publishing.
+Release PR CI and the publishing workflow regenerate the Changesets output from the PR base and
 the pre-merge commit, respectively, in a temporary directory. They compare all
 generated files, including manifests, changelogs, and consumed changesets, with
 the candidate commit. npm validates the lockfile separately. Changed input
@@ -59,13 +56,10 @@ repository `viewstem`, and workflow filename `ci.yml`, with direct `npm publish`
 allowed. Leave the npm Environment field empty. The publishing job has no
 GitHub environment. `ci.yml` calls `npm-release.yml`.
 
-To migrate from `core.yml`, first merge `ci.yml` into `main`. Add a separate
-`ci.yml` connection for each package before merging the Release PR that will
-publish it. Create each connection within two days of that package's planned
-publish. npm validates it on the first successful publish. Keep the package's
-`core.yml` connection until its `ci.yml` publish succeeds so an older release can
-still be retried. If the new connection expires, recreate it and retry while
-the new two-day window is open.
+Set up a `ci.yml` connection for each package before merging its Release PR.
+npm validates a new connection on the first successful publish within two days
+of registration. If a connection expires, recreate it before retrying the
+release.
 [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/).
 
 ### Release PR GitHub App
@@ -77,9 +71,7 @@ client ID as the environment variable `RELEASE_APP_CLIENT_ID` and its private
 key as the environment secret `RELEASE_APP_PRIVATE_KEY`.
 
 The Release PR job requests an installation token scoped to this repository.
-Both PR CI and post-merge release planning check the Release PR author. Close
-any open PR from the previous bot before switching so Changesets opens a new
-PR with the expected author.
+PR CI and post-merge release planning both require the App's bot as the author.
 The npm publish job uses OIDC and the tagging job has contents write permission.
 
 ## Deploy the site
@@ -100,10 +92,10 @@ event runs the cleanup workflow from the default branch.
 [GitHub Actions event policy](https://docs.github.com/en/actions/reference/security/securely-using-pull_request_target#default-policy-for-pull_request_target)
 
 If removal fails, rerun the failed cleanup job after confirming the PR is still
-closed or targets a different base branch. If the cleanup workflow was absent
-from the default branch when the PR closed, a maintainer can remove the named
-preview from the repository root. Set `pr_number` to the closed or retargeted PR's
-number and use Cloudflare credentials authorized for `viewstem-preview`.
+closed or targets a different base branch. If automatic cleanup is unavailable,
+a maintainer can remove the named preview from the repository root. Set
+`pr_number` to the closed or retargeted PR's number and use Cloudflare
+credentials authorized for `viewstem-preview`.
 
 ```sh
 pr_number=123
@@ -134,8 +126,9 @@ commit, verify the public packages, and check the active production version.
 The active deployment's recorded package release commit is the starting point
 for the safety check. The workflow inspects the entire first-parent history
 from that baseline to the selected commit. It accepts site changes and the named
-CI/deployment maintenance files. It stops on package changes, pending changeset
-commits, root dependency changes, or other paths it cannot classify as safe,
+CI/deployment maintenance files. Retired maintenance paths are allowed in
+history once removed from the candidate. The workflow stops on package changes,
+pending changeset commits, root dependency changes, or other unclassified paths,
 including package changes that kept the same version or were later reverted.
 If the baseline is missing or the check stops the deployment, wait for the next
 package release and use its documentation job. Review prose against the public

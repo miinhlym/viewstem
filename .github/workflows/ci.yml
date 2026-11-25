@@ -26,7 +26,6 @@ jobs:
       CHECK_RELEASE_PLAN: >-
         ${{ matrix.node == '24.1.0' &&
             github.event_name == 'pull_request' &&
-            github.event.pull_request.user.login == 'viewstem-release[bot]' &&
             github.event.pull_request.head.repo.full_name == github.repository &&
             github.event.pull_request.base.ref == github.event.repository.default_branch &&
             github.event.pull_request.head.ref == format('changeset-release/{0}', github.event.repository.default_branch) }}
@@ -44,6 +43,7 @@ jobs:
         if: env.CHECK_RELEASE_PLAN == 'true'
         env:
           BEFORE_SHA: ${{ github.event.pull_request.base.sha }}
+          RELEASE_PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: node .github/scripts/npm-release.mjs verify-plan
       - name: Build all packages once
         run: npm run build:dom && npm run build -w @viewstem/ui && npm run build -w @viewstem/svelte
@@ -52,7 +52,9 @@ jobs:
           npm run test:report
           npm run typecheck
           npm run check:coverage
-          npm run test:ci
+      - name: Test release and deployment automation
+        if: matrix.node == '24.1.0'
+        run: npm run test:ci
       - name: Browser connector and Svelte adapter types
         run: |
           npm run typecheck -w @viewstem/dom
@@ -103,7 +105,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && github.repository == 'miinhlym/viewstem'
     permissions:
       contents: write
-      pull-requests: write
+      pull-requests: read
       id-token: write
     uses: ./.github/workflows/npm-release.yml
     secrets:

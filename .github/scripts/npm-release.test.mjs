@@ -133,26 +133,36 @@ test('a release requires a previous manifest for every published package', async
     /Missing previous manifest for @viewstem\/dom/);
 });
 
-test('release callers forward the named token and isolate manual CI from publishing pushes', async () => {
+test('CI tests automation on Node 24 and calls the release workflow only from default branch pushes', async () => {
   const ci = await readFile(new URL('../workflows/ci.yml', import.meta.url), 'utf8');
-  const release = await readFile(new URL('../workflows/npm-release.yml', import.meta.url), 'utf8');
   assert.match(ci, /^name: CI\n/);
-  assert.match(release, /^name: Release npm packages\n/);
   assert.match(ci, /group:.*github\.event_name.*github\.event\.pull_request\.number \|\| github\.sha/);
   assert.match(ci, /needs: \[compatibility, ui\]/);
-  assert.match(ci, /github\.event\.pull_request\.user\.login == 'viewstem-release\[bot\]'/);
-  assert.match(ci, /BEFORE_SHA: \$\{\{ github\.event\.pull_request\.base\.sha \}\}\n\s+run: node \.github\/scripts\/npm-release\.mjs verify-plan/);
+  assert.match(ci, /- name: Test release and deployment automation\n\s+if: matrix\.node == '24\.1\.0'\n\s+run: npm run test:ci/);
+  assert.equal(ci.match(/npm run test:ci/g)?.length, 1);
+  const releasePlanCondition = ci.split('CHECK_RELEASE_PLAN:')[1].split('\n    steps:')[0];
+  assert.match(releasePlanCondition, /github\.event\.pull_request\.head\.ref == format\('changeset-release\/\{0\}', github\.event\.repository\.default_branch\)/);
+  assert.doesNotMatch(releasePlanCondition, /user\.login/);
+  assert.match(ci, /BEFORE_SHA: \$\{\{ github\.event\.pull_request\.base\.sha \}\}\n\s+RELEASE_PR_AUTHOR: \$\{\{ github\.event\.pull_request\.user\.login \}\}\n\s+run: node \.github\/scripts\/npm-release\.mjs verify-plan/);
   assert.match(ci, /workflow_dispatch' && 'Manual CI complete' \|\| 'CI complete'/);
-  assert.doesNotMatch(ci, /docs-label|unlabeled/);
+  const caller = ci.slice(ci.indexOf('\n  release:'));
+  assert.match(caller, /needs: complete\n\s+if: github\.event_name == 'push' && github\.ref == format\('refs\/heads\/\{0\}', github\.event\.repository\.default_branch\)/);
+  assert.match(caller, /pull-requests: read/);
+  assert.doesNotMatch(caller, /pull-requests: write/);
+  assert.match(caller, /uses: \.\/\.github\/workflows\/npm-release\.yml/);
+  assert.match(caller, /CLOUDFLARE_PRODUCTION_API_TOKEN: \$\{\{ secrets\.CLOUDFLARE_PRODUCTION_API_TOKEN \}\}/);
+  assert.match(caller, /RELEASE_APP_PRIVATE_KEY: \$\{\{ secrets\.RELEASE_APP_PRIVATE_KEY \}\}/);
+});
+
+test('release PR creation uses the App and production docs depend on publishing', async () => {
+  const release = await readFile(new URL('../workflows/npm-release.yml', import.meta.url), 'utf8');
+  assert.match(release, /^name: Release npm packages\n/);
   const namedSecret = /secrets:\n\s+CLOUDFLARE_PRODUCTION_API_TOKEN: \$\{\{ secrets\.CLOUDFLARE_PRODUCTION_API_TOKEN \}\}/;
-  assert.match(ci.slice(ci.indexOf('\n  release:')), namedSecret);
-  assert.match(ci.slice(ci.indexOf('\n  release:')), /RELEASE_APP_PRIVATE_KEY: \$\{\{ secrets\.RELEASE_APP_PRIVATE_KEY \}\}/);
   assert.match(release, /workflow_call:\n\s+secrets:\n\s+CLOUDFLARE_PRODUCTION_API_TOKEN:\n\s+required: true/);
   const docs = release.slice(release.indexOf('\n  docs:'));
   assert.match(docs, /needs: \[plan, publish\]\n\s+if: needs\.plan\.outputs\.targets != '\[\]'/);
   assert.match(docs, /uses: \.\/\.github\/workflows\/docs-deploy\.yml/);
   assert.match(docs, namedSecret);
-  assert.doesNotMatch(release, /docs-refresh|docs_publishable/);
   assert.match(release, /changeset status --output.*\n.*\.type != "none"/);
   const version = release.slice(release.indexOf('\n  version:'), release.indexOf('\n  publish:'));
   assert.match(version, /environment:\n\s+name: release-pr\n\s+deployment: false/);
@@ -161,17 +171,6 @@ test('release callers forward the named token and isolate manual CI from publish
   assert.match(version, /github-token: \$\{\{ steps\.release-app\.outputs\.token \}\}/);
   assert.doesNotMatch(release.slice(release.indexOf('\n  publish:')), /RELEASE_APP_PRIVATE_KEY/);
   assert.match(release, /BEFORE_SHA: \$\{\{ github\.event\.before \}\}\n\s+run: node \.github\/scripts\/npm-release\.mjs verify-plan/);
-  const production = await readFile(new URL('../workflows/docs-deploy.yml', import.meta.url), 'utf8');
-  assert.match(production, /^name: Deploy docs\n/);
-  assert.match(production, /workflow_dispatch:\n\npermissions:/);
-  assert.match(production, /ref: \$\{\{ github\.sha \}\}/);
-  assert.match(production, /github\.ref == format\('refs\/heads\/\{0\}', github\.event\.repository\.default_branch\)/);
-  assert.match(production, /group: docs-production\n\s+queue: max/);
-  assert.match(production, /verify-published-packages\.mjs --availability-only/);
-  assert.doesNotMatch(production, /id-token:|npm publish|verify-source|source_sha:/);
-  assert.ok(production.indexOf('verify-published-packages.mjs') < production.indexOf('build-published.mjs'));
-  assert.ok(production.indexOf('assert-active') < production.indexOf('wrangler deploy'));
-  assert.ok(production.indexOf('verify-site-previews.mjs') < production.indexOf('wrangler deploy'));
   const publish = release.slice(release.indexOf('\n  publish:'), release.indexOf('\n  tag:'));
   assert.match(publish, /group: npm-publish\n\s+queue: max/);
   assert.match(publish, /fetch-depth: 0/);

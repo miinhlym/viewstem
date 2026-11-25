@@ -113,8 +113,8 @@ esac
       PATH: `${dir}${delimiter}${process.env.PATH}`, MOCK_PUBLISH_STATUS: status, MOCK_PUBLISH_LOG: join(dir, 'publications'),
     }, mockRegistry(), ['publish']);
   }
-  function verifyPlan(sha, before) {
-    return run(planRelease, { GITHUB_SHA: sha, BEFORE_SHA: before }, [], ['verify-plan']);
+  function verifyPlan(sha, before, env = {}) {
+    return run(planRelease, { GITHUB_EVENT_NAME: 'push', GITHUB_SHA: sha, BEFORE_SHA: before, ...env }, [], ['verify-plan']);
   }
   function packSource(name, sha) {
     write('package/README.md', `[Source and documentation for this version](https://github.com/${repo}/blob/${sha}/docs/README.md)\n`);
@@ -154,6 +154,11 @@ test('the merged release must match Changesets on the pre-merge commit', t => {
   git('branch', '-D', 'main');
   const accepted = verifyPlan(genuine, intended);
   assert.equal(accepted.status, 0, accepted.stderr);
+  const pr = verifyPlan(genuine, intended, { GITHUB_EVENT_NAME: 'pull_request', RELEASE_PR_AUTHOR: 'viewstem-release[bot]' });
+  assert.equal(pr.status, 0, pr.stderr);
+  const legacy = verifyPlan(genuine, intended, { GITHUB_EVENT_NAME: 'pull_request', RELEASE_PR_AUTHOR: 'github-actions[bot]' });
+  assert.equal(legacy.status, 1);
+  assert.match(legacy.stderr, /requires a PR opened by viewstem-release\[bot\]/);
   assert.equal(git('rev-parse', 'HEAD'), genuine);
   assert.equal(git('for-each-ref', 'refs/heads'), '');
 
@@ -261,7 +266,7 @@ test('manual deployment recognizes the moved maintainer docs without allowing ar
   assert.match(blocked.stderr, /docs\/unclassified\.md/);
 });
 
-test('manual deployment accepts workflow and script moves after the active release and rejects unknown paths', t => {
+test('manual deployment accepts retired paths in history and rejects their return', t => {
   const { base, commit, select } = repository(t);
   const oldScript = '.github/scripts/docs-site-changes.mjs';
   const oldTest = '.github/scripts/docs-site-changes.test.mjs';
@@ -287,6 +292,13 @@ test('manual deployment accepts workflow and script moves after the active relea
   const result = select(moved, active);
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.output, `deploy=true\nbase=${base}\nthrough=${moved}\n`);
+
+  const restored = '.github/workflows/core.yml';
+  const restoredResult = select(commit({ [restored]: ci }), active);
+  assert.equal(restoredResult.status, 1);
+  assert.ok(restoredResult.stderr.includes(restored));
+  assert.equal(restoredResult.output, '');
+  commit({ [restored]: null });
 
   const unexpected = '.github/scripts/docs-deploy/new-deployment-script.mjs';
   const blocked = select(commit({ [unexpected]: '// Unknown script\n' }), active);

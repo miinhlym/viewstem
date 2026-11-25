@@ -7,12 +7,13 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const registry = 'https://registry.npmjs.org';
 const packages = ['core', 'dom', 'svelte', 'ui'];
+const releaseBot = 'viewstem-release[bot]';
 const stableVersion = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const run = (command, args, options) => execFileSync(command, args, { encoding: 'utf8', ...options }).trim();
 
 export function isReleasePullRequest(pr, repository, sha, branch) {
   return pr.merged_at && pr.merge_commit_sha === sha
-    && pr.user.login === 'viewstem-release[bot]'
+    && pr.user.login === releaseBot
     && pr.base.ref === branch && pr.base.repo.full_name === repository
     && pr.head.ref === `changeset-release/${branch}` && pr.head.repo?.full_name === repository;
 }
@@ -100,7 +101,10 @@ function readReleaseManifest(directory, previous) {
 }
 
 async function verifyChangesetsPlan() {
-  const { BEFORE_SHA: before, GITHUB_SHA: sha } = process.env;
+  const { BEFORE_SHA: before, GITHUB_SHA: sha, GITHUB_EVENT_NAME: event, RELEASE_PR_AUTHOR: author } = process.env;
+  if (event === 'pull_request') {
+    assert.equal(author, releaseBot, `The Changesets release branch requires a PR opened by ${releaseBot}`);
+  }
   assert.equal(run('git', ['rev-parse', 'HEAD']), sha, 'The checkout does not match the release commit');
   assert.equal(run('git', ['status', '--porcelain', '--untracked-files=no']), '', 'Expected a clean release checkout');
   run('git', ['merge-base', '--is-ancestor', before, sha]);

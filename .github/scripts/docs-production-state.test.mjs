@@ -19,6 +19,19 @@ test('the production workflow calls the deployment scripts at their repository p
   await Promise.all([...scripts].map(path => access(new URL(`../../${path}`, import.meta.url))));
 });
 
+test('production docs use one fixed commit and verify the build before uploading', async () => {
+  const workflow = await readFile(new URL('../workflows/docs-deploy.yml', import.meta.url), 'utf8');
+  assert.match(workflow, /^name: Deploy docs\n/);
+  assert.match(workflow, /workflow_dispatch:\n\npermissions:/);
+  assert.match(workflow, /ref: \$\{\{ github\.sha \}\}/);
+  assert.match(workflow, /github\.ref == format\('refs\/heads\/\{0\}', github\.event\.repository\.default_branch\)/);
+  assert.doesNotMatch(workflow, /id-token:|npm publish/);
+  assert.match(workflow, /verify-published-packages\.mjs --availability-only/);
+  assert.ok(workflow.indexOf('verify-published-packages.mjs') < workflow.indexOf('build-published.mjs'));
+  assert.ok(workflow.indexOf('assert-active') < workflow.indexOf('wrangler deploy'));
+  assert.ok(workflow.indexOf('verify-site-previews.mjs') < workflow.indexOf('wrangler deploy'));
+});
+
 test('manual deploys on other refs report the default branch and fail', async () => {
   const workflow = await readFile(new URL('../workflows/docs-deploy.yml', import.meta.url), 'utf8');
   const guard = workflow.split('\n  reject-manual-ref:\n')[1].split('\n  release:\n')[0];
@@ -33,7 +46,7 @@ test('manual deploys on other refs report the default branch and fail', async ()
 test('GitHub deployment records require an uploaded, live version verified in the current attempt', async () => {
   const workflow = await readFile(new URL('../workflows/docs-deploy.yml', import.meta.url), 'utf8');
   const [release, record] = workflow.split('\n  record-deployment:\n');
-  assert.match(workflow, /concurrency:\n  group: docs-production/);
+  assert.match(workflow, /concurrency:\n  group: docs-production\n  queue: max/);
   assert.match(release, /environment:\n      name: docs-production\n      deployment: false/);
   assert.match(release, /verified_version: \$\{\{ steps\.live\.outputs\.verified_version \}\}/);
   assert.match(release, /verified_attempt: \$\{\{ steps\.live\.outputs\.verified_attempt \}\}/);

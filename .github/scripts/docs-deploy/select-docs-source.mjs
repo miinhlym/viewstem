@@ -8,7 +8,7 @@ const git = (...args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer
 const waitForRelease = 'Wait for the next package release and retry its documentation deployment.';
 const historicalDocs = /^(?:docs\/(?:designs|handoff|history)\/|(?:concepts_brief|design_draft)\.md$)/;
 // These exact maintenance paths do not change the shipped packages.
-const deploymentPaths = new Set([
+const maintenancePaths = new Set([
   '.github/workflows/ci.yml',
   '.github/workflows/docs-preview.yml',
   '.github/workflows/docs-deploy.yml',
@@ -43,11 +43,6 @@ const deploymentPaths = new Set([
   'docs/core-cel.md',
   'docs/decisions.md',
   'docs/follow-up.md',
-  'docs/designs/viewstem-resource-sets-implementation-2026-11-16.md',
-  'docs/handoff/acceptance-matrix.md',
-  'docs/handoff/implementation-start.md',
-  'docs/handoff/open-contracts.md',
-  'docs/handoff/public-api-naming-2026-11-02.md',
   'docs/spec/01-datasource-auth.md',
   'docs/spec/02-query.md',
   'docs/spec/03-variable-type.md',
@@ -55,8 +50,6 @@ const deploymentPaths = new Set([
   'docs/spec/05-component-view.md',
   'docs/spec/06-composition-examples.md',
   'docs/spec/07-host-integration.md',
-  'docs/spec/08-readiness-conformance.md',
-  'docs/spec/09-preserved-contracts.md',
   'docs/spec/09-state-store-and-url.md',
   'docs/spec/10-value-contracts.md',
   'docs/spec/11-optional-charts.md',
@@ -64,7 +57,6 @@ const deploymentPaths = new Set([
   'docs/releasing.md',
   'docs/verification.md',
   'docs/VIEWSTEM-SPEC.md',
-  'docs/history/decision-register.md',
   'experiments/t1-cel-patch/README.md',
   'experiments/t1-values/README.md',
   'experiments/t2-composite-query/README.md',
@@ -77,7 +69,10 @@ const deploymentPaths = new Set([
   'experiments/t4-charts/README.md',
   'experiments/verification/README.md',
   'skills/README.md',
-  // The active release can predate moves and removals of maintenance files.
+]);
+// A deployed baseline can predate these moves. Accept the old paths in its
+// history while requiring them to be absent from the deployment candidate.
+const retiredMaintenancePaths = new Set([
   '.github/workflows/core.yml',
   '.github/workflows/docs-release.yml',
   '.github/scripts/docs-production.mjs',
@@ -91,6 +86,14 @@ const deploymentPaths = new Set([
   'SECURITY.ko.md',
   'SUPPORT.ko.md',
   'docs/ci.ko.md',
+  'docs/designs/viewstem-resource-sets-implementation-2026-11-16.md',
+  'docs/handoff/acceptance-matrix.md',
+  'docs/handoff/implementation-start.md',
+  'docs/handoff/open-contracts.md',
+  'docs/handoff/public-api-naming-2026-11-02.md',
+  'docs/history/decision-register.md',
+  'docs/spec/08-readiness-conformance.md',
+  'docs/spec/09-preserved-contracts.md',
 ]);
 
 export async function selectSource(env) {
@@ -121,10 +124,18 @@ export async function selectSource(env) {
     // reverted. A current patch or an unchanged version field cannot prove safety.
     const changedPaths = (...options) => git('log', '--first-parent', '--diff-merges=first-parent', '--name-only',
       '--no-renames', '-z', '--format=', ...options, `${base}..${sha}`, '--').split('\0').filter(Boolean);
-    const paths = [...new Set(changedPaths())].filter(path => !path.startsWith('apps/docs/') && !deploymentPaths.has(path));
-    // A historical path can be removed, but edits or additions still need an explicit review.
-    const edited = paths.some(path => historicalDocs.test(path)) ? new Set(changedPaths('--diff-filter=d')) : new Set();
-    const unexpected = paths.filter(path => !historicalDocs.test(path) || edited.has(path));
+    const paths = [...new Set(changedPaths())].filter(path => !path.startsWith('apps/docs/') && !maintenancePaths.has(path));
+    const retired = paths.filter(path => retiredMaintenancePaths.has(path));
+    const present = retired.length
+      ? new Set(git('ls-tree', '-r', '-z', '--name-only', sha, '--', ...retired).split('\0'))
+      : new Set();
+    // Other archived files are accepted only when the history records their deletion.
+    const edited = paths.some(path => historicalDocs.test(path) && !retiredMaintenancePaths.has(path))
+      ? new Set(changedPaths('--diff-filter=d'))
+      : new Set();
+    const unexpected = paths.filter(path => retiredMaintenancePaths.has(path)
+      ? present.has(path)
+      : !historicalDocs.test(path) || edited.has(path));
     assert.equal(unexpected.length, 0,
       `Cannot prove that this commit contains only safe documentation changes since ${base}. ${waitForRelease}\n${unexpected.slice(0, 12).map(path => JSON.stringify(path)).join('\n')}`);
   }
