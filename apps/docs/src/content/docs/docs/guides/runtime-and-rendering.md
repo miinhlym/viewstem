@@ -15,7 +15,8 @@ Use `mount()` to create a View owned by a mount. Use `attach(view, target)` to b
 | --- | --- |
 | `mounted.ready` | The View has been prepared and the display is connected. |
 | `mounted.whenRendered()` | DOM updates for that display or a failure on that connection. It does not wait for Queries or browser paint. |
-| `view.initial` | The initial eligible Query report. Inspect the reported Query errors. |
+| `view.initial` | The `ViewApplication` handle for the View's initial application. |
+| `await view.whenSettled(view.initial)` | Waits for the initial eligible Queries to settle and returns an `InitialReport`. Read `queryErrors` from that report. |
 
 Check the display's error when it fails to render. A failure on one connection leaves the View and other connections available. Replacing a parent slot may recreate child DOM instances. When the View node keeps its lifetime, its Core State is preserved.
 

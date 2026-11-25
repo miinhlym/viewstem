@@ -15,7 +15,8 @@ description: 하나의 View를 여러 화면에 표시할 때 대기와 정리�
 | --- | --- |
 | `mounted.ready` | View 준비와 표시 연결이 끝났습니다. |
 | `mounted.whenRendered()` | 해당 표시 연결의 DOM 반영 완료 또는 실패입니다. Query 실행이나 브라우저 화면 그리기는 별도로 진행됩니다. |
-| `view.initial` | 실행 자격이 있는 초기 Query의 결과입니다. 보고된 Query 오류를 확인하세요. |
+| `view.initial` | View의 최초 적용을 식별하는 `ViewApplication` 핸들입니다. |
+| `await view.whenSettled(view.initial)` | 최초 적용에서 실행 가능한 Query가 끝날 때까지 기다리고 `InitialReport`를 반환합니다. 보고서의 `queryErrors`에서 오류를 확인합니다. |
 
 표시에 실패하면 해당 연결의 오류를 확인하세요. 한 연결의 실패 이후에도 View와 다른 표시 연결은 사용할 수 있습니다. 부모 슬롯을 교체하면 자식 DOM 인스턴스가 다시 만들어질 수 있습니다. View 노드의 수명이 유지되면 Core State는 보존됩니다.
 
