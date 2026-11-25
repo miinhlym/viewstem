@@ -7,6 +7,8 @@ sidebar:
 
 View는 State·Query·이벤트 수명을 가진 실행 중 화면 하나입니다. `runtime.createView()`에서 얻으며 렌더러는 이 객체의 스냅샷으로 UI를 만듭니다.
 
+표시 연결의 소유권, 완료와 취소는 [런타임과 렌더링 수명](../../guides/runtime-and-rendering/)을 참고하세요.
+
 ## View 관찰하기
 
 | 메서드 | 시그니처와 동작 |

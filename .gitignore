@@ -1,6 +1,7 @@
 /context-archive/
 
 /node_modules/
+/.wrangler/tmp/
 /apps/docs/.astro/
 /apps/docs/.wrangler/
 /apps/docs/dist/

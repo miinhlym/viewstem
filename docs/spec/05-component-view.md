@@ -10,7 +10,7 @@ Query 사용 인스턴스는 [Query 상세](02-query.md)에 별도로 정리한�
 
 ## 10.5 Component: 재사용 화면과 State/Derived
 
-**확정:** Component는 재사용하는 UI 단위다. spec.ports·states·queries는 필요한 경우에만 두고, 선언형 구현은 단일 spec.render 루트로 구성한다. 공개 입력은 ports, 받는 UI 영역은 slots, 발행 가능한 이벤트는 events에 정의한다. 코드형 Component는 같은 공개 계약을 코드 등록 시 제공하고 실제 렌더러 구현은 별도로 연결한다. 아래는 기존 상태/Derived 예시에 render를 결합한 사례다.
+**확정:** Component는 재사용하는 UI 단위다. 선언형 Component는 필요할 때 `ports`·`states`·`queries`·`queryDefaults`·`reactions`를 두고, 선언형 구현은 단일 spec.render 루트로 구성한다. 공개 입력은 ports, 받는 UI 영역은 slots, 발행 가능한 이벤트는 events에 정의한다. 코드형 Component의 공개 본문은 `ports`·`slots`·`events`이며, 렌더러 구현은 별도로 연결한다. 아래는 기존 상태/Derived 예시에 render를 결합한 사례다.
 
 ```json
 {
@@ -73,9 +73,9 @@ Query 사용 인스턴스는 [Query 상세](02-query.md)에 별도로 정리한�
 
 ## 10.6 View: 화면 구성과 인스턴스
 
-**확정:** View는 서비스가 마운트하는 화면의 진입점과 수명 소유자이며, 재사용 Component는 그 안에서 조합하는 단위다. View 역시 ports·states·queries를 소유할 수 있고 spec.render는 배열이 아닌 단일 루트 노드다. 자식 트리는 각 노드의 slots에 넣는다. 서로 다른 View 마운트는 별도 인스턴스이며 자동 전역 singleton이 아니다.
+**확정:** View는 서비스가 마운트하는 화면의 진입점과 수명 소유자이며, 재사용 Component는 그 안에서 조합하는 단위다. View 역시 `ports`·`states`·`queries`·`queryDefaults`·`reactions`를 가질 수 있다. 공개 `slots`와 `events`는 Component에만 둔다. View는 표시 연결 없이 생성할 수 있으며 [표시 연결 수명](12-resource-sets-browser.md#공통-저장소와-view-적용)은 별도로 관리한다. View의 `spec.render`는 배열이 아닌 단일 루트 노드다. 자식 트리는 각 노드의 slots에 넣는다. 서로 다른 View 마운트는 별도 인스턴스이며 자동 전역 singleton이 아니다.
 
-**D164 · 첫 버전의 View 루트.** 첫 버전은 단일 루트를 유지한다. 여러 컴포넌트를 호스트 요소의 직접 자식으로 배치해야 하는 사용 사례가 생기면 `ViewSpec.render`에 배열을 허용하는 안을 검토한다. [혼합 View 공개 API 리뷰](../designs/viewstem-mixed-view-api-review-2026-11-18.md#4-단일-루트는-실제-배치-제약이다--후속-검토)
+**D164 · 첫 버전의 View 루트.** 첫 버전은 단일 루트를 유지한다. 여러 컴포넌트를 호스트 요소의 직접 자식으로 배치해야 하는 사용 사례가 생기면 `ViewSpec.render`에 배열을 허용하는 안을 검토한다. [혼합 View 공개 API 리뷰](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/designs/viewstem-mixed-view-api-review-2026-11-18.md#4-단일-루트는-실제-배치-제약이다--후속-검토)
 
 ```json
 {
@@ -143,4 +143,4 @@ Grid는 등록 Component이며 core 공통 CSS 문법이 아니다. Grid.inputs.
 
 반복 템플릿은 공통 span만 지정하며 항목별 고정 좌표는 1차 제외다. when:false는 공간을 차지하지 않지만 선언된 layout 키는 유효하다. 알 수 없는 선언 ID는 오류다. 슬롯 전달은 작성자와 ID 정보를 보존한다. 좌표 변경이 상태 정체성을 바꾸지 않는다. 읽기/접근성 순서는 원래 순서다. 행 높이·gap은 디자인 시스템 기준, 넘친 셀 내용은 내부 스크롤이며 자동 높이 증가·드래그 편집은 후속이다. 구체 픽셀 값은 정하지 않았다.
 
-JS/TS 배치 함수 `computeGridLayout`의 확장 인스턴스 주소는 반환 Map의 키다. 반복 인스턴스는 선언 ID를 공유할 수 있으며 주소는 Map 키 비교 기준으로 고유해야 한다. 중복 주소는 `INVALID_DEFINITION`과 `GRID_DUPLICATE_ADDRESS` 메시지로 거절한다.
+JS/TS 배치 함수 `computeGridLayout`은 좌표와 span에 양의 안전 정수를 요구하며 최종 행도 안전 정수 범위를 검사한다. 함수의 확장 인스턴스 주소는 반환 Map의 키다. 반복 인스턴스는 선언 ID를 공유할 수 있으며 주소는 Map 키 비교 기준으로 고유해야 한다. 중복 주소는 `INVALID_DEFINITION`과 `GRID_DUPLICATE_ADDRESS` 메시지로 거절한다.

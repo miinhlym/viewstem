@@ -6,6 +6,8 @@
 
 ## 10.9 도메인 중립 연결 예시
 
+아래 `ui.*` 및 다음 절의 `item-card`는 호스트가 별도로 등록하는 예제 전제다. 공개 패키지로 실행하는 예제는 [State 변경 예제](https://viewstem.miinhlym.workers.dev/ko/examples/set-state/)를 참고한다.
+
 ui.Column은 default 슬롯을 세로 배치하고, ui.Text는 text를 표시하며, ui.TextInput은 value 문자열과 change payload {value:string}, ui.Button은 label과 click payload {}를 지원하는 **예시 등록 계약**이다. 이 필드가 전역 필수 카탈로그라는 뜻은 아니다.
 
 아래 ui.confirm은 코드형 Action의 공개 계약이다. 서비스 구현 함수는 message를 확인창에 표시하고 boolean을 반환하도록 별도로 등록한다. output.value가 없다고 선언형 Action으로 단독 실행할 수 있는 JSON은 아니다.
@@ -223,11 +225,11 @@ ui.Column은 default 슬롯을 세로 배치하고, ui.Text는 text를 표시하
 
 이 예시의 title-input.on.change는 id가 없지만 실제 호출 연결이다. 해당 Action이 아직 실행 중일 때 같은 연결에서 들어온 추가 호출은 무시한다. 반대로 실행 정보를 읽으려고 같은 View 안의 다른 버튼에도 `on.click.id: "confirmTitle"`을 붙이면 조회 id 중복 오류다. 두 연결이 같은 ui.confirm을 호출하는지와 무관하다. title-editor를 두 번 배치했을 때 각 인스턴스 내부에 선언한 같은 로컬 조회 id는 서로 독립적이다. [호출 연결 ID 규칙](05-component-view.md#이벤트와-action-연결)을 따른다. [E56]
 
-checkRequested payload 자체가 유효해도 ui.confirm의 message 입력 평가·검증은 별도다. 예시의 message 연결을 잘못 수정해 입력 준비가 실패하면 Action 단계는 실행하지 않고, 해당 연결의 status는 error, data는 null이 되며 error에서 입력 준비 실패 원인과 문제 입력을 식별할 수 있어야 한다. 정확한 오류 필드명은 아직 미정이다. [Action 계약](04-action.md)을 따른다. [E57]
+checkRequested payload 자체가 유효해도 ui.confirm의 message 입력 평가·검증은 별도다. 예시의 message 연결을 잘못 수정해 입력 준비가 실패하면 Action 단계는 실행하지 않고, 해당 연결의 status는 error, data는 null이 되며 error에서 입력 준비 실패 원인과 문제 입력을 식별할 수 있어야 한다. 공개 오류의 `input`은 문제 포트 이름을, 제공되는 경우 `location`은 선언 위치를 나타낸다. [오류 DTO](07-host-integration.md#공통-오류와-진단) · [Action 계약](04-action.md) [E57]
 
 ### 반복 카드와 Grid 연결 예시
 
-다음은 View.spec에 들어갈 구조 예시다. item-card는 item Value 포트를 가진 선언형 Component, ui.Grid는 앞 절의 배치 계약을 지원한다고 가정한다. 각 카드의 상태는 item-card 인스턴스에 속한다.
+다음은 View.spec에 들어갈 구조 예시다. item-card는 item Value 포트를 가진 선언형 Component, ui.Grid는 [Grid 배치 계약](05-component-view.md#grid-배치)을 지원한다고 가정한다. 각 카드의 상태는 item-card 인스턴스에 속한다.
 
 ```json
 {

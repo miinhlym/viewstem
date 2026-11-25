@@ -44,16 +44,16 @@ On route exit, await `screen.unmount()`. On app shutdown, await `renderer.dispos
 
 ## Documentation
 
-- [Documentation guide](docs/README.md): usage, contracts, and verification records.
+- [Public documentation](https://viewstem.miinhlym.workers.dev/docs/) for installation, examples, and API reference.
+- [Repository documentation](docs/README.md) for implementation, verification, and release procedures.
 - [Contributing](CONTRIBUTING.md): setup, checks, review, and contribution licensing.
 - [Support](SUPPORT.md): questions, maintenance policy, and supported environments.
 - [Security](SECURITY.md): private vulnerability reporting.
 - [Code of Conduct](CODE_OF_CONDUCT.md): participation and private conduct reports.
 
-User-facing guides default to English and provide a Korean version through the
-language link at the top of each page. Design specifications and historical
-verification records remain in Korean. Issues and pull requests are welcome in
-English or Korean.
+The project, package, and example READMEs and the documentation guide offer
+English and Korean versions. Design specifications and historical verification
+records are in Korean. Issues and pull requests are welcome in English or Korean.
 
 ## License
 

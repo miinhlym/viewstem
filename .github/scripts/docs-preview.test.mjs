@@ -159,14 +159,16 @@ test('ownership requires the exact per-PR task and payload', () => {
   assert.equal(ownsDeployment({ environment: 'docs-preview', task: 'deploy', payload: { pull_request: 6 } }, 6), false);
 });
 
-test('workflow handles base edits without branch filters and keeps cleanup on trusted code and queued jobs', async () => {
+test('preview creation targets main while cleanup still handles retargets away from main', async () => {
   const workflow = await readFile(new URL('../workflows/docs-preview.yml', import.meta.url), 'utf8');
-  assert.match(workflow, /types: \[opened, synchronize, reopened, edited\]/);
-  assert.match(workflow, /types: \[closed, edited\]/);
-  assert.doesNotMatch(workflow, /branches:/);
+  assert.match(workflow, /pull_request:\n\s+types: \[opened, synchronize, reopened, edited\]\n\s+branches: \[main\]/);
+  const cleanupTrigger = workflow.split('\n  pull_request_target:\n')[1].split('\n\n')[0];
+  assert.match(cleanupTrigger, /types: \[closed, edited\]/);
+  assert.doesNotMatch(cleanupTrigger, /branches(?:-ignore)?:/);
   assert.equal((workflow.match(/queue: max/g) || []).length, 3);
   assert.equal((workflow.match(/deployment: false/g) || []).length, 2);
   const cleanup = workflow.split('\n  cleanup:')[1].split('\n  metadata:')[0];
+  assert.match(cleanup, /github.event.pull_request.base.ref != 'main' && github.event.changes.base.ref != null/);
   assert.match(cleanup, /ref: \$\{\{ github.event.repository.default_branch \}\}/);
   assert.doesNotMatch(cleanup, /ref: \$\{\{ github.event.pull_request.head.sha/);
 });

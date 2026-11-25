@@ -9,10 +9,13 @@ Use package guides to complete a task, then look up exact fields and method cont
 |---|---|
 | [DSL](../dsl/) | Resources, expressions, View and Component, State and ports, Query, Datasource, Action, and types |
 | [@viewstem/core](../core/) | Run without a UI, connect State and URLs, and use HTTP and Actions |
+| [@viewstem/dom](../dom/) | Mount custom DOM components, provide slots, and scope component CSS |
 | [@viewstem/ui](../ui/) | Register the shared UI catalog and attach a View to a browser DOM container |
 | [@viewstem/svelte](../svelte/) | Mount a View, write a Svelte adapter, and manage attachment lifetimes |
 
 Each package menu follows overview → usage guides → API reference. API pages explain signatures, options and defaults, return values, errors, and lifetimes. The Viewstem UI [component catalog](../ui/components/) links to detailed pages for all 66 families.
+
+See the [shared runtime and rendering guide](../guides/runtime-and-rendering/) for the lifetimes and completion signals used by the browser renderers.
 
 <a id="host-examples"></a>
 

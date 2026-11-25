@@ -3,7 +3,7 @@ title: Installation
 description: Install the Viewstem packages you need from npm.
 ---
 
-Run the install command for your use case from your app directory.
+Run the install command for your use case from your app directory. Commands without a version select npm’s current release. To find docs for an installed version, follow the source and documentation link in that package’s README.
 
 ## Requirements
 
@@ -33,7 +33,7 @@ Install the DOM renderer to render a View with components you provide.
 npm install @viewstem/core @viewstem/dom
 ```
 
-See the [DOM package guide](https://www.npmjs.com/package/@viewstem/dom) for component registration and mounting.
+See the [DOM package guide](../dom/) for component registration and mounting.
 
 <a id="install-browser-ui"></a>
 

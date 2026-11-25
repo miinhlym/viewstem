@@ -1,3 +1,4 @@
+import { unified } from '@astrojs/markdown-remark';
 import starlight from '@astrojs/starlight';
 import svelte from '@astrojs/svelte';
 import tailwindcss from '@tailwindcss/vite';
@@ -28,6 +29,8 @@ const publishedPackages = {
 export default defineConfig({
   site: 'https://viewstem.miinhlym.workers.dev',
   output: 'static',
+  compressHTML: true,
+  markdown: { processor: unified() },
   vite: { plugins: [tailwindcss(), ...(publishedModules ? [publishedPackages] : [])] },
   redirects: {
     '/docs/concepts/state-and-actions/': '/docs/concepts/state/',
@@ -114,6 +117,10 @@ export default defineConfig({
             { label: 'Usage guides', translations: { ko: '사용 가이드' }, items: ['docs/core/guides/runtime', 'docs/core/guides/state-and-url', 'docs/core/guides/http-and-actions'] },
             { label: 'API reference', translations: { ko: 'API 레퍼런스' }, items: ['docs/core/registry', 'docs/core/runtime', 'docs/core/view', 'docs/core/state-store', 'docs/core/url', 'docs/core/http', 'docs/core/cel', 'docs/core/utilities', 'docs/core/types'] },
           ],
+        },
+        {
+          label: '@viewstem/dom',
+          items: ['docs/dom'],
         },
         {
           label: '@viewstem/ui',

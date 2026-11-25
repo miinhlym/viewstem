@@ -51,7 +51,7 @@ import { createHttpExecutor } from '@viewstem/core/http';
 import { compileCel, evaluateCel, defaultCelLimits } from '@viewstem/core/cel';
 ```
 
-`Registry`, `StateStore`, `Runtime`, `View`는 생성자가 아닌 타입입니다. 팩토리가 반환하는 객체에는 공개 메서드만 있으며 내부 엔진·검증기·초기화 메서드를 노출하지 않습니다. `@path`/`@call`, Query, Variable은 리소스 선언을 통해 실행합니다. 기존 생성자·엔진 export를 사용했다면 같은 revision의 [API 변경 안내](../../docs/handoff/public-api-refactor-2026-11-02.md)를 따릅니다.
+`Registry`, `StateStore`, `Runtime`, `View`는 생성자가 아닌 타입입니다. 팩토리가 반환하는 객체에는 공개 메서드만 있으며 내부 엔진·검증기·초기화 메서드를 노출하지 않습니다. `@path`/`@call`, Query, Variable은 리소스 선언을 통해 실행합니다. 기존 생성자·엔진 export를 사용했다면 같은 revision의 [API 변경 안내](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/public-api-refactor-2026-11-02.md)를 따릅니다.
 
 정확한 타입·필드는 패키지의 `dist/index.d.ts`, `dist/http.d.ts`, `dist/cel.d.ts`를 따릅니다. Registry/Store/View 및 State/Query 핸들은 라이브러리가 발급한 객체입니다. JSON 값으로 직렬화하거나 일반 객체로 모사하지 않습니다. Value는 원본을 격리하고 읽기 전용으로 전달합니다. Set/Map은 native 정체성·동등성 계약을 유지하며 HTTP 계획 입력에서만 배열/엔트리 쌍으로 변환합니다.
 
@@ -93,9 +93,9 @@ CEL AST·비용·결과 크기 제한은 `defaultCelLimits`로 확인할 수 있
 
 - [전체 계약과 문서 지도](../../docs/README.ko.md): 리소스별 기준 명세와 검증 경로.
 - [스키마 프로필](../../docs/spec/03-variable-type.md), [값·날짜·snapshot](../../docs/spec/10-value-contracts.md).
-- [호스트·권한·초기 완료](../../docs/spec/07-host-integration.md), [Store·reaction·URL](../../docs/spec/09-preserved-contracts.md).
-- [CEL 지원 의미·제한](../../docs/handoff/core-cel-support.md), [패치와 재현 빌드](vendor/README.md).
-- [API 정리 이후 검증 결과](../../docs/handoff/public-api-verification-results.json), [초기 제품 검증 결과](../../docs/handoff/core-verification-results.json), [후속 범위](../../docs/handoff/open-contracts.md#실제-남은-작업).
+- [호스트·권한·초기 완료](../../docs/spec/07-host-integration.md), [Store·reaction·URL](../../docs/spec/09-state-store-and-url.md).
+- [CEL 지원 의미·제한](../../docs/core-cel.md), [패치와 재현 빌드](vendor/README.md).
+- [API 정리 이후 검증 결과](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/public-api-verification-results.json), [초기 제품 검증 결과](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/core-verification-results.json), [후속 범위](../../docs/follow-up.md#실제-남은-작업).
 
 발행된 tarball에는 해당 소스 커밋의 공개 문서 링크가 포함됩니다.
 
@@ -115,4 +115,4 @@ Node 22.21.1·24.1.0 및 Playwright 1.62.1 Chromium으로 검증합니다. Svelt
 
 빌드는 세 진입점·필수 타입 선언·공통 모듈 chunk를 모두 준비한 뒤 `dist`를 교체하며 이전 빌드의 불필요한 파일을 남기지 않습니다. `npm run check`는 `skip`·`todo`를 통과로 집계하지 않고 실패 처리하며, 인수 대조에는 실제 실행 보고서가 필요합니다.
 
-공개 이름 변경은 [U42 이행표](../../docs/handoff/public-api-naming-2026-11-02.md)를 따릅니다. `registerComponentContract`, `exportResource`, `writeBatch`, `registerReaction`, `getSnapshot`, `getDiagnostics`를 사용하며 이전 이름의 별칭은 제공하지 않습니다. JSON State 선언의 `initial`은 그대로입니다.
+[11월 2일 U42 이행표](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/public-api-naming-2026-11-02.md)는 당시 API 변경을 기록합니다. 현재 메서드와 타입은 [Core 레퍼런스](https://viewstem.miinhlym.workers.dev/ko/docs/core/)에서 확인할 수 있습니다. State의 JSON 선언은 `initial`을 사용합니다.

@@ -6,7 +6,7 @@ body:
       value: |
         For security vulnerabilities, use [private reporting](https://github.com/miinhlym/viewstem/security/advisories/new) or email miinhlym@gmail.com instead.
         Remove credentials and private data from examples and logs.
-        [한국어 제보 안내](https://github.com/miinhlym/viewstem/blob/main/SUPPORT.ko.md)
+        See [Support](https://github.com/miinhlym/viewstem/blob/main/SUPPORT.md) for reporting guidance.
   - type: input
     id: affected
     attributes:

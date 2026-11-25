@@ -1,10 +1,10 @@
 # Viewstem 최종 설계 명세
 
-현재 공개 API 이름과 변경 후 검증은 [U42 네이밍 적용](handoff/public-api-naming-2026-11-02.md), [검증 기록](handoff/public-api-naming-verification-results.json)을 따른다. U41 및 이전 기록의 API 이름·해시는 당시 증거로 보존한다.
+이 문서는 Viewstem의 공통 제품 계약을 정의한다. 실제 JS/TS 호출은 [호스트 연결 명세](spec/07-host-integration.md)와 [Core 공개 타입](../packages/core/src/index.d.ts)을 따른다. 검사는 [검증 안내](verification.md), 출시 후의 구현 범위는 [후속 작업](follow-up.md)에서 확인한다.
 
-최초 통합: **2026-10-28** · 현재 인계: **2026-11-02, U41** · 구현 담당자를 위한 현재 계약
+최초 통합 **2026-10-28** · 구현 담당자를 위한 현재 계약
 
-설계 복원·명확화의 배경은 [결정 등록부](history/decision-register.md)와 [원문→계약 대응표](handoff/source-contract-matrix.md)에 있다. 현재 구현·검증 결과는 [제품 인수인계](handoff/core-implementation-2026-11-02.md), 실제 잔여는 [후속 작업](handoff/open-contracts.md#실제-남은-작업)을 따른다. 이 명세는 언어 독립 계약을 소유하며 진행 수치를 복제하지 않는다.
+설계 근거는 [결정 등록부](decisions.md)와 [원문→계약 대응표](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/source-contract-matrix.md)에 있다. 현재 구현 경계는 [아키텍처](architecture.md), 검사와 실행 근거는 [검증 안내](verification.md), 공개 범위 밖의 작업은 [후속 범위](follow-up.md#실제-남은-작업)를 따른다. 이 명세는 언어 독립 계약을 소유한다.
 
 Viewstem은 **재사용 리소스로 UI·상태·데이터·동작을 선언하고, 사용자와 에이전트가 같은 실행 규칙으로 화면을 조작하는 도메인 독립 라이브러리**다. 에이전트 없이도 실행 가능하며, 에이전트는 별도 엔진이 아니라 같은 코어의 요청 주체다.
 
@@ -22,15 +22,15 @@ Viewstem은 **재사용 리소스로 UI·상태·데이터·동작을 선언하�
 | [05 Component·View](spec/05-component-view.md) | JSON 골격, slots/events/on, when/repeat, Grid |
 | [06 연결 예시](spec/06-composition-examples.md) | State→입력→이벤트→Action→결과, 슬롯 작성자 문맥, 반복 Grid |
 | [07 호스트 연결](spec/07-host-integration.md) | 구현 제안인 등록·마운트 의사 코드와 확정 계약의 경계 |
-| [08 적합성 검증](spec/08-readiness-conformance.md) | 확정 계약의 검증 관점, 대표 시나리오, 인수 증거 연결 |
-| [09 StateStore·reaction·URL](spec/09-preserved-contracts.md) | Store 주입·관찰·URL·컬렉션 전송의 현행 계약과 이관 근거 |
+| [적합성 검사](verification.md#contract-boundaries) | 검증할 경계와 [항목별 기대값](acceptance.md) |
+| [09 StateStore·reaction·URL](spec/09-state-store-and-url.md) | Store 소유·관찰, reaction 및 URL 동기화 |
 | [10 값 상세](spec/10-value-contracts.md) | State의 missing 읽기·undefined·숫자 범위·표현·정규화·미지원 값/순환 거절, literal/escape, 시간 의존 계산, 타입별 비교, 격리·읽기 snapshot, 날짜 경계 |
 | [11 선택 차트](spec/11-optional-charts.md) | core 기본 제공과 구별하는 차트 계약·엔진 범위·독립 실험과 제품 구현의 구분 |
 | [12 리소스 셋과 브라우저 렌더링](spec/12-resource-sets-browser.md) | 패키지 역할, 실행 중 셋 등록과 View별 적용, headless, 혼합 트리 소유권의 확정 설계 |
 
-`[E01]` 등의 근거 표기는 결정 근거 식별자다. E01–E42는 원 통합 명세의 색인이고 E43–E69은 보관 원문 직접 대조와 방 기록 회수로 보완한 근거다. 회수 요약과 원문 전문은 [색인](history/evidence-index.md)에서 구별한다. U01–U41은 이관 후 프로젝트 대화에서 확정한 명확화·값 계약·실행 실험·CEL 패치 진행 전제·검증 진행·도구 구현의 근거다. 해당 대화를 읽어야만 이 명세를 해석할 수 있도록 작성하지 않는다.
+`[E01]` 등의 근거 표기는 결정 근거 식별자다. E01–E42는 원 통합 명세의 색인이고 E43–E69은 보관 원문 직접 대조와 방 기록 회수로 보완한 근거다. 회수 요약과 원문 전문은 [색인](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/history/evidence-index.md)에서 구별한다. U01–U41은 이관 후 프로젝트 대화에서 확정한 명확화·값 계약·실행 실험·CEL 패치 진행 전제·검증 진행·도구 구현의 근거다. 해당 대화를 읽어야만 이 명세를 해석할 수 있도록 작성하지 않는다.
 
-JS/TS의 실제 API는 [패키지 사용법](../packages/core/README.md)과 [공개 타입](../packages/core/src/index.d.ts), 실행 가능한 CEL 프로필은 [지원 문서](handoff/core-cel-support.md)를 따른다. U28–U36의 독립 실험·누락 보완·실패 전후 증거는 [검증 진행표](handoff/verification-ledger.md)에 보존한다. 그 시점의 미구현 표기는 현재 진행 상태가 아니다.
+JS/TS의 실제 API는 [패키지 사용법](../packages/core/README.md)과 [공개 타입](../packages/core/src/index.d.ts), 실행 가능한 CEL 프로필은 [지원 문서](core-cel.md)를 따른다. U28–U36의 독립 실험·누락 보완·실패 전후 증거는 [검증 진행표](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/verification-ledger.md)에 보존한다. 그 시점의 미구현 표기는 현재 진행 상태가 아니다.
 
 ## 1 이 문서의 상태 표시와 사용법
 
@@ -64,7 +64,7 @@ JS/TS 브라우저 렌더러의 후속 구조는 [리소스 셋과 브라우저 
 | 변경과 에이전트 | 공통 탐색·설명·변경·호출, 코어 상태/구성 원자 적용 | 부분 변경 프로토콜과 충돌 처리 |
 | 후속 | Dart core와 Flutter, 선택 UI 패키지 | Theme, scoped slot 데이터, 드래그 편집기 |
 
-공통 리소스・상태・실행 책임은 이미 결정했다. 위 마지막 열은 언어별 구현과 테스트로 확인할 경계이며 JS/TS의 미구현 목록이 아니다. 과거 승인에서 이어지는 [Store·URL 등의 현재 의미](spec/09-preserved-contracts.md)를 유지한다. [E02]
+공통 리소스・상태・실행 책임은 이미 결정했다. 위 마지막 열은 언어별 구현과 테스트로 확인할 경계이며 JS/TS의 미구현 목록이 아니다. 과거 승인에서 이어지는 [Store·URL 등의 현재 의미](spec/09-state-store-and-url.md)를 유지한다. [E02]
 
 ## 3 최상위 확정 결정
 
@@ -84,10 +84,7 @@ JS/TS 브라우저 렌더러의 후속 구조는 [리소스 셋과 브라우저 
 
 - 바닐라 DOM 컴포넌트를 먼저 만들고 Svelte가 이를 감싸야 한다는 결정은 아니다. 화면 구현은 각 렌더러가 맡는다.
 
-- U46·D103에서 임시 바닐라 playground와 shadcn 갤러리를 제거했다. 패키지 사용은 각 공개 README를 따르며, UI 검증은 패키지를 직접 마운트하는 내부 fixture로 수행한다. 도구 제거는 core·renderer·UI 패키지의 공개 계약이나 지원 목록을 변경하지 않는다. [제거와 검증 범위](handoff/temporary-tools-removal-2026-11-04.md)를 따른다.
-- U39–U40의 [Svelte 클라이언트 렌더러](../packages/svelte/README.md)는 공개 core projection·수명·이벤트에 Svelte 구현을 연결한다. `@viewstem/svelte`의 `createRenderer()`만으로 시작하며 기본 UI·Action·테마 자동 등록 없이 호스트가 Component 계약과 구현을 각각 등록한다. 실제 패키지 검증과 지원 한계는 [인계](handoff/svelte-implementation-2026-11-02.md)를 따른다.
-- [`@viewstem/ui`](../packages/ui/README.md)는 기본 컴포넌트 패키지다. `@viewstem/core`의 View를 브라우저 DOM에 연결하며 순수 JS·React·Vue·Svelte에서 같은 JSON을 사용한다. Basecoat Vega·Neutral 스타일과 Vanilla JS 컨트롤러를 사용한다. Calendar·Range Calendar·Date Picker는 Zag Vanilla, Data Table은 TanStack Table Core에 연결한다. Chart의 축과 보조선은 D3 스케일로 계산한다.
-- D144에 따라 `@viewstem/ui`는 JSON Component ID 357개와 66개 계열의 지원 계약을 제공한다. 입력·슬롯·이벤트의 공개 범위는 `@viewstem/ui/support.json`을 따른다. 기존 `@viewstem/svelte`는 앱이 제공하는 Svelte 구현을 연결하는 어댑터로 유지한다. [D144](history/decision-register.md#a-현재-채택한-결정)
+- JS/TS의 구현 경계와 기본 UI 공급 방식은 [아키텍처](architecture.md)와 [리소스 셋 명세](spec/12-resource-sets-browser.md)를 따른다. 실제 사용법과 지원 컴포넌트는 [패키지 안내](README.md#use-a-released-package)에서 확인한다.
 
 - Rust/WASM 통합 코어는 검토했지만 현재 채택 경로는 아니다.
 
@@ -99,53 +96,7 @@ JS/TS 브라우저 렌더러의 후속 구조는 [리소스 셋과 브라우저 
 
 ### 3.4 공개 문서와 Playground 배포
 
-공개 문서 사이트는 **Astro와 Starlight**로 구축한다. Starlight가 영·한 문서 탐색과 검색을 맡고, 같은 사이트의 `/playground/`에서 Svelte로 만든 편집·실행 화면을 제공한다. [D106](history/decision-register.md#a-현재-채택한-결정)
-
-공개 문서의 좌측 메뉴는 시작하기, 핵심 개념, 가이드, 레퍼런스 안내, DSL 레퍼런스, @viewstem/core, @viewstem/ui, @viewstem/svelte로 구성한다. 핵심 개념은 View와 Component, 값과 입력, State, 계산된 값, 이벤트와 Action, Query와 데이터, 조건과 목록, Component 재사용, 리소스와 타입의 9개 페이지로 구성한다. 각 페이지에서 정의·최소 코드·예상 결과·주요 실행 의미를 설명하고 대표 실습을 연결한다. 읽기 순서는 좌측 메뉴와 하단 이전·다음 탐색으로 제공하며, 개념 설명을 예제 링크 목록으로 대체하지 않는다. [조사와 페이지별 구성](handoff/docs-core-concepts-2026-11-05.md), [D110](history/decision-register.md#a-현재-채택한-결정)을 따른다. 문서 본문의 제목에서 페이지 목차를 만들고, 정적 빌드에서 Pagefind 검색 색인을 생성한다. [D108](history/decision-register.md#a-현재-채택한-결정)
-
-패키지 문서는 개요 → 작업별 사용 가이드 → 상세 API 레퍼런스 순서로 구성한다. 공개 export·타입·구현을 기준으로 시그니처, 옵션·기본값, 반환값, 오류와 수명을 한국어·영어로 제공한다. DSL은 리소스와 표현식의 필드 계약을 별도로 설명한다. `@viewstem/ui`는 한·영 개요, 브라우저 마운트 가이드, API와 66개 계열 상세 페이지를 제공한다. 입력·슬롯·이벤트 표는 UI 패키지의 지원 메타데이터에서 생성한다. [D144](history/decision-register.md#a-현재-채택한-결정)
-
-공개 문서의 상세 API 페이지는 상위 경로와 현재 메뉴 위치를 표시한다. UI의 지원 계열 66개를 좌측 컴포넌트 메뉴에 모두 나열하고, 현재 항목 표시·같은 언어의 인접 계열 이동을 제공한다. 각 계열 상세 페이지에는 실제 공개 렌더러로 실행되는 미리보기와 동일한 View JSON, 앱 등록 예제를 함께 제공한다. [D122](history/decision-register.md#a-현재-채택한-결정)를 따른다. 제목 크기는 h1 → h2 → h3 → h4 순서를 유지하고, 참조 표보다 목적·사용 예제를 먼저 설명한다. 일반 HTML·SVG 입력과 큰 중첩 타입은 펼침 영역으로 분리하되 지원 계약을 생략하지 않는다. 공통 헤더의 테마 선택은 밝게·어둡게·시스템 설정을 지원하며 모든 사이트 진입점에서 같은 선택을 적용한다. [D117](history/decision-register.md#a-현재-채택한-결정), [사이트 리뷰](../apps/docs/review/2026-11-05/review.md)를 따른다.
-
-`@viewstem/ui`의 계열 상세 페이지는 컴포넌트 이름과 역할 설명에 이어 기본 예제, 사용법, 추가 예제, JSON 레퍼런스 순서로 제공한다. 목차는 본문 순서를 따른다. 사용법에 기본 예제의 View JSON과 짝을 이루는 실행 코드를 바로 표시하고 코드 블록 헤더에서 복사할 수 있게 한다. 추가 예제는 미리보기·JSON·실행 코드 탭에서 조작·확인·복사한다. 참조 표의 제약은 해당 타입 아래에 표시한다. 미리보기는 Vega·Neutral 스타일로 실행한다. [D142·D146·D147](history/decision-register.md#a-현재-채택한-결정), [공식 예제 조사](../apps/docs/review/2026-11-11/shadcn-example-comparison.md)를 따른다.
-
-설명할 차이가 있는 변형은 기본 예제 아래에 별도 제목으로 제공하고 목차에서 바로 연결한다. 66개 계열의 한·영 상세 문서에 기본 예제에서 다루지 않는 입력·상태·조합을 보여 준다. 같은 입력의 차이는 비교 묶음으로, 구조나 조작이 달라지는 경우는 독립 예제로 제공한다. 각 묶음은 하나의 View JSON으로 실행·표시·복사하며, 하단 미리보기는 화면에 들어올 때 실행한다. [D143·D145](history/decision-register.md#a-현재-채택한-결정), [검토 결과](../apps/docs/review/2026-11-11/component-example-variants/concepts_brief.md#goldfish-검토-종합)를 따른다.
-
-`shadcn.Slider`의 다중 모드는 `value` 배열의 숫자마다 손잡이를 렌더링한다. 손잡이는 오름차순을 유지하고 `thumbLabels`로 각각 이름을 붙일 수 있다. `valueChange`와 `valueCommit`은 다중 모드에서 전체 배열을, 단일 모드에서 숫자를 전달한다. [D148](history/decision-register.md#a-현재-채택한-결정)을 따른다.
-
-사이트 자체의 기본 UI는 공식 Astro 설치 방식의 shadcn-svelte로 통일한다. 공식 CLI가 생성한 원본 부품을 사용하고 React 런타임·통합·관련 의존성은 포함하지 않는다. `apps/docs/src/components/ui`의 사이트용 컴포넌트와 Neutral 테마를 사용하고, 헤더·검색·사이드바·목차·메뉴·페이지 탐색·예제 파일 탭·Playground 조작부를 포함한다. 문서·Examples·Playground에서 선언형 JSON을 실행하는 영역은 `@viewstem/ui`를 사용한다. CodeMirror 편집기와 문서 본문은 각각 편집·읽기 역할을 유지하며 사이트 테마 토큰을 따른다. D127의 React 구현 선택을 대체하며 기존 디자인·한영·모바일·테마·사이드바 스크롤 및 D142 예제 탭의 동작은 유지한다. [D130](history/decision-register.md#a-현재-채택한-결정), [적용 범위·검증](../apps/docs/review/2026-11-06/site-svelte.md)을 따른다.
-
-미리보기·JSON 탭은 같은 예제를 표시한다. 탭을 전환해도 실행 상태는 보존되고, 다시 실행하면 초기 상태로 돌아간다. JSON 탭과 복사 버튼은 초기 선언을 사용한다. JavaScript 없이도 초기 JSON과 앱 연결 코드를 읽을 수 있다. [D142](history/decision-register.md#a-현재-채택한-결정)를 따른다.
-
-
-홈·예제·Playground·문서는 동일한 공통 헤더를 사용한다. 로고, 문서·예제·Playground 탐색, GitHub, 현재 페이지를 유지하는 언어 전환을 공유하고 문서에만 검색과 모바일 문서 메뉴를 추가한다. 모바일에서는 공통 탐색 아래에 문서 도구 행을 둔다. [D111](history/decision-register.md#a-현재-채택한-결정)
-
-사이트 전체의 한글·영문 제목·본문·UI는 Pretendard, 코드와 편집기는 D2Coding을 사용하며 코드 합자는 끈다. 기본 서체에 없는 기호는 Noto Sans Symbols 2로 보완하고 이모지는 운영체제 컬러 이모지, UI 아이콘은 SVG를 사용한다. 웹폰트와 라이선스는 사이트에 포함하며 이 선택은 라이브러리 소비자의 폰트를 강제하지 않는다. 페이지 제목·공통 메뉴에 필요한 Pretendard 부분 파일과 기본 코드 폰트를 미리 요청하고, 본문·코드 폰트가 늦게 도착하면 현재 화면에서 대체 폰트를 유지해 읽는 중 위치가 바뀌지 않게 한다. 보조 기호 폰트는 시스템 문자 폰트 뒤에서 누락 기호를 보완한다. [D118](history/decision-register.md#a-현재-채택한-결정) [D112](history/decision-register.md#a-현재-채택한-결정)
-
-사이트의 설명과 탐색에는 장식용 뱃지·반복 카드를 사용하지 않고 제목, 여백, 필요한 구분선으로 위계를 표현한다. 홈의 실행 흐름은 순서 목록, 특징은 열린 단락, 예제 진입은 텍스트 링크 목록으로 구성한다. 문서의 이전·다음 탐색은 구분선 아래 방향별 링크로 제공한다. 실행 화면·코드·팝오버의 기능적 경계와 라이브러리 사용법을 보여 주는 예제의 Card·Badge는 유지한다. [D113](history/decision-register.md#a-현재-채택한-결정)
-
-사이트 모션은 상태 변화와 탐색 방향을 이해하도록 보조한다. 홈의 일부 주요 영역에 한 번만 진입 효과를 적용하고 필터 변경, 실행 결과 교체, 메뉴·검색 열림, 앵커 목적지에 짧은 피드백을 제공한다. 상태 변경·입력·탐색은 애니메이션 완료를 기다리지 않으며, 본문을 기본적으로 숨기거나 모든 문단에 반복 진입 효과를 적용하지 않는다. `prefers-reduced-motion`에서는 모션을 생략하고 실행 중인 자체 모션도 취소한다. [D114](history/decision-register.md#a-현재-채택한-결정)
-
-문서와 예제의 이전·다음은 같은 방향별 탐색 표현을 사용하며 모바일 예제는 실행 결과 아래에서 다음 실습으로 이어진다. 모바일 예제 목록은 본문에서 한 번만 제공한다. Playground는 빈 상태의 첫 예제·시작 문서 연결, 수동 실행 안내와 미실행 변경 표시, 같은 탭의 언어 전환에도 보존되는 초안을 제공한다. 복원한 초안은 자동 실행하지 않는다. 한국어 문서 검색·코드 복사 UI도 한국어로 제공한다. [D115](history/decision-register.md#a-현재-채택한-결정), [검토·검증](handoff/docs-site-consistency-2026-11-05.md)을 따른다.
-
-시작하기의 문서 순서는 개요, 설치, 빠른 시작이다. 개요와 빠른 시작에서 브라우저 예제로 갈 수 있다. 설치에서 패키지 준비를 다루고, 빠른 시작에서는 브라우저에서 `@viewstem/ui`로 첫 View를 실행한다. [D109](history/decision-register.md#a-현재-채택한-결정)
-
-공개 문서와 Playground는 **Cloudflare Workers Static Assets**로 배포한다. 첫 버전은 정적 빌드 결과를 Cloudflare에 올리고, Playground의 Viewstem 런타임은 방문자의 브라우저에서 실행한다. 기본 주소는 별도 도메인 구매 없이 `workers.dev`를 사용한다. [D104](history/decision-register.md#a-현재-채택한-결정)
-
-같은 저장소에서 `main`을 대상으로 연 PR은 head 코드로 빌드한 미리보기를 전용 Worker의 별도 `workers.dev` 주소에 배포한다.
-PR을 닫거나 `main`을 대상으로 하지 않게 되면 해당 미리보기를 제거하고 GitHub 배포 기록을 비활성으로 표시한다.
-미리보기와 운영의 자격 증명은 각각 담당 Worker로 범위를 제한한다.
-기능과 관련 문서는 기본 브랜치인 `main`에 함께 머지한다. 문서 단독 PR도 같은 브랜치에 머지한다.
-패키지 릴리스의 전체 배치가 공개되면 같은 SHA에서 문서를 배포한다. 사이트 단계는 그 SHA에서 독립적으로 재시도할 수 있다.
-독립 사이트 공개는 기본 브랜치의 **Deploy docs** 수동 실행으로 시작한다. 운영의 패키지 릴리스 기준부터 후보까지 안전한 문서 변경 범위를 입증할 수 있어야 한다.
-두 배포 경로 모두 고정 버전의 공개 아카이브에 기록된 소스로 패키지별 후보 트리를 검증한다. 이번 발행 배치의 패키지는 릴리스 SHA가 일치해야 한다.
-두 경로는 하나의 운영 큐를 사용하고 더 최신 운영 커밋을 보호한다. 운영 예제와 Playground는 공개된 패키지로 빌드하고 배포 전에 브라우저에서 검사한다. [D174](history/decision-register.md#a-현재-채택한-결정)
-배포 후 공개 주소에서 이번 빌드의 소스와 실행을 확인한다. 이전 소스의 복구는 명시적인 롤백으로 수행한다.
-[배포 설정과 절차](../apps/docs/README.ko.md#사이트-배포)를 따른다. [D171](history/decision-register.md#a-현재-채택한-결정)
-
-공개 Playground는 하나로 제공한다. 브라우저에서 `@viewstem/ui`로 View JSON을 실행하고, 편집한 내용은 사용자가 실행할 때 적용한다. [D144](history/decision-register.md#a-현재-채택한-결정)
-
-공개 홈은 제품 소개, 고객 목록 실행 흐름, 주요 특징, 브라우저 UI 연동, 폼·대시보드 가이드, 문서 진입 순으로 구성한다. 주 버튼은 첫 View를 실행하는 Quickstart로 연결한다. [D107](history/decision-register.md#a-현재-채택한-결정)
+사이트 탐색·예제·Playground의 제품 계약은 [사이트 유지보수 안내](../apps/docs/README.ko.md#사이트-동작-계약)에 둔다. 공개 패키지와 사이트의 배포 계약 및 절차는 [릴리스 안내](releasing.md#deploy-the-site)를 따른다.
 
 ## 4 리소스와 런타임의 확정 구분
 
@@ -216,7 +167,7 @@ Component는 필요한 기능만 포함한다. 제목·값만 표시하는 카�
 | render·slots의 Component 노드 | componentRef / component | 노드 id·inputs·slots·on·when·repeat |
 | on의 Action 호출 | actionRef / action | inputs와 선택적 호출 연결 id; emit과는 배타적 |
 | Action의 Query/Variable/Action 단계 | 기존 xxxRef / spec | 기존 kind·inputs·선택적 단계 id 유지 |
-| 호스트의 View 적용 | viewRef / view | inputs; view는 View spec 본문 |
+| 호스트의 View 적용 | 등록된 View ID / 인라인 View spec | JS/TS `ViewSource`는 `{ ref: id }` 또는 인라인 View spec이다. 입력은 `ViewOptions.inputs`로 전달한다. |
 
 인라인 필드는 객체만 받으며 옛 bare 문자열 참조를 복원하지 않는다. Component 노드에 kind/spec 외피를 새로 요구하지 않는다. 인라인 정의도 자신의 ports만 보며, 주변 상태나 이벤트는 호출 위치의 inputs를 통해 전달한다. 인라인 코드 함수는 JSON에 넣지 않고 등록된 코드 Component/Action을 참조한다.
 
@@ -323,15 +274,15 @@ State.initial은 새 소유 인스턴스를 만들 때 한 번 적용하며 inpu
 
 시간 의존 계산에 현재 시각을 제공하고 시간 변화 때 재평가하는 기능은 유지하되, State.initial을 반복 초기화하거나 선택 날짜를 자동 추종시키는 의미는 아니다. 타입별 변경 비교·원본을 freeze하지 않는 격리·안정 읽기 snapshot은 [값 상세](spec/10-value-contracts.md)를 따른다. [E53, E58–E60]
 
-Derived는 의존 입력 변경으로 다시 계산하고 직접 쓸 수 없다. 계산 실패가 원본 State 변경을 되돌리지는 않는다. 실패/대기인 의존 결과를 오래된 성공값으로 가장하지 않으며 무관한 UI는 유지한다. Derived와 reaction 의존 순환은 검증한다. **같은 Store의 같은 대상 State에 reaction을 둘 이상 등록하면 거절한다.** 다른 Component가 등록해도 같은 셀을 대상으로 하면 중복이며, 서로 다른 범위의 같은 로컬 이름만으로 중복이라고 보지는 않는다. 같은 배치의 명시적 쓰기가 reaction보다 우선하고, 값 확정 뒤 Derived/Query를 계산하는 기존 정책을 유지한다. 이는 외부 API까지 포함한 트랜잭션 약속이 아니다. reaction의 현행 JSON·등록 수명은 [Store 상세](spec/09-preserved-contracts.md#store-주소관찰reaction의-현행-매핑)의 U13을 따르며 중복 거절 의미를 유지한다. [E44]
+Derived는 의존 입력 변경으로 다시 계산하고 직접 쓸 수 없다. 계산 실패가 원본 State 변경을 되돌리지는 않는다. 실패/대기인 의존 결과를 오래된 성공값으로 가장하지 않으며 무관한 UI는 유지한다. Derived와 reaction 의존 순환은 검증한다. **같은 Store의 같은 대상 State에 reaction을 둘 이상 등록하면 거절한다.** 다른 Component가 등록해도 같은 셀을 대상으로 하면 중복이며, 서로 다른 범위의 같은 로컬 이름만으로 중복이라고 보지는 않는다. 같은 배치의 명시적 쓰기가 reaction보다 우선하고, 값 확정 뒤 Derived/Query를 계산하는 기존 정책을 유지한다. 이는 외부 API까지 포함한 트랜잭션 약속이 아니다. reaction의 현행 JSON·등록 수명은 [Store 상세](spec/09-state-store-and-url.md#store-주소관찰reaction의-현행-매핑)의 U13을 따르며 중복 거절 의미를 유지한다. [E44]
 
 ### 5.3 StateStore 주입과 관찰
 
 서비스는 **라이브러리가 생성한 StateStore**를 소유하고 주입할 수 있다. 메서드 모양만 같은 임의 외부 Store 지원은 별도 확장 계약이 필요하다. 서비스용 공개 등록과 View/Component 수명에 따른 내부 등록을 구분하며, 누가 값을 썼는지가 생성 소유권을 바꾸지는 않는다. 과거 함수명이나 내부 관리 구현은 현재 SDK를 확정하지 않는다. [E51]
 
-관찰은 Store 전체·단일 State·여러 State 묶음을 지원한다. 콜백은 구독 범위의 변경 후 `values`와 이번 `changes`를 받으며, 구독 직후에는 현재 값과 `changes: []`를 한 번 전달한다. 이후 해당 범위의 실제 변경에만 통지하고 한 원자 변경 묶음에는 한 번 통지한다. 등록·값 변경·제거·동일 이름의 새 수명 교체를 `added/updated/removed/replaced`로 구별한다. 값이 같아도 교체는 `replaced`이며 제거는 null 저장과 다르다. 구독 해제를 지원하고 객체 내부 필드·배열 원소 구독은 1차 제외다. [관찰 상세](spec/09-preserved-contracts.md#statestore-관찰의-확정-의미)에서 원본 보호와 새 이름 공간 매핑 경계를 설명한다. [E45]
+관찰은 Store 전체·단일 State·여러 State 묶음을 지원한다. 콜백은 구독 범위의 변경 후 `values`와 이번 `changes`를 받으며, 구독 직후에는 현재 값과 `changes: []`를 한 번 전달한다. 이후 해당 범위의 실제 변경에만 통지하고 한 원자 변경 묶음에는 한 번 통지한다. 등록·값 변경·제거·동일 이름의 새 수명 교체를 `added/updated/removed/replaced`로 구별한다. 값이 같아도 교체는 `replaced`이며 제거는 null 저장과 다르다. 구독 해제를 지원하고 객체 내부 필드·배열 원소 구독은 1차 제외다. [관찰 상세](spec/09-state-store-and-url.md#statestore-관찰의-확정-의미)에서 원본 보호와 새 이름 공간 매핑 경계를 설명한다. [E45]
 
-URL 복원·실패·소유 key의 규범은 [URL 상세](spec/09-preserved-contracts.md#url-동기화의-확정-의미)를 따른다. URL에 기록할 값이 기본값과 같다는 이유로 자동 생략하지 않으며, 모든 초기 기본값을 최초 연결 때 URL에 기록하도록 요구하는 의미는 아니다. Query 서비스 콜백 직전 Set/Map 변환은 [별도 경계](spec/09-preserved-contracts.md#query-서비스-콜백의-컬렉션-변환)로 보존하며, Store 관찰값을 같은 전송용 JSON으로 바꾸는 규칙은 아니다. [E46, E47]
+URL 복원·실패·소유 key의 규범은 [URL 상세](spec/09-state-store-and-url.md#url-동기화의-확정-의미)를 따른다. URL에 기록할 값이 기본값과 같다는 이유로 자동 생략하지 않으며, 모든 초기 기본값을 최초 연결 때 URL에 기록하도록 요구하는 의미는 아니다. Query 서비스 콜백 직전 Set/Map 변환은 [별도 경계](spec/01-datasource-auth.md#query-서비스-콜백의-컬렉션-변환)로 보존하며, Store 관찰값을 같은 전송용 JSON으로 바꾸는 규칙은 아니다. [E46, E47]
 
 ## 6 Query와 실행 환경 계약
 
@@ -439,9 +390,9 @@ U35에서 코드 Action의 내부 호출은 부모 실행에 연결하기로 확
 
 ### 8.3 정의의 자동 추종은 하지 않는다
 
-실행할 때 주입된 정의를 사용한다. 저장소의 공용 Component·Query·Type이 바뀌어도 기존 화면이 몰래 최신 정의를 따라가지 않는다. 서비스의 명시적 재주입·업데이트 경로를 거친다. 이는 데이터 재조회/실시간 갱신을 막는 원칙이 아니다. 기존 setResource의 기본 동작인 이전 화면 소유 상태/URL 정리와 서비스 소유 상태 유지는 이미 정해졌다([이전 승인 의미의 이관](spec/09-preserved-contracts.md)). 이후 명시적으로 뒤로 미룬 것은 새 부분 변경·인스턴스 모델에서의 이행 및 진행 중 작업 처리 세부이지, 기존 기본 동작 전체가 아니다. [E19]
+실행 중에는 주입된 정의를 사용한다. 공용 정의가 바뀌어도 서비스가 새 정의를 명시적으로 적용할 때까지 기존 View는 기존 정의를 읽는다. 명시적인 전체 교체(`view.replace()`)는 이전 View가 소유한 State와 URL key를 정리하고 서비스 소유 State를 보존한다. [URL 정리](spec/09-state-store-and-url.md#쓰기실패정리) · [E19]
 
-초기 적용은 준비된 UI부터 점진 표시하고 실행 가능한 최초 Query·화면 반영이 성공/개별 오류로 정리되면 완료한다. 외부 입력 대기는 오류/빈 데이터로 숨기지 않고 초기 완료를 막지 않는다. 구조·타입 충돌 같은 적용 자체 실패는 기존 화면·Store를 유지한다. 전부 inline/static인 화면은 서비스 조회/Query 콜백 없이 동작하며 실제 필요한 연결의 누락은 오류다. [초기 적용 관찰 상세](spec/09-preserved-contracts.md#초기-적용-완료의-확정-관찰-의미)를 새 SDK에 보존한다. 함수명·완료 핸들·Promise 시그니처는 별도 구체화다. [E61, E68]
+초기 적용에서 준비된 UI를 먼저 표시한다. 외부 입력을 기다리는 Query는 완료를 막지 않으며 개별 Query 실패는 보고서에 포함한다. 구조·타입 문제가 있는 후보는 기존 화면과 Store를 보존한다. JS/TS는 Core의 `view.initial` 적용 핸들과 `view.whenSettled(application)`, 표시 연결의 `whenRendered()`를 사용한다. [호스트 완료 계약](spec/07-host-integration.md#최소-sdk와-적용-완료) · [E61, E68]
 
 ### 8.4 에이전트 인터페이스는 라이브러리 공통 기반이다
 
@@ -451,19 +402,13 @@ agent-kit과 SDK 어댑터는 이를 모델/SDK에 연결하는 구성 제안이
 
 ### 8.5 외부 앱 개발용 공통 스킬
 
-외부 앱을 만드는 코딩 에이전트가 Viewstem 라이브러리를 사용할 수 있도록 공통 스킬을 구성한다. **현재 지원·검증 대상은 Codex이며 Claude Code는 첫 배포의 필수 조건에서 제외한다.** D129는 D119의 두 호스트 동시 첫 지원 조건을 대체한다. 라이브러리 계약·예제·작업 흐름은 특정 에이전트에 종속되지 않게 공유하고, 설치·발견·호출·도구 연결 등 실제 에이전트별 차이만 분리한다. 지원 완료는 실제 검증한 Codex 환경 범위로 표시한다. [현재 범위와 제거 기록](handoff/viewstem-skills-scope-2026-11-06.md), [D129](history/decision-register.md)
+외부 앱을 만드는 코딩 에이전트가 Viewstem 라이브러리를 사용할 수 있도록 공통 스킬을 구성한다. **현재 지원·검증 대상은 Codex이며 Claude Code는 첫 배포의 필수 조건에서 제외한다.** D129는 D119의 두 호스트 동시 첫 지원 조건을 대체한다. 라이브러리 계약·예제·작업 흐름은 특정 에이전트에 종속되지 않게 공유하고, 설치·발견·호출·도구 연결 등 실제 에이전트별 차이만 분리한다. 지원 완료는 실제 검증한 Codex 환경 범위로 표시한다. [현재 범위와 제거 기록](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/viewstem-skills-scope-2026-11-06.md), [D129](decisions.md)
 
-첫 지원 환경은 **로컬·클라우드 구분 없이 프로젝트 파일 접근과 Node.js 실행이 가능한 환경**이다. 파일·실행 도구가 없는 대화 환경을 위한 원격 계약 조회 경로는 첫 범위에 포함하지 않는다. [D120](history/decision-register.md)
+첫 지원 환경은 **로컬·클라우드 구분 없이 프로젝트 파일 접근과 Node.js 실행이 가능한 환경**이다. 파일·실행 도구가 없는 대화 환경을 위한 원격 계약 조회 경로는 첫 범위에 포함하지 않는다. [D120](decisions.md)
 
-라이브러리와 스킬은 **별도로 설치**한다. 라이브러리 설치가 스킬 설치나 에이전트 설정 변경을 자동으로 수행하지 않으며, 두 가지를 함께 준비하는 통합 설치 흐름은 제공 범위에 포함하지 않는다. [D121](history/decision-register.md)
+라이브러리와 스킬은 **별도로 설치**한다. 라이브러리 설치가 스킬 설치나 에이전트 설정 변경을 자동으로 수행하지 않으며, 두 가지를 함께 준비하는 통합 설치 흐름은 제공 범위에 포함하지 않는다. [D121](decisions.md)
 
-최종 독립 리뷰의 보완을 [스킬 설계](../design_draft.md)와 [실행 계획](designs/viewstem-skills-implementation-2026-11-05.md)에 반영하고 최소 스킬 및 초기 비교 실험부터 구현했다. UI 조회 도구는 참조 자료만으로 남는 조회 실패·반복 비용이 관찰될 때 추가한다. D123 단계에서는 Claude Code를 준비만 했으며, 이후 D129에서 실행 검증을 중단하고 현재 지원 범위에서 제외했다. 준비 자료는 미검증 참고 자료로 보존한다. 공개 발행은 실제 검증과 배포 조건을 별도로 확인한다. [D123·D129](history/decision-register.md)
-
-최소 공통 스킬과 Codex의 첫 View·폼·native UI 초기 비교를 완료했다. 최종 후보는 4파일 구성을 유지하며 추가 참조·조회 도구는 도입하지 않았다. 실제 통과 범위와 Claude Code의 준비·미실행 경계는 [초기 구현 인계](handoff/viewstem-skills-initial-2026-11-05.md)에 기록한다.
-
-후속 Codex 확장 비교·비활성화 검사·B3 보완과 배포 판단은 [확장 검증 인계](handoff/viewstem-skills-extended-2026-11-05.md)를 따른다. 개발 산출물에서 재현된 [View 구독 후 투영 불일치](handoff/view-subscription-projection-2026-11-05.md)는 후속 [제품 수정·회귀·원본 앱 재검증](handoff/view-subscription-projection-fix-2026-11-06.md)에서 해결했다. 과거 스킬 비교의 실패 기록과 수정된 패키지의 검증 결과는 구별한다.
-
-이는 실행 중인 화면의 원격 조작 프로토콜이나 새 agent-kit API, 공개 발행 승인을 뜻하지 않는다.
+설치·지원 범위와 구현 및 검증 기록은 [스킬 유지보수 안내](../skills/README.md)가 관리한다.
 
 ## 9 표현 언어와 혼선의 정정
 
@@ -473,9 +418,9 @@ agent-kit과 SDK 어댑터는 이를 모델/SDK에 연결하는 구성 제안이
 
 - CEL 언어 선택과 npm 실행기 선택은 별개다.
 
-- @marcbachmann/cel-js, @bufbuild/cel은 검증 후보이지 최종 의존성이 아니다.
+- JS/TS Core는 수정한 `@marcbachmann/cel-js@8.0.0`을 포함한다. 공개 함수와 평가 제약은 [CEL 레퍼런스](core-cel.md)에 있다. Dart CEL 실행기와 교차 적합성은 [후속 범위](follow-up.md)다.
 
-- native Set/Map·날짜·암묵 coercion 금지·입력 격리 등 기존 요구는 [이전 승인 의미의 이관](spec/09-preserved-contracts.md)대로 유지한다. Query 서비스 콜백 직전의 재귀 Set→배열·Map→쌍 배열 변환은 이미 확정됐다. 날짜의 공개 값·전송 문자열은 U14의 [값 상세](spec/10-value-contracts.md#날짜-값과-전송-형식)를 따른다. CEL 구현체와 JS·Dart의 동일 결과, 실행 비용 제한은 실제 검증이 필요하다. [E47, U14]
+- native Set/Map·날짜·암묵 coercion 금지·입력 격리 등 기존 요구는 [공통 값 계약](spec/10-value-contracts.md)에 따라 유지한다. Query 서비스 콜백 직전의 재귀 Set→배열·Map→쌍 배열 변환은 이미 확정됐다. 날짜의 공개 값·전송 문자열은 U14의 [값 상세](spec/10-value-contracts.md#날짜-값과-전송-형식)를 따른다. Dart에서 같은 값·오류·제한을 재현하는 작업은 별도다. [E47, U14]
 
 - 초기 compute 제안은 **expression으로 변경 승인**됐다. 현재 공통 리소스 외피 결정에 따라 위치는 `Variable.spec.expression`이다. 중간의 외피 평탄화 이력은 최신 결정으로 대체되며 CEL 선택과 expression 명칭은 유지한다. [E21, E27]
 
@@ -503,6 +448,6 @@ agent-kit과 SDK 어댑터는 이를 모델/SDK에 연결하는 구성 제안이
 
 ## 10 구현으로 넘어가는 기준
 
-확정 계약을 변경·확장할 때 [적합성 안내](spec/08-readiness-conformance.md)와 [현재 작업 절차](handoff/implementation-start.md#새-채팅에서-시작할-때)를 적용한다. 공통 타입/검증 → State·값 → Query → Action → 화면 실행의 의존 관계를 유지하며 이미 구현한 core를 다시 착수 대상으로 취급하지 않는다.
+확정 계약을 변경·확장할 때 [인수 기대값](acceptance.md)와 [현재 작업 절차](verification.md#choose-checks-by-change)를 적용한다. 공통 타입/검증 → State·값 → Query → Action → 화면 실행의 의존 관계를 유지하며 이미 구현한 core를 다시 착수 대상으로 취급하지 않는다.
 
 U13의 스키마·오류·요청 DTO·최소 SDK, U14의 날짜·명시 업무 시간대·실패 후 성공 결과 보존·v1 선언형 Catch/Finally 제외, U35의 하위 호출 수명은 종료된 결정이다. 실제 지원과 통과 여부는 해당 구현의 타입·지원 문서·실행 증거로 확인한다.

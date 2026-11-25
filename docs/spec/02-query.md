@@ -8,7 +8,7 @@
 
 ## 10.2 Query: 재사용 요청과 복합 변환
 
-**확정 구조:** `spec.ports`는 Value만 허용한다. `sources`는 이름별 맵이며 각 항목은 `datasourceRef`(또는 인라인 datasource) + `request`, `queryRef`(또는 인라인 query) + `inputs` 중 하나로 정의한다. request에는 method·path·headers·params·body를 둔다. 참조 Query의 공개 port에 입력을 명시하며 이름이 같다는 이유로 자동 상속하지 않는다. 필수 입력의 기본값도 없고 inputs도 빠졌으면 실행 전 오류로 처리한다. 외부 Component는 Query의 공개 port를 거쳐 입력하고 내부 source를 직접 덮어쓰지 않는다.
+**확정 구조:** `spec.ports`는 Value만 허용한다. `sources`는 이름별 맵이며 각 항목은 `datasourceRef`(또는 인라인 datasource) + `request`, `queryRef`(또는 인라인 query) + `inputs` 중 하나로 정의한다. 요청의 `method`와 `path`는 필수이며 `baseUrl`, `headers`, `params`, `body`는 선택이다. 두 source 종류 중 하나를 선택한다. 외부 source가 없는 변환은 `sources: {}`를 사용할 수 있다. 참조 Query의 공개 port에 입력을 명시하며 이름이 같다는 이유로 자동 상속하지 않는다. `required: true`와 `default`는 함께 지정할 수 없다. 필요한 입력이 없으면 명시 실행에서 오류로, 자동 실행에서는 입력 대기로 처리한다. 외부 Component는 Query의 공개 port를 거쳐 입력하고 내부 source를 직접 덮어쓰지 않는다.
 
 각 source는 독립적이며 맵의 순서가 실행 순서가 아니다. 형제 source의 응답을 다른 source 요청 입력으로 사용하지 않는다. `/sources/별칭`은 직접 HTTP 요청이면 응답 body, Query 참조이면 해당 Query의 최종 변환 결과다. `transform.input`은 명시하고 `steps`는 선택적 순차 변환이다. steps를 생략할 수 있지만 명시 null을 빈 배열로 처리하지 않는다. steps가 없으면 input을 그대로 반환한다. 암묵적 첫 source 선택·필수 step ID·별도 변환 DAG를 추가하지 않는다. `main`은 보통의 별칭이며 단일 source의 이름 관례는 강제하지 않는다.
 
@@ -87,7 +87,7 @@
 
 **변환 의미 확정:** join은 left가 기본이며 left/right/inner를 지원한다. 여러 매칭은 모든 조합을 만들고, 유입 필드가 충돌 필드를 덮어쓴다. 키 타입은 엄격히 비교하고 null은 매칭하지 않으며 키 누락은 오류다. 미매칭 필드를 임의 null로 만들어내지 않는다. concat은 배열 순서·중복·이질적 항목을 보존한다.
 
-하위 Query의 inputs는 객체 또는 객체를 반환하는 표현식이며 명시 null을 생략으로 처리하지 않는다. 객체 템플릿의 `@@` 키는 공통 이스케이프 규칙으로 복원한 이름을 기준으로 필수 입력 연결을 검사한다. Join.mode 역시 생략 때만 left이며 명시 null은 잘못된 정의다. U32의 [후속 경계 검증](../handoff/boundary-followup-2026-10-30.md)에서 이 경계와 많은 배열의 Concat, 중첩 재사용·실패/취소를 확인했다.
+하위 Query의 inputs는 객체 또는 객체를 반환하는 표현식이며 명시 null을 생략으로 처리하지 않는다. 객체 템플릿의 `@@` 키는 공통 이스케이프 규칙으로 복원한 이름을 기준으로 필수 입력 연결을 검사한다. Join.mode 역시 생략 때만 left이며 명시 null은 잘못된 정의다. U32의 [후속 경계 검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/boundary-followup-2026-10-30.md)에서 이 경계와 많은 배열의 Concat, 중첩 재사용·실패/취소를 확인했다.
 
 ### Query 실패의 확정 의미
 
@@ -172,10 +172,11 @@ Query 정의의 직접·간접 참조 순환은 미사용 정의까지 등록 �
 | /queries/plantList | Query 사용 인스턴스 대상 |
 | /queries/plantList/data | transform을 마친 최종 Query 결과 |
 | /queries/plantList/status | 읽기 전용 실행 상태 |
+| /queries/plantList/waitingReason | 대기 사유. 대기하지 않으면 null |
 | /queries/plantList/error | 읽기 전용 오류 |
 | /queries/plantList/dataInputs · /stale | 보유 결과의 입력 snapshot·이전 결과 여부. 뒤 경로도 /queries/plantList/stale 전체 경로 |
 | /ports/list | Query 포트가 연결한 같은 사용 인스턴스 |
-| /ports/list/data · /status · /error · /dataInputs · /stale | 연결된 인스턴스의 동일한 읽기 표면. 각 경로에 /ports/list 접두 적용 |
+| /ports/list/data · /status · /error · /dataInputs · /stale · /waitingReason | 연결된 인스턴스의 동일한 읽기 표면. 각 경로에 /ports/list 접두 적용 |
 
 마지막 행의 /status·/error도 각각 /ports/list/status·/ports/list/error 전체 경로를 뜻한다. Query 결과가 배열이면 data 자체가 그 배열이며 원본 HTTP 응답 envelope를 추가로 강제하지 않는다. 상태와 공통 오류는 아래 U13을 따른다. Query data/status/error를 SetState로 수정할 수 없다. [E36, E37, E52, U13]
 
@@ -195,7 +196,7 @@ refresh:false는 Query 정의를 영구 실행 금지하는 권한이 아니라 
 
 ### 사용 설정·상태·대기 호출의 구체 계약
 
-**확정(U13):** View/Component의 `spec.queryDefaults`에는 정적 refresh:boolean과 intervalMs를 둘 수 있다. queries 항목에도 같은 필드를 평탄하게 두고, 사용 위치 → 가까운 Component 기본값 → View 기본값 순으로 상속한다. refresh 기본값은 true이며 intervalMs 생략은 주기 없음이다. intervalMs는 양의 안전 정수 밀리초다. executeWhen/autoRefreshWhen은 사용 위치의 동적 boolean이며 기본 true다. 기본값 객체에 숨은 상태 참조나 새 기본 주기를 넣지 않는다.
+**확정(U13):** View/Component의 `spec.queryDefaults`에는 정적 refresh:boolean과 intervalMs를 둘 수 있다. queries 항목에도 같은 필드를 평탄하게 두고, 사용 위치 → 가까운 Component 기본값 → View 기본값 순으로 상속한다. refresh 기본값은 true이며 intervalMs 생략은 주기 없음이다. intervalMs는 양의 안전 정수 밀리초다. executeWhen/autoRefreshWhen은 사용 위치의 동적 boolean이며 기본 true다. 기본값 객체에 숨은 상태 참조나 새 기본 주기를 넣지 않는다. 같은 사용 인스턴스를 유지하는 정의 갱신에서 해당 필드의 명시값과 상속값이 모두 없으면 이전의 유효 `refresh` 또는 `intervalMs`를 유지한다.
 
 | 관찰 필드 | 계약 |
 |---|---|
@@ -215,7 +216,7 @@ refresh:false는 Query 정의를 영구 실행 금지하는 권한이 아니라 
 
 위 대기 결합은 자동 Query 사용 인스턴스에만 적용한다. 독립 Action Query 호출끼리는 합치지 않는다. 시간순 경합 fixture는 구현 검증 과제로 유지한다. [U13]
 
-U17의 [Query 경합 독립 실험](../handoff/t2-query-races-2026-10-29.md)에서 지연 성공/실패·입력 세대·fresh 대기 결합·소유 수명 교체·timeout의 대표 경로를 실행했다. 현재 계약의 프로토타입 증거다. U29의 [Query–실제 HTTP 연결 검사](../handoff/t2-query-http-2026-10-30.md)는 같은 스케줄러를 HTTP/Login 실행기에 연결해 Node 22/24 각각 39개 사례·4개 고의 결함을 확인했다. 단일 직접 source의 연결 증거이며 일반 Query DSL·복합 Query·실제 core/URL/Action/renderer 연결 완료와 구별한다.
+U17의 [Query 경합 독립 실험](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-query-races-2026-10-29.md)에서 지연 성공/실패·입력 세대·fresh 대기 결합·소유 수명 교체·timeout의 대표 경로를 실행했다. 현재 계약의 프로토타입 증거다. U29의 [Query–실제 HTTP 연결 검사](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-query-http-2026-10-30.md)는 같은 스케줄러를 HTTP/Login 실행기에 연결해 Node 22/24 각각 39개 사례·4개 고의 결함을 확인했다. 단일 직접 source의 연결 증거이며 일반 Query DSL·복합 Query·실제 core/URL/Action/renderer 연결 완료와 구별한다.
 
 ### 완료 기준 주기 실행
 
@@ -230,9 +231,9 @@ executeWhen·입력 준비·refresh·autoRefreshWhen을 주기 실행 직전에�
 - executeWhen:false, 미준비 입력, refresh:false, intervalMs 생략은 재개로 우회하지 않는다. 실행할 수 없는 재개 요청을 따로 누적하지 않는다. 이후 gate/입력 준비에 따른 실행은 기존 정책을 따른다.
 - false가 되면 주기 timer와 아직 시작하지 않은 주기·재개 요청만 제거한다. 같은 pending에 결합된 입력 변경·수동 호출은 유지하며, 이미 시작한 실행은 autoRefreshWhen만으로 취소하지 않는다.
 
-U30의 [복합 Query·완료 기준 polling 검증](../handoff/t2-composite-polling-2026-10-30.md)은 하위 입력별 재사용·전체 성공 반영·source/transform 오류 위치와 위 주기 정책을 함께 확인했다. 수동/retry/주기의 fresh 실행과 입력 변경용 재사용을 구분하고, owner 폐기 때 내부 캐시도 정리했다. 독립 실험이며 전체 core·스키마·renderer 완료가 아니다.
+U30의 [복합 Query·완료 기준 polling 검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-composite-polling-2026-10-30.md)은 하위 입력별 재사용·전체 성공 반영·source/transform 오류 위치와 위 주기 정책을 함께 확인했다. 수동/retry/주기의 fresh 실행과 입력 변경용 재사용을 구분하고, owner 폐기 때 내부 캐시도 정리했다. 독립 실험이며 전체 core·스키마·renderer 완료가 아니다.
 
-U31의 [재개 정책 검증](../handoff/t2-polling-resume-2026-10-30.md)은 즉시 갱신·진행 중 한 건 결합·완료 후 재예약과 다시 중단할 때 다른 실행 계기의 보존을 확인했다. 마지막 완료 시각을 저장하는 U30의 임시 구현 선택은 대체했다.
+U31의 [재개 정책 검증](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-polling-resume-2026-10-30.md)은 즉시 갱신·진행 중 한 건 결합·완료 후 재예약과 다시 중단할 때 다른 실행 계기의 보존을 확인했다. 마지막 완료 시각을 저장하는 U30의 임시 구현 선택은 대체했다.
 
 ### 실패 후 마지막 성공 결과의 보존
 
@@ -248,7 +249,7 @@ U31의 [재개 정책 검증](../handoff/t2-polling-resume-2026-10-30.md)은 즉
 
 ## 실행 정책 이관
 
-자동 조회 인스턴스의 executeWhen/autoRefreshWhen·1 active + 1 latest pending·완료 기준 주기·generation/snapshot 유효성은 [이전 승인 이관](09-preserved-contracts.md)을 따른다. 이를 명시 Action Query 호출에 자동 구독·캐시 공유·재시도를 추가하는 근거로 사용하지 않는다. Query 상태는 U13, 실패 후 data 정책은 위 U14를 따른다.
+`executeWhen`은 실행 계기를, `autoRefreshWhen`은 주기 실행을 제한한다. 진행 중인 자동 실행이 있으면 다음 실행은 최신 대기 입력 한 건으로 합친다. 주기는 완료 시점부터 재며, 현재 세대와 입력에 유효한 결과만 적용한다. 이 규칙의 범위는 자동 조회 인스턴스다. 명시 Action Query에는 자동 구독·공유 캐시·자동 재시도를 추가하지 않는다.
 
 ### 자동 조회 결합의 입력 변경 대기
 

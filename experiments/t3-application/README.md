@@ -2,6 +2,8 @@
 
 M01–M07·N01–N05·K23·C03·C14·C16·C17을 작은 호스트 프로토콜로 실행한다. 실제 Viewstem registry/core/Store/공개 SDK의 구현이 아니다. [UI 실험](../t3-ui/README.md)의 projection, [State 실험](../t3-state/README.md)의 서비스 소유 셀, [T2 Query 실행기](../t2-query-races/README.md), 기존 URL `mergeOwned`를 **읽기 전용으로 재사용**한다. 변경 파일은 이 폴더뿐이다.
 
+[실험 기준 리비전 `10a326b9`](https://github.com/miinhlym/viewstem/tree/10a326b9c623aaf2763375b8628635dd70ba65d8)을 별도 디렉터리에 풀고 그 루트에서 아래 명령을 실행한다. 이 리비전에 보고서가 해시로 기록한 명세와 실행 코드가 있다. 현재 제품 검사는 [검증 안내](../../docs/verification.md)를 따른다.
+
 ```sh
 node experiments/t3-application/run.mjs
 /opt/homebrew/opt/node@24/bin/node experiments/t3-application/run.mjs

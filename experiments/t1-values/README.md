@@ -20,7 +20,7 @@ dart format --output=none --set-exit-if-changed bin/probe.dart
 
 직접 의존성과 lockfile을 고정했다. 설치에는 패키지 저장소 연결이 필요하지만 fixture 실행은 실제 서비스·API를 호출하지 않는다. runtime 의존성은 이 private 실험 패키지에만 있다.
 
-`npm test`는 후보의 적합/부적합 결과를 모두 출력하고 [results/latest.json](results/latest.json)을 갱신한다. **종료 코드 0은 후보 전체 채택이나 core 테스트 통과를 뜻하지 않는다.** 실험용 어댑터, 검증 중 원본 보존, 실제 Worker 종료의 assertion이 실패하거나 실행 자체가 깨지면 비정상 종료한다. 후보의 예상 계약과 다른 결과는 `MISMATCH`와 `matches:false`로 보존한다. 전체 판정은 [실험 결과와 후속 작업](../../docs/handoff/t1-experiment-2026-10-29.md)을 따른다.
+`npm test`는 후보의 적합/부적합 결과를 모두 출력하고 [results/latest.json](results/latest.json)을 갱신한다. **종료 코드 0은 후보 전체 채택이나 core 테스트 통과를 뜻하지 않는다.** 실험용 어댑터, 검증 중 원본 보존, 실제 Worker 종료의 assertion이 실패하거나 실행 자체가 깨지면 비정상 종료한다. 후보의 예상 계약과 다른 결과는 `MISMATCH`와 `matches:false`로 보존한다. 전체 판정은 [실험 결과와 후속 작업](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t1-experiment-2026-10-29.md)을 따른다.
 
 ## 구성과 범위
 
@@ -44,13 +44,13 @@ missing/pending/error 실험은 지연 입력을 실제로 읽는지 측정한�
 
 ## U24: 배열 크기 집중 검증
 
-`node array-size-tests.mjs array-size-node24.json`으로 고정된 cel-js 8.0.0의 `size(items)`/`items.size()`와 기존 안전 정수 결과 변환을 실행한다. Node 22에서는 해당 바이너리와 `array-size-node22.json`을 사용한다. [Node 22 결과](results/array-size-node22.json)와 [Node 24 결과](results/array-size-node24.json)는 각각 18/18 통과했다. 빈/중복/null/중첩/객체/10,000개 배열, 조건식·필터 결과를 포함하며 입력 불변성도 확인했다. 이는 기존 전체 T1 결과를 덮어쓰지 않는 별도 집중 검사다. 실제 core/renderer·Dart·브라우저 CEL·native Set/Map·성능·비용 제한을 검증한 것은 아니다. [현재 계약](../../docs/spec/03-variable-type.md#배열-크기-계산)과 [U24 HTTP 경로 연계 기록](../../docs/handoff/t2-http-boundary-2026-10-29.md)을 따른다.
+`node array-size-tests.mjs array-size-node24.json`으로 고정된 cel-js 8.0.0의 `size(items)`/`items.size()`와 기존 안전 정수 결과 변환을 실행한다. Node 22에서는 해당 바이너리와 `array-size-node22.json`을 사용한다. [Node 22 결과](results/array-size-node22.json)와 [Node 24 결과](results/array-size-node24.json)는 각각 18/18 통과했다. 빈/중복/null/중첩/객체/10,000개 배열, 조건식·필터 결과를 포함하며 입력 불변성도 확인했다. 이는 기존 전체 T1 결과를 덮어쓰지 않는 별도 집중 검사다. 실제 core/renderer·Dart·브라우저 CEL·native Set/Map·성능·비용 제한을 검증한 것은 아니다. [현재 계약](../../docs/spec/03-variable-type.md#배열-크기-계산)과 [U24 HTTP 경로 연계 기록](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/t2-http-boundary-2026-10-29.md)을 따른다.
 
 ## U32 직접 날짜 경계 보완
 
 `node date-boundaries.mjs date-boundaries-node24.json`으로 날짜 정규화 후 const/enum/pattern/문자열 길이·nullable, 잘못된 날짜, 지역 시각→UTC 연도 범위, DST gap/overlap을 검사한다. Node 22 바이너리에서는 `date-boundaries-node22.json`을 사용한다. 각각 **39/39** 통과했다. 날짜 정규화 후 나머지 스키마 제약 검사와 지역 시각 변환 결과의 범위 검사를 보완했으며 [수정 전 21/39 결과](archive/u32-date-before-fix/README.md)를 보존했다.
 
-기존 T1 전체 회귀의 294개 관찰 판정은 두 Node 버전 모두 이전과 같고, 어댑터 93/93·CEL 크기 18/18도 유지했다. 새 전체 결과는 실행 소스·lockfile SHA-256을 포함한다. 기존 CEL 후보/Dart 불일치는 해결된 것으로 표시하지 않는다. [후속 기록](../../docs/handoff/boundary-followup-2026-10-30.md)을 따르며 전체 스키마/native 조합·CEL 내부 날짜 패치·실제 HTTP/URL 날짜 연결을 구현한 것은 아니다.
+기존 T1 전체 회귀의 294개 관찰 판정은 두 Node 버전 모두 이전과 같고, 어댑터 93/93·CEL 크기 18/18도 유지했다. 새 전체 결과는 실행 소스·lockfile SHA-256을 포함한다. 기존 CEL 후보/Dart 불일치는 해결된 것으로 표시하지 않는다. [후속 기록](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/boundary-followup-2026-10-30.md)을 따르며 전체 스키마/native 조합·CEL 내부 날짜 패치·실제 HTTP/URL 날짜 연결을 구현한 것은 아니다.
 
 ## U34 등록·복합 스키마 후속 검증
 
@@ -58,4 +58,4 @@ missing/pending/error 실험은 지연 입력을 실제로 읽는지 측정한�
 
 U32 날짜 fixture의 type과 native 표식 동시 선언은 명세 위반이었다. 해당 fixture와 [과거 결과](archive/u34-before-schema-profile/README.md)를 보존하고 native 표식만 쓰는 유효한 선언으로 39/39를 다시 확인했다. 이제 acceptDirect도 선언 guard를 먼저 거친다. 기존 제한된 acceptDirect와 새 독립 compileSchema 실험의 범위를 구별한다.
 
-[HTTP/URL 날짜 연결](../verification/date-integration.mjs)은 별도 실험이며 Node와 실제 Chromium에서 정규 문자열 왕복·대상 스키마 재검증을 수행한다. 최신 범위와 잔여는 [전체 진행표](../../docs/handoff/verification-ledger.md)에 기록한다.
+[HTTP/URL 날짜 연결](../verification/date-integration.mjs)은 별도 실험이며 Node와 실제 Chromium에서 정규 문자열 왕복·대상 스키마 재검증을 수행한다. 최신 범위와 잔여는 [전체 진행표](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/verification-ledger.md)에 기록한다.

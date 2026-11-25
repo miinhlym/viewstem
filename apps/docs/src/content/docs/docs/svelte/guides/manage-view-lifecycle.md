@@ -7,6 +7,8 @@ sidebar:
 
 Mount a View with an internal State, change the definition while retaining that State, then replace the View to start with fresh State. This guide uses `Label.svelte` and `label.ts` from [Mount a View in a Svelte app](../mount-in-svelte/#define-label) and an HTML entry containing `<main id="app"></main>`.
 
+See [Runtime and rendering lifetimes](../../../guides/runtime-and-rendering/) for the contract shared with the DOM renderer.
+
 Add the three blocks below to `main.ts` in order. Open the browser console to follow each DOM change.
 
 First [prepare the example entry point](../mount-in-svelte/#prepare-entry) so `index.html` loads `/src/main.ts` and contains `id="app"`. The example below replaces your existing `src/main.ts`.

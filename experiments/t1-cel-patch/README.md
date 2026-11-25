@@ -11,7 +11,7 @@ U16의 두 보완 방향을 U34 연속 검증에서 실제로 시험한다. 원�
 - 추가 검사에서 발견한 concurrent parsed quantifier의 undefined 결과, int 최소값 나눗셈/부호 반전 overflow, timestamp 연산의 범위/밀리초 손실, 0099년 시간대 getter를 수정했다. 기존 golden 22개도 확인한다.
 - [첫 실패](archive/u34-first-patch/README.md), [추가 경계 실패](archive/u34-deeper-boundaries/README.md)는 수정 전 patch와 결과를 보존한다.
 
-기본 패치의 Node 22/24·Chromium 결과는 각 157/157이었다. 후속 비용·값 제한 검사를 합친 이 단계 결과는 각 **267/267**이었다. 기본 노출 확장 보완 후 현재 결과는 각 **433/433**이다. [native CEL 어댑터](../t1-native-cel/README.md), [Clock/날짜 연결](../t3-state/README.md), [Dart 값 교차](../t1-dart-values/README.md)는 별도 범위·결과로 관리한다. Dart 값 실험은 Dart CEL 후보의 불일치를 해결하지 않는다. 전체 함수/타입 프로필과 생산 통합의 완료를 주장하지 않으며, JS 네이티브 작업 한 번의 시간을 AST 횟수만으로 제한했다고 보지 않는다. [전체 진행표](../../docs/handoff/verification-ledger.md)를 따른다.
+기본 패치의 Node 22/24·Chromium 결과는 각 157/157이었다. 후속 비용·값 제한 검사를 합친 이 단계 결과는 각 **267/267**이었다. 기본 노출 확장 보완 후 현재 결과는 각 **433/433**이다. [native CEL 어댑터](../t1-native-cel/README.md), [Clock/날짜 연결](../t3-state/README.md), [Dart 값 교차](../t1-dart-values/README.md)는 별도 범위·결과로 관리한다. Dart 값 실험은 Dart CEL 후보의 불일치를 해결하지 않는다. 전체 함수/타입 프로필과 생산 통합의 완료를 주장하지 않으며, JS 네이티브 작업 한 번의 시간을 AST 횟수만으로 제한했다고 보지 않는다. [전체 진행표](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/handoff/verification-ledger.md)를 따른다.
 
 ## 추가 비용·수치 경계
 
