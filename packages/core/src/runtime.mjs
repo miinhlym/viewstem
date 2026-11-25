@@ -638,20 +638,28 @@ export class View {
         this.owners = owners;
         this.connections = connections;
         this.leafRepeats = leafRepeats;
-        this.treeQueryReads = plan.queryReads;
-        plan.queryReads = null;
         const queryUses = new Set(), stateAddresses = new Set();
         for (const owner of owners.values()) {
           for (const handle of owner.states.values()) stateAddresses.add(keyOf(handle.address));
           for (const name in owner.ports) {
-            if (owner.spec.ports[name].kind !== 'State') continue;
             const handle = owner.ports[name];
-            if (handle) stateAddresses.add(keyOf(handle.address));
+            if (owner.spec.ports[name].kind === 'State' && handle) stateAddresses.add(keyOf(handle.address));
+            if (owner.spec.ports[name].kind !== 'Query' || !handle) continue;
+            // Code adapters can read any Query field through the handle. A new
+            // snapshot must reach them even without a declarative field read.
+            const componentRef = owner.instance?.source.componentRef;
+            if (componentRef && plan.queryReads && !plan.queryReads.get(handle)?.has(undefined)
+              && registry.isCode('Component', componentRef)) {
+              try { readQuery(handle, plan, undefined); }
+              catch { /* The failed read disabled reuse. The adapter owns the error. */ }
+            }
           }
           for (const item of owner.queries.values()) queryUses.add(item);
         }
         this.stateAddresses = stateAddresses;
         this.queryUses = queryUses;
+        this.treeQueryReads = plan.queryReads;
+        plan.queryReads = null;
         plan.connections = null;
         return () => {
           const retained = new Set([...connections.values()].map(entry => entry.connection));
