@@ -12,13 +12,14 @@ package.
 1. Run `npx changeset` from the repository root. Select the affected packages
    and choose a SemVer bump for each. Changesets tracks `core`, `dom`, `svelte`,
    and `ui` independently.
-2. The summary appears in the package changelog. Name the affected feature
+2. The summary appears in the package changelog and GitHub Release notes. Name the affected feature
    and describe what changes for package users. For a routine patch, aim for
    one short sentence. Keep implementation details and full benchmark results
    in the PR.
 3. Explain why the change matters when it helps users understand the impact.
    When users need to update their code, include migration steps and link to
-   an existing guide if the steps need more detail.
+   an existing guide if the steps need more detail. Use absolute URLs so links
+   work from both the changelog and the release page.
 4. Review the package names, bumps, and summary in the generated
    `.changeset/*.md` file and commit it with the PR.
 
