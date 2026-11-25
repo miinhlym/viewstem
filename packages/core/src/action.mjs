@@ -164,7 +164,7 @@ export class ActionEngine {
           // innermost caller's cancellation must also reach its Query ticket.
           const requestSignal = childSignal => childSignal && childSignal !== signal ? AbortSignal.any([signal, childSignal]) : signal;
           bounded[name] = boundedQuery(createQueryHandle({ getSnapshot: () => value.getSnapshot(),
-            refresh: childSignal => value.refresh(requestSignal(childSignal)), retry: childSignal => value.retry(requestSignal(childSignal)) }), check);
+            refresh: childSignal => value.refresh(requestSignal(childSignal)), retry: childSignal => value.retry(requestSignal(childSignal)) }, value), check);
         }
         else bounded[name] = value;
       }

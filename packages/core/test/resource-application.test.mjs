@@ -252,6 +252,65 @@ test('State writes publish owning and connected Views and follow State port repl
   assert.deepEqual(connectedValues.slice(previous), [5]);
 });
 
+test('a Query port observes another View and stops following it after port replacement', async t => {
+  const p = value => ({ '@path': value });
+  const status = binding('Status');
+  status.contract.spec.ports = { value: { kind: 'Value', schema: { type: 'string' }, required: true } };
+  const registry = localRegistry().registerResourceSet(localSet({
+    id: 'components', version: '1', components: [status],
+  }));
+  const runtime = localRuntime({ registry });
+  t.after(() => runtime.dispose());
+  const node = value => ({ id: 'status', componentRef: 'Status', inputs: { value: p(value) } });
+  const source = () => runtime.createView({
+    states: { open: { kind: 'State', schema: { type: 'boolean' }, initial: true } },
+    queries: { result: { query: { sources: {}, transform: { input: 1 } }, executeWhen: p('/states/open') } },
+    render: node('/queries/result/status'),
+  });
+  const first = await source(), second = await source();
+  await Promise.all([first.whenSettled(first.initial), second.whenSettled(second.initial)]);
+  const handle = first.getQuery('result');
+  let open = true;
+  const borrowed = boundedQuery(handle, () => {
+    if (!open) throw { code: 'CANCELLED' };
+  });
+  const consumer = async query => {
+    const view = await runtime.createView({
+      ports: { result: { kind: 'Query', required: true } },
+      queries: { dependent: {
+        query: { sources: {}, transform: { input: 2 } },
+        executeWhen: p('/ports/result/stale'),
+      } },
+      render: node('/ports/result/status'),
+    }, { inputs: { result: query } });
+    await view.whenSettled(view.initial);
+    return view;
+  };
+  const direct = await consumer(handle), wrapped = await consumer(borrowed);
+  const state = view => view.getSnapshot().roots[0].inputs.value;
+  assert.deepEqual([state(direct), state(wrapped)], ['success', 'success']);
+  assert.equal(direct.getQuery('dependent').getSnapshot().waitingReason, 'EXECUTION_BLOCKED');
+  first.getState('open').write(false);
+  assert.equal(handle.getSnapshot().status, 'waiting');
+  assert.deepEqual([state(direct), state(wrapped)], ['waiting', 'waiting']);
+  await direct.getQuery('dependent').refresh();
+  assert.equal(direct.getQuery('dependent').getSnapshot().data, 2);
+
+  await direct.setInputs({ result: second.getQuery('result') });
+  await tick();
+  open = false;
+  const observed = [], wrappedPublications = [];
+  direct.subscribe(snapshot => observed.push(snapshot.roots[0].inputs.value));
+  wrapped.subscribe(snapshot => wrappedPublications.push(snapshot.roots[0].inputs.value));
+  first.getState('open').write(true);
+  await tick();
+  assert.deepEqual(observed, ['success']);
+  assert.deepEqual(wrappedPublications, ['waiting']);
+  await wrapped.dispose();
+  second.getState('open').write(false);
+  assert.equal(observed.at(-1), 'waiting');
+});
+
 test('sets and definitions apply to one View together and reject invalid State or code bindings atomically', async t => {
   const registry = createRegistry().registerResourceSet(defineResourceSet({ id: 'base', version: '1', components: [binding('Base')] }));
   const runtime = createRuntime({ registry });

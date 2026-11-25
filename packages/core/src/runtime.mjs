@@ -1,7 +1,7 @@
 import { Registry, actionDeclarations, missingReference } from './registry.mjs';
 import { prepareUrlConnection } from './url.mjs';
 import { StateStore, createStateStore, keyOf } from './state.mjs';
-import { compilePorts, expression, createQueryHandle, sameContract, stateRoot } from './ports.mjs';
+import { compilePorts, expression, createQueryHandle, notifyQueryHandle, observeQueryHandle, sameContract, stateRoot } from './ports.mjs';
 import { compileSchema, equal } from './schema.mjs';
 import { isProtected, protect, trustedCopies } from './immutable.mjs';
 import { evaluate, evaluateSnapshot, readSnapshot, pathsIn, validateInitials, pointerKeys, isRecord, expressionKind, dataEntries } from './expressions.mjs';
@@ -233,6 +233,7 @@ export class View {
     const runtime=execution;this.host=host;this.runtime=runtime;this.owner=owner;this.generation=0;this.instances=new Map();this.owners=new Map();this.connections=new Map();this.listeners=new Map();this.diagnostics=[];this.planning=false;this.queued=false;
     this.lifetime = new AbortController();
     this.queryUses = new Set();
+    this.queryPortObservers = new Map();
     this.leafRepeats = new Map();
     this.nodeSnapshots = new WeakMap();
     this.stateAddresses = new Set();
@@ -248,7 +249,16 @@ export class View {
     this.projectionWaiters = new Set();
     this.renderListeners = new Map();
     this.unsubscribe = runtime.stateStore.observe(addresses => {
-      if (addresses.some(address => this.stateAddresses.has(address))) this.refresh();
+      if (!addresses.some(address => this.stateAddresses.has(address))) return;
+      if (!this.queryUses.size) {
+        this.refresh();
+        return;
+      }
+      const event = { handles: new Set(), views: new Set([this]) };
+      this.refresh(false, event.handles);
+      // A State write has always settled dependent View gates synchronously.
+      // Propagate changed Query ports after the owning View has published.
+      for (const handle of event.handles) notifyQueryHandle(handle, event);
     });
   }
   get alive() { return !this.disposal && this.host.alive && !this.owner?.signal.aborted && (this.owner?.isOpen?.() ?? true); }
@@ -311,8 +321,9 @@ export class View {
     yield* this.urlDiagnostics ?? [];
   }
   queryChanged(item, snapshot, failedRun) {
-    this.schedule(true);
     if (!this.alive || !this.queryUses.has(item)) return;
+    this.schedule(true);
+    this.stateQueryChanges?.add(item.handle);
     const failure = snapshot.error;
     if (snapshot.status !== 'error' || !failure || failure.code === 'CANCELLED') {
       item.diagnostic = undefined;
@@ -325,6 +336,23 @@ export class View {
     queueMicrotask(() => {
       if (this.queryUses.has(item)) this.publishDiagnostic(diagnostic, listeners);
     });
+  }
+  observeQueryPorts(ports, uses) {
+    for (const item of uses) ports.delete(item.handle);
+    for (const [handle, stop] of this.queryPortObservers) {
+      if (ports.has(handle)) continue;
+      stop();
+      this.queryPortObservers.delete(handle);
+    }
+    for (const handle of ports) {
+      if (!this.queryPortObservers.has(handle)) {
+        this.queryPortObservers.set(handle, observeQueryHandle(handle, event => {
+          if (event.views.has(this)) return;
+          event.views.add(this);
+          this.refresh(true, event.handles);
+        }));
+      }
+    }
   }
   projection() {
     return { generation: this.generation, requested: this.requested, published: this.published };
@@ -638,13 +666,14 @@ export class View {
         this.owners = owners;
         this.connections = connections;
         this.leafRepeats = leafRepeats;
-        const queryUses = new Set(), stateAddresses = new Set();
+        const queryUses = new Set(), queryPorts = new Set(), stateAddresses = new Set();
         for (const owner of owners.values()) {
           for (const handle of owner.states.values()) stateAddresses.add(keyOf(handle.address));
           for (const name in owner.ports) {
             const handle = owner.ports[name];
             if (owner.spec.ports[name].kind === 'State' && handle) stateAddresses.add(keyOf(handle.address));
             if (owner.spec.ports[name].kind !== 'Query' || !handle) continue;
+            queryPorts.add(handle);
             // Code adapters can read any Query field through the handle. A new
             // snapshot must reach them even without a declarative field read.
             const componentRef = owner.instance?.source.componentRef;
@@ -658,6 +687,7 @@ export class View {
         }
         this.stateAddresses = stateAddresses;
         this.queryUses = queryUses;
+        this.observeQueryPorts(queryPorts, queryUses);
         this.treeQueryReads = plan.queryReads;
         plan.queryReads = null;
         plan.connections = null;
@@ -744,7 +774,7 @@ export class View {
     }
     return true;
   }
-  refresh(queryOnly = false) {
+  refresh(queryOnly = false, stateQueryChanges) {
     if(!this.alive||!this.root)return;
     this.requested++;
     // A subscriber can commit State while project() is publishing this plan.
@@ -752,6 +782,7 @@ export class View {
     // a newer snapshot to listeners still receiving the current one.
     if(this.planning){this.schedule();return;}
     this.planning=true;
+    this.stateQueryChanges = stateQueryChanges;
     try {
       // Publish every Query status as before. Rebuild only when a tracked read
       // changed or a State, Action, URL or application requires reconciliation.
@@ -764,7 +795,10 @@ export class View {
       this.treeQueryReads = this.configuredQueryReads = null;
       this.diagnostics.push(safeError(caught));
       this.project();
-    } finally { this.planning = false; }
+    } finally {
+      this.stateQueryChanges = undefined;
+      this.planning = false;
+    }
   }
   schedule(queryOnly = false) {
     if (!this.alive) return;
@@ -1135,6 +1169,8 @@ export class View {
       this.nextJob?.cancel();
       this.nextJob = null;
       this.unsubscribe();
+      for (const stop of this.queryPortObservers.values()) stop();
+      this.queryPortObservers.clear();
       this.owner?.signal.removeEventListener('abort', this.disposeOnAbort);
       cleanup(() => this.urlTransition?.dispose());
       cleanup(() => this.url?.dispose());
