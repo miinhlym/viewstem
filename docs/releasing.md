@@ -26,8 +26,9 @@ View.” See the [Changesets writing guide](https://changesets.dev/faq#how-do-i-
 When `main` CI passes and pending changesets include a public package bump, Changesets opens or updates
 the Release PR with version bumps, any internal dependency updates, and the
 refreshed npm lockfile.
-The bot uses `GITHUB_TOKEN`. A maintainer with repository write access selects
-**Approve workflows to run** on the Release PR before waiting for **CI complete**.
+Changesets opens and updates the PR as `viewstem-release[bot]` using a GitHub
+App installation token. These pull request events start **CI complete**
+automatically. A maintainer reviews and merges the PR after CI passes.
 The same check must pass on the merged commit before npm publishing runs.
 Release PR CI and
 the publishing workflow regenerate the Changesets output from the PR base and
@@ -67,9 +68,19 @@ still be retried. If the new connection expires, recreate it and retry while
 the new two-day window is open.
 [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/).
 
-The repository's Actions settings must allow GitHub Actions to create PRs.
-The workflow grants PR write access only to the Release PR job. The npm publish
-job has OIDC permission and the tagging job has contents write permission.
+### Release PR GitHub App
+
+Install the private `viewstem-release` GitHub App on `miinhlym/viewstem`. Grant
+repository **Contents** and **Pull requests** read and write permissions.
+Limit the `release-pr` GitHub Actions environment to `main`. Add the App's
+client ID as the environment variable `RELEASE_APP_CLIENT_ID` and its private
+key as the environment secret `RELEASE_APP_PRIVATE_KEY`.
+
+The Release PR job requests an installation token scoped to this repository.
+Both PR CI and post-merge release planning check the Release PR author. Close
+any open PR from the previous bot before switching so Changesets opens a new
+PR with the expected author.
+The npm publish job uses OIDC and the tagging job has contents write permission.
 
 ## Deploy the site
 

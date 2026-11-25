@@ -12,7 +12,7 @@ const run = (command, args, options) => execFileSync(command, args, { encoding: 
 
 export function isReleasePullRequest(pr, repository, sha, branch) {
   return pr.merged_at && pr.merge_commit_sha === sha
-    && pr.user.login === 'github-actions[bot]'
+    && pr.user.login === 'viewstem-release[bot]'
     && pr.base.ref === branch && pr.base.repo.full_name === repository
     && pr.head.ref === `changeset-release/${branch}` && pr.head.repo?.full_name === repository;
 }

@@ -5,6 +5,8 @@ on:
     secrets:
       CLOUDFLARE_PRODUCTION_API_TOKEN:
         required: true
+      RELEASE_APP_PRIVATE_KEY:
+        required: true
 
 permissions: {}
 
@@ -47,9 +49,11 @@ jobs:
     name: Update the Release PR
     runs-on: ubuntu-latest
     timeout-minutes: 8
+    environment:
+      name: release-pr
+      deployment: false
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
     concurrency:
       group: changesets-release-pr
       queue: max
@@ -83,9 +87,24 @@ jobs:
           if jq -e 'any(.releases[]; .type != "none" and (.name | IN("@viewstem/core", "@viewstem/dom", "@viewstem/svelte", "@viewstem/ui")))' "$plan" > /dev/null; then
             echo 'exists=true' >> "$GITHUB_OUTPUT"
           fi
+      - name: Get a Viewstem-only release App token
+        if: steps.version-plan.outputs.exists == 'true'
+        id: release-app
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
+        with:
+          client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+      - name: Check the release App identity
+        if: steps.version-plan.outputs.exists == 'true'
+        env:
+          APP_SLUG: ${{ steps.release-app.outputs.app-slug }}
+        run: test "$APP_SLUG" = viewstem-release
       - if: steps.version-plan.outputs.exists == 'true'
         uses: changesets/action/version@198f833dd7d863100ea6e28967bc9a9fdefadb0a # v2.1.0
         with:
+          github-token: ${{ steps.release-app.outputs.token }}
           script: npm run release:version
           commit-message: 'chore: version npm packages'
           pr-title: 'chore: release npm packages'

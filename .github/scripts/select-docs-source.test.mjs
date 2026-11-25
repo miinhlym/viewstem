@@ -63,7 +63,7 @@ function repository(t) {
       GITHUB_SHA: sha, BEFORE_SHA: before, GITHUB_REPOSITORY: repo, RELEASE_BRANCH: 'main',
       PATH: `${dir}${delimiter}${process.env.PATH}`, MOCK_URL: `repos/${repo}/commits/${sha}/pulls`,
       MOCK_PRS: JSON.stringify([[{ number: 3, merged_at: '2026-11-24', merge_commit_sha: sha,
-        user: { login: pr ? 'github-actions[bot]' : 'author' }, base: { ref: 'main', repo: { full_name: repo } },
+        user: { login: pr ? 'viewstem-release[bot]' : 'author' }, base: { ref: 'main', repo: { full_name: repo } },
         head: { ref: pr ? 'changeset-release/main' : 'docs/fix-guide', repo: { full_name: repo } } }]]),
     }, [], ['plan']);
   }
