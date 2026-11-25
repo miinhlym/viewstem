@@ -12,7 +12,7 @@ const bundle = await build({ stdin: { contents: `
   import { createRegistry, createRuntime } from '@viewstem/core';
   import { createRenderer } from '@viewstem/dom';
   import { observeCatalog } from './packages/ui/test/observe-catalog.mjs';
-  window.mountRecipe = async definition => {
+  window.mountRecipe = async (definition, target = document.querySelector('#app')) => {
     window.errors = [];
     window.calendarEvents = [];
     window.sliderEvents = [];
@@ -28,7 +28,6 @@ const bundle = await build({ stdin: { contents: `
     });
     const runtime = createRuntime({ registry });
     const view = await runtime.createView(definition);
-    const target = document.querySelector('#app');
     target.setAttribute('data-viewstem-ui', '');
     const renderer = createRenderer({ runtime, connectors: [connector] });
     const attachment = renderer.attach(view, target, { onError: diagnostic => errors.push(diagnostic.error.code) });
@@ -140,48 +139,54 @@ test('DataTable retains rows and focus when another input changes and still acce
   await page.evaluate(() => window.disposeRecipe());
 });
 
-test('DataTable restores controlled inputs after its form resets', { timeout: 30_000 }, async t => {
+async function verifyDataTableFormReset(t, inShadowRoot) {
   const browser = await chromium.launch({ headless: true });
   t.after(() => browser.close());
   const page = await browser.newPage();
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.setContent('<!doctype html><form id="table-form"><main id="app"></main></form><form id="other-form"></form>');
+  await page.setContent('<!doctype html><div id="host"></div>');
   await page.addScriptTag({ content: recipeScript });
   const definition = resizableTable();
   definition.states.summary = { kind: 'State', schema: { type: 'string' }, initial: 'Before' };
   definition.states.filter.initial = '1월';
   definition.states.selected.initial = ['a'];
   definition.states.pageSize.initial = 25;
-  await page.evaluate(view => window.mountRecipe(view), definition);
+  await page.evaluate(({ definition, inShadowRoot }) => {
+    const host = document.querySelector('#host');
+    const container = inShadowRoot ? host.attachShadow({ mode: 'open' }) : host;
+    container.innerHTML = '<form id="table-form"><main id="app"></main></form><form id="other-form"></form>';
+    return window.mountRecipe(definition, container.querySelector('#app'));
+  }, { definition, inShadowRoot });
 
   const result = await page.evaluate(async () => {
+    const root = document.querySelector('#host').shadowRoot ?? document;
     const read = () => ({
-      filter: document.querySelector('input[type="search"]').value,
-      pageSize: document.querySelector('select').value,
-      selected: document.querySelector('input[type="checkbox"]').checked,
-      text: document.querySelector('tbody').textContent,
+      filter: root.querySelector('input[type="search"]').value,
+      pageSize: root.querySelector('select').value,
+      selected: root.querySelector('input[type="checkbox"]').checked,
+      text: root.querySelector('tbody').textContent,
     });
     const initial = read();
-    const row = document.querySelector('tbody tr');
-    document.querySelector('#other-form').reset();
+    const row = root.querySelector('tbody tr');
+    root.querySelector('#other-form').reset();
     window.view.getState('summary').write('Other form reset');
     await window.whenRecipeRendered();
-    const retainedAfterOtherReset = row === document.querySelector('tbody tr');
-    document.querySelector('#table-form').reset();
+    const retainedAfterOtherReset = row === root.querySelector('tbody tr');
+    root.querySelector('#table-form').reset();
     const reset = read();
     window.view.getState('summary').write('Table form reset');
     await window.whenRecipeRendered();
     const restored = read();
-    const restoredRow = document.querySelector('tbody tr');
-    const focused = document.querySelector('tbody input');
+    const restoredRow = root.querySelector('tbody tr');
+    const focused = root.querySelector('tbody input');
     focused.focus();
     window.view.getState('summary').write('Unrelated update');
     await window.whenRecipeRendered();
     return {
       initial, reset, restored, retainedAfterOtherReset,
-      retainedAfterUpdate: restoredRow === document.querySelector('tbody tr'),
-      focused: document.activeElement === focused,
+      retainedAfterUpdate: restoredRow === root.querySelector('tbody tr'),
+      focused: root.activeElement === focused,
     };
   });
   assert.equal(result.initial.filter, '1월');
@@ -195,7 +200,13 @@ test('DataTable restores controlled inputs after its form resets', { timeout: 30
   assert.deepEqual(await page.evaluate(() => [window.errors, window.view.getSnapshot().errors]), [[], []]);
   assert.deepEqual(errors, []);
   await page.evaluate(() => window.disposeRecipe());
-});
+}
+
+test('DataTable restores controlled inputs after its form resets', { timeout: 30_000 },
+  t => verifyDataTableFormReset(t, false));
+
+test('DataTable restores controlled inputs after its form resets inside a ShadowRoot', { timeout: 30_000 },
+  t => verifyDataTableFormReset(t, true));
 
 test('Input and Textarea render numeric State values', { timeout: 30_000 }, async t => {
   const browser = await chromium.launch({ headless: true });

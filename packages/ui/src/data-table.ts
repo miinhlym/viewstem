@@ -60,15 +60,25 @@ export function dataTable(element: HTMLElement, send: Send, signal: AbortSignal)
   let setSize = (_value: number) => {};
   let renderedData: readonly Row[] | undefined;
   let renderedSettings: string | undefined;
-  doc.addEventListener('reset', event => {
-    if (element.closest('form') === event.target) renderedData = undefined;
-  }, { capture: true, signal });
+  let resetForm: HTMLFormElement | null = null;
+  const onReset = (event: Event) => {
+    if (event.target === resetForm) renderedData = undefined;
+  };
   filter.addEventListener('input', () => { renderedData = undefined; setFilter(filter.value); }, { signal });
   previous.addEventListener('click', () => setPage(-1), { signal });
   next.addEventListener('click', () => setPage(1), { signal });
   size.addEventListener('change', () => { renderedData = undefined; setSize(Number(size.value)); }, { signal });
 
   return { sync(inputs) {
+    // Sync runs after insertion. Listen on the form because reset events
+    // stay within their DOM tree, including inside a ShadowRoot.
+    const form = filter.form;
+    if (form !== resetForm) {
+      resetForm?.removeEventListener('reset', onReset, true);
+      resetForm = form;
+      resetForm?.addEventListener('reset', onReset, { capture: true, signal });
+      renderedData = undefined;
+    }
     const data = (inputs.data ?? emptyRows) as readonly Row[];
     const columns = (inputs.columns ?? []) as Column[];
     const sorting = (inputs.sorting ?? []) as SortingState;
