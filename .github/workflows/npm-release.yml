@@ -43,6 +43,7 @@ jobs:
         if: steps.plan.outputs.targets != '[]'
         env:
           BEFORE_SHA: ${{ github.event.before }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: node .github/scripts/npm-release.mjs verify-plan
 
   version:

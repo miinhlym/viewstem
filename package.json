@@ -41,7 +41,9 @@
     "check:ui": "npm run build:ui && npm run test -w @viewstem/ui"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "1.0.1",
     "@changesets/cli": "3.0.3",
+    "@changesets/get-github-info": "1.0.1",
     "@marcbachmann/cel-js": "8.0.0",
     "@sveltejs/package": "2.5.8",
     "@tailwindcss/oxide": "4.3.3",
