@@ -157,9 +157,11 @@ docs** for the same release commit. Changesets updates the site's pins for
 its dependencies in the release. For example, a UI-only release can move the
 site to `ui@0.1.1` with `core@0.1.0` and `dom@0.1.0`.
 Both deployment paths read the source commit from each exact public npm
-archive and compare its package tree with the candidate commit. A package in
-the incoming npm batch must identify the release commit itself. If a tree has
-unpublished changes, the site waits for that package's release.
+archive and compare its package tree with the candidate commit. The workflow
+checks immediately and retries pending packages every 10 seconds for up to 10
+minutes before building the site. A package in the incoming npm batch must
+identify the release commit itself. If a tree has unpublished changes, the
+workflow stops until a package containing those changes is released.
 Tags and GitHub Releases record the package release in a separate job.
 The npm caller passes its published batch in `released_packages` as objects with
 `registry`, `name`, and `version`. The registry check can confirm pub.dev archive

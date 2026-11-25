@@ -5,6 +5,8 @@ import { pathToFileURL } from 'node:url';
 import { setTimeout } from 'node:timers/promises';
 
 const stableVersion = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
+const publicReleaseWaitMs = 10 * 60_000;
+const retryIntervalMs = 10_000;
 const npmPackages = new Set(['core', 'dom', 'svelte', 'ui'].map(name => `@viewstem/${name}`));
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim();
 const registries = {
@@ -47,9 +49,11 @@ async function readNetwork(read) {
   }
 }
 
-function fetchRelease(url, method, request) {
+function fetchRelease(url, method, request, signal) {
+  const requestTimeout = AbortSignal.timeout(15_000);
   return readNetwork(() => request(url, {
-    method, headers: { 'cache-control': 'no-cache' }, signal: AbortSignal.timeout(15_000),
+    method, headers: { 'cache-control': 'no-cache' },
+    signal: signal ? AbortSignal.any([signal, requestTimeout]) : requestTimeout,
   }));
 }
 
@@ -57,9 +61,9 @@ function shouldRetry(response) {
   return !response || response.status === 404 || response.status === 429 || response.status >= 500;
 }
 
-async function publicArchive({ registry, name, version }, request) {
+async function publicArchive({ registry, name, version }, request, signal) {
   const provider = registries[registry];
-  const response = await fetchRelease(provider.origin + provider.path(name), 'GET', request);
+  const response = await fetchRelease(provider.origin + provider.path(name), 'GET', request, signal);
   if (shouldRetry(response)) return;
   assert.ok(response.ok, `Could not read ${registry} metadata for ${name}: HTTP ${response.status}`);
   const metadata = await readNetwork(() => response.json());
@@ -70,18 +74,18 @@ async function publicArchive({ registry, name, version }, request) {
   return archive;
 }
 
-export async function isPublicRelease(pkg, request = fetch, source) {
-  const archive = await publicArchive(pkg, request);
+export async function isPublicRelease(pkg, request = fetch, source, signal) {
+  const archive = await publicArchive(pkg, request, signal);
   if (!archive) return false;
-  if (source && pkg.registry === 'npm') return verifyNpmSource(pkg, archive, source, request);
-  const download = await fetchRelease(archive, 'HEAD', request);
+  if (source && pkg.registry === 'npm') return verifyNpmSource(pkg, archive, source, request, signal);
+  const download = await fetchRelease(archive, 'HEAD', request, signal);
   if (shouldRetry(download)) return false;
   assert.ok(download.ok, `Could not access ${pkg.name}@${pkg.version} on ${pkg.registry}: HTTP ${download.status}`);
   return true;
 }
 
-async function verifyNpmSource({ name, version }, archive, { sha, repository, released, history }, request) {
-  const response = await fetchRelease(archive, 'GET', request);
+async function verifyNpmSource({ name, version }, archive, { sha, repository, released, history }, request, signal) {
+  const response = await fetchRelease(archive, 'GET', request, signal);
   if (shouldRetry(response)) return false;
   assert.ok(response?.ok, `Could not download ${name}@${version} to verify its source`);
   const body = await readNetwork(() => response.arrayBuffer());
@@ -123,6 +127,26 @@ export function deploymentPackages(releases, manifests, dependencies) {
   }))]));
 }
 
+export async function waitForPublicReleases(packages, {
+  source, once = false, request = fetch, now = () => performance.now(), wait = setTimeout, log = console.log,
+} = {}) {
+  const pending = new Map(packages.map(pkg => [`${pkg.registry}:${pkg.name}@${pkg.version}`, pkg]));
+  const deadline = now() + publicReleaseWaitMs;
+  const signal = AbortSignal.timeout(publicReleaseWaitMs);
+  while (pending.size && now() < deadline) {
+    await Promise.all([...pending].map(async ([key, pkg]) => {
+      if (await isPublicRelease(pkg, request, source, signal)) {
+        log(`Public release verified: ${key}`);
+        pending.delete(key);
+      }
+    }));
+    const remaining = deadline - now();
+    if (once || !pending.size || remaining <= 0) break;
+    await wait(Math.min(retryIntervalMs, remaining));
+  }
+  assert.equal(pending.size, 0, `Public packages unavailable: ${[...pending.keys()].join(', ')}`);
+}
+
 async function main() {
   const { GITHUB_EVENT_NAME: event, GITHUB_SHA: sha, GITHUB_REPOSITORY: repository } = process.env;
   assert.ok(event === 'push' || event === 'workflow_dispatch', 'Unsupported documentation deployment event');
@@ -147,18 +171,7 @@ async function main() {
     sha, repository, released: new Set(releases.filter(pkg => pkg.registry === 'npm').map(pkg => pkg.name)),
     history: new Set(git('rev-list', '--first-parent', sha).split('\n')),
   };
-  const pending = new Map(expected.map(entry => [`${entry.registry}:${entry.name}@${entry.version}`, entry]));
-  const attempts = availabilityOnly || process.argv.includes('--once') ? 1 : 18;
-  for (let attempt = 0; attempt < attempts && pending.size; attempt++) {
-    const states = await Promise.all([...pending].map(async ([key, entry]) => [key, await isPublicRelease(entry, fetch, source)]));
-    for (const [key, published] of states) {
-      if (!published) continue;
-      console.log(`Public release verified: ${key}`);
-      pending.delete(key);
-    }
-    if (pending.size && attempt + 1 < attempts) await setTimeout(10000);
-  }
-  assert.equal(pending.size, 0, `Public packages unavailable: ${[...pending.keys()].join(', ')}`);
+  await waitForPublicReleases(expected, { source, once: availabilityOnly || process.argv.includes('--once') });
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
