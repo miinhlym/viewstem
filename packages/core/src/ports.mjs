@@ -79,13 +79,14 @@ export function stateRoot(handle, store) {
 }
 export const isQueryHandle = value => queries.has(value);
 export const isWrappedStateHandle = value => stateWrappers.has(value);
+export const hasStateGuard = value => stateWrappers.get(value)?.guarded === true;
 
 export function boundedState(baseHandle, guard) {
   if (!record(baseHandle) || typeof guard !== 'function'
     || ['read', "getSnapshot", 'write', 'reset'].some(method => typeof baseHandle[method] !== 'function')) fail('TYPE_CONTRACT_MISMATCH');
   const wrapper = { address: baseHandle.address, generation: baseHandle.generation };
   for (const method of ['read', "getSnapshot", 'write', 'reset']) wrapper[method] = (...args) => { guard(method); return baseHandle[method](...args); };
-  stateWrappers.set(wrapper, { base: baseHandle }); return Object.freeze(wrapper);
+  stateWrappers.set(wrapper, { base: baseHandle, guarded: true }); return Object.freeze(wrapper);
 }
 export function createQueryHandle(delegate = {}, source) {
   if (!record(delegate)) fail('INVALID_DEFINITION');
@@ -165,7 +166,7 @@ export function compilePorts({ resourceKind, ports = {}, types = {}, store }) {
       write(value) { verify(); handle.write(accept(port.validator, value)); },
       reset() { verify(); handle.reset(); },
     });
-    stateWrappers.set(wrapper, { base: handle, store }); return wrapper;
+    stateWrappers.set(wrapper, { base: handle, store, guarded: hasStateGuard(handle) }); return wrapper;
   }
   return Object.freeze({
     prepare(inputs = {}, { mode = 'explicit' } = {}) {

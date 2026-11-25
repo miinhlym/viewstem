@@ -1,7 +1,7 @@
 import { Registry, actionDeclarations, missingReference } from './registry.mjs';
 import { prepareUrlConnection } from './url.mjs';
 import { StateStore, createStateStore, keyOf } from './state.mjs';
-import { compilePorts, expression, createQueryHandle, notifyQueryHandle, observeQueryHandle, sameContract, stateRoot } from './ports.mjs';
+import { compilePorts, expression, createQueryHandle, hasStateGuard, notifyQueryHandle, observeQueryHandle, sameContract, stateRoot } from './ports.mjs';
 import { compileSchema, equal } from './schema.mjs';
 import { isProtected, protect, trustedCopies } from './immutable.mjs';
 import { evaluate, evaluateSnapshot, readSnapshot, pathsIn, validateInitials, pointerKeys, isRecord, expressionKind, dataEntries } from './expressions.mjs';
@@ -505,13 +505,24 @@ export class View {
         const unchanged=tracked&&prior&&equal(prior.declaration,declaration)&&equal(prior.variable,variable)&&equal(prior.values,values)
           &&dependencies.length===prior.dependencies.length&&dependencies.every((handle,index)=>handle===prior.dependencies[index]);
         owner.computations.set(name,{declaration,variable,values,dependencies});
+        const queryInputs = values.filter(([name]) => spec.ports?.[name]?.kind === 'Query' && ports[name]);
+        let externalChanged;
+        if (!tracked || [...portNames].some(name => hasStateGuard(ports[name]))) externalChanged = () => true;
+        else if (queryInputs.length) {
+          // A Query may publish before its consumer rebuilds. Check the live
+          // snapshot without preparing inputs or running CEL on a stable port.
+          externalChanged = () => queryInputs.some(([name, snapshot]) => {
+            try { return ports[name].getSnapshot() !== snapshot; }
+            catch { return true; }
+          });
+        }
         store.computed(handle,dependencies,()=>{
           try {
             const inputs=this.prepareInputs(variable,declaration.inputs??{},context,'automatic',false,'Variable',runtime);
             if(inputs.status==='waiting')return {status:'pending'};
             return {status:'ready',value:runtime.variable(variable,inputs.ports)};
           }catch(caught){return {status:'error',error:safeError(caught)};}
-        },{recompute:!unchanged});
+        },{recompute:!unchanged,externalChanged});
       } else if(own(declaration,'initial')) {
         let snapshot=evaluateSnapshot(declaration.initial,context,{roots:['states','ports','queries']});
         if(snapshot.status==='missing')snapshot={status:'pending'};

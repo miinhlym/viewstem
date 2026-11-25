@@ -148,21 +148,20 @@ export class StateStore {
     else for (const listener of this.#baselineListeners) listener();
   }
 
-  computed(handle, dependencies, compute, { recompute = true } = {}) {
+  computed(handle, dependencies, compute, { recompute = true, externalChanged } = {}) {
     const cell = this.#cellFor(handle), previous = {...cell};
     const next = dependencies.map(handle => this.#cellFor(handle));
     const graphChanged = next.length !== previous.dependencies.length ||
       next.some((dependency, index) => dependency !== previous.dependencies[index]);
-    cell.derived = true; cell.computeSnapshot = compute;
+    cell.derived = true; cell.computeSnapshot = compute; cell.externalChanged = externalChanged;
     cell.dependencies = next;
     // Rebinding an unchanged runtime owner keeps its latest context without
-    // walking an otherwise unchanged dependency graph. Recompute orders the graph itself.
+    // walking an otherwise unchanged dependency graph.
     try {
-      if (recompute) this.recompute();
-      else if (graphChanged) this.#order();
+      const order = graphChanged ? this.#order() : undefined;
+      if (recompute) this.#structuralCommit([], { recompute: cell, order });
     } catch (caught) { Object.assign(cell, previous); throw caught; }
   }
-  recompute() { this.#structuralCommit([]); }
   baseline(handle) { return this.#cellFor(handle).baseline; }
   hasWritten(handle) { return this.#cellFor(handle).writes > 0; }
   observeBaseline(listener) { this.#baselineListeners.add(listener);return ()=>this.#baselineListeners.delete(listener); }
@@ -282,7 +281,7 @@ export class StateStore {
             store.#retireClock(cell);
           }
           for (const [target, reaction] of store.#reactions) if (reaction.owner === scopeId || removed.includes(target) || reaction.watch.some(cell => removed.includes(cell))) store.#reactions.delete(target);
-          store.#structuralCommit(removed.map(cell => store.#change(cell, 'removed')));
+          store.#structuralCommit(removed.map(cell => store.#change(cell, 'removed')), { retired: removed });
         };
         if (store.#transaction) store.#perform(() => { close(); remove(); });
         else { close(); store.#perform(remove); }
@@ -320,7 +319,8 @@ export class StateStore {
     if (!declaration || typeof declaration !== 'object' || !Object.hasOwn(declaration, 'schema')) fail('INVALID_DEFINITION');
     let validator;try { validator = compileSchema(declaration.schema); } catch(caught) { throw safeError(caught,'INVALID_DEFINITION'); }
     const cell = { address, generation: ++nextGeneration, validator, schema: structuredClone(declaration.schema), initialSettled: Object.hasOwn(declaration, 'initial'), state: missing, baseline: missing, writes: 0, clockSubscriptions: new Set(),
-      derived: declaration.derived, dependencies: (declaration.dependencies ?? []).map(handle => this.#cellFor(handle)) };
+      derived: declaration.derived, computeSnapshot: undefined, externalChanged: undefined,
+      dependencies: (declaration.dependencies ?? []).map(handle => this.#cellFor(handle)) };
     if (cell.derived && typeof cell.derived !== 'function') fail('INVALID_DEFINITION');
     // Async initialization is distinct from ordinary stored data.
     if (Object.hasOwn(declaration, 'pendingInitial') && Object.hasOwn(declaration, 'initial')) fail('INVALID_DEFINITION');
@@ -341,8 +341,6 @@ export class StateStore {
         store.#perform(() => store.#writePrepared(new Map([[cell, cell.baseline]]), 'explicit'));
       },
     });
-    // Structural preparation occurs before replacing the old generation.
-    if (cell.derived) cell.state = this.#calculate(cell, new Map([...this.#cells.values()].map(item => [item, item.state])));
     const initial = this.#transaction?.deferredMutations ? { ...cell } : undefined;
     this.#perform(() => {
       checkScope();
@@ -354,7 +352,9 @@ export class StateStore {
         for (const [target, reaction] of this.#reactions) if (target === previous || reaction.watch.includes(previous)) this.#reactions.delete(target);
         this.#retireClock(previous);
       }
-      this.#structuralCommit([this.#change(cell, previous ? 'replaced' : 'added')]);
+      this.#structuralCommit([this.#change(cell, previous ? 'replaced' : 'added')], {
+        added: cell, retired: previous ? [previous] : [],
+      });
     });
     stateHandles.add(cell.handle);
     return cell.handle;
@@ -383,7 +383,7 @@ export class StateStore {
       this.#current(cell); this.#cells.delete(keyOf(cell.address));
       for (const [target, reaction] of this.#reactions) if (target === cell || reaction.watch.includes(cell)) this.#reactions.delete(target);
       this.#retireClock(cell);
-      this.#structuralCommit([this.#change(cell, 'removed')]);
+      this.#structuralCommit([this.#change(cell, 'removed')], { retired: [cell] });
     });
   }
 
@@ -456,15 +456,27 @@ export class StateStore {
     try { return this.#accept(cell, cell.derived(...snapshots.map(item => item.value))); }
     catch (error) { return errorState(error); }
   }
-  #structuralCommit(changes) {
-    const staged = new Map([...this.#cells.values()].map(cell => [cell, cell.state]));
+  #structuralCommit(changes, { added, retired = [], recompute, order } = {}) {
     // A dependency is a generation-bound cell, never an automatic name rebind.
-    for (const cell of this.#order()) if (cell.derived) {
-      const snapshot = this.#calculate(cell, staged); staged.set(cell, snapshot);
-      if (!same(cell.state, snapshot)) {
+    const changed = new Set(retired);
+    const affected = new Set();
+    if (added?.derived) affected.add(added);
+    if (recompute) affected.add(recompute);
+    for (const cell of this.#cells.values()) {
+      if (cell.derived && (cell.dependencies.some(dependency => changed.has(dependency))
+        || cell.externalChanged?.())) affected.add(cell);
+    }
+    if (affected.size) {
+      const staged = new Map([...this.#cells.values()].map(cell => [cell, cell.state]));
+      for (const cell of order ?? this.#order()) {
+        if (!cell.derived || !affected.has(cell) && !cell.dependencies.some(dependency => changed.has(dependency))) continue;
+        const snapshot = this.#calculate(cell, staged);
+        if (same(cell.state, snapshot)) continue;
+        staged.set(cell, snapshot);
+        changed.add(cell);
         this.#transaction?.reactionBaseline.delete(cell);
         cell.state = snapshot;
-        changes.push(this.#change(cell, 'updated'));
+        if (cell !== added) changes.push(this.#change(cell, 'updated'));
       }
     }
     this.#notify(changes);

@@ -87,8 +87,14 @@ test('reconnecting the same State through an expired capability cannot reuse a r
   await f.runtime.invokeAction({ owner: author.view, actionRef: 'capture', inputs: { target: source } });
   const spec = { ports: { source: state }, states: { computed: derived(path('/ports/source')) }, render: leaf };
   const { view, initialComplete: initial } = await f.runtime.createView({ view: spec, inputs: { source } }); await initial;
+  const guardedConsumer = await f.runtime.createView({ view: spec, inputs: { source: guarded } });
+  await guardedConsumer.initialComplete;
+  const guardedOutput = guardedConsumer.view.getState('computed');
+  assert.equal(guardedOutput.read(), 1);
   const output = view.getState('computed'); assert.equal(output.read(), 1);
-  author.view.dispose(); assert.throws(() => guarded.getSnapshot(), { code: 'CANCELLED' });
+  await author.view.dispose();
+  assert.throws(() => guarded.getSnapshot(), { code: 'CANCELLED' });
+  assert.throws(() => guardedOutput.read(), { code: 'CANCELLED' });
   await (await view.update(spec, { inputs: { source: guarded } })).initialComplete;
   assert.equal(output.getSnapshot().status, 'error'); assert.equal(output.getSnapshot().error.code, 'CANCELLED');
   await (await view.update(spec, { inputs: { source } })).initialComplete;
@@ -125,6 +131,12 @@ test('Derived Query-port values refresh through a retained owner and conditional
   const { view, initialComplete: initial } = await f.runtime.createView({ view: spec }); await initial;
   const oldNode = view.getSnapshot().roots[0], output = view.getState('computed', oldNode.instanceId);
   assert.equal(output.read(), 1);
+  const before = { ...f.calls }, stable = output.getSnapshot();
+  const unrelated = f.store.createScope();
+  unrelated.registerState('unrelated', { schema: integer, initial: 0 });
+  unrelated.dispose();
+  assert.deepEqual(f.calls, before);
+  assert.equal(output.getSnapshot(), stable);
   result = 2; await view.getQuery('number').refresh();
   for (let index = 0; index < 10; index++) await Promise.resolve();
   assert.equal(view.getState('computed', oldNode.instanceId), output); assert.equal(output.read(), 2);
