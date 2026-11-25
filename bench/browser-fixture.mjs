@@ -167,6 +167,12 @@ window.bench = {
       for (let i = 0; i < 1000; i++) host.append(scope.createElement(document, 'div'));
     });
     check(host.children.length === 1000, 'style scope count incorrect');
+    check(
+      [...host.children].every(
+        (element) => element.getAttribute('data-vs-ui-owner') === 'bench-scope',
+      ),
+      'style scope ownership marker missing',
+    );
     host.remove();
     return ms;
   },
@@ -421,13 +427,29 @@ window.bench = {
           screen.view.getState('value').write('after');
           await screen.whenRendered();
         });
-      if (operation === 'replace')
+      if (operation === 'replace') {
+        const previous = screen.view.getSnapshot();
+        const previousProbe = e.target.querySelector('[data-probe]');
+        const replacement = structuredClone(source);
+        replacement.states.value.initial = 'replacement';
         ms = await time(async () => {
           await (
-            await screen.replace({ view: source })
+            await screen.replace({ view: replacement })
           ).initialComplete;
           await screen.whenRendered();
         });
+        const next = screen.view.getSnapshot();
+        check(
+          next.generation > previous.generation && next.lifetime !== previous.lifetime,
+          'Svelte replacement did not create a new View application lifetime',
+        );
+        check(
+          previousProbe &&
+            !previousProbe.isConnected &&
+            e.target.querySelector('[data-probe]') !== previousProbe,
+          'Svelte replacement retained the old component',
+        );
+      }
       if (operation === 'unmount') {
         ms = await time(async () => {
           await screen.dispose();
@@ -440,7 +462,7 @@ window.bench = {
       check(e.target.querySelectorAll('span').length >= 25, 'mixed DOM children missing');
     if (screen) {
       check(
-        e.target.textContent.includes(operation === 'update' ? 'after' : 'before'),
+        e.target.textContent.includes(operation === 'replace' ? 'replacement' : operation === 'update' ? 'after' : 'before'),
         'Svelte render failed',
       );
       await screen.dispose();

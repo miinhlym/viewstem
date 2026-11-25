@@ -156,11 +156,14 @@ export async function benchmarkCore(measure) {
           spec = definition(size),
           view = await runtime.createView(spec);
         await view.whenSettled(view.initial);
+        const before = view.getSnapshot().lifetime;
         const [ms] = await timedAsync(async () => {
           view.getState('show').write(false);
+          assert.equal(view.getSnapshot().roots[0].children.length, 0);
           await view.setInputs({});
           await view.whenSettled(await view.replace(spec));
         });
+        assert.notEqual(view.getSnapshot().lifetime, before);
         assert.equal(view.getSnapshot().roots[0].children.length, size);
         await view.dispose();
         runtime.dispose();
