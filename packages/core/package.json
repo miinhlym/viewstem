@@ -9,7 +9,7 @@
   "bugs": {
     "url": "https://github.com/miinhlym/viewstem/issues"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Framework-independent declarative UI runtime",
   "engines": {
