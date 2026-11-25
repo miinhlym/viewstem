@@ -32,6 +32,38 @@ rows. Use `--match='cross-view|scoped-subscribers|borrowed-view|burst|component[
 to run those cases. A sample that misses a completion signal records the failed
 phase. Use `--timeout-ms` to set the per-sample limit, which defaults to 60,000 ms.
 
+## Compare a revision with the current source
+
+Export the reference revision into a temporary directory and copy the same
+`bench/` directory into it. The reference must install dependencies in that
+directory so workspace package links resolve to its own build. Capture the
+current Node executable by absolute path so both runs use it after changing
+directories.
+
+```sh
+viewstem_export="$(mktemp -d)"
+viewstem_node="$(node -p 'process.execPath')"
+git archive --format=tar -o "$viewstem_export/source.tar" 4cc2d04
+mkdir "$viewstem_export/base"
+tar -xf "$viewstem_export/source.tar" -C "$viewstem_export/base"
+cp -R bench "$viewstem_export/base/bench"
+(
+  cd "$viewstem_export/base"
+  export PATH="$(dirname "$viewstem_node"):$PATH"
+  npm ci
+  npm run build:svelte
+  npm run build:docs
+  "$viewstem_node" bench/run.mjs all --source-archive=../source.tar --warmup=1 --samples=3 --out=../before.json
+)
+"$viewstem_node" bench/run.mjs all --warmup=1 --samples=3 --out="$viewstem_export/after.json"
+```
+
+Build the current source with the commands above before starting the paired
+runs. Compare fixture and lock hashes, scenario IDs, workloads, environment,
+and completion checks. The archive report records the source commit, archive
+hash, changed tracked files outside `bench/`, and package source and build
+fingerprints.
+
 | Area | Examples and completion checks |
 | --- | --- |
 | Core registry and resources | Batch registration, updates, a resource set and reference resolution |
