@@ -140,6 +140,63 @@ test('DataTable retains rows and focus when another input changes and still acce
   await page.evaluate(() => window.disposeRecipe());
 });
 
+test('DataTable restores controlled inputs after its form resets', { timeout: 30_000 }, async t => {
+  const browser = await chromium.launch({ headless: true });
+  t.after(() => browser.close());
+  const page = await browser.newPage();
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.setContent('<!doctype html><form id="table-form"><main id="app"></main></form><form id="other-form"></form>');
+  await page.addScriptTag({ content: recipeScript });
+  const definition = resizableTable();
+  definition.states.summary = { kind: 'State', schema: { type: 'string' }, initial: 'Before' };
+  definition.states.filter.initial = '1월';
+  definition.states.selected.initial = ['a'];
+  definition.states.pageSize.initial = 25;
+  await page.evaluate(view => window.mountRecipe(view), definition);
+
+  const result = await page.evaluate(async () => {
+    const read = () => ({
+      filter: document.querySelector('input[type="search"]').value,
+      pageSize: document.querySelector('select').value,
+      selected: document.querySelector('input[type="checkbox"]').checked,
+      text: document.querySelector('tbody').textContent,
+    });
+    const initial = read();
+    const row = document.querySelector('tbody tr');
+    document.querySelector('#other-form').reset();
+    window.view.getState('summary').write('Other form reset');
+    await window.whenRecipeRendered();
+    const retainedAfterOtherReset = row === document.querySelector('tbody tr');
+    document.querySelector('#table-form').reset();
+    const reset = read();
+    window.view.getState('summary').write('Table form reset');
+    await window.whenRecipeRendered();
+    const restored = read();
+    const restoredRow = document.querySelector('tbody tr');
+    const focused = document.querySelector('tbody input');
+    focused.focus();
+    window.view.getState('summary').write('Unrelated update');
+    await window.whenRecipeRendered();
+    return {
+      initial, reset, restored, retainedAfterOtherReset,
+      retainedAfterUpdate: restoredRow === document.querySelector('tbody tr'),
+      focused: document.activeElement === focused,
+    };
+  });
+  assert.equal(result.initial.filter, '1월');
+  assert.equal(result.initial.pageSize, '25');
+  assert.equal(result.initial.selected, true);
+  assert.deepEqual(result.reset, { ...result.initial, filter: '', pageSize: '10', selected: false });
+  assert.deepEqual(result.restored, result.initial);
+  assert.equal(result.retainedAfterOtherReset, true);
+  assert.equal(result.retainedAfterUpdate, true);
+  assert.equal(result.focused, true);
+  assert.deepEqual(await page.evaluate(() => [window.errors, window.view.getSnapshot().errors]), [[], []]);
+  assert.deepEqual(errors, []);
+  await page.evaluate(() => window.disposeRecipe());
+});
+
 test('Input and Textarea render numeric State values', { timeout: 30_000 }, async t => {
   const browser = await chromium.launch({ headless: true });
   t.after(() => browser.close());

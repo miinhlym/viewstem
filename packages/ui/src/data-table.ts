@@ -60,6 +60,9 @@ export function dataTable(element: HTMLElement, send: Send, signal: AbortSignal)
   let setSize = (_value: number) => {};
   let renderedData: readonly Row[] | undefined;
   let renderedSettings: string | undefined;
+  doc.addEventListener('reset', event => {
+    if (element.closest('form') === event.target) renderedData = undefined;
+  }, { capture: true, signal });
   filter.addEventListener('input', () => { renderedData = undefined; setFilter(filter.value); }, { signal });
   previous.addEventListener('click', () => setPage(-1), { signal });
   next.addEventListener('click', () => setPage(1), { signal });
