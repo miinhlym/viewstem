@@ -48,6 +48,9 @@ Publishing requires the previous versions to be public. Each internal dependency
 be public or appear earlier in the batch. After npm publishing succeeds, the
 documentation job verifies the public versions and deploys the same commit.
 A separate job records package tags such as `@viewstem/core@0.1.1` and GitHub Releases.
+Each GitHub Release uses the same package entry shown in the Release PR. It reads
+the entry from the release commit's changelog and preserves its headings, source
+links, and dependency list.
 
 Merge documentation-only changes through the regular PR process without a
 changeset. To publish a separate site update, run **Deploy docs** manually.

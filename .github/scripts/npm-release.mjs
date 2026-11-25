@@ -45,6 +45,42 @@ export function releaseTargets(readManifest) {
   });
 }
 
+export function releaseNotes(changelog, { name, version }) {
+  const lines = changelog.split(/\r?\n/);
+  let start = -1;
+  let end = lines.length;
+  let fence;
+  for (const [index, line] of lines.entries()) {
+    const marker = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line);
+    if (fence) {
+      if (marker && marker[1][0] === fence[0] && marker[1].length >= fence.length && !marker[2].trim()) {
+        fence = undefined;
+      }
+      continue;
+    }
+    if (marker) {
+      fence = marker[1];
+      continue;
+    }
+    const heading = /^##[ \t]+(\S+)[ \t]*$/.exec(line);
+    if (!heading || !stableVersion.test(heading[1])) continue;
+    if (start !== -1) {
+      end = index;
+      break;
+    }
+    if (heading[1] === version) start = index + 1;
+  }
+
+  const entry = start === -1 ? '' : lines.slice(start, end).join('\n').trim();
+  assert.ok(entry, `Missing changelog entry for ${name}@${version}`);
+  return entry;
+}
+
+function readReleaseNotes(target, sha) {
+  const changelog = run('git', ['show', `${sha}:packages/${target.directory}/CHANGELOG.md`]);
+  return releaseNotes(changelog, target);
+}
+
 export function shouldPublish(target, metadata, integrity) {
   const existing = metadata.versions[target.version];
   if (existing) {
@@ -108,7 +144,8 @@ async function verifyChangesetsPlan() {
   assert.equal(run('git', ['rev-parse', 'HEAD']), sha, 'The checkout does not match the release commit');
   assert.equal(run('git', ['status', '--porcelain', '--untracked-files=no']), '', 'Expected a clean release checkout');
   run('git', ['merge-base', '--is-ancestor', before, sha]);
-  assert.ok(releaseTargets(readReleaseManifest).length, 'Release PR must bump at least one public package');
+  const targets = releaseTargets(readReleaseManifest);
+  assert.ok(targets.length, 'Release PR must bump at least one public package');
   const { baseBranch, commit } = JSON.parse(run('git', ['show', `${before}:.changeset/config.json`]));
   assert.equal(commit, false, 'Changesets version generation must leave changes uncommitted');
   const cli = fileURLToPath(import.meta.resolve('@changesets/cli/bin.js'));
@@ -128,6 +165,7 @@ async function verifyChangesetsPlan() {
     const differences = snapshot('diff', '--name-only', '--no-renames', generated, sha, '--',
       '.', ':(exclude)package-lock.json');
     assert.equal(differences, '', `Release PR differs from Changesets output at the base commit:\n${differences}`);
+    for (const target of targets) readReleaseNotes(target, sha);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
@@ -210,8 +248,10 @@ async function publish(targets) {
 async function createReleases(targets) {
   const { GITHUB_REPOSITORY: repository, GITHUB_SHA: sha } = process.env;
   const releases = JSON.parse(run('gh', ['api', '--paginate', '--slurp', `repos/${repository}/releases`])).flat();
-  for (const { directory, name, version } of targets) {
-    const tag = `${name}@${version}`;
+  for (const target of targets) {
+    const tag = `${target.name}@${target.version}`;
+    const existing = releases.some(release => release.tag_name === tag);
+    const notes = existing ? null : readReleaseNotes(target, sha);
     const ref = `refs/tags/${tag}`;
     const remote = run('git', ['ls-remote', '--tags', 'origin', ref, `${ref}^{}`]);
     if (remote) {
@@ -221,10 +261,10 @@ async function createReleases(targets) {
       execFileSync('gh', ['api', '--method', 'POST', `repos/${repository}/git/refs`,
         '-f', `ref=${ref}`, '-f', `sha=${sha}`], { stdio: 'inherit' });
     }
-    if (releases.some(release => release.tag_name === tag)) continue;
-    const changelog = `https://github.com/${repository}/blob/${sha}/packages/${directory}/CHANGELOG.md`;
-    execFileSync('gh', ['release', 'create', tag, '--repo', repository, '--verify-tag',
-      '--title', tag, '--notes', `[Package changelog](${changelog})`, '--latest=false'], { stdio: 'inherit' });
+    if (notes) {
+      execFileSync('gh', ['release', 'create', tag, '--repo', repository, '--verify-tag',
+        '--title', tag, '--notes-file', '-', '--latest=false'], { input: notes, stdio: ['pipe', 'inherit', 'inherit'] });
+    }
   }
 }
 
