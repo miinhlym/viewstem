@@ -166,10 +166,10 @@ export function compilePorts({ resourceKind, ports = {}, types = {}, store }) {
       write(value) { verify(); handle.write(accept(port.validator, value)); },
       reset() { verify(); handle.reset(); },
     });
-    stateWrappers.set(wrapper, { base: handle, store, guarded: hasStateGuard(handle) }); return wrapper;
+    stateWrappers.set(wrapper, { base: handle, store, schema: port.schema, guarded: hasStateGuard(handle) }); return wrapper;
   }
   return Object.freeze({
-    prepare(inputs = {}, { mode = 'explicit' } = {}) {
+    prepare(inputs = {}, { mode = 'explicit', retainedPorts } = {}) {
       if (!record(inputs) || !['explicit', 'automatic'].includes(mode)) fail('INVALID_DEFINITION');
       for (const key of Object.keys(inputs)) if (!declarations.has(key)) fail('INVALID_DEFINITION', key);
       // Structural errors are discovered before any connected expression executes.
@@ -183,7 +183,16 @@ export function compilePorts({ resourceKind, ports = {}, types = {}, store }) {
           continue;
         }
         const input = inputs[key];
-        if (port.kind === 'State') values[key] = connectState(port, input);
+        if (port.kind === 'State') {
+          const retained = retainedPorts?.[key];
+          const binding = stateWrappers.get(retained);
+          // An existing connection keeps its capability identity after the
+          // producer retires. Reads still fail through the handle's guard.
+          if (binding?.base === input && binding?.store === store && !store.isCurrentHandle(stateRoot(input, store))) {
+            if (!sameContract(port.schema, binding.schema)) fail('TYPE_CONTRACT_MISMATCH');
+            values[key] = retained;
+          } else values[key] = connectState(port, input);
+        }
         else if (port.kind === 'Query') { if (!queries.has(input)) fail('TYPE_CONTRACT_MISMATCH'); values[key] = input; }
         else {
           let snapshot;

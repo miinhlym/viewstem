@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRegistry, createStateStore } from '@viewstem/core';
 import { createRuntime } from './fixtures/runtime-operations.mjs';
+import { memoryUrl, link, tick } from './fixtures/state/url-adapter.mjs';
 
 const integer = { type: 'integer' }, value = { kind: 'Value', schema: integer, required: true }, state = { kind: 'State', schema: integer, required: true };
 const path = value => ({ '@path': value });
@@ -123,6 +124,47 @@ test('Derived refreshes a State path read through a dynamic formatString templat
   assert.deepEqual(observed, [[1, '1'], [2, '2']]);
 });
 
+for (const target of ['computed', 'peer']) {
+  test(`View rejects a dynamic formatString cycle through ${target} without publishing`, async t => {
+    const f = fixture(t), string = { type: 'string' };
+    const text = { kind: 'Value', schema: string, required: true };
+    const spec = {
+      ports: { template: text },
+      states: {
+        source: { kind: 'State', schema: string, initial: 'true' },
+        computed: { kind: 'Derived', schema: string,
+          variable: { ports: { text }, expression: "text == 'true' ? 'false' : 'true'" },
+          inputs: { text: { '@call': 'formatString', args: { value: path('/ports/template') } } },
+        },
+        peer: { kind: 'Derived', schema: string,
+          variable: { ports: { text }, expression: 'text' },
+          inputs: { text: path('/states/computed') },
+        },
+      },
+      render: leaf,
+    };
+    const { view, initialComplete } = await f.runtime.createView({ view: spec, inputs: { template: '${/states/source}' } });
+    await initialComplete;
+    const output = view.getState('computed'), peer = view.getState('peer');
+    assert.equal(output.read(), 'false');
+    let updates = 0;
+    t.after(f.store.subscribe(output.address, ({ changes }) => {
+      // Stop a regressed notification loop so the test can fail and report it.
+      if (changes.length && ++updates === 8) void view.dispose();
+    }));
+
+    await assert.rejects(view.setInputs({ template: '${/states/' + target + '}' }), { code: 'INVALID_DEFINITION' });
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(output.read(), 'false');
+    assert.equal(peer.read(), 'false');
+    assert.equal(updates, 0);
+    view.getState('source').write('false');
+    assert.equal(output.read(), 'true');
+    assert.equal(peer.read(), 'true');
+    assert.equal(updates, 1);
+  });
+}
+
 test('dynamic Derived writes settle the newly selected dependency before reactions publish', async t => {
   const f = fixture(t), string = { type: 'string' };
   const text = { kind: 'Value', schema: string, required: true };
@@ -190,6 +232,521 @@ test('dynamic Deriveds recover from a cycle in the State write that breaks it', 
     ['INVALID_DEFINITION', 'INVALID_DEFINITION'],
     ['value', 'value'],
   ]);
+});
+
+test('a View application validates dynamic paths against its candidate reactions', async t => {
+  const f = fixture(t), string = { type: 'string' };
+  const text = { kind: 'Value', schema: string, required: true };
+  const spec = {
+    ports: { template: text },
+    states: {
+      source: { kind: 'State', schema: string, initial: 'old' },
+      computed: { kind: 'Derived', schema: string,
+        variable: { ports: { text }, expression: 'text' },
+        inputs: { text: { '@call': 'formatString', args: { value: path('/ports/template') } } },
+      },
+      target: { kind: 'State', schema: string, initial: 'new' },
+    },
+    reactions: [{ watch: [path('/states/computed')], target: path('/states/target'), value: 'fired' }],
+    render: leaf,
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec, inputs: { template: '${/states/source}' } });
+  await initialComplete;
+  const output = view.getState('computed'), target = view.getState('target');
+  const observed = [];
+  t.after(f.store.subscribe(output.address, () => observed.push(output.getSnapshot())));
+  const inputs = { template: '${/states/target}' };
+  await assert.rejects(view.setInputs(inputs), { code: 'INVALID_DEFINITION' });
+  assert.equal(output.read(), 'old');
+  assert.equal(target.read(), 'new');
+
+  const next = { ...spec, reactions: [] };
+  await view.whenSettled(await view.updateDefinition(next, { inputs }));
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(observed, [{ status: 'ready', value: 'old' }, { status: 'ready', value: 'new' }]);
+  target.write('later');
+  assert.equal(output.read(), 'later');
+});
+
+test('external reactions participate in candidate validation and unblock live reads when disconnected', async t => {
+  const f = fixture(t), string = { type: 'string' };
+  const text = { kind: 'Value', schema: string, required: true };
+  const target = f.scope.registerState('serviceTarget', { schema: string, initial: 'target' });
+  const spec = {
+    ports: { target: { kind: 'State', schema: string, required: true } },
+    states: {
+      source: { kind: 'State', schema: string, initial: 'source' },
+      selector: { kind: 'State', schema: string, initial: '${/states/source}' },
+      computed: { kind: 'Derived', schema: string,
+        variable: { ports: { text }, expression: 'text' },
+        inputs: { text: { '@call': 'formatString', args: { value: path('/states/selector') } } },
+      },
+    },
+    render: leaf,
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec, inputs: { target } });
+  await initialComplete;
+  const output = view.getState('computed'), selector = view.getState('selector');
+  const stop = f.store.registerReaction(f.scope, { watch: [output], target, value: 'fired' });
+  const observed = [];
+  t.after(f.store.subscribe(output.address, () => {
+    const snapshot = output.getSnapshot();
+    observed.push(snapshot.error?.code ?? snapshot.value);
+  }));
+  const next = '${/ports/target}';
+  await assert.rejects(view.updateDefinition(spec, { states: { selector: next } }), { code: 'INVALID_DEFINITION' });
+  assert.equal(selector.read(), '${/states/source}');
+  assert.deepEqual(observed, ['source']);
+  selector.write(next);
+  assert.throws(() => output.read(), { code: 'INVALID_DEFINITION' });
+  stop();
+  assert.equal(output.read(), 'target');
+  assert.equal(target.read(), 'target');
+  assert.deepEqual(observed, ['source', 'INVALID_DEFINITION', 'target']);
+});
+
+test('a View cannot introduce a cycle using only external reaction ports', async t => {
+  const f = fixture(t), string = { type: 'string' };
+  const port = { kind: 'State', schema: string, required: true };
+  const text = { kind: 'Value', schema: string, required: true };
+  const target = f.scope.registerState('target', { schema: string, initial: 'target' });
+  const bridge = f.scope.registerState('bridge', { schema: string, initial: 'bridge' });
+  const first = await f.runtime.createView({
+    view: {
+      ports: { target: port, template: text },
+      states: { computed: {
+        kind: 'Derived', schema: string, variable: { ports: { text }, expression: 'text' },
+        inputs: { text: { '@call': 'formatString', args: { value: path('/ports/template') } } },
+      } },
+      render: leaf,
+    },
+    inputs: { target, template: '${/ports/target}' },
+  });
+  await first.initialComplete;
+  const output = first.view.getState('computed');
+  const before = output.getSnapshot();
+  f.store.registerReaction(f.scope, { watch: [output], target: bridge, value: 'fired' });
+  const observed = [];
+  t.after(f.store.subscribe(output.address, () => observed.push(output.getSnapshot())));
+  await assert.rejects(f.runtime.createView({
+    view: {
+      ports: { target: port, bridge: port },
+      reactions: [{ watch: [path('/ports/bridge')], target: path('/ports/target'), value: 'cycle' }],
+      render: leaf,
+    },
+    inputs: { target, bridge },
+  }), { code: 'INVALID_DEFINITION' });
+  assert.equal(output.getSnapshot(), before);
+  assert.deepEqual(observed, [before]);
+  target.write('healthy');
+  assert.equal(output.read(), 'healthy');
+  assert.equal(bridge.read(), 'fired');
+});
+
+test('View state settlement replays only surviving reactions before its first projection', async t => {
+  const f = fixture(t), string = { type: 'string' }, boolean = { type: 'boolean' };
+  const text = { kind: 'Value', schema: string, required: true };
+  const stringState = { kind: 'State', schema: string, required: true };
+  const state = (schema, initial) => ({ kind: 'State', schema, initial });
+  const reaction = (watch, target, value) => ({ watch: [path(watch)], target: path(target), value });
+  bindTestComponents(f.registry, [
+    { kind: 'Component', id: 'Row', spec: { slots: { default: {} } } },
+    { kind: 'Component', id: 'Label', spec: { ports: { value: text } } },
+  ]);
+  f.registry.registerResources([{ kind: 'Component', id: 'Child', spec: {
+    ports: { bridge: stringState, target: stringState, extra: stringState, trigger: statePort(integer) },
+    reactions: [
+      reaction('/ports/bridge', '/ports/target', 'child'),
+      reaction('/ports/trigger', '/ports/extra', 'leaked'),
+    ],
+    render: { ...leaf, id: 'child-leaf' },
+  } }]);
+  const spec = {
+    states: {
+      trigger: state(integer, 0),
+      selector: state(string, '${/states/source}'),
+      source: state(string, 'source'),
+      target: state(string, 'target'),
+      extra: state(string, 'safe'),
+      bridge: state(string, 'unfired'),
+      show: state(boolean, true),
+      computed: { kind: 'Derived', schema: string,
+        variable: { ports: { text }, expression: 'text' },
+        inputs: { text: { '@call': 'formatString', args: { value: path('/states/selector') } } },
+      },
+    },
+    reactions: [
+      reaction('/states/trigger', '/states/selector', '${/states/target}'),
+      reaction('/states/trigger', '/states/show', false),
+      reaction('/states/computed', '/states/bridge', 'fired'),
+    ],
+    render: { id: 'row', componentRef: 'Row', slots: { default: [
+      { id: 'child', componentRef: 'Child', when: path('/states/show'), inputs: {
+        trigger: path('/states/trigger'), bridge: path('/states/bridge'),
+        target: path('/states/target'), extra: path('/states/extra'),
+      } },
+      { id: 'label', componentRef: 'Label', inputs: { value: path('/states/computed') } },
+    ] } },
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  const originalGeneration = view.getSnapshot().generation;
+  const names = ['trigger', 'computed', 'bridge', 'target', 'extra'];
+  const handles = names.map(name => view.getState(name));
+  const observed = [], projections = [];
+  t.after(f.store.subscribe(handles.map(handle => handle.address), () => {
+    observed.push(handles.map(handle => handle.getSnapshot().value));
+  }));
+  t.after(view.subscribe(snapshot => {
+    if (snapshot.generation <= originalGeneration) return;
+    const nodes = snapshot.roots[0].children;
+    projections.push(nodes.map(node => [node.id, node.status, node.inputs.value]));
+  }));
+  const cyclic = { ...spec, reactions: spec.reactions.filter(rule => rule.target['@path'] !== '/states/show') };
+  await assert.rejects(view.updateDefinition(cyclic, { states: { trigger: 1 } }), { code: 'INVALID_DEFINITION' });
+  assert.equal(view.getSnapshot().generation, originalGeneration);
+  assert.deepEqual(observed, [[0, 'source', 'unfired', 'target', 'safe']]);
+
+  const next = { ...spec, states: { ...spec.states,
+    loaded: { kind: 'State', schema: string, initial: path('/states/bridge') },
+  } };
+  await view.whenSettled(await view.updateDefinition(next, { states: { trigger: 1 } }));
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(observed, [[0, 'source', 'unfired', 'target', 'safe'], [1, 'target', 'fired', 'target', 'safe']]);
+  assert.deepEqual(projections[0], [['label', 'ready', 'target']]);
+  assert.ok(projections.every(nodes => nodes.length === 1 && nodes[0][1] === 'ready'));
+  const loaded = view.getState('loaded');
+  assert.equal(loaded.read(), 'fired');
+  loaded.write('different');
+  loaded.reset();
+  assert.equal(loaded.read(), 'fired');
+
+  function statePort(schema) { return { kind: 'State', schema, required: true }; }
+});
+
+test('View rejects a reaction that repeatedly removes and restores its own owner', async t => {
+  const f = fixture(t), boolean = { type: 'boolean' };
+  f.registry.registerResources([{ kind: 'Component', id: 'Toggle', spec: {
+    ports: { trigger: state, show: { kind: 'State', schema: boolean, required: true } },
+    reactions: [{ watch: [path('/ports/trigger')], target: path('/ports/show'), value: false }],
+    render: leaf,
+  } }]);
+  const spec = {
+    states: {
+      trigger: { kind: 'State', schema: integer, initial: 0 },
+      show: { kind: 'State', schema: boolean, initial: true },
+    },
+    render: { id: 'toggle', componentRef: 'Toggle', when: path('/states/show'),
+      inputs: { trigger: path('/states/trigger'), show: path('/states/show') },
+    },
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  const original = view.getSnapshot(), trigger = view.getState('trigger'), show = view.getState('show');
+  const observed = [];
+  t.after(f.store.subscribe([trigger.address, show.address], () => observed.push([trigger.read(), show.read()])));
+  await assert.rejects(view.updateDefinition(spec, { states: { trigger: 1 } }), { code: 'INVALID_DEFINITION' });
+  assert.deepEqual(observed, [[0, true]]);
+  assert.equal(view.getSnapshot().generation, original.generation);
+  assert.equal(view.getSnapshot().roots[0].instanceId, original.roots[0].instanceId);
+});
+
+for (const [trigger, delta, previous] of [[0, 0], [1, 0], [0, 1], [0, 0, 9]]) test(`View replay separates initialization from writes ${trigger},${delta},${previous}`, async t => {
+  const f = fixture(t);
+  f.registry.registerResources([{ kind: 'Component', id: 'Initializing', spec: {
+    ports: { input: { kind: 'Value', schema: integer }, delta: value, trigger: state, output: state },
+    states: { loaded: { kind: 'State', schema: integer, initial: path('/ports/input') }, calculated: {
+      kind: 'Derived', schema: integer, variable: { ports: { n: value, delta: value }, expression: 'n + delta' },
+      inputs: { n: path('/states/loaded'), delta: path('/ports/delta') },
+    } },
+    reactions: [
+      { watch: [path('/ports/trigger')], target: path('/states/loaded'), value: 9 },
+      { watch: [path('/states/calculated')], target: path('/ports/output'), value: 1 },
+    ],
+    render: leaf,
+  } }]);
+  const spec = {
+    states: {
+      input: { kind: 'State', schema: integer },
+      trigger: { kind: 'State', schema: integer, initial: 0 },
+      delta: { kind: 'State', schema: integer, initial: 0 },
+      output: { kind: 'State', schema: integer, initial: 0 },
+    },
+    render: { id: 'owner', componentRef: 'Initializing',
+      inputs: { input: path('/states/input'), delta: path('/states/delta'), trigger: path('/states/trigger'), output: path('/states/output') },
+    },
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  const owner = view.getSnapshot().roots[0].instanceId;
+  const loaded = view.getState('loaded', owner);
+  assert.equal(loaded.getSnapshot().status, 'pending');
+  const output = view.getState('output');
+  if (previous !== undefined) {
+    loaded.write(previous);
+    output.write(0);
+  }
+  const observed = [];
+  t.after(f.store.subscribe(loaded.address, () => observed.push(loaded.getSnapshot())));
+  await view.whenSettled(await view.updateDefinition(spec, { states: { input: 5, trigger, delta } }));
+  assert.equal(view.getState('loaded', owner), loaded);
+  assert.deepEqual(observed, previous === undefined
+    ? [{ status: 'pending' }, { status: 'ready', value: trigger ? 9 : 5 }]
+    : [{ status: 'ready', value: previous }]);
+  assert.equal(output.read(), trigger || delta);
+  loaded.reset();
+  assert.equal(loaded.read(), 5);
+});
+
+for (const duplicate of [false, true]) test(`an independent reaction can remove a provisional ${duplicate ? 'duplicate target' : 'static cycle'}`, async t => {
+  const f = fixture(t), boolean = { type: 'boolean' };
+  f.registry.registerResources([{ kind: 'Component', id: 'Cyclic', spec: {
+    ports: { source: state, target: state },
+    states: { dependent: derived(path('/ports/source')) },
+    reactions: [{ watch: [path('/states/dependent')], target: path('/ports/target'), value: 9 }],
+    render: leaf,
+  } }]);
+  const spec = {
+    states: {
+      trigger: { kind: 'State', schema: integer, initial: 0 },
+      show: { kind: 'State', schema: boolean, initial: true },
+      target: { kind: 'State', schema: integer, initial: 4 },
+    },
+    reactions: [
+      { watch: [path('/states/trigger')], target: path('/states/show'), value: false },
+      ...(duplicate ? [{ watch: [path('/states/trigger')], target: path('/states/target'), value: 7 }] : []),
+    ],
+    render: leaf,
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  const next = { ...spec, render: { id: 'child', componentRef: 'Cyclic', when: path('/states/show'),
+    inputs: { source: path('/states/target'), target: path('/states/target') } } };
+  await assert.rejects(view.updateDefinition(next), { code: 'INVALID_DEFINITION' });
+  assert.equal(view.getState('show').read(), true);
+  await view.whenSettled(await view.updateDefinition(next, { states: { trigger: 1 } }));
+  assert.equal(view.getState('show').read(), false);
+  assert.equal(view.getState('target').read(), duplicate ? 7 : 4);
+  assert.deepEqual(view.getSnapshot().roots, []);
+});
+
+for (const direct of [false, true]) test(`retired State ports invalidate first projection (direct=${direct})`, async t => {
+  const f = fixture(t), boolean = { type: 'boolean' };
+  bindTestComponents(f.registry, [{ kind: 'Component', id: 'Row', spec: { slots: { default: {} } } }]);
+  f.registry.registerResources([{ kind: 'Component', id: 'Producer', spec: {
+    states: { value: { kind: 'State', schema: integer, initial: 4 } },
+    render: leaf,
+  } }]);
+  const spec = {
+    ports: { fromChild: { kind: 'State', schema: integer } },
+    states: {
+      trigger: { kind: 'State', schema: integer, initial: 0 },
+      show: { kind: 'State', schema: boolean, initial: true },
+      unrelated: { kind: 'State', schema: integer, initial: 2 },
+      output: { kind: 'State', schema: integer, initial: 0 },
+      ...(direct ? {} : { dependent: derived(path('/ports/fromChild')) }),
+    },
+    reactions: [{ watch: [path('/states/trigger')], target: path('/states/show'), value: false }],
+    render: { id: 'row', componentRef: 'Row', slots: { default: [
+      { id: 'producer', componentRef: 'Producer', when: path('/states/show') },
+      { id: 'consumer', componentRef: 'Leaf', inputs: { value: path(direct ? '/ports/fromChild' : '/states/dependent') } },
+      { id: 'other', componentRef: 'Leaf', inputs: { value: path('/states/unrelated') } },
+    ] } },
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  const producer = view.getSnapshot().roots[0].children.find(child => child.id === 'producer');
+  await view.whenSettled(await view.setInputs({ fromChild: view.getState('value', producer.instanceId) }));
+  const ready = view.getSnapshot();
+  assert.equal(ready.roots[0].children.find(child => child.id === 'consumer').inputs.value, 4);
+  const updates = [];
+  t.after(view.subscribe(snapshot => {
+    if (snapshot.generation > ready.generation) updates.push(snapshot.roots[0].children.find(child => child.id === 'consumer'));
+  }));
+  const next = direct ? spec : { ...spec, reactions: [...spec.reactions,
+    { watch: [path('/states/trigger')], target: path('/ports/fromChild'), value: 7 },
+    { watch: [path('/ports/fromChild')], target: path('/states/output'), value: 8 },
+  ] };
+  await view.whenSettled(await view.updateDefinition(next, { states: { trigger: 1 } }));
+  assert.equal(updates[0].status, 'error');
+  assert.equal(updates[0].error.code, 'CANCELLED');
+  assert.equal(view.getState('output').read(), 0);
+  await assert.rejects(view.updateDefinition({ ...spec, ports: { fromChild: { kind: 'State', schema: { type: 'string' } } } }),
+    { code: 'TYPE_CONTRACT_MISMATCH' });
+  view.getState('unrelated').write(3);
+  const nodes = view.getSnapshot().roots[0].children;
+  assert.equal(nodes.find(child => child.id === 'consumer').error.code, 'CANCELLED');
+  assert.equal(nodes.find(child => child.id === 'other').inputs.value, 3);
+});
+
+for (const duplicate of [false, true]) test(`a settled watch can resolve a provisional ${duplicate ? 'duplicate' : 'cycle'}`, async t => {
+  const f = fixture(t), boolean = { type: 'boolean' }, toggle = { kind: 'State', schema: boolean, required: true };
+  f.registry.registerResources([{ kind: 'Component', id: 'Conditional', spec: {
+    ports: { show: toggle, target: state },
+    ...(duplicate ? {} : { states: { dependent: {
+      kind: 'Derived', schema: boolean,
+      variable: { ports: { checked: { kind: 'Value', schema: boolean, required: true } }, expression: 'checked' },
+      inputs: { checked: path('/ports/show') },
+    } } }),
+    reactions: [duplicate
+      ? { watch: [path('/ports/target')], target: path('/ports/show'), value: true }
+      : { watch: [path('/states/dependent')], target: path('/ports/target'), value: 9 }],
+    render: leaf,
+  } }]);
+  const spec = {
+    states: {
+      trigger: { kind: 'State', schema: integer, initial: 0 },
+      show: { kind: 'State', schema: boolean, initial: true },
+      target: { kind: 'State', schema: integer, initial: 4 },
+    },
+    reactions: [{ watch: [path('/states/trigger'), ...(!duplicate ? [path('/states/target')] : [])],
+      target: path('/states/show'), value: false }],
+    render: leaf,
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  const next = { ...spec, render: { id: 'child', componentRef: 'Conditional', when: path('/states/show'),
+    inputs: { show: path('/states/show'), target: path('/states/target') } } };
+  await view.whenSettled(await view.updateDefinition(next, { states: { trigger: 1 } }));
+  assert.deepEqual(view.getSnapshot().roots, []);
+  assert.equal(view.getState('target').read(), 4);
+});
+
+test('Action aliases are validated on the final projection after explicit writes', async t => {
+  const f = fixture(t), boolean = { type: 'boolean' };
+  bindTestComponents(f.registry, [
+    { kind: 'Component', id: 'Row', spec: { slots: { default: {} } } },
+    { kind: 'Component', id: 'Button', spec: { events: { click: { schema: true } } } },
+  ]);
+  f.registry.registerAction({ kind: 'Action', id: 'noop', spec: {} }, () => {});
+  const button = { id: 'first', componentRef: 'Button', on: { click: { id: 'shared', actionRef: 'noop' } } };
+  const spec = { states: { show: { kind: 'State', schema: boolean, initial: true } }, render: button };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  const next = { ...spec, render: { id: 'row', componentRef: 'Row', slots: { default: [
+    button, { ...button, id: 'second', when: path('/states/show') },
+  ] } } };
+  await assert.rejects(view.updateDefinition(next), { code: 'INVALID_DEFINITION' });
+  assert.equal(view.getState('show').read(), true);
+  await view.whenSettled(await view.updateDefinition(next, { states: { show: false } }));
+  assert.deepEqual(view.getSnapshot().roots[0].children.map(child => child.id), ['first']);
+});
+
+test('a discarded reaction never replaces the URL value of an initialized State', async t => {
+  const f = fixture(t), endpoint = memoryUrl(link({ owned: 8 })), boolean = { type: 'boolean' };
+  f.registry.registerResources([{ kind: 'Component', id: 'Temporary', spec: {
+    ports: { trigger: state, loaded: state },
+    reactions: [{ watch: [path('/ports/trigger')], target: path('/ports/loaded'), value: 9 }],
+    render: leaf,
+  } }]);
+  const spec = {
+    states: {
+      trigger: { kind: 'State', schema: integer, initial: 0 },
+      show: { kind: 'State', schema: boolean, initial: true },
+      input: { kind: 'State', schema: integer },
+      loaded: { kind: 'State', schema: integer, initial: path('/states/input') },
+    },
+    reactions: [{ watch: [path('/states/trigger')], target: path('/states/show'), value: false }],
+    render: { id: 'temporary', componentRef: 'Temporary', when: path('/states/show'),
+      inputs: { trigger: path('/states/trigger'), loaded: path('/states/loaded') } },
+  };
+  const { view, initialComplete } = await f.runtime.createView({
+    view: spec, url: { adapter: endpoint.adapter, bindings: [{ state: 'loaded', key: 'owned' }] },
+  });
+  await initialComplete;
+  assert.equal(view.getState('loaded').getSnapshot().status, 'pending');
+  await view.whenSettled(await view.updateDefinition(spec, { states: { trigger: 1, input: 5 } }));
+  await tick();
+  assert.equal(view.getState('loaded').read(), 8);
+  assert.equal(new URL(endpoint.read()).searchParams.get('owned'), '8');
+  assert.deepEqual(endpoint.attempts, []);
+});
+
+for (const constrained of [false, true]) test(`a discarded reaction cannot freeze or reject a provisional initializer (${constrained})`, async t => {
+  const f = fixture(t), boolean = { type: 'boolean' }, items = { type: 'array', items: integer };
+  bindTestComponents(f.registry, [{ kind: 'Component', id: 'Row', spec: { slots: { default: {} } } }]);
+  f.registry.registerResources([
+    { kind: 'Component', id: 'Removed', spec: {
+      ports: { trigger: state, input: state, items: { kind: 'State', schema: items, required: true } },
+      reactions: [
+        { watch: [path('/ports/trigger')], target: path('/ports/input'), value: 9 },
+        { watch: [path('/ports/trigger')], target: path('/ports/items'), value: [1, 1] },
+      ],
+      render: leaf,
+    } },
+    { kind: 'Component', id: 'Initializing', spec: {
+      ports: { input: { kind: 'Value', schema: integer } },
+      states: { loaded: { kind: 'State', schema: constrained ? { ...integer, maximum: 5 } : integer, initial: path('/ports/input') } },
+      render: leaf,
+    } },
+  ]);
+  const spec = {
+    states: {
+      trigger: { kind: 'State', schema: integer, initial: 0 },
+      show: { kind: 'State', schema: boolean, initial: true },
+      input: { kind: 'State', schema: integer },
+      items: { kind: 'State', schema: items, initial: [1] },
+    },
+    reactions: [{ watch: [path('/states/trigger')], target: path('/states/show'), value: false }],
+    render: { id: 'row', componentRef: 'Row', slots: { default: [
+      { id: 'removed', componentRef: 'Removed', when: path('/states/show'),
+        inputs: { trigger: path('/states/trigger'), input: path('/states/input'), items: path('/states/items') } },
+      { id: 'owner', componentRef: 'Initializing', inputs: { input: path('/states/input') } },
+      { id: 'repeat', componentRef: 'Leaf',
+        repeat: { items: path('/states/items'), as: 'item', key: path('/repeat/item') },
+        inputs: { value: path('/repeat/item') } },
+    ] } },
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  const owner = view.getSnapshot().roots[0].children.find(node => node.id === 'owner').instanceId;
+  const loaded = view.getState('loaded', owner), input = view.getState('input');
+  const observed = [];
+  t.after(f.store.subscribe(loaded.address, () => observed.push(loaded.getSnapshot())));
+  await view.whenSettled(await view.updateDefinition(spec, { states: { trigger: 1 } }));
+  const nodes = view.getSnapshot().roots[0].children;
+  assert.deepEqual(nodes.map(node => node.id), ['owner', 'repeat']);
+  assert.equal(nodes[0].instanceId, owner);
+  assert.equal(nodes[1].inputs.value, 1);
+  assert.equal(input.getSnapshot().status, 'missing');
+  assert.deepEqual(observed, [{ status: 'pending' }]);
+  input.write(5);
+  assert.equal(loaded.read(), 5);
+  assert.deepEqual(observed, [{ status: 'pending' }, { status: 'ready', value: 5 }]);
+});
+
+test('Derived can reverse dynamic connections in one input update without publishing a cycle', async t => {
+  const f = fixture(t), string = { type: 'string' };
+  const text = { kind: 'Value', schema: string, required: true };
+  const fromTemplate = name => ({
+    kind: 'Derived', schema: string,
+    variable: { ports: { text }, expression: 'text' },
+    inputs: { text: { '@call': 'formatString', args: { value: path('/ports/' + name) } } },
+  });
+  const spec = {
+    ports: { first: text, second: text },
+    states: {
+      source: { kind: 'State', schema: string, initial: 'same' },
+      first: fromTemplate('first'),
+      second: fromTemplate('second'),
+    },
+    render: leaf,
+  };
+  const { view, initialComplete } = await f.runtime.createView({
+    view: spec, inputs: { first: '${/states/source}', second: '${/states/first}' },
+  });
+  await initialComplete;
+  const first = view.getState('first'), second = view.getState('second');
+  const observed = [];
+  t.after(f.store.subscribe([first.address, second.address], () => {
+    observed.push([first.getSnapshot().status, second.getSnapshot().status]);
+  }));
+  await view.whenSettled(await view.setInputs({ first: '${/states/second}', second: '${/states/source}' }));
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(observed, [['ready', 'ready']]);
+  view.getState('source').write('new');
+  assert.equal(first.read(), 'new');
+  assert.equal(second.read(), 'new');
 });
 
 test('Derived Query-port values refresh through a retained owner and conditional removal cancels old cells', async t => {
