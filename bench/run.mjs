@@ -6,6 +6,7 @@ import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { chromium } from 'playwright';
+import { withDeadline } from './deadline.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const { values, positionals } = parseArgs({
@@ -15,6 +16,7 @@ const { values, positionals } = parseArgs({
     warmup: { type: 'string', default: '2' },
     match: { type: 'string', default: '.' },
     out: { type: 'string' },
+    'timeout-ms': { type: 'string', default: '60000' },
   },
 });
 const [selection = 'all'] = positionals;
@@ -25,13 +27,21 @@ const groups = {
 };
 if (positionals.length > 1 || (selection !== 'all' && !Object.hasOwn(groups, selection))) {
   throw new Error(
-    'Usage: node bench/run.mjs [all|core|browser|docs] [--samples=5] [--warmup=2] [--match=regex] [--out=path]',
+    'Usage: node bench/run.mjs [all|core|browser|docs] [--samples=5] [--warmup=2] [--match=regex] [--out=path] [--timeout-ms=60000]',
   );
 }
 const samples = Number(values.samples);
 const warmup = Number(values.warmup);
-if (!Number.isSafeInteger(samples) || samples < 1 || !Number.isSafeInteger(warmup) || warmup < 0) {
-  throw new Error('Use positive --samples and nonnegative --warmup counts');
+const timeoutMs = Number(values['timeout-ms']);
+if (
+  !Number.isSafeInteger(samples) ||
+  samples < 1 ||
+  !Number.isSafeInteger(warmup) ||
+  warmup < 0 ||
+  !Number.isSafeInteger(timeoutMs) ||
+  timeoutMs < 1
+) {
+  throw new Error('Use positive --samples and --timeout-ms, and nonnegative --warmup counts');
 }
 const match = new RegExp(values.match);
 const output = values.out
@@ -86,6 +96,7 @@ const report = {
     match: values.match,
     warmup,
     samples,
+    timeoutMs,
     unit: 'ms',
   },
   results: [],
@@ -97,14 +108,20 @@ const describeError = (error) => error?.stack ?? JSON.stringify(error) ?? String
 await save();
 console.log(output);
 
-async function measure({ id, workload, sample }) {
+async function measure({ id, workload, sample, recover }) {
   if (ids.has(id)) throw new Error(`Duplicate benchmark ID: ${id}`);
   ids.add(id);
   if (!match.test(id)) return;
   const durations = [];
   try {
     for (let i = 0; i < warmup + samples; i++) {
-      const elapsed = await sample();
+      const controller = new AbortController();
+      const elapsed = await withDeadline(
+        Promise.resolve().then(() => sample({ signal: controller.signal })),
+        id + ' sample ' + (i + 1),
+        timeoutMs,
+        () => controller.abort(),
+      );
       if (typeof elapsed !== 'number' || !Number.isFinite(elapsed) || elapsed < 0) {
         throw new Error(`Invalid duration for ${id}: ${elapsed}`);
       }
@@ -127,6 +144,9 @@ async function measure({ id, workload, sample }) {
     const reason = describeError(error);
     report.failures.push({ id, workload, durations, reason });
     console.error(`${id}  ${reason}`);
+    // Persist the failure before a browser recovery or cleanup can fail.
+    await save();
+    if (recover) await withDeadline(recover(), id + ' recovery', timeoutMs);
   }
   await save();
 }

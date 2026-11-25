@@ -1,3 +1,5 @@
+import { withDeadline } from './deadline.mjs';
+
 const path = (value) => ({ '@path': value });
 const label = { kind: 'Value', required: true, schema: { type: 'string' } };
 const deferred = () => {
@@ -29,7 +31,9 @@ export async function sampleQueryProjection({
   adapters,
   attach,
   instrument,
+  timeoutMs = 30_000,
 }) {
+  const wait = (value, phase) => withDeadline(value, phase, timeoutMs);
   const rows = Array.from({ length: size }, (_, id) => ({ id, label: `Option ${id}` }));
   const entered = deferred();
   const response = deferred();
@@ -83,9 +87,9 @@ export async function sampleQueryProjection({
     runtime.registry.registerResourceSet(
       defineResourceSet({ id: 'bench-query-projection', version: '1', components }),
     );
-    const view = await runtime.createView(source);
-    await view.whenSettled(view.initial);
-    connection = await attach?.(runtime, view);
+    const view = await wait(runtime.createView(source), 'Query fixture View creation');
+    await wait(view.whenSettled(view.initial), 'Query fixture initial completion');
+    connection = await wait(attach?.(runtime, view), 'Query fixture renderer attachment');
     const initial = view.getSnapshot().roots[0].children;
     check(
       initial.length === size + 1 && initial.at(-1).inputs.label === 'Before',
@@ -101,13 +105,23 @@ export async function sampleQueryProjection({
       if (snapshot.queries.summary.data === 'After') projected.resolve(snapshot.roots[0].children);
     });
     const ticket = view.getQuery('summary').refresh();
-    await Promise.all([entered.promise, running.promise]);
-    await connection?.whenRendered();
+    // A failed publication check must still observe the refresh ticket rejection
+    // when the fixture closes its View in the cleanup path.
+    void ticket.catch(() => {});
+    await wait(
+      Promise.all([entered.promise, running.promise]),
+      'summary request and running publication',
+    );
+    await wait(connection?.whenRendered(), 'running projection render');
     const endProbe = instrument?.(view);
     const started = performance.now();
     response.resolve({ status: 200, headers: {}, body: 'After' });
-    const [, final] = await Promise.all([ticket, projected.promise]);
-    await connection?.whenRendered();
+    const [, final] = await wait(
+      Promise.all([ticket, projected.promise]),
+      'summary completion and result publication',
+    );
+    await wait(connection?.whenRendered(), 'summary result render');
+
     const elapsed = performance.now() - started;
     endProbe?.(elapsed);
 
@@ -124,7 +138,6 @@ export async function sampleQueryProjection({
     return elapsed;
   } finally {
     stop?.();
-    await connection?.dispose();
-    await runtime.dispose();
+    await wait(Promise.all([connection?.dispose(), runtime.dispose()]), 'Query fixture cleanup');
   }
 }

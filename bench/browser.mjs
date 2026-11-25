@@ -6,6 +6,7 @@ import { compile } from 'svelte/compiler';
 import postcss from 'postcss';
 import { scopeUiCss } from '@viewstem/dom/styles/postcss';
 import { performance } from 'node:perf_hooks';
+import { withDeadline } from './deadline.mjs';
 
 // Measures completion through whenRendered; interactions include an event-loop turn.
 // Setup, assertions and teardown are outside the timed region.
@@ -36,23 +37,46 @@ export async function benchmarkBrowser(measure) {
   });
   const browser = await chromium.launch({ headless: true });
   try {
-    const page = await browser.newPage();
+    let page;
     const errors = [];
-    page.on('pageerror', (error) => errors.push(error));
+    const openPage = async () => {
+      page = await browser.newPage();
+      page.on('pageerror', (error) => errors.push(error));
+      await page.setContent('<!doctype html><html><head></head><body></body></html>');
+      for (const file of bundle.outputFiles) {
+        if (file.path.endsWith('.css')) await page.addStyleTag({ content: file.text });
+        if (file.path.endsWith('.js')) await page.addScriptTag({ content: file.text });
+      }
+    };
     const run = (options) =>
       measure({
         ...options,
-        async sample() {
-          const elapsed = await options.sample();
-          if (errors.length) throw new AggregateError(errors.splice(0), 'Uncaught browser exception');
-          return elapsed;
+        async sample({ signal } = {}) {
+          const abort = () => {
+            void page.close().catch(() => {});
+          };
+          signal?.addEventListener('abort', abort, { once: true });
+          try {
+            const elapsed = await withDeadline(
+              options.sample(),
+              options.id + ' browser sample',
+              60_000,
+              abort,
+            );
+            if (errors.length)
+              throw new AggregateError(errors.splice(0), 'Uncaught browser exception');
+            return elapsed;
+          } finally {
+            signal?.removeEventListener('abort', abort);
+          }
+        },
+        async recover() {
+          await page.close().catch(() => {});
+          errors.length = 0;
+          await openPage();
         },
       });
-    await page.setContent('<!doctype html><html><head></head><body></body></html>');
-    for (const file of bundle.outputFiles) {
-      if (file.path.endsWith('.css')) await page.addStyleTag({ content: file.text });
-      if (file.path.endsWith('.js')) await page.addScriptTag({ content: file.text });
-    }
+    await openPage();
     for (const operation of ['mount', 'update', 'reorder', 'event', 'unmount', 'custom'])
       await run({
         id: `dom.${operation}`,
