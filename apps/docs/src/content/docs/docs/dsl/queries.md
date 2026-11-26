@@ -7,16 +7,16 @@ sidebar:
 
 ## Examples by form
 
-Each link opens runnable JSON with its required resources, inputs, and expected result. This table locates forms; the reference below defines required fields and constraints.
+Use these links to run a form or compare its JSON structure. The reference below defines required fields and constraints.
 
 | Form | Key fields | Runnable example |
 | --- | --- | --- |
-| Query source | `queryRef` / `query`, `inputs` | [Open example](/examples/query-sources/) |
-| HTTP source | `datasourceRef` / `datasource`, `request` | [Open example](/examples/http-datasource/) |
+| Nested Query source | `queryRef` / `query`, parent `inputs` | [Run both source forms](/examples/query-sources/) |
+| HTTP source | `datasourceRef` / `datasource`, `request` | [Run a Datasource reference](/examples/http-datasource/) · [Compare both shapes](/docs/dsl/datasources/#reference-and-inline-use) |
 | Concat | `kind`, `with` | [Open example](/examples/query-concat/) |
 | Join | `kind`, `right`, `on`, `mode` | [Open example](/examples/query-join/) |
-| Query use | `queryRef` / `query`, `inputs`, `executeWhen` | [Open example](/examples/query-ref/) |
-| Refresh | `refresh`, `intervalMs`, `autoRefreshWhen` | [Open example](/examples/query-polling/) |
+| Query use | `queryRef` / `query`, `inputs`, `executeWhen` | [Reference](/examples/query-ref/) · [Inline with inputs](/examples/query-inputs/) · [Execution gate](/examples/query-gate/) |
+| Refresh | `refresh`, `intervalMs`, `autoRefreshWhen` | [Manual refresh](/examples/refresh-query/) · [Polling](/examples/query-polling/) |
 
 ## Standalone resource example
 

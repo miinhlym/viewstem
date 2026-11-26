@@ -58,19 +58,23 @@ export function scenarioDefinitions(locale: Locale): Record<'issue-intake' | 'is
         { value: t('Low', '낮음'), label: t('Low', '낮음') }, { value: t('Medium', '보통'), label: t('Medium', '보통') }, { value: t('High', '높음'), label: t('High', '높음') },
       ])]),
       connect(node('submit-issue', 'Button', { text: t('Submit report', '신고 제출'), type: 'button' }), 'click', {
-        ports: { title: valuePort(textSchema), priority: valuePort(textSchema), details: valuePort(textSchema),
+        ports: { title: valuePort(textSchema), minimum: valuePort(numberSchema), priority: valuePort(textSchema), details: valuePort(textSchema),
           status: statePort(textSchema), preparedDetails: statePort(textSchema) },
         steps: [
-          { kind: 'Variable', id: 'valid', spec: { ports: { title: valuePort(textSchema) }, expression: 'size(title.trim()) > 0' }, inputs: { title: path('/ports/title') } },
+          { kind: 'Variable', id: 'valid',
+            spec: { ports: { title: valuePort(textSchema), minimum: valuePort(numberSchema) }, expression: 'size(title.trim()) >= minimum' },
+            inputs: { title: path('/ports/title'), minimum: path('/ports/minimum') } },
           { kind: 'If', condition: path('/steps/valid'),
             then: [
               write('status', { '@call': 'formatString', args: { value: t('Report prepared: ${/ports/title} (${/ports/priority})', '신고 내용 확인: ${/ports/title} (${/ports/priority})') } }),
               write('preparedDetails', path('/ports/details')),
             ],
-            else: [write('status', t('Enter a title before submitting.', '제목을 입력한 뒤 제출하세요.')), write('preparedDetails', '')],
+            else: [write('status', { '@call': 'formatString', args: { value: t(
+              'Enter a title with ${/ports/minimum} or more characters.', '제목은 ${/ports/minimum}자 이상 입력하세요.',
+            ) } }), write('preparedDetails', '')],
           },
         ],
-      }, { title: path('/states/title'), priority: path('/states/priority'), details: path('/states/details'),
+      }, { title: path('/states/title'), minimum: 1, priority: path('/states/priority'), details: path('/states/details'),
         status: path('/states/status'), preparedDetails: path('/states/preparedDetails') }),
       { ...layout('form-result', 'Alert.Root', [
         node('report-status', 'Alert.Title', { text: path('/states/status') }),

@@ -71,6 +71,24 @@ async function readQuery(query, runtime) {
 }
 
 const checks = {
+  'whole-inputs.json': async viewSpec => {
+    assertSchema(resource('View', viewSpec));
+    await withRuntime([], async runtime => {
+      const view = await runtime.createView(viewSpec, { inputs: { notice: { text: 'Trail open', variant: 'default' } } });
+      assert.deepEqual({ ...view.getSnapshot().roots[0].inputs }, { text: 'Trail open', variant: 'default' });
+    });
+    const registry = createRegistry({ functions: [{
+      name: 'makeNotice', inputs: [{ type: 'string' }], output: viewSpec.ports.notice.schema,
+      run: text => ({ text, variant: 'destructive' }),
+    }] });
+    registry.registerResourceSet(ui);
+    const fromCall = { render: { ...viewSpec.render, inputs: { '@call': 'makeNotice', args: ['Trail closed'] } } };
+    assertSchema(resource('View', fromCall));
+    await withRuntime([], async runtime => {
+      const view = await runtime.createView(fromCall);
+      assert.deepEqual({ ...view.getSnapshot().roots[0].inputs }, { text: 'Trail closed', variant: 'destructive' });
+    }, { registry });
+  },
   'view-resource.json': async resource => withRuntime([resource], async runtime => {
     const view = await runtime.createView({ ref: resource.id });
     assert.equal(view.getSnapshot().roots[0].inputs.text, 'Hello');

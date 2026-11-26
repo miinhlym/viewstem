@@ -12,7 +12,7 @@ const quote = JSON.stringify;
 const format = (value: unknown) => JSON.stringify(value, null, 2);
 
 const solutions: Record<ExampleId, Solution> = {
-  'issue-intake': { view: replace('size(title.trim()) > 0', 'size(title.trim()) >= 5') },
+  'issue-intake': { view: replace('"minimum": 1,\n', '"minimum": 5,\n') },
   'issue-queue': { resources: (source, locale) => replace(
     '"owner": ' + quote(tr(locale, 'Mina', '민아')),
     '"owner": ' + quote(tr(locale, 'Sam', '샘')),
@@ -25,6 +25,9 @@ const solutions: Record<ExampleId, Solution> = {
     return format(view);
   } },
   'component-inputs': { view: replace('"disabled": true', '"disabled": false') },
+  'input-object': { inputs: (_, locale) => format({
+    notice: { text: tr(locale, 'The trail is closed.', '산책로가 통제되었습니다.'), variant: 'destructive' },
+  }) },
   slots: { view: source => {
     const view = JSON.parse(source);
     const [header, body, footer] = view.render.slots.default;
@@ -77,12 +80,7 @@ const solutions: Record<ExampleId, Solution> = {
     return format(view);
   } },
   'query-join': { view: replace('"book": "moon"', '"book": "missing"') },
-  'query-sources': { view: source => {
-    const view = JSON.parse(source);
-    const transform = view.queries.schedule.query.transform;
-    [transform.input, transform.steps[0].with[0]] = [transform.steps[0].with[0], transform.input];
-    return format(view);
-  } },
+  'query-sources': { inputs: replace('"studioTime": "10:00"', '"studioTime": "11:30"') },
   'reusable-component': { resources: replace(/ · \$\{\/ports\/minutes\}(?: min|분)/, '') },
   'inline-component': { view: replace('"minimum": 5', '"minimum": 2') },
   'component-state': { resources: replace('"initial": 60', '"initial": 40') },

@@ -19,6 +19,7 @@ const data = (name: string, field = '') => path(`/queries/${name}/data${field ? 
 const format = (value: string) => ({ '@call': 'formatString', args: { value } });
 const string = { type: 'string' } as const;
 const integer = { type: 'integer' } as const;
+const stock = { type: 'integer', minimum: 0 } as const;
 const bool = { type: 'boolean' } as const;
 const valuePort = (schema: Schema) => ({ kind: 'Value', schema, required: true } as const);
 const statePort = (schema: Schema) => ({ kind: 'State', schema, required: true } as const);
@@ -116,6 +117,14 @@ export function exampleDefinitions(locale: Locale) {
       node('reserve', 'Button', { text: t('Reserve Friday', '금요일 예약'), variant: 'outline', disabled: true }),
       node('waitlist', 'Button', { text: t('Join the waitlist', '대기 명단 등록'), variant: 'secondary' }),
     ) } },
+    'input-object': {
+      inputs: { notice: { text: t('The trail is open.', '산책로를 이용할 수 있습니다.'), variant: 'default' } },
+      view: {
+        ports: { notice: valuePort({ type: 'object', properties: { text: string, variant: { enum: ['default', 'destructive'] } },
+          required: ['text', 'variant'], additionalProperties: false }) },
+        render: node('trail-notice', 'Alert.Root', port('notice')),
+      },
+    },
     'slots': { view: { render: layout('reading-card', 'Card.Root', [
       layout('header', 'Card.Header', [
         node('book', 'Card.Title', { text: t('The Moon Atlas', '달 지도') }),
@@ -226,17 +235,21 @@ export function exampleDefinitions(locale: Locale) {
         result('route-result', read('route'))),
     } },
     'action-assert': { view: {
-      states: { confirmed: state(bool, false), seats: state(integer, 2) },
+      states: { confirmed: state(bool, false), available: state(stock, 2) },
       render: stack('borrowing', heading('kit', t('Borrow a telescope', '망원경 빌리기')),
         toggle('confirm', t('I can return the kit before 8 PM', '저녁 8시 전에 반납할 수 있어요'), 'confirmed'),
-        result('kits', format(t('${/states/seats} kits currently available', '대여 가능한 세트 ${/states/seats}개'))),
-        click('borrow', t('Borrow one kit', '한 세트 빌리기'), {
-          ports: { confirmed: valuePort(bool), seats: statePort(integer) },
+        result('kits', format(t('Available kits: ${/states/available}', '대여 가능한 세트 ${/states/available}개'))),
+        connect(node('borrow', 'Button', { text: t('Borrow one kit', '한 세트 빌리기'), type: 'button',
+          disabled: path('/actions/borrow-action/running') }), 'click', {
+          ports: { confirmed: valuePort(bool), available: statePort(stock) },
           steps: [
             { kind: 'Assert', condition: port('confirmed'), message: t('Confirm the return time before borrowing.', '대여 전에 반납 시간을 확인하세요.') },
-            write('seats', 1),
+            { kind: 'Variable', id: 'stock', spec: { ports: { count: valuePort(stock) },
+              expression: '{"inStock": count > 0, "remaining": count - 1}' }, inputs: { count: port('available') } },
+            { kind: 'Assert', condition: path('/steps/stock/inStock'), message: t('There are no kits left to borrow.', '대여할 수 있는 세트가 없습니다.') },
+            write('available', path('/steps/stock/remaining')),
           ],
-        }, { confirmed: read('confirmed'), seats: read('seats') })),
+        }, { confirmed: read('confirmed'), available: read('available') })),
     } },
     'action-output': {
       resources: [{ kind: 'Action', id: 'make-pickup-slip', spec: {
@@ -386,17 +399,29 @@ export function exampleDefinitions(locale: Locale) {
       render: stack('catalog', heading('catalog-heading', t('Find a book on the shelf', '책이 있는 서가 찾기')),
         repeat(text('book', format(t('${/repeat/item/title} · Shelf ${/repeat/item/shelf}', '${/repeat/item/title} · ${/repeat/item/shelf} 서가'))), data('books'))),
     } },
-    'query-sources': { view: {
-      queries: { schedule: { query: {
-        sources: {
-          studio: { query: query([{ id: 'print', name: t('Printmaking', '판화'), time: '10:00', room: t('Studio', '작업실') }]) },
-          garden: { query: query([{ id: 'seed', name: t('Seed exchange', '씨앗 나눔'), time: '13:30', room: t('Garden', '정원') }]) },
-        },
-        transform: { input: path('/sources/studio'), steps: [{ kind: 'Concat', with: [path('/sources/garden')] }] },
-      } } },
-      render: stack('schedule', heading('today', t('Today at the community center', '오늘의 커뮤니티 센터 일정')),
-        repeat(text('session', format('${/repeat/item/time} · ${/repeat/item/name} · ${/repeat/item/room}')), data('schedule'))),
-    } },
+    'query-sources': {
+      inputs: { studioTime: '10:00' },
+      resources: [{ kind: 'Query', id: 'studio-sessions', spec: {
+        ports: { time: valuePort(string) },
+        ...query([{ id: 'print', name: t('Printmaking', '판화'), time: port('time'), room: t('Studio', '작업실') }]),
+      } }],
+      view: {
+        ports: { studioTime: valuePort(string) },
+        queries: { schedule: {
+          inputs: { studioTime: port('studioTime') },
+          query: {
+            ports: { studioTime: valuePort(string) },
+            sources: {
+              studio: { queryRef: 'studio-sessions', inputs: { time: port('studioTime') } },
+              garden: { query: query([{ id: 'seed', name: t('Seed exchange', '씨앗 나눔'), time: '13:30', room: t('Garden', '정원') }]) },
+            },
+            transform: { input: path('/sources/studio'), steps: [{ kind: 'Concat', with: [path('/sources/garden')] }] },
+          },
+        } },
+        render: stack('schedule', heading('today', t('Today at the community center', '오늘의 커뮤니티 센터 일정')),
+          repeat(text('session', format('${/repeat/item/time} · ${/repeat/item/name} · ${/repeat/item/room}')), data('schedule'))),
+      },
+    },
     'reusable-component': {
       resources: [{ kind: 'Component', id: 'route-card', spec: {
         ports: { name: valuePort(string), km: valuePort({ type: 'number' }), minutes: valuePort(integer) },

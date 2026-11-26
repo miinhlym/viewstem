@@ -133,7 +133,7 @@ function lessonChecks(t) {
   const lift = t('Take the lift from the east entrance to floor 4.', '동쪽 입구에서 엘리베이터로 4층까지 이동하세요.');
   const borrow = t('Borrow one kit', '한 세트 빌리기');
   const submit = t('Submit report', '신고 제출');
-  const reportError = t('Enter a title before submitting.', '제목을 입력한 뒤 제출하세요.');
+  const reportError = minimum => t(`Enter a title with ${minimum} or more characters.`, `제목은 ${minimum}자 이상 입력하세요.`);
   const media = t('Send sample reservation', '샘플 예약 요청');
   const park = t('Riverside trail guide', '강변 산책로 안내');
   const studio = t('10:00 · Printmaking · Studio', '10:00 · 판화 · 작업실');
@@ -144,7 +144,7 @@ function lessonChecks(t) {
       const title = field(t('Title (required)', '제목 (필수)'));
       const details = field(t('Details', '상세 내용'));
       await click(submit);
-      await see(reportError);
+      await see(reportError(1));
       await title.fill('Checkout');
       await details.fill('Card declined');
       await field(t('Priority', '우선순위')).selectOption(t('High', '높음'));
@@ -155,7 +155,7 @@ function lessonChecks(t) {
       await showSolution();
       await title.fill('Sun');
       await click(submit);
-      await see(reportError);
+      await see(reportError(5));
       await title.fill('Cloud');
       await click(submit);
       await see(t('Report prepared: Cloud (Medium)', '신고 내용 확인: Cloud (보통)'));
@@ -202,6 +202,18 @@ function lessonChecks(t) {
       assert.equal(await preview.getByRole('button', { name: t('Join the waitlist', '대기 명단 등록') }).isEnabled(), true);
       await showSolution();
       assert.equal(await reserve.isEnabled(), true);
+    },
+    'input-object': async ({ see, preview, showSolution, hideSolution }) => {
+      const open = t('The trail is open.', '산책로를 이용할 수 있습니다.');
+      const closed = t('The trail is closed.', '산책로가 통제되었습니다.');
+      const notice = preview.locator('[data-vs-component="Alert.Root"]');
+      await see(open);
+      assert.equal(await notice.getAttribute('data-variant'), 'default');
+      await showSolution();
+      await see(closed);
+      assert.equal(await notice.getAttribute('data-variant'), 'destructive');
+      await hideSolution();
+      await see(open);
     },
     'slots': async ({ order, showSolution }) => {
       await order(bookSummary, borrowed);
@@ -320,16 +332,22 @@ function lessonChecks(t) {
       await see(lift);
     },
     'action-assert': async ({ click, see, status, toggle, showSolution }) => {
-      const one = t('1 kits currently available', '대여 가능한 세트 1개');
+      const stock = count => t(`Available kits: ${count}`, `대여 가능한 세트 ${count}개`);
+      const noStock = t('There are no kits left to borrow.', '대여할 수 있는 세트가 없습니다.');
       await click(borrow);
       await status.getByText(t('Confirm the return time before borrowing.', '대여 전에 반납 시간을 확인하세요.')).waitFor();
-      await see(t('2 kits currently available', '대여 가능한 세트 2개'));
+      await see(stock(2));
       await toggle();
       await click(borrow);
-      await see(one);
+      await see(stock(1));
+      await click(borrow);
+      await see(stock(0));
+      await click(borrow);
+      await status.getByText(noStock, { exact: true }).waitFor();
+      await see(stock(0));
       await showSolution();
       await click(borrow);
-      await see(one);
+      await see(stock(1));
     },
     'action-output': async ({ field, click, see, showSolution }) => {
       const recipient = field(t('Recipient', '수령인'));
@@ -455,10 +473,11 @@ function lessonChecks(t) {
       await see(night);
       await hide(moon);
     },
-    'query-sources': async ({ order, showSolution }) => {
+    'query-sources': async ({ order, hide, showSolution }) => {
       await order(studio, garden);
       await showSolution();
-      await order(garden, studio);
+      await order(t('11:30 · Printmaking · Studio', '11:30 · 판화 · 작업실'), garden);
+      await hide(studio);
     },
     'reusable-component': async ({ see, showSolution }) => {
       await see(t('2.4 km · 35 min', '2.4km · 35분'));

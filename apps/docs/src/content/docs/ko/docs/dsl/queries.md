@@ -7,16 +7,16 @@ sidebar:
 
 ## 구성별 실행 예제
 
-각 링크에서 실제 JSON, 필요한 리소스와 입력, 예상 결과를 함께 확인하고 실행할 수 있습니다. 아래 표는 선택지 탐색용이며 필드의 필수 여부와 제약은 이어지는 레퍼런스를 따릅니다.
+링크에서 변형별 JSON을 실행하거나 구조를 비교하세요. 필드의 필수 여부와 제약은 이어지는 레퍼런스에서 설명합니다.
 
 | 구성 | 주요 필드 | 실행 예제 |
 | --- | --- | --- |
-| Query source | `queryRef` / `query`, `inputs` | [예제 열기](/ko/examples/query-sources/) |
-| HTTP source | `datasourceRef` / `datasource`, `request` | [예제 열기](/ko/examples/http-datasource/) |
+| 중첩 Query 소스 | `queryRef` / `query`, 부모 `inputs` | [두 형태 실행하기](/ko/examples/query-sources/) |
+| HTTP 소스 | `datasourceRef` / `datasource`, `request` | [Datasource 참조 실행](/ko/examples/http-datasource/) · [두 구조 비교](/ko/docs/dsl/datasources/#참조와-인라인-사용) |
 | Concat | `kind`, `with` | [예제 열기](/ko/examples/query-concat/) |
 | Join | `kind`, `right`, `on`, `mode` | [예제 열기](/ko/examples/query-join/) |
-| Query use | `queryRef` / `query`, `inputs`, `executeWhen` | [예제 열기](/ko/examples/query-ref/) |
-| Refresh | `refresh`, `intervalMs`, `autoRefreshWhen` | [예제 열기](/ko/examples/query-polling/) |
+| Query 사용 | `queryRef` / `query`, `inputs`, `executeWhen` | [참조형](/ko/examples/query-ref/) · [입력이 있는 인라인](/ko/examples/query-inputs/) · [실행 조건](/ko/examples/query-gate/) |
+| 갱신 | `refresh`, `intervalMs`, `autoRefreshWhen` | [수동 갱신](/ko/examples/refresh-query/) · [주기 갱신](/ko/examples/query-polling/) |
 
 ## 독립 리소스 예제
 

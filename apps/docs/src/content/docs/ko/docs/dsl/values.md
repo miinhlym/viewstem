@@ -12,6 +12,7 @@ sidebar:
 | 구성 | 주요 필드 | 실행 예제 |
 | --- | --- | --- |
 | Literal / path / call | `@path`, `@call`, `args` | [예제 열기](/ko/examples/value-call/) |
+| 입력 객체 전체 | `inputs: {"@path": "/ports/notice"}` | [예제 열기](/ko/examples/input-object/) |
 | Event payload | `/event` | [예제 열기](/ko/examples/event-payload/) |
 
 ## ValueExpression과 PathExpression
@@ -27,7 +28,31 @@ sidebar:
 
 동적 필드에서 실제 데이터 키가 `@`로 시작하면 앞에 `@`를 한 번 더 붙입니다. 평가기는 맨 앞의 `@` 하나를 제거하고, 반환된 데이터를 다시 평가하지 않습니다. `@literal`처럼 인식하지 못하는 단일 `@` 키나 다른 키를 섞은 표현식은 `INVALID_EXPRESSION` 오류를 냅니다. 스키마 객체, 포트 기본값, reaction의 값, 참조 ID, CEL 소스 문자열은 작성한 그대로 사용합니다.
 
-`InputExpressions`는 입력 이름을 표현식에 연결하는 객체입니다. 직접 경로가 값을 읽을지, State 또는 Query 핸들을 연결할지는 받는 쪽 [포트](/ko/docs/dsl/state-and-ports/#포트)가 결정합니다. 호스트 JS에서 받는 입력은 이미 평가된 값 또는 핸들입니다.
+`InputExpressions`에는 이름별 표현식 맵 또는 입력 객체 전체를 반환하는 `@path`나 `@call` 하나를 넣을 수 있습니다. 예를 들어 `"inputs": {"@path": "/ports/notice"}`는 Value 포트가 담고 있는 객체의 `text`와 `variant`를 함께 전달합니다. Core는 표현식을 평가한 뒤 결과의 키와 값을 받는 포트에 맞춰 검사합니다. [State나 Query 포트](/ko/docs/dsl/state-and-ports/#포트)는 이름별로 대상을 직접 가리키는 경로를 연결하세요. 호스트 JS에서 받는 입력은 이미 평가된 값 또는 핸들입니다.
+
+이 View는 호스트에서 알림 객체를 받습니다. 예를 들어 `{"notice":{"text":"Trail open","variant":"default"}}`를 입력으로 넘겨 마운트하세요. 실행 예제에서 두 키를 함께 바꿀 수 있습니다.
+
+```json title="whole-inputs.json"
+{
+  "ports": {
+    "notice": {
+      "kind": "Value",
+      "required": true,
+      "schema": {
+        "type": "object",
+        "properties": { "text": { "type": "string" }, "variant": { "enum": ["default", "destructive"] } },
+        "required": ["text", "variant"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "render": {
+    "id": "notice",
+    "componentRef": "shadcn.Alert.Root",
+    "inputs": { "@path": "/ports/notice" }
+  }
+}
+```
 
 ## 경로로 읽기
 
