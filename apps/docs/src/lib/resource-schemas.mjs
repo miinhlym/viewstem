@@ -56,10 +56,21 @@ const callStep = (kind, resource) => {
     ['kind'], choose(reference, 'spec'));
 };
 const httpMethods = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
-const httpMap = item => any(ref('HttpDynamicExpression'), {
-  ...map(item), propertyNames: escapedName,
+const httpMap = (item, propertyNames = escapedName) => any(ref('HttpDynamicExpression'), {
+  ...map(item), propertyNames,
 });
-const headerValue = any(str, literal(null), ref('HttpDynamicExpression'));
+// Mirror Core's HTTP header contract. JSON Schema patterns have no flags field.
+const headerNameSyntax = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
+const headerValueSyntax = /^[\t\x20-\x7e\x80-\xff]*$/;
+const reservedHeaderNames = [
+  'accept-charset', 'accept-encoding', 'access-control-request-headers', 'access-control-request-method',
+  'connection', 'content-length', 'cookie', 'cookie2', 'date', 'dnt', 'expect', 'host', 'keep-alive',
+  'origin', 'referer', 'set-cookie', 'te', 'trailer', 'transfer-encoding', 'upgrade', 'via',
+  'user-agent', 'x-http-method', 'x-http-method-override', 'x-method-override',
+];
+const ignoreAsciiCase = token => token.replace(/[a-z]/g, char => `[${char}${char.toUpperCase()}]`);
+const reservedHeaderPattern = `^(?:(?:${reservedHeaderNames.map(ignoreAsciiCase).join('|')})$|${['proxy-', 'sec-'].map(ignoreAsciiCase).join('|')})`;
+const headerValue = any({ ...str, pattern: headerValueSyntax.source }, literal(null), ref('HttpDynamicExpression'));
 const paramValue = any({ type: ['string', 'number', 'boolean'] }, ref('HttpDynamicExpression'));
 const keys = ['null', 'boolean', 'object', 'array', 'number', 'integer', 'string'];
 const nativeKinds = ['set', 'map', 'date', 'time', 'datetime'];
@@ -142,7 +153,10 @@ const definitions = {
   }, ['method', 'path'], {
     if: { properties: { method: { enum: ['GET', 'HEAD'] } }, required: ['method'] }, then: { not: { required: ['body'] } },
   }),
-  HttpHeaders: httpMap(headerValue),
+  HttpHeaders: {
+    description: 'Header names are case-insensitive. Core also checks for duplicate names that differ only in case and validates evaluated headers.',
+    ...httpMap(headerValue, { pattern: headerNameSyntax.source, not: { pattern: reservedHeaderPattern } }),
+  },
   HttpParams: httpMap(any(paramValue, literal(null), array(paramValue))),
   ActionSpec: object({ ...actionFields, steps: array(ref('ActionStep')), output: contract({ value }, ['value']) }, ['steps']),
   CodeActionSpec: {

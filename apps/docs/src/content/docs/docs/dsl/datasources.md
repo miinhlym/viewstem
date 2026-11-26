@@ -99,6 +99,8 @@ Each header declaration is checked before merging. Names use HTTP token syntax a
 - `Accept-Charset`, `Accept-Encoding`, `Access-Control-Request-Headers`, `Access-Control-Request-Method`, `Connection`, `Content-Length`, `Cookie`, `Cookie2`, `Date`, `DNT`, `Expect`, `Host`, `Keep-Alive`, `Origin`, `Referer`, `Set-Cookie`, `TE`, `Trailer`, `Transfer-Encoding`, `Upgrade`, and `Via`
 - `Proxy-*`, `Sec-*`, `User-Agent`, `X-HTTP-Method`, `X-HTTP-Method-Override`, and `X-Method-Override`
 
+The resource JSON Schema checks literal header names and values. Core also checks case-insensitive duplicates and validates headers produced by expressions.
+
 ## Expression scope
 
 | Location | Available values |

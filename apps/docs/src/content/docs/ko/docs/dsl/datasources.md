@@ -99,6 +99,8 @@ Datasource는 HTTP 소스의 공통 설정을 정의합니다. 소스는 `dataso
 - `Accept-Charset`, `Accept-Encoding`, `Access-Control-Request-Headers`, `Access-Control-Request-Method`, `Connection`, `Content-Length`, `Cookie`, `Cookie2`, `Date`, `DNT`, `Expect`, `Host`, `Keep-Alive`, `Origin`, `Referer`, `Set-Cookie`, `TE`, `Trailer`, `Transfer-Encoding`, `Upgrade`, `Via`
 - `Proxy-*`, `Sec-*`, `User-Agent`, `X-HTTP-Method`, `X-HTTP-Method-Override`, `X-Method-Override`
 
+리소스 JSON Schema는 직접 선언한 헤더 이름과 값을 검사합니다. 대소문자만 다른 중복 이름과 표현식이 반환한 헤더는 Core에서 추가로 검사합니다.
+
 ## 표현식 문맥
 
 | 위치 | 사용 가능한 값 |

@@ -47,6 +47,49 @@ for (const invalid of [
 }
 console.log(`Compiled and checked all ${schemas.size} resource JSON Schemas.`);
 
+const headerCases = [
+  [{ Accept: '\ttext/plain', 'X-Note': 'café', 'X-Remove': null }, 'accepted'],
+  [{ '@path': '/ports/headers' }, 'accepted'],
+  [{ 'X-Note': { '@path': '/ports/note' } }, 'accepted'],
+  [{ 'Bad Header': null }, 'name'],
+  [{ '': 'value' }, 'name'],
+  [{ '@@Invalid': 'value' }, 'name'],
+  [{ hOsT: null }, 'name'],
+  [{ 'pRoXy-Example': null }, 'name'],
+  [{ 'sEc-Example': 'value' }, 'name'],
+  [{ 'X-Note': 'line\nbreak' }, 'value'],
+  [{ 'X-Note': '한글' }, 'value'],
+  [{ 'X-Note': false }, 'value'],
+  // Draft 2020-12 cannot compare arbitrary sibling names after case folding.
+  [{ Accept: null, accept: null }, 'duplicate'],
+];
+for (const placement of ['datasource', 'request']) {
+  for (const [headers, outcome] of headerCases) {
+    const datasource = { kind: 'Http', baseUrl: 'https://example.test' };
+    const request = { method: 'GET', path: '/items' };
+    (placement === 'datasource' ? datasource : request).headers = headers;
+    const datasourceResource = resource('Datasource', datasource);
+    const queryResource = { kind: 'Query', id: 'header-test', spec: {
+      ports: { headers: { kind: 'Value', schema: true }, note: { kind: 'Value', schema: true } },
+      sources: { http: { datasourceRef: datasourceResource.id, request } }, transform: { input: [] },
+    } };
+    const tested = placement === 'datasource' ? datasourceResource : queryResource;
+    const label = `${placement}: ${JSON.stringify(headers)}`;
+    assert.equal(schemas.get(tested.kind)(tested), ['accepted', 'duplicate'].includes(outcome), label);
+    const register = () => createRegistry({ resources: [datasourceResource, queryResource] });
+    if (['name', 'duplicate'].includes(outcome)) assert.throws(register, { code: 'INVALID_DEFINITION' }, label);
+    else register();
+
+    let sent = false;
+    const execute = createHttpExecutor({ transport: async () => { sent = true; return Response.json([]); } });
+    const plan = { version: 1, datasource, request, inputs: { headers: { Accept: 'text/plain' }, note: 'café' } };
+    if (outcome === 'accepted') assert.equal((await execute(plan)).status, 200, label);
+    else await assert.rejects(execute(plan), { code: 'INVALID_DEFINITION' }, label);
+    assert.equal(sent, outcome === 'accepted', label);
+  }
+}
+console.log('Compared Datasource and Query header schemas with Core registration and HTTP execution.');
+
 function createDocsRegistry(resources = []) {
   const registry = createRegistry();
   registry.registerResourceSet(ui);
