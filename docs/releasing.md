@@ -28,11 +28,17 @@ PR applies version bumps and generates changelogs from pending changesets.
    When users need to update their code, include migration steps and link to
    an existing guide if the steps need more detail. Use absolute URLs so links
    work from both the changelog and the release page.
-4. Review the package names, bumps, and summary in the generated
-   `.changeset/*.md` file and commit it with the PR.
+4. Before committing, read the actual summary on its own as a changelog entry.
+   Check that a package user can identify the affected feature and what will
+   work differently after upgrading. If the summary describes implementation
+   steps, rewrite it around the result a user can observe.
+5. Review the package names and bumps in the `.changeset/*.md` file.
+   Use `changeset status` to verify the release plan, then commit the
+   reviewed changeset with the PR.
 
 A patch summary could read “Preserve unrelated URL parameters when replacing a View.”
 or “Keep DataTable rows and focus during unrelated View updates.”
+A performance patch could read “Speed up View updates that add or remove components.”
 [Changesets writing guide](https://changesets.dev/guide/writing-changesets)
 
 ### Release PR
