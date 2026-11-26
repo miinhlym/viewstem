@@ -498,6 +498,67 @@ for (const [trigger, delta, previous] of [[0, 0], [1, 0], [0, 1], [0, 0, 9]]) te
   assert.equal(loaded.read(), 5);
 });
 
+for (const [throughRepeat, delta] of [[false, 0], [false, 1], [true, 0], [true, 1]]) {
+  test(`View replay isolates initialization through Value ports (repeat=${throughRepeat}, delta=${delta})`, async t => {
+    const f = fixture(t);
+    bindTestComponents(f.registry, [{ kind: 'Component', id: 'Row', spec: { slots: { default: {} } } }]);
+    f.registry.registerResources([
+      { kind: 'Component', id: 'Watcher', spec: {
+        ports: { input: value, delta: value, output: state },
+        states: { seen: {
+          kind: 'Derived', schema: integer,
+          variable: { ports: { input: value, delta: value }, expression: 'input + delta' },
+          inputs: { input: path('/ports/input'), delta: path('/ports/delta') },
+        } },
+        reactions: [{ watch: [path('/states/seen')], target: path('/ports/output'), value: 1 }],
+        render: leaf,
+      } },
+      { kind: 'Component', id: 'Relay', spec: {
+        ports: { input: value, delta: value, output: state },
+        render: { id: 'watcher', componentRef: 'Watcher',
+          inputs: { input: path('/ports/input'), delta: path('/ports/delta'), output: path('/ports/output') },
+        },
+      } },
+    ]);
+    const items = { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, n: integer }, required: ['id', 'n'] } };
+    const relay = { id: 'relay', componentRef: 'Relay',
+      ...(throughRepeat ? { repeat: { items: path('/states/input'), as: 'item', key: path('/repeat/item/id') } } : {}),
+      inputs: { input: throughRepeat ? path('/repeat/item/n') : path('/states/input'),
+        delta: path('/states/delta'), output: path('/states/output') },
+    };
+    const row = node => ({ id: 'row', componentRef: 'Row', slots: { default: [node] } });
+    const spec = {
+      states: {
+        input: { kind: 'State', schema: throughRepeat ? items : integer, initial: throughRepeat ? [{ id: 'stable', n: 0 }] : 0 },
+        delta: { kind: 'State', schema: integer, initial: 0 },
+        output: { kind: 'State', schema: integer, initial: 0 },
+      },
+      render: row(relay),
+    };
+    const { view, initialComplete } = await f.runtime.createView({ view: spec });
+    await initialComplete;
+    const watcher = () => view.getSnapshot().roots[0].children[0].children[0].instanceId;
+    const owner = watcher(), seen = view.getState('seen', owner), output = view.getState('output');
+    const observed = [];
+    t.after(f.store.subscribe([seen.address, output.address], () => observed.push([seen.read(), output.read()])));
+    const next = {
+      ...spec,
+      states: { ...spec.states, loaded: { kind: 'State', schema: spec.states.input.schema, initial: path('/states/input') } },
+      render: row(throughRepeat
+        ? { ...relay, repeat: { ...relay.repeat, items: path('/states/loaded') } }
+        : { ...relay, inputs: { ...relay.inputs, input: path('/states/loaded') } }),
+    };
+    const input = throughRepeat ? [{ id: 'stable', n: 5 }] : 5;
+    await view.whenSettled(await view.updateDefinition(next, { states: { input, delta } }));
+    assert.equal(watcher(), owner);
+    const loaded = view.getState('loaded').read();
+    assert.equal(throughRepeat ? loaded[0].n : loaded, 5);
+    assert.equal(seen.read(), 5 + delta);
+    assert.equal(output.read(), delta);
+    assert.deepEqual(observed, [[0, 0], [5 + delta, delta]]);
+  });
+}
+
 for (const duplicate of [false, true]) test(`an independent reaction can remove a provisional ${duplicate ? 'duplicate target' : 'static cycle'}`, async t => {
   const f = fixture(t), boolean = { type: 'boolean' };
   f.registry.registerResources([{ kind: 'Component', id: 'Cyclic', spec: {
