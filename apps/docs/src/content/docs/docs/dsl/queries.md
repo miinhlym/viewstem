@@ -5,6 +5,40 @@ sidebar:
   order: 5
 ---
 
+## Examples by form
+
+Each link opens runnable JSON with its required resources, inputs, and expected result. This table locates forms; the reference below defines required fields and constraints.
+
+| Form | Key fields | Runnable example |
+| --- | --- | --- |
+| Query source | `queryRef` / `query`, `inputs` | [Open example](/examples/query-sources/) |
+| HTTP source | `datasourceRef` / `datasource`, `request` | [Open example](/examples/http-datasource/) |
+| Concat | `kind`, `with` | [Open example](/examples/query-concat/) |
+| Join | `kind`, `right`, `on`, `mode` | [Open example](/examples/query-join/) |
+| Query use | `queryRef` / `query`, `inputs`, `executeWhen` | [Open example](/examples/query-ref/) |
+| Refresh | `refresh`, `intervalMs`, `autoRefreshWhen` | [Open example](/examples/query-polling/) |
+
+## Standalone resource example
+
+This standalone resource has no sources and returns `[ { "name": "Plan" } ]`. A View can use it with `queryRef`.
+
+```json title="query-resource.json"
+{
+  "kind": "Query",
+  "id": "projects",
+  "spec": {
+    "sources": {},
+    "transform": {
+      "input": [
+        {
+          "name": "Plan"
+        }
+      ]
+    }
+  }
+}
+```
+
 ## QuerySpec
 
 | Field | Contract |
@@ -45,6 +79,48 @@ This QuerySpec produces `[{"id":"a","projectId":"a","open":true},{"id":"b"}]`. I
         "kind": "Join",
         "right": [{ "projectId": "a", "open": true }],
         "on": [{ "left": "id", "right": "projectId" }]
+      }
+    ]
+  }
+}
+```
+
+### Join mode results
+
+This QuerySpec requires no HTTP or extra resources. `inner` returns only the matched `a` row. Change `mode` to `left` or omit it to retain the left `a` and `b` rows; `right` retains the right `a` and `c` rows. Unmatched rows do not gain fields from the other side.
+
+```json title="join-modes.json"
+{
+  "sources": {},
+  "transform": {
+    "input": [
+      {
+        "id": "a"
+      },
+      {
+        "id": "b"
+      }
+    ],
+    "steps": [
+      {
+        "kind": "Join",
+        "right": [
+          {
+            "projectId": "a",
+            "status": "open"
+          },
+          {
+            "projectId": "c",
+            "status": "closed"
+          }
+        ],
+        "on": [
+          {
+            "left": "id",
+            "right": "projectId"
+          }
+        ],
+        "mode": "inner"
       }
     ]
   }

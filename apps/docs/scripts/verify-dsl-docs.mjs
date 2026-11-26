@@ -32,6 +32,52 @@ async function readQuery(query, runtime) {
 }
 
 const checks = {
+  'view-resource.json': async resource => withRuntime([resource], async runtime => {
+    const view = await runtime.createView({ ref: resource.id });
+    assert.equal(view.getSnapshot().roots[0].inputs.text, 'Hello');
+  }),
+  'component-resource.json': async resource => withRuntime([resource], async runtime => {
+    const view = await runtime.createView({ render: { id: 'root', componentRef: resource.id } });
+    assert.equal(view.getSnapshot().roots[0].children[0].inputs.text, 'Hello');
+  }),
+  'variable-resource.json': async resource => withRuntime([resource], async runtime => {
+    const view = await runtime.createView({ ...render, states: {
+      hasItems: { kind: 'Derived', schema: { type: 'boolean' }, variableRef: resource.id, inputs: { items: ['A'] } },
+    } });
+    assert.equal(view.getState('hasItems').read(), true);
+  }),
+  'query-resource.json': async resource => withRuntime([resource], async runtime => {
+    const view = await runtime.createView({ ...render, queries: { project: { queryRef: resource.id } } });
+    assert.deepEqual((await view.whenSettled(view.initial)).queryErrors, []);
+    assert.equal(JSON.stringify(view.getQuery('project').getSnapshot().data), '[{"name":"Plan"}]');
+  }),
+  'datasource-forms.json': async query => {
+    const datasource = { kind: 'Datasource', id: 'projects-api', spec: { kind: 'Http', baseUrl: 'https://example.test/api' } };
+    const calls = [];
+    const requestExecutor = createHttpExecutor({ transport: async (url, init) => {
+      calls.push([url.href, init.method]);
+      return Response.json([{ name: 'Plan' }]);
+    } });
+    await withRuntime([datasource, query], async runtime => {
+      const view = await runtime.createView({ ...render, queries: { project: { queryRef: query.id } } });
+      assert.deepEqual((await view.whenSettled(view.initial)).queryErrors, []);
+      assert.equal(JSON.stringify(view.getQuery('project').getSnapshot().data), '{"referenced":[{"name":"Plan"}],"inline":[{"name":"Plan"}]}');
+    }, { requestExecutor });
+    assert.equal(calls.length, 2);
+    assert.ok(calls.every(([url, method]) => url === 'https://example.test/api/projects' && method === 'GET'));
+  },
+  'datasource-resource.json': async resource => withRuntime([resource], async runtime => {
+    assert.equal(runtime.registry.get('Datasource', resource.id).spec.baseUrl, 'https://example.test/api');
+  }),
+  'action-resource.json': async resource => withRuntime([resource], async runtime => {
+    const view = await runtime.createView(render);
+    assert.equal(await view.invokeAction({ actionRef: resource.id }), 'draft');
+  }),
+  'type-resource.json': async resource => withRuntime([resource], async runtime => {
+    const view = { ...render, ports: { name: { kind: 'Value', required: true, typeRef: resource.id } } };
+    await runtime.createView(view, { inputs: { name: 'Plan' } });
+    await assert.rejects(runtime.createView(view, { inputs: { name: '' } }), { code: 'TYPE_MISMATCH' });
+  }),
   'resources.json': async resources => withRuntime(resources, async runtime => {
     const view = await runtime.createView(render);
     assert.equal(await view.invokeAction({ actionRef: 'status' }), 'draft');
@@ -63,6 +109,20 @@ const checks = {
     assert.equal(view.getSnapshot().roots[0].inputs.text, 'Selected');
     view.getState('items').write([]);
     assert.deepEqual(view.getSnapshot().roots, []);
+  }),
+  'join-modes.json': async query => withRuntime([], async runtime => {
+    const step = query.transform.steps[0];
+    const expected = {
+      inner: '[{"id":"a","projectId":"a","status":"open"}]',
+      left: '[{"id":"a","projectId":"a","status":"open"},{"id":"b"}]',
+      right: '[{"id":"a","projectId":"a","status":"open"},{"projectId":"c","status":"closed"}]',
+    };
+    for (const mode of ['inner', 'left', 'right']) {
+      step.mode = mode;
+      assert.equal(JSON.stringify(await readQuery(query, runtime)), expected[mode]);
+    }
+    delete step.mode;
+    assert.equal(JSON.stringify(await readQuery(query, runtime)), expected.left);
   }),
   'join-query.json': async query => withRuntime([], async runtime => {
     const result = await readQuery(query, runtime);

@@ -5,6 +5,30 @@ sidebar:
   order: 6
 ---
 
+## Examples by form
+
+Each link opens runnable JSON with its required resources, inputs, and expected result. This table locates forms; the reference below defines required fields and constraints.
+
+| Form | Key fields | Runnable example |
+| --- | --- | --- |
+| Datasource reference | `datasourceRef`, `request` | [Open example](/examples/http-datasource/) |
+| HTTP POST | `method`, `path`, `body` | [Open example](/examples/query-on-click/) |
+
+## Standalone resource example
+
+This standalone resource uses `example.test` as a placeholder, not a live service. A Query uses it with `datasourceRef` and its own request. The Login example below shows the inline `datasource` form.
+
+```json title="datasource-resource.json"
+{
+  "kind": "Datasource",
+  "id": "projects-api",
+  "spec": {
+    "kind": "Http",
+    "baseUrl": "https://example.test/api"
+  }
+}
+```
+
 ## DatasourceSpec
 
 A Datasource holds settings shared by HTTP sources. The source selects `datasourceRef` or inline `datasource` and supplies its own `request`.
@@ -16,6 +40,48 @@ A Datasource holds settings shared by HTTP sources. The source selects `datasour
 | `headers`, `params` | Optional expressions yielding plain objects of shared headers and URL parameters. |
 | `secrets` | Optional map of aliases to nonempty secret reference strings. The server resolves these references to actual values. |
 | `auth` | Optional object with `kind: "Login"`, a required `request`, and a required `token` expression. |
+
+## Reference and inline use
+
+Register the `projects-api` Datasource above together with this Query. The two sources make the same request independently. `example.test` is a placeholder; execution requires a host HTTP executor and a reachable URL.
+
+```json title="datasource-forms.json"
+{
+  "kind": "Query",
+  "id": "compare-sources",
+  "spec": {
+    "sources": {
+      "referenced": {
+        "datasourceRef": "projects-api",
+        "request": {
+          "method": "GET",
+          "path": "/projects"
+        }
+      },
+      "inline": {
+        "datasource": {
+          "kind": "Http",
+          "baseUrl": "https://example.test/api"
+        },
+        "request": {
+          "method": "GET",
+          "path": "/projects"
+        }
+      }
+    },
+    "transform": {
+      "input": {
+        "referenced": {
+          "@path": "/sources/referenced"
+        },
+        "inline": {
+          "@path": "/sources/inline"
+        }
+      }
+    }
+  }
+}
+```
 
 ## HttpRequest
 

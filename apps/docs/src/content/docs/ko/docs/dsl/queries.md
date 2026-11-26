@@ -5,6 +5,40 @@ sidebar:
   order: 5
 ---
 
+## 구성별 실행 예제
+
+각 링크에서 실제 JSON, 필요한 리소스와 입력, 예상 결과를 함께 확인하고 실행할 수 있습니다. 아래 표는 선택지 탐색용이며 필드의 필수 여부와 제약은 이어지는 레퍼런스를 따릅니다.
+
+| 구성 | 주요 필드 | 실행 예제 |
+| --- | --- | --- |
+| Query source | `queryRef` / `query`, `inputs` | [예제 열기](/ko/examples/query-sources/) |
+| HTTP source | `datasourceRef` / `datasource`, `request` | [예제 열기](/ko/examples/http-datasource/) |
+| Concat | `kind`, `with` | [예제 열기](/ko/examples/query-concat/) |
+| Join | `kind`, `right`, `on`, `mode` | [예제 열기](/ko/examples/query-join/) |
+| Query use | `queryRef` / `query`, `inputs`, `executeWhen` | [예제 열기](/ko/examples/query-ref/) |
+| Refresh | `refresh`, `intervalMs`, `autoRefreshWhen` | [예제 열기](/ko/examples/query-polling/) |
+
+## 독립 리소스 예제
+
+독립 등록용 예제입니다. 소스가 없으며 실행 결과는 `[ { "name": "Plan" } ]`입니다. View의 Query 사용에서 `queryRef`로 참조할 수 있습니다.
+
+```json title="query-resource.json"
+{
+  "kind": "Query",
+  "id": "projects",
+  "spec": {
+    "sources": {},
+    "transform": {
+      "input": [
+        {
+          "name": "Plan"
+        }
+      ]
+    }
+  }
+}
+```
+
 ## QuerySpec
 
 | 필드 | 계약 |
@@ -45,6 +79,48 @@ sidebar:
         "kind": "Join",
         "right": [{ "projectId": "a", "open": true }],
         "on": [{ "left": "id", "right": "projectId" }]
+      }
+    ]
+  }
+}
+```
+
+### Join 모드별 결과
+
+다음 QuerySpec은 HTTP나 추가 리소스가 필요 없습니다. `inner`는 매칭된 `a` 한 행을 반환합니다. `mode`를 `left`로 바꾸거나 생략하면 왼쪽의 `a`, `b`가 남고, `right`로 바꾸면 오른쪽의 `a`, `c`가 남습니다. 매칭되지 않은 행에는 반대쪽 필드가 추가되지 않습니다.
+
+```json title="join-modes.json"
+{
+  "sources": {},
+  "transform": {
+    "input": [
+      {
+        "id": "a"
+      },
+      {
+        "id": "b"
+      }
+    ],
+    "steps": [
+      {
+        "kind": "Join",
+        "right": [
+          {
+            "projectId": "a",
+            "status": "open"
+          },
+          {
+            "projectId": "c",
+            "status": "closed"
+          }
+        ],
+        "on": [
+          {
+            "left": "id",
+            "right": "projectId"
+          }
+        ],
+        "mode": "inner"
       }
     ]
   }

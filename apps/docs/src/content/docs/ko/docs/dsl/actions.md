@@ -5,6 +5,40 @@ sidebar:
   order: 7
 ---
 
+## 구성별 실행 예제
+
+각 링크에서 실제 JSON, 필요한 리소스와 입력, 예상 결과를 함께 확인하고 실행할 수 있습니다. 아래 표는 선택지 탐색용이며 필드의 필수 여부와 제약은 이어지는 레퍼런스를 따릅니다.
+
+| 구성 | 주요 필드 | 실행 예제 |
+| --- | --- | --- |
+| Query | `queryRef` 또는 `spec`, `inputs` | [예제 열기](/ko/examples/query-on-click/) |
+| Variable | `variableRef` 또는 `spec`, `inputs` | [예제 열기](/ko/examples/action-variable/) |
+| Action | `actionRef` 또는 `spec`, `inputs` | [예제 열기](/ko/examples/action-output/) |
+| SetState | `target`, `value` | [예제 열기](/ko/examples/set-state/) |
+| RefreshQuery | `target` | [예제 열기](/ko/examples/refresh-query/) |
+| If | `condition`, `then`, `else` | [예제 열기](/ko/examples/action-branch/) |
+| Assert | `condition`, `message` | [예제 열기](/ko/examples/action-assert/) |
+
+## 독립 리소스 예제
+
+독립 등록용 예제입니다. 입력 없이 호출하면 `draft`를 반환합니다.
+
+```json title="action-resource.json"
+{
+  "kind": "Action",
+  "id": "status",
+  "spec": {
+    "steps": [],
+    "output": {
+      "schema": {
+        "type": "string"
+      },
+      "value": "draft"
+    }
+  }
+}
+```
+
 ## ActionSpec
 
 | 필드 | 계약 |

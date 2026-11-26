@@ -5,6 +5,40 @@ sidebar:
   order: 7
 ---
 
+## Examples by form
+
+Each link opens runnable JSON with its required resources, inputs, and expected result. This table locates forms; the reference below defines required fields and constraints.
+
+| Form | Key fields | Runnable example |
+| --- | --- | --- |
+| Query | `queryRef` or `spec`, `inputs` | [Open example](/examples/query-on-click/) |
+| Variable | `variableRef` or `spec`, `inputs` | [Open example](/examples/action-variable/) |
+| Action | `actionRef` or `spec`, `inputs` | [Open example](/examples/action-output/) |
+| SetState | `target`, `value` | [Open example](/examples/set-state/) |
+| RefreshQuery | `target` | [Open example](/examples/refresh-query/) |
+| If | `condition`, `then`, `else` | [Open example](/examples/action-branch/) |
+| Assert | `condition`, `message` | [Open example](/examples/action-assert/) |
+
+## Standalone resource example
+
+This standalone resource returns `draft` when invoked without inputs.
+
+```json title="action-resource.json"
+{
+  "kind": "Action",
+  "id": "status",
+  "spec": {
+    "steps": [],
+    "output": {
+      "schema": {
+        "type": "string"
+      },
+      "value": "draft"
+    }
+  }
+}
+```
+
 ## ActionSpec
 
 | Field | Contract |

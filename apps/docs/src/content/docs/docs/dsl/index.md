@@ -7,6 +7,23 @@ sidebar:
 
 Use this reference when writing or reviewing Viewstem JSON. The field names and defaults describe the shapes accepted by the current core. A complete resource has a registration envelope. An inline definition supplies just the body expected by its enclosing field.
 
+
+This reference describes the Core contract used by this site. Each resource page links field definitions and examples by form. A separate machine-readable resource JSON Schema is not provided. Registration and runtime checks also cover references, port bindings, expressions, and execution context.
+
+## JSON by resource kind
+
+Each link leads to a minimal standalone example with its registration envelope and field reference. State is declared inside a View or Component, not as a standalone resource.
+
+| Resource | Purpose |
+| --- | --- |
+| [View](/docs/dsl/view-and-component/#standalone-resource-example) | Executable screen definition |
+| [Component](/docs/dsl/view-and-component/#standalone-resource-example) | Reusable screen composition |
+| [Variable](/docs/dsl/state-and-ports/#standalone-resource-example) | CEL calculation |
+| [Query](/docs/dsl/queries/#standalone-resource-example) | Data retrieval and transformation |
+| [Datasource](/docs/dsl/datasources/#standalone-resource-example) | Shared HTTP configuration |
+| [Action](/docs/dsl/actions/#standalone-resource-example) | Execution steps and output |
+| [Type](/docs/dsl/types/#standalone-resource-example) | Reusable value type |
+
 | To look up | Reference |
 | --- | --- |
 | Resource kinds, IDs, and which fields take references | [Resources](/docs/dsl/resources/) |

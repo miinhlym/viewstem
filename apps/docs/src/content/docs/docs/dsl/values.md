@@ -5,6 +5,15 @@ sidebar:
   order: 2
 ---
 
+## Examples by form
+
+Each link opens runnable JSON with its required resources, inputs, and expected result. This table locates forms; the reference below defines required fields and constraints.
+
+| Form | Key fields | Runnable example |
+| --- | --- | --- |
+| Literal / path / call | `@path`, `@call`, `args` | [Open example](/examples/value-call/) |
+| Event payload | `/event` | [Open example](/examples/event-payload/) |
+
 ## ValueExpression and PathExpression
 
 A `ValueExpression` is a JSON value in a field that supports evaluation. The evaluator visits arrays and plain objects recursively. Strings, numbers, booleans, and null are literals. Write a path or call using the exact object shape below.

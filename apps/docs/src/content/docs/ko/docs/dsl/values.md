@@ -5,6 +5,15 @@ sidebar:
   order: 2
 ---
 
+## 구성별 실행 예제
+
+각 링크에서 실제 JSON, 필요한 리소스와 입력, 예상 결과를 함께 확인하고 실행할 수 있습니다. 아래 표는 선택지 탐색용이며 필드의 필수 여부와 제약은 이어지는 레퍼런스를 따릅니다.
+
+| 구성 | 주요 필드 | 실행 예제 |
+| --- | --- | --- |
+| Literal / path / call | `@path`, `@call`, `args` | [예제 열기](/ko/examples/value-call/) |
+| Event payload | `/event` | [예제 열기](/ko/examples/event-payload/) |
+
 ## ValueExpression과 PathExpression
 
 `ValueExpression`은 평가를 지원하는 필드에 놓인 JSON 값입니다. 평가기는 배열과 일반 객체를 재귀적으로 방문합니다. 문자열, 숫자, 불리언, null은 리터럴입니다. 경로와 함수 호출은 아래 객체 형식을 따릅니다.

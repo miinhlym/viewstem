@@ -5,6 +5,30 @@ sidebar:
   order: 6
 ---
 
+## 구성별 실행 예제
+
+각 링크에서 실제 JSON, 필요한 리소스와 입력, 예상 결과를 함께 확인하고 실행할 수 있습니다. 아래 표는 선택지 탐색용이며 필드의 필수 여부와 제약은 이어지는 레퍼런스를 따릅니다.
+
+| 구성 | 주요 필드 | 실행 예제 |
+| --- | --- | --- |
+| Datasource reference | `datasourceRef`, `request` | [예제 열기](/ko/examples/http-datasource/) |
+| HTTP POST | `method`, `path`, `body` | [예제 열기](/ko/examples/query-on-click/) |
+
+## 독립 리소스 예제
+
+독립 등록용 예제입니다. `example.test`는 실제 서비스가 아닌 예시 주소입니다. Query에서 `datasourceRef`와 요청을 지정해 사용합니다. 아래 Login 예제는 인라인 `datasource` 형태를 보여줍니다.
+
+```json title="datasource-resource.json"
+{
+  "kind": "Datasource",
+  "id": "projects-api",
+  "spec": {
+    "kind": "Http",
+    "baseUrl": "https://example.test/api"
+  }
+}
+```
+
 ## DatasourceSpec
 
 Datasource는 HTTP 소스의 공통 설정을 정의합니다. 소스는 `datasourceRef` 또는 인라인 `datasource`를 선택하고 자체 `request`를 지정합니다.
@@ -16,6 +40,48 @@ Datasource는 HTTP 소스의 공통 설정을 정의합니다. 소스는 `dataso
 | `headers`, `params` | 공통 헤더와 URL 파라미터의 일반 객체를 반환하는 선택적 표현식. |
 | `secrets` | 별칭을 비어 있지 않은 비밀 참조 문자열에 연결하는 선택적 맵. 서버가 참조에서 실제 값을 찾습니다. |
 | `auth` | `kind: "Login"`, 필수 `request`, 필수 `token` 표현식이 담긴 선택적 객체. |
+
+## 참조와 인라인 사용
+
+위 `projects-api` Datasource와 이 Query를 함께 등록합니다. 두 소스는 같은 요청을 각각 실행합니다. `example.test`는 예시이므로 실제 실행에는 호스트의 HTTP 실행기와 접근 가능한 주소가 필요합니다.
+
+```json title="datasource-forms.json"
+{
+  "kind": "Query",
+  "id": "compare-sources",
+  "spec": {
+    "sources": {
+      "referenced": {
+        "datasourceRef": "projects-api",
+        "request": {
+          "method": "GET",
+          "path": "/projects"
+        }
+      },
+      "inline": {
+        "datasource": {
+          "kind": "Http",
+          "baseUrl": "https://example.test/api"
+        },
+        "request": {
+          "method": "GET",
+          "path": "/projects"
+        }
+      }
+    },
+    "transform": {
+      "input": {
+        "referenced": {
+          "@path": "/sources/referenced"
+        },
+        "inline": {
+          "@path": "/sources/inline"
+        }
+      }
+    }
+  }
+}
+```
 
 ## HttpRequest
 
