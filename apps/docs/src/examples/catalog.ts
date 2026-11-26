@@ -141,7 +141,7 @@ export const stages: readonly Stage[] = [
     { id: 'refresh-query', title: ['Refresh the reading-room seat count', '열람실 빈자리 수 다시 확인하기'], concept: 'Query port · RefreshQuery',
       explanation: ['The button passes a Query handle to RefreshQuery. The simulated response changes on each request so you can see the refresh.', '버튼은 Query 핸들을 RefreshQuery에 넘깁니다. 모의 응답의 빈자리 수가 요청마다 달라 갱신을 확인할 수 있습니다.'],
       check: ['The preview starts at 8 free seats. Refresh to see 7.', '빈자리 8석에서 시작하며 다시 확인하면 7석이 표시됩니다.'],
-      experiment: { find: '"target": {', instruction: ['Change the RefreshQuery target path from /ports/seats to /ports/missing. The invalid reference is reported and the last successful count is retained.', 'RefreshQuery의 target 경로를 /ports/seats에서 /ports/missing으로 바꾸세요. 잘못된 참조가 보고되고 마지막 성공 결과를 유지합니다.'] } },
+      experiment: { find: '"seats": {', instruction: ['Add "refresh": false to queries.seats, then click the refresh button. The initial count still loads, but refreshing reports QUERY_REFRESH_DISABLED.', 'queries.seats에 "refresh": false를 추가한 뒤 다시 확인을 누르세요. 초기 수치는 불러오고, 다시 조회하면 QUERY_REFRESH_DISABLED가 표시됩니다.'] } },
     { id: 'query-polling', title: ['Keep availability current with polling', '주기적으로 빈자리 수 갱신하기'], concept: 'intervalMs · autoRefreshWhen',
       explanation: ['The Query fetches once on load. Enabling polling refreshes immediately, then waits intervalMs between requests.', '페이지를 열면 Query가 한 번 요청합니다. 자동 갱신을 켜면 즉시 다시 요청한 뒤 intervalMs 간격으로 요청합니다.'],
       check: ['Turn on the switch to see 7 seats immediately and 6 after about 1.5 seconds. Turn it off to keep the last count.', '스위치를 켜면 즉시 7석, 약 1.5초 후 6석이 표시됩니다. 끄면 마지막 수치를 유지합니다.'],
@@ -202,6 +202,7 @@ export const exampleCopy = {
   en: {
     title: 'Examples', description: 'Explore examples and learn how Viewstem definitions shape each result.',
     stages: 'Learning stages', run: 'Run example', running: 'Running…', reset: 'Reset code', preview: 'Preview',
+    showSolution: 'Show changed result', restoreDraft: 'Back to my code', solutionCode: 'Example change',
     expect: 'What to look for', tryEdit: 'Try an edit', openCode: 'Show in', autoRun: 'Runs on edit',
     toPreview: 'Jump to preview', toCode: 'Back to code',
     source: 'Example workspace', sourceFiles: 'Source files', setup: 'Run in your app', quickstart: 'Quick Start',
@@ -211,6 +212,7 @@ export const exampleCopy = {
   ko: {
     title: '예제', description: '예제를 살펴보며 Viewstem 정의가 화면과 동작을 어떻게 만드는지 확인하세요.',
     stages: '학습 단계', run: '예제 실행', running: '실행 중…', reset: '코드 초기화', preview: '실행 결과',
+    showSolution: '변경 결과 보기', restoreDraft: '내 코드로 돌아가기', solutionCode: '변경 예시',
     expect: '확인할 동작', tryEdit: '직접 바꿔 보기', openCode: '코드에서 보기', autoRun: '수정 시 자동 실행',
     toPreview: '결과로 이동', toCode: '코드로 돌아가기',
     source: '예제 편집 및 실행', sourceFiles: '소스 파일', setup: '내 앱에서 실행하기', quickstart: '빠른 시작',

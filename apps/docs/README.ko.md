@@ -160,8 +160,9 @@ Core View를 `@viewstem/dom`으로 연결한다. Sonner의 호스트 Action은 �
 
 ### 실습과 플레이그라운드
 
-실습 정의와 한영 catalog 항목을 함께 수정한다. catalog가 경로와 학습 순서를
-결정한다. 예상 결과, 변경해 볼 내용, 필요한 resources/inputs, 초기화와 인접 실습을
+실습 정의, 한영 catalog 항목, [solutions.ts](src/examples/solutions.ts)의 실행 가능한 변경을
+함께 수정한다. 실행 결과 도구 막대에서 변경된 JSON과 결과를 열고, 돌아오면 사용자의
+편집 내용과 실행 화면을 복원한다. 변경 전후 결과, 필요한 resources/inputs, 초기화와 인접 실습을
 확인한다. fixture와 실제 호스트 API를 구분한다. 플레이그라운드는 수동 실행,
 미실행 변경 표시, 같은 탭에서 언어를 전환할 때 초안 복원을 보존한다. 복원한 초안을
 자동으로 실행하지 않는다.

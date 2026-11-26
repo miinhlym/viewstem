@@ -109,7 +109,7 @@ const navigation = { label: text.stages, title: text.title, home: `${home}exampl
                 </details>
                 <PagePagination {...pagination} class="example-pagination" />
               </article></ScrollRegion>
-              <ExamplePreview {definition} {locale} />
+              <ExamplePreview {definition} {locale} exampleId={lesson.id} />
               <PagePagination {...pagination} class="example-pagination-mobile" />
             </div>
           </>

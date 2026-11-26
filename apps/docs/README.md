@@ -129,9 +129,10 @@ Tab changes preserve runtime state, and rerunning restores the initial state.
 
 ### Lessons and playground
 
-For a lesson, change its definition and bilingual catalog entry together; the
-catalog drives routes and learning order. Check the expected result, suggested
-edit, required resources/inputs, reset, and adjacent lessons. Fixtures must remain
+For a lesson, update its definition, bilingual catalog entry, and runnable change in
+[solutions.ts](src/examples/solutions.ts) together. The preview toolbar opens the
+changed JSON and result, then restores the reader's draft and its preview on return.
+Check both results, required resources/inputs, reset, and adjacent lessons. Fixtures must remain
 distinguishable from real host APIs. For the playground, preserve manual Run,
 unrun-change feedback, and draft restoration across same-tab language changes;
 restored drafts must not execute automatically.
