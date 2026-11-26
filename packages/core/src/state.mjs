@@ -506,7 +506,7 @@ export class StateStore {
       if (!effects.has(cell)) effects.set(cell, { snapshot, baseline: cell.baseline });
       if (!same(snapshot, value)) finalEffects.add(cell);
     };
-    const settle = () => {
+    const settle = scopes => {
       // Replay the writes against the current candidate graph. Effects of a
       // reaction removed since a previous pass must not become input State.
       finalEffects.clear();
@@ -535,10 +535,11 @@ export class StateStore {
       for (const cell of initializers ?? []) {
         if (reference.has(cell) && !previouslyWritten.has(cell)) reference.set(cell, cell.baseline);
       }
-      // Compare the same candidate recipes against State before explicit
-      // writes and Reaction effects, including the accepted initializers.
+      // Only this candidate refreshes Value bindings in the applied pass.
+      // Other scopes use their committed bindings in both passes, while
+      // their State handles still read from the corresponding snapshot.
       this.#settle(reference, cell => !same(cell.state, reference.get(cell) ?? missing), {
-        roots: watched, referenceCells,
+        roots: watched, comparison: { cells: referenceCells, scopeIds: new Set(scopes.map(scope => scope.scopeId)) },
       });
       return this.#commit(staged, explicit, 'explicit', { baseline: reference, affected, recordReaction, referenceCells });
     };
@@ -706,13 +707,13 @@ export class StateStore {
     for (const cell of this.#cells.values()) if (!indices.has(cell)) visit(cell);
     return cyclic;
   }
-  #settle(staged, changed, { affected, first, applyReaction, roots = staged.keys(), referenceCells } = {}) {
+  #settle(staged, changed, { affected, first, applyReaction, roots = staged.keys(), comparison } = {}) {
     const active = new Set(), done = new Set();
     // Share reevaluated inputs among Derived cells in this reference pass.
-    const reference = referenceCells && new Map();
+    const referenceInputs = comparison && new Map();
     // A preliminary View can contain a Reaction that its own independent
     // writes will retire. Evaluate other inputs and validate the final graph.
-    const omitted = !reference && this.#transaction?.viewCandidate && this.#reactions.size
+    const omitted = !comparison && this.#transaction?.viewCandidate && this.#reactions.size
       ? this.#transaction.cyclicReactions ??= this.#cyclicReactionWatches()
       : undefined;
     // Previously observed reads are invalidation hints. A changed input can
@@ -725,14 +726,14 @@ export class StateStore {
     const settle = cell => {
       if (!staged.has(cell) || done.has(cell)) return;
       if (active.has(cell)) throw dependencyCycle;
-      if (this.#candidateSuspends(cell) || referenceCells && cell.derived && !referenceCells.has(cell)) {
+      if (this.#candidateSuspends(cell) || comparison && cell.derived && !comparison.cells.has(cell)) {
         done.add(cell);
         return;
       }
       active.add(cell);
       try {
         for (const dependency of cell.dependencies) settle(dependency);
-        const reactions = reference ? undefined : this.#reactions.get(cell);
+        const reactions = comparison ? undefined : this.#reactions.get(cell);
         const blocked = omitted?.get(cell);
         for (const reaction of reactions ?? []) {
           for (const dependency of reaction.watch) if (!blocked?.has(dependency)) settle(dependency);
@@ -741,8 +742,10 @@ export class StateStore {
           const recompute = affected?.has(cell) || cell.dependencies.some(changed)
             || cell.dynamicDependencies?.reads.some(observedChanged)
             || cell.dynamicDependencies?.blocked.some(observedChanged);
-          if (recompute || reference && !cell.bindingSuspended && cell.referenceInputsChanged) {
-            staged.set(cell, this.#calculate(cell, staged, settle, { reference, recompute }));
+          const bindings = comparison?.scopeIds.has(cell.address.scopeId) && !cell.bindingSuspended
+            ? referenceInputs : undefined;
+          if (recompute || bindings && cell.referenceInputsChanged) {
+            staged.set(cell, this.#calculate(cell, staged, settle, { comparison, bindings, recompute }));
           }
         }
         if (reactions) applyReaction?.(cell, reactions, blocked);
@@ -758,13 +761,13 @@ export class StateStore {
     }
     return done;
   }
-  #calculate(cell, staged, settle, { reference, recompute }) {
+  #calculate(cell, staged, settle, { comparison, bindings, recompute }) {
     if (cell.dependencies.some(item => this.#cells.get(keyOf(item.address)) !== item)) return errorState({ code: 'CANCELLED' });
     if (cell.computeSnapshot) {
       const previous=this.#readingStage, previousRead=this.#settleRead;
       this.#readingStage=staged;
-      const observed = !reference && cell.dynamicDependencies && { reads: [], blocked: [] };
-      this.#settleRead = reference || observed ? dependency => {
+      const observed = !comparison && cell.dynamicDependencies && { reads: [], blocked: [] };
+      this.#settleRead = comparison || observed ? dependency => {
         try { settle(dependency); }
         catch (caught) {
           if (caught !== dependencyCycle) throw caught;
@@ -776,8 +779,8 @@ export class StateStore {
         if (observed && !cell.dependencies.includes(dependency) && !observed.reads.includes(dependency)) observed.reads.push(dependency);
       } : undefined;
       try {
-        if (!recompute && !cell.referenceInputsChanged(reference)) return staged.get(cell);
-        const result=cell.computeSnapshot(cell.bindingSuspended ? undefined : reference);
+        if (!recompute && !cell.referenceInputsChanged(bindings)) return staged.get(cell);
+        const result=cell.computeSnapshot(bindings);
         return result.status === 'ready' ? this.#accept(cell,result.value) : result;
       } catch(caught) { return errorState(caught); }
       finally {

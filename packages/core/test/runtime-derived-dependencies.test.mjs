@@ -977,6 +977,57 @@ test('an unrelated View can apply while a shared Store has a blocked Derived rea
   assert.equal(first.getState('target').read(), 'unfired');
 });
 
+for (const delta of [0, 5]) test(`shared Store replay distinguishes initialization from a State port write (delta=${delta})`, async t => {
+  const f = fixture(t);
+  const inputs = { kind: 'Value', required: true, schema: {
+    type: 'object', properties: { initial: integer, delta: integer }, required: ['delta'],
+  } };
+  f.registry.registerResources([{ kind: 'Component', id: 'SharedWatcher', spec: {
+    ports: { initial: { kind: 'Value', schema: integer }, delta: state },
+    states: { seen: {
+      kind: 'Derived', schema: integer,
+      variable: { ports: { inputs }, expression: '(has(inputs.initial) ? inputs.initial : 0) + inputs.delta' },
+      inputs: { inputs: path('/ports') },
+    } },
+    render: leaf,
+  } }]);
+  const spec = {
+    states: {
+      input: { kind: 'State', schema: integer },
+      loaded: { kind: 'State', schema: integer },
+      delta: { kind: 'State', schema: integer, initial: 0 },
+    },
+    render: leaf,
+  };
+  const producer = await f.runtime.createView({ view: spec });
+  await producer.initialComplete;
+  const loaded = producer.view.getState('loaded');
+  const consumer = await f.runtime.createView({
+    view: {
+      ports: { loaded: state, delta: state },
+      render: { id: 'watcher', componentRef: 'SharedWatcher',
+        inputs: { initial: path('/ports/loaded'), delta: path('/ports/delta') } },
+    },
+    inputs: { loaded, delta: producer.view.getState('delta') },
+  });
+  await consumer.initialComplete;
+  const owner = consumer.view.getSnapshot().roots[0].instanceId;
+  const seen = consumer.view.getState('seen', owner);
+  const output = f.scope.registerState('output', { schema: integer, initial: 0 });
+  t.after(f.store.registerReaction(f.scope, { watch: [seen], target: output, value: 9 }));
+  const observed = [];
+  t.after(f.store.subscribe(output.address, () => observed.push(output.read())));
+  assert.equal(loaded.getSnapshot().status, 'missing');
+  assert.equal(seen.read(), 0);
+
+  const next = { ...spec, states: { ...spec.states, loaded: { ...spec.states.loaded, initial: path('/states/input') } } };
+  await producer.view.whenSettled(await producer.view.updateDefinition(next, { states: { input: 5, delta } }));
+  assert.equal(loaded.read(), 5);
+  assert.equal(consumer.view.getState('seen', owner), seen);
+  assert.equal(seen.read(), 5 + delta);
+  assert.deepEqual(observed, delta ? [0, 9] : [0]);
+});
+
 for (const late of [false, true]) test(`new owners compare against the watch cell's own baseline (late=${late})`, async t => {
   const f = fixture(t);
   f.registry.registerResources([{ kind: 'Component', id: 'NewOwner', spec: {

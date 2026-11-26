@@ -810,10 +810,11 @@ export class View {
         if (stagedWrites) reexpand();
         let reactionChanged = reconcileReactions(oldOwners);
         const previousPlans = [];
+        const candidateScopes = () => Array.from(owners.values(), owner => owner.scope);
         // A settled value can change which owners contribute reactions. Keep
         // the entire calculation and tree in the same candidate transaction.
         for (;;) {
-          let changed = stagedWrites ? stagedWrites.settle() : reactionChanged && store.settleReactionChanges();
+          let changed = stagedWrites ? stagedWrites.settle(candidateScopes()) : reactionChanged && store.settleReactionChanges();
           if (!changed) {
             // Retire State declarations only after selecting the owner that
             // will publish, including a committed owner held in suspension.
@@ -831,7 +832,7 @@ export class View {
           store.recordReactionPlan(previousPlans);
           reactionChanged = reconcileReactions(reexpand());
         }
-        store.validateCandidateDependencies([...owners.values()].map(owner=>owner.scope), { includeBlocked: !!commit });
+        store.validateCandidateDependencies(candidateScopes(), { includeBlocked: !!commit });
         stagedWrites?.finalize();
       }), () => {
         if (!this.alive) fail('CANCELLED');
