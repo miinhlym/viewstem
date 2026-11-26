@@ -395,9 +395,8 @@ export class View {
   context(owner,extra={},plan,reference) {
     const resolve=(keys,target)=>{
       const [root,name]=keys;let value;
-      const repeat = root === 'repeat' ? this.repeatValues(extra, plan, reference) : undefined;
       if(keys.length===1&&root!=='event'){
-        const names=root==='states'?[...owner.states.keys()]:root==='ports'?Object.keys(owner.spec.ports??{}):root==='queries'?[...owner.queries.keys()]:root==='actions'?[...this.actionNames(owner.spec)]:root==='repeat'?Object.keys(repeat??{}):null;
+        const names=root==='states'?[...owner.states.keys()]:root==='ports'?Object.keys(owner.spec.ports??{}):root==='queries'?[...owner.queries.keys()]:root==='actions'?[...this.actionNames(owner.spec)]:root==='repeat'?Object.keys(extra.repeat??{}):null;
         if(!names)fail('REFERENCE_NOT_FOUND');return {value:Object.fromEntries(names.map(name=>[name,resolve([root,name],target).value])),offset:1};
       }
       if(root==='states') {
@@ -407,15 +406,18 @@ export class View {
         if(!own(owner.spec.ports??{},name))fail('REFERENCE_NOT_FOUND');
         value=owner.ports[name];
         if (!target) {
-          const kind = owner.spec.ports[name].kind;
-          if (kind === 'State') value = value ? readSnapshot(value.getSnapshot()) : undefined;
-          else if (kind === 'Query' && value) value = readQuery(value, plan, keys[2]);
-          else if (kind === 'Value' && reference) value = this.referencePorts(owner, plan, reference)[name];
+          const port = owner.spec.ports[name];
+          if (port.kind === 'State') value = value ? readSnapshot(value.getSnapshot()) : undefined;
+          else if (port.kind === 'Query' && value) value = readQuery(value, reference ? undefined : plan, keys[2]);
+          else if (port.kind === 'Value' && reference && owner.inputBinding) {
+            const snapshot = this.referenceValue(owner, name, plan, reference);
+            value = snapshot.status === 'missing' && !port.required ? undefined : readSnapshot(snapshot);
+          }
         }
       } else if(root==='queries') {
         const item = owner.queries.get(name);
         if (!item) fail('REFERENCE_NOT_FOUND');
-        value = target ? item.handle : readQuery(item.handle, plan, keys[2]);
+        value = target ? item.handle : readQuery(item.handle, reference ? undefined : plan, keys[2]);
       } else if(root==='actions') {
         let connection=[...(plan?.connections??this.connections).values()].find(item=>item.owner.id===owner.id&&item.handler.id===name);
         if(!connection&&plan?.connections){
@@ -426,27 +428,34 @@ export class View {
         if(connection)value=connection.connection.getSnapshot();
         else if(plan?.connections&&actionDeclarations(owner.spec).has(name))value=idle;
         else fail('REFERENCE_NOT_FOUND');
-      } else if(root==='repeat') {if(!own(repeat??{},name))fail('REFERENCE_NOT_FOUND');value=repeat[name];}
+      } else if(root==='repeat') {
+        if(!own(extra.repeat??{},name))fail('REFERENCE_NOT_FOUND');
+        value=this.repeatValue(extra,name,plan,reference);
+      }
       else if(root==='event') {if(!own(extra,'event'))fail('REFERENCE_NOT_FOUND');return {value:extra.event,offset:1};}
       else fail('REFERENCE_NOT_FOUND');
       return {value,offset:2};
     };return {functions:this.runtime.functions,resolve};
   }
-  referencePorts(owner, plan, reference) {
-    if (!owner.inputBinding) return owner.ports;
-    if (!reference.has(owner)) {
+  referenceValue(owner, name, plan, reference) {
+    let binding = reference.get(owner);
+    if (!binding) {
       const { author, extra, templates, runtime } = owner.inputBinding;
       const context = this.context(author, extra, plan, reference);
-      const { ports } = this.prepareInputs(owner.spec, templates, context, 'automatic', false, 'Component', runtime, owner.ports);
-      reference.set(owner, ports);
+      binding = {
+        inputs: this.bindInputs(owner.spec, templates, context, false, runtime.registry, true),
+        compile: this.portCompiler(owner.spec, 'Component', runtime), values: new Map(),
+      };
+      reference.set(owner, binding);
     }
-    return reference.get(owner);
+    if (!binding.values.has(name)) binding.values.set(name, binding.compile.prepareValue(name, binding.inputs));
+    return binding.values.get(name);
   }
   repeatEntries(node, author, extra, items, plan, reference) {
-    const seen = new Set(), repeat = this.repeatValues(extra, plan, reference);
+    const seen = new Set(), alias = node.repeat.as;
     return items.map(item => {
-      const childExtra = { ...extra, repeat: { ...repeat, [node.repeat.as]: item } };
-      if (reference) delete childExtra.repeatSource;
+      const childExtra = { ...extra, repeat: { ...extra.repeat, [alias]: item } };
+      if (reference) childExtra.repeatSource = { alias, parent: extra };
       const value = evaluate(node.repeat.key, this.context(author, childExtra, plan, reference));
       if (typeof value !== 'string' && !(typeof value === 'number' && Number.isFinite(value))) fail('TYPE_MISMATCH');
       const key = tuple([typeof value, Object.is(value, -0) ? 0 : value]);
@@ -455,24 +464,28 @@ export class View {
       return { childExtra, key };
     });
   }
-  repeatValues(extra, plan, reference) {
-    if (!reference || !extra.repeatSource) return extra.repeat;
-    const { group, node, author, parent, key } = extra.repeatSource;
+  repeatValue(extra, name, plan, reference) {
+    if (!reference || !extra.repeatSource) return extra.repeat[name];
+    const { alias, group, node, author, parent, key } = extra.repeatSource;
+    if (name !== alias) return this.repeatValue(parent, name, plan, reference);
+    // During key evaluation the current item is already available.
+    if (group === undefined) return extra.repeat[name];
     if (!reference.has(group)) {
       const items = evaluateSnapshot(node.repeat.items, this.context(author, parent, plan, reference));
       const entries = items.status === 'ready' && Array.isArray(items.value)
         ? this.repeatEntries(node, author, parent, items.value, plan, reference) : [];
-      reference.set(group, new Map(entries.map(entry => [entry.key, entry.childExtra.repeat])));
+      reference.set(group, new Map(entries.map(entry => [entry.key, entry.childExtra.repeat[alias]])));
     }
-    // Use the captured item if the instance has no matching reference key.
-    return reference.get(group).get(key) ?? extra.repeat;
+    // A missing key cannot borrow its item from the live candidate.
+    return reference.get(group).get(key);
   }
-  bindInputs(spec, templates, context, literal = false, registry = this.runtime.registry) {
+  bindInputs(spec, templates, context, literal = false, registry = this.runtime.registry, valueOnly = false) {
     const inputs=Object.create(null);
     if(literal)Object.assign(inputs,templates??{});
     else if(isRecord(templates??{})&&!expressionKind(templates??{},registry.functions)) {
       for(const [name,value] of dataEntries(templates??{})) {
         const port=spec.ports?.[name];
+        if(valueOnly&&port?.kind!=='Value')continue;
         if(port?.kind==='State'||port?.kind==='Query')inputs[name]=evaluate(value,context,{target:true});
         else inputs[name]=expression(()=>evaluateSnapshot(value,context));
       }
@@ -480,8 +493,11 @@ export class View {
     return inputs;
   }
   prepareInputs(spec, templates, context, mode = 'automatic', literal = false, kind = 'Component', runtime = this.runtime, retainedPorts) {
+    const inputs = this.bindInputs(spec, templates, context, literal, runtime.registry);
+    return this.portCompiler(spec, kind, runtime).prepare(inputs, { mode, retainedPorts });
+  }
+  portCompiler(spec, kind, runtime) {
     const { registry, stateStore, portCompilers } = runtime;
-    const inputs = this.bindInputs(spec, templates, context, literal, registry);
     let byKind = portCompilers.get(spec);
     if (!byKind) portCompilers.set(spec, byKind = new Map());
     let compiled = byKind.get(kind);
@@ -489,7 +505,7 @@ export class View {
       compiled = compilePorts({ resourceKind: kind, ports: spec.ports, types: registry.types(), store: stateStore });
       byKind.set(kind, compiled);
     }
-    return compiled.prepare(inputs, { mode, retainedPorts });
+    return compiled;
   }
   makeOwner(spec,ports,id,previous,created,runtime,plan,inputBinding) {
     const { stateStore: store, registry } = runtime;
@@ -499,12 +515,31 @@ export class View {
     );
     const owner={id,spec,ports,inputBinding,scope:previous?.scope??store.createScope(),actionOwner,states:new Map(previous?.states),computations:new Map(),queries:new Map(),reactions:previous?.reactions??[],slots:previous?.slots??{},instance:null};
     if(!previous)created.push(owner);
-    for(const [name,declaration] of Object.entries(spec.states??{})) {
-      const schema=registry.schema(declaration),existing=owner.states.get(name);
-      if(existing) {if(previous.spec.states?.[name]?.kind!==declaration.kind||!sameContract(store.contract(existing).schema,schema))fail('TYPE_CONTRACT_MISMATCH');}
-      else owner.states.set(name,owner.scope.registerState(name,{schema}));
+    const declarations = Object.entries(spec.states??{});
+    let allocated = plan.stateCells.get(owner.scope);
+    if (!allocated && (owner.states.size || declarations.length)) {
+      allocated = new Map([...owner.states].map(([name, handle]) => [
+        name, { handle, kind: previous.spec.states[name].kind },
+      ]));
+      plan.stateCells.set(owner.scope, allocated);
     }
-    for(const [name,handle] of owner.states)if(!own(spec.states??{},name)){owner.scope.removeState(name);owner.states.delete(name);}
+    for (const [name, declaration] of declarations) {
+      const schema = registry.schema(declaration), existing = allocated.get(name);
+      if (existing) {
+        if (existing.kind !== declaration.kind || !sameContract(store.contract(existing.handle).schema, schema)) fail('TYPE_CONTRACT_MISMATCH');
+        owner.states.set(name, existing.handle);
+      } else {
+        const handle = owner.scope.registerState(name, { schema });
+        allocated.set(name, { handle, kind: declaration.kind });
+        owner.states.set(name, handle);
+      }
+    }
+    const inactive = [];
+    for (const [name, handle] of owner.states) if (!own(spec.states??{}, name)) {
+      if (allocated.get(name).kind === 'Derived') inactive.push(handle);
+      owner.states.delete(name);
+    }
+    if(inactive.length)store.suspendComputations(inactive);
     for(const [name,use] of Object.entries(spec.queries??{})) {
       const old=previous?.queries.get(name),identity=use.queryRef?`Query:${use.queryRef}`:tuple(use.query);
       const item=old?.identity===identity?{...old,use,owner}: {use,owner,identity,usage:null,handle:null};
@@ -556,14 +591,18 @@ export class View {
         }
         const valuePortNames = inputBinding && [...(dynamicPath ? Object.keys(spec.ports ?? {}) : portNames)]
           .filter(name => spec.ports?.[name]?.kind === 'Value');
-        const referenceInputsChanged = valuePortNames?.length ? reference => {
-          const rebound = this.referencePorts(owner, plan, reference);
-          return valuePortNames.some(name => !equal(ports[name], rebound[name]));
-        } : undefined;
-        store.computed(handle,dependencies,reference=>{
+        const referenceInputsChanged = valuePortNames?.length ? reference => dynamicPath || valuePortNames.some(name => {
+          try {
+            const snapshot = this.referenceValue(owner, name, plan, reference);
+            return snapshot.status === 'ready' ? !equal(ports[name], snapshot.value)
+              : snapshot.status !== 'missing' || own(ports, name);
+          } catch { return true; }
+        }) : undefined;
+        store.computed(handle,dependencies,(reference, inputsOnly = false)=>{
           try {
             const resolved = reference ? this.context(owner, {}, plan, reference) : context;
             const inputs=this.prepareInputs(variable,declaration.inputs??{},resolved,'automatic',false,'Variable',runtime);
+            if(inputsOnly)return;
             if(inputs.status==='waiting')return {status:'pending'};
             return {status:'ready',value:runtime.variable(variable,inputs.ports)};
           }catch(caught){return {status:'error',error:safeError(caught)};}
@@ -583,7 +622,7 @@ export class View {
     const oldOwners=this.owners;let oldInstances=replace?new Map():this.instances,availableConnections=replace?new Map():this.connections;
     const previousRepeats = commit ? undefined : this.leafRepeats;
     const leafRepeats = new Map();
-    const plan = { connections, queryReads: runtime.functions.length ? null : new Map() };
+    const plan = { connections, queryReads: runtime.functions.length ? null : new Map(), stateCells: new Map() };
     let root,roots;
     const prepare = run => commit ? this.host.prepare(run) : run();
     try {
@@ -601,9 +640,12 @@ export class View {
           aliases.add(alias);
         };
         const retainSuspended=(old,instance=old)=>{
-          const owner=old.owner?{...old.owner,suspended:true,instance}:null;
-          if(owner){instance.owner=owner;owners.set(owner.id,owner);}
-          instance.retainedChildren=old.retainedChildren??old.children;
+          const committed=this.instances.get(old.address);
+          if(!committed?.owner||committed.generation!==old.generation||retiredScopes.has(committed.owner.scope))return;
+          const owner={...committed.owner,suspended:true,instance};
+          if(owner.computations.size)store.suspendComputations([...owner.computations.keys()].map(name=>owner.states.get(name)));
+          instance.owner=owner;owners.set(owner.id,owner);
+          instance.retainedChildren=committed.retainedChildren??committed.children;
           for(const child of instance.retainedChildren) {
             const retained={...child};next.set(child.address,retained);retainSuspended(child,retained);
           }
@@ -646,7 +688,7 @@ export class View {
               return invalidProjection(caught);
             }
             const instances = entries.flatMap(({childExtra,key})=>{
-              if (stateWrites) childExtra.repeatSource={group,node,author,parent:extra,key};
+              childExtra.repeatSource={alias:node.repeat.as,group,node,author,parent:extra,key};
               return expand(node,author,childExtra,[...trail,[node.id,key]],true);
             });
             const protectedItems = isProtected(items);
@@ -691,7 +733,7 @@ export class View {
           next.set(address,instance);
           // Missing inputs wait independently; the surrounding screen remains usable.
           if(status!=='ready'){if(preserved&&old.owner)retainSuspended(old,instance);return [instance];}
-          const inputBinding=stateWrites&&childSpec.render?{author,extra,templates:node.inputs??{},runtime}:undefined;
+          const inputBinding=childSpec.render?{author,extra,templates:node.inputs??{},runtime}:undefined;
           const owner=this.makeOwner(childSpec,preparation.ports,tuple([address,generation]),preserved?old.owner:null,created,runtime,plan,inputBinding);owners.set(owner.id,owner);owner.instance=instance;instance.owner=owner;
           owner.queryDefaults={...author.queryDefaults,...childSpec.queryDefaults};
           owner.slots=Object.fromEntries(Object.keys(childSpec.slots??{}).map(name=>[name,own(node.slots??{},name)?contentToken(node.slots[name],author,extra,trail):{nodes:[],owner:author,extra,trail}]));
@@ -710,7 +752,8 @@ export class View {
             removed = true;
           }
           for(const owner of owners.values()) {
-            const previous=previousOwners.get(owner.id)?.reactionDefinitions??[];
+            const prior=previousOwners.get(owner.id);
+            const previous=prior?.reactionDefinitions??[];
             if (!previous.length && !owner.spec.reactions?.length) continue;
             const definitions=owner.suspended?[]:(owner.spec.reactions??[]).map(reaction=>({
               watch:reaction.watch.map(value=>stateRoot(evaluate(value,this.context(owner,{},plan),{target:true}),store)),
@@ -718,6 +761,7 @@ export class View {
             })).filter(rule=>store.isCurrentHandle(rule.target)&&rule.watch.every(handle=>store.isCurrentHandle(handle)));
             const unchanged=definitions.length===previous.length&&definitions.every((item,index)=>item.target===previous[index].target&&item.watch.length===previous[index].watch.length&&item.watch.every((handle,i)=>handle===previous[index].watch[i])&&equal(item.value,previous[index].value));
             owner.reactionDefinitions=definitions;
+            owner.reactions=prior?.reactions??[];
             if(!unchanged){for(const stop of owner.reactions)stop();owner.reactions=[];changed.push(owner);}
           }
           // Remove every changed target first; exchanging two legal targets is atomic.
@@ -729,9 +773,26 @@ export class View {
           root.queryDefaults=spec.queryDefaults??{};
           roots=expand(spec.render,root);
         };
+        const retireUnusedStates = owner => {
+          const allocated = plan.stateCells.get(owner.scope);
+          let retired = false;
+          for (const name of allocated?.keys() ?? []) if (!owner.states.has(name)) {
+            owner.scope.removeState(name);
+            allocated.delete(name);
+            retired = true;
+          }
+          return retired;
+        };
         const reexpand = () => {
           const previous = new Map(owners);
-          oldInstances=new Map([...oldInstances,...next]);availableConnections=new Map([...availableConnections,...connections]);
+          oldInstances=new Map(oldInstances);
+          for(const [address,instance] of next) {
+            const prior=oldInstances.get(address);
+            // A pending projection exposes no uncommitted owner. Keep its
+            // provisional scope available if a later pass makes it ready.
+            if(instance.owner||!prior?.owner||prior.generation!==instance.generation)oldInstances.set(address,instance);
+          }
+          availableConnections=new Map([...availableConnections,...connections]);
           next.clear();owners.clear();connections.clear();aliases.clear();leafRepeats.clear();
           projectionError = undefined;
           root=this.makeOwner(spec,prepared.ports,root.id,root,created,runtime,plan);
@@ -739,8 +800,11 @@ export class View {
           return previous;
         };
         root=this.makeOwner(spec,prepared.ports,replace?`view:${++nextLifetime}`:this.root?.id??`view:${++nextLifetime}`,replace?null:this.root,created,runtime,plan);
-        // Capture Value-port bindings from the candidate definition before
-        // applying explicit writes. Initialization alone is not a Reaction.
+        // The root cannot suspend. Its removed declarations cannot
+        // participate in the explicit write batch.
+        retireUnusedStates(root);
+        // Materialize owners and State that exist before the explicit writes.
+        // Reference calculations use the recipes of the current candidate.
         expandRoot();
         const stagedWrites=stateWrites?store.stageBatch(Object.entries(stateWrites).map(([name,value])=>[root.states.get(name),value])):null;
         if (stagedWrites) reexpand();
@@ -751,13 +815,17 @@ export class View {
         for (;;) {
           let changed = stagedWrites ? stagedWrites.settle() : reactionChanged && store.settleReactionChanges();
           if (!changed) {
-            if (projectionError) throw projectionError;
-            const retiring = new Set([...oldOwners.values(),...created]
-              .filter(owner=>!owners.has(owner.id)&&!retiredScopes.has(owner.scope))
-              .map(owner=>owner.scope));
-            if (!retiring.size) break;
-            for (const scope of retiring) retiredScopes.add(scope);
-            changed = store.retireScopes(retiring);
+            // Retire State declarations only after selecting the owner that
+            // will publish, including a committed owner held in suspension.
+            for (const owner of owners.values()) if(retireUnusedStates(owner)) changed = true;
+            if (!changed) {
+              if (projectionError) throw projectionError;
+              const retiring = new Set([...oldOwners.values(),...created]
+                .filter(owner=>!owners.has(owner.id)&&!retiredScopes.has(owner.scope))
+                .map(owner=>owner.scope));
+              for (const scope of retiring) retiredScopes.add(scope);
+              if (retiring.size) changed = store.retireScopes(retiring);
+            }
             if (!changed) break;
           }
           store.recordReactionPlan(previousPlans);
@@ -800,6 +868,7 @@ export class View {
         this.treeQueryReads = plan.queryReads;
         plan.queryReads = null;
         plan.connections = null;
+        plan.stateCells.clear();
         return () => {
           const retained = new Set([...connections.values()].map(entry => entry.connection));
           const cleanup = run => { try { run(); } catch (cause) { this.diagnostics.push(safeError(cause)); } };
@@ -822,6 +891,7 @@ export class View {
       }, { viewCandidate: true });
     } catch (caught) {
       plan.connections = null;
+      plan.stateCells.clear();
       for (const connection of newConnections) connection.dispose();
       for (const owner of created) owner.actionOwner.dispose();
       throw caught;

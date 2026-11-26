@@ -498,9 +498,13 @@ for (const [trigger, delta, previous] of [[0, 0], [1, 0], [0, 1], [0, 0, 9]]) te
   assert.equal(loaded.read(), 5);
 });
 
-for (const [throughRepeat, delta] of [[false, 0], [false, 1], [true, 0], [true, 1]]) {
-  test(`View replay isolates initialization through Value ports (repeat=${throughRepeat}, delta=${delta})`, async t => {
+for (const [throughRepeat, delta, blocked] of [
+  [false, 0], [false, 1], [true, 0], [true, 1], [false, 0, 'pending'], [false, 1, 'pending'],
+  [false, 0, 'error'], [false, 1, 'error'],
+]) {
+  test(`View replay isolates initialization through Value ports (repeat=${throughRepeat}, delta=${delta}, before=${blocked ?? 'ready'})`, async t => {
     const f = fixture(t);
+    const waiting = blocked === 'pending', invalidGate = blocked === 'error';
     bindTestComponents(f.registry, [{ kind: 'Component', id: 'Row', spec: { slots: { default: {} } } }]);
     f.registry.registerResources([
       { kind: 'Component', id: 'Watcher', spec: {
@@ -514,7 +518,7 @@ for (const [throughRepeat, delta] of [[false, 0], [false, 1], [true, 0], [true, 
         render: leaf,
       } },
       { kind: 'Component', id: 'Relay', spec: {
-        ports: { input: value, delta: value, output: state },
+        ports: { input: value, delta: value, output: state, gate: { kind: 'Value', schema: integer } },
         render: { id: 'watcher', componentRef: 'Watcher',
           inputs: { input: path('/ports/input'), delta: path('/ports/delta'), output: path('/ports/output') },
         },
@@ -523,13 +527,19 @@ for (const [throughRepeat, delta] of [[false, 0], [false, 1], [true, 0], [true, 
     const items = { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, n: integer }, required: ['id', 'n'] } };
     const relay = { id: 'relay', componentRef: 'Relay',
       ...(throughRepeat ? { repeat: { items: path('/states/input'), as: 'item', key: path('/repeat/item/id') } } : {}),
-      inputs: { input: throughRepeat ? path('/repeat/item/n') : path('/states/input'),
+      inputs: { input: throughRepeat ? path('/repeat/item/n') : waiting ? 0 : path('/states/input'),
         delta: path('/states/delta'), output: path('/states/output') },
     };
     const row = node => ({ id: 'row', componentRef: 'Row', slots: { default: [node] } });
     const spec = {
       states: {
-        input: { kind: 'State', schema: throughRepeat ? items : integer, initial: throughRepeat ? [{ id: 'stable', n: 0 }] : 0 },
+        input: { kind: 'State', schema: throughRepeat ? items : integer,
+          ...(!waiting && { initial: throughRepeat ? [{ id: 'stable', n: 0 }] : 0 }) },
+        ...(waiting && { loaded: { kind: 'State', schema: integer, initial: path('/states/input') } }),
+        ...(invalidGate && {
+          loaded: { kind: 'State', schema: integer, initial: 5 },
+          gate: { kind: 'State', schema: true, initial: 'invalid' },
+        }),
         delta: { kind: 'State', schema: integer, initial: 0 },
         output: { kind: 'State', schema: integer, initial: 0 },
       },
@@ -539,6 +549,7 @@ for (const [throughRepeat, delta] of [[false, 0], [false, 1], [true, 0], [true, 
     await initialComplete;
     const watcher = () => view.getSnapshot().roots[0].children[0].children[0].instanceId;
     const owner = watcher(), seen = view.getState('seen', owner), output = view.getState('output');
+    if (waiting) assert.equal(view.getState('loaded').getSnapshot().status, 'pending');
     const observed = [];
     t.after(f.store.subscribe([seen.address, output.address], () => observed.push([seen.read(), output.read()])));
     const next = {
@@ -546,10 +557,11 @@ for (const [throughRepeat, delta] of [[false, 0], [false, 1], [true, 0], [true, 
       states: { ...spec.states, loaded: { kind: 'State', schema: spec.states.input.schema, initial: path('/states/input') } },
       render: row(throughRepeat
         ? { ...relay, repeat: { ...relay.repeat, items: path('/states/loaded') } }
-        : { ...relay, inputs: { ...relay.inputs, input: path('/states/loaded') } }),
+        : { ...relay, inputs: { ...relay.inputs, input: path('/states/loaded'),
+          ...(invalidGate && { gate: path('/states/gate') }) } }),
     };
     const input = throughRepeat ? [{ id: 'stable', n: 5 }] : 5;
-    await view.whenSettled(await view.updateDefinition(next, { states: { input, delta } }));
+    await view.whenSettled(await view.updateDefinition(next, { states: { input, delta, ...(invalidGate && { gate: 0 }) } }));
     assert.equal(watcher(), owner);
     const loaded = view.getState('loaded').read();
     assert.equal(throughRepeat ? loaded[0].n : loaded, 5);
@@ -558,6 +570,438 @@ for (const [throughRepeat, delta] of [[false, 0], [false, 1], [true, 0], [true, 
     assert.deepEqual(observed, [[0, 0], [5 + delta, delta]]);
   });
 }
+
+test('a Reaction cannot feed its own Derived through a Value port', async t => {
+  const f = fixture(t);
+  f.registry.registerResources([{ kind: 'Component', id: 'Reviewer', spec: {
+    ports: { input: value, target: state },
+    states: { seen: derived(path('/ports/input')) },
+    reactions: [{ watch: [path('/states/seen')], target: path('/ports/target'), value: 9 }],
+    render: leaf,
+  } }]);
+  const spec = {
+    states: {
+      input: { kind: 'State', schema: integer, initial: 0 },
+      output: { kind: 'State', schema: integer, initial: 0 },
+    },
+    render: { id: 'reviewer', componentRef: 'Reviewer',
+      inputs: { input: path('/states/input'), target: path('/states/output') } },
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  const input = view.getState('input'), output = view.getState('output');
+  const observed = [];
+  t.after(f.store.subscribe([input.address, output.address], () => observed.push([input.read(), output.read()])));
+  const cyclic = { ...spec, render: { ...spec.render, inputs: { ...spec.render.inputs, target: path('/states/input') } } };
+  await assert.rejects(view.updateDefinition(cyclic, { states: { input: 1 } }), { code: 'INVALID_DEFINITION' });
+  assert.deepEqual(observed, [[0, 0]]);
+  await view.whenSettled(await view.updateDefinition(spec, { states: { input: 1 } }));
+  assert.deepEqual(observed, [[0, 0], [1, 9]]);
+});
+
+test('whole ports compares omitted optional Values consistently and traces the remaining ports', async t => {
+  const f = fixture(t);
+  const all = { kind: 'Value', required: true, schema: {
+    type: 'object', properties: { input: integer, delta: integer }, required: ['input', 'delta'],
+  } };
+  f.registry.registerResources([{ kind: 'Component', id: 'Aggregate', spec: {
+    ports: { unused: { kind: 'Value', schema: integer }, input: value, delta: value },
+    states: {
+      seen: { kind: 'Derived', schema: integer,
+        variable: { ports: { all }, expression: 'all.input' }, inputs: { all: path('/ports') } },
+      output: { kind: 'State', schema: integer, initial: 0 },
+    },
+    reactions: [{ watch: [path('/states/seen')], target: path('/states/output'), value: 9 }],
+    render: leaf,
+  } }]);
+  const spec = {
+    states: {
+      input: { kind: 'State', schema: integer, initial: 1 },
+      delta: { kind: 'State', schema: integer, initial: 0 },
+    },
+    render: { id: 'aggregate', componentRef: 'Aggregate',
+      inputs: { input: path('/states/input'), delta: path('/states/delta') } },
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  const id = view.getSnapshot().roots[0].instanceId, seen = view.getState('seen', id);
+  const output = view.getState('output', id);
+  await view.whenSettled(await view.updateDefinition(spec, { states: { delta: 1 } }));
+  assert.equal(seen.read(), 1);
+  assert.equal(output.read(), 0);
+  assert.throws(() => f.store.registerReaction(f.scope, { watch: [seen], target: view.getState('input'), value: 9 }),
+    { code: 'INVALID_DEFINITION' });
+});
+
+test('a nested repeat traces the alias that the watched Value reads', async t => {
+  const f = fixture(t);
+  bindTestComponents(f.registry, [{ kind: 'Component', id: 'Row', spec: { slots: { default: {} } } }]);
+  const items = { type: 'array', items: {
+    type: 'object', properties: { id: { type: 'string' }, n: integer }, required: ['id', 'n'],
+  } };
+  f.registry.registerResources([{ kind: 'Component', id: 'NestedWatcher', spec: {
+    ports: { input: value, target: { kind: 'State', schema: items, required: true } },
+    states: { seen: derived(path('/ports/input')) },
+    reactions: [{ watch: [path('/states/seen')], target: path('/ports/target'), value: [{ id: 'stable', n: 9 }] }],
+    render: leaf,
+  } }]);
+  const makeSpec = input => ({
+    states: {
+      outer: { kind: 'State', schema: { type: 'array', items: integer }, initial: [1] },
+      target: { kind: 'State', schema: items, initial: [{ id: 'stable', n: 0 }] },
+    },
+    render: { id: 'root', componentRef: 'Row', slots: { default: [{
+      id: 'outer', componentRef: 'Row', repeat: { items: path('/states/outer'), as: 'outer', key: path('/repeat/outer') },
+      slots: { default: [{
+        id: 'inner', componentRef: 'NestedWatcher',
+        repeat: { items: path('/states/target'), as: 'inner', key: path('/repeat/inner/id') },
+        inputs: { input: path(input), target: path('/states/target') },
+      }] },
+    }] } },
+  });
+  const { view, initialComplete } = await f.runtime.createView({ view: makeSpec('/repeat/outer') });
+  await initialComplete;
+  const watcher = view.getSnapshot().roots[0].children[0].children[0];
+  assert.equal(view.getState('seen', watcher.instanceId).read(), 1);
+  await assert.rejects(view.updateDefinition(makeSpec('/repeat/inner/n')), { code: 'INVALID_DEFINITION' });
+  assert.equal(view.getState('target').read()[0].n, 0);
+  assert.equal(view.getState('seen', watcher.instanceId).read(), 1);
+});
+
+for (const cycle of [false, true]) test(`a suspended owner has no active Derived binding (cycle=${cycle})`, async t => {
+  const f = fixture(t), string = { type: 'string' }, text = { kind: 'Value', schema: string, required: true };
+  f.registry.registerResources([{ kind: 'Component', id: 'Suspendable', spec: {
+    ports: { input: text, gate: text },
+    states: { seen: { kind: 'Derived', schema: string,
+      variable: { ports: { input: text }, expression: 'input' }, inputs: { input: path('/ports/input') } } },
+    render: leaf,
+  } }]);
+  const spec = {
+    states: {
+      selector: { kind: 'State', schema: string, initial: '${/states/source}' },
+      source: { kind: 'State', schema: string, initial: 'safe' },
+      target: { kind: 'State', schema: string, initial: 'unfired' },
+      missing: { kind: 'State', schema: string },
+    },
+    render: { id: 'watcher', componentRef: 'Suspendable', inputs: {
+      input: cycle ? { '@call': 'formatString', args: { value: path('/states/selector') } } : path('/states/source'),
+      gate: 'ready',
+    } },
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  const id = view.getSnapshot().roots[0].instanceId, seen = view.getState('seen', id), target = view.getState('target');
+  t.after(f.store.registerReaction(f.scope, { watch: [seen], target, value: 'fired' }));
+  const next = {
+    states: { ...spec.states },
+    render: { ...spec.render, inputs: { input: cycle ? path('/states/source') : 'safe', gate: path('/states/missing') } },
+  };
+  if (!cycle) delete next.states.source;
+  await view.whenSettled(await view.updateDefinition(next, { states: { selector: '${/states/target}' } }));
+  assert.equal(view.getSnapshot().roots[0].status, 'pending');
+  assert.equal(view.getSnapshot().roots[0].instanceId, id);
+  assert.equal(seen.read(), 'safe');
+  assert.equal(target.read(), 'unfired');
+  await view.whenSettled(await view.updateDefinition(next, { states: { missing: 'ready' } }));
+  assert.equal(view.getSnapshot().roots[0].status, 'ready');
+  assert.equal(view.getState('seen', id), seen);
+  assert.equal(target.read(), 'unfired');
+});
+
+test('a late Derived initializes without a Reaction during its first View application', async t => {
+  const f = fixture(t);
+  f.registry.registerResources([{ kind: 'Component', id: 'LateWatcher', spec: {
+    ports: { source: state, output: state },
+    states: {
+      loaded: { kind: 'State', schema: integer, initial: path('/ports/source') },
+      seen: derived(path('/states/loaded')),
+    },
+    reactions: [{ watch: [path('/states/seen')], target: path('/ports/output'), value: 9 }],
+    render: leaf,
+  } }]);
+  const spec = {
+    states: {
+      trigger: { kind: 'State', schema: integer, initial: 0 },
+      output: { kind: 'State', schema: integer, initial: 0 },
+      source: { kind: 'State', schema: integer },
+      show: { kind: 'State', schema: { type: 'boolean' }, initial: false },
+    },
+    reactions: [{ watch: [path('/states/trigger')], target: path('/states/source'), value: 5 }],
+    render: { id: 'late-watcher', componentRef: 'LateWatcher', when: path('/states/show'),
+      inputs: { source: path('/states/source'), output: path('/states/output') } },
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  await view.whenSettled(await view.updateDefinition(spec, { states: { trigger: 1, show: true } }));
+  const id = view.getSnapshot().roots[0].instanceId;
+  assert.equal(view.getState('seen', id).read(), 5);
+  assert.equal(view.getState('output').read(), 0);
+});
+
+test('discarded effects cannot seed the Reaction of a late Derived', async t => {
+  const f = fixture(t);
+  bindTestComponents(f.registry, [{ kind: 'Component', id: 'Row', spec: { slots: { default: {} } } }]);
+  f.registry.registerResources([
+    { kind: 'Component', id: 'Early', spec: {
+      ports: { trigger: state, target: state },
+      reactions: [{ watch: [path('/ports/trigger')], target: path('/ports/target'), value: 5 }],
+      render: leaf,
+    } },
+    { kind: 'Component', id: 'Late', spec: {
+      ports: { source: state, output: state },
+      states: { seen: derived(path('/ports/source')) },
+      reactions: [{ watch: [path('/states/seen')], target: path('/ports/output'), value: 9 }],
+      render: leaf,
+    } },
+  ]);
+  const integerState = { kind: 'State', schema: integer, initial: 0 };
+  const boolean = { type: 'boolean' };
+  const spec = {
+    states: { trigger: integerState, input: integerState, output: integerState,
+      early: { kind: 'State', schema: boolean, initial: true },
+      late: { kind: 'State', schema: boolean, initial: false },
+    },
+    reactions: [
+      { watch: [path('/states/trigger')], target: path('/states/early'), value: false },
+      { watch: [path('/states/trigger')], target: path('/states/late'), value: true },
+    ],
+    render: { id: 'row', componentRef: 'Row', slots: { default: [
+      { id: 'early', componentRef: 'Early', when: path('/states/early'),
+        inputs: { trigger: path('/states/trigger'), target: path('/states/input') } },
+      { id: 'late', componentRef: 'Late', when: path('/states/late'),
+        inputs: { source: path('/states/input'), output: path('/states/output') } },
+    ] } },
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  await view.whenSettled(await view.updateDefinition(spec, { states: { trigger: 1 } }));
+  const [late] = view.getSnapshot().roots[0].children;
+  assert.equal(late.id, 'late');
+  assert.equal(view.getState('seen', late.instanceId).read(), 0);
+  assert.equal(view.getState('output').read(), 0);
+  view.getState('input').write(2);
+  assert.equal(view.getState('output').read(), 9);
+});
+
+test('an independent Store write still runs a service Reaction watching a suspended owner', async t => {
+  const f = fixture(t);
+  const source = f.scope.registerState('source', { schema: integer, initial: 0 });
+  const output = f.scope.registerState('output', { schema: integer, initial: 0 });
+  f.registry.registerResources([{ kind: 'Component', id: 'SourceWatcher', spec: {
+    ports: { source: state, gate: value },
+    states: { seen: derived(path('/ports/source')) },
+    render: leaf,
+  } }]);
+  const spec = {
+    ports: { source: state, gate: { kind: 'Value', schema: integer } },
+    render: { id: 'watcher', componentRef: 'SourceWatcher',
+      inputs: { source: path('/ports/source'), gate: path('/ports/gate') } },
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec, inputs: { source, gate: 0 } });
+  await initialComplete;
+  const id = view.getSnapshot().roots[0].instanceId, seen = view.getState('seen', id);
+  t.after(f.store.registerReaction(f.scope, { watch: [seen], target: output, value: 9 }));
+  await view.whenSettled(await view.setInputs({ source }));
+  assert.equal(view.getSnapshot().roots[0].status, 'pending');
+  source.write(1);
+  assert.equal(seen.read(), 1);
+  assert.equal(output.read(), 9);
+  await view.whenSettled(await view.setInputs({ source, gate: 0 }));
+  assert.equal(view.getState('seen', id), seen);
+});
+
+test('suspension preserves the committed State binding through speculative retargeting', async t => {
+  const f = fixture(t);
+  const first = f.scope.registerState('first', { schema: integer, initial: 0 });
+  const second = f.scope.registerState('second', { schema: integer, initial: 10 });
+  const output = f.scope.registerState('output', { schema: integer, initial: 0 });
+  f.registry.registerResources([{ kind: 'Component', id: 'SourceWatcher', spec: {
+    ports: { source: state, gate: value },
+    states: { seen: derived(path('/ports/source')) },
+    render: leaf,
+  } }]);
+  const spec = {
+    ports: { first: state, second: state },
+    states: { gate: { kind: 'State', schema: true, initial: 0 } },
+    render: { id: 'watcher', componentRef: 'SourceWatcher',
+      inputs: { source: path('/ports/first'), gate: path('/states/gate') } },
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec, inputs: { first, second } });
+  await initialComplete;
+  const id = view.getSnapshot().roots[0].instanceId, seen = view.getState('seen', id);
+  t.after(f.store.registerReaction(f.scope, { watch: [seen], target: output, value: 9 }));
+  const next = { ...spec, render: { ...spec.render, inputs: { ...spec.render.inputs, source: path('/ports/second') } } };
+  await view.whenSettled(await view.updateDefinition(next, { states: { gate: 'invalid' } }));
+  assert.equal(view.getSnapshot().roots[0].status, 'error');
+  assert.equal(view.getState('seen', id), seen);
+  second.write(11);
+  assert.deepEqual([seen.read(), output.read()], [0, 0]);
+  first.write(1);
+  assert.deepEqual([seen.read(), output.read()], [1, 9]);
+  output.write(0);
+  await view.whenSettled(await view.updateDefinition(next, { states: { gate: 0 } }));
+  assert.equal(view.getState('seen', id), seen);
+  assert.deepEqual([seen.read(), output.read()], [11, 0]);
+});
+
+test('a new owner suspended before commit does not publish provisional State', async t => {
+  const f = fixture(t);
+  f.registry.registerResources([{ kind: 'Component', id: 'NewWatcher', spec: {
+    ports: { gate: value },
+    states: { seen: derived(path('/ports/gate')) },
+    render: leaf,
+  } }]);
+  const spec = { states: { gate: { kind: 'State', schema: true, initial: 1 } }, render: leaf };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  const observed = [];
+  t.after(f.store.subscribe(undefined, ({ changes }) => observed.push(...changes.map(change => change.target.name))));
+  const next = { ...spec, render: { id: 'watcher', componentRef: 'NewWatcher', inputs: { gate: path('/states/gate') } } };
+  await view.whenSettled(await view.updateDefinition(next, { states: { gate: 'invalid' } }));
+  const node = view.getSnapshot().roots[0];
+  assert.equal(node.status, 'error');
+  assert.throws(() => view.getState('seen', node.instanceId), { code: 'REFERENCE_NOT_FOUND' });
+  assert.deepEqual(observed, ['gate']);
+  await view.whenSettled(await view.updateDefinition(next, { states: { gate: 2 } }));
+  assert.equal(view.getState('seen', view.getSnapshot().roots[0].instanceId).read(), 2);
+  assert.equal(observed.filter(name => name === 'seen').length, 1);
+});
+
+test('a suspended owner keeps its committed State declarations until resumption', async t => {
+  const f = fixture(t);
+  const spec = {
+    states: { gate: { kind: 'State', schema: true, initial: 0 } },
+    render: { id: 'watcher', component: {
+      ports: { gate: value },
+      states: { count: { kind: 'State', schema: integer, initial: 7 } },
+      render: leaf,
+    }, inputs: { gate: path('/states/gate') } },
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  const id = view.getSnapshot().roots[0].instanceId, count = view.getState('count', id);
+  const changes = [];
+  t.after(f.store.subscribe(undefined, batch => {
+    changes.push(...batch.changes.filter(change => ['count', 'different'].includes(change.target.name))
+      .map(change => [change.kind, change.target.name]));
+  }));
+  const next = { ...spec, render: { ...spec.render, component: { ...spec.render.component,
+    states: { different: { kind: 'State', schema: integer, initial: 9 } },
+  } } };
+  await view.whenSettled(await view.updateDefinition(next, { states: { gate: 'invalid' } }));
+  assert.equal(view.getSnapshot().roots[0].status, 'error');
+  assert.equal(view.getState('count', id), count);
+  assert.equal(count.read(), 7);
+  assert.throws(() => view.getState('different', id), { code: 'REFERENCE_NOT_FOUND' });
+  assert.deepEqual(changes, []);
+
+  await view.whenSettled(await view.updateDefinition(next, { states: { gate: 0 } }));
+  assert.equal(view.getState('different', id).read(), 9);
+  assert.throws(() => count.read(), { code: 'CANCELLED' });
+  assert.deepEqual(changes.sort(), [['added', 'different'], ['removed', 'count']]);
+});
+
+test('a suspended owner detaches the Reaction installed in a preceding candidate', async t => {
+  const f = fixture(t);
+  f.registry.registerResources([{ kind: 'Component', id: 'Watcher', spec: {
+    ports: { trigger: state, target: state, gate: value },
+    reactions: [{ watch: [path('/ports/trigger')], target: path('/ports/target'), value: 9 }],
+    render: leaf,
+  } }]);
+  const integerState = { kind: 'State', schema: integer, initial: 0 };
+  const spec = {
+    states: { trigger: integerState, first: integerState, second: integerState,
+      gate: { kind: 'State', schema: true, initial: 0 } },
+    reactions: [{ watch: [path('/states/trigger')], target: path('/states/gate'), value: 'invalid' }],
+    render: { id: 'watcher', componentRef: 'Watcher', inputs: {
+      trigger: path('/states/trigger'), target: path('/states/first'), gate: path('/states/gate'),
+    } },
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  const target = view.getState('second'), output = [];
+  t.after(f.store.subscribe(target.address, () => output.push(target.read())));
+  const next = { ...spec, render: { ...spec.render, inputs: { ...spec.render.inputs, target: path('/states/second') } } };
+  await view.whenSettled(await view.updateDefinition(next, { states: { trigger: 1 } }));
+  assert.equal(view.getSnapshot().roots[0].status, 'error');
+  assert.equal(view.getState('first').read(), 0);
+  view.getState('trigger').write(2);
+  assert.deepEqual(output, [0]);
+});
+
+test('a removed root State cannot contribute a Reaction that invalidates projection', async t => {
+  const f = fixture(t);
+  bindTestComponents(f.registry, [{ kind: 'Component', id: 'Row', spec: { slots: { default: {} } } }]);
+  const integerState = { kind: 'State', schema: integer, initial: 0 };
+  const spec = {
+    states: { trigger: integerState, removed: integerState,
+      items: { kind: 'State', schema: { type: 'array', items: integer }, initial: [0] } },
+    render: { id: 'row', componentRef: 'Row', slots: { default: [{
+      ...leaf, repeat: { items: path('/states/items'), as: 'item', key: path('/repeat/item') },
+    }] } },
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  const trigger = view.getState('trigger'), removed = view.getState('removed'), items = view.getState('items');
+  f.store.registerReaction(f.scope, { watch: [trigger], target: removed, value: 1 });
+  f.store.registerReaction(f.scope, { watch: [removed], target: items, value: [0, 0] });
+  const next = { ...spec, states: { trigger: spec.states.trigger, items: spec.states.items } };
+  await view.whenSettled(await view.updateDefinition(next, { states: { trigger: 1 } }));
+  assert.equal(trigger.read(), 1);
+  assert.throws(() => removed.read(), { code: 'CANCELLED' });
+  assert.deepEqual(items.read(), [0]);
+});
+
+test('an unrelated View can apply while a shared Store has a blocked Derived read', async t => {
+  const f = fixture(t), string = { type: 'string' }, text = { kind: 'Value', schema: string, required: true };
+  const { view: first, initialComplete: firstReady } = await f.runtime.createView({ view: {
+    states: {
+      source: { kind: 'State', schema: string, initial: 'value' },
+      selector: { kind: 'State', schema: string, initial: '${/states/source}' },
+      target: { kind: 'State', schema: string, initial: 'unfired' },
+      seen: { kind: 'Derived', schema: string, variable: { ports: { input: text }, expression: 'input' },
+        inputs: { input: { '@call': 'formatString', args: { value: path('/states/selector') } } } },
+    },
+    reactions: [{ watch: [path('/states/seen')], target: path('/states/target'), value: 'fired' }],
+    render: leaf,
+  } });
+  await firstReady;
+  first.getState('selector').write('${/states/target}');
+  await new Promise(resolve => setImmediate(resolve));
+  assert.throws(() => first.getState('seen').read(), { code: 'INVALID_DEFINITION' });
+
+  const { view: second, initialComplete: secondReady } = await f.runtime.createView({ view: { render: leaf } });
+  await secondReady;
+  await second.whenSettled(await second.updateDefinition({ render: { ...leaf, id: 'changed' } }));
+  assert.equal(second.getSnapshot().roots[0].id, 'changed');
+  assert.equal(first.getState('target').read(), 'unfired');
+});
+
+for (const late of [false, true]) test(`new owners compare against the watch cell's own baseline (late=${late})`, async t => {
+  const f = fixture(t);
+  f.registry.registerResources([{ kind: 'Component', id: 'NewOwner', spec: {
+    ports: { delta: late ? state : value, output: state },
+    ...(!late && { states: { seen: derived(path('/ports/delta'), 'n + 5') } }),
+    reactions: [{ watch: [path(late ? '/ports/delta' : '/states/seen')], target: path('/ports/output'), value: 9 }],
+    render: leaf,
+  } }]);
+  const spec = {
+    states: {
+      delta: { kind: 'State', schema: integer, initial: 0 },
+      output: { kind: 'State', schema: integer, initial: 0 },
+      show: { kind: 'State', schema: { type: 'boolean' }, initial: false },
+    },
+    render: leaf,
+  };
+  const { view, initialComplete } = await f.runtime.createView({ view: spec });
+  await initialComplete;
+  const next = { ...spec, render: {
+    id: 'new-owner', componentRef: 'NewOwner', ...(late && { when: path('/states/show') }),
+    inputs: { delta: path('/states/delta'), output: path('/states/output') },
+  } };
+  await view.whenSettled(await view.updateDefinition(next, { states: { delta: 1, show: true } }));
+  assert.equal(view.getState('output').read(), 9);
+});
 
 for (const duplicate of [false, true]) test(`an independent reaction can remove a provisional ${duplicate ? 'duplicate target' : 'static cycle'}`, async t => {
   const f = fixture(t), boolean = { type: 'boolean' };

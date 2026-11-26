@@ -153,6 +153,18 @@ export function compilePorts({ resourceKind, ports = {}, types = {}, store }) {
     try { return protect(validator.accept(value, trustedCopies(value))); }
     catch (error) { throw safeError(error, 'TYPE_MISMATCH'); }
   }
+  function valueSnapshot(port, inputs, key) {
+    if (!own(inputs, key)) return port.hasDefault
+      ? Object.freeze({ status: 'ready', value: accept(port.validator, cloneValue(port.defaultValue)) })
+      : Object.freeze({ status: 'missing' });
+    const input = inputs[key];
+    const snapshot = expressions.has(input) ? expressions.get(input)() : { status: 'ready', value: input };
+    if (!record(snapshot) || !['ready', 'missing', 'pending', 'error'].includes(snapshot.status)) fail('INVALID_EXPRESSION');
+    if (snapshot.status === 'error') throw safeError(snapshot.error);
+    return snapshot.status === 'ready'
+      ? Object.freeze({ status: 'ready', value: accept(port.validator, snapshot.value) })
+      : Object.freeze({ status: snapshot.status });
+  }
   function connectState(port, handle) {
     if (!record(handle) || !record(handle.address) || typeof handle.write !== 'function' || typeof handle.getSnapshot !== 'function') fail('TYPE_CONTRACT_MISMATCH');
     const verify = () => {
@@ -169,6 +181,12 @@ export function compilePorts({ resourceKind, ports = {}, types = {}, store }) {
     stateWrappers.set(wrapper, { base: handle, store, schema: port.schema, guarded: hasStateGuard(handle) }); return wrapper;
   }
   return Object.freeze({
+    prepareValue(key, inputs) {
+      const port = declarations.get(key);
+      if (port?.kind !== 'Value') fail('INVALID_DEFINITION', key);
+      try { return valueSnapshot(port, inputs, key); }
+      catch (error) { throw inputError(error, key); }
+    },
     prepare(inputs = {}, { mode = 'explicit', retainedPorts } = {}) {
       if (!record(inputs) || !['explicit', 'automatic'].includes(mode)) fail('INVALID_DEFINITION');
       for (const key of Object.keys(inputs)) if (!declarations.has(key)) fail('INVALID_DEFINITION', key);
@@ -177,9 +195,15 @@ export function compilePorts({ resourceKind, ports = {}, types = {}, store }) {
       const values = Object.create(null), states = Object.create(null); let waitingKey;
       for (const [key, port] of declarations) {
         try {
+        if (port.kind === 'Value') {
+          const snapshot = valueSnapshot(port, inputs, key);
+          states[key] = snapshot;
+          if (snapshot.status === 'ready') values[key] = snapshot.value;
+          else if ((snapshot.status === 'pending' || port.required) && waitingKey === undefined) waitingKey = key;
+          continue;
+        }
         if (!own(inputs, key)) {
-          if (port.hasDefault) { values[key] = accept(port.validator, cloneValue(port.defaultValue)); states[key] = Object.freeze({ status: 'ready', value: values[key] }); }
-          else states[key] = Object.freeze({ status: 'missing' });
+          states[key] = Object.freeze({ status: 'missing' });
           continue;
         }
         const input = inputs[key];
@@ -193,19 +217,9 @@ export function compilePorts({ resourceKind, ports = {}, types = {}, store }) {
             values[key] = retained;
           } else values[key] = connectState(port, input);
         }
-        else if (port.kind === 'Query') { if (!queries.has(input)) fail('TYPE_CONTRACT_MISMATCH'); values[key] = input; }
         else {
-          let snapshot;
-          try { snapshot = expressions.has(input) ? expressions.get(input)() : { status: 'ready', value: input }; }
-          catch (error) { throw safeError(error); }
-          if (!record(snapshot) || !['ready', 'missing', 'pending', 'error'].includes(snapshot.status)) fail('INVALID_EXPRESSION');
-          if (snapshot.status === 'error') throw safeError(snapshot.error);
-          if (snapshot.status !== 'ready') {
-            states[key] = Object.freeze({ status: snapshot.status });
-            if ((snapshot.status === 'pending' || port.required) && waitingKey === undefined) waitingKey = key;
-            continue;
-          }
-          values[key] = accept(port.validator, snapshot.value);
+          if (!queries.has(input)) fail('TYPE_CONTRACT_MISMATCH');
+          values[key] = input;
         }
         states[key] = Object.freeze({ status: 'ready', value: values[key] });
         } catch (error) { throw inputError(error, key); }

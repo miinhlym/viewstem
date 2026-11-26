@@ -75,6 +75,30 @@ await test('structural changes evaluate only affected computed cells and propaga
   store.dispose();
 });
 
+await test('suspension propagates the restored committed value to surviving computations', () => {
+  const { store, scope } = fixture();
+  const first = scope.registerState('first', { schema: integer, initial: 0 });
+  const second = scope.registerState('second', { schema: integer, initial: 10 });
+  const seen = scope.registerState('seen', { schema: integer });
+  const dependent = scope.registerState('dependent', { schema: integer });
+  const bind = (cell, input) => store.computed(cell, [input], () => ({ status: 'ready', value: input.read() }));
+  bind(seen, first);
+  bind(dependent, seen);
+  const observations = [];
+  const unsubscribe = store.subscribe(dependent.address, () => observations.push([seen.read(), dependent.read()]));
+  store.transaction(() => {
+    bind(seen, second);
+    assert.equal(dependent.read(), 10);
+    store.suspendComputations([seen]);
+  }, undefined, { viewCandidate: true });
+  assert.deepEqual([seen.read(), dependent.read()], [0, 0]);
+  assert.deepEqual(observations, [[0, 0]]);
+  first.write(1);
+  assert.deepEqual(observations, [[0, 0], [1, 1]]);
+  unsubscribe();
+  store.dispose();
+});
+
 await test('V31-V35/missing-null-falsy-reference', () => {
   const { scope } = fixture(), cell = scope.registerState('value', { schema: true });
   assert.equal(cell.read(), undefined); assert.deepEqual(cell.getSnapshot(), { status: 'missing' });
