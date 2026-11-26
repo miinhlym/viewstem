@@ -14,6 +14,7 @@ For visible changes, include a screenshot or describe the before and after behav
 
 Describe changes to public APIs, declarations, supported behavior, or dependencies.
 Identify third-party material and its license if any was added.
+List the affected npm package changeset and bump, or explain why the PR can skip one.
 
 - [ ] I reviewed the change and have the right to submit it under the contribution licensing terms.
 - [ ] Relevant tests and owning documentation are updated, or I explained why they are not needed.

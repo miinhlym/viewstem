@@ -7,8 +7,13 @@ const fail = code => { throw coreError(({READ_ONLY:'TYPE_MISMATCH',DUPLICATE_STA
 export const keyOf = address => JSON.stringify([address.scopeId, address.name]);
 const missing = Object.freeze({ status: 'missing' });
 const pending = Object.freeze({ status: 'pending' });
+const dependencyCycle = Symbol();
 const errorState = error => Object.freeze({ status: 'error', error: safeError(error) });
 const same = (a, b) => a.status === b.status && (a.status === 'ready' ? equal(a.value, b.value) : a.status !== 'error' || a.error.code === b.error.code);
+const sameReaction = (a, b) => a === b || !!a && !!b && a.owner === b.owner && same(a.value, b.value)
+  && a.watch.length === b.watch.length && a.watch.every((watch, index) => watch === b.watch[index]);
+const sameReactions = (a, b) => a === b || !!a && !!b && a.length === b.length
+  && a.every((reaction, index) => sameReaction(reaction, b[index]));
 const changedValue = (before, after) => after.status === 'ready' && (before.status !== 'ready' || !equal(before.value, after.value));
 const stateHandles = new WeakSet();
 export const isStateHandle = value => stateHandles.has(value);
@@ -27,6 +32,7 @@ export class StateStore {
   #diagnostics = [];
   #transaction = null;
   #readingStage = null;
+  #settleRead;
   #scopes = new Set();
   #scopeLifetimes = new WeakMap();
   #url = null;
@@ -44,20 +50,27 @@ export class StateStore {
     try { return run(); }
     finally { this.#runningPureCallback = previous; }
   }
-  transaction(run, beforeNotify) {
+  transaction(run, beforeNotify, { viewCandidate = false } = {}) {
     this.assertCanWrite();
     if (this.#transaction) {
       if (beforeNotify) fail('INVALID_DEFINITION');
       return run();
     }
-    if (this.#notifying && !beforeNotify) return this.#runTransaction(run, undefined, []);
-    return this.#runTransaction(run, beforeNotify);
+    if (this.#notifying && !beforeNotify) return this.#runTransaction(run, undefined, [], viewCandidate);
+    return this.#runTransaction(run, beforeNotify, undefined, viewCandidate);
   }
-  #runTransaction(run, beforeNotify, deferredMutations) {
+  #runTransaction(run, beforeNotify, deferredMutations, viewCandidate) {
     const cells = new Map(this.#cells), reactions = new Map(this.#reactions), scopes = new Set(this.#scopes);
     const previous = new Map([...cells.values()].map(cell => [cell, {...cell}]));
     const lifetimes = new Map([...scopes].map(scope => [this.#scopeLifetimes.get(scope), this.#scopeLifetimes.get(scope).alive]));
     const pending = [];
+    pending.viewCandidate = viewCandidate;
+    pending.suspendedComputations = viewCandidate ? new Set() : undefined;
+    pending.cyclicReactions = new Map();
+    pending.previousCells = previous;
+    pending.previousReactions = reactions;
+    pending.initializers = new Set();
+    pending.initializerErrors = new Map();
     pending.createdScopes = new Set();
     pending.cleanup = [];
     pending.rollback = [];
@@ -76,7 +89,7 @@ export class StateStore {
       result = run();
       if (result?.then) fail('INVALID_DEFINITION');
       if (pending.reactionBaseline.size) {
-        this.#commit(new Map(), pending.explicitWrites, 'explicit', pending.reactionBaseline);
+        this.#commit(new Map(), pending.explicitWrites, 'explicit', { baseline: pending.reactionBaseline });
       }
       afterCommit = beforeNotify?.();
     }
@@ -138,31 +151,78 @@ export class StateStore {
 
   initialize(handle, snapshot) {
     const cell = this.#cellFor(handle);
-    if (cell.initialSettled) return;
+    const initializers = this.#transaction?.initializers;
+    if (cell.initialSettled && !initializers?.has(cell)) return;
+    // Initialization is provisional until the enclosing plan commits. Its
+    // inputs can change if a subsequent candidate discards reaction effects.
+    initializers?.add(cell);
     let accepted = snapshot;
-    if (snapshot.status === 'ready') accepted = this.#accept(cell, snapshot.value);
-    if (snapshot.status !== 'pending' && snapshot.status !== 'missing') cell.initialSettled = true;
+    this.#transaction?.initializerErrors.delete(cell);
+    if (snapshot.status === 'ready') {
+      try { accepted = this.#accept(cell, snapshot.value); }
+      catch (caught) {
+        if (!this.#transaction?.viewCandidate) throw caught;
+        this.#transaction.initializerErrors.set(cell, caught);
+        accepted = errorState(caught);
+      }
+    }
+    cell.initialSettled = snapshot.status !== 'pending' && snapshot.status !== 'missing';
     cell.baseline = accepted;
-    if (!cell.writes) this.#commit(new Map([[cell,accepted]]),new Set(),'initial');
+    if (!cell.writes && !this.#transaction?.reactionEffects?.has(cell)) {
+      this.#commit(new Map([[cell,accepted]]),new Set(),'initial');
+    }
     if (this.#transaction) this.#transaction.baseline = true;
     else for (const listener of this.#baselineListeners) listener();
   }
 
-  computed(handle, dependencies, compute, { recompute = true } = {}) {
+  computed(handle, dependencies, compute, { recompute = true, externalChanged, trackDependencies = false, referenceInputsChanged } = {}) {
     const cell = this.#cellFor(handle), previous = {...cell};
     const next = dependencies.map(handle => this.#cellFor(handle));
-    const graphChanged = next.length !== previous.dependencies.length ||
+    const graphChanged = previous.bindingSuspended || next.length !== previous.dependencies.length ||
       next.some((dependency, index) => dependency !== previous.dependencies[index]);
-    cell.derived = true; cell.computeSnapshot = compute;
+    cell.derived = true; cell.computeSnapshot = compute; cell.externalChanged = externalChanged;
     cell.dependencies = next;
+    cell.dynamicDependencies = trackDependencies ? { reads: [], blocked: [] } : undefined;
+    cell.referenceInputsChanged = referenceInputsChanged;
+    cell.bindingSuspended = false;
+    this.#transaction?.suspendedComputations?.delete(cell);
     // Rebinding an unchanged runtime owner keeps its latest context without
-    // walking an otherwise unchanged dependency graph. Recompute orders the graph itself.
+    // walking an otherwise unchanged dependency graph.
     try {
-      if (recompute) this.recompute();
-      else if (graphChanged) this.#order();
+      if (graphChanged) {
+        if (this.#transaction?.viewCandidate) this.#invalidateReactionGraph();
+        else this.#validateDependencyGraph(this.#cells.values(), { observed: false });
+      }
+      if (recompute || previous.bindingSuspended) this.#structuralCommit([], { recompute: cell });
     } catch (caught) { Object.assign(cell, previous); throw caught; }
   }
-  recompute() { this.#structuralCommit([]); }
+  suspendComputations(handles) {
+    const candidate = this.#transaction;
+    const restored = new Map();
+    for (const handle of handles) {
+      if (!this.isCurrentHandle(handle)) continue;
+      const cell = this.#cellFor(handle);
+      if (candidate.suspendedComputations.has(cell)) continue;
+      candidate.suspendedComputations.add(cell);
+      // A pre-write expansion may already have rebound this cell. Restore
+      // its committed recipe and let the Store propagate the restored value.
+      const committed = candidate.previousCells.get(cell);
+      if (committed) {
+        const staged = cell.state;
+        Object.assign(cell, committed);
+        if (!same(staged, committed.state)) {
+          cell.state = staged;
+          restored.set(cell, committed.state);
+        }
+      }
+      cell.bindingSuspended = true;
+      this.#invalidateReactionGraph();
+    }
+    if (restored.size) this.#commit(restored, new Set(), 'suspend');
+  }
+  #candidateSuspends(cell) {
+    return this.#transaction?.suspendedComputations?.has(cell);
+  }
   baseline(handle) { return this.#cellFor(handle).baseline; }
   hasWritten(handle) { return this.#cellFor(handle).writes > 0; }
   observeBaseline(listener) { this.#baselineListeners.add(listener);return ()=>this.#baselineListeners.delete(listener); }
@@ -281,8 +341,11 @@ export class StateStore {
             store.#cells.delete(keyOf(cell.address));
             store.#retireClock(cell);
           }
-          for (const [target, reaction] of store.#reactions) if (reaction.owner === scopeId || removed.includes(target) || reaction.watch.some(cell => removed.includes(cell))) store.#reactions.delete(target);
-          store.#structuralCommit(removed.map(cell => store.#change(cell, 'removed')));
+          if (removed.length) store.#invalidateReactionGraph();
+          const removedCells = new Set(removed);
+          store.#removeReactions((target, reaction) =>
+            reaction.owner === scopeId || removedCells.has(target) || reaction.watch.some(cell => removedCells.has(cell)));
+          store.#structuralCommit(removed.map(cell => store.#change(cell, 'removed')), { retired: removed });
         };
         if (store.#transaction) store.#perform(() => { close(); remove(); });
         else { close(); store.#perform(remove); }
@@ -299,6 +362,22 @@ export class StateStore {
 
   #lookup(address) { return this.#cells.get(keyOf(address)) ?? fail('REFERENCE_NOT_FOUND'); }
   #current(cell) { if (this.#cells.get(keyOf(cell.address)) !== cell) fail('CANCELLED'); }
+  #invalidateReactionGraph() {
+    if (this.#transaction?.viewCandidate) this.#transaction.cyclicReactions = undefined;
+  }
+  isCurrentHandle(handle) { return !!handle && this.#cells.get(keyOf(handle.address))?.handle === handle; }
+  retireScopes(scopes) {
+    const start = this.#transaction.length;
+    const reactions = new Map(this.#reactions);
+    for (const scope of scopes) scope.dispose();
+    return [...reactions].some(([target, entries]) => this.#reactions.get(target) !== entries)
+      || this.#transaction.length > start;
+  }
+  #snapshot(cell) {
+    this.#current(cell);
+    this.#settleRead?.(cell);
+    return this.#readingStage ? this.#readingStage.get(cell) ?? missing : cell.state;
+  }
   #afterCommit(cleanup) {
     if (this.#transaction) { this.#transaction.cleanup.push(cleanup); return; }
     const wasNotifying = this.#notifying;
@@ -320,7 +399,9 @@ export class StateStore {
     if (!declaration || typeof declaration !== 'object' || !Object.hasOwn(declaration, 'schema')) fail('INVALID_DEFINITION');
     let validator;try { validator = compileSchema(declaration.schema); } catch(caught) { throw safeError(caught,'INVALID_DEFINITION'); }
     const cell = { address, generation: ++nextGeneration, validator, schema: structuredClone(declaration.schema), initialSettled: Object.hasOwn(declaration, 'initial'), state: missing, baseline: missing, writes: 0, clockSubscriptions: new Set(),
-      derived: declaration.derived, dependencies: (declaration.dependencies ?? []).map(handle => this.#cellFor(handle)) };
+      derived: declaration.derived, computeSnapshot: undefined, externalChanged: undefined, dynamicDependencies: undefined,
+      referenceInputsChanged: undefined, bindingSuspended: false,
+      dependencies: (declaration.dependencies ?? []).map(handle => this.#cellFor(handle)) };
     if (cell.derived && typeof cell.derived !== 'function') fail('INVALID_DEFINITION');
     // Async initialization is distinct from ordinary stored data.
     if (Object.hasOwn(declaration, 'pendingInitial') && Object.hasOwn(declaration, 'initial')) fail('INVALID_DEFINITION');
@@ -330,8 +411,8 @@ export class StateStore {
     } else if (Object.hasOwn(declaration, 'initial')) cell.state = cell.baseline = this.#accept(cell, declaration.initial);
     const store = this;
     cell.handle = Object.freeze({ address, generation: cell.generation,
-      read() { store.#current(cell); const snapshot = store.#readingStage?.get(cell) ?? cell.state; if (snapshot.status === 'pending') fail('VALUE_PENDING'); if (snapshot.status === 'error') throw snapshot.error; return snapshot.status === 'ready' ? snapshot.value : undefined; },
-      getSnapshot() { store.#current(cell); return store.#readingStage?.get(cell) ?? cell.state; },
+      read() { const snapshot = store.#snapshot(cell); if (snapshot.status === 'pending') fail('VALUE_PENDING'); if (snapshot.status === 'error') throw snapshot.error; return snapshot.status === 'ready' ? snapshot.value : undefined; },
+      getSnapshot() { return store.#snapshot(cell); },
       write(value) { store.writeBatch([[cell.handle, value]]); },
       reset() {
         store.assertCanWrite();
@@ -341,8 +422,6 @@ export class StateStore {
         store.#perform(() => store.#writePrepared(new Map([[cell, cell.baseline]]), 'explicit'));
       },
     });
-    // Structural preparation occurs before replacing the old generation.
-    if (cell.derived) cell.state = this.#calculate(cell, new Map([...this.#cells.values()].map(item => [item, item.state])));
     const initial = this.#transaction?.deferredMutations ? { ...cell } : undefined;
     this.#perform(() => {
       checkScope();
@@ -350,11 +429,14 @@ export class StateStore {
       // Later mutations in the candidate may already have touched this cell.
       if (initial) Object.assign(cell, initial);
       this.#cells.set(key, cell);
+      if (previous || cell.derived) this.#invalidateReactionGraph();
       if (previous) {
-        for (const [target, reaction] of this.#reactions) if (target === previous || reaction.watch.includes(previous)) this.#reactions.delete(target);
+        this.#removeReactions((target, reaction) => target === previous || reaction.watch.includes(previous));
         this.#retireClock(previous);
       }
-      this.#structuralCommit([this.#change(cell, previous ? 'replaced' : 'added')]);
+      this.#structuralCommit([this.#change(cell, previous ? 'replaced' : 'added')], {
+        added: cell, retired: previous ? [previous] : [],
+      });
     });
     stateHandles.add(cell.handle);
     return cell.handle;
@@ -381,14 +463,19 @@ export class StateStore {
     this.assertCanWrite();
     this.#perform(() => {
       this.#current(cell); this.#cells.delete(keyOf(cell.address));
-      for (const [target, reaction] of this.#reactions) if (target === cell || reaction.watch.includes(cell)) this.#reactions.delete(target);
+      this.#invalidateReactionGraph();
+      this.#removeReactions((target, reaction) => target === cell || reaction.watch.includes(cell));
       this.#retireClock(cell);
-      this.#structuralCommit([this.#change(cell, 'removed')]);
+      this.#structuralCommit([this.#change(cell, 'removed')], { retired: [cell] });
     });
   }
 
   writeBatch(changes, { origin = 'explicit' } = {}) {
     this.assertCanWrite();
+    const prepared = this.#prepareWrites(changes);
+    this.#perform(() => this.#writePrepared(prepared, origin));
+  }
+  #prepareWrites(changes) {
     const prepared = new Map();
     for (const [handle, value] of changes) {
       const cell = this.#cellFor(handle);
@@ -396,7 +483,7 @@ export class StateStore {
       if (prepared.has(cell)) fail('DUPLICATE_TARGET');
       prepared.set(cell, this.#accept(cell, value));
     }
-    this.#perform(() => this.#writePrepared(prepared, origin));
+    return prepared;
   }
   #writePrepared(prepared, origin) {
     for (const cell of prepared.keys()) this.#current(cell);
@@ -404,12 +491,75 @@ export class StateStore {
     this.#commit(prepared, new Set(prepared.keys()), origin);
   }
   stageBatch(changes) {
-    const before=new Map([...this.#cells.values()].map(cell=>[cell,cell.state]));
-    const explicit=new Set(changes.map(([handle])=>this.#cellFor(handle)));
-    this.writeBatch(changes,{origin:'stage'});
-    return ()=>this.#commit(new Map(),explicit,'explicit',before);
+    this.assertCanWrite();
+    const baseline = new Map([...this.#cells.values()].map(cell => [cell, cell.state]));
+    const previouslyWritten = new Set([...baseline.keys()].filter(cell => cell.writes));
+    const referenceCells = new Set(baseline.keys());
+    const initializers = this.#transaction?.initializers;
+    const prepared = this.#prepareWrites(changes);
+    const explicit = new Set(prepared.keys());
+    this.#perform(() => this.#writePrepared(prepared, 'stage'));
+    const effects = new Map();
+    const finalEffects = new Set();
+    if (this.#transaction) this.#transaction.reactionEffects = effects;
+    const recordReaction = (cell, snapshot, value) => {
+      if (!effects.has(cell)) effects.set(cell, { snapshot, baseline: cell.baseline });
+      if (!same(snapshot, value)) finalEffects.add(cell);
+    };
+    const settle = scopes => {
+      // Replay the writes against the current candidate graph. Effects of a
+      // reaction removed since a previous pass must not become input State.
+      finalEffects.clear();
+      const watched = new Set();
+      for (const cell of this.#cells.values()) {
+        if (!baseline.has(cell)) baseline.set(cell, cell.state);
+      }
+      for (const reactions of this.#reactions.values()) for (const reaction of reactions) {
+        for (const watch of reaction.watch) watched.add(watch);
+      }
+      const staged = new Map();
+      for (const [cell, effect] of effects) {
+        if (this.#cells.get(keyOf(cell.address)) !== cell) continue;
+        // A newly completed initializer is part of the candidate, even if
+        // another pass previously wrote this cell through a reaction.
+        if (cell.baseline !== effect.baseline && !cell.writes) {
+          effect.snapshot = effect.baseline = cell.baseline;
+        }
+        staged.set(cell, effect.snapshot);
+      }
+      for (const [cell, snapshot] of prepared) staged.set(cell, snapshot);
+      const affected = new Set([...this.#cells.values()].filter(cell => cell.dynamicDependencies?.blocked.length));
+      const reference = new Map([...this.#cells.values()].map(cell => [
+        cell, cell.derived ? cell.state : baseline.get(cell),
+      ]));
+      for (const cell of initializers ?? []) {
+        if (reference.has(cell) && !previouslyWritten.has(cell)) reference.set(cell, cell.baseline);
+      }
+      // Only this candidate refreshes Value bindings in the applied pass.
+      // Other scopes use their committed bindings in both passes, while
+      // their State handles still read from the corresponding snapshot.
+      this.#settle(reference, cell => !same(cell.state, reference.get(cell) ?? missing), {
+        roots: watched, comparison: { cells: referenceCells, scopeIds: new Set(scopes.map(scope => scope.scopeId)) },
+      });
+      return this.#commit(staged, explicit, 'explicit', { baseline: reference, affected, recordReaction, referenceCells });
+    };
+    return {
+      settle,
+      finalize: () => {
+        const written = new Set(finalEffects);
+        for (const [cell, snapshot] of prepared) if (!same(baseline.get(cell), snapshot)) written.add(cell);
+        const changes = [];
+        for (const cell of written) {
+          if (this.#cells.get(keyOf(cell.address)) !== cell) continue;
+          const change = this.#change(cell, 'updated');
+          this.#urlChanges.add(change);
+          changes.push(change);
+        }
+        this.#notify(changes);
+      },
+    };
   }
-  registerReaction(owner, { watch, target, value }) {
+  registerReaction(owner, { watch, target, value }, { candidate = false } = {}) {
     this.assertCanWrite();
     const lifetime = this.#scopeLifetimes.get(owner);
     if (!lifetime) fail('INVALID_DEFINITION');
@@ -417,37 +567,227 @@ export class StateStore {
     if (!Array.isArray(watch) || watch.length === 0) fail('INVALID_DEFINITION');
     const cell = this.#cellFor(target), watched = watch.map(handle => this.#cellFor(handle));
     if (cell.derived) fail('READ_ONLY');
-    if (this.#reactions.has(cell)) fail('DUPLICATE_REACTION');
+    if (!candidate && this.#reactions.has(cell)) fail('DUPLICATE_REACTION');
     const reaction = { owner: owner.scopeId, watch: watched, value: this.#accept(cell, value) };
     this.#mutate(() => {
       if (!lifetime.alive) fail('CANCELLED');
       this.#current(cell);
       for (const dependency of watched) this.#current(dependency);
-      if (this.#reactions.has(cell)) fail('DUPLICATE_REACTION');
-      this.#reactions.set(cell, reaction);
-      try { this.#order(); } catch (error) { this.#reactions.delete(cell); throw error; }
+      if (!candidate && this.#reactions.has(cell)) fail('DUPLICATE_REACTION');
+      this.#reactions.set(cell, [...(this.#reactions.get(cell) ?? []), reaction]);
+      this.#invalidateReactionGraph();
+      if (!candidate) {
+        try {
+          this.#validateDependencyGraph(this.#cells.values());
+          this.#validateDependencyGraph([cell], { valueInputs: true });
+        } catch (error) { this.#reactions.delete(cell); throw error; }
+      }
     });
-    return () => this.#mutate(() => { if (this.#reactions.get(cell) === reaction) this.#reactions.delete(cell); });
+    return () => {
+      this.assertCanWrite();
+      const remove = () => {
+        if (!this.#removeReactions((target, entry) => target === cell && entry === reaction)) return;
+        if (!candidate) this.#structuralCommit([], { retryBlocked: true });
+      };
+      if (candidate) this.#mutate(remove);
+      else this.#perform(remove);
+    };
   }
-  #order() {
-    const result = [], active = new Set(), done = new Set();
+  #removeReactions(remove) {
+    let changed = false;
+    for (const [target, entries] of this.#reactions) {
+      const remaining = entries.filter(entry => !remove(target, entry));
+      if (remaining.length === entries.length) continue;
+      if (remaining.length) this.#reactions.set(target, remaining);
+      else this.#reactions.delete(target);
+      changed = true;
+    }
+    if (changed) this.#invalidateReactionGraph();
+    return changed;
+  }
+  #reaction(cell) {
+    const entries = this.#reactions.get(cell);
+    return entries?.length === 1 ? entries[0] : undefined;
+  }
+  settleReactionChanges() {
+    return this.#structuralCommit([], { reevaluateDynamic: true });
+  }
+  recordReactionPlan(previous) {
+    const values = new Map([...this.#cells.values()].map(cell => [cell, { state: cell.state, baseline: cell.baseline }]));
+    const reactions = new Map(this.#reactions);
+    const repeated = previous.some(plan =>
+      plan.values.size === values.size && plan.reactions.size === reactions.size
+      && [...values].every(([cell, value]) => {
+        const prior = plan.values.get(cell);
+        return prior && same(value.state, prior.state) && same(value.baseline, prior.baseline);
+      })
+      && [...reactions].every(([cell, entries]) => sameReactions(entries, plan.reactions.get(cell))));
+    if (repeated) fail('DEPENDENCY_CYCLE');
+    previous.push({ values, reactions });
+  }
+  validateCandidateDependencies(scopes, { includeBlocked } = {}) {
+    const scopeIds = new Set(scopes.map(scope => scope.scopeId));
+    const roots = new Set();
+    for (const [cell, error] of this.#transaction?.initializerErrors ?? []) {
+      if (this.#cells.get(keyOf(cell.address)) === cell) throw error;
+    }
+    for (const cell of this.#cells.values()) {
+      const previous = this.#transaction?.previousCells.get(cell)?.dynamicDependencies?.blocked;
+      if (scopeIds.has(cell.address.scopeId)
+        || cell.dynamicDependencies?.blocked.some(dependency => !previous?.includes(dependency))) roots.add(cell);
+    }
+    // An owner can introduce edges exclusively between external State cells.
+    for (const [target, entries] of this.#reactions) {
+      if (entries.length > 1) fail('DUPLICATE_REACTION');
+      if (!sameReactions(entries, this.#transaction?.previousReactions.get(target))) roots.add(target);
+    }
+    this.#validateDependencyGraph(roots, { includeBlocked });
+    if (this.#reactions.size) this.#validateDependencyGraph(roots, { valueInputs: true });
+  }
+  #validateDependencyGraph(roots, { observed = true, includeBlocked = false, valueInputs = false } = {}) {
+    const active = new Set(), done = new Set();
     const visit = cell => {
-      if (this.#cells.get(keyOf(cell.address)) !== cell) return;
+      if (this.#candidateSuspends(cell) || this.#cells.get(keyOf(cell.address)) !== cell) return;
       if (active.has(cell)) fail('DEPENDENCY_CYCLE');
       if (done.has(cell)) return;
       active.add(cell);
-      for (const dependency of [...cell.dependencies, ...(this.#reactions.get(cell)?.watch ?? [])]) visit(dependency);
-      active.delete(cell); done.add(cell); result.push(cell);
+      for (const dependency of cell.dependencies) visit(dependency);
+      if (valueInputs && !cell.bindingSuspended && cell.referenceInputsChanged) {
+        for (const dependency of this.#readValueDependencies(cell)) visit(dependency);
+      }
+      if (observed && cell.dynamicDependencies) {
+        for (const dependency of cell.dynamicDependencies.reads) visit(dependency);
+        // A candidate includes attempted reads. Live evaluation omits a
+        // blocked edge from its usable graph and keeps it for recovery.
+        if (includeBlocked) for (const dependency of cell.dynamicDependencies.blocked) visit(dependency);
+      }
+      for (const dependency of this.#reaction(cell)?.watch ?? []) visit(dependency);
+      active.delete(cell); done.add(cell);
     };
-    for (const cell of this.#cells.values()) visit(cell);
-    return result;
+    for (const cell of roots) visit(cell);
   }
-  #calculate(cell, staged) {
+  #readValueDependencies(cell) {
+    // Trace the settled candidate's input recipes without evaluating CEL or
+    // installing edges from the separate Reaction reference calculation.
+    const dependencies = new Set(), previous = this.#settleRead;
+    this.#settleRead = dependency => dependencies.add(dependency);
+    try { cell.computeSnapshot(new Map(), true); }
+    finally { this.#settleRead = previous; }
+    return dependencies;
+  }
+  #cyclicReactionWatches() {
+    const indices = new Map(), stack = [], cyclic = new Map();
+    const visit = cell => {
+      const node = { index: indices.size, low: indices.size, active: true };
+      indices.set(cell, node);
+      stack.push(cell);
+      const watches = this.#reactions.get(cell)?.flatMap(reaction => reaction.watch) ?? [];
+      for (const dependency of this.#candidateSuspends(cell) ? [] : [...cell.dependencies, ...watches]) {
+        if (this.#cells.get(keyOf(dependency.address)) !== dependency) continue;
+        const seen = indices.get(dependency);
+        if (!seen) node.low = Math.min(node.low, visit(dependency).low);
+        else if (seen.active) node.low = Math.min(node.low, seen.index);
+      }
+      if (node.low === node.index) {
+        const component = new Set();
+        let member;
+        do {
+          member = stack.pop();
+          indices.get(member).active = false;
+          component.add(member);
+        } while (member !== cell);
+        for (const member of component) {
+          if (this.#reactions.get(member)?.some(reaction => reaction.watch.some(watch => component.has(watch)))) {
+            cyclic.set(member, component);
+          }
+        }
+      }
+      return node;
+    };
+    for (const cell of this.#cells.values()) if (!indices.has(cell)) visit(cell);
+    return cyclic;
+  }
+  #settle(staged, changed, { affected, first, applyReaction, roots = staged.keys(), comparison } = {}) {
+    const active = new Set(), done = new Set();
+    // Share reevaluated inputs among Derived cells in this reference pass.
+    const referenceInputs = comparison && new Map();
+    // A preliminary View can contain a Reaction that its own independent
+    // writes will retire. Evaluate other inputs and validate the final graph.
+    const omitted = !comparison && this.#transaction?.viewCandidate && this.#reactions.size
+      ? this.#transaction.cyclicReactions ??= this.#cyclicReactionWatches()
+      : undefined;
+    // Previously observed reads are invalidation hints. A changed input can
+    // redirect a dynamic path, so validate the actual read during evaluation.
+    const observedChanged = dependency => {
+      try { settle(dependency); }
+      catch (caught) { if (caught === dependencyCycle) return true; throw caught; }
+      return changed(dependency);
+    };
+    const settle = cell => {
+      if (!staged.has(cell) || done.has(cell)) return;
+      if (active.has(cell)) throw dependencyCycle;
+      if (this.#candidateSuspends(cell) || comparison && cell.derived && !comparison.cells.has(cell)) {
+        done.add(cell);
+        return;
+      }
+      active.add(cell);
+      try {
+        for (const dependency of cell.dependencies) settle(dependency);
+        const reactions = comparison ? undefined : this.#reactions.get(cell);
+        const blocked = omitted?.get(cell);
+        for (const reaction of reactions ?? []) {
+          for (const dependency of reaction.watch) if (!blocked?.has(dependency)) settle(dependency);
+        }
+        if (cell.derived) {
+          const recompute = affected?.has(cell) || cell.dependencies.some(changed)
+            || cell.dynamicDependencies?.reads.some(observedChanged)
+            || cell.dynamicDependencies?.blocked.some(observedChanged);
+          const bindings = comparison?.scopeIds.has(cell.address.scopeId) && !cell.bindingSuspended
+            ? referenceInputs : undefined;
+          if (recompute || bindings && cell.referenceInputsChanged) {
+            staged.set(cell, this.#calculate(cell, staged, settle, { comparison, bindings, recompute }));
+          }
+        }
+        if (reactions) applyReaction?.(cell, reactions, blocked);
+        done.add(cell);
+      } finally { active.delete(cell); }
+    };
+    try {
+      if (first) settle(first);
+      for (const cell of roots) settle(cell);
+    } catch (caught) {
+      if (caught === dependencyCycle) fail('DEPENDENCY_CYCLE');
+      throw caught;
+    }
+    return done;
+  }
+  #calculate(cell, staged, settle, { comparison, bindings, recompute }) {
     if (cell.dependencies.some(item => this.#cells.get(keyOf(item.address)) !== item)) return errorState({ code: 'CANCELLED' });
     if (cell.computeSnapshot) {
-      const previous=this.#readingStage;this.#readingStage=staged;
-      try { const result=cell.computeSnapshot();return result.status === 'ready' ? this.#accept(cell,result.value) : result; }
-      catch(caught){return errorState(caught);}finally{this.#readingStage=previous;}
+      const previous=this.#readingStage, previousRead=this.#settleRead;
+      this.#readingStage=staged;
+      const observed = !comparison && cell.dynamicDependencies && { reads: [], blocked: [] };
+      this.#settleRead = comparison || observed ? dependency => {
+        try { settle(dependency); }
+        catch (caught) {
+          if (caught !== dependencyCycle) throw caught;
+          // Remember the failed read for recovery, without adding a cycle
+          // to the valid dependency graph.
+          if (observed && !observed.blocked.includes(dependency)) observed.blocked.push(dependency);
+          fail('DEPENDENCY_CYCLE');
+        }
+        if (observed && !cell.dependencies.includes(dependency) && !observed.reads.includes(dependency)) observed.reads.push(dependency);
+      } : undefined;
+      try {
+        if (!recompute && !cell.referenceInputsChanged(bindings)) return staged.get(cell);
+        const result=cell.computeSnapshot(bindings);
+        return result.status === 'ready' ? this.#accept(cell,result.value) : result;
+      } catch(caught) { return errorState(caught); }
+      finally {
+        this.#readingStage=previous;
+        this.#settleRead=previousRead;
+        if (observed) cell.dynamicDependencies=observed;
+      }
     }
     const snapshots = cell.dependencies.map(item => staged.get(item) ?? missing);
     const error = snapshots.find(item => item.status === 'error'); if (error) return error;
@@ -456,42 +796,73 @@ export class StateStore {
     try { return this.#accept(cell, cell.derived(...snapshots.map(item => item.value))); }
     catch (error) { return errorState(error); }
   }
-  #structuralCommit(changes) {
-    const staged = new Map([...this.#cells.values()].map(cell => [cell, cell.state]));
+  #structuralCommit(changes, { added, retired = [], recompute, reevaluateDynamic, retryBlocked } = {}) {
     // A dependency is a generation-bound cell, never an automatic name rebind.
-    for (const cell of this.#order()) if (cell.derived) {
-      const snapshot = this.#calculate(cell, staged); staged.set(cell, snapshot);
-      if (!same(cell.state, snapshot)) {
+    const removed = new Set(retired);
+    const affected = new Set();
+    if (added?.derived) affected.add(added);
+    if (recompute) affected.add(recompute);
+    for (const cell of this.#cells.values()) {
+      if (cell.derived && !this.#candidateSuspends(cell) && (reevaluateDynamic && cell.dynamicDependencies
+        || retryBlocked && cell.dynamicDependencies?.blocked.length || cell.externalChanged?.() || removed.size && (
+        cell.dependencies.some(dependency => removed.has(dependency))
+        || cell.dynamicDependencies?.reads.some(dependency => removed.has(dependency))
+        || cell.dynamicDependencies?.blocked.some(dependency => removed.has(dependency))))) affected.add(cell);
+    }
+    if (affected.size) {
+      const staged = new Map([...this.#cells.values()].map(cell => [cell, cell.state]));
+      const changed = cell => removed.has(cell) || !same(cell.state, staged.get(cell) ?? cell.state);
+      const settled = this.#settle(staged, changed, { affected, first: recompute });
+      for (const cell of settled) {
+        const snapshot = staged.get(cell);
+        if (same(cell.state, snapshot)) continue;
         this.#transaction?.reactionBaseline.delete(cell);
         cell.state = snapshot;
-        changes.push(this.#change(cell, 'updated'));
+        if (cell !== added) changes.push(this.#change(cell, 'updated'));
       }
     }
     this.#notify(changes);
+    return changes.length > 0;
   }
-  #commit(prepared, explicit, origin, baseline) {
+  #commit(prepared, explicit, origin, { baseline, affected, recordReaction, referenceCells } = {}) {
     const before = new Map([...this.#cells.values()].map(cell => [cell, cell.state]));
     const staged = new Map(before);
     const deferReactions = origin === 'explicit' && !baseline && this.#transaction;
     if (deferReactions) for (const cell of explicit) deferReactions.explicitWrites.add(cell);
     for (const [cell, snapshot] of prepared) staged.set(cell, snapshot);
-    for (const cell of this.#order()) {
-      if (!staged.has(cell)) continue;
-      if (cell.derived && cell.dependencies.some(item => !same(before.get(item) ?? missing, staged.get(item) ?? missing))) staged.set(cell, this.#calculate(cell, staged));
-      const reaction = this.#reactions.get(cell);
-      if (reaction && origin === 'explicit' && !deferReactions && !explicit.has(cell)
-        && reaction.watch.some(item => changedValue(baseline?.get(item) ?? before.get(item) ?? missing, staged.get(item) ?? missing))) staged.set(cell, reaction.value);
-    }
+    const changed = cell => !same(before.get(cell) ?? missing, staged.get(cell) ?? missing);
+    const applyReaction = origin === 'explicit' && !deferReactions ? (cell, reactions, blocked) => {
+      if (explicit.has(cell)) return;
+      let value;
+      for (const reaction of reactions) {
+        if (!reaction.watch.some(item => {
+          if (blocked?.has(item)) return false;
+          const prior = baseline?.get(item) ?? before.get(item) ?? missing;
+          // A Derived first created after staging has no comparison value
+          // in this application. Its first committed value is initialization.
+          if (referenceCells && item.derived && !referenceCells.has(item)) return false;
+          return changedValue(prior, staged.get(item) ?? missing);
+        })) continue;
+        if (value && !same(value, reaction.value)) return;
+        value = reaction.value;
+      }
+      if (value) {
+        recordReaction?.(cell, staged.get(cell), value);
+        staged.set(cell, value);
+      }
+    } : undefined;
+    this.#settle(staged, changed, { applyReaction, affected });
     const changes = [];
     for (const [cell, snapshot] of staged) if (!same(cell.state, snapshot)) {
       if (deferReactions && !deferReactions.reactionBaseline.has(cell)) deferReactions.reactionBaseline.set(cell, cell.state);
       if (origin !== 'explicit') this.#transaction?.reactionBaseline.delete(cell);
       cell.state = snapshot;
       const change = this.#change(cell, 'updated');
-      if (origin === 'explicit' || origin === 'stage') this.#urlChanges.add(change);
+      if (origin === 'explicit' && !referenceCells) this.#urlChanges.add(change);
       changes.push(change);
     }
     this.#notify(changes);
+    return changes.length > 0;
   }
   #change(cell, kind) { return Object.freeze({ kind, target: cell.address, generation: cell.generation }); }
   #mutate(run) {

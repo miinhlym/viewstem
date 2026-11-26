@@ -205,6 +205,9 @@
 | D168 | URL 준비 실패와 선택 제거의 관찰 | 지연된 초기 준비 실패는 `ready` 거절과 URL 진단으로 관찰하고, 선택 제거는 나머지 키의 대기 쓰기를 보존한다. [URL 명세](spec/09-state-store-and-url.md) | EGM 공개 API 재리뷰의 지연 어댑터 재현 |
 | D169 | UI 셋 스타일의 DOM과 CSS 이름 소유권 | 셋의 기본 스타일을 소유 DOM에 적용한다. 같은 셋 ID를 DOM 생성과 CSS 빌드에서 사용하며, 빌드가 격리할 수 있는 전역 이름에 접두사를 붙인다. 호스트가 공유 이름을 등록한다. `data-viewstem-ui`는 이전 테마 지정 범위로 사용한다. [브라우저 명세](spec/12-resource-sets-browser.md#ui-셋의-스타일-소유권) | 혼합 UI의 CSS 리셋과 독립 셋의 글꼴 이름 충돌 재현. 선택자 검사만으로는 문서 이름을 격리할 수 없어 빌드에서 지원 규칙을 제한하기로 함 |
 | D170 | 브라우저 UI 스타일 기본 로딩 | `@viewstem/ui`의 `browser` 진입점에서 기본 CSS를 가져온다. Node용 JS와 직접 불러올 수 있는 `styles.css`도 제공한다. [브라우저 명세](spec/12-resource-sets-browser.md#ui-셋의-스타일-소유권) | 상위 셋만 등록하는 앱이 의존 셋의 CSS 경로를 따로 관리할 필요를 없애기로 결정 |
+| D175 | Derived와 View 적용을 같은 State 후보에서 확정 | 동적 경로가 새로 선택한 셀을 먼저 계산한다. Reaction이 노드의 존재를 바꾸면 명시적 State 입력과 후보에 남은 Reaction으로 다시 계산한다. State 값과 노드 구성이 일치할 때만 함께 공개하고, 후보가 반복되면 적용을 취소한다. [Store 명세](spec/09-state-store-and-url.md#store-주소관찰reaction의-현행-매핑) | 동적 경로가 직전 Derived 값을 읽거나 제거될 노드의 Reaction이 첫 화면과 State에 남는 사례를 EGM 검토에서 재현 |
+| D176 | 같은 후보 바인딩으로 Reaction 감시값 비교 | Store가 초기화를 포함한 비교용 State를 관리하고, View가 현재 후보의 Value 포트와 반복 항목을 그 State에 맞춰 해석한다. 후보 수명과 공개 시점은 실제 적용에서 확정한다. 순환 검증에는 실제 후보가 읽은 의존성을 사용한다. [Store 명세](spec/09-state-store-and-url.md#store-주소관찰reaction의-현행-매핑) | 이전 후보의 콜백을 저장하는 방식에서 초기화만으로 Reaction이 실행되는 두 경로를 재현하고 EGM 설계 검토에서 경계를 확정 |
+| D177 | 공유 Store에서 View 적용의 재바인딩 범위 | 적용하는 View가 재바인딩할 소유자 범위를 Store에 전달한다. 다른 View의 확정된 Value 입력을 비교 양쪽에 사용해 그 View가 공개하는 구성과 감시값을 일치시킨다. [Store 명세](spec/09-state-store-and-url.md#store-주소관찰reaction의-현행-매핑) | 다른 View의 Value 입력을 비교 기준에서만 다시 계산하면 초기화가 Reaction을 실행하거나 실제 State 포트 쓰기가 가려지는 사례를 재현 |
 
 ### 문서 배포
 
@@ -219,7 +222,7 @@
 
 | ID | 의제·결정 | 이유·경계 | 근거 |
 |---|---|---|---|
-| D175 | 리소스별 전체 JSON Schema 제공 | 리소스 7종의 구조를 Draft 2020-12로 기술한다. 문서 본문과 다운로드는 같은 정의를 사용한다. Core는 참조 해석, 포트 연결 및 표현식 실행을 계속 검증한다. [사이트 동작 계약](../apps/docs/README.ko.md#사이트-동작-계약) | 2026-11-26 사용자 요청 |
+| D178 | 리소스별 전체 JSON Schema 제공 | 리소스 7종의 구조를 Draft 2020-12로 기술한다. 문서 본문과 다운로드는 같은 정의를 사용한다. Core는 참조 해석, 포트 연결 및 표현식 실행을 계속 검증한다. [사이트 동작 계약](../apps/docs/README.ko.md#사이트-동작-계약) | 2026-11-26 사용자 요청 |
 
 리소스 셋과 혼합 렌더링의 후속 선택은 [별도 결정 이력](https://github.com/miinhlym/viewstem/blob/4cc2d048d9c1c6237e62add7057cb595116dc607/docs/history/resource-sets-browser-2026-11-16.md)에 있다. D144의 패키지 역할에서 바뀌는 부분과 D150–D158의 현재 호스트 구현 기준을 함께 확인할 수 있다.
 
