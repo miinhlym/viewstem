@@ -13,6 +13,7 @@ Each link opens runnable JSON with its required resources, inputs, and expected 
 | --- | --- | --- |
 | Literal / path / call | `@path`, `@call`, `args` | [Open example](/examples/value-call/) |
 | Whole input object | `inputs: {"@path": "/ports/notice"}` | [Open example](/examples/input-object/) |
+| Whole input object from a function | `inputs: {"@call": "makeNotice", "args": [...]}` | [Run the function example](/examples/input-object-call/) |
 | Event payload | `/event` | [Open example](/examples/event-payload/) |
 
 ## ValueExpression and PathExpression
@@ -52,6 +53,49 @@ This View body takes a notice from its host. Mount it with an input such as `{"n
     "inputs": { "@path": "/ports/notice" }
   }
 }
+```
+
+<a id="whole-inputs-call"></a>
+
+### Return the whole input object with `@call`
+
+The alert receives the object returned by `makeNotice`. The example registers the function for you. Change the first argument to `true` to render the closure message and the `destructive` variant. [Run the function example](/examples/input-object-call/)
+
+```json title="whole-inputs-call.json"
+{
+  "render": {
+    "id": "trail-notice",
+    "componentRef": "shadcn.Alert.Root",
+    "inputs": {
+      "@call": "makeNotice",
+      "args": [false, "The trail is open.", "The trail is closed."]
+    }
+  }
+}
+```
+
+Register the same function in your app. Pass this `runtime` to `createRenderer({ runtime })` and mount the View JSON above.
+
+```js title="Register makeNotice"
+import { createRuntime } from '@viewstem/core';
+import { ui } from '@viewstem/ui';
+
+const runtime = createRuntime({
+  functions: [{
+    name: 'makeNotice',
+    inputs: [{ type: 'boolean' }, { type: 'string' }, { type: 'string' }],
+    output: {
+      type: 'object',
+      properties: { text: { type: 'string' }, variant: { enum: ['default', 'destructive'] } },
+      required: ['text', 'variant'],
+      additionalProperties: false,
+    },
+    run: (closed, openText, closedText) => closed
+      ? { text: closedText, variant: 'destructive' }
+      : { text: openText, variant: 'default' },
+  }],
+});
+runtime.registry.registerResourceSet(ui);
 ```
 
 ## Reading paths

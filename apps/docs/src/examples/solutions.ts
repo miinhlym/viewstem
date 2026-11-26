@@ -28,6 +28,7 @@ const solutions: Record<ExampleId, Solution> = {
   'input-object': { inputs: (_, locale) => format({
     notice: { text: tr(locale, 'The trail is closed.', '산책로가 통제되었습니다.'), variant: 'destructive' },
   }) },
+  'input-object-call': { view: replace('false,', 'true,') },
   slots: { view: source => {
     const view = JSON.parse(source);
     const [header, body, footer] = view.render.slots.default;

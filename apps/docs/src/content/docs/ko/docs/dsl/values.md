@@ -13,6 +13,7 @@ sidebar:
 | --- | --- | --- |
 | Literal / path / call | `@path`, `@call`, `args` | [예제 열기](/ko/examples/value-call/) |
 | 입력 객체 전체 | `inputs: {"@path": "/ports/notice"}` | [예제 열기](/ko/examples/input-object/) |
+| 함수가 반환한 입력 객체 전체 | `inputs: {"@call": "makeNotice", "args": [...]}` | [함수 예제 실행](/ko/examples/input-object-call/) |
 | Event payload | `/event` | [예제 열기](/ko/examples/event-payload/) |
 
 ## ValueExpression과 PathExpression
@@ -52,6 +53,49 @@ sidebar:
     "inputs": { "@path": "/ports/notice" }
   }
 }
+```
+
+<a id="whole-inputs-call"></a>
+
+### `@call`로 입력 객체 전체 반환하기
+
+알림은 `makeNotice`가 반환하는 객체를 입력으로 받습니다. 실행 예제에는 함수가 등록되어 있습니다. 첫 번째 인자를 `true`로 바꾸면 통제 안내 문구와 `destructive` 스타일이 함께 표시됩니다. [함수 예제 실행](/ko/examples/input-object-call/)
+
+```json title="whole-inputs-call.json"
+{
+  "render": {
+    "id": "trail-notice",
+    "componentRef": "shadcn.Alert.Root",
+    "inputs": {
+      "@call": "makeNotice",
+      "args": [false, "산책로를 이용할 수 있습니다.", "산책로가 통제되었습니다."]
+    }
+  }
+}
+```
+
+앱에서도 같은 함수를 등록하세요. `createRenderer({ runtime })`에 아래 `runtime`을 넘기고 위 View JSON을 마운트합니다.
+
+```js title="makeNotice 등록"
+import { createRuntime } from '@viewstem/core';
+import { ui } from '@viewstem/ui';
+
+const runtime = createRuntime({
+  functions: [{
+    name: 'makeNotice',
+    inputs: [{ type: 'boolean' }, { type: 'string' }, { type: 'string' }],
+    output: {
+      type: 'object',
+      properties: { text: { type: 'string' }, variant: { enum: ['default', 'destructive'] } },
+      required: ['text', 'variant'],
+      additionalProperties: false,
+    },
+    run: (closed, openText, closedText) => closed
+      ? { text: closedText, variant: 'destructive' }
+      : { text: openText, variant: 'default' },
+  }],
+});
+runtime.registry.registerResourceSet(ui);
 ```
 
 ## 경로로 읽기

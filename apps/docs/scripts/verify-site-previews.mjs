@@ -215,6 +215,26 @@ function lessonChecks(t) {
       await hideSolution();
       await see(open);
     },
+    'input-object-call': async ({ see, preview, showSolution, hideSolution, edit }) => {
+      const open = t('The trail is open.', '산책로를 이용할 수 있습니다.');
+      const closed = t('The trail is closed.', '산책로가 통제되었습니다.');
+      const notice = preview.locator('[data-vs-component="Alert.Root"]');
+      const expectNotice = async (message, variant) => {
+        await see(message);
+        assert.equal(await notice.getAttribute('data-variant'), variant);
+      };
+      await expectNotice(open, 'default');
+      await showSolution();
+      await expectNotice(closed, 'destructive');
+      await hideSolution();
+      await expectNotice(open, 'default');
+      await edit(source => {
+        assert.equal(source.render.inputs['@call'], 'makeNotice');
+        source.render.inputs.args = [true, open, 'Closed by the editor'];
+        return source;
+      });
+      await expectNotice('Closed by the editor', 'destructive');
+    },
     'slots': async ({ order, showSolution }) => {
       await order(bookSummary, borrowed);
       await showSolution();
@@ -571,6 +591,9 @@ async function verify(locale) {
     };
     const entries = await readdir(new URL(`../dist${prefix}/examples/`, import.meta.url), { withFileTypes: true });
     await verifySchemaPages(page, prefix);
+    await page.goto(`${origin}${prefix}/docs/dsl/values/`);
+    await page.locator(`a[href="${prefix}/examples/input-object-call/"]`).first().click();
+    await page.waitForURL(`${origin}${prefix}/examples/input-object-call/`);
     const lessons = entries.filter(entry => entry.isDirectory());
     assert.ok(lessons.length > 0);
     const cases = lessonChecks(t);

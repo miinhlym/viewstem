@@ -3,15 +3,18 @@ import { createHttpExecutor } from '@viewstem/core/http';
 import { createRenderer } from '@viewstem/dom';
 import { ui } from '@viewstem/ui';
 import { libraryEndpoint, type ExampleDefinition, type Locale } from './definitions';
+import { makeNotice } from './notice-function.mjs';
 
 export function createExamplePreview(
   target: HTMLElement,
   definition: ExampleDefinition,
   locale: Locale,
+  exampleId: string | undefined,
   onError: NonNullable<Parameters<ReturnType<typeof createRenderer>['attach']>[2]>['onError'],
 ) {
   let requestCount = 0;
   const runtime = createRuntime({
+    functions: exampleId === 'input-object-call' ? [makeNotice] : [],
     requestExecutor: createHttpExecutor({ transport: async (url, request) => {
       if (!definition.fixture) throw new Error('No example response is configured.');
       const endpoint = libraryEndpoint[definition.fixture];

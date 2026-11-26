@@ -30,6 +30,7 @@ const solution = getSolution(exampleId, locale, Object.fromEntries(files.map(({ 
   class="example-workbench"
   aria-label={text.source}
   data-example-preview
+  data-example-id={exampleId}
   data-locale={locale}
   data-fixture={definition.fixture}
   data-error={text.error}
@@ -93,7 +94,7 @@ const solution = getSolution(exampleId, locale, Object.fromEntries(files.map(({ 
     const target = container.querySelector<HTMLElement>('[data-example-target]')!;
     const status = container.querySelector<HTMLElement>('[data-example-status]')!;
     const progress = container.querySelector<HTMLElement>('[data-example-running]')!;
-    const { locale, fixture, error, retained, editorError } = container.dataset;
+    const { exampleId, locale, fixture, error, retained, editorError } = container.dataset;
     const editors = new Map<string, ReturnType<typeof createJsonEditor>>();
     const originals = new Map<string, string>();
     const changedSources = new Map<string, string>();
@@ -163,7 +164,7 @@ const solution = getSolution(exampleId, locale, Object.fromEntries(files.map(({ 
         const { createExamplePreview } = await import('../examples/preview');
         surface.hidden = true;
         target.append(surface);
-        next = createExamplePreview(surface, source, locale as Locale, diagnostic => {
+        next = createExamplePreview(surface, source, locale as Locale, exampleId, diagnostic => {
           if (session.preview === next && !session.runFailed) showError(diagnostic.error.message, session);
         });
         await next.run();

@@ -5,6 +5,7 @@ import { createHttpExecutor } from '@viewstem/core/http';
 import { ui } from '@viewstem/ui';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { resourceKinds, resourceSchema } from '../src/lib/resource-schemas.mjs';
+import { makeNotice } from '../src/examples/notice-function.mjs';
 
 const content = new URL('../src/content/docs/', import.meta.url);
 const badge = { id: 'badge', componentRef: 'shadcn.Badge' };
@@ -23,7 +24,7 @@ const childQuery = { sources: {}, transform: { input: [] } };
 const wholeInputs = { '@path': '/ports/notice' };
 for (const supported of [
   resource('View', { render: { ...badge, inputs: wholeInputs } }),
-  resource('View', { render: { ...badge, inputs: { '@call': 'makeNotice', args: ['Trail open'] } } }),
+  resource('View', { render: { ...badge, inputs: { '@call': 'makeNotice', args: [false, 'Trail open', 'Trail closed'] } } }),
   resource('Query', { sources: { external: { queryRef: 'registered', inputs: wholeInputs }, internal: { query: childQuery } },
     transform: { input: { '@path': '/sources/external' } } }),
   resource('Component', { slots: { content: { required: true } } }),
@@ -120,16 +121,19 @@ const checks = {
       const view = await runtime.createView(viewSpec, { inputs: { notice: { text: 'Trail open', variant: 'default' } } });
       assert.deepEqual({ ...view.getSnapshot().roots[0].inputs }, { text: 'Trail open', variant: 'default' });
     });
-    const registry = createRegistry({ functions: [{
-      name: 'makeNotice', inputs: [{ type: 'string' }], output: viewSpec.ports.notice.schema,
-      run: text => ({ text, variant: 'destructive' }),
-    }] });
+  },
+  'whole-inputs-call.json': async viewSpec => {
+    assertSchema(resource('View', viewSpec));
+    const registry = createRegistry({ functions: [makeNotice] });
     registry.registerResourceSet(ui);
-    const fromCall = { render: { ...viewSpec.render, inputs: { '@call': 'makeNotice', args: ['Trail closed'] } } };
-    assertSchema(resource('View', fromCall));
+    const [, openText, closedText] = viewSpec.render.inputs.args;
     await withRuntime([], async runtime => {
-      const view = await runtime.createView(fromCall);
-      assert.deepEqual({ ...view.getSnapshot().roots[0].inputs }, { text: 'Trail closed', variant: 'destructive' });
+      const open = await runtime.createView(viewSpec);
+      assert.deepEqual({ ...open.getSnapshot().roots[0].inputs }, { text: openText, variant: 'default' });
+      const closed = structuredClone(viewSpec);
+      closed.render.inputs.args[0] = true;
+      const updated = await runtime.createView(closed);
+      assert.deepEqual({ ...updated.getSnapshot().roots[0].inputs }, { text: closedText, variant: 'destructive' });
     }, { registry });
   },
   'view-resource.json': async resource => withRuntime([resource], async runtime => {

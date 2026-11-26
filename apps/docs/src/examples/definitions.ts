@@ -125,6 +125,10 @@ export function exampleDefinitions(locale: Locale) {
         render: node('trail-notice', 'Alert.Root', port('notice')),
       },
     },
+    'input-object-call': { view: { render: node('trail-notice', 'Alert.Root', {
+      '@call': 'makeNotice',
+      args: [false, t('The trail is open.', '산책로를 이용할 수 있습니다.'), t('The trail is closed.', '산책로가 통제되었습니다.')],
+    }) } },
     'slots': { view: { render: layout('reading-card', 'Card.Root', [
       layout('header', 'Card.Header', [
         node('book', 'Card.Title', { text: t('The Moon Atlas', '달 지도') }),
