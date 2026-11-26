@@ -5,6 +5,40 @@ sidebar:
   order: 5
 ---
 
+## Examples by form
+
+Use these links to run a form or compare its JSON structure. The reference below defines required fields and constraints.
+
+| Form | Key fields | Runnable example |
+| --- | --- | --- |
+| Nested Query source | `queryRef` / `query`, parent `inputs` | [Run both source forms](/examples/query-sources/) |
+| HTTP source | `datasourceRef` / `datasource`, `request` | [Run a Datasource reference](/examples/http-datasource/) · [Compare both shapes](/docs/dsl/datasources/#reference-and-inline-use) |
+| Concat | `kind`, `with` | [Open example](/examples/query-concat/) |
+| Join | `kind`, `right`, `on`, `mode` | [Open example](/examples/query-join/) |
+| Query use | `queryRef` / `query`, `inputs`, `executeWhen` | [Reference](/examples/query-ref/) · [Inline with inputs](/examples/query-inputs/) · [Execution gate](/examples/query-gate/) |
+| Refresh | `refresh`, `intervalMs`, `autoRefreshWhen` | [Manual refresh](/examples/refresh-query/) · [Polling](/examples/query-polling/) |
+
+## Standalone resource example
+
+This standalone resource has no sources and returns `[ { "name": "Plan" } ]`. A View can use it with `queryRef`.
+
+```json title="query-resource.json"
+{
+  "kind": "Query",
+  "id": "projects",
+  "spec": {
+    "sources": {},
+    "transform": {
+      "input": [
+        {
+          "name": "Plan"
+        }
+      ]
+    }
+  }
+}
+```
+
 ## QuerySpec
 
 | Field | Contract |
@@ -45,6 +79,48 @@ This QuerySpec produces `[{"id":"a","projectId":"a","open":true},{"id":"b"}]`. I
         "kind": "Join",
         "right": [{ "projectId": "a", "open": true }],
         "on": [{ "left": "id", "right": "projectId" }]
+      }
+    ]
+  }
+}
+```
+
+### Join mode results
+
+This QuerySpec requires no HTTP or extra resources. `inner` returns only the matched `a` row. Change `mode` to `left` or omit it to retain the left `a` and `b` rows; `right` retains the right `a` and `c` rows. Unmatched rows do not gain fields from the other side.
+
+```json title="join-modes.json"
+{
+  "sources": {},
+  "transform": {
+    "input": [
+      {
+        "id": "a"
+      },
+      {
+        "id": "b"
+      }
+    ],
+    "steps": [
+      {
+        "kind": "Join",
+        "right": [
+          {
+            "projectId": "a",
+            "status": "open"
+          },
+          {
+            "projectId": "c",
+            "status": "closed"
+          }
+        ],
+        "on": [
+          {
+            "left": "id",
+            "right": "projectId"
+          }
+        ],
+        "mode": "inner"
       }
     ]
   }

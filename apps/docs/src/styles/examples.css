@@ -152,6 +152,12 @@
 .example-editor [data-editor-fallback] { overflow: auto; }
 .example-editor .cm-editor.cm-focused { outline: 2px solid var(--viewstem-ring); outline-offset: -2px; }
 .example-preview > header h2 { margin: 0; color: var(--viewstem-foreground); font-size: .875rem; font-weight: 600; line-height: 1.4; }
+.example-workbench > .example-preview > header { flex-wrap: wrap; padding-block: .25rem; }
+.example-result-actions { display: flex; flex-wrap: wrap; gap: .375rem; margin-inline-start: auto; }
+.example-result-actions [aria-disabled="true"] { opacity: .5; }
+@media (pointer: coarse) {
+  .example-result-actions button { min-block-size: 44px; }
+}
 .example-preview [data-example-target] { flex: 1; min-height: 0; padding: 1rem; overflow: visible; overflow-wrap: anywhere; }
 .example-preview [data-example-target] [data-slot="card-content"] { display: flex; flex-wrap: wrap; gap: .65rem; align-items: center; }
 .example-preview [data-example-status]:not([hidden]) { margin: .75rem 1rem 0; width: calc(100% - 2rem); overflow-wrap: anywhere; }

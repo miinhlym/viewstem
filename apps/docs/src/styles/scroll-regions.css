@@ -17,6 +17,8 @@
 .preview-scroll [data-example-target] { overflow: visible; }
 .source-scroll { max-height: 30rem; background: var(--viewstem-muted); }
 .content-scroll { max-width: 100%; }
+/* Table regions may scroll horizontally; vertical wheel gestures must reach the page. */
+.content-scroll:has(table) > [data-slot="scroll-area-viewport"] { overscroll-behavior-y: auto; }
 .content-scroll table { display: table; overflow: visible; }
 .content-scroll .expressive-code { margin-block: 0; }
 .content-scroll .expressive-code pre { max-height: none; }

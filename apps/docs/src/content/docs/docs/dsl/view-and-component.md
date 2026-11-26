@@ -5,6 +5,58 @@ sidebar:
   order: 3
 ---
 
+## Examples by form
+
+Each link opens runnable JSON with its required resources, inputs, and expected result. This table locates forms; the reference below defines required fields and constraints.
+
+| Form | Key fields | Runnable example |
+| --- | --- | --- |
+| Node / inputs | `componentRef` / `component`, `inputs` | [Open example](/examples/component-inputs/) |
+| Inline Component | `component`, `ports` | [Open example](/examples/inline-component/) |
+| Registered Component | `componentRef` | [Open example](/examples/reusable-component/) |
+| Slots | `slots`, `@path` | [Open example](/examples/forward-slot/) |
+| Event / emit | `events`, `on`, `emit`, `payload` | [Open example](/examples/component-event/) |
+| Condition | `when` | [Open example](/examples/conditions/) |
+| Repeat | `items`, `as`, `key` | [Open example](/examples/repeat/) |
+| Component State | `states` | [Open example](/examples/component-state/) |
+
+## Standalone resource example
+
+Each JSON object is a standalone resource. Register the `ui` resource set providing `shadcn.Badge` first. A View is an execution target; another node can use the Component via `componentRef`.
+
+```json title="view-resource.json"
+{
+  "kind": "View",
+  "id": "greeting",
+  "spec": {
+    "render": {
+      "id": "greeting-label",
+      "componentRef": "shadcn.Badge",
+      "inputs": {
+        "text": "Hello"
+      }
+    }
+  }
+}
+```
+
+
+```json title="component-resource.json"
+{
+  "kind": "Component",
+  "id": "greeting-card",
+  "spec": {
+    "render": {
+      "id": "greeting-label",
+      "componentRef": "shadcn.Badge",
+      "inputs": {
+        "text": "Hello"
+      }
+    }
+  }
+}
+```
+
 ## ViewSpec and ComponentSpec
 
 | Field | Contract |

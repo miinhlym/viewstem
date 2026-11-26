@@ -5,6 +5,17 @@ sidebar:
   order: 2
 ---
 
+## 구성별 실행 예제
+
+각 링크에서 실제 JSON, 필요한 리소스와 입력, 예상 결과를 함께 확인하고 실행할 수 있습니다. 아래 표는 선택지 탐색용이며 필드의 필수 여부와 제약은 이어지는 레퍼런스를 따릅니다.
+
+| 구성 | 주요 필드 | 실행 예제 |
+| --- | --- | --- |
+| Literal / path / call | `@path`, `@call`, `args` | [예제 열기](/ko/examples/value-call/) |
+| 입력 객체 전체 | `inputs: {"@path": "/ports/notice"}` | [예제 열기](/ko/examples/input-object/) |
+| 함수가 반환한 입력 객체 전체 | `inputs: {"@call": "makeNotice", "args": [...]}` | [함수 예제 실행](/ko/examples/input-object-call/) |
+| Event payload | `/event` | [예제 열기](/ko/examples/event-payload/) |
+
 ## ValueExpression과 PathExpression
 
 `ValueExpression`은 평가를 지원하는 필드에 놓인 JSON 값입니다. 평가기는 배열과 일반 객체를 재귀적으로 방문합니다. 문자열, 숫자, 불리언, null은 리터럴입니다. 경로와 함수 호출은 아래 객체 형식을 따릅니다.
@@ -18,7 +29,74 @@ sidebar:
 
 동적 필드에서 실제 데이터 키가 `@`로 시작하면 앞에 `@`를 한 번 더 붙입니다. 평가기는 맨 앞의 `@` 하나를 제거하고, 반환된 데이터를 다시 평가하지 않습니다. `@literal`처럼 인식하지 못하는 단일 `@` 키나 다른 키를 섞은 표현식은 `INVALID_EXPRESSION` 오류를 냅니다. 스키마 객체, 포트 기본값, reaction의 값, 참조 ID, CEL 소스 문자열은 작성한 그대로 사용합니다.
 
-`InputExpressions`는 입력 이름을 표현식에 연결하는 객체입니다. 직접 경로가 값을 읽을지, State 또는 Query 핸들을 연결할지는 받는 쪽 [포트](/ko/docs/dsl/state-and-ports/#포트)가 결정합니다. 호스트 JS에서 받는 입력은 이미 평가된 값 또는 핸들입니다.
+`InputExpressions`에는 이름별 표현식 맵 또는 입력 객체 전체를 반환하는 `@path`나 `@call` 하나를 넣을 수 있습니다. 예를 들어 `"inputs": {"@path": "/ports/notice"}`는 Value 포트가 담고 있는 객체의 `text`와 `variant`를 함께 전달합니다. Core는 표현식을 평가한 뒤 결과의 키와 값을 받는 포트에 맞춰 검사합니다. [State나 Query 포트](/ko/docs/dsl/state-and-ports/#포트)는 이름별로 대상을 직접 가리키는 경로를 연결하세요. 호스트 JS에서 받는 입력은 이미 평가된 값 또는 핸들입니다.
+
+이 View는 호스트에서 알림 객체를 받습니다. 예를 들어 `{"notice":{"text":"Trail open","variant":"default"}}`를 입력으로 넘겨 마운트하세요. 실행 예제에서 두 키를 함께 바꿀 수 있습니다.
+
+```json title="whole-inputs.json"
+{
+  "ports": {
+    "notice": {
+      "kind": "Value",
+      "required": true,
+      "schema": {
+        "type": "object",
+        "properties": { "text": { "type": "string" }, "variant": { "enum": ["default", "destructive"] } },
+        "required": ["text", "variant"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "render": {
+    "id": "notice",
+    "componentRef": "shadcn.Alert.Root",
+    "inputs": { "@path": "/ports/notice" }
+  }
+}
+```
+
+<a id="whole-inputs-call"></a>
+
+### `@call`로 입력 객체 전체 반환하기
+
+알림은 `makeNotice`가 반환하는 객체를 입력으로 받습니다. 실행 예제에는 함수가 등록되어 있습니다. 첫 번째 인자를 `true`로 바꾸면 통제 안내 문구와 `destructive` 스타일이 함께 표시됩니다. [함수 예제 실행](/ko/examples/input-object-call/)
+
+```json title="whole-inputs-call.json"
+{
+  "render": {
+    "id": "trail-notice",
+    "componentRef": "shadcn.Alert.Root",
+    "inputs": {
+      "@call": "makeNotice",
+      "args": [false, "산책로를 이용할 수 있습니다.", "산책로가 통제되었습니다."]
+    }
+  }
+}
+```
+
+앱에서도 같은 함수를 등록하세요. `createRenderer({ runtime })`에 아래 `runtime`을 넘기고 위 View JSON을 마운트합니다.
+
+```js title="makeNotice 등록"
+import { createRuntime } from '@viewstem/core';
+import { ui } from '@viewstem/ui';
+
+const runtime = createRuntime({
+  functions: [{
+    name: 'makeNotice',
+    inputs: [{ type: 'boolean' }, { type: 'string' }, { type: 'string' }],
+    output: {
+      type: 'object',
+      properties: { text: { type: 'string' }, variant: { enum: ['default', 'destructive'] } },
+      required: ['text', 'variant'],
+      additionalProperties: false,
+    },
+    run: (closed, openText, closedText) => closed
+      ? { text: closedText, variant: 'destructive' }
+      : { text: openText, variant: 'default' },
+  }],
+});
+runtime.registry.registerResourceSet(ui);
+```
 
 ## 경로로 읽기
 

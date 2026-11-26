@@ -5,6 +5,31 @@ sidebar:
   order: 8
 ---
 
+## 구성별 실행 예제
+
+각 링크에서 실제 JSON, 필요한 리소스와 입력, 예상 결과를 함께 확인하고 실행할 수 있습니다. 아래 표는 선택지 탐색용이며 필드의 필수 여부와 제약은 이어지는 레퍼런스를 따릅니다.
+
+| 구성 | 주요 필드 | 실행 예제 |
+| --- | --- | --- |
+| Type reference | `typeRef`, `schema`, `enum` | [예제 열기](/ko/examples/shared-type/) |
+
+## 독립 리소스 예제
+
+독립 등록용 예제입니다. 다른 타입 계약에서 `typeRef: "project-name"`으로 참조합니다.
+
+```json title="type-resource.json"
+{
+  "kind": "Type",
+  "id": "project-name",
+  "spec": {
+    "schema": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
+```
+
 ## Type 리소스
 
 Type 리소스에는 `kind: "Type"`과 필수 `schema` 필드 하나가 있는 본문을 둡니다. 리소스 ID 문자열을 `typeRef`에 넣으면 Type을 재사용할 수 있습니다. `TypeContract`는 `schema`와 `typeRef` 중 하나를 받습니다. Value 및 State 포트, State 및 Derived 선언, 이벤트 payload, Action 출력에 적용합니다.
@@ -29,6 +54,28 @@ Type 리소스에는 `kind: "Type"`과 필수 `schema` 필드 하나가 있는 �
   }
 }
 ```
+
+## 스키마 필드별 형식
+
+아래 필드는 `Type.spec.schema`뿐 아니라 `schema`를 받는 포트와 선언에도 사용할 수 있습니다. 키워드는 검증할 값의 타입에 적용됩니다. `schema`와 `typeRef`는 같은 타입 계약에 함께 둘 수 없습니다.
+
+| 키워드 | 값의 형식 | 의미와 제약 |
+| --- | --- | --- |
+| `$schema` | 문자열 | 지정한다면 `https://json-schema.org/draft/2020-12/schema`만 허용합니다. |
+| `type` | 문자열 또는 문자열 배열 | `null`, `boolean`, `object`, `array`, `number`, `integer`, `string` 중 허용 타입. `x-viewstem-type`과 같은 객체에 둘 수 없습니다. |
+| `enum`, `const` | JSON 값 배열 / JSON 값 | 허용 값 목록 또는 단일 값. 배열·객체도 값으로 비교합니다. |
+| `allOf`, `anyOf`, `oneOf` | 비어 있지 않은 스키마 배열 | 각각 모든 분기, 하나 이상, 정확히 하나의 분기를 만족해야 합니다. |
+| `not`, `if`, `then`, `else` | 스키마 | `not`을 만족하면 거절합니다. `if` 결과에 따라 `then` 또는 `else`를 적용합니다. |
+| `minimum`, `maximum`, `exclusiveMinimum`, `exclusiveMaximum` | 숫자 | 숫자의 포함 또는 제외 경계입니다. |
+| `minLength`, `maxLength`, `pattern` | 음이 아닌 정수 / 정규식 문자열 | 문자열 길이와 패턴을 제한합니다. 패턴은 유효한 Unicode 정규식이어야 합니다. |
+| `properties`, `required`, `additionalProperties` | 이름별 스키마 맵 / 문자열 배열 / 스키마 | 객체 속성의 타입, 필수 이름, 나머지 속성의 허용 여부를 지정합니다. `additionalProperties`에는 불리언 스키마도 쓸 수 있습니다. |
+| `minProperties`, `maxProperties` | 음이 아닌 정수 | 객체 속성 수의 하한과 상한입니다. |
+| `items`, `prefixItems`, `minItems`, `maxItems`, `uniqueItems` | 스키마 / 비어 있지 않은 스키마 배열 / 음이 아닌 정수 / 불리언 | 배열의 원소 및 위치별 계약, 길이와 중복 허용 여부를 지정합니다. |
+| `$defs`, `$ref` | 이름별 스키마 맵 / 로컬 포인터 문자열 | 같은 스키마 내부의 정의를 재사용합니다. 외부 참조와 순환 참조는 지원하지 않습니다. |
+| `title`, `description`, `default`, `examples`, `readOnly`, `writeOnly`, `deprecated`, `$comment` | JSON Schema 주석 값 | 설명용 정보입니다. `default`는 포트 기본값이나 State 초기값을 설정하지 않습니다. |
+| `x-viewstem-type`, `keys`, `values` | 네이티브 타입 이름 / 스키마 | 아래 네이티브 값의 규칙을 따릅니다. `keys`와 `values`는 Map 스키마에만 사용할 수 있습니다. |
+
+스키마가 `true`면 모든 값을, `false`면 어떤 값도 허용하지 않습니다. 등록 시 지원하지 않는 키워드나 잘못된 스키마를 거절하며, 스키마 검사에는 크기와 중첩 한도가 적용됩니다.
 
 ## 스키마 키워드
 

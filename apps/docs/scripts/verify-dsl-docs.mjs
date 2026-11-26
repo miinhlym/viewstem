@@ -3,10 +3,93 @@ import { readdir, readFile } from 'node:fs/promises';
 import { createRegistry, createRuntime } from '@viewstem/core';
 import { createHttpExecutor } from '@viewstem/core/http';
 import { ui } from '@viewstem/ui';
+import Ajv2020 from 'ajv/dist/2020.js';
+import { resourceKinds, resourceSchema } from '../src/lib/resource-schemas.mjs';
+import { makeNotice } from '../src/examples/notice-function.mjs';
 
 const content = new URL('../src/content/docs/', import.meta.url);
 const badge = { id: 'badge', componentRef: 'shadcn.Badge' };
 const render = { render: badge };
+const ajv = new Ajv2020({ strict: false });
+const schemas = new Map(resourceKinds.map(kind => [kind, ajv.compile(resourceSchema(kind))]));
+const resource = (kind, spec) => ({ kind, id: 'example', spec });
+
+function assertSchema(value) {
+  const validate = schemas.get(value.kind);
+  assert.ok(validate?.(value), `${value.kind}: ${ajv.errorsText(validate?.errors)}`);
+}
+
+// Exercise nested and mutually exclusive forms independently of the Markdown.
+const childQuery = { sources: {}, transform: { input: [] } };
+const wholeInputs = { '@path': '/ports/notice' };
+for (const supported of [
+  resource('View', { render: { ...badge, inputs: wholeInputs } }),
+  resource('View', { render: { ...badge, inputs: { '@call': 'makeNotice', args: [false, 'Trail open', 'Trail closed'] } } }),
+  resource('Query', { sources: { external: { queryRef: 'registered', inputs: wholeInputs }, internal: { query: childQuery } },
+    transform: { input: { '@path': '/sources/external' } } }),
+  resource('Component', { slots: { content: { required: true } } }),
+  resource('Action', { ports: { count: { kind: 'Value', schema: { type: 'integer' } } }, output: { schema: true } }),
+  resource('Type', { schema: { 'x-viewstem-type': 'map', keys: { type: 'string' }, values: { type: 'number' } } }),
+  resource('Type', { schema: { enum: [] } }),
+]) assertSchema(supported);
+createRegistry({ resources: [resource('Type', { schema: { enum: [] } })] });
+
+for (const invalid of [
+  resource('View', { render: { ...badge, repeat: { items: [], as: 'item', key: 'item' } } }),
+  resource('View', { render: { ...badge, inputs: { '@path': '/ports/notice', text: 'Extra' } } }),
+  resource('View', { ports: { input: { kind: 'Value', schema: true, required: true, default: '' } }, render: badge }),
+  resource('Query', { ...childQuery, sources: { conflict: { queryRef: 'q', query: childQuery } } }),
+  resource('Query', { ...childQuery, sources: { http: { datasourceRef: 'api', request: { method: 'GET', path: '/items', body: {} } } } }),
+  resource('Action', { steps: [{ kind: 'If', condition: true }] }),
+  resource('Action', { steps: [{ kind: 'Assert', condition: 'true' }] }),
+  resource('Type', { schema: { 'x-viewstem-type': 'map', keys: true } }),
+]) {
+  assert.equal(schemas.get(invalid.kind)(invalid), false, JSON.stringify(invalid));
+}
+console.log(`Compiled and checked all ${schemas.size} resource JSON Schemas.`);
+
+const headerCases = [
+  [{ Accept: '\ttext/plain', 'X-Note': 'café', 'X-Remove': null }, 'accepted'],
+  [{ '@path': '/ports/headers' }, 'accepted'],
+  [{ 'X-Note': { '@path': '/ports/note' } }, 'accepted'],
+  [{ 'Bad Header': null }, 'name'],
+  [{ '': 'value' }, 'name'],
+  [{ '@@Invalid': 'value' }, 'name'],
+  [{ hOsT: null }, 'name'],
+  [{ 'pRoXy-Example': null }, 'name'],
+  [{ 'sEc-Example': 'value' }, 'name'],
+  [{ 'X-Note': 'line\nbreak' }, 'value'],
+  [{ 'X-Note': '한글' }, 'value'],
+  [{ 'X-Note': false }, 'value'],
+  // Draft 2020-12 cannot compare arbitrary sibling names after case folding.
+  [{ Accept: null, accept: null }, 'duplicate'],
+];
+for (const placement of ['datasource', 'request']) {
+  for (const [headers, outcome] of headerCases) {
+    const datasource = { kind: 'Http', baseUrl: 'https://example.test' };
+    const request = { method: 'GET', path: '/items' };
+    (placement === 'datasource' ? datasource : request).headers = headers;
+    const datasourceResource = resource('Datasource', datasource);
+    const queryResource = { kind: 'Query', id: 'header-test', spec: {
+      ports: { headers: { kind: 'Value', schema: true }, note: { kind: 'Value', schema: true } },
+      sources: { http: { datasourceRef: datasourceResource.id, request } }, transform: { input: [] },
+    } };
+    const tested = placement === 'datasource' ? datasourceResource : queryResource;
+    const label = `${placement}: ${JSON.stringify(headers)}`;
+    assert.equal(schemas.get(tested.kind)(tested), ['accepted', 'duplicate'].includes(outcome), label);
+    const register = () => createRegistry({ resources: [datasourceResource, queryResource] });
+    if (['name', 'duplicate'].includes(outcome)) assert.throws(register, { code: 'INVALID_DEFINITION' }, label);
+    else register();
+
+    let sent = false;
+    const execute = createHttpExecutor({ transport: async () => { sent = true; return Response.json([]); } });
+    const plan = { version: 1, datasource, request, inputs: { headers: { Accept: 'text/plain' }, note: 'café' } };
+    if (outcome === 'accepted') assert.equal((await execute(plan)).status, 200, label);
+    else await assert.rejects(execute(plan), { code: 'INVALID_DEFINITION' }, label);
+    assert.equal(sent, outcome === 'accepted', label);
+  }
+}
+console.log('Compared Datasource and Query header schemas with Core registration and HTTP execution.');
 
 function createDocsRegistry(resources = []) {
   const registry = createRegistry();
@@ -32,6 +115,73 @@ async function readQuery(query, runtime) {
 }
 
 const checks = {
+  'whole-inputs.json': async viewSpec => {
+    assertSchema(resource('View', viewSpec));
+    await withRuntime([], async runtime => {
+      const view = await runtime.createView(viewSpec, { inputs: { notice: { text: 'Trail open', variant: 'default' } } });
+      assert.deepEqual({ ...view.getSnapshot().roots[0].inputs }, { text: 'Trail open', variant: 'default' });
+    });
+  },
+  'whole-inputs-call.json': async viewSpec => {
+    assertSchema(resource('View', viewSpec));
+    const registry = createRegistry({ functions: [makeNotice] });
+    registry.registerResourceSet(ui);
+    const [, openText, closedText] = viewSpec.render.inputs.args;
+    await withRuntime([], async runtime => {
+      const open = await runtime.createView(viewSpec);
+      assert.deepEqual({ ...open.getSnapshot().roots[0].inputs }, { text: openText, variant: 'default' });
+      const closed = structuredClone(viewSpec);
+      closed.render.inputs.args[0] = true;
+      const updated = await runtime.createView(closed);
+      assert.deepEqual({ ...updated.getSnapshot().roots[0].inputs }, { text: closedText, variant: 'destructive' });
+    }, { registry });
+  },
+  'view-resource.json': async resource => withRuntime([resource], async runtime => {
+    const view = await runtime.createView({ ref: resource.id });
+    assert.equal(view.getSnapshot().roots[0].inputs.text, 'Hello');
+  }),
+  'component-resource.json': async resource => withRuntime([resource], async runtime => {
+    const view = await runtime.createView({ render: { id: 'root', componentRef: resource.id } });
+    assert.equal(view.getSnapshot().roots[0].children[0].inputs.text, 'Hello');
+  }),
+  'variable-resource.json': async resource => withRuntime([resource], async runtime => {
+    const view = await runtime.createView({ ...render, states: {
+      hasItems: { kind: 'Derived', schema: { type: 'boolean' }, variableRef: resource.id, inputs: { items: ['A'] } },
+    } });
+    assert.equal(view.getState('hasItems').read(), true);
+  }),
+  'query-resource.json': async resource => withRuntime([resource], async runtime => {
+    const view = await runtime.createView({ ...render, queries: { project: { queryRef: resource.id } } });
+    assert.deepEqual((await view.whenSettled(view.initial)).queryErrors, []);
+    assert.equal(JSON.stringify(view.getQuery('project').getSnapshot().data), '[{"name":"Plan"}]');
+  }),
+  'datasource-forms.json': async query => {
+    const datasource = { kind: 'Datasource', id: 'projects-api', spec: { kind: 'Http', baseUrl: 'https://example.test/api' } };
+    const calls = [];
+    const requestExecutor = createHttpExecutor({ transport: async (url, init) => {
+      calls.push([url.href, init.method]);
+      return Response.json([{ name: 'Plan' }]);
+    } });
+    await withRuntime([datasource, query], async runtime => {
+      const view = await runtime.createView({ ...render, queries: { project: { queryRef: query.id } } });
+      assert.deepEqual((await view.whenSettled(view.initial)).queryErrors, []);
+      assert.equal(JSON.stringify(view.getQuery('project').getSnapshot().data), '{"referenced":[{"name":"Plan"}],"inline":[{"name":"Plan"}]}');
+    }, { requestExecutor });
+    assert.equal(calls.length, 2);
+    assert.ok(calls.every(([url, method]) => url === 'https://example.test/api/projects' && method === 'GET'));
+  },
+  'datasource-resource.json': async resource => withRuntime([resource], async runtime => {
+    assert.equal(runtime.registry.get('Datasource', resource.id).spec.baseUrl, 'https://example.test/api');
+  }),
+  'action-resource.json': async resource => withRuntime([resource], async runtime => {
+    const view = await runtime.createView(render);
+    assert.equal(await view.invokeAction({ actionRef: resource.id }), 'draft');
+  }),
+  'type-resource.json': async resource => withRuntime([resource], async runtime => {
+    const view = { ...render, ports: { name: { kind: 'Value', required: true, typeRef: resource.id } } };
+    await runtime.createView(view, { inputs: { name: 'Plan' } });
+    await assert.rejects(runtime.createView(view, { inputs: { name: '' } }), { code: 'TYPE_MISMATCH' });
+  }),
   'resources.json': async resources => withRuntime(resources, async runtime => {
     const view = await runtime.createView(render);
     assert.equal(await view.invokeAction({ actionRef: 'status' }), 'draft');
@@ -63,6 +213,20 @@ const checks = {
     assert.equal(view.getSnapshot().roots[0].inputs.text, 'Selected');
     view.getState('items').write([]);
     assert.deepEqual(view.getSnapshot().roots, []);
+  }),
+  'join-modes.json': async query => withRuntime([], async runtime => {
+    const step = query.transform.steps[0];
+    const expected = {
+      inner: '[{"id":"a","projectId":"a","status":"open"}]',
+      left: '[{"id":"a","projectId":"a","status":"open"},{"id":"b"}]',
+      right: '[{"id":"a","projectId":"a","status":"open"},{"projectId":"c","status":"closed"}]',
+    };
+    for (const mode of ['inner', 'left', 'right']) {
+      step.mode = mode;
+      assert.equal(JSON.stringify(await readQuery(query, runtime)), expected[mode]);
+    }
+    delete step.mode;
+    assert.equal(JSON.stringify(await readQuery(query, runtime)), expected.left);
   }),
   'join-query.json': async query => withRuntime([], async runtime => {
     const result = await readQuery(query, runtime);
@@ -114,7 +278,13 @@ for (const locale of ['docs', 'ko/docs']) {
       const [, title, json] = match;
       assert.ok(Object.hasOwn(checks, title), `${locale}/dsl/${file} has an unmapped JSON example: ${title}`);
       try {
-        await checks[title](JSON.parse(json));
+        const value = JSON.parse(json);
+        if (Array.isArray(value)) value.forEach(assertSchema);
+        else if (Object.hasOwn(value, 'spec')) assertSchema(value);
+        const inlineKind = { 'repeated-view.json': 'View', 'derived-view.json': 'View', 'join-query.json': 'Query',
+          'join-modes.json': 'Query', 'login-query.json': 'Query' }[title];
+        if (inlineKind) assertSchema(resource(inlineKind, value));
+        await checks[title](value);
       } catch (cause) {
         throw new Error(`${locale}/dsl/${file}: ${title}`, { cause });
       }

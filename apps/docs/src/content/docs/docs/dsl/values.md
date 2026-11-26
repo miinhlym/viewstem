@@ -5,6 +5,17 @@ sidebar:
   order: 2
 ---
 
+## Examples by form
+
+Each link opens runnable JSON with its required resources, inputs, and expected result. This table locates forms; the reference below defines required fields and constraints.
+
+| Form | Key fields | Runnable example |
+| --- | --- | --- |
+| Literal / path / call | `@path`, `@call`, `args` | [Open example](/examples/value-call/) |
+| Whole input object | `inputs: {"@path": "/ports/notice"}` | [Open example](/examples/input-object/) |
+| Whole input object from a function | `inputs: {"@call": "makeNotice", "args": [...]}` | [Run the function example](/examples/input-object-call/) |
+| Event payload | `/event` | [Open example](/examples/event-payload/) |
+
 ## ValueExpression and PathExpression
 
 A `ValueExpression` is a JSON value in a field that supports evaluation. The evaluator visits arrays and plain objects recursively. Strings, numbers, booleans, and null are literals. Write a path or call using the exact object shape below.
@@ -18,7 +29,74 @@ A `ValueExpression` is a JSON value in a field that supports evaluation. The eva
 
 In dynamic fields, prefix an actual `@` data key with one extra `@`. The evaluator removes one leading `@` and leaves returned data alone. Unrecognized single-`@` keys, including `@literal`, and expressions mixed with extra keys fail with `INVALID_EXPRESSION`. Schema objects, port defaults, reaction values, reference IDs, and CEL source strings are taken as authored.
 
-`InputExpressions` describes a name-to-expression object. The receiving [port](/docs/dsl/state-and-ports/#ports) determines whether a direct path reads a value or connects a State or Query handle. Host JS inputs are already evaluated values or handles.
+`InputExpressions` accepts a map of input names to expressions or a single `@path` or `@call` expression that returns the whole input object. For example, `"inputs": {"@path": "/ports/notice"}` supplies both the `text` and `variant` keys from a Value port containing that object. Core checks the result’s keys and values against the receiving ports after evaluation. For a [State or Query port](/docs/dsl/state-and-ports/#ports), bind the input by name to a direct capability path. Host JS inputs are already evaluated values or handles.
+
+This View body takes a notice from its host. Mount it with an input such as `{"notice":{"text":"Trail open","variant":"default"}}`. See the runnable lesson to change both keys.
+
+```json title="whole-inputs.json"
+{
+  "ports": {
+    "notice": {
+      "kind": "Value",
+      "required": true,
+      "schema": {
+        "type": "object",
+        "properties": { "text": { "type": "string" }, "variant": { "enum": ["default", "destructive"] } },
+        "required": ["text", "variant"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "render": {
+    "id": "notice",
+    "componentRef": "shadcn.Alert.Root",
+    "inputs": { "@path": "/ports/notice" }
+  }
+}
+```
+
+<a id="whole-inputs-call"></a>
+
+### Return the whole input object with `@call`
+
+The alert receives the object returned by `makeNotice`. The example registers the function for you. Change the first argument to `true` to render the closure message and the `destructive` variant. [Run the function example](/examples/input-object-call/)
+
+```json title="whole-inputs-call.json"
+{
+  "render": {
+    "id": "trail-notice",
+    "componentRef": "shadcn.Alert.Root",
+    "inputs": {
+      "@call": "makeNotice",
+      "args": [false, "The trail is open.", "The trail is closed."]
+    }
+  }
+}
+```
+
+Register the same function in your app. Pass this `runtime` to `createRenderer({ runtime })` and mount the View JSON above.
+
+```js title="Register makeNotice"
+import { createRuntime } from '@viewstem/core';
+import { ui } from '@viewstem/ui';
+
+const runtime = createRuntime({
+  functions: [{
+    name: 'makeNotice',
+    inputs: [{ type: 'boolean' }, { type: 'string' }, { type: 'string' }],
+    output: {
+      type: 'object',
+      properties: { text: { type: 'string' }, variant: { enum: ['default', 'destructive'] } },
+      required: ['text', 'variant'],
+      additionalProperties: false,
+    },
+    run: (closed, openText, closedText) => closed
+      ? { text: closedText, variant: 'destructive' }
+      : { text: openText, variant: 'default' },
+  }],
+});
+runtime.registry.registerResourceSet(ui);
+```
 
 ## Reading paths
 

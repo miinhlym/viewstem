@@ -5,6 +5,58 @@ sidebar:
   order: 3
 ---
 
+## 구성별 실행 예제
+
+각 링크에서 실제 JSON, 필요한 리소스와 입력, 예상 결과를 함께 확인하고 실행할 수 있습니다. 아래 표는 선택지 탐색용이며 필드의 필수 여부와 제약은 이어지는 레퍼런스를 따릅니다.
+
+| 구성 | 주요 필드 | 실행 예제 |
+| --- | --- | --- |
+| Node / inputs | `componentRef` / `component`, `inputs` | [예제 열기](/ko/examples/component-inputs/) |
+| Inline Component | `component`, `ports` | [예제 열기](/ko/examples/inline-component/) |
+| Registered Component | `componentRef` | [예제 열기](/ko/examples/reusable-component/) |
+| Slots | `slots`, `@path` | [예제 열기](/ko/examples/forward-slot/) |
+| Event / emit | `events`, `on`, `emit`, `payload` | [예제 열기](/ko/examples/component-event/) |
+| Condition | `when` | [예제 열기](/ko/examples/conditions/) |
+| Repeat | `items`, `as`, `key` | [예제 열기](/ko/examples/repeat/) |
+| Component State | `states` | [예제 열기](/ko/examples/component-state/) |
+
+## 독립 리소스 예제
+
+각 JSON은 독립 등록용입니다. `shadcn.Badge`를 제공하는 `ui` 리소스 셋을 먼저 등록하세요. View는 실행 대상이고 Component는 다른 노드에서 `componentRef`로 참조합니다.
+
+```json title="view-resource.json"
+{
+  "kind": "View",
+  "id": "greeting",
+  "spec": {
+    "render": {
+      "id": "greeting-label",
+      "componentRef": "shadcn.Badge",
+      "inputs": {
+        "text": "Hello"
+      }
+    }
+  }
+}
+```
+
+
+```json title="component-resource.json"
+{
+  "kind": "Component",
+  "id": "greeting-card",
+  "spec": {
+    "render": {
+      "id": "greeting-label",
+      "componentRef": "shadcn.Badge",
+      "inputs": {
+        "text": "Hello"
+      }
+    }
+  }
+}
+```
+
 ## ViewSpec and ComponentSpec
 
 | 필드 | 계약 |

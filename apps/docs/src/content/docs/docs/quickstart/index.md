@@ -3,7 +3,7 @@ title: Quick Start
 description: Run your first Viewstem View and render a button in the browser.
 ---
 
-Render a **Hello, Viewstem** button from a JSON View. To run it in your app, [install the browser UI packages](../installation/#install-browser-ui) in a Vite JavaScript project. You can also try the [same example in your browser](../../examples/first-view/).
+Render a **Hello, Viewstem** button from a JSON View. To run it in your app, [install the browser UI packages](../installation/#install-browser-ui) in a Vite JavaScript project. The [trail guide example](../../examples/first-view/) shows the same View structure with a heading you can edit in the browser.
 
 ## 1. Add a mount target
 

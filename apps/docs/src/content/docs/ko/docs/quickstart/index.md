@@ -3,7 +3,7 @@ title: 빠른 시작
 description: 첫 Viewstem View를 실행해 브라우저에 버튼을 표시합니다.
 ---
 
-JSON View로 **Hello, Viewstem** 버튼 하나를 표시합니다. 앱에서 실행하려면 Vite JavaScript 프로젝트에 [브라우저 UI 패키지를 설치](../installation/#install-browser-ui)하세요. 브라우저에서 [같은 예제를 바로 실행](../../examples/first-view/)할 수도 있습니다.
+JSON View로 **Hello, Viewstem** 버튼 하나를 표시합니다. 앱에서 실행하려면 Vite JavaScript 프로젝트에 [브라우저 UI 패키지를 설치](../installation/#install-browser-ui)하세요. [산책로 안내 예제](../../examples/first-view/)는 같은 View 구조로 제목을 그리고 브라우저에서 편집해 볼 수 있습니다.
 
 ## 1. View를 표시할 요소 추가
 

@@ -5,6 +5,43 @@ sidebar:
   order: 4
 ---
 
+## Examples by form
+
+Each link opens runnable JSON with its required resources, inputs, and expected result. This table locates forms; the reference below defines required fields and constraints.
+
+| Form | Key fields | Runnable example |
+| --- | --- | --- |
+| State | `kind`, `schema` / `typeRef`, `initial` | [Open example](/examples/state/) |
+| Derived | `kind`, `variableRef` / `variable`, `inputs` | [Open example](/examples/derived/) |
+| Value port | `kind`, `schema` / `typeRef`, `required`, `default` | [Open example](/examples/port-default/) |
+| State port | `kind`, `schema` / `typeRef`, `required` | [Open example](/examples/shared-state-port/) |
+| Query port | `kind`, `required` | [Open example](/examples/refresh-query/) |
+| Reaction | `watch`, `target`, `value` | [Open example](/examples/state-reaction/) |
+| Variable reference | `variableRef` | [Open example](/examples/variable-ref/) |
+
+## Standalone resource example
+
+This standalone Variable can be referenced by `variableRef` in a Derived declaration or called by a Variable Action step.
+
+```json title="variable-resource.json"
+{
+  "kind": "Variable",
+  "id": "has-items",
+  "spec": {
+    "ports": {
+      "items": {
+        "kind": "Value",
+        "required": true,
+        "schema": {
+          "type": "array"
+        }
+      }
+    },
+    "expression": "size(items) > 0"
+  }
+}
+```
+
 ## State declarations
 
 `ResourceStateDeclaration` is an entry in a View or Component’s `states` map. Read the entry’s current value at `/states/<name>`. Each entry requires exactly one `schema` or `typeRef`.

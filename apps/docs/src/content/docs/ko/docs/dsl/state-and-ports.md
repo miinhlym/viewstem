@@ -5,6 +5,43 @@ sidebar:
   order: 4
 ---
 
+## 구성별 실행 예제
+
+각 링크에서 실제 JSON, 필요한 리소스와 입력, 예상 결과를 함께 확인하고 실행할 수 있습니다. 아래 표는 선택지 탐색용이며 필드의 필수 여부와 제약은 이어지는 레퍼런스를 따릅니다.
+
+| 구성 | 주요 필드 | 실행 예제 |
+| --- | --- | --- |
+| State | `kind`, `schema` / `typeRef`, `initial` | [예제 열기](/ko/examples/state/) |
+| Derived | `kind`, `variableRef` / `variable`, `inputs` | [예제 열기](/ko/examples/derived/) |
+| Value port | `kind`, `schema` / `typeRef`, `required`, `default` | [예제 열기](/ko/examples/port-default/) |
+| State port | `kind`, `schema` / `typeRef`, `required` | [예제 열기](/ko/examples/shared-state-port/) |
+| Query port | `kind`, `required` | [예제 열기](/ko/examples/refresh-query/) |
+| Reaction | `watch`, `target`, `value` | [예제 열기](/ko/examples/state-reaction/) |
+| Variable reference | `variableRef` | [예제 열기](/ko/examples/variable-ref/) |
+
+## 독립 리소스 예제
+
+독립 등록용 Variable입니다. Derived에서 `variableRef`로 참조하거나 Action의 Variable 단계에서 호출할 수 있습니다.
+
+```json title="variable-resource.json"
+{
+  "kind": "Variable",
+  "id": "has-items",
+  "spec": {
+    "ports": {
+      "items": {
+        "kind": "Value",
+        "required": true,
+        "schema": {
+          "type": "array"
+        }
+      }
+    },
+    "expression": "size(items) > 0"
+  }
+}
+```
+
 ## State 선언
 
 `ResourceStateDeclaration`은 View나 Component의 `states` 맵 항목입니다. 현재 값은 `/states/<이름>`에서 읽습니다. 각 항목에 `schema`와 `typeRef` 중 하나가 필요합니다.

@@ -5,6 +5,31 @@ sidebar:
   order: 8
 ---
 
+## Examples by form
+
+Each link opens runnable JSON with its required resources, inputs, and expected result. This table locates forms; the reference below defines required fields and constraints.
+
+| Form | Key fields | Runnable example |
+| --- | --- | --- |
+| Type reference | `typeRef`, `schema`, `enum` | [Open example](/examples/shared-type/) |
+
+## Standalone resource example
+
+This standalone resource can be reused as `typeRef: "project-name"` in a type contract.
+
+```json title="type-resource.json"
+{
+  "kind": "Type",
+  "id": "project-name",
+  "spec": {
+    "schema": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
+```
+
 ## Type resource
 
 A Type resource has `kind: "Type"` and a spec with one required field, `schema`. Reuse it through a `typeRef` string containing its resource ID. A `TypeContract` takes exactly one of `schema` and `typeRef`. It applies to Value and State ports, State and Derived declarations, event payloads, and Action outputs.
@@ -29,6 +54,28 @@ This Type accepts an object with a required name and an optional due date. A con
   }
 }
 ```
+
+## Schema field forms
+
+These fields apply to `Type.spec.schema` and to other contracts accepting `schema`. Keywords apply to the relevant value type. A type contract cannot contain both `schema` and `typeRef`.
+
+| Keyword | Value form | Meaning and constraints |
+| --- | --- | --- |
+| `$schema` | string | If supplied, only `https://json-schema.org/draft/2020-12/schema` is accepted. |
+| `type` | string or string array | Accepted types among `null`, `boolean`, `object`, `array`, `number`, `integer`, and `string`. Cannot share an object with `x-viewstem-type`. |
+| `enum`, `const` | array of JSON values / JSON value | Allowed values or one required value; arrays and objects are compared as values. |
+| `allOf`, `anyOf`, `oneOf` | non-empty schema array | Require all, at least one, or exactly one branch respectively. |
+| `not`, `if`, `then`, `else` | schema | Reject a match for `not`; apply `then` or `else` according to `if`. |
+| `minimum`, `maximum`, `exclusiveMinimum`, `exclusiveMaximum` | number | Inclusive or exclusive numeric bounds. |
+| `minLength`, `maxLength`, `pattern` | non-negative integer / regular-expression string | Bound string length or match a valid Unicode regular expression. |
+| `properties`, `required`, `additionalProperties` | map of schemas / string array / schema | Define object properties, required names, and the contract for other properties. A boolean is also a schema. |
+| `minProperties`, `maxProperties` | non-negative integer | Bounds on object property count. |
+| `items`, `prefixItems`, `minItems`, `maxItems`, `uniqueItems` | schema / non-empty schema array / non-negative integer / boolean | Define array items and positional contracts, length, and uniqueness. |
+| `$defs`, `$ref` | map of schemas / local pointer string | Reuse a definition within the same schema; external and cyclic references are unsupported. |
+| `title`, `description`, `default`, `examples`, `readOnly`, `writeOnly`, `deprecated`, `$comment` | JSON Schema annotations | Metadata. `default` does not set a port default or State initial value. |
+| `x-viewstem-type`, `keys`, `values` | native type name / schemas | Follow the native value rules below. `keys` and `values` are only allowed for Map schemas. |
+
+The schema `true` accepts every value; `false` accepts none. Registration rejects unsupported keywords and invalid schemas. Size and nesting limits apply to schema validation.
 
 ## Schema vocabulary
 

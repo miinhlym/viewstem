@@ -57,13 +57,14 @@ try {
     await page.waitForFunction(()=>document.querySelector('[role="dialog"] [data-slot="scroll-area-viewport"]')?.scrollTop>500);
     await page.keyboard.press('Escape');
     await page.goto(origin+prefix+'/examples/first-view/');
+    await page.waitForFunction(() => !document.querySelector('astro-island[client="load"][ssr]'));
     await page.getByRole('button',{name:ko?'학습 단계':'Learning stages',exact:true}).click();
     await page.getByRole('dialog').waitFor();
     assert.deepEqual(await styles(page,'[role="dialog"]'),mobileDocs);
     await page.getByRole('dialog').locator(`a[href="${prefix}/examples/component-inputs/"]`).click();
     await page.waitForURL(origin+prefix+'/examples/component-inputs/');
     assert.equal(await page.getByRole('dialog').count(),0);
-    await page.locator('[data-example-target] button').waitFor();
+    await page.locator('[data-example-target] [data-viewstem-ui]:visible').waitFor();
     checks.push({locale:ko?'ko':'en',theme,desktopStyleMatch:true,mobileStyleMatch:true,widths:[375,768,800,1440,1920],groupKeyboard:true,mobileNavigation:true});
     await context.close();
   }

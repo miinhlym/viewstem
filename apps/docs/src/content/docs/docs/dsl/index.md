@@ -7,6 +7,20 @@ sidebar:
 
 Use this reference when writing or reviewing Viewstem JSON. The field names and defaults describe the shapes accepted by the current core. A complete resource has a registration envelope. An inline definition supplies just the body expected by its enclosing field.
 
+## JSON by resource kind
+
+Choose a resource to see its complete, downloadable JSON Schema or a minimal runnable registration example. The schema describes JSON structure. Core also checks references, port bindings and execution. State is declared inside a View or Component.
+
+| Resource | Complete schema | Minimal example |
+| --- | --- | --- |
+| View | [JSON Schema](/docs/dsl/view-and-component/#view-json-schema) | [Open example](/docs/dsl/view-and-component/#standalone-resource-example) |
+| Component | [JSON Schema](/docs/dsl/view-and-component/#component-json-schema) | [Open example](/docs/dsl/view-and-component/#standalone-resource-example) |
+| Variable | [JSON Schema](/docs/dsl/state-and-ports/#variable-json-schema) | [Open example](/docs/dsl/state-and-ports/#standalone-resource-example) |
+| Query | [JSON Schema](/docs/dsl/queries/#query-json-schema) | [Open example](/docs/dsl/queries/#standalone-resource-example) |
+| Datasource | [JSON Schema](/docs/dsl/datasources/#datasource-json-schema) | [Open example](/docs/dsl/datasources/#standalone-resource-example) |
+| Action | [JSON Schema](/docs/dsl/actions/#action-json-schema) | [Open example](/docs/dsl/actions/#standalone-resource-example) |
+| Type | [JSON Schema](/docs/dsl/types/#type-json-schema) | [Open example](/docs/dsl/types/#standalone-resource-example) |
+
 | To look up | Reference |
 | --- | --- |
 | Resource kinds, IDs, and which fields take references | [Resources](/docs/dsl/resources/) |
