@@ -4,14 +4,22 @@
 
 After CI succeeds on `main`, it calls [Release npm packages](../.github/workflows/npm-release.yml).
 
-Add a changeset when a PR has a change to ship in a new version of a published
-package.
-
 ### Writing a changeset
+
+Decide whether a changeset is needed while reviewing the feature or fix diff.
+Before handing off the PR, commit a changeset for each directly affected
+published package that needs a new version. This includes consumer-facing bug
+fixes and performance improvements, API changes, and updates to shipped
+dependencies. Repository-only docs, tests, and tooling can skip a changeset
+when the published packages are unaffected. State the release impact in the PR.
+
+The changeset records the package and bump for the feature or fix. The Release
+PR applies version bumps and generates changelogs from pending changesets.
 
 1. Run `npx changeset` from the repository root. Select the affected packages
    and choose a SemVer bump for each. Changesets tracks `core`, `dom`, `svelte`,
-   and `ui` independently.
+   and `ui` independently. Use a patch for compatible fixes and performance
+   improvements.
 2. The summary appears in the package changelog and GitHub Release notes. Name the affected feature
    and describe what changes for package users. For a routine patch, aim for
    one short sentence. Keep implementation details and full benchmark results
@@ -53,8 +61,8 @@ Each GitHub Release uses the same package entry shown in the Release PR. It read
 the entry from the release commit's changelog and preserves its headings, source
 links, and dependency list.
 
-Merge documentation-only changes through the regular PR process without a
-changeset. To publish a separate site update, run **Deploy docs** manually.
+Merge independent repository and site documentation changes through the regular
+PR process. To publish a separate site update, run **Deploy docs** manually.
 See the [deployment procedure](#deploy-independently-of-a-package-release).
 
 If publishing fails partway through, rerun the failed jobs on that commit
