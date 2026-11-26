@@ -5,7 +5,7 @@ import { safeError, fail } from './errors.mjs';
 export { isRecord, expressionKind, dataEntries, pointerKeys, validateTemplate, formatParts } from './expression-syntax.mjs';
 const own = (value, key) => Object.hasOwn(value, key);
 export const valueRoots = ['ports', 'states', 'queries', 'repeat', 'actions', 'event', 'steps', 'sources'];
-export function pathsIn(template, functions = []) {
+export function pathsIn(template, functions = [], onDynamicPath) {
   validateTemplate(template, new WeakSet(), functions);
   const paths = [];
   const walk = value => {
@@ -15,8 +15,11 @@ export function pathsIn(template, functions = []) {
     if (kind === 'path') paths.push(pointerKeys(value['@path']));
     else if (kind === 'call') {
       walk(value.args);
-      if (value['@call'] === 'formatString' && typeof value.args.value === 'string')
-        for (const part of formatParts(value.args.value)) if (own(part, 'path')) paths.push(pointerKeys(part.path));
+      if (value['@call'] === 'formatString') {
+        if (typeof value.args.value === 'string') {
+          for (const part of formatParts(value.args.value)) if (own(part, 'path')) paths.push(pointerKeys(part.path));
+        } else onDynamicPath?.();
+      }
     } else for (const [, item] of dataEntries(value)) walk(item);
   };
   walk(template);

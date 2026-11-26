@@ -90,8 +90,8 @@ The submitter must understand the change, verify its behavior, check its sources
 and submission rights, and respond to review feedback. Do not submit unreviewed
 generated changes or claim checks that were not run.
 
-For npm package changes, see [Writing a changeset](docs/releasing.md#writing-a-changeset)
-for when to add a changeset and what to include.
+Before opening the PR, check the [changeset criteria](docs/releasing.md#writing-a-changeset)
+and commit the changeset for any package that needs a new version.
 
 ## Contribution licensing
 

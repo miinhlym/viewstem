@@ -32,6 +32,73 @@ await test('computed rebind uses the latest callback and rejects a changed depen
   store.dispose();
 });
 
+await test('structural changes evaluate only affected computed cells and propagate changed snapshots', () => {
+  const { store, scope } = fixture(), unrelated = store.createScope();
+  const source = scope.registerState('source', { schema: integer, initial: 1 });
+  const first = scope.registerState('first', { schema: integer });
+  const downstream = scope.registerState('downstream', { schema: integer });
+  const calls = { first: 0, downstream: 0 };
+  const compute = offset => () => {
+    calls.first++;
+    return { status: 'ready', value: source.read() + offset };
+  };
+  store.computed(first, [source], compute(1));
+  store.computed(downstream, [first], () => {
+    calls.downstream++;
+    return { status: 'ready', value: first.read() + 1 };
+  });
+  const original = downstream.getSnapshot();
+
+  unrelated.registerState('other', { schema: integer, initial: 0 });
+  unrelated.replaceState('other', { schema: integer, initial: 1 });
+  unrelated.removeState('other');
+  unrelated.dispose();
+  assert.deepEqual(calls, { first: 1, downstream: 1 });
+
+  store.computed(first, [source], compute(1));
+  assert.deepEqual(calls, { first: 2, downstream: 1 });
+  assert.equal(downstream.getSnapshot(), original);
+  store.computed(first, [source], compute(2));
+  assert.equal(downstream.read(), 4);
+  assert.deepEqual(calls, { first: 3, downstream: 2 });
+
+  const ready = downstream.getSnapshot();
+  assert.throws(() => store.transaction(() => {
+    scope.removeState('source');
+    assert.throws(() => downstream.read(), { code: 'CANCELLED' });
+    throw new Error('rollback');
+  }), /rollback/);
+  assert.equal(downstream.getSnapshot(), ready);
+  scope.replaceState('source', { schema: integer, initial: 1 });
+  assert.throws(() => first.read(), { code: 'CANCELLED' });
+  assert.throws(() => downstream.read(), { code: 'CANCELLED' });
+  store.dispose();
+});
+
+await test('suspension propagates the restored committed value to surviving computations', () => {
+  const { store, scope } = fixture();
+  const first = scope.registerState('first', { schema: integer, initial: 0 });
+  const second = scope.registerState('second', { schema: integer, initial: 10 });
+  const seen = scope.registerState('seen', { schema: integer });
+  const dependent = scope.registerState('dependent', { schema: integer });
+  const bind = (cell, input) => store.computed(cell, [input], () => ({ status: 'ready', value: input.read() }));
+  bind(seen, first);
+  bind(dependent, seen);
+  const observations = [];
+  const unsubscribe = store.subscribe(dependent.address, () => observations.push([seen.read(), dependent.read()]));
+  store.transaction(() => {
+    bind(seen, second);
+    assert.equal(dependent.read(), 10);
+    store.suspendComputations([seen]);
+  }, undefined, { viewCandidate: true });
+  assert.deepEqual([seen.read(), dependent.read()], [0, 0]);
+  assert.deepEqual(observations, [[0, 0]]);
+  first.write(1);
+  assert.deepEqual(observations, [[0, 0], [1, 1]]);
+  unsubscribe();
+  store.dispose();
+});
+
 await test('V31-V35/missing-null-falsy-reference', () => {
   const { scope } = fixture(), cell = scope.registerState('value', { schema: true });
   assert.equal(cell.read(), undefined); assert.deepEqual(cell.getSnapshot(), { status: 'missing' });
