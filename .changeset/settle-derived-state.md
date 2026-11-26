@@ -2,4 +2,4 @@
 "@viewstem/core": patch
 ---
 
-Skip redundant Derived evaluations during State lifecycle changes and settle dynamic Derived values before notifying subscribers.
+Speed up View updates that add or remove components and keep Derived values in sync when their State references change.
