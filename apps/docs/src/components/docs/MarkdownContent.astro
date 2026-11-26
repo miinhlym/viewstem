@@ -2,6 +2,8 @@
 import DefaultMarkdownContent from '@astrojs/starlight/components/MarkdownContent.astro';
 import { dependencies } from '../../../package.json';
 import ComponentDemo from '../ComponentDemo.astro';
+import ResourceSchemas from './ResourceSchemas.astro';
+import { schemaPages } from '../../lib/resource-schemas.mjs';
 import { componentSections } from '../../examples/component-reference-copy.mjs';
 import { getComponentReferenceVariants } from '../../examples/component-reference-demos.mjs';
 const { entry, lang } = Astro.locals.starlightRoute;
@@ -10,6 +12,8 @@ const locale = lang === 'ko' ? 'ko' : 'en';
 const variants = component ? getComponentReferenceVariants(component[1], locale) : [];
 const examples = componentSections[locale].examples;
 const installation = entry.id === 'docs/installation' || entry.id === 'ko/docs/installation';
+const dslPage = entry.id.match(/(?:^|\/)docs\/dsl\/([^/]+)$/)?.[1];
+const resourceSchemas = dslPage && schemaPages[dslPage as keyof typeof schemaPages];
 const browserPackages = ['@viewstem/core', '@viewstem/dom', '@viewstem/ui'] as const;
 const installCommand = `npm install ${browserPackages.map(name => `${name}@${dependencies[name]}`).join(' ')}`;
 ---
@@ -26,6 +30,7 @@ const installCommand = `npm install ${browserPackages.map(name => `${name}@${dep
   </div>
 ) : (
   <DefaultMarkdownContent>
+    {resourceSchemas && <ResourceSchemas kinds={resourceSchemas} {locale} />}
     {installation && (
       <>
         <p id="site-build-versions">{locale === 'ko'

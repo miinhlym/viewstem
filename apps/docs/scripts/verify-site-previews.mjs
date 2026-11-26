@@ -1,9 +1,49 @@
 import assert from 'node:assert/strict';
 import { readdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
+import Ajv2020 from 'ajv/dist/2020.js';
+import { resourceKinds, resourceSchema, resourceSchemaUrl } from '../src/lib/resource-schemas.mjs';
 
 const origin = process.env.DOCS_ORIGIN ?? 'http://localhost:4321';
+const ajv = new Ajv2020({ strict: false });
+const schemas = new Map(resourceKinds.map(kind => [kind, ajv.compile(resourceSchema(kind))]));
 const browser = await chromium.launch({ channel: process.env.DEMO_BROWSER_CHANNEL });
+
+async function verifySchemaPages(page, prefix) {
+  await page.goto(origin + prefix + '/docs/dsl/');
+  const links = await page.locator('a[href$="-json-schema"]').evaluateAll(items => items.map(link => link.href));
+  assert.equal(links.length, resourceKinds.length);
+  for (const [index, kind] of resourceKinds.entries()) {
+    await page.goto(links[index]);
+    const details = page.locator(`details[data-resource-schema="${kind}"]`);
+    const code = details.locator('pre code');
+    await code.waitFor();
+    const download = await details.locator('a[download]').getAttribute('href');
+    assert.equal(download, resourceSchemaUrl(kind));
+    const response = await page.request.get(origin + download);
+    assert.equal(response.status(), 200);
+    const downloaded = await response.json();
+    assert.deepEqual(JSON.parse(await code.textContent()), downloaded);
+    assert.deepEqual(downloaded, resourceSchema(kind));
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1));
+    await details.locator('summary').press('Enter');
+    await code.waitFor({ state: 'hidden' });
+  }
+}
+
+async function verifyLessonSchemas(page) {
+  const files = page.locator('#source-view, #source-resources');
+  for (const file of await files.all()) {
+    for (const source of await file.locator('[data-source-original], [data-source-solution]').all()) {
+      const value = JSON.parse(await source.inputValue());
+      const entries = Array.isArray(value) ? value : [{ kind: 'View', id: 'lesson-view', spec: value }];
+      for (const entry of entries) {
+        const validate = schemas.get(entry.kind);
+        assert.ok(validate?.(entry), ajv.errorsText(validate?.errors));
+      }
+    }
+  }
+}
 
 async function verifyLesson(page, preview, check, t) {
   const jump = page.locator('[data-example-jump]');
@@ -511,6 +551,7 @@ async function verify(locale) {
       return preview;
     };
     const entries = await readdir(new URL(`../dist${prefix}/examples/`, import.meta.url), { withFileTypes: true });
+    await verifySchemaPages(page, prefix);
     const lessons = entries.filter(entry => entry.isDirectory());
     assert.ok(lessons.length > 0);
     const cases = lessonChecks(t);
@@ -518,7 +559,9 @@ async function verify(locale) {
     const failures = [];
     for (const { name } of lessons) {
       try {
-        await verifyLesson(page, await open(name), cases[name], t);
+        const preview = await open(name);
+        await verifyLessonSchemas(page);
+        await verifyLesson(page, preview, cases[name], t);
       } catch (cause) {
         const context = cause.message.split('\n').slice(0, 3).join('\n');
         failures.push(name + ' (' + locale + '): ' + context);
@@ -570,7 +613,8 @@ async function verify(locale) {
     await alertDialog.click();
     await page.waitForURL(`${origin}${prefix}/docs/ui/components/alert-dialog/`);
     assert.deepEqual(errors, []);
-    return { locale, lessonPages: lessons.length, lessonSolutions: lessons.length, playground: 'run, invalid definition, retained preview and rerun', componentLinks: ['breadcrumb', 'navigation-menu'] };
+    return { locale, resourceSchemas: resourceKinds.length, lessonPages: lessons.length, lessonSolutions: lessons.length,
+      playground: 'run, invalid definition, retained preview and rerun', componentLinks: ['breadcrumb', 'navigation-menu'] };
   } finally { await context.close(); }
 }
 

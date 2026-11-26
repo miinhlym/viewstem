@@ -3,10 +3,49 @@ import { readdir, readFile } from 'node:fs/promises';
 import { createRegistry, createRuntime } from '@viewstem/core';
 import { createHttpExecutor } from '@viewstem/core/http';
 import { ui } from '@viewstem/ui';
+import Ajv2020 from 'ajv/dist/2020.js';
+import { resourceKinds, resourceSchema } from '../src/lib/resource-schemas.mjs';
 
 const content = new URL('../src/content/docs/', import.meta.url);
 const badge = { id: 'badge', componentRef: 'shadcn.Badge' };
 const render = { render: badge };
+const ajv = new Ajv2020({ strict: false });
+const schemas = new Map(resourceKinds.map(kind => [kind, ajv.compile(resourceSchema(kind))]));
+const resource = (kind, spec) => ({ kind, id: 'example', spec });
+
+function assertSchema(value) {
+  const validate = schemas.get(value.kind);
+  assert.ok(validate?.(value), `${value.kind}: ${ajv.errorsText(validate?.errors)}`);
+}
+
+// Exercise nested and mutually exclusive forms independently of the Markdown.
+const childQuery = { sources: {}, transform: { input: [] } };
+const wholeInputs = { '@path': '/ports/notice' };
+for (const supported of [
+  resource('View', { render: { ...badge, inputs: wholeInputs } }),
+  resource('View', { render: { ...badge, inputs: { '@call': 'makeNotice', args: ['Trail open'] } } }),
+  resource('Query', { sources: { external: { queryRef: 'registered', inputs: wholeInputs }, internal: { query: childQuery } },
+    transform: { input: { '@path': '/sources/external' } } }),
+  resource('Component', { slots: { content: { required: true } } }),
+  resource('Action', { ports: { count: { kind: 'Value', schema: { type: 'integer' } } }, output: { schema: true } }),
+  resource('Type', { schema: { 'x-viewstem-type': 'map', keys: { type: 'string' }, values: { type: 'number' } } }),
+  resource('Type', { schema: { enum: [] } }),
+]) assertSchema(supported);
+createRegistry({ resources: [resource('Type', { schema: { enum: [] } })] });
+
+for (const invalid of [
+  resource('View', { render: { ...badge, repeat: { items: [], as: 'item', key: 'item' } } }),
+  resource('View', { render: { ...badge, inputs: { '@path': '/ports/notice', text: 'Extra' } } }),
+  resource('View', { ports: { input: { kind: 'Value', schema: true, required: true, default: '' } }, render: badge }),
+  resource('Query', { ...childQuery, sources: { conflict: { queryRef: 'q', query: childQuery } } }),
+  resource('Query', { ...childQuery, sources: { http: { datasourceRef: 'api', request: { method: 'GET', path: '/items', body: {} } } } }),
+  resource('Action', { steps: [{ kind: 'If', condition: true }] }),
+  resource('Action', { steps: [{ kind: 'Assert', condition: 'true' }] }),
+  resource('Type', { schema: { 'x-viewstem-type': 'map', keys: true } }),
+]) {
+  assert.equal(schemas.get(invalid.kind)(invalid), false, JSON.stringify(invalid));
+}
+console.log(`Compiled and checked all ${schemas.size} resource JSON Schemas.`);
 
 function createDocsRegistry(resources = []) {
   const registry = createRegistry();
@@ -174,7 +213,13 @@ for (const locale of ['docs', 'ko/docs']) {
       const [, title, json] = match;
       assert.ok(Object.hasOwn(checks, title), `${locale}/dsl/${file} has an unmapped JSON example: ${title}`);
       try {
-        await checks[title](JSON.parse(json));
+        const value = JSON.parse(json);
+        if (Array.isArray(value)) value.forEach(assertSchema);
+        else if (Object.hasOwn(value, 'spec')) assertSchema(value);
+        const inlineKind = { 'repeated-view.json': 'View', 'derived-view.json': 'View', 'join-query.json': 'Query',
+          'join-modes.json': 'Query', 'login-query.json': 'Query' }[title];
+        if (inlineKind) assertSchema(resource(inlineKind, value));
+        await checks[title](value);
       } catch (cause) {
         throw new Error(`${locale}/dsl/${file}: ${title}`, { cause });
       }

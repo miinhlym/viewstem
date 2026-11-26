@@ -1,0 +1,49 @@
+---
+import { resourceSchemaAnchor, resourceSchemaJson, resourceSchemaUrl } from '../../lib/resource-schemas.mjs';
+
+interface Props {
+  kinds: readonly string[];
+  locale: 'en' | 'ko';
+}
+
+const { kinds, locale } = Astro.props;
+const ko = locale === 'ko';
+---
+
+<section class="resource-schemas" aria-labelledby="resource-schemas-heading">
+  <h2 id="resource-schemas-heading">{ko ? '전체 JSON 스키마' : 'Complete JSON Schema'}</h2>
+  <p>{ko
+    ? '등록용 JSON의 구조와 허용되는 변형을 확인하세요. 등록된 참조, 포트 호환성, 표현식 결과는 Core에서 별도로 검증합니다.'
+    : 'Inspect the JSON structure and variants for registration. Core separately validates references, port compatibility, and evaluated expressions.'}</p>
+  {kinds.map(kind => (
+    <details id={resourceSchemaAnchor(kind)} data-resource-schema={kind}>
+      <summary>{kind} JSON Schema</summary>
+      <a href={resourceSchemaUrl(kind)} download>{ko ? '스키마 다운로드' : 'Download schema'}</a>
+      <pre data-wrap-code><code>{resourceSchemaJson(kind)}</code></pre>
+    </details>
+  ))}
+</section>
+
+<style>
+  .resource-schemas { margin-block-end: 2rem; }
+  .resource-schemas h2 { font-size: var(--sl-text-h2); }
+  .resource-schemas pre {
+    background: var(--viewstem-muted);
+    color: var(--viewstem-foreground);
+    font-size: var(--site-text-code);
+    line-height: var(--site-leading-code);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    border-radius: .3rem;
+    padding: .75rem;
+  }
+</style>
+
+<script>
+  const openLinkedSchema = () => {
+    const details = document.getElementById(location.hash.slice(1));
+    if (details instanceof HTMLDetailsElement && details.hasAttribute('data-resource-schema')) details.open = true;
+  };
+  openLinkedSchema();
+  window.addEventListener('hashchange', openLinkedSchema);
+</script>
