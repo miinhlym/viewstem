@@ -126,13 +126,13 @@ const files = [
           view: readFile('view') as ViewSpec,
           resources: readFile('resources') as AnyResource[] | undefined,
           inputs: readFile('inputs') as Record<string, JsonValue> | undefined,
-          fixture: fixture === 'projects' || fixture === 'project-write' ? fixture : undefined,
+          fixture: fixture === 'availability' || fixture === 'reservation' ? fixture : undefined,
         };
         const { createExamplePreview } = await import('../examples/preview');
         surface.hidden = true;
         target.append(surface);
         next = createExamplePreview(surface, source, locale as Locale, diagnostic => {
-          if (preview === next && !runFailed) showError(diagnostic && typeof diagnostic === 'object' && 'message' in diagnostic ? String(diagnostic.message) : String(diagnostic));
+          if (preview === next && !runFailed) showError(diagnostic.error.message);
         });
         await next.run();
         await preview?.dispose();

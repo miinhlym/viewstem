@@ -98,9 +98,12 @@ const navigation = { label: text.stages, title: text.title, home: `${home}exampl
                     {definition.inputs && (locale === 'ko'
                       ? ' inputs.json은 mount의 inputs로 전달하세요.'
                       : ' Pass inputs.json as the mount inputs.')}
-                    {definition.fixture && (locale === 'ko'
-                      ? ' 앱에서는 Datasource의 주소를 실제 API로 바꾸고 title을 포함한 JSON 응답을 반환하세요.'
-                      : ' In your app, set the Datasource URL to an API that returns JSON with a title.')}
+                    {definition.fixture === 'availability' && (locale === 'ko'
+                      ? ' 사이트는 모의 응답을 사용합니다. 앱에서 실행하려면 GET /availability가 availability의 room, free, total을 반환하도록 연결하세요.'
+                      : ' The site uses a simulated response. In your app, connect GET /availability to an endpoint that returns room, free, and total under availability.')}
+                    {definition.fixture === 'reservation' && (locale === 'ko'
+                      ? ' 사이트는 모의 응답을 사용합니다. 앱에서는 POST /reservations로 name, slot을 보내고 응답에서 code, name, slot을 읽습니다.'
+                      : ' The site uses a simulated response. In your app, POST /reservations sends name and slot and reads code, name, and slot from the response.')}
                     {' '}<a href={`${home}docs/quickstart/`}>{text.quickstart}</a>
                   </p>
                 </details>

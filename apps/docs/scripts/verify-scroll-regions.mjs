@@ -17,7 +17,7 @@ try {
    try {
     await page.goto(origin+prefix+path);
     await page.waitForFunction(()=>!document.querySelector('astro-island[client="load"][ssr]'));
-    if(path.includes('first-view')) await page.locator('[data-example-target] button').waitFor();
+    if(path.includes('first-view')) await page.locator('[data-example-target] h2').waitFor();
     if(path.includes('/components/')) await page.locator('[aria-labelledby="component-preview"][data-demo-ready="true"]').waitFor();
     const observation=await page.evaluate(()=>({
       width:document.documentElement.scrollWidth, client:document.documentElement.clientWidth,
@@ -46,13 +46,13 @@ try {
   const ko=prefix==='/ko';
   await page.goto(origin+prefix+'/examples/first-view/');
   const edit=page.getByRole('textbox',{name:'view.json',exact:true});
-  await edit.waitFor();await page.locator('[data-example-target] button').waitFor();
+  await edit.waitFor();await page.locator('[data-example-target] h2').waitFor();
   const long=JSON.stringify({render:{id:'scroll-check',componentRef:'shadcn.Button',inputs:{text:'Scroll check'}}},null,2)+'\n'.repeat(100);
   await edit.fill(long);await edit.press('ControlOrMeta+End');
   await page.getByRole('button',{name:'Scroll check',exact:true}).waitFor();
   assert.ok(await page.locator(`.editor-scroll ${viewport}`).evaluate(e=>e.scrollTop)>300,'Editor caret must reveal itself in ScrollArea');
   await page.getByRole('button',{name:ko?'코드 초기화':'Reset code',exact:true}).click();
-  await page.locator('[data-example-target] button').filter({hasText:ko?'안녕, Viewstem':'Hello, Viewstem'}).waitFor();
+  await page.locator('[data-example-target] h2').filter({hasText:ko?'강변 산책로 안내':'Riverside trail guide'}).waitFor();
   await page.goto(origin+prefix+'/playground/');
   const editor=page.getByRole('textbox',{name:ko?'View 정의 (JSON)':'View definition (JSON)',exact:true});
   await editor.fill(long);await editor.press('ControlOrMeta+End');
